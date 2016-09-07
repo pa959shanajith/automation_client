@@ -4,3 +4,4 @@
 3. controller development
 4. handler development
 5. Building array list. Should be a linked lists. 
+6. HTTPS or WSS? Develop POC to check the same
