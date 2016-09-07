@@ -1,0 +1,6 @@
+# List of TODO Items
+1. WXpython - window development
+2. minimizing the window on to status bar
+3. controller development
+4. handler development
+5. Building array list. Should be a linked lists. 
