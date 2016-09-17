@@ -70,6 +70,7 @@ class OutlookKeywords:
                                     continue
             if self.Flag!=True:
                 Logger.log("Error: No such mail found")
+                return False
 
         def GetFromMailId(self):
             if self.Flag==True:
