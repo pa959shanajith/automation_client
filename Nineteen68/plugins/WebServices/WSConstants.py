@@ -31,7 +31,15 @@ RESPONSE_BODY='Response body is:'
 
 RESULT='Result is:'
 
-CONTENT_TYPE_XML = """{'content-type': 'text/xml'}"""
+CONTENT_TYPE_XML = {'content-type': 'text/xml'}
 
-CONTENT_TYPE_JSON = """{'content-type': 'application/json'}"""
+CONTENT_TYPE_JSON = {'content-type': 'application/json'}
+
+CONTENT_TYPE_SOAP_XML = {'content-type': 'application/json'}
+
+TYPE_XML="""Content-Type:text/xml;charset=utf-8"""
+
+TYPE_JSON="""Content-Type:application/json;"""
+
+TYPE_SOAP_XML="""Content-Type:application/soap+xml;charset=utf-8"""
 
