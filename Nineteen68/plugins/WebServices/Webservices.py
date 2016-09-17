@@ -14,18 +14,6 @@ import requests
 import WSConstants
 from requests import Request,Session
 
-baseEndPointURL=''
-baseOperation=''
-baseMethod=''
-baseReqHeader= ''
-baseReqBody=''
-baseResHeader = ''
-baseResBody=''
-modifiedTemplate = ''
-dict={}
-
-
-
 
 class WSkeywords:
 
@@ -33,14 +21,22 @@ class WSkeywords:
 
 
      def __init__(self):
-        print
-        # what to do
+        self.baseEndPointURL=''
+        self.baseOperation=''
+        self.baseMethod=''
+        self.baseReqHeader= ''
+        self.baseReqBody=''
+        self.baseResHeader = ''
+        self.baseResBody=''
+        self.modifiedTemplate = ''
+        self.verify=''
+
 
      def setEndPointURL(self,url):
         url=url.strip()
         if not (url is None or url is ''):
-             global baseEndPointURL
-             baseEndPointURL = url
+
+             self.baseEndPointURL = url
              return True
         else:
             Logger.log(WSConstants.METHOD_INVALID_INPUT)
@@ -51,8 +47,8 @@ class WSkeywords:
 
         operation=operation.strip()
         if not (operation is None or operation is ''):
-             global baseOperation
-             baseOperation = operation
+
+             self.baseOperation = operation
              return True
         else:
             Logger.log(WSConstants.METHOD_INVALID_INPUT)
@@ -64,9 +60,9 @@ class WSkeywords:
 
         if not (method is None or method is ''):
             if method in WSConstants.METHOD_ARRAY:
-                global baseMethod
-                baseMethod = method
-                Logger.log("baseMethod is:"+baseMethod)
+
+                self.baseMethod = method
+                Logger.log("baseMethod is:"+self.baseMethod)
                 return True
             else:
                 Logger.log(WSConstants.METHOD_INVALID)
@@ -79,11 +75,19 @@ class WSkeywords:
      def setHeader(self,header):
 
         header=header.strip()
-
-        header.get('Content-Type')
         if not (header is None or header is ''):
-             global baseReqHeader
-             baseReqHeader = header
+             str=header.replace(' ','')
+
+             if WSConstants.TYPE_XML in str :
+                self.baseReqHeader = WSConstants.CONTENT_TYPE_XML
+             elif WSConstants.TYPE_JSON in str:
+                self.baseReqHeader = WSConstants.CONTENT_TYPE_JSON
+             elif WSConstants.TYPE_SOAP_XML in str:
+                self.baseReqHeader = WSConstants.CONTENT_TYPE_SOAP_XML
+             else:
+                self.baseReqHeader = header
+
+             print self.baseReqHeader
              return True
         else:
             Logger.log(WSConstants.METHOD_INVALID_INPUT)
@@ -92,81 +96,77 @@ class WSkeywords:
      def setWholeBody(self,body):
 
         if not (body is None or body is ''):
-             global baseReqBody
-             baseReqBody = body
+
+             self.baseReqBody = body
              return True
         else:
             Logger.log(WSConstants.METHOD_INVALID_INPUT)
             return False
 
      def saveResults(self,response):
-        global baseResHeader
-        global baseReqBody
 
-        baseResHeader=response.headers
-        Logger.log(WSConstants.RESPONSE_HEADER+str(baseResHeader))
-        baseResBody=response.content
-        Logger.log(WSConstants.RESPONSE_BODY+str(baseResBody))
-        print type(baseResHeader)
-        print type(baseResBody)
+        self.baseResHeader=response.headers
+        Logger.log(WSConstants.RESPONSE_HEADER+str(self.baseResHeader))
+        self.baseResBody=response.content
+        Logger.log(WSConstants.RESPONSE_BODY+str(self.baseResBody))
+
 
 
      def post(self):
-        if baseReqHeader == WSConstants.CONTENT_TYPE_JSON:
-            response = requests.post(baseEndPointURL)
+        if self.baseReqHeader == WSConstants.CONTENT_TYPE_JSON:
+            response = requests.post(self.baseEndPointURL)
             print response.content
             WSkeywords().saveResults(response)
-            return baseResHeader,baseResBody
-        elif baseReqHeader == WSConstants.CONTENT_TYPE_XML:
+            return self.baseResHeader,self.baseResBody
+        elif self.baseReqHeader == WSConstants.CONTENT_TYPE_XML:
 ##        baseReqHeader={'content-type': 'text/xml'}
-            if not (baseEndPointURL is '' or baseReqBody is '' or baseReqHeader is ''):
-                response = requests.post(baseEndPointURL,data=baseReqBody,headers=baseReqHeader)
-                WSkeywords().saveResults(response)
-                return baseResHeader,baseResBody
+            if not (self.baseEndPointURL is '' or self.baseReqBody is '' or self.baseReqHeader is ''):
+                response = requests.post(self.baseEndPointURL,data=self.baseReqBody,headers=self.baseReqHeader)
+                WSkeywords.saveResults(self,response)
+                return self.baseResHeader,self.baseResBody
         else :
             Logger.log(WSConstants.METHOD_INVALID_INPUT)
             return None
 
      def get(self):
-        if baseReqHeader == WSConstants.CONTENT_TYPE_JSON:
-            response=requests.get(baseEndPointURL)
+        if self.baseReqHeader == WSConstants.CONTENT_TYPE_JSON:
+            response=requests.get(self.baseEndPointURL)
             print response.content
             WSkeywords().saveResults(response)
-            return baseResHeader,baseResBody
-        elif baseReqHeader == WSConstants.CONTENT_TYPE_XML:
-
-            if not (baseEndPointURL is '' or baseOperation is '' or baseReqHeader is ''):
-                req=baseEndPointURL+'/'+baseOperation+'?'+baseReqHeader
+            return self.baseResHeader,self.baseResBody
+        else:
+            if not (self.baseEndPointURL is '' or self.baseOperation is '' or self.baseReqHeader is ''):
+                req=self.baseEndPointURL+'/'+self.baseOperation+'?'+self.baseReqHeader
                 response=requests.get(req)
                 WSkeywords().saveResults(response)
-                return baseResHeader,baseResBody
-        else :
-            Logger.log(WSConstants.METHOD_INVALID_INPUT)
-            return None
+                return self.baseResHeader,self.baseResBody
+            else :
+                Logger.log(WSConstants.METHOD_INVALID_INPUT)
+                return None
 
      def put(self):
 
          s=Session()
-         if not (baseEndPointURL is '' or baseReqBody is '' or baseOperation is ''):
-            reqUrl=baseEndPointURL+'/'+baseOperation
-            req = requests.Request(method=baseMethod, url=reqUrl, data=baseReqBody)
+         if not (self.baseEndPointURL is '' or self.baseReqBody is '' or self.baseOperation is ''):
+            reqUrl=self.baseEndPointURL+'/'+self.baseOperation
+            req = requests.Request(method=self.baseMethod, url=reqUrl, data=self.baseReqBody)
             prep=req.prepare()
             response=s.send(prep)
             WSkeywords().saveResults(response)
-            return baseResHeader,baseResBody
+            return self.baseResHeader,self.baseResBody
          else :
             Logger.log(WSConstants.METHOD_INVALID_INPUT)
             return None
 
      def delete(self):
         s=Session()
-        if not (baseEndPointURL is '' or baseOperation is ''):
-            reqUrl=baseEndPointURL+'/'+baseOperation
-            req = requests.Request(method=baseMethod, url=reqUrl)
+        if not (self.baseEndPointURL is '' or self.baseOperation is ''):
+            reqUrl=self.baseEndPointURL+'/'+self.baseOperation
+            req = requests.Request(method=self.baseMethod, url=reqUrl)
             prep=req.prepare()
             response=s.send(prep)
             WSkeywords().saveResults(response)
-            return baseResHeader,baseResBody
+            return self.baseResHeader,self.baseResBody
         else :
             Logger.log(WSConstants.METHOD_INVALID_INPUT)
             return None
@@ -174,13 +174,13 @@ class WSkeywords:
      def head(self):
         s=Session()
         if not (baseEndPointURL is '' or baseOperation is ''):
-            reqUrl=baseEndPointURL+'/'+baseOperation
-            req = requests.Request(method=baseMethod, url=reqUrl)
+            reqUrl=self.baseEndPointURL+'/'+self.baseOperation
+            req = requests.Request(method=self.baseMethod, url=reqUrl)
             prep=req.prepare()
             response=s.send(prep)
-            baseResHeader=response.headers
-            Logger.log(WSConstants.RESPONSE_HEADER+str(baseResHeader))
-            return baseResHeader
+            self.baseResHeader=response.headers
+            Logger.log(WSConstants.RESPONSE_HEADER+str(self.baseResHeader))
+            return self.baseResHeader
         else :
             Logger.log(WSConstants.METHOD_INVALID_INPUT)
             return None
@@ -194,15 +194,14 @@ class WSkeywords:
         'PUT':WSkeywords.put,
         'HEAD':WSkeywords.head,
         'DELETE':WSkeywords.delete}
-        if baseMethod in WSConstants.METHOD_ARRAY:
-
-            print 'yes'
-            return dict[baseMethod](self)
+        print self.baseMethod
+        if self.baseMethod in WSConstants.METHOD_ARRAY:
+            return dict[self.baseMethod](self)
         else :
             Logger.log(WSConstants.METHOD_INVALID)
 
 
-     def setTagValue(self):
+     def setTagValue(self,tagValue):
         print
 
 
@@ -212,24 +211,28 @@ class WSkeywords:
 
 
      def getHeader(self,*args):
+        print len(args)
+        print args
+        print args[0]
         if len(args) == 0:
-            Logger.log(WSConstants.RESULT+baseResHeader)
-            return baseResHeader
+            Logger.log(WSConstants.RESULT+str(self.baseResHeader))
+            print self.baseResHeader
+            return self.baseResHeader
         elif len(args) == 1:
             key=args[0]
-            Logger.log(WSConstants.RESULT+baseResHeader[key])
-            return baseResHeader[key]
+            Logger.log(WSConstants.RESULT+str(self.baseResHeader[key]))
+            return self.baseResHeader[key]
 
 
      def getBody(self,*args):
 
         if len(args) == 0:
-                Logger.log(WSConstants.RESULT+baseResBody)
-                return baseResBody
+                Logger.log(WSConstants.RESULT+self.baseResBody)
+                return self.baseResBody
         elif len(args) == 2:
             key=args[0]
-            if not(baseResBody is None):
-                str=baseResBody
+            if not(self.baseResBody is None):
+                str=self.baseResBody
                 if not (args[0] is '' or args[1] is ''):
                     start=str.find(args[0])+len(args[0])
                     end=str.find(args[1])
@@ -238,7 +241,9 @@ class WSkeywords:
                     return str
 
 
-
+     def ignoreCertificate(self):
+        self.verify=False
+        print
 
      def addClientCertificate(self,filepath,url):
         print
@@ -259,8 +264,8 @@ class WSkeywords:
             if port is '':
                 port=443
 
-            cert = ssl.get_server_certificate((hostname, 443), ssl_version=ssl.PROTOCOL_TLSv1)
-##        cert = ssl.get_server_certificate((hostname, port))
+##            cert = ssl.get_server_certificate((hostname, 443), ssl_version=ssl.PROTOCOL_TLSv1)
+            cert = ssl.get_server_certificate((hostname, port))
             cert=str(cert)
             cert=cert.replace('\n','')
 
