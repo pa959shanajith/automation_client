@@ -116,7 +116,7 @@ class WSkeywords:
         if self.baseReqHeader == WSConstants.CONTENT_TYPE_JSON:
             response = requests.post(self.baseEndPointURL)
             print response.content
-            WSkeywords().saveResults(response)
+            WSkeywords.saveResults(self,response)
             return self.baseResHeader,self.baseResBody
         elif self.baseReqHeader == WSConstants.CONTENT_TYPE_XML:
 ##        baseReqHeader={'content-type': 'text/xml'}
@@ -132,13 +132,13 @@ class WSkeywords:
         if self.baseReqHeader == WSConstants.CONTENT_TYPE_JSON:
             response=requests.get(self.baseEndPointURL)
             print response.content
-            WSkeywords().saveResults(response)
+            WSkeywords.saveResults(self,response)
             return self.baseResHeader,self.baseResBody
         else:
             if not (self.baseEndPointURL is '' or self.baseOperation is '' or self.baseReqHeader is ''):
                 req=self.baseEndPointURL+'/'+self.baseOperation+'?'+self.baseReqHeader
                 response=requests.get(req)
-                WSkeywords().saveResults(response)
+                WSkeywords.saveResults(self,response)
                 return self.baseResHeader,self.baseResBody
             else :
                 Logger.log(WSConstants.METHOD_INVALID_INPUT)
@@ -152,7 +152,7 @@ class WSkeywords:
             req = requests.Request(method=self.baseMethod, url=reqUrl, data=self.baseReqBody)
             prep=req.prepare()
             response=s.send(prep)
-            WSkeywords().saveResults(response)
+            WSkeywords.saveResults(self,response)
             return self.baseResHeader,self.baseResBody
          else :
             Logger.log(WSConstants.METHOD_INVALID_INPUT)
@@ -165,7 +165,7 @@ class WSkeywords:
             req = requests.Request(method=self.baseMethod, url=reqUrl)
             prep=req.prepare()
             response=s.send(prep)
-            WSkeywords().saveResults(response)
+            WSkeywords.saveResults(self,response)
             return self.baseResHeader,self.baseResBody
         else :
             Logger.log(WSConstants.METHOD_INVALID_INPUT)
