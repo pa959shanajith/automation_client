@@ -12,6 +12,7 @@
 from  win32com.client import Dispatch
 import Logger
 import constants
+
 ## This class will have the methods to automate Outlook Application
 class OutlookKeywords:
 
@@ -26,6 +27,7 @@ class OutlookKeywords:
             self.AttachmentStatus=constants.ATTACH_STATUS_NO
             self.Body=""
             self.message=""
+            self.Content=None
 
 
 ##  This method takes 3 params
@@ -37,8 +39,8 @@ class OutlookKeywords:
         def GetEmail(self):
 
 ##   Get the Outlook com object registry
-            outlook = Dispatch("Outlook.Application").GetNamespace("MAPI")
-            inbox = outlook.GetDefaultFolder(constants.INBOX_FOLDER)
+            self.outlook = Dispatch("Outlook.Application").GetNamespace("MAPI")
+            inbox = self.outlook.GetDefaultFolder(constants.INBOX_FOLDER)
             all_inbox = inbox.Items
             folders = inbox.Folders
             for msg in all_inbox:
@@ -47,6 +49,7 @@ class OutlookKeywords:
                                 if msg.SenderName==self.senderEmail:
                                     if msg.Subject==self.subject:
                                         if msg.To==self.toMail:
+                                            self.Content=msg
                                             self.Subject = msg.Subject
                                             self.Body= msg.Body
                                             if msg.SenderEmailType=='EX':
@@ -109,17 +112,40 @@ class OutlookKeywords:
                 Logger.log("Error : No Body found")
                 return constants.STATUS_FAIL
 
-        def VerifyEmail(self):
+        def VerifyEmail(self,FilePath):
             if self.Flag==True:
-                return Body
+##                self.outlook = Dispatch("Outlook.Application").GetNamespace("MAPI")
+                try:
+                    mail_content = self.outlook.OpenSharedItem(FilePath)
+                    if self.Content.SenderName == mail_content.SenderName:
+                        if self.Content.To==mail_content.To:
+                            if self.Content.Subject==mail_content.Subject:
+                                if self.Content.Body==mail_content.Body:
+                                    if str(self.Content.Attachments)==str(mail_content.Attachments):
+                                        return True
+                                    else:
+                                        return False
+                                else:
+                                    return False
+                            else:
+                                return False
+                        else:
+                            return False
+                    else:
+                        return False
+                except ():
+                    Logger.log("Error: File already open")
+
+
             else:
-                Logger.log("Error : No Body found")
+                Logger.log("Error : No such mail found")
                 return constants.STATUS_FAIL
 
 ##a=OutlookKeywords("Microsoft Outlook","Your mailbox is almost full.","Prudhvi Prem Gujjuboyina")
 ##a.GetEmail()
-##b=OutlookKeywords("Vivek Kallaje","RE: Want to work on weekends !!!!!!!!!!!!!!!","Arpitha B.V; Test Automation")
+##b=OutlookKeywords("Vidya Baduru","Unit Testing Status - Email  Keywords","Vivek Kallaje; Shaik Shanawaz; Gowtham Gangadhara Suvarnakala")
 ##b.GetEmail()
+##b.VerifyEmail("C:\Users\prudhvi.gujjuboyina\Desktop\Unit Testing Status - Email  Keywords.msg")
 ##b.GetEmail()
 ##b.GetToMailID()
 ##a.GetSubject()
