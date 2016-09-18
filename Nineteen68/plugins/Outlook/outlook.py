@@ -54,8 +54,9 @@ class OutlookKeywords:
                                             else:
                                                 self.FromMailId=msg.SenderEmailAddress
                                             for recipient in  msg.Recipients:
-                                                self.ToMailID=recipient.PropertyAccessor.GetProperty(constants.PR_SMTP_ADDRESS)+";"
-                                                self.ToMailID=self.ToMailID[:-1]
+                                                if recipient.Type==1:
+                                                    self.ToMailID+=recipient.PropertyAccessor.GetProperty(constants.PR_SMTP_ADDRESS)+";"
+                                            self.ToMailID=self.ToMailID[:-1]
                                             if msg.Attachments.Count>0:
                                                 self.AttachmentStatus=constants.ATTACH_STATUS_YES
                                             message="From : "+msg.SenderName+" <"+self.FromMailId+">"+"\n"+ "To: "+ self.ToMailID + "\n"+ "Date: "+str(msg.SentOn)+ "\n"+ "Subject: "+ msg.Subject+ "\n"+ str(msg.Attachments.Count)+ " attachments." + "\n"+ msg.Body
@@ -117,10 +118,10 @@ class OutlookKeywords:
 
 ##a=OutlookKeywords("Microsoft Outlook","Your mailbox is almost full.","Prudhvi Prem Gujjuboyina")
 ##a.GetEmail()
-##b=OutlookKeywords("Arpitha B.V","RE: Want to work on weekends !!!!!!!!!!!!!!!","Vivek Kallaje; Test Automation")
+##b=OutlookKeywords("Vivek Kallaje","RE: Want to work on weekends !!!!!!!!!!!!!!!","Arpitha B.V; Test Automation")
 ##b.GetEmail()
 ##b.GetEmail()
-##a.GetToMailID()
+##b.GetToMailID()
 ##a.GetSubject()
-##a.GetBody()
+##b.GetBody()
 ##a.GetAttachmentStatus()
