@@ -39,7 +39,7 @@ CONTENT_TYPE_SOAP_XML = {'content-type': 'application/json'}
 
 TYPE_XML="""Content-Type:text/xml;charset=utf-8"""
 
-TYPE_JSON="""Content-Type:application/json;"""
+TYPE_JSON="""Content-Type:application/json;charset=utf-8"""
 
 TYPE_SOAP_XML="""Content-Type:application/soap+xml;charset=utf-8"""
 
