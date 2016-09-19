@@ -13,6 +13,8 @@ import Logger
 import requests
 import WSConstants
 from requests import Request,Session
+import json
+import ast
 
 
 class WSkeywords:
@@ -30,6 +32,7 @@ class WSkeywords:
         self.baseResBody=''
         self.modifiedTemplate = ''
         self.verify=''
+        self.content_type=''
 
 
      def setEndPointURL(self,url):
@@ -45,10 +48,11 @@ class WSkeywords:
 
      def setOperations(self,operation):
 
-        operation=operation.strip()
+        if type(operation) is 'str':
+            operation=operation.strip()
         if not (operation is None or operation is ''):
 
-             self.baseOperation = operation
+             self.baseOperation = str(operation)
              return True
         else:
             Logger.log(WSConstants.METHOD_INVALID_INPUT)
@@ -74,21 +78,26 @@ class WSkeywords:
 
      def setHeader(self,header):
 
-        header=header.strip()
-        if not (header is None or header is ''):
-             str=header.replace(' ','')
+        header = str(header)
+        if WSConstants.CONTENT_TYPE_JSON in header.lower() or WSConstants.CONTENT_TYPE_XML in header.lower() or WSConstants.CONTENT_TYPE_SOAP_XML in header.lower():
+            header = ast.literal_eval(header)
+            self.content_type=header['Content-Type']
 
-             if WSConstants.TYPE_XML in str :
-                self.baseReqHeader = WSConstants.CONTENT_TYPE_XML
-             elif WSConstants.TYPE_JSON in str:
-                self.baseReqHeader = WSConstants.CONTENT_TYPE_JSON
-             elif WSConstants.TYPE_SOAP_XML in str:
-                self.baseReqHeader = WSConstants.CONTENT_TYPE_SOAP_XML
-             else:
+##        header=header.strip()
+        if not (header is None):
+##             str=header.replace(' ','')
+
+##             if WSConstants.TYPE_XML in str :
+##                self.baseReqHeader = WSConstants.CONTENT_TYPE_XML
+##             elif WSConstants.TYPE_JSON in str:
+##                self.baseReqHeader = WSConstants.CONTENT_TYPE_JSON
+##             elif WSConstants.TYPE_SOAP_XML in str:
+##                self.baseReqHeader = WSConstants.CONTENT_TYPE_SOAP_XML
+##             else:
                 self.baseReqHeader = header
 
-             print self.baseReqHeader
-             return True
+                print self.baseReqHeader
+                return True
         else:
             Logger.log(WSConstants.METHOD_INVALID_INPUT)
             return False
@@ -105,6 +114,7 @@ class WSkeywords:
 
      def saveResults(self,response):
 
+        Logger.log(response.status_code)
         self.baseResHeader=response.headers
         Logger.log(WSConstants.RESPONSE_HEADER+str(self.baseResHeader))
         self.baseResBody=response.content
@@ -113,12 +123,13 @@ class WSkeywords:
 
 
      def post(self):
-        if self.baseReqHeader == WSConstants.CONTENT_TYPE_JSON:
-            response = requests.post(self.baseEndPointURL)
-            print response.content
+        if  WSConstants.CONTENT_TYPE_JSON in self.content_type.lower():
+            print type(self.baseReqBody)
+            response = requests.post(self.baseEndPointURL,data = json.dumps(self.baseReqBody), headers=self.baseReqHeader)
+##            response = requests.post(self.baseEndPointURL)
             WSkeywords.saveResults(self,response)
             return self.baseResHeader,self.baseResBody
-        elif self.baseReqHeader == WSConstants.CONTENT_TYPE_XML:
+        elif WSConstants.CONTENT_TYPE_XML in self.content_type.lower() or WSConstants.CONTENT_TYPE_SOAP_XML in self.content_type.lower():
 ##        baseReqHeader={'content-type': 'text/xml'}
             if not (self.baseEndPointURL is '' or self.baseReqBody is '' or self.baseReqHeader is ''):
                 response = requests.post(self.baseEndPointURL,data=self.baseReqBody,headers=self.baseReqHeader)
@@ -129,12 +140,12 @@ class WSkeywords:
             return None
 
      def get(self):
-        if self.baseReqHeader == WSConstants.CONTENT_TYPE_JSON:
+        if  WSConstants.CONTENT_TYPE_JSON in self.content_type.lower():
             response=requests.get(self.baseEndPointURL)
             print response.content
             WSkeywords.saveResults(self,response)
             return self.baseResHeader,self.baseResBody
-        else:
+        else :
             if not (self.baseEndPointURL is '' or self.baseOperation is '' or self.baseReqHeader is ''):
                 req=self.baseEndPointURL+'/'+self.baseOperation+'?'+self.baseReqHeader
                 response=requests.get(req)
@@ -201,19 +212,8 @@ class WSkeywords:
             Logger.log(WSConstants.METHOD_INVALID)
 
 
-     def setTagValue(self,tagValue):
-        print
-
-
-     def setTagAttribute(self):
-        print
-
-
 
      def getHeader(self,*args):
-        print len(args)
-        print args
-        print args[0]
         if len(args) == 0:
             Logger.log(WSConstants.RESULT+str(self.baseResHeader))
             print self.baseResHeader
@@ -241,12 +241,18 @@ class WSkeywords:
                     return str
 
 
-     def ignoreCertificate(self):
-        self.verify=False
-        print
+     def addClientCertificate(self,filepath_key,filepath_cert,url):
+        response=requests.get(url, cert=(filepath_cert, filepath_key))
 
-     def addClientCertificate(self,filepath,url):
-        print
+     def setTagValue(self,tagname,tagvalue):
+        if not (self.baseReqBody is None or self.baseReqBody is ''):
+            from lxml import etree
+            doc=etree.fromstring(self.baseReqBody)
+            doc.find('.//'+tagname).text=tagvalue
+            return True
+        else:
+            Logger.log(WSConstants.METHOD_INVALID_INPUT)
+            return False
 
 
      def getServerCertificate(self,url,filepath):
@@ -261,16 +267,20 @@ class WSkeywords:
 
             hostname=m.group('host')
             port=m.group('port')
-            if port is '':
+
+            if str(port) is '':
                 port=443
 
 ##            cert = ssl.get_server_certificate((hostname, 443), ssl_version=ssl.PROTOCOL_TLSv1)
-            cert = ssl.get_server_certificate((hostname, port))
+
+            cert = ssl.get_server_certificate((hostname, int(str(port))))
             cert=str(cert)
             cert=cert.replace('\n','')
 
             with open(filepath, "w") as text_file:
                 text_file.write(cert)
                 text_file.close()
+                return True
         else :
             Logger.log(WSConstants.METHOD_INVALID_INPUT)
+            return False
