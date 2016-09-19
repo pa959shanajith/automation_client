@@ -294,6 +294,7 @@ class WSkeywords:
             from lxml import etree
             doc=etree.fromstring(self.baseReqBody)
             doc.find('.//'+tagname).text=tagvalue
+            self.baseReqBody=etree.tostring(doc)
             return True
         else:
             Logger.log(WSConstants.METHOD_INVALID_INPUT)
