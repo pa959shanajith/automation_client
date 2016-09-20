@@ -89,7 +89,6 @@ class WSkeywords:
         purpose : sets the method provided in param method
         param method : method of the webservice to set
         return : Returns True if it sets the url else False
-
         """
 
         method=method.strip().upper()
