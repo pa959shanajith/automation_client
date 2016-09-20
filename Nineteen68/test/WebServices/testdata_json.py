@@ -17,12 +17,14 @@ class message:
     method = ''
     operation = ''
     header=''
+    body = ''
     # The class "constructor" - It's actually an initializer
-    def __init__(self, endpoint_url, method, operation,header):
+    def __init__(self, endpoint_url, method, operation,header,body):
         self.endpoint_url = endpoint_url
         self.method = method
         self.operation = operation
         self.header = header
+        self.body = body
 
 def read_excel_data(filePath):
     testdata=[]
@@ -31,12 +33,13 @@ def read_excel_data(filePath):
     Work_sheet = Work_book.sheet_by_name(Sheet_Name)
     row_count = Work_sheet.nrows
     col_count = Work_sheet.ncols
-    for row in range (1,5):
+    for row in range (1,8):
             endpoint_url = Work_sheet.cell_value (row,1)
             method = Work_sheet.cell_value (row,2)
             operation = Work_sheet.cell_value (row,3)
             header = Work_sheet.cell_value (row,4)
-            msg=message(endpoint_url,method,operation,header)
+            body = Work_sheet.cell_value (row,5)
+            msg=message(endpoint_url,method,operation,header,body)
             testdata.append(msg)
     return testdata
 

@@ -39,6 +39,8 @@ def test_webservice_execute(message):
     assert a.setMethods(message.method)
     """set the Header"""
     assert a.setHeader(message.header)
+    """set the Body"""
+    assert a.setWholeBody(message.body)
     """Execute the request"""
     assert a.executeRequest()
     """Execute the request"""
