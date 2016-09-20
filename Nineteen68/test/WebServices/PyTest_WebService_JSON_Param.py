@@ -25,7 +25,7 @@ sys.path.append(basepath)
 import Webservices
 
 a = Webservices.WSkeywords()
-test_data=testdata_json.read_excel_data(curpath +'\Restful_jsonWebService Keywords.xlsx')
+test_data=testdata_json.read_excel_data(curpath +'\Restful_jsonWebService_Keywords.xlsx')
 
 @pytest.fixture(params=test_data)
 def message(request):
