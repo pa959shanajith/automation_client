@@ -1,19 +1,29 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
-# Purpose:
+# Name:        Webservices.py
+# Purpose:     Keywords for XML on SOA and RestfulJSON
 #
-# Author:      sushma.p
+# Author:      sushma.p and wasimakram.sutar
 #
 # Created:     08-09-2016
-# Copyright:   (c) sushma.p 2016
+# Copyright:   (c) sushma.p wasimakram.sutar 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
+"""Logger - File which prints the code loggers """
 import Logger
+
+"""request - requests is an elegant and simple HTTP library for Python to perform webservice operations"""
 import requests
+
+"""WSConstants - File consists of Webservice constants"""
 import WSConstants
+
 from requests import Request,Session
+
+"""json - JSON (JavaScript Object Notation) is a lightweight data interchange format inspired by JavaScript object literal syntax """
 import json
+
+"""ast - The ast module helps Python applications to process trees of the Python abstract syntax grammar."""
 import ast
 
 
@@ -21,6 +31,7 @@ class WSkeywords:
 
 
 
+     """The instantiation operation __init__ creates an empty object of the class WSkeywords when it is instantiated"""
 
      def __init__(self):
         self.baseEndPointURL=''
@@ -36,6 +47,13 @@ class WSkeywords:
 
 
      def setEndPointURL(self,url):
+        """
+        def : setEndPointURL
+        purpose : sets the endpoint url provided in param url
+        param url : url of the webservice to set
+        return : Returns True if it sets the url else False
+
+        """
         url=url.strip()
         if not (url is None or url is ''):
 
@@ -47,6 +65,13 @@ class WSkeywords:
 
 
      def setOperations(self,operation):
+        """
+        def : setOperations
+        purpose : sets the operation provided in param operation
+        param operation : operation of the webservice to set
+        return : Returns True if it sets the url else False
+
+        """
 
         if type(operation) is 'str':
             operation=operation.strip()
@@ -59,6 +84,13 @@ class WSkeywords:
             return False
 
      def setMethods(self,method):
+        """
+        def : setMethods
+        purpose : sets the method provided in param method
+        param method : method of the webservice to set
+        return : Returns True if it sets the url else False
+
+        """
 
         method=method.strip().upper()
 
@@ -77,6 +109,13 @@ class WSkeywords:
             return False
 
      def setHeader(self,header):
+        """
+        def : setHeader
+        purpose : sets the header provided in param header
+        param header : header of the webservice to set
+        return : Returns True if it sets the url else False
+
+        """
 
         header = str(header)
         if WSConstants.CONTENT_TYPE_JSON in header.lower() or WSConstants.CONTENT_TYPE_XML in header.lower() or WSConstants.CONTENT_TYPE_SOAP_XML in header.lower():
@@ -103,6 +142,13 @@ class WSkeywords:
             return False
 
      def setWholeBody(self,body):
+        """
+        def : setWholeBody
+        purpose : sets the body provided in param body
+        param body : body of the webservice to set
+        return : Returns True if it sets the url else False
+
+        """
 
         if not (body is None or body is ''):
 
