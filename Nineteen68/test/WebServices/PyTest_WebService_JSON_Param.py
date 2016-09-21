@@ -22,9 +22,9 @@ basepath = os.getcwd()
 basepath = basepath +'\plugins\WebServices'
 sys.path.append(basepath)
 
-import Webservices
+import Dispatcher
 
-a = Webservices.WSkeywords()
+dispatcher = Dispatcher.Dispatcher()
 test_data=testdata_json.read_excel_data(curpath +'\Restful_jsonWebService_Keywords.xlsx')
 
 @pytest.fixture(params=test_data)
@@ -34,16 +34,22 @@ def message(request):
 
 def test_webservice_execute(message):
     """set the endpoint URL"""
-    assert a.setEndPointURL(message.endpoint_url)
+    assert dispatcher.dispatcher('setEndPointURL',message.endpoint_url)
+##    assert a.setEndPointURL(message.endpoint_url)
     """set the Method"""
-    assert a.setMethods(message.method)
+    assert dispatcher.dispatcher('setMethods',message.method)
+##    assert a.setMethods(message.method)
     """set the Header"""
-    assert a.setHeader(message.header)
+    assert dispatcher.dispatcher('setHeader',message.header)
+##    assert a.setHeader(message.header)
     """set the Body"""
-    assert a.setWholeBody(message.body)
+    assert dispatcher.dispatcher('setWholeBody',message.body)
+##    assert a.setWholeBody(message.body)
     """Execute the request"""
-    assert a.executeRequest()
-    """Execute the request"""
-    assert a.getHeader()
+    assert dispatcher.dispatcher('executeRequest')
+##    assert a.executeRequest()
+    """Get the header"""
+    assert dispatcher.dispatcher('getHeader')
+##    assert a.getHeader()
 
 
