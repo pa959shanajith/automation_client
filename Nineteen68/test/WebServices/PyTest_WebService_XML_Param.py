@@ -79,6 +79,7 @@ def test_Webservice_executor(message):
     #verfies the response body
     """Get the getBody"""
     assert dispatcher.dispatcher('getBody')
+
 ##    assert WSobj.getBody()
 
      #get server certificate
