@@ -43,4 +43,3 @@ def read_excel_data(filePath):
             testdata.append(msg)
     return testdata
 
-
