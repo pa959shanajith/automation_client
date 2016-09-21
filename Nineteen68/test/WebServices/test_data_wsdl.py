@@ -29,11 +29,22 @@ test_data=wsdl_test_data.read_excel_data(curpath + '\wsdl.xlsx')
 def message(request):
         return request.param
 
-
 def test_requestbody(message):
     a=wsdlgenerator.BodyGenarator(message.wsdl, message.operation_name, message.soap_type)
-    a.requestBody()
-    a.requestHeader()
+    print a.requestBody() , message.expected_body
+    assert(a.requestBody(),message.expected_body)
+
+def test_requestheader(message):
+    a=wsdlgenerator.BodyGenarator(message.wsdl, message.operation_name, message.soap_type)
+    print a.requestHeader() , message.expected_header
+    assert(a.requestHeader(),message.expected_header)
+
+
+##    a.requestBody()
+##    a.requestHeader()
+##    assert a.requestBody() == message.expected_body
+##    assert a.requestHeader() == message.expected_header
+
 ##    body= """<soap-env:Envelope xmlns:ns0="http://www.webserviceX.NET" xmlns:soap-env="http://www.w3.org/2003/05/soap-envelope">
 ##      <soap-env:Body>
 ##        <ns0:GetBibleWordsByChapterAndVerse>
@@ -45,8 +56,4 @@ def test_requestbody(message):
 ##    </soap-env:Envelope>"""
 
 ##    head = {'SOAPAction': '"http://www.webserviceX.NET/GetBibleWordsByChapterAndVerse"', 'Content-Type': 'application/soap+xml; charset=utf-8'}
-    assert a.requestBody() == message.expected_body
-    assert a.requestHeader() == message.expected_header
-
-
 
