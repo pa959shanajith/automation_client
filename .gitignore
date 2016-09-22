@@ -1,0 +1,4 @@
+##removing .pyc extension files while commiting
+git rm *.pyc
+git commit -a -m ''
+git push
