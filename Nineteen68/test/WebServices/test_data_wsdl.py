@@ -11,19 +11,19 @@
 
 import pytest
 import xlrd
-import wsdl_test_data
+
 import os
 import sys
 
-curpath = os.getcwd()
 os.chdir('..')
-os.chdir('..')
-basepath = os.getcwd()
-basepath = basepath +'\plugins\WebServices'
-sys.path.append(basepath)
+maindir = os.getcwd()
+plug_path = maindir + '\Nineteen68\plugins\WebServices'
+sys.path.append(plug_path)
+os.chdir(plug_path)
 import wsdlgenerator
+import wsdl_test_data
 
-test_data=wsdl_test_data.read_excel_data(curpath + '\wsdl.xlsx')
+test_data=wsdl_test_data.read_excel_data(maindir + '\Nineteen68\\test\WebServices' + '\wsdl.xlsx')
 
 @pytest.fixture(params=test_data)
 def message(request):
