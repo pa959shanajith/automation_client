@@ -11,21 +11,21 @@
 
 import pytest
 import xlrd
-import testdata_json
-import sys
 import os
+import sys
 
-curpath = os.getcwd()
+
 os.chdir('..')
-os.chdir('..')
-basepath = os.getcwd()
-basepath = basepath +'\plugins\WebServices'
-sys.path.append(basepath)
+maindir = os.getcwd()
+plug_path = maindir + '\Nineteen68\plugins\WebServices'
+sys.path.append(plug_path)
+os.chdir(plug_path)
 
-import Dispatcher
+import dispatcher
+import testdata_json
 
-dispatcher = Dispatcher.Dispatcher()
-test_data=testdata_json.read_excel_data(curpath +'\Restful_jsonWebService_Keywords.xlsx')
+dispatcher_obj = dispatcher.Dispatcher()
+test_data=testdata_json.read_excel_data(maindir + '\Nineteen68\\test\WebServices' + '\Restful_jsonWebService_Keywords.xlsx')
 
 @pytest.fixture(params=test_data)
 def message(request):
@@ -34,22 +34,22 @@ def message(request):
 
 def test_webservice_execute(message):
     """set the endpoint URL"""
-    assert dispatcher.dispatcher('setEndPointURL',message.endpoint_url)
+    assert dispatcher_obj.dispatcher('setEndPointURL',message.endpoint_url)
 ##    assert a.setEndPointURL(message.endpoint_url)
     """set the Method"""
-    assert dispatcher.dispatcher('setMethods',message.method)
+    assert dispatcher_obj.dispatcher('setMethods',message.method)
 ##    assert a.setMethods(message.method)
     """set the Header"""
-    assert dispatcher.dispatcher('setHeader',message.header)
+    assert dispatcher_obj.dispatcher('setHeader',message.header)
 ##    assert a.setHeader(message.header)
     """set the Body"""
-    assert dispatcher.dispatcher('setWholeBody',message.body)
+    assert dispatcher_obj.dispatcher('setWholeBody',message.body)
 ##    assert a.setWholeBody(message.body)
     """Execute the request"""
-    assert dispatcher.dispatcher('executeRequest')
+    assert dispatcher_obj.dispatcher('executeRequest')
 ##    assert a.executeRequest()
     """Get the header"""
-    assert dispatcher.dispatcher('getHeader')
+    assert dispatcher_obj.dispatcher('getHeader')
 
 ##    assert a.getHeader()
 

@@ -9,11 +9,11 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import Exceptions
-import Webservices
-import Logger
-import WSConstants
+import webservices
+import logger
+import ws_constants
 class Dispatcher:
-    webservice = Webservices.WSkeywords()
+    webservice = webservices.WSkeywords()
     def dispatcher(self,keyword,*message):
         try:
             dict={'setEndPointURL': self.webservice.setEndPointURL,
@@ -31,7 +31,7 @@ class Dispatcher:
             if keyword in dict.keys():
                 return dict[keyword](*message)
             else:
-                Logger.log(WSConstants.METHOD_INVALID)
+                logger.log(ws_constants.METHOD_INVALID)
         except Exception as e:
             Exceptions.error(e)
 

@@ -9,14 +9,14 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-"""Logger - File which prints the code loggers """
-import Logger
+"""logger - File which prints the code loggers """
+import logger
 
 """request - requests is an elegant and simple HTTP library for Python to perform webservice operations"""
 import requests
 
-"""WSConstants - File consists of Webservice constants"""
-import WSConstants
+"""ws_constants - File consists of Webservice constants"""
+import ws_constants
 
 from requests import Request,Session
 
@@ -58,7 +58,7 @@ class WSkeywords:
              self.baseEndPointURL = url
              return True
         else:
-            Logger.log(WSConstants.METHOD_INVALID_INPUT)
+            logger.log(ws_constants.METHOD_INVALID_INPUT)
             return False
 
 
@@ -76,7 +76,7 @@ class WSkeywords:
              self.baseOperation = str(operation)
              return True
         else:
-            Logger.log(WSConstants.METHOD_INVALID_INPUT)
+            logger.log(ws_constants.METHOD_INVALID_INPUT)
             return False
 
      def setMethods(self,method):
@@ -88,15 +88,15 @@ class WSkeywords:
         """
         method=method.strip().upper()
         if not (method is None or method is ''):
-            if method in WSConstants.METHOD_ARRAY:
+            if method in ws_constants.METHOD_ARRAY:
                 self.baseMethod = method
-                Logger.log("baseMethod is:"+self.baseMethod)
+                logger.log("baseMethod is:"+self.baseMethod)
                 return True
             else:
-                Logger.log(WSConstants.METHOD_INVALID)
+                logger.log(ws_constants.METHOD_INVALID)
                 return False
         else:
-            Logger.log(WSConstants.METHOD_INVALID_INPUT)
+            logger.log(ws_constants.METHOD_INVALID_INPUT)
             return False
 
      def setHeader(self,header):
@@ -107,14 +107,14 @@ class WSkeywords:
         return : Returns True if it sets the url else False
         """
         header = str(header)
-        if WSConstants.CONTENT_TYPE_JSON in header.lower() or WSConstants.CONTENT_TYPE_XML in header.lower() or WSConstants.CONTENT_TYPE_SOAP_XML in header.lower():
+        if ws_constants.CONTENT_TYPE_JSON in header.lower() or ws_constants.CONTENT_TYPE_XML in header.lower() or ws_constants.CONTENT_TYPE_SOAP_XML in header.lower():
             header = ast.literal_eval(header)
             self.content_type=header['Content-Type']
         if not (header is None):
                 self.baseReqHeader = header
                 return True
         else:
-            Logger.log(WSConstants.METHOD_INVALID_INPUT)
+            logger.log(ws_constants.METHOD_INVALID_INPUT)
             return False
 
      def setWholeBody(self,body):
@@ -129,32 +129,32 @@ class WSkeywords:
              self.baseReqBody = body
              return True
         else:
-            Logger.log(WSConstants.METHOD_INVALID_INPUT)
+            logger.log(ws_constants.METHOD_INVALID_INPUT)
             return False
 
      def __saveResults(self,response):
-        Logger.log(response.status_code)
+        logger.log(response.status_code)
         self.baseResHeader=response.headers
-        Logger.log(WSConstants.RESPONSE_HEADER+str(self.baseResHeader))
+        logger.log(ws_constants.RESPONSE_HEADER+str(self.baseResHeader))
         self.baseResBody=response.content
-        Logger.log(WSConstants.RESPONSE_BODY+str(self.baseResBody))
+        logger.log(ws_constants.RESPONSE_BODY+str(self.baseResBody))
 
      def post(self):
-        if  WSConstants.CONTENT_TYPE_JSON in self.content_type.lower():
+        if  ws_constants.CONTENT_TYPE_JSON in self.content_type.lower():
             response = requests.post(self.baseEndPointURL,data = json.dumps(self.baseReqBody), headers=self.baseReqHeader)
             self.__saveResults(response)
             return self.baseResHeader,self.baseResBody
-        elif WSConstants.CONTENT_TYPE_XML in self.content_type.lower() or WSConstants.CONTENT_TYPE_SOAP_XML in self.content_type.lower():
+        elif ws_constants.CONTENT_TYPE_XML in self.content_type.lower() or ws_constants.CONTENT_TYPE_SOAP_XML in self.content_type.lower():
             if not (self.baseEndPointURL is '' or self.baseReqBody is '' or self.baseReqHeader is ''):
                 response = requests.post(self.baseEndPointURL,data=self.baseReqBody,headers=self.baseReqHeader)
                 self.__saveResults(response)
                 return self.baseResHeader,self.baseResBody
         else:
-            Logger.log(WSConstants.METHOD_INVALID_INPUT)
+            logger.log(ws_constants.METHOD_INVALID_INPUT)
             return None
 
      def get(self):
-        if  WSConstants.CONTENT_TYPE_JSON in self.content_type.lower():
+        if  ws_constants.CONTENT_TYPE_JSON in self.content_type.lower():
             response=requests.get(self.baseEndPointURL)
             print response.content
             self.__saveResults(response)
@@ -166,7 +166,7 @@ class WSkeywords:
                 self.__saveResults(response)
                 return self.baseResHeader,self.baseResBody
             else:
-                Logger.log(WSConstants.METHOD_INVALID_INPUT)
+                logger.log(ws_constants.METHOD_INVALID_INPUT)
                 return None
 
      def put(self):
@@ -179,7 +179,7 @@ class WSkeywords:
             self.__saveResults(response)
             return self.baseResHeader,self.baseResBody
          else:
-            Logger.log(WSConstants.METHOD_INVALID_INPUT)
+            logger.log(ws_constants.METHOD_INVALID_INPUT)
             return None
 
      def delete(self):
@@ -192,7 +192,7 @@ class WSkeywords:
             self.__saveResults(response)
             return self.baseResHeader,self.baseResBody
         else:
-            Logger.log(WSConstants.METHOD_INVALID_INPUT)
+            logger.log(ws_constants.METHOD_INVALID_INPUT)
             return None
 
      def head(self):
@@ -203,10 +203,10 @@ class WSkeywords:
             prep=req.prepare()
             response=s.send(prep)
             self.baseResHeader=response.headers
-            Logger.log(WSConstants.RESPONSE_HEADER+str(self.baseResHeader))
+            logger.log(ws_constants.RESPONSE_HEADER+str(self.baseResHeader))
             return self.baseResHeader
         else:
-            Logger.log(WSConstants.METHOD_INVALID_INPUT)
+            logger.log(ws_constants.METHOD_INVALID_INPUT)
             return None
 
 
@@ -218,24 +218,24 @@ class WSkeywords:
         'PUT':WSkeywords.put,
         'HEAD':WSkeywords.head,
         'DELETE':WSkeywords.delete}
-        if self.baseMethod in WSConstants.METHOD_ARRAY:
+        if self.baseMethod in ws_constants.METHOD_ARRAY:
             return dict[self.baseMethod](self)
         else:
-            Logger.log(WSConstants.METHOD_INVALID)
+            logger.log(ws_constants.METHOD_INVALID)
 
      def getHeader(self,*args):
         if len(args) == 0:
-            Logger.log(WSConstants.RESULT+str(self.baseResHeader))
+            logger.log(ws_constants.RESULT+str(self.baseResHeader))
             return self.baseResHeader
         elif len(args) == 1:
             key=args[0]
-            Logger.log(WSConstants.RESULT+str(self.baseResHeader[key]))
+            logger.log(ws_constants.RESULT+str(self.baseResHeader[key]))
             return self.baseResHeader[key]
 
 
      def getBody(self,*args):
         if len(args) == 0:
-                Logger.log(WSConstants.RESULT+self.baseResBody)
+                logger.log(ws_constants.RESULT+self.baseResBody)
                 return self.baseResBody
         elif len(args) == 2:
             key=args[0]
@@ -245,7 +245,7 @@ class WSkeywords:
                     start=str.find(args[0])+len(args[0])
                     end=str.find(args[1])
                     str=str[start:end]
-                    Logger.log(WSConstants.RESULT+str)
+                    logger.log(ws_constants.RESULT+str)
                     return str
 
 
@@ -260,7 +260,7 @@ class WSkeywords:
             self.baseReqBody=etree.tostring(doc)
             return True
         else:
-            Logger.log(WSConstants.METHOD_INVALID_INPUT)
+            logger.log(ws_constants.METHOD_INVALID_INPUT)
             return False
 
 
@@ -283,5 +283,5 @@ class WSkeywords:
                 text_file.close()
                 return True
         else:
-            Logger.log(WSConstants.METHOD_INVALID_INPUT)
+            logger.log(ws_constants.METHOD_INVALID_INPUT)
             return False
