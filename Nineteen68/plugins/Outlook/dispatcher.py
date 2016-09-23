@@ -11,28 +11,28 @@
 
 import Exceptions
 import outlook
-import Logger
+import logger
 import constants
 class Dispatcher:
+    def __init__(self):
+        self.outook_obj = outlook.OutlookKeywords()
 
     def dispatcher(self,keyword,*message):
 
         try:
-            if keyword=='GetEmail':
-                self.outook_obj = outlook.OutlookKeywords(message[0],message[1],message[2])
-            dict={'GetEmail': self.outook_obj.GetEmail(),
-                  'GetFromMailId' : self.outook_obj.GetFromMailId(),
-                  'GetAttachmentStatus'    : self.outook_obj.GetAttachmentStatus(),
-                  'GetSubject'     : self.outook_obj.GetSubject(),
-                  'GetToMailID'  : self.outook_obj.GetToMailID(),
-                  'GetBody' : self.outook_obj.GetBody(),
-                  'VerifyEmail' : self.outook_obj.VerifyEmail(message)
+            dict={'GetEmail': self.outook_obj.GetEmail,
+                  'GetFromMailId' : self.outook_obj.GetFromMailId,
+                  'GetAttachmentStatus'    : self.outook_obj.GetAttachmentStatus,
+                  'GetSubject'     : self.outook_obj.GetSubject,
+                  'GetToMailID'  : self.outook_obj.GetToMailID,
+                  'GetBody' : self.outook_obj.GetBody,
+                  'VerifyEmail' : self.outook_obj.VerifyEmail
                 }
             if keyword in dict.keys():
-                    return dict[keyword]
+                    return dict[keyword](*message)
 
             else:
-                Logger.log(constants.METHOD_INVALID)
+                logger.log(constants.METHOD_INVALID)
         except Exception as e:
             Exceptions.error(e)
 

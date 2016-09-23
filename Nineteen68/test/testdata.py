@@ -20,8 +20,9 @@ class message:
     toMail=""
     toMail_exp=""
     GetAttachmentStatus_exp=""
+    File_Loc=""
     # The class "constructor" - It's actually an initializer
-    def __init__(self, fromMail, fromMail_exp, subject,subject_exp,toMail,toMail_exp,GetAttachmentStatus_exp):
+    def __init__(self, fromMail, fromMail_exp, subject,subject_exp,toMail,toMail_exp,GetAttachmentStatus_exp,File_Loc):
         self.fromMail = fromMail
         self.fromMail_exp = fromMail_exp
         self.subject = subject
@@ -29,6 +30,7 @@ class message:
         self.toMail = toMail
         self.toMail_exp = toMail_exp
         self.GetAttachmentStatus_exp = GetAttachmentStatus_exp
+        self.File_Loc = File_Loc
 
 def read_excel_data(filePath):
     testdata=[]
@@ -39,7 +41,7 @@ def read_excel_data(filePath):
     Work_sheet = Work_book.sheet_by_name(Sheet_Name)
     row_count = Work_sheet.nrows
     col_count = Work_sheet.ncols
-    for row in range (1,4):
+    for row in range (1,2):
             fromMail = Work_sheet.cell_value (row,1)
             fromMail_exp = Work_sheet.cell_value (row,2)
             subject = Work_sheet.cell_value (row,3)
@@ -47,7 +49,8 @@ def read_excel_data(filePath):
             toMail = Work_sheet.cell_value (row,5)
             toMail_exp = Work_sheet.cell_value (row,6)
             GetAttachmentStatus_exp = Work_sheet.cell_value(row,7)
-            msg=message(fromMail,fromMail_exp,subject,subject_exp,toMail,toMail_exp,GetAttachmentStatus_exp)
+            File_Loc=Work_sheet.cell_value(row,8)
+            msg=message(fromMail,fromMail_exp,subject,subject_exp,toMail,toMail_exp,GetAttachmentStatus_exp,File_Loc)
             testdata.append(msg)
     return testdata
 

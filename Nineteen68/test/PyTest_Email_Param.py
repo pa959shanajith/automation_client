@@ -11,14 +11,24 @@
 
 ##import PyTest_Email_ReadData
 import pytest
-import outlook
+import os
+import sys
 import xlrd
+##curdir  = os.curdir()
+os.chdir('..')
+maindir = os.getcwd()
+plug_path = maindir + '\Nineteen68\plugins\Outlook'
+sys.path.append(plug_path)
+os.chdir(plug_path)
+import outlook
 import testdata
+import dispatcher
 ##  Unit  test to test outlook keywords
 ##class outlooktestcase():
 
 ##a=outlook.OutlookKeywords()
-test_data=testdata.read_excel_data("C:\Users\prudhvi.gujjuboyina\Documents\pytest\Email Keywords.xlsx")
+test_path = maindir + '\Nineteen68\\test'
+test_data=testdata.read_excel_data(test_path+"\Email Keywords.xlsx")
 ##message=testdata.message
 ##for message in test_data:
 ##    print message
@@ -32,13 +42,17 @@ def message(request):
 
     ## Verify if the email has been fetched successfully or not. Parameters are: "From" email ID, "Subject" and "To" email ID.
 def test_outlook_GetEmail(message):
-    a=outlook.OutlookKeywords(message.fromMail, message.subject,  message.toMail)
-    assert a.GetEmail()
-    assert a.VerifyEmail("C:\Users\prudhvi.gujjuboyina\Desktop\Unit Testing Status - Email  Keywords.msg")
-    assert a.GetFromMailId() == message.fromMail_exp
-    assert a.GetSubject() == message.subject_exp
-    assert a.GetToMailID() == message.toMail_exp
-    assert a.GetAttachmentStatus()== message.GetAttachmentStatus_exp
+##    a=outlook.OutlookKeywords(message.fromMail, message.subject,  message.toMail)
+    a=dispatcher.Dispatcher()
+    assert a.dispatcher('GetEmail',message.fromMail, message.toMail, message.subject )
+    assert a.dispatcher('GetFromMailId')==message.fromMail_exp
+    assert a.dispatcher('GetToMailID')==message.toMail_exp
+    assert a.dispatcher('GetSubject')==message.subject_exp
+    assert a.dispatcher('GetAttachmentStatus')==message.GetAttachmentStatus_exp
+    assert a.dispatcher('VerifyEmail',message.File_Loc)
+
+
+
 
 
 
