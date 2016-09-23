@@ -31,12 +31,10 @@ def message(request):
 
 def test_requestbody(message):
     a=wsdlgenerator.BodyGenarator(message.wsdl, message.operation_name, message.soap_type)
-    print a.requestBody() , message.expected_body
     assert(a.requestBody(),message.expected_body)
 
 def test_requestheader(message):
     a=wsdlgenerator.BodyGenarator(message.wsdl, message.operation_name, message.soap_type)
-    print a.requestHeader() , message.expected_header
     assert(a.requestHeader(),message.expected_header)
 
 
