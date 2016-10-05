@@ -296,9 +296,7 @@ class XML:
 class CSV:
     print 'pass'
 
-obj=ExcelFile()
-obj.set_excel_path('D:/sample.xls','Sheet1')
-obj.read_cell_xls(4,1)
+
 
 
 
