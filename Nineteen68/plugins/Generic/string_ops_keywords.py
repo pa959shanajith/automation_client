@@ -9,6 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import string
+import random
 import logger
 import generic_constants
 import Exceptions
@@ -176,7 +177,6 @@ class StringOperation:
             Exceptions.error(e)
             return False
 
-
     def replace(self, actual_string, to_be_replaced , value ):
         """
         def : replace
@@ -227,7 +227,6 @@ class StringOperation:
             Exceptions.error(e)
             return False
 
-
     def concatenate(self,input1,input2):
         """
         def : concatenate
@@ -250,8 +249,6 @@ class StringOperation:
         except Exception as e:
             Exceptions.error(e)
             return False
-
-
 
     def getSubString(self,actual_string,index):
         """
@@ -286,8 +283,33 @@ class StringOperation:
             Exceptions.error(e)
             return False
 
-
-
+    def stringGeneration(self,data_type,data_length):
+        """
+        def : stringGeneration
+        purpose : to generate random digits or character
+        param  : string , string
+        return : string
+        """
+        try:
+            if not (data_type is None and data_type is ''):
+                if not (data_length is None and data_length is ''):
+                    if (data_type == 'char'):
+                        output = ''.join(random.choice(string.lowercase + string.uppercase) for i in range(data_length))
+                        logger.log(output)
+                        return output
+                    elif (data_type == 'num'):
+                        output = ''.join(random.choice(string.digits) for i in range(data_length))
+                        logger.log(output)
+                        return output
+                else:
+                    logger.log(generic_constants.INVALID_INPUT)
+                    return False
+            else:
+                logger.log(generic_constants.INVALID_INPUT)
+                return False
+        except Exception as e:
+            Exceptions.error(e)
+            return False
 
 ##obj =StringOperation()
 ##obj.toLowerCase('RAkESH')
@@ -303,5 +325,6 @@ class StringOperation:
 ##obj.left("Rakesh SV","7")
 ##obj.right("Rakesh SV",7)
 ##obj.getStringLength("\"\"")
+##obj.stringGeneration('num',15)
 
 
