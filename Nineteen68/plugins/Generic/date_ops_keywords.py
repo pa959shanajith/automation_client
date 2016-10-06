@@ -182,18 +182,27 @@ class DateOperation:
             Exceptions.error(e)
             return False
 
-    def dateCompare(self, input_from , input_to , input_format):
+    def dateCompare(self, input_from , input_to , input_format=None):
         """
         def : dateCompare
         purpose : compare if two dates are equal or not
-        param  : string,string,string
+        param  : string,string,string(if 3rd param is none then by default format id dd/MM/YYYY)
         return : boolean
         """
         try:
             if not (input_from is None and input_from is ''):
                  if not (input_to is None and input_to is ''):
-                    if not (input_format is None and input_format is ''):
+                    if  (input_format is None):
+                        date1 = datetime.datetime.strptime(input_from, '%d/%m/%Y' )
+                        date2 = datetime.datetime.strptime(input_to, '%d/%m/%Y' )
+                        if date1 == date2:
+                            logger.log(date1 == date2)
+                            return True
+                        else:
+                            return False
+                    else:
                         ret_inp_format = self.__validate(input_format)
+                        print ret_inp_format
                         if ret_inp_format != -1:
                             date1 = datetime.datetime.strptime(input_from, ret_inp_format )
                             date2 = datetime.datetime.strptime(input_to, ret_inp_format )
@@ -239,7 +248,8 @@ class DateOperation:
 ##obj.getCurrentTime("HH:mm:ss")
 ##obj.getCurrentDateAndTime("dd/MMM/yyyy HH:mm:ss")
 ##obj.changeDateFormat("03/10/2016","dd/MM/yyyy","MMM/dd/yyyy")
-##obj.dateCompare("03/10/2016","03/10/2016","dd/MM/yyyy")
+##obj.dateCompare("03/10/2016","03/10/2016")
+##obj.dateCompare("03/10/2016","03/10/2016", "dd/MM/yyyy")
 ##obj.validate("dd/MMMM/yyyy")
 ##obj.dateDifference("03/10/2016","8893","dd/MM/yyyy")
 ##obj.dateDifference("03/10/2016","29/05/1992","dd/MM/yyyy")
