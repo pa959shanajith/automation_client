@@ -11,165 +11,7 @@
 
 import logger
 import generic_constants
-
-class ExcelFile:
-
-
-    import xlwt
-    import openpyxl
-    import xlsxwriter
-    import xlutils
-
-    def __init__(self):
-
-        self.excel_path=''
-        self.sheetname=''
-
-    def get_linenumber_xls(self,input_path,content):
-        print 'pass'
-
-    def get_linenumber_xlsx(self,input_path,content):
-        print 'pass'
-
-
-    def write_to_file_xls(self,input_path,content):
-       print 'xls'
-
-    def write_to_file_xlsx(self,input_path,content):
-        print 'xlsx'
-
-    def delete_row_xls(self,row):
-        logger.log(generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname)
-
-
-    def delete_row_xlsx(self,row):
-        logger.log(generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname)
-
-
-    def compare_content_xls(self,input_path1,input_path2,*args):
-        logger.log(generic_constants.INPUT_IS+input_path1+' '+input_path2)
-
-    def compare_content_xlsx(self,input_path1,input_path2,*args):
-        logger.log(generic_constants.INPUT_IS+input_path1+' '+input_path2)
-
-    def set_excel_path(self,input_path,sheetname):
-        logger.log(generic_constants.INPUT_IS+input_path+' '+sheetname)
-        self.excel_path=input_path
-        self.sheetname=sheetname
-        return True
-
-    def clear_excel_path(self):
-        self.excel_path=''
-        self.sheetname=''
-        return True
-
-    def read_cell_xls(self,row,col,*args):
-        import datetime
-        import xlrd
-        value=None
-        logger.log(generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname)
-        from xlrd import open_workbook
-        book = open_workbook(self.excel_path)
-        sheet = book.sheet_by_name(self.sheetname)
-        if row<sheet.nrows and col<sheet.ncols:
-            cell=sheet.cell(row-1,col-1)
-            if cell.ctype==3:
-                value=datetime.datetime(*xlrd.xldate_as_tuple(cell.value, book.datemode))
-                value=value.date()
-            else:
-                value=cell.value
-            logger.log(value)
-        else:
-            logger.log(generic_constants.INDEX_EXCEEDS)
-
-        return value
-
-
-
-    def read_cell_xlsx(self,row,col,*args):
-        logger.log(generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname)
-        wb=openpyxl.load_workbook(self.excel_path,read_only=true,data_only=True)
-        sheet=wb.get_sheet_by_name(self.sheetname)
-        sheet.get_index()
-        cell=sheet.cell(row=row,column=col,value=None)
-        print cell.internal_value
-        print cell.value
-        return cell.value
-
-
-    def write_cell_xls(self,row,col,value):
-        logger.log(generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname)
-        from xlutils.copy import copy
-        book = open_workbook(self.excel_path)
-        workbook = copy(book)
-        sheets=book.sheet_names()
-        try:
-            sheetnum=sheets.index(self.sheetname)
-            s = workbook.get_sheet(sheetnum)
-            s.write(row,col,value)
-            workbook.save(input_path)
-        except ValueError:
-            Exception.message('Value Error occured')
-
-    def write_cell_xlsx(self,row,col,value):
-        logger.log(generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname)
-        workbook=openpyxl.load_workbook(self.excel_path)
-        sheet=workbook.get_sheet_by_name(self.sheetname)
-        cell=sheet.cell(row=row,column=col,value=None)
-        cell.value=value
-        workbook.save(self.excel_path)
-
-
-    def clear_cell_xls(self,row,col):
-        logger.log(generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname)
-        from xlutils.copy import copy
-        book = open_workbook(self.excel_path)
-        workbook = copy(book)
-        sheets=book.sheet_names()
-        try:
-            sheetnum=sheets.index(self.sheetname)
-            s = workbook.get_sheet(sheetnum)
-            s.write(row,col,'')
-            workbook.save(input_path)
-        except ValueError:
-            Exception.message('Value Error occured')
-
-    def clear_cell_xlsx(self,row,col):
-        logger.log(generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname)
-        workbook=openpyxl.load_workbook(self.excel_path)
-        sheet=workbook.get_sheet_by_name(self.sheetname)
-        cell=sheet.cell(row=row,column=col,value=None)
-        cell.value=None
-        workbook.save(self.excel_path)
-
-
-    def get_rowcount_xls(self,*args):
-        logger.log(generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname)
-        book = open_workbook(self.excel_path)
-        sheet=book.sheet_by_name(self.sheetname)
-        rowcount=sheet.nrows
-        return rowcount
-
-    def get_rowcount_xlsx(self,*args):
-        logger.log(generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname)
-        book=openpyxl.load_workbook(self.excel_path)
-        sheet=book.get_sheet_by_name(self.sheetname)
-        rowcount=sheet.max_row
-        return rowcount
-
-    def get_colcount_xls(self,*args):
-        logger.log(generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname)
-        book = open_workbook(self.excel_path)
-        sheet=book.sheet_by_name(self.sheetname)
-        colcount=sheet.ncols
-        return colcount
-
-    def get_colcount_xlsx(self,*args):
-        logger.log(generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname)
-        book=openpyxl.load_workbook(self.excel_path)
-        sheet=book.get_sheet_by_name(self.sheetname)
-        colcount=sheet.max_column
-        return colcount
+import Exceptions
 
 
 class PdfFile:
@@ -181,7 +23,8 @@ class PdfFile:
         return False
 
     def compare_content(self,input_path1,input_path2):
-        print 'pass'
+        import filecmp
+        return filecmp.cmp(input_path1,input_path2)
 
 
     def get_content(self,input_path,pagenumber,output_file,*args):
@@ -199,7 +42,8 @@ class PdfFile:
                 if len(args) == 2:
                     start=args[0].strip()
                     end=args[1].strip()
-
+                    content=content[content.find(start)+1:content.find(end)]
+                    return content
                 else:
                     with open(output_file,'w') as file:
                         file.write(content)
@@ -234,7 +78,7 @@ class TextFile:
         return False
 
 
-    def clear_content(self,input_path,content):
+    def clear_content(self,input_path):
         with open(input_path) as myFile:
             myFile.write('')
             myFile.close()
@@ -285,26 +129,30 @@ class TextFile:
 
 
 class XML:
+
     def write_to_file(self,input_path,content):
+        import xml.dom.minidom as minidom
+        from xml.etree import ElementTree as ET
+        from xml.etree import ElementTree
         logger.log('Writing to XML file')
         try:
+            tree = ET.XML(content)
+            val =  prettify(tree)
+            logger.log(val)
             with open(input_path, 'a') as file:
                 file.write(content)
-        except (OSError, IOError) as e:
-            Exception.message('Cannot open file')
+                file.close
+        except Exception as e:
+            Exceptions.error(e)
 
-class CSV:
-    print 'pass'
+    def prettify(elem):
+        """Return a pretty-printed XML string for the Element.
+        """
+        rough_string = ElementTree.tostring(elem)
+        reparsed = minidom.parseString(rough_string)
+        return reparsed.toprettyxml(indent="\t")
 
-
-
-
-
-
-
-
-
-
-
-
-
+    def clear_content(self,input_path):
+        with open(input_path) as myFile:
+            myFile.write('')
+            myFile.close()
