@@ -16,13 +16,16 @@ import folder_operations
 import logger
 import generic_constants
 import Exceptions
+import excel_operartions
 
 class GenericKeywordDispatcher:
     generic_date = date_ops_keywords.DateOperation()
     generic_string =string_ops_keywords.StringOperation()
     generic_file=file_operations.FileOperations()
     genric_folder=folder_operations.FolderOperations()
+    generic_excel=excel_operartions.ExcelFile()
     def dispatcher(self,keyword,*message):
+         logger.log('Keyword is '+keyword)
          try:
             dict={'toLowerCase': self.generic_string.toLowerCase,
                   'toUpperCase' : self.generic_string.toUpperCase,
@@ -57,7 +60,15 @@ class GenericKeywordDispatcher:
                   'clearFileContent':self.generic_file.clear_content,
                   'getLineNumber':self.generic_file.get_line_number,
                   'getContent':self.generic_file.get_content,
-                  'writeToFile':self.generic_file.write_to_file
+                  'writeToFile':self.generic_file.write_to_file,
+                  'writeToCell':self.generic_excel.write_cell,
+                  'readCell':self.generic_excel.read_cell,
+                  'clearCell':self.generic_excel.clear_cell,
+                  'setExcelPath':self.generic_excel.set_excel_path,
+                  'clearExcelPath':self.generic_excel.clear_excel_path,
+                  'deleteRow':self.generic_excel.delete_row,
+                  'getRowCount':self.generic_excel.get_rowcount,
+                  'getColumnCount':self.generic_excel.get_colcount
                 }
             if keyword in dict.keys():
                 return dict[keyword](*message)
@@ -65,3 +76,7 @@ class GenericKeywordDispatcher:
                 logger.log(generic_constants.INVALID_INPUT)
          except Exception as e:
             Exceptions.error(e)
+
+
+
+
