@@ -33,6 +33,7 @@ class Clickandadd():
             win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
             logger.log('FILE: clickandadd.py , DEF: startclickandadd()  , MSG: Minimizing the foreground window i.e tool and assuming AUT on top .....')
             javascript_hasfocus = """return(document.hasFocus());"""
+            time.sleep(6)
             for eachdriverhand in driver.window_handles:
                 logger.log('FILE: clickandadd.py , DEF: startclickandadd() , MSG: Iterating through the number of windows open by the driver')
                 driver.switch_to.window(eachdriverhand)
