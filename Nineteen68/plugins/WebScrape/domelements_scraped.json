@@ -1,0 +1,35 @@
+{
+	"view": [{
+		"xpath": "//*[@id=\"calc\"]/form/section/section[2]/div/div/div[1]/div/div/div[3]/div[1]/div[1]/div[1]/input;null;/html/body/section/div/form/section/section[2]/div/div/div[1]/div/div/div[3]/div[1]/div[1]/div[1]/input;null;null;null",
+		"url": "http://www.mortgagecalculator.org/",
+		"text": "param[homevalue]",
+		"hiddentag": "No",
+		"custname": "param[homevalue]_txtbox",
+		"tag": "input",
+		"id": "null"
+	}, {
+		"xpath": "//*[@id=\"loanamt\"];loanamt;/html/body/section/div/form/section/section[2]/div/div/div[1]/div/div/div[3]/div[1]/div[1]/div[2]/input;null;null;null",
+		"url": "http://www.mortgagecalculator.org/",
+		"text": "param[principal]",
+		"hiddentag": "No",
+		"custname": "param[principal]_txtbox",
+		"tag": "input",
+		"id": "loanamt"
+	}, {
+		"xpath": "//*[@id=\"intrstsrate\"];intrstsrate;/html/body/section/div/form/section/section[2]/div/div/div[1]/div/div/div[3]/div[1]/div[1]/div[3]/input;null;null;null",
+		"url": "http://www.mortgagecalculator.org/",
+		"text": "param[interest_rate]",
+		"hiddentag": "No",
+		"custname": "param[interest_rate]_txtbox",
+		"tag": "input",
+		"id": "intrstsrate"
+	}, {
+		"xpath": "//*[@id=\"loanterm\"];loanterm;/html/body/section/div/form/section/section[2]/div/div/div[1]/div/div/div[3]/div[1]/div[1]/div[5]/input;null;null;null",
+		"url": "http://www.mortgagecalculator.org/",
+		"text": "param[term]",
+		"hiddentag": "No",
+		"custname": "param[term]_txtbox",
+		"tag": "input",
+		"id": "loanterm"
+	}]
+}
