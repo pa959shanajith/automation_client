@@ -13,7 +13,10 @@ import sys
 import os
 import logger
 import generic_constants
-from file_comparison_operations import TextFile,PdfFile,ExcelFile
+from file_comparison_operations import TextFile,PdfFile,XML
+from excel_operartions import ExcelFile
+import Exceptions
+
 
 class FileOperations:
 
@@ -22,19 +25,37 @@ class FileOperations:
         self.txt=TextFile()
         self.pdf=PdfFile()
         self.excel=ExcelFile()
+        self.xml=XML()
         self.dict={'.txt_write_to_file':self.txt.write_to_file,
               '.xls_write_to_file':self.excel.write_to_file_xls,
               '.xlsx_write_to_file':self.excel.write_to_file_xlsx,
+              '.xml_write_to_file':self.xml.write_to_file,
+
+              '.xls_verify_content':self.excel.write_to_file_xls,
+              '.xlsx_verify_content':self.excel.write_to_file_xlsx,
               '.txt_verify_content':self.txt.verify_content,
               '.pdf_verify_content':self.pdf.verify_content,
+
               '.txt_compare_content':self.txt.compare_content,
               '.xls_compare_content':self.excel.compare_content_xls,
               '.xlsx_compare_content':self.excel.compare_content_xlsx,
               '.pdf_compare_content':self.pdf.compare_content,
+
               '.txt_clear_content':self.txt.clear_content,
+              '.xls_clear_content':self.excel.clear_content_xls,
+              '.xlsx_clear_content':self.excel.clear_content_xlsx,
+              '.xml_clear_content':self.xml.clear_content,
+
               '.txt_get_content':self.txt.get_content,
               '.pdf_get_content':self.pdf.get_content,
-              '.txt_replace_content':self.txt.replace_content
+
+              '.txt_replace_content':self.txt.replace_content,
+              '.xls_replace_content':self.excel.replace_content_xls,
+              '.xlsx_replace_content':self.excel.replace_content_xls,
+
+              '.txt_get_line_number':self.txt.get_linenumber,
+              '.xls_get_line_number':self.excel.get_linenumber_xls,
+              '.xlsx_get_line_number':self.excel.get_linenumber_xlsx
               }
 
     def create_file(self,input):
