@@ -35,7 +35,7 @@ class Fullscrape():
             actwindow = win32gui.GetForegroundWindow()
             win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
             javascript_hasfocus = """return(document.hasFocus());"""
-            time.sleep(3)
+            time.sleep(6)
             for eachdriverhand in driver.window_handles:
                 logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: Iterating through the number of windows open by the driver')
                 driver.switch_to.window(eachdriverhand)
