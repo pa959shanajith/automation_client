@@ -156,3 +156,18 @@ class XML:
         with open(input_path) as myFile:
             myFile.write('')
             myFile.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
