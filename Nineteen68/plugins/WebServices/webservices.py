@@ -11,6 +11,7 @@
 
 """logger - File which prints the code loggers """
 import logger
+import Exceptions
 
 """request - requests is an elegant and simple HTTP library for Python to perform webservice operations"""
 import requests
@@ -106,16 +107,30 @@ class WSkeywords:
         param header : header of the webservice to set
         return : Returns True if it sets the url else False
         """
-        header = str(header)
-        if ws_constants.CONTENT_TYPE_JSON in header.lower() or ws_constants.CONTENT_TYPE_XML in header.lower() or ws_constants.CONTENT_TYPE_SOAP_XML in header.lower():
-            header = ast.literal_eval(header)
-            self.content_type=header['Content-Type']
-        if not (header is None):
-                self.baseReqHeader = header
+        try:
+            if not(header is None and header is ''):
+                header = str(header).replace('\n','').replace("'",'')
+                header=header.split('##')
+                dict={}
+                #to support update of header multiple times
+                for x in header:
+                    if ':' in x:
+                        index=x.index(':')
+                        dict[x[0:index].strip()]=x[index+1:].strip()
+                if len(dict) !=0:
+                    self.baseReqHeader=dict
+                    logger.log(dict)
+                    if 'Content-Type' in dict.keys():
+                        self.content_type=dict['Content-Type']
+                else:
+                    self.baseReqHeader=header
                 return True
-        else:
-            logger.log(ws_constants.METHOD_INVALID_INPUT)
-            return False
+            else:
+                logger.log(ws_constants.METHOD_INVALID_INPUT)
+
+        except Exception as e:
+            Exceptions.error(e)
+        return False
 
      def setWholeBody(self,body):
         """
@@ -135,6 +150,8 @@ class WSkeywords:
      def __saveResults(self,response):
         logger.log(response.status_code)
         self.baseResHeader=response.headers
+        #added status code
+        self.baseResHeader['status_code']=response.status_code
         logger.log(ws_constants.RESPONSE_HEADER+str(self.baseResHeader))
         self.baseResBody=response.content
         logger.log(ws_constants.RESPONSE_BODY+str(self.baseResBody))
@@ -154,20 +171,13 @@ class WSkeywords:
             return None
 
      def get(self):
-        if  ws_constants.CONTENT_TYPE_JSON in self.content_type.lower():
-            response=requests.get(self.baseEndPointURL)
-            print response.content
+        if not (self.baseEndPointURL is '' or self.baseOperation is '' or self.baseReqHeader is ''):
+            req=self.baseEndPointURL+'/'+self.baseOperation+'?'+self.baseReqHeader
+        elif not (self.baseEndPointURL is ''):
+            req=self.baseEndPointURL
+            response=requests.get(req)
             self.__saveResults(response)
-            return self.baseResHeader,self.baseResBody
-        else:
-            if not (self.baseEndPointURL is '' or self.baseOperation is '' or self.baseReqHeader is ''):
-                req=self.baseEndPointURL+'/'+self.baseOperation+'?'+self.baseReqHeader
-                response=requests.get(req)
-                self.__saveResults(response)
-                return self.baseResHeader,self.baseResBody
-            else:
-                logger.log(ws_constants.METHOD_INVALID_INPUT)
-                return None
+        return self.baseResHeader,self.baseResBody
 
      def put(self):
          s=Session()
@@ -197,7 +207,7 @@ class WSkeywords:
 
      def head(self):
         s=Session()
-        if not (baseEndPointURL is '' or baseOperation is ''):
+        if not (self.baseEndPointURL is '' or self.baseOperation is ''):
             reqUrl=self.baseEndPointURL+'/'+self.baseOperation
             req = requests.Request(method=self.baseMethod, url=reqUrl)
             prep=req.prepare()
@@ -208,8 +218,6 @@ class WSkeywords:
         else:
             logger.log(ws_constants.METHOD_INVALID_INPUT)
             return None
-
-
 
      def executeRequest(self):
 

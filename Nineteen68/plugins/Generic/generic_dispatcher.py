@@ -39,6 +39,7 @@ class GenericKeywordDispatcher:
                   'split' : self.generic_string.split,
                   'concatenate' : self.generic_string.concatenate,
                   'getSubString':self.generic_string.getSubString,
+                  'stringGeneration':self.generic_string.stringGeneration,
                   'getCurrentDate' : self.generic_date.getCurrentDate,
                   'getCurrentTime' : self.generic_date.getCurrentTime,
                   'getCurrentDateAndTime': self.generic_date.getCurrentDateAndTime,
