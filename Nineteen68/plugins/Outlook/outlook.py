@@ -51,7 +51,7 @@ class OutlookKeywords:
                     if msg.Class==43:
                         if msg.SenderName==self.senderEmail:
                             if msg.Subject==self.subject:
-                                if msg.To==self.toMail:
+                                if self.toMail in msg.To:
                                     self.Content=msg
                                     self.Subject = msg.Subject
                                     self.Body= msg.Body
@@ -124,7 +124,7 @@ class OutlookKeywords:
                     if str(self.Content.SenderName) == str(mail_content.SenderName):
                         if self.Content.To==mail_content.To:
                             if self.Content.Subject==mail_content.Subject:
-                                if str(self.Content.Body)==str(mail_content.Body):
+                                if self.Content.Body==mail_content.Body:
                                     if str(self.Content.Attachments)==str(mail_content.Attachments):
                                         if self.Content.SentOn==mail_content.SentOn:
                                             return True
