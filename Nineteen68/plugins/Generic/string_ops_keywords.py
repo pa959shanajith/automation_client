@@ -293,6 +293,7 @@ class StringOperation:
         try:
             if not (data_type is None and data_type is ''):
                 if not (data_length is None and data_length is ''):
+                    data_type=data_type.lower()
                     if (data_type == 'char'):
                         output = ''.join(random.choice(string.lowercase + string.uppercase) for i in range(data_length))
                         logger.log(output)
