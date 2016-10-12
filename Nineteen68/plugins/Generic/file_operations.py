@@ -164,7 +164,7 @@ class FileOperations:
             return status
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return False
 
     def clear_content(self,input_path):
         try:
@@ -177,7 +177,7 @@ class FileOperations:
             return status
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return False
 
     def get_content(self,input_path,*args):
         try:
@@ -190,7 +190,7 @@ class FileOperations:
             return status
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return False
 
     def replace_content(self,input_path,existing_content,replace_content):
         try:
@@ -203,7 +203,7 @@ class FileOperations:
             return status
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return False
 
     def write_to_file(self,input_path,content):
         try:
@@ -213,10 +213,12 @@ class FileOperations:
                 file_ext,status=self.__get_ext(input_path)
                 if status == True:
                     status= self.dict[file_ext+'_write_to_file'](input_path,content)
+            if status == True:
+                logger.log('Content matched')
             return status
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return False
 
     def get_line_number(self,input_path,content):
         try:
