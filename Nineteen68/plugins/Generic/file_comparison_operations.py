@@ -63,8 +63,8 @@ class TextFile:
             for num, line in enumerate(myFile, 1):
                 print line
                 if content in line:
-                    print 'found at line:'
-                    break;
+                    print 'found at line:'+str(num)
+                    return True
 
 
     def compare_content(self,input_path1,input_path2):
@@ -75,13 +75,13 @@ class TextFile:
         if content1==content2:
             print 'pass'
             return True
-        return False
 
 
     def clear_content(self,input_path):
-        with open(input_path) as myFile:
+        with open(input_path,'w') as myFile:
             myFile.write('')
             myFile.close()
+            return True
 
 
     def get_content(self,input_path):
@@ -99,6 +99,7 @@ class TextFile:
                     print 'found at line:', num
                     line_numbers.append(num)
         logger.log(line_numbers)
+        return line_numbers
 
 
 
@@ -114,7 +115,7 @@ class TextFile:
             return True
         except:
             Exception.message('Error occurred')
-            return False
+        return False
 
 
 
@@ -124,8 +125,10 @@ class TextFile:
             with open(input_path, 'a') as file:
                 file.write(content)
                 file.close()
+                return True
         except (OSError, IOError) as e:
             Exception.message('Cannot open file')
+        return False
 
 
 class XML:
@@ -141,9 +144,11 @@ class XML:
             logger.log(val)
             with open(input_path, 'a') as file:
                 file.write(content)
-                file.close
+                file.close()
+                return True
         except Exception as e:
             Exceptions.error(e)
+        return False
 
     def prettify(elem):
         """Return a pretty-printed XML string for the Element.
@@ -156,6 +161,7 @@ class XML:
         with open(input_path) as myFile:
             myFile.write('')
             myFile.close()
+            return True
 
 
 

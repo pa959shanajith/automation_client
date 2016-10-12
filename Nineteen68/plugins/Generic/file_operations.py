@@ -68,14 +68,11 @@ class FileOperations:
                     return True
                 else:
                     logger.log(generic_constants.FILE_EXISTS)
-                    return False
-
             else:
                 logger.log(generic_constants.INVALID_INPUT)
-                return False
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return False
 
 
     def verify_file_exists(self,input):
@@ -90,10 +87,9 @@ class FileOperations:
                     logger.log(generic_constants.FILE_NOT_EXISTS)
             else:
                 logger.log(generic_constants.INVALID_INPUT)
-            return False
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return False
 
     def rename_file(self,actualpath,renamepath):
         try:
@@ -105,13 +101,11 @@ class FileOperations:
                     return True
                 else:
                     logger.log(generic_constants.FILE_NOT_EXISTS)
-                    return False
             else:
                 logger.log(generic_constants.INVALID_INPUT)
-                return False
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return False
 
 
     def delete_file(self,input):
@@ -124,13 +118,11 @@ class FileOperations:
                     return True
                 else:
                     logger.log(generic_constants.FILE_NOT_EXISTS)
-                    return False
             else:
                 logger.log(generic_constants.INVALID_INPUT)
-                return False
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return False
 
 
     def verify_content(self,input_path,content):
@@ -138,13 +130,13 @@ class FileOperations:
             input_path=input_path.strip()
             status=False
             if self.verify_file_exists(input_path) == True:
-                file_ext,status=self.__get_ext(input_paths)
+                file_ext,status=self.__get_ext(input_path)
                 if status == True:
                     status= self.dict[file_ext+'_verify_content'](input_path,content)
-            return status
+                return status
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return False
 
 
     def __get_ext(self,input_path):
@@ -187,14 +179,14 @@ class FileOperations:
             Exceptions.error(e)
             return False
 
-    def get_content(self,input_path,outputfile,*args):
+    def get_content(self,input_path,*args):
         try:
             input_path=input_path.strip()
             status=False
             if self.verify_file_exists(input_path) == True:
                 file_ext,status=self.__get_ext(input_path)
                 if status == True:
-                    status=self.dict[file_ext+'_get_content'](input_path,outputfile)
+                    status=self.dict[file_ext+'_get_content'](input_path)
             return status
         except Exception as e:
             Exceptions.error(e)
@@ -218,7 +210,7 @@ class FileOperations:
             status=False
             input_path=input_path.strip()
             if self.verify_file_exists(input_path) == True:
-                file_ext,status=self.__get_ext(input_paths)
+                file_ext,status=self.__get_ext(input_path)
                 if status == True:
                     status= self.dict[file_ext+'_write_to_file'](input_path,content)
             return status
@@ -233,26 +225,13 @@ class FileOperations:
             if self.verify_file_exists(input_path) == True:
                 file_ext,status=self.__get_ext(input_paths)
                 if status == True:
-                    status,linenumbers= self.dict[file_ext+'_get_line_number'](input_path,content)
+                    linenumbers= self.dict[file_ext+'_get_line_number'](input_path,content)
                     logger.log(linenumbers)
-            return status
+                    return True
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return False
 
-
-
-##obj=FileOperations()
-##obj.compare_content('C:/Test/compare1.txt','C:/Test/compare2.txt')
-####input1='D:\\1968-2.0\\nineteen68\\Nineteen68\\plugins\\Generic\\file_operationsNEW.txt'
-##input2='D:\\1968-2.0\\nineteen68\\Nineteen68\\plugins\\Generic\\hi.exe'
-##obj.create_file(input2)
-##obj.verify_file_exists(input2)
-##obj.rename_file(input1,input2)
-##obj.verify_file_exists(input2)
-##obj.delete_file(input2)
-
-##obj.write_to_file(input2,'sushma')
 
 
 
