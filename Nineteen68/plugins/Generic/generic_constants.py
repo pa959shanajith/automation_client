@@ -24,6 +24,11 @@ INVALID_FILE_FORMAT='Invalid file format'
 
 INDEX_EXCEEDS='Index of row/col is exceeded'
 
+INP_VAL_EXCEEDS = 'Given length should be in (1-323) range'
+
+DATE_FORMAT = '%d/%m/%Y'
+
+
 
 
 
