@@ -128,10 +128,12 @@ class StringOperation:
                     even_inp = input_len/2 + 1
                     output = input[even_inp]
                     logger.log(output)
+                    return True
                 else:
                     odd_inp = input_len/2
                     output = input[odd_inp]
                     logger.log(output)
+                    return True
             else:
                 logger.log(generic_constants.INVALID_INPUT)
                 return False
@@ -194,12 +196,16 @@ class StringOperation:
                             return output
                         else:
                             logger.log("Input Value " + actual_string+ " does not contain " + to_be_replaced);
+                            return False
                     else:
                         logger.log(generic_constants.INVALID_INPUT)
+                        return False
                 else:
                     logger.log(generic_constants.INVALID_INPUT)
+                    return False
             else:
                 logger.log(generic_constants.INVALID_INPUT)
+                return False
         except Exception as e:
             Exceptions.error(e)
             return False
@@ -269,10 +275,12 @@ class StringOperation:
                         high_range = int(high_range)
                         output = actual_string[low_range:high_range]
                         logger.log(output)
+                        return output
                     else:
                         to_int_index = int(index)
                         output = actual_string[to_int_index:]
                         logger.log(output)
+                        return output
                 else:
                     logger.log(generic_constants.INVALID_INPUT)
                     return False
@@ -294,7 +302,7 @@ class StringOperation:
             if not (data_type is None and data_type is ''):
                 if not (data_length is None and data_length is ''):
                     data_length_int = int(data_length)
-                    if(data_length_int>0 and data_length_int <= 323):
+                    if(data_length_int > 0):
                         data_type=data_type.lower()
                         if (data_type == 'char'):
                             output = ''.join(random.choice(string.lowercase + string.uppercase) for i in range(data_length_int))
@@ -331,6 +339,6 @@ class StringOperation:
 ##obj.left("Rakesh SV","7")
 ##obj.right("Rakesh SV",7)
 ##obj.getStringLength("\"\"")
-##obj.stringGeneration('char','323')
+##obj.stringGeneration('char','1')
 
 
