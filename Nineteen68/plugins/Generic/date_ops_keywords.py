@@ -193,8 +193,8 @@ class DateOperation:
             if not (input_from is None and input_from is ''):
                  if not (input_to is None and input_to is ''):
                     if  (input_format is None):
-                        date1 = datetime.datetime.strptime(input_from, '%d/%m/%Y' )
-                        date2 = datetime.datetime.strptime(input_to, '%d/%m/%Y' )
+                        date1 = datetime.datetime.strptime(input_from, generic_constants.DATE_FORMAT )
+                        date2 = datetime.datetime.strptime(input_to, generic_constants.DATE_FORMAT )
                         if date1 == date2:
                             logger.log(date1 == date2)
                             return True
@@ -235,7 +235,6 @@ class DateOperation:
             }
             if(input in dict):
                 date_format = dict.get(input)
-    ##            logger.log(date_format)
                 return date_format
             else:
                 return -1
@@ -248,7 +247,7 @@ class DateOperation:
 ##obj.getCurrentTime("HH:mm:ss")
 ##obj.getCurrentDateAndTime("dd/MMM/yyyy HH:mm:ss")
 ##obj.changeDateFormat("03/10/2016","dd/MM/yyyy","MMM/dd/yyyy")
-##obj.dateCompare("03/10/2016","03/10/2016")
+##obj.dateCompare("03/10/2016","03/11/2016")
 ##obj.dateCompare("03/10/2016","03/10/2016", "dd/MM/yyyy")
 ##obj.validate("dd/MMMM/yyyy")
 ##obj.dateDifference("03/10/2016","8893","dd/MM/yyyy")
