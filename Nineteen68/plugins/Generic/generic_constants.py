@@ -18,11 +18,16 @@ INPUT_IS='Input is:'
 
 FILE_NOT_EXISTS='File does not exists'
 
-FILE_TYPES=['.txt','xls','.xlsx','.pdf']
+FILE_TYPES=['.txt','.xls','.xlsx','.pdf','.xml']
 
 INVALID_FILE_FORMAT='Invalid file format'
 
 INDEX_EXCEEDS='Index of row/col is exceeded'
+
+INP_VAL_EXCEEDS = 'Given length should be in (1-323) range'
+
+DATE_FORMAT = '%d/%m/%Y'
+
 
 
 
