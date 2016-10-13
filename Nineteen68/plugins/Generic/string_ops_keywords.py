@@ -306,6 +306,7 @@ class StringOperation:
                             return output
                     else:
                         logger.log(generic_constants.INP_VAL_EXCEEDS)
+                        return False
                 else:
                     logger.log(generic_constants.INVALID_INPUT)
                     return False
