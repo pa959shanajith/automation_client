@@ -293,15 +293,19 @@ class StringOperation:
         try:
             if not (data_type is None and data_type is ''):
                 if not (data_length is None and data_length is ''):
-                    data_type=data_type.lower()
-                    if (data_type == 'char'):
-                        output = ''.join(random.choice(string.lowercase + string.uppercase) for i in range(data_length))
-                        logger.log(output)
-                        return output
-                    elif (data_type == 'num'):
-                        output = ''.join(random.choice(string.digits) for i in range(data_length))
-                        logger.log(output)
-                        return output
+                    data_length_int = int(data_length)
+                    if(data_length_int>0 and data_length_int <= 323):
+                        data_type=data_type.lower()
+                        if (data_type == 'char'):
+                            output = ''.join(random.choice(string.lowercase + string.uppercase) for i in range(data_length_int))
+                            logger.log(output)
+                            return output
+                        elif (data_type == 'num'):
+                            output = ''.join(random.choice(string.digits) for i in range(data_length_int))
+                            logger.log(output)
+                            return output
+                    else:
+                        logger.log(generic_constants.INP_VAL_EXCEEDS)
                 else:
                     logger.log(generic_constants.INVALID_INPUT)
                     return False
@@ -326,6 +330,6 @@ class StringOperation:
 ##obj.left("Rakesh SV","7")
 ##obj.right("Rakesh SV",7)
 ##obj.getStringLength("\"\"")
-##obj.stringGeneration('num',15)
+##obj.stringGeneration('char','323')
 
 
