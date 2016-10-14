@@ -248,7 +248,7 @@ class FileOperations:
         """
         try:
             status=False
-            params=self.__split(input_path)
+            params=self.__split(input_path,*args)
             if self.verify_file_exists(params[0]) == True:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
@@ -329,10 +329,13 @@ class FileOperations:
         """
         params=[]
         for x in args:
-            x.strip()
-            val=x.split(';')
-            for y in val:
-                params.append(y)
+            if isinstance(x, str):
+                x.strip()
+                val=x.split(';')
+                for y in val:
+                    params.append(y)
+            else:
+                params.append(x)
         return params
 
 

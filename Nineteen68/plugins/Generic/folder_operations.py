@@ -108,7 +108,7 @@ class FolderOperations:
                 try:
 
                     if os.path.exists(input):
-                        if len(args)==1 and args[0] == 1:
+                        if len(args)==1 and int(args[0]) == 1:
                             import shutil
                             shutil.rmtree(input)
                         else:
