@@ -12,7 +12,6 @@
 import datetime
 import logger
 import generic_constants
-##from datetime import datetime
 from datetime import timedelta
 import Exceptions
 
@@ -34,6 +33,7 @@ class DateOperation:
                     return output
                 else:
                     logger.log('Format not supported')
+                    return False
             else:
                 logger.log(generic_constants.INVALID_INPUT)
                 return False
@@ -59,6 +59,7 @@ class DateOperation:
                     return output
                 else:
                     logger.log('Format not supported')
+                    return False
             else:
                 logger.log(generic_constants.INVALID_INPUT)
                 return False
@@ -83,6 +84,7 @@ class DateOperation:
                     return output
                 else:
                     logger.log('Format not supported')
+                    return False
             else:
                 logger.log(generic_constants.INVALID_INPUT)
                 return False
@@ -118,8 +120,10 @@ class DateOperation:
                                 return output
                         else:
                             logger.log('Format not supported')
+                            return False
                     else:
                         logger.log(generic_constants.INVALID_INPUT)
+                        return False
                     return False
         except Exception as e:
             Exceptions.error(e)
@@ -148,6 +152,7 @@ class DateOperation:
                                     return output
                             else:
                                 logger.log('Format not supported')
+                                return False
 
         except Exception as e:
             Exceptions.error(e)
@@ -172,9 +177,10 @@ class DateOperation:
                             if ret_out_format != -1:
                                 output=datetime.datetime.strptime(inp_date, ret_inp_format).strftime(ret_out_format)
                                 logger.log(output)
-
+                                return output
                         else:
                             logger.log('Format not supported')
+                            return False
             else:
                 logger.log(generic_constants.INVALID_INPUT)
                 return False
@@ -213,6 +219,7 @@ class DateOperation:
                                 return False
                         else:
                             logger.log('Format not supported')
+                            return False
             else:
                 logger.log(generic_constants.INVALID_INPUT)
                 return False
