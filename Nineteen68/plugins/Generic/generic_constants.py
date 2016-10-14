@@ -18,7 +18,7 @@ INPUT_IS='Input is:'
 
 FILE_NOT_EXISTS='File does not exists'
 
-FILE_TYPES=['.txt','xls','.xlsx','.pdf']
+FILE_TYPES=['.txt','.xls','.xlsx','.pdf','.xml']
 
 INVALID_FILE_FORMAT='Invalid file format'
 

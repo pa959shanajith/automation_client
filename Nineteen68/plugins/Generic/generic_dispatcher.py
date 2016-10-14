@@ -52,7 +52,7 @@ class GenericKeywordDispatcher:
                   'deleteFile':self.generic_file.delete_file,
                   'verifyFileExists':self.generic_file.verify_file_exists,
                   'createFolder':self.genric_folder.create_folder,
-                  'reanmeFolder':self.genric_folder.rename_folder,
+                  'renameFolder':self.genric_folder.rename_folder,
                   'deleteFolder':self.genric_folder.delete_folder,
                   'verifyFolderExists':self.genric_folder.verify_folder_exists,
                   'compareContent':self.generic_file.compare_content,
@@ -77,6 +77,8 @@ class GenericKeywordDispatcher:
                 logger.log(generic_constants.INVALID_INPUT)
          except Exception as e:
             Exceptions.error(e)
+
+
 
 
 

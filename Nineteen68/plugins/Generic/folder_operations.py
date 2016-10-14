@@ -18,6 +18,13 @@ import Exceptions
 class FolderOperations:
 
     def create_folder(self,input):
+        """
+        def : create_folder
+        purpose : creates the all the intermediate folders in the given path
+        param : input
+        return : bool
+
+        """
         try:
             logger.log(generic_constants.INPUT_IS+input)
             if not (input is None and input is ''):
@@ -38,6 +45,13 @@ class FolderOperations:
 
 
     def verify_folder_exists(self,input):
+        """
+        def : verify_folder_exists
+        purpose : verifies if the given folder exists
+        param : input
+        return : bool
+
+        """
         try:
             logger.log(generic_constants.INPUT_IS+input)
             if not (input is None and input is ''):
@@ -54,6 +68,13 @@ class FolderOperations:
             return False
 
     def rename_folder(self,actualpath,renamepath):
+        """
+        def : rename_folder
+        purpose : renames the folder in the 'actualpath' by 'renamepath'
+        param : actualpath,renamepath
+        return : bool
+
+        """
         try:
             logger.log(generic_constants.INPUT_IS+actualpath)
             if not (actualpath is None and actualpath is ''):
@@ -72,14 +93,22 @@ class FolderOperations:
             return False
 
 
-    def delete_folder(self,input,force_delete):
+    def delete_folder(self,input):
+        """
+        def : delete_folder
+        purpose : deletes / force deletes the given folder based on the argument
+                  optional argument '1' which indicates 'force_delete'
+        param : input,force_delete
+        return : bool
+
+        """
         try:
             logger.log(generic_constants.INPUT_IS+input)
             if not (input is None and input is ''):
                 try:
 
                     if os.path.exists(input):
-                        if force_delete==1:
+                        if len(args)==1 and args[0] == 1:
                             import shutil
                             shutil.rmtree(input)
                         else:
@@ -97,20 +126,4 @@ class FolderOperations:
         except Exception as e:
             Exceptions.error(e)
             return False
-
-
-
-
-##obj=FolderOperations()
-##input1='D:\\1968-2.0\\nineteen68\\Nineteen68\\plugins\\Generic\\file_operationsNEW.txt'
-##delete='D:\\1968-2.0\\Nineteen68\\Nineteen68\\plugins\\Generic\\delete'
-####input2='D:\\1968-2.0\\nineteen68\\Nineteen68\\plugins\\Generic\\hi.txt'
-####obj.create_file(input1)
-##obj.verify_folder_exists(delete)
-####obj.rename_file(input1,input2)
-####obj.verify_file_exists(input2)
-##obj.delete_folder(delete)
-
-
-
 
