@@ -47,6 +47,7 @@ class OutlookKeywords:
                 inbox = self.outlook.GetDefaultFolder(constants.INBOX_FOLDER)
                 all_inbox = inbox.Items
                 folders = inbox.Folders
+                all_inbox=reversed(list(all_inbox))
                 for msg in all_inbox:
                     if msg.Class==43:
                         if msg.SenderName==self.senderEmail:
