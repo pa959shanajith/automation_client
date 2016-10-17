@@ -125,7 +125,7 @@ class StringOperation:
             if not (input is None and input is ''):
                 input_len = len(input)
                 if (input_len % 2 == 0):
-                    even_inp = input_len/2 + 1
+                    even_inp = input_len/2
                     output = input[even_inp]
                     logger.log(output)
                     return True
