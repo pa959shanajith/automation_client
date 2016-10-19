@@ -104,9 +104,12 @@ class StringOperation:
             if not (actual_string is None and actual_string is ''):
                 if not (index is None and index is ''):
                     index_toint = int(index)
-                    output = actual_string[index_toint:]
-                    logger.log(output)
-                    return output
+                    if index_toint > 0:
+                        output = actual_string[-index_toint:]
+                        logger.log(output)
+                        return output
+                    else:
+                        logger.log(generic_constants.INVALID_INPUT)
                 else:
                     logger.log(generic_constants.INVALID_INPUT)
                     return False
@@ -125,7 +128,7 @@ class StringOperation:
             if not (input is None and input is ''):
                 input_len = len(input)
                 if (input_len % 2 == 0):
-                    even_inp = input_len/2 + 1
+                    even_inp = input_len/2
                     output = input[even_inp]
                     logger.log(output)
                     return True
@@ -337,8 +340,10 @@ class StringOperation:
 ##obj.getSubString("RAKESH","5-6")
 ##obj.find("Rakesh","z")
 ##obj.left("Rakesh SV","7")
-##obj.right("Rakesh SV",7)
+##obj.right("RakeshSV",7)
 ##obj.getStringLength("\"\"")
 ##obj.stringGeneration('char','1')
+
+
 
 
