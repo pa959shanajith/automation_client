@@ -53,7 +53,7 @@ class FileOperations:
 
               '.txt_replace_content':self.txt.replace_content,
               '.xls_replace_content':self.excel.replace_content_xls,
-              '.xlsx_replace_content':self.excel.replace_content_xls,
+              '.xlsx_replace_content':self.excel.replace_content_xlsx,
 
               '.txt_get_line_number':self.txt.get_linenumber,
               '.xls_get_line_number':self.excel.get_linenumber_xls,
@@ -343,3 +343,4 @@ class FileOperations:
             else:
                 params.append(x)
         return params
+

@@ -16,14 +16,14 @@ import folder_operations
 import logger
 import generic_constants
 import Exceptions
-import excel_operartions
+import excel_operations
 
 class GenericKeywordDispatcher:
     generic_date = date_ops_keywords.DateOperation()
     generic_string =string_ops_keywords.StringOperation()
     generic_file=file_operations.FileOperations()
     genric_folder=folder_operations.FolderOperations()
-    generic_excel=excel_operartions.ExcelFile()
+    generic_excel=excel_operations.ExcelFile()
     def dispatcher(self,keyword,*message):
          logger.log('Keyword is '+keyword)
          try:
@@ -77,9 +77,3 @@ class GenericKeywordDispatcher:
                 logger.log(generic_constants.INVALID_INPUT)
          except Exception as e:
             Exceptions.error(e)
-
-
-
-
-
-
