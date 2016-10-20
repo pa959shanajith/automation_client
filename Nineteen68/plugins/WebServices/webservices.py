@@ -111,19 +111,21 @@ class WSkeywords:
             if not(header is None and header is ''):
                 header = str(header).replace('\n','').replace("'",'')
                 header=header.split('##')
-                dict={}
+                header_dict={}
+                if self.baseReqHeader is not None and isinstance(self.baseReqHeader,dict):
+                    header_dict=self.baseReqHeader
                 #to support update of header multiple times
                 for x in header:
                     if ':' in x:
                         index=x.index(':')
-                        dict[x[0:index].strip()]=x[index+1:].strip()
-                if len(dict) !=0:
-                    self.baseReqHeader=dict
-                    logger.log(dict)
-                    if 'Content-Type' in dict.keys():
-                        self.content_type=dict['Content-Type']
+                        header_dict[x[0:index].strip()]=x[index+1:].strip()
+                if len(header_dict) !=0:
+                    self.baseReqHeader=header_dict
+                    logger.log(header_dict)
+                    if 'Content-Type' in header_dict.keys():
+                        self.content_type=header_dict['Content-Type']
                 else:
-                    self.baseReqHeader=header
+                    self.baseReqHeader=header[0]
                 return True
             else:
                 logger.log(ws_constants.METHOD_INVALID_INPUT)
@@ -151,7 +153,7 @@ class WSkeywords:
         logger.log(response.status_code)
         self.baseResHeader=response.headers
         #added status code
-        self.baseResHeader['status_code']=response.status_code
+        self.baseResHeader['StatusCode']=response.status_code
         logger.log(ws_constants.RESPONSE_HEADER+str(self.baseResHeader))
         self.baseResBody=response.content
         logger.log(ws_constants.RESPONSE_BODY+str(self.baseResBody))
@@ -172,11 +174,12 @@ class WSkeywords:
 
      def get(self):
         if not (self.baseEndPointURL is '' or self.baseOperation is '' or self.baseReqHeader is ''):
+            print self.baseReqHeader
             req=self.baseEndPointURL+'/'+self.baseOperation+'?'+self.baseReqHeader
         elif not (self.baseEndPointURL is ''):
             req=self.baseEndPointURL
-            response=requests.get(req)
-            self.__saveResults(response)
+        response=requests.get(req)
+        self.__saveResults(response)
         return self.baseResHeader,self.baseResBody
 
      def put(self):
