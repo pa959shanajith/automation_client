@@ -173,7 +173,7 @@ class FileOperations:
         try:
             status=False
             params=self.__split(input_path,content,*args)
-            if self.verify_file_exists(params[0]) == True:
+            if self.verify_file_exists(params[0],'') == True:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
                     status= self.dict[file_ext+'_verify_content'](*params)
@@ -212,11 +212,11 @@ class FileOperations:
         """
         try:
             status=False
-            params=self.__split(input_path1,input_path2)
+            params=self.__split(input_path1,input_path2,*args)
             path2=params[1]
             if len(params)>2:
                 path2=params[2]
-            if self.verify_file_exists(params[0]) == True and self.verify_file_exists(path2) :
+            if self.verify_file_exists(params[0],'') == True and self.verify_file_exists(path2,'') :
                 file_ext1,status1=self.__get_ext(params[0])
                 file_ext2,status2=self.__get_ext(path2)
                 if status1 == True and status2==True and file_ext1==file_ext2:
@@ -236,7 +236,7 @@ class FileOperations:
         try:
             status=False
             params=self.__split(input_path)
-            if self.verify_file_exists(params[0]) == True:
+            if self.verify_file_exists(params[0],'') == True:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
                     status=self.dict[file_ext+'_clear_content'](*params)
