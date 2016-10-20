@@ -620,12 +620,9 @@ class ExcelFile:
         """
         book=load_workbook(inputpath)
         sheet=book.get_sheet_by_name(sheetname)
-        print 'max-row',sheet.max_row
-        print 'max-row',sheet.max_column
         row_list=list(sheet.iter_rows())
         row=row_list[0]
         cell=row[0]
-        print cell.value
         if sheet.max_row==1 and cell.value is None:
             last_row=1
             last_col=1
@@ -663,11 +660,9 @@ class ExcelFile:
         logger.log(generic_constants.INPUT_IS+input_path+' '+sheetname)
         #loads the xls workbook
         workbook_info=self.__load_workbook_xlsx(input_path,sheetname)
-        print 'info',workbook_info
         row=workbook_info[2]
         col=workbook_info[3]
         if len(args)>0 and args[0] == 'newline':
-            print row
             row=row+1
             col=1
 

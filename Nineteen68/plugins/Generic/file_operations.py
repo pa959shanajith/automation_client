@@ -292,7 +292,7 @@ class FileOperations:
         """
         try:
             status=False
-            params=self.__split(input_path,content)
+            params=self.__split(input_path,content,*args)
             if self.verify_file_exists(params[0],'') == True:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
