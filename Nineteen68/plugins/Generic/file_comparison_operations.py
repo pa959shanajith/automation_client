@@ -57,7 +57,7 @@ class PdfFile:
                 page=reader.getPage(pagenumber)
                 content=page.extractText()
                 content=content.encode('utf-8')
-                if args[0]=='_internal_verify_content':
+                if len(args)>1 and args[1]=='_internal_verify_content':
                     return content
                 if len(args) >= 2 and not (args[0] is None and args[1] is None):
                     start=args[0].strip()
