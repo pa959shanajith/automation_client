@@ -15,23 +15,26 @@ import time
 
 import browserops
 import clickandadd
-import objectmapper
+import highlight
 import io
+import logging
+
 class Object_Mapper():
 
-    def compare(self):
+    def compare(self,browserType):
         a=browserops.BrowserOperations()
-        a.openBrowser('CH')
+        a.openBrowser(browserType)
         time.sleep(10)
-        find_ele=objectmapper.Highlight()
+        find_ele=highlight.Highlight()
 
         with open('domelements_scraped.json') as data_file:
             self.data = json.load(data_file)
-            lst=[]
+
             for element  in self.data['view']:
-                    updated_ele=find_ele.find_element(element['xpath']+','+element['url'],element)
-                    lst.append(updated_ele)
-            vie = {'view': lst}
+                    updated_ele=find_ele.highlight('OBJECTMAPPER'+','+element['xpath']+','+element['url'],element)
+
+
+            vie = {'view': highlight.lst}
             with open('domelements.json', 'w') as outfile:
                 json.dump(vie, outfile, indent=4, sort_keys=False)
 
@@ -54,7 +57,15 @@ class Object_Mapper():
 
 
 
-a=Object_Mapper()
-a.compare()
-a.clickandadd()
+
+if __name__ == '__main__':
+        print 'Inside main'
+        logging.basicConfig(filename='python-scrappy.log', level=logging.DEBUG, format='%(asctime)s--Line No:%(lineno)d--%(message)s')
+        logging.debug('==================OBJECT MAPPING UTILITY STARTED============================')
+        logging.debug('---------------------------------------------------------------------------------------')
+        a=Object_Mapper()
+        a.compare('CH')
+        a.clickandadd()
+
+        print 'End of main'
 
