@@ -123,7 +123,8 @@ class FileOperations:
             inputpath=inputpath.strip()
             logger.log(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             if not (inputpath is None and inputpath is ''):
-                rename_path=inputpath[0:inputpath.find('/')]+'/'+file_name
+                rename_path=inputpath+'/'+rename_file
+                inputpath=inputpath+'/'+file_name
                 if os.path.isfile(inputpath):
                     os.rename(inputpath,rename_path)
                     status= True
@@ -292,7 +293,7 @@ class FileOperations:
         """
         try:
             status=False
-            params=self.__split(input_path,content)
+            params=self.__split(input_path,content,*args)
             if self.verify_file_exists(params[0],'') == True:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
