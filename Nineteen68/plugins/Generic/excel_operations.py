@@ -691,11 +691,14 @@ class ExcelFile:
         workbook = copy(book)
         sheets=book.sheet_names()
         try:
-            sheetnum=sheets.index(self.sheetname)
-            s = workbook.get_sheet(sheetnum)
-            s.write(row,col,'')
-            workbook.save(self.excel_path)
-            return True
+            if row>0 and col>0:
+                sheetnum=sheets.index(self.sheetname)
+                s = workbook.get_sheet(sheetnum)
+                s.write(row-1,col-1,'')
+                workbook.save(self.excel_path)
+                return True
+            else:
+                logger.log('Row/Col should be greater than 0')
         except ValueError:
             Exception.message('Value Error occured')
         workbook.save(self.excel_path)

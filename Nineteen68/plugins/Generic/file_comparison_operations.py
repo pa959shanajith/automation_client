@@ -251,18 +251,3 @@ class XML:
             myFile.close()
             return True
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
