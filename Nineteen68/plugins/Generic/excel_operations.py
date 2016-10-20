@@ -425,6 +425,7 @@ class ExcelFile:
         logger.log(generic_constants.INPUT_IS+inputpath+' '+sheetname)
         from win32com.client.gencache import EnsureDispatch
         excel = EnsureDispatch("Excel.Application")
+        excel.DisplayAlerts = False
         excel_file = excel.Workbooks.Open(inputpath)
         sheet = excel.Sheets(sheetname)
         sheet.Delete()
@@ -533,13 +534,13 @@ class ExcelFile:
         """
         book = open_workbook(inputpath,formatting_info=True)
         sheet=book.sheet_by_name(sheetname)
-        if sheet.nrows==0:
-            last_row=0
-            last_col=0
-        else:
+        last_row=-1
+        last_col=-1
+        if sheet.nrows>0:
             last_row=sheet.nrows-1
             row=sheet.row(last_row)
             last_col=len(row)-1
+
         return book,sheet,last_row,last_col,sheet.nrows
 
     def write_to_file_xls(self,input_path,sheetname,content,*args):
@@ -555,11 +556,18 @@ class ExcelFile:
         workbook_info=self.__load_workbook_xls(input_path,sheetname)
         row=workbook_info[2]
         col=workbook_info[3]
-        if len(args)>0 and args[0] == 'newline' and workbook_info[3] !=0:
-            row=row+1
+        if len(args)>0 and args[0] == 'newline':
             col=0
+            if workbook_info[3] != -1:
+                row=row+1
+                col=workbook_info[3]
+            else:
+                row=0
+        elif workbook_info[3]==-1:
+            row=col=0
+
         #writes to the cell in given row,col
-        status=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content,)
+        status=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content)
         return status
 
 
@@ -576,7 +584,11 @@ class ExcelFile:
         #loads the xls workbook
         workook_info=self.__load_workbook_xls(self.excel_path,self.sheetname)
         #writes to the cell in given row,col
-        status=self.__write_to_cell_xls(self.excel_path,workook_info[0],self.sheetname,row,col,value)
+        status=False
+        if(int(row)>0 and int(col)>0):
+            row=int(row)-1
+            col=int(col)-1
+            status=self.__write_to_cell_xls(self.excel_path,workook_info[0],self.sheetname,row,col,value)
         return status
 
     def __write_to_cell_xlsx(self,input_path,book,sheetname,row,col,value,*args):
@@ -608,13 +620,19 @@ class ExcelFile:
         """
         book=load_workbook(inputpath)
         sheet=book.get_sheet_by_name(sheetname)
-        if sheet.max_row==1:
+        print 'max-row',sheet.max_row
+        print 'max-row',sheet.max_column
+        row_list=list(sheet.iter_rows())
+        row=row_list[0]
+        cell=row[0]
+        print cell.value
+        if sheet.max_row==1 and cell.value is None:
             last_row=1
             last_col=1
         else:
-            last_row=sheet.max_column
-            row=list(sheet.iter_rows())[len(list(sheet.iter_rows()))-1]
-            last_col=len(row)
+            last_row=sheet.max_row
+            row=row_list[len(row_list)-1]
+            last_col=len(row)+1
 
         return book,sheet,last_row,last_col,sheet.max_row
 
@@ -645,9 +663,10 @@ class ExcelFile:
         logger.log(generic_constants.INPUT_IS+input_path+' '+sheetname)
         #loads the xls workbook
         workbook_info=self.__load_workbook_xlsx(input_path,sheetname)
+        print 'info',workbook_info
         row=workbook_info[2]
         col=workbook_info[3]
-        if len(args)>0 and args[0] == 'newline' and workbook_info[3] !=0:
+        if len(args)>0 and args[0] == 'newline':
             print row
             row=row+1
             col=1
@@ -759,3 +778,4 @@ class ExcelFile:
         sheet=book.get_sheet_by_name(self.sheetname)
         colcount=sheet.max_column
         return colcount
+

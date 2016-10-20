@@ -14,7 +14,7 @@ import os
 import logger
 import generic_constants
 from file_comparison_operations import TextFile,PdfFile,XML
-from excel_operartions import ExcelFile
+from excel_operations import ExcelFile
 import Exceptions
 
 
@@ -60,92 +60,97 @@ class FileOperations:
               '.xlsx_get_line_number':self.excel.get_linenumber_xlsx
               }
 
-    def create_file(self,input):
+    def create_file(self,inputpath,file_name):
         """
         def : create_file
         purpose : creates the file in the given input path
-        param : input
+        param : inputpath,file_name
         return : bool
 
         """
         try:
-            input=input.strip()
-            logger.log(generic_constants.INPUT_IS+input)
+            status=False
+            inputpath=inputpath.strip()
+            logger.log(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             if not (input is None and input is ''):
-                if not os.path.isfile(input):
-                    open(input, 'w').close()
-                    return True
+                if not os.path.isfile(inputpath+'/'+file_name):
+                    open(inputpath+'/'+file_name, 'w').close()
+                    status=True
                 else:
                     logger.log(generic_constants.FILE_EXISTS)
             else:
                 logger.log(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
-        return False
+        return status
 
 
-    def verify_file_exists(self,input):
+    def verify_file_exists(self,inputpath,file_name):
         """
         def : verify_file_exists
         purpose : verifies if file exists in the given input path
-        param : input
+        param : inputpath,file_name
         return : bool
 
         """
         try:
-            input=input.strip()
-            logger.log(generic_constants.INPUT_IS+input)
+            status=False
+            inputpath=inputpath.strip()
+            logger.log(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             if not (input is None and input is ''):
-                if os.path.isfile(input):
+                if file_name is not '':inputpath=inputpath+'/'+file_name
+                if os.path.isfile(inputpath):
                     logger.log(generic_constants.FILE_EXISTS)
-                    return True
+                    status=True
                 else:
                     logger.log(generic_constants.FILE_NOT_EXISTS)
             else:
                 logger.log(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
-        return False
+        return status
 
-    def rename_file(self,actualpath,renamepath):
+    def rename_file(self,inputpath,file_name,rename_file):
         """
         def : rename_file
-        purpose : renames the file in the 'actualpath' by 'renamepath'
-        param : actualpath,renamepath
+        purpose : renames the file in the 'inputpath' by 'renamepath'
+        param : inputpath,file_name
         return : bool
 
         """
         try:
-            actualpath=actualpath.strip()
-            logger.log(generic_constants.INPUT_IS+actualpath)
-            if not (actualpath is None and actualpath is ''):
-                if os.path.isfile(actualpath):
-                    os.rename(actualpath,renamepath)
-                    return True
+            status=False
+            inputpath=inputpath.strip()
+            logger.log(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
+            if not (inputpath is None and inputpath is ''):
+                rename_path=inputpath[0:inputpath.find('/')]+'/'+file_name
+                if os.path.isfile(inputpath):
+                    os.rename(inputpath,rename_path)
+                    status= True
                 else:
                     logger.log(generic_constants.FILE_NOT_EXISTS)
             else:
                 logger.log(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
-        return False
+        return status
 
 
-    def delete_file(self,input):
+    def delete_file(self,inputpath,file_name):
         """
         def : delete_file
         purpose : deletes the file in the input path
-        param : input
+        param : inputpath,file_name
         return : bool
 
         """
         try:
-            input=input.strip()
             status=False
-            logger.log(generic_constants.INPUT_IS+input)
+            inputpath=inputpath.strip()
+            logger.log(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             if not (input is None and input is ''):
-                if os.path.isfile(input):
-                    os.remove(input)
+                if os.path.isfile(inputpath+'/'+file_name):
+                    os.remove(inputpath+'/'+file_name)
                     status= True
                 else:
                     logger.log(generic_constants.FILE_NOT_EXISTS)
@@ -249,7 +254,8 @@ class FileOperations:
         try:
             status=False
             params=self.__split(input_path,*args)
-            if self.verify_file_exists(params[0]) == True:
+
+            if self.verify_file_exists(params[0],'') == True:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
                     status=self.dict[file_ext+'_get_content'](*params)
@@ -268,7 +274,7 @@ class FileOperations:
         try:
             status=False
             params=self.__split(input_path,existing_content,replace_content)
-            if self.verify_file_exists(params[0]) == True:
+            if self.verify_file_exists(params[0],'') == True:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
                     status=self.dict[file_ext+'_replace_content'](*params)
@@ -276,7 +282,7 @@ class FileOperations:
             Exceptions.error(e)
         return status
 
-    def write_to_file(self,input_path,content):
+    def write_to_file(self,input_path,content,*args):
         """
         def : replace_content
         purpose : calls the respective method to write the content to given file based on file type
@@ -287,7 +293,7 @@ class FileOperations:
         try:
             status=False
             params=self.__split(input_path,content)
-            if self.verify_file_exists(params[0]) == True:
+            if self.verify_file_exists(params[0],'') == True:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
                     status = self.dict[file_ext+'_write_to_file'](*params)
@@ -308,7 +314,7 @@ class FileOperations:
         try:
             status=False
             params=self.__split(input_path,content)
-            if self.verify_file_exists(params[0]) == True:
+            if self.verify_file_exists(params[0],'') == True:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
                     linenumbers= self.dict[file_ext+'_get_line_number'](*params)
@@ -337,5 +343,3 @@ class FileOperations:
             else:
                 params.append(x)
         return params
-
-

@@ -14,22 +14,24 @@ import os
 import logger
 import generic_constants
 import Exceptions
+from file_operations import FileOperations
+
 
 class FolderOperations:
 
-    def create_folder(self,input):
+    def create_folder(self,inputpath,folder_name):
         """
         def : create_folder
         purpose : creates the all the intermediate folders in the given path
-        param : input
+        param : inputpath,folder_name
         return : bool
 
         """
         try:
-            logger.log(generic_constants.INPUT_IS+input)
-            if not (input is None and input is ''):
-                if not os.path.exists(input):
-                    os.makedirs(input)
+            logger.log(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
+            if not (inputpath is None and inputpath is ''):
+                if not os.path.exists(inputpath+'/'+folder_name):
+                    os.makedirs(inputpath+'/'+folder_name)
                     return True
                 else:
                     logger.log(generic_constants.FILE_EXISTS)
@@ -44,18 +46,18 @@ class FolderOperations:
 
 
 
-    def verify_folder_exists(self,input):
+    def verify_folder_exists(self,inputpath,folder_name):
         """
         def : verify_folder_exists
         purpose : verifies if the given folder exists
-        param : input
+        param : inputpath,folder_name
         return : bool
 
         """
         try:
-            logger.log(generic_constants.INPUT_IS+input)
-            if not (input is None and input is ''):
-                if os.path.exists(input):
+            logger.log(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
+            if not (inputpath is None and inputpath is ''):
+                if os.path.exists(inputpath+'/'+folder_name):
                     logger.log(generic_constants.FILE_EXISTS)
                     return True
                 else:
@@ -67,19 +69,21 @@ class FolderOperations:
             Exceptions.error(e)
             return False
 
-    def rename_folder(self,actualpath,renamepath):
+    def rename_folder(self,inputpath,folder_name,rename_folder):
         """
         def : rename_folder
-        purpose : renames the folder in the 'actualpath' by 'renamepath'
-        param : actualpath,renamepath
+        purpose : renames the 'folder_name' in the 'inputpath' by 'rename_folder'
+        param : inputpath,folder_name
         return : bool
 
         """
         try:
-            logger.log(generic_constants.INPUT_IS+actualpath)
-            if not (actualpath is None and actualpath is ''):
-                if os.path.exists(actualpath):
-                    os.renames(actualpath,renamepath)
+            logger.log(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name+' new folder name '+rename_folder)
+            if not (inputpath is None and inputpath is ''):
+                old_path=inputpath+'/'+folder_name
+                rename_path=inputpath+'/'+rename_folder
+                if os.path.exists(old_path):
+                    os.renames(old_path,rename_path)
                     return True
                 else:
                     logger.log(generic_constants.FILE_NOT_EXISTS)
@@ -93,26 +97,26 @@ class FolderOperations:
             return False
 
 
-    def delete_folder(self,input):
+    def delete_folder(self,inputpath,folder_name,*args):
         """
         def : delete_folder
         purpose : deletes / force deletes the given folder based on the argument
                   optional argument '1' which indicates 'force_delete'
-        param : input,force_delete
+       param : inputpath,folder_name
         return : bool
 
         """
         try:
-            logger.log(generic_constants.INPUT_IS+input)
-            if not (input is None and input is ''):
+            logger.log(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
+            if not (inputpath is None and inputpath is ''):
                 try:
 
-                    if os.path.exists(input):
+                    if os.path.exists(inputpath+'/'+folder_name):
                         if len(args)==1 and int(args[0]) == 1:
                             import shutil
-                            shutil.rmtree(input)
+                            shutil.rmtree(inputpath+'/'+folder_name)
                         else:
-                            os.rmdir(input)
+                            os.rmdir(inputpath+'/'+folder_name)
                         return True
                     else:
                         logger.log(generic_constants.FILE_NOT_EXISTS)
@@ -126,4 +130,5 @@ class FolderOperations:
         except Exception as e:
             Exceptions.error(e)
             return False
+
 

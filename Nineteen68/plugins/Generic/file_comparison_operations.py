@@ -41,7 +41,7 @@ class PdfFile:
         return filecmp.cmp(input_path1,input_path2)
 
 
-    def get_content(self,input_path,pagenumber,output_file,*args):
+    def get_content(self,input_path,pagenumber,*args):
         """
         def : get_content
         purpose : return the content present in given pagnumber of pdf file
@@ -57,17 +57,24 @@ class PdfFile:
                 page=reader.getPage(pagenumber)
                 content=page.extractText()
                 content=content.encode('utf-8')
-                logger.log('Content is:'+content)
-                if output_file=='_internal_verify_content':
+                if args[0]=='_internal_verify_content':
                     return content
-                if len(args) == 2:
+                if len(args) >= 2 and not (args[0] is None and args[1] is None):
                     start=args[0].strip()
                     end=args[1].strip()
-                    content=content[content.find(start)+1:content.find(end)]
-                    return content
-                else:
-                    with open(output_file,'w') as file:
+                    startIndex=0
+                    endIndex=len(content)
+                    if not start is '':
+                        startIndex=content.find(start)+len(start)
+                    if not end is '':
+                        endIndex=content.find(end)
+                    content=content[startIndex:endIndex]
+                    logger.log('Content between Start and End string is ')
+                elif len(args)==1:
+                    with open(args[0],'w') as file:
                         file.write(content)
+                        file.close()
+                logger.log(content)
                 return content
              else:
                 logger.log(generic_constants.INVALID_INPUT)
