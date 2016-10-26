@@ -22,7 +22,7 @@ FILE_NOT_EXISTS='File does not exists'
 
 FOLDER_NOT_EXISTS='Folder does not exists'
 
-FILE_TYPES=['.txt','.xls','.xlsx','.pdf','.xml']
+FILE_TYPES=['.txt','.xls','.xlsx','.pdf','.xml','.csv']
 
 INVALID_FILE_FORMAT='Invalid file format'
 
@@ -31,6 +31,10 @@ INDEX_EXCEEDS='Index of row/col is exceeded'
 INP_VAL_EXCEEDS = 'Given length should be greater than 0'
 
 DATE_FORMAT = '%d/%m/%Y'
+
+DATABASE_FILE = '\Ninteen68Database_verify.xls'
+
+DATABASE_SHEET = 'Sheet0'
 
 
 
