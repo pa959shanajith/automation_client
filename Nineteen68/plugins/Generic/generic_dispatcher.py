@@ -17,6 +17,7 @@ import logger
 import generic_constants
 import Exceptions
 import excel_operations
+import database_keywords
 
 class GenericKeywordDispatcher:
     generic_date = date_ops_keywords.DateOperation()
@@ -24,6 +25,7 @@ class GenericKeywordDispatcher:
     generic_file=file_operations.FileOperations()
     genric_folder=folder_operations.FolderOperations()
     generic_excel=excel_operations.ExcelFile()
+    generic_database =database_keywords.DatabaseOperation()
     def dispatcher(self,keyword,*message):
          logger.log('Keyword is '+keyword)
          try:
@@ -69,7 +71,11 @@ class GenericKeywordDispatcher:
                   'clearExcelPath':self.generic_excel.clear_excel_path,
                   'deleteRow':self.generic_excel.delete_row,
                   'getRowCount':self.generic_excel.get_rowcount,
-                  'getColumnCount':self.generic_excel.get_colcount
+                  'getColumnCount':self.generic_excel.get_colcount,
+                  'runQuery':self.generic_database.runQuery,
+                  'getData':self.generic_database.getData,
+                  'exportData':self.generic_database.exportData,
+                  'verifyData':self.generic_database.verifyData
                 }
             if keyword in dict.keys():
                 return dict[keyword](*message)
