@@ -13,6 +13,7 @@ import sys
 import os
 import logger
 import generic_constants
+import folder_operations
 from file_comparison_operations import TextFile,PdfFile,XML
 from excel_operations import ExcelFile
 import Exceptions
@@ -22,11 +23,11 @@ class FileOperations:
 
     """The instantiation operation __init__ creates an empty object of the class FileOperations when it is instantiated"""
     def __init__(self):
-        print 'init'
         self.txt=TextFile()
         self.pdf=PdfFile()
         self.excel=ExcelFile()
         self.xml=XML()
+        self.folder=folder_operations.FolderOperations()
         """Mapping of keywords to its respective methods"""
         self.dict={'.txt_write_to_file':self.txt.write_to_file,
               '.xls_write_to_file':self.excel.write_to_file_xls,
@@ -72,7 +73,7 @@ class FileOperations:
             status=False
             inputpath=inputpath.strip()
             logger.log(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
-            if not (input is None and input is ''):
+            if not (input is None and input is '') and self.folder.validateFolderName(file_name) :
                 if not os.path.isfile(inputpath+'/'+file_name):
                     open(inputpath+'/'+file_name, 'w').close()
                     status=True

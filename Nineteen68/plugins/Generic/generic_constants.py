@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        generic_constants
 # Purpose:
 #
 # Author:      sushma.p
@@ -14,9 +14,13 @@ INVALID_INPUT='Invalid Input'
 
 FILE_EXISTS='File exists'
 
+FOLDER_EXISTS='Folder exists'
+
 INPUT_IS='Input is:'
 
 FILE_NOT_EXISTS='File does not exists'
+
+FOLDER_NOT_EXISTS='Folder does not exists'
 
 FILE_TYPES=['.txt','.xls','.xlsx','.pdf','.xml']
 

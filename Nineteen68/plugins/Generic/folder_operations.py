@@ -14,7 +14,7 @@ import os
 import logger
 import generic_constants
 import Exceptions
-from file_operations import FileOperations
+import file_operations
 
 
 class FolderOperations:
@@ -29,12 +29,12 @@ class FolderOperations:
         """
         try:
             logger.log(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
-            if not (inputpath is None and inputpath is ''):
+            if not (inputpath is None and inputpath is '') and self.validateFolderName(folder_name):
                 if not os.path.exists(inputpath+'/'+folder_name):
                     os.makedirs(inputpath+'/'+folder_name)
                     return True
                 else:
-                    logger.log(generic_constants.FILE_EXISTS)
+                    logger.log(generic_constants.FOLDER_EXISTS)
                     return False
 
             else:
@@ -58,10 +58,10 @@ class FolderOperations:
             logger.log(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
             if not (inputpath is None and inputpath is ''):
                 if os.path.exists(inputpath+'/'+folder_name):
-                    logger.log(generic_constants.FILE_EXISTS)
+                    logger.log(generic_constants.FOLDER_EXISTS)
                     return True
                 else:
-                    logger.log(generic_constants.FILE_NOT_EXISTS)
+                    logger.log(generic_constants.FOLDER_NOT_EXISTS)
             else:
                 logger.log(generic_constants.INVALID_INPUT)
             return False
@@ -86,7 +86,7 @@ class FolderOperations:
                     os.renames(old_path,rename_path)
                     return True
                 else:
-                    logger.log(generic_constants.FILE_NOT_EXISTS)
+                    logger.log(generic_constants.FOLDER_NOT_EXISTS)
                     return False
 
             else:
@@ -119,7 +119,7 @@ class FolderOperations:
                             os.rmdir(inputpath+'/'+folder_name)
                         return True
                     else:
-                        logger.log(generic_constants.FILE_NOT_EXISTS)
+                        logger.log(generic_constants.FOLDER_NOT_EXISTS)
                         return False
                 except ValueError,WindowsError:
                     Exception.message('Error occured')
@@ -131,4 +131,12 @@ class FolderOperations:
             Exceptions.error(e)
             return False
 
+    def validateFolderName(self,name):
+        invalid_chars='\/:*?"<>|'
+        chars = set(invalid_chars)
+        if any((c in chars) for c in name):
+            logger.log("A Folder/File name can't contain any of the following characters "+invalid_chars)
+            return False
+        else:
+            return True
 
