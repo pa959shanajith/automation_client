@@ -36,6 +36,10 @@ DATABASE_FILE = '\Ninteen68Database_verify.xls'
 
 DATABASE_SHEET = 'Sheet0'
 
+BATCH_FILE_TYPE='.bat'
+
+VBS_FILE_TYPE='.vbs'
+
 
 
 
