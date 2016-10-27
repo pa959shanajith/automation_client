@@ -565,6 +565,8 @@ class ExcelFile:
                 row=0
         elif workbook_info[3]==-1:
             row=col=0
+        else:
+            col+=1
 
         #writes to the cell in given row,col
         status=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content)
