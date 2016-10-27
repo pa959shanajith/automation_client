@@ -116,7 +116,7 @@ class DatabaseOperation():
                         k+=1
                     obj = file_operations.FileOperations()
                     output = obj.compare_content(file_path,generic_constants.DATABASE_SHEET,inp_file,inp_sheet)
-                    if output == "True":
+                    if output == True:
                         return True
                     else:
                         return False
@@ -196,7 +196,7 @@ class DatabaseOperation():
         param : database type, IP, port number , database name, username , password , query
         return : connection object
         """
-        dbNumber = {4:'{SQL Server}',5:'{Microdsoft ODBC for Oracle}'}
+        dbNumber = {4:'{SQL Server}',5:'{Microdsoft ODBC for Oracle}',2:'{IBM DB2 ODBC DRIVER}'}
         try:
             self.dbtype= int(self.dbtype)
             self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[self.dbtype], self.ip, self.port, self.dbName, self.userName ,self.password ) )
@@ -235,7 +235,7 @@ class DatabaseOperation():
            ws = wb.add_sheet(generic_constants.DATABASE_SHEET)
            os.chdir('..')
            maindir = os.getcwd()
-           path = maindir + '\Nineteen68\plugins\Generic' + generic_constants.DATABASE_FILE
+           path = maindir + '\Generic' + generic_constants.DATABASE_FILE
 ##           path = 'D:\db6.xls'
            wb.save(path)
            return path

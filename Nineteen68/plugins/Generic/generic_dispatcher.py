@@ -26,6 +26,10 @@ class GenericKeywordDispatcher:
     genric_folder=folder_operations.FolderOperations()
     generic_excel=excel_operations.ExcelFile()
     generic_database =database_keywords.DatabaseOperation()
+    generic_batch=batch_operation_keyword.BatchOperationKeyword()
+    generic_math=math_operation_keywords.NumericStringParser()
+    generic_screenshot=screenshot_keywords.Screenshot()
+    generic_logical=logical_operation_keywords.logical_eval()
     def dispatcher(self,keyword,*message):
          logger.log('Keyword is '+keyword)
          try:
@@ -75,7 +79,11 @@ class GenericKeywordDispatcher:
                   'runQuery':self.generic_database.runQuery,
                   'getData':self.generic_database.getData,
                   'exportData':self.generic_database.exportData,
-                  'verifyData':self.generic_database.verifyData
+                  'verifyData':self.generic_database.verifyData,
+                  'evalLogicalExpression':self.generic_logical.eval_expression,
+                  'captureScreenshot':self.generic_screenshot.captureScreenshot,
+                  'executeFile':self.generic_batch.executeFile,
+                  'evaluate':self.generic_math.eval
                 }
             if keyword in dict.keys():
                 return dict[keyword](*message)
