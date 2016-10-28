@@ -20,7 +20,7 @@ import os
 import logger
 
 class DatabaseOperation():
-    def __init__(self, dbtype, ip , port , dbName, userName , password, query):
+    def __init__(self, ip , port , userName , password, dbName, query, dbtype):
         self.dbtype = dbtype
         self.ip = ip
         self.port = port
@@ -242,7 +242,7 @@ class DatabaseOperation():
         except Exception as e:
             Exceptions.error(e)
 
-##obj =DatabaseOperation('4','10.44.10.54','1433','Version20_TestDB','version20_test','version2.0_Test',"select * from Persons")
+##obj =DatabaseOperation('10.44.10.54','1433','version20_test','version2.0_Test','Version20_TestDB',"select * from Persons",'4')
 ##obj.runQuery()
 ##obj.getData()
 ##obj.exportData('D:\db5.xls','Sheet1')
