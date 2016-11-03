@@ -18,7 +18,10 @@ import clickandadd
 import highlight
 import io
 import logging
-
+import win32gui
+import win32con
+import logger
+currenthandle=''
 class Object_Mapper():
 
     def compare(self,browserType):
@@ -29,9 +32,29 @@ class Object_Mapper():
 
         with open('domelements_scraped.json') as data_file:
             self.data = json.load(data_file)
+            driver = browserops.driver
+            time.sleep(10)
+            hwndg = browserops.hwndg
+            logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: Obtained browser handle and driver from browserops.py class .....')
+            toolwindow = win32gui.GetForegroundWindow()
+##            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
+            logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: Minimizing the foreground window i.e tool and assuming AUT on top .....')
+            time.sleep(2)
+            actwindow = win32gui.GetForegroundWindow()
+##            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
+            javascript_hasfocus = """return(document.hasFocus());"""
 
+            for eachdriverhand in driver.window_handles:
+                logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: Iterating through the number of windows open by the driver')
+                driver.switch_to.window(eachdriverhand)
+                logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: Switching to each handle and checking weather it has focus ')
+                time.sleep(3)
+                if (driver.execute_script(javascript_hasfocus)):
+                        logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: Got the window which has the focus')
+                        global currenthandle
+                        currenthandle = eachdriverhand
             for element  in self.data['view']:
-                    updated_ele=find_ele.highlight('OBJECTMAPPER'+','+element['xpath']+','+element['url'],element)
+                    updated_ele=find_ele.highlight('OBJECTMAPPER'+','+element['xpath']+','+element['url'],element,currenthandle)
 
 
             vie = {'view': highlight.lst}
