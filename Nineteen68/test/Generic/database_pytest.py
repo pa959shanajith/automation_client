@@ -23,7 +23,7 @@ os.chdir(plug_path)
 
 ##test_data=readexcel_filefolder.read_excel_data(maindir + '\Nineteen68\\test\Generic' + '\generic.xls')
 import database_keywords
-dispatcher_obj = database_keywords.DatabaseOperation('4','10.44.10.54','1433','Version20_TestDB','version20_test','version2.0_Test',"select * from Persons")
+dispatcher_obj = database_keywords.DatabaseOperation('10.44.10.54','1433','version20_test','version2.0_Test','Version20_TestDB',"select * from Persons",'4')
 
 def test_generic_executor():
 
