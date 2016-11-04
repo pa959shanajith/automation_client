@@ -131,7 +131,7 @@ class ExcelFile:
         return None
 
 
-    def write_cell(self,row,col,value):
+    def write_cell(self,row,col,value,*args):
         """
         def : write_cell
         purpose : calls the respective method to write to the given cell of excel
@@ -144,7 +144,7 @@ class ExcelFile:
             file_ext,status=self.__get_ext(self.excel_path)
             if status == True:
                 logger.log('Row is'+str(row)+'and col is'+str(col))
-                status=self.dict['write_cell_'+file_ext](int(row),int(col),value)
+                status=self.dict['write_cell_'+file_ext](int(row),int(col),value,*args)
                 return status
         except Exception as e:
             Exceptions.error(e)
@@ -458,7 +458,7 @@ class ExcelFile:
         from xlrd import open_workbook
         book = open_workbook(self.excel_path)
         sheet = book.sheet_by_name(self.sheetname)
-        if row<sheet.nrows and col<sheet.ncols:
+        if row<=sheet.nrows and col<=sheet.ncols:
             cell=sheet.cell(row-1,col-1)
             if cell.ctype==3:
                 value=datetime.datetime(*xlrd.xldate_as_tuple(cell.value, book.datemode))
@@ -573,7 +573,7 @@ class ExcelFile:
         return status
 
 
-    def write_cell_xls(self,row,col,value):
+    def write_cell_xls(self,row,col,value,*args):
         """
         def : write_cell_xls
         purpose : calls the private methods to write given value to the cell of given
@@ -669,7 +669,7 @@ class ExcelFile:
             col=1
 
         #writes to the cell in given row,col
-        status=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,content,)
+        status=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,content)
         return status
 
 
@@ -778,4 +778,3 @@ class ExcelFile:
         sheet=book.get_sheet_by_name(self.sheetname)
         colcount=sheet.max_column
         return colcount
-
