@@ -22,15 +22,14 @@ os.chdir(plug_path)
 
 
 ##test_data=readexcel_filefolder.read_excel_data(maindir + '\Nineteen68\\test\Generic' + '\generic.xls')
-import database_keywords
-dispatcher_obj = database_keywords.DatabaseOperation('10.44.10.54','1433','version20_test','version2.0_Test','Version20_TestDB',"select * from Persons",'4')
+import generic_dispatcher
+dispatcher_obj =  generic_dispatcher.GenericKeywordDispatcher()
+
 
 def test_generic_executor():
 
 
-    assert dispatcher_obj.runQuery()
-    assert dispatcher_obj.getData()
-    assert dispatcher_obj.exportData(maindir + '\Nineteen68\\test\Generic' + '\generic.xls','Sheet4')
-    assert dispatcher_obj.verifyData(maindir + '\Nineteen68\\test\Generic' + '\generic.xls','Sheet5')
-
-
+    assert dispatcher_obj.dispatcher('runQuery','10.44.10.54','1433','version20_test','version2.0_Test','Version20_TestDB',"select * from Persons",'4')
+    assert dispatcher_obj.dispatcher('getData','10.44.10.54','1433','version20_test','version2.0_Test','Version20_TestDB',"select * from Persons",'4')
+##    assert dispatcher_obj.exportData(maindir + '\Nineteen68\\test\Generic' + '\generic.xls','Sheet4')
+##    assert dispatcher_obj.verifyData(maindir + '\Nineteen68\\test\Generic' + '\generic.xls','Sheet5')

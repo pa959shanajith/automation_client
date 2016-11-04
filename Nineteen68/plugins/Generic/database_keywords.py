@@ -20,17 +20,7 @@ import os
 import logger
 
 class DatabaseOperation():
-    def __init__(self, ip , port , userName , password, dbName, query, dbtype):
-        self.dbtype = dbtype
-        self.ip = ip
-        self.port = port
-        self.dbName = dbName
-        self.userName = userName
-        self.password = password
-        self.query = query
-
-
-    def runQuery(self):
+    def runQuery(self, ip , port , userName , password, dbName, query, dbtype):
         """
         def : runQuery
         purpose : Executes the query
@@ -38,15 +28,15 @@ class DatabaseOperation():
         return : boolean
         """
         try:
-            cnxn = self.connection()
+            cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
             cursor = cnxn.cursor()
             statement = ['create','update','insert','CREATE','UPDATE','INSERT']
-            if any(x in self.query for x in statement ):
-                cursor.execute(self.query)
+            if any(x in query for x in statement ):
+                cursor.execute(query)
                 cnxn.commit()
                 return True
             else:
-                cursor.execute(self.query)
+                cursor.execute(query)
                 return True
 ##                rows = cursor.fetchall()
 ##                for row in rows:
@@ -59,7 +49,7 @@ class DatabaseOperation():
             cursor.close()
             cnxn.close()
 
-    def getData(self):
+    def getData(self, ip , port , userName , password, dbName, query, dbtype):
         """
         def : getData
         purpose : Executes the query and gets the data
@@ -67,9 +57,9 @@ class DatabaseOperation():
         return : data
         """
         try:
-            cnxn = self.connection()
+            cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
             cursor = cnxn.cursor()
-            cursor.execute(self.query)
+            cursor.execute(query)
             rows = cursor.fetchall()
             for row in rows:
                 logger.log(row)
@@ -81,7 +71,7 @@ class DatabaseOperation():
             cursor.close()
             cnxn.close()
 
-    def verifyData(self,inp_file,inp_sheet):
+    def verifyData(self, ip , port , userName , password, dbName, query, dbtype,inp_file,inp_sheet):
         """
         def : verifyData
         purpose : Executes the query and compares the data with data in files
@@ -90,9 +80,9 @@ class DatabaseOperation():
         """
         try:
             file_path=self.create_file()
-            cnxn = self.connection()
+            cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
             cursor = cnxn.cursor()
-            cursor.execute(self.query)
+            cursor.execute(query)
             rows = cursor.fetchall()
             verify = os.path.isfile(inp_file)
             if (verify == True):
@@ -116,7 +106,7 @@ class DatabaseOperation():
                         k+=1
                     obj = file_operations.FileOperations()
                     output = obj.compare_content(file_path,generic_constants.DATABASE_SHEET,inp_file,inp_sheet)
-                    if output == True:
+                    if output == "True":
                         return True
                     else:
                         return False
@@ -132,7 +122,7 @@ class DatabaseOperation():
             cursor.close()
             cnxn.close()
 
-    def exportData(self,inp_file,inp_sheet=None):
+    def exportData(self, ip , port , userName , password, dbName, query, dbtype,inp_file,inp_sheet=None):
         """
         def : exportData
         purpose : Executes the query and exports the data to excel or csv file
@@ -140,9 +130,9 @@ class DatabaseOperation():
         return : bool
         """
         try:
-            cnxn = self.connection()
+            cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
             cursor = cnxn.cursor()
-            cursor.execute(self.query)
+            cursor.execute(query)
             rows = cursor.fetchall()
             columns = [column[0] for column in cursor.description]
             verify = os.path.isfile(inp_file)
@@ -189,7 +179,7 @@ class DatabaseOperation():
             cursor.close()
             cnxn.close()
 
-    def connection(self):
+    def connection(self,dbtype, ip , port , dbName, userName , password):
         """
         def : connection
         purpose : connecting to database based on database type given
@@ -198,8 +188,8 @@ class DatabaseOperation():
         """
         dbNumber = {4:'{SQL Server}',5:'{Microdsoft ODBC for Oracle}',2:'{IBM DB2 ODBC DRIVER}'}
         try:
-            self.dbtype= int(self.dbtype)
-            self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[self.dbtype], self.ip, self.port, self.dbName, self.userName ,self.password ) )
+            dbtype= int(dbtype)
+            self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
             return self.cnxn
         except Exception as e:
             Exceptions.error(e)
@@ -235,16 +225,16 @@ class DatabaseOperation():
            ws = wb.add_sheet(generic_constants.DATABASE_SHEET)
            os.chdir('..')
            maindir = os.getcwd()
-           path = maindir + '\Generic' + generic_constants.DATABASE_FILE
+           path = maindir + '\Nineteen68\plugins\Generic' + generic_constants.DATABASE_FILE
 ##           path = 'D:\db6.xls'
            wb.save(path)
            return path
         except Exception as e:
             Exceptions.error(e)
 
-##obj =DatabaseOperation('10.44.10.54','1433','version20_test','version2.0_Test','Version20_TestDB',"select * from Persons",'4')
-##obj.runQuery()
-##obj.getData()
-##obj.exportData('D:\db5.xls','Sheet1')
-##obj.exportData('D:\\test.csv')
-##obj.verifyData('D:\db5.xls','Sheet1')
+
+##obj = DatabaseOperation()
+##obj.runQuery('10.44.10.54','1433','version20_test','version2.0_Test','Version20_TestDB',,"select * from Persons",'4')
+##obj.getData('10.44.10.54','1433','version20_test','version2.0_Test','Version20_TestDB',"select * from Persons",'4')
+##obj.exportData('4','10.44.10.54','1433','Version20_TestDB','version20_test','version2.0_Test',"select * from Persons",'D:\db5.xls','Sheet1')
+##obj.verifyData('4','10.44.10.54','1433','Version20_TestDB','version20_test','version2.0_Test',"select * from Persons",'D:\db5.xls','Sheet1')

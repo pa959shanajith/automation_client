@@ -18,6 +18,10 @@ import generic_constants
 import Exceptions
 import excel_operations
 import database_keywords
+import math_operation_keywords
+import screenshot_keywords
+import logical_operation_keywords
+import batch_operation_keyword
 
 class GenericKeywordDispatcher:
     generic_date = date_ops_keywords.DateOperation()
