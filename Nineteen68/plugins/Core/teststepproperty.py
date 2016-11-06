@@ -11,8 +11,8 @@
 import logger
 class TestStepProperty():
 
-    def __init__(self,keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name):
-        self.keyword=keyword
+    def __init__(self,name,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo):
+        self.name=name
         self.index=index
         self.apptype=apptype
         self.inputval=inputval
@@ -22,9 +22,10 @@ class TestStepProperty():
         self.url=url
         self.custname=custname
         self.testscript_name=testscript_name
+        self.additionalinfo = additionalinfo
 
     def print_step(self):
-        logger.log(str(self.index)+' '+self.keyword+' '+self.testscript_name+' '+self.apptype)
+        logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+self.apptype)
 
 
 

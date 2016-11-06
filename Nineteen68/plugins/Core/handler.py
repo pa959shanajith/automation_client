@@ -10,10 +10,12 @@
 #-------------------------------------------------------------------------------
 
 import json
+import jumpBy
+import jumpTo
 from teststepproperty import TestStepProperty
-from for_step import For
-from if_step import If
-from getparam_step import GetParam
+import if_step
+import for_step
+import getparam
 from collections import OrderedDict
 import constants
 import logger
@@ -312,7 +314,7 @@ class Handler():
 
 
 
-    def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name):
+    def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo):
         """
         def : create_step
         purpose : creates an object of each step
@@ -321,27 +323,33 @@ class Handler():
 
         """
         key_lower=keyword.lower()
+        print key_lower,constants.JUMP_TO
         key=(index,key_lower)
         if key_lower in for_array:
             if for_info.has_key(key):
-                tsp_step=For(index,keyword,inputval,outputval,stepnum,testscript_name,for_info[key],False,apptype)
+                tsp_step=for_step.For(index,keyword,inputval,outputval,stepnum,testscript_name,for_info[key],False,apptype)
             else:
                 logger.log(str(start_end_dict[key_lower])+' missing in script:'+str(testscript_name))
                 return False
         elif key_lower in if_array:
             if if_info.has_key(key):
-                tsp_step=If(index,keyword,inputval,outputval,stepnum,testscript_name,if_info[key],False,apptype)
+                tsp_step=if_step.If(index,keyword,inputval,outputval,stepnum,testscript_name,if_info[key],False,apptype)
             else:
                 logger.log(key_lower+' keyword missing in script:'+str(testscript_name))
                 return False
         elif key_lower in get_param:
             if get_param_info.has_key(key):
-                tsp_step=GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False,apptype)
+                tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False,apptype)
             else:
                 logger.log(key_lower+' keyword missing in script:'+str(testscript_name))
                 return False
+        elif key_lower == constants.JUMP_BY:
+            print 'key_lower',key_lower
+            tsp_step=jumpBy.JumpBy(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype)
+        elif key_lower == constants.JUMP_TO:
+            tsp_step=jumpTo.JumpTo(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype)
         else:
-            tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name)
+            tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo)
         return tsp_step
 
     def extract_field(self,step,index,testscript_name):
@@ -360,11 +368,12 @@ class Handler():
         stepnum=step['stepNo']
         url=step['url']
         custname=step['custname']
+        additionalinfo = ''
         outputArray=outputval.split(';')
         if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
             global tspIndex2
             tspIndex2+=1
-            return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name)
+            return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo)
         return None
 
 
@@ -404,6 +413,7 @@ class Handler():
         for x in tspList:
             x.print_step()
             logger.log('\n')
+        return tspList
 
     def print_dict(self,d):
         """
@@ -415,4 +425,3 @@ class Handler():
         """
         for k, v in d.items():
             print(k,':', v)
-
