@@ -81,7 +81,7 @@ class Handler():
         return : None
 
         """
-        logger.log('parse')
+        logger.log('Parsing')
         json_string = json.dumps(test_data)
         new_obj = json.loads(json_string)
         if len(new_obj)==1:
@@ -279,7 +279,7 @@ class Handler():
             outputval=step['outputVal'].strip()
             outputArray=outputval.split(';')
             if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
-                logger.log(str(x)+' '+keyword)
+##                logger.log(str(x)+' '+keyword)
                 keyword=keyword.lower()
                 global tspIndex
                 tspIndex+=1
@@ -323,7 +323,6 @@ class Handler():
 
         """
         key_lower=keyword.lower()
-        print key_lower,constants.JUMP_TO
         key=(index,key_lower)
         if key_lower in for_array:
             if for_info.has_key(key):
@@ -410,6 +409,7 @@ class Handler():
 
         """
         logger.log('TSP list\n')
+        logger.log('-------------------------')
         for x in tspList:
             x.print_step()
             logger.log('\n')
