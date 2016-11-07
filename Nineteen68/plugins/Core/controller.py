@@ -52,10 +52,8 @@ class Controller():
             print
             index = tsp.invokeFor()
         elif tsp != None and isinstance(tsp,getparam.GetParam):
-            print 'inside getparam'
             index = tsp.performdataparam()
         elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
-            print 'jumpBYYYYYYYYYYYY'
             index = tsp.invoke_jumpby()
         elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
             print
@@ -86,7 +84,7 @@ class Controller():
             currentdir =  os.getcwd()
             os.chdir('..')
             maindir = os.getcwd()
-            plug_path = maindir + '\Generic'
+            plug_path = maindir + '\Nineteen68\plugins\Generic'
             sys.path.append(plug_path)
             os.chdir(plug_path)
             import generic_dispatcher
@@ -105,7 +103,7 @@ class Controller():
             currentdir =  os.getcwd()
             os.chdir('..')
             maindir = os.getcwd()
-            plug_path = maindir + '\WebServices'
+            plug_path = maindir + '\Nineteen68\plugins\WebServices'
             sys.path.append(plug_path)
             os.chdir(plug_path)
             import dispatcher
@@ -123,7 +121,7 @@ class Controller():
             currentdir =  os.getcwd()
             os.chdir('..')
             maindir = os.getcwd()
-            plug_path = maindir + '\Oebs'
+            plug_path = maindir + '\Nineteen68\plugins\Oebs'
             sys.path.append(plug_path)
             os.chdir(plug_path)
             import oebs_dispatcher
