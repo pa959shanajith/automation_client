@@ -40,6 +40,8 @@ BATCH_FILE_TYPE='.bat'
 
 VBS_FILE_TYPE='.vbs'
 
+EXE_FILE_TYPE='.exe'
+
 
 
 
