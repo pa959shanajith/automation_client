@@ -26,25 +26,34 @@ import ast
 
 from xlrd import open_workbook
 
+import logger
+
+import Exceptions
+
+import handler
+
+from teststepproperty import TestStepProperty
+
+import controller
+
 """The xml.etree.ElementTree module implements a simple and efficient API for parsing and creating XML data."""
 import xml.etree.ElementTree as ET
 import constants
-class GetParam:
+class GetParam():
+    """Object instantiation of 'getparam,startloop,endloop' object"""
+    def __init__(self,index,name,inputval,outputval,stepnum,testscript_name,info_dict,executed,apptype):
+        self.index=index
+        self.name=name
+        self.inputval=inputval[0]
+        self.info_dict=info_dict
+        self.testscript_name=testscript_name
+        self.outputval=outputval
+        self.stepnum=stepnum
+        self.executed=executed
+        self.apptype=apptype
 
-##    """Object instantiation of 'for' object"""
-##    def __init__(self,index,name,inputval,outputval,step_num,testscript_name,info_dict,executed):
-##        self.index=index
-##        self.name=name
-##        self.inputval=inputval
-##        self.info_dict=info_dict
-##        self.next_index=next_index
-##        self.testscript_name=testscript_name
-##        self.outputval=outputval
-##        self.step_num=step_num
-##        self.executed=executed
-##
-##    def print_step(self):
-##        print self.name,self.inputval,self.outputval,self.step_num,self.testscript_name,str(self.info_dict)+'\n'
+    def print_step(self):
+        logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
 
     def getparam(self,input):
         """
@@ -84,6 +93,7 @@ class GetParam:
 
             elif file_extension[1:].lower() == constants.FILE_TYPE_CSV:
                 """CSV .csv file check goes here"""
+                print 'File path :', filepath
                 if os.access(filepath, os.R_OK):
                     print "File is readable"
                     filereader = csv.reader(open(filepath))
@@ -317,7 +327,7 @@ class GetParam:
 
         return data
 
-    def retrievestaticvariable(self,data,variable,row):
+    def retrievestaticvariable(self,data,paramindex,row):
         """
         def : retrievestaticvariable
         purpose : To retrieve actual value of the static variable
@@ -325,7 +335,36 @@ class GetParam:
         return : Returns actual value of the static variable
         """
         if data !=None:
-            return data[variable][row-1]
+            teststepproperty =handler.tspList[paramindex]
+            inputval = teststepproperty.inputval
+            print 'inputval :',inputval
+            inputlistwithval = []
+            inputlistwithval = (list)( inputval)
+            for i in range(0,len(inputval)):
+                inputvalstring = inputval[i]
+                resultinput = inputvalstring
+                inputresult = ''
+##                staticlist = []
+
+                # A check should be made to see static variables in evaluate keyword, like |b| - |c|
+##                staticlist.append(inputvalstring)
+                variable = ''
+                temp = ''
+                columnname = ''
+                arr = inputvalstring.split(';')
+                for item in arr:
+                    if self.checkforstaticvariable(item.strip()):
+                        p = 0
+                        while p < len(item.strip()) - 1:
+                            if(item.find(constants.PIPE) != -1):
+                                temp = item[p+1 : len(item)]
+                                columnname = temp[0:temp.find(constants.PIPE)]
+                                variable = constants.PIPE + columnname + constants.PIPE
+                                p = p + len(variable)
+                                inputresult = data[columnname][row]
+                                resultinput = resultinput.replace(variable,inputresult)
+                                inputlistwithval.insert(i,resultinput)
+            return inputlistwithval
 
     def checkforstaticvariable(self, statvariable):
         """
@@ -336,133 +375,152 @@ class GetParam:
         """
         return (statvariable.startswith('|') and statvariable.endswith('|'))
 
-    def performdataparam(self,input,*args):
-        fileinfo = input.split(';')
-        filepath = fileinfo[0]
-        data = obj.invokegetparam(input)
-        print 'Data in dictionary----------',data
-        startRow = None
-        endRow =None
-        filter = None
-        k = 1
-        filename, file_extension = os.path.splitext(filepath)
-        if file_extension[1:].lower() == constants.FILE_TYPE_XLS or file_extension[1:].lower() == constants.FILE_TYPE_XLSX:
-            if len(fileinfo) == 2 :
-                if fileinfo[1].find(constants.HYPHEN) != -1:
-                    filters = fileinfo[1].split(constants.HYPHEN)
-                    start = filters[0]
-                    #start - check for dynamic variable
-                    end = filters[1]
-                    #end - check for dynamic variable
-                    startRow = int(start);
-                    endRow = int(end);
-            elif len(fileinfo) == 3 :
-                if fileinfo[2].find(constants.HYPHEN) != -1:
-                    filters = fileinfo[2].split(constants.HYPHEN)
-                    start = filters[0]
-                    #start - check for dynamic variable
-                    end = filters[1]
-                    #end - check for dynamic variable
-                    startRow = int(start);
-                    endRow = int(end);
-                else:
-                    filter1 = fileinfo[2]
-                    filter = int(filter1)
-        else:
-            if len(fileinfo) == 2 :
-                if fileinfo[1].find(constants.HYPHEN) != -1:
-                    filters = fileinfo[1].split(constants.HYPHEN)
-                    start = filters[0]
-                    #start - check for dynamic variable
-                    end = filters[1]
-                    #end - check for dynamic variable
-                    startRow = int(start);
-                    endRow = int(end);
-                else:
-                    filter1 = fileinfo[1]
-                    filter = int(filter1)
-##            elif len(fileinfo) == 3 :
-##                if fileinfo[2].find(constants.HYPHEN) != -1:
-##                    filters = fileinfo[2].split(constants.HYPHEN)
-##                    start = filters[0]
-##                    #start - check for dynamic variable
-##                    end = filters[1]
-##                    #end - check for dynamic variable
-##                    startRow = int(start);
-##                    endRow = int(end);
-##                else:
-##                    filter1 = fileinfo[2]
-##                    filter = int(filter1)
+    def performdataparam(self):
+        try:
+            input = self.inputval
+            con= controller.Controller()
+            endlopnum = self.info_dict[0].keys()[0]
 
-        if startRow !=None and endRow != None:
-            print '***Data Parameterization started***'
-            for row in range(startRow,endRow+1):
-                print '***Data Param: Iteration ',k, ' started***'
-                print 'Variable\t\t','Value \n'
-                print '---------------------------'
-                for statvar in range(len(args)):
-                    staticVar = args[statvar ]
-                    check = obj.checkforstaticvariable(staticVar)
-                    if check == True:
-                        staticVar = staticVar[1:len(staticVar)-1]
-                        if staticVar in data:
-                            value = obj.retrievestaticvariable(data,staticVar,row)
-                            print staticVar,'\t\t',value,'\n'
+            if self.getparam(input) == constants.TEST_RESULT_PASS :
+                fileinfo = input.split(';')
+                filepath = fileinfo[0]
+                data = self.invokegetparam(input)
+                startRow = None
+                endRow =None
+                filter = None
+                k = 1
+                filename, file_extension = os.path.splitext(filepath)
+                if file_extension[1:].lower() == constants.FILE_TYPE_XLS or file_extension[1:].lower() == constants.FILE_TYPE_XLSX:
+                    if len(fileinfo) == 2 :
+                        if fileinfo[1].find(constants.HYPHEN) != -1:
+                            filters = fileinfo[1].split(constants.HYPHEN)
+                            start = filters[0]
+                            #start - check for dynamic variable
+                            end = filters[1]
+                            #end - check for dynamic variable
+                            startRow = int(start);
+                            endRow = int(end);
+                    elif len(fileinfo) == 3 :
+                        if fileinfo[2].find(constants.HYPHEN) != -1:
+                            filters = fileinfo[2].split(constants.HYPHEN)
+                            start = filters[0]
+                            #start - check for dynamic variable
+                            end = filters[1]
+                            #end - check for dynamic variable
+                            startRow = int(start);
+                            endRow = int(end);
                         else:
-                            print 'No static variable with name ', staticVar ,' exists'
-                    else:
-                        print 'Variable ',args[statvar] , ' is not static variable'
-                print '***Data Param: Iteration ',k, ' completed***\n\n'
-                k = k + 1
-            print '***Data Parameterization completed***'
-        elif filter != None:
-            print '***Data Parameterization started***'
-            print '***Data Param: Iteration ',k, ' started***'
-            print 'Variable\t\t','Value \n'
-            print '---------------------------'
-            for statvar in range(len(args)):
-                    staticVar = args[statvar]
-                    check = obj.checkforstaticvariable(staticVar)
-                    if check == True:
-                        staticVar = staticVar[1:len(staticVar)-1]
-                        if staticVar in data:
-                            value = obj.retrievestaticvariable(data,staticVar,filter)
-                            print staticVar,'\t\t',value,'\n'
+                            filter1 = fileinfo[2]
+                            filter = int(filter1)
+                else:
+                    if len(fileinfo) == 2 :
+                        if fileinfo[1].find(constants.HYPHEN) != -1:
+                            filters = fileinfo[1].split(constants.HYPHEN)
+                            start = filters[0]
+                            #start - check for dynamic variable
+                            end = filters[1]
+                            #end - check for dynamic variable
+                            startRow = int(start);
+                            endRow = int(end);
                         else:
-                            print 'No static variable with name ', staticVar ,' exists'
-                    else:
-                        print 'Variable ',args[statvar] , ' is not static variable'
-            print '***Data Param: Iteration ',k, ' completed***\n\n'
-            print '***Data Parameterization completed***'
-        else:
-            print '***Data Parameterization started***'
-            for i in range(len(data.values()[0])):
-                print '***Data Param: Iteration ',k, ' started***'
-                print 'Variable\t\t','Value \n'
-                print '---------------------------'
-                for statvar in range(len(args)):
-                    staticVar = args[statvar]
-                    check = obj.checkforstaticvariable(staticVar)
-                    if check == True:
-                        staticVar = staticVar[1:len(staticVar)-1]
-                        if staticVar in data:
-                            value = obj.retrievestaticvariable(data,staticVar,i)
-                            print staticVar,'\t\t',value,'\n'
-                        else:
-                            print 'No static variable with name ', staticVar ,' exists'
-                    else:
-                        print 'Variable ',args[statvar] , ' is not static variable'
-                print '***Data Param: Iteration ',k, ' completed***\n\n'
-                k = k + 1
-            print '***Data Parameterization completed***'
+                            filter1 = fileinfo[1]
+                            filter = int(filter1)
+        ##            elif len(fileinfo) == 3 :
+        ##                if fileinfo[2].find(constants.HYPHEN) != -1:
+        ##                    filters = fileinfo[2].split(constants.HYPHEN)
+        ##                    start = filters[0]
+        ##                    #start - check for dynamic variable
+        ##                    end = filters[1]
+        ##                    #end - check for dynamic variable
+        ##                    startRow = int(start);
+        ##                    endRow = int(end);
+        ##                else:
+        ##                    filter1 = fileinfo[2]
+        ##                    filter = int(filter1)
 
-if __name__ == '__main__':
-    obj = GetParam()
-    input = """D:\\MsSQL_exportdata1.csv"""
-##    input = """D:\\dat.xlsx;Sheet1;2-5"""
-##    input = """D:\\param.xml;1-3"""
-##    obj.performdataparam(input,'|Project|','|SubProjectStatus|')
-    obj.performdataparam(input,'|Project|')
+                if startRow !=None and endRow != None:
+                    print '***Data Parameterization started***'
+                    for i in range(startRow,endRow+1):
+                        if self.name.lower()==constants.GETPARAM:
+                            inputval = self.inputval
+                            paramindex = self.index+2;
+                            if (inputval != None):
+                                j = 0
+                                iterations = len(data.values()[0])
+                                while (paramindex <= endlopnum):
+                                    print '***Data Param: Iteration ',k, ' started***'
+                                    j+=1
+                                    if (j < iterations):
+                                        input = self.retrievestaticvariable(data,paramindex,i-1)
+                                        paramindex =con.methodinvocation(paramindex,input)
+                                        paramindex = paramindex + 1
+                                        print '***Data Param: Iteration ',k, ' completed***\n\n'
+                                        k = k + 1
+                                    else:
+                                        return endlopnum + 1
+                    return paramindex
+                    print '***Data Parameterization completed***'
+                elif filter != None:
+                    print '***Data Parameterization started***'
+                    if self.name.lower()==constants.GETPARAM:
+                        inputval = self.inputval
+                        paramindex = self.index+2;
+                        if (inputval != None):
+                            j = 0
+                            iterations = len(data.values()[0])
+                            while (paramindex <= endlopnum):
+                                print '***Data Param: Iteration ',k, ' started***'
+                                j+=1
+                                if (j < iterations):
+                                    input = self.retrievestaticvariable(data,paramindex,filter-1)
+                                    paramindex =con.methodinvocation(paramindex,input)
+                                    paramindex = paramindex + 1
+                                    print '***Data Param: Iteration ',k, ' completed***\n\n'
+                                    k = k + 1
+                                else:
+                                    return endlopnum + 1
+                    print '***Data Parameterization completed***'
+                    return paramindex
+
+                else:
+                    print '***Data Parameterization started***'
+                    for i in range(len(data.values()[0])):
+                        if self.name.lower()==constants.GETPARAM:
+                            inputval = self.inputval
+                            paramindex = self.index+2;
+                            if (inputval != None):
+                                j = 0
+                                iterations = len(data.values()[0])
+                                while (paramindex <= endlopnum):
+                                    print '***Data Param: Iteration ',k, ' started***'
+                                    j+=1
+                                    if (j < iterations):
+                                        input = self.retrievestaticvariable(data,paramindex,i)
+                                        paramindex =con.methodinvocation(paramindex,input)
+                                        paramindex = paramindex + 1
+                                        print '***Data Param: Iteration ',k, ' completed***\n\n'
+                                        k = k + 1
+                                    else:
+                                        return endlopnum + 1
+
+                    print '***Data Parameterization completed***'
+                    return paramindex
+            else:
+                print 'Cannot perform dataparam please check file name ,sheetname'
+                return endlopnum + 1
+        except Exception as e:
+            Exceptions.error(e)
+        def getendloop(self):
+            return self.info_dict[0].keys()[0]
+
+
+##if __name__ == '__main__':
+##    obj = GetParam()
+##    input = """D:\\MsSQL_exportdata1.csv"""
+####    input = """D:\\dat.xlsx;Sheet1;2-5"""
+####    input = """D:\\param.xml;1-3"""
+####    obj.performdataparam(input,'|Project|','|SubProjectStatus|')
+##    obj.performdataparam(input,'|Project|')
 
 
 

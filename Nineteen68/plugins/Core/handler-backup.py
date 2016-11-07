@@ -10,12 +10,10 @@
 #-------------------------------------------------------------------------------
 
 import json
-import jumpBy
-import jumpTo
 from teststepproperty import TestStepProperty
-import if_step
-import for_step
-import getparam
+from for_step import For
+from if_step import If
+from getparam_step import GetParam
 from collections import OrderedDict
 import constants
 import logger
@@ -64,7 +62,6 @@ get_param_info={}
 
 """Dict to store information about the possible start of each conditional keyword"""
 start_end_dict={constants.ENDFOR:[constants.FOR],
-                constants.FOR:[constants.ENDFOR],
                 constants.ENDIF:[constants.IF,constants.ELSE_IF,constants.ELSE],
                 constants.ELSE_IF:[constants.IF,constants.ELSE_IF],
                 constants.ELSE:[constants.IF,constants.ELSE_IF],
@@ -90,8 +87,7 @@ class Handler():
 
         comments=testcase[len(testcase)-1]['comments']
         testscript_name=json_data['testscript_name']
-        flag=self.create_list(testcase,testscript_name)
-        return flag
+        self.create_list(testcase,testscript_name)
 
     def validate(self,start,end):
         """
@@ -162,17 +158,13 @@ class Handler():
 
         """
         flag=True
-
         if len(for_keywords) != 0:
             start_index=for_keywords.items()[-1]
-            if keyword == constants.ENDFOR and self.validate(keyword,start_index[1]):
+            if start_end_dict.has_key(keyword):
                 self.insert_into_fordict(keyword_index,keyword,start_index)
-            elif keyword== constants.ENDFOR:
-                logger.log('For is missing: Invalid script ')
-                flag=False
+        else:
+            self.insert_into_fordict(keyword_index,keyword,None)
         return flag
-
-
 
     def if_index(self,keyword,keyword_index):
         """
@@ -273,6 +265,8 @@ class Handler():
         flag=True
 
         for x in range(0,len(testcase)):
+            global tspIndex
+            tspIndex+=1
             step=testcase[x]
 
             keyword=step['keywordVal']
@@ -281,15 +275,13 @@ class Handler():
             if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
                 logger.log(str(x)+' '+keyword)
                 keyword=keyword.lower()
-                global tspIndex
-                tspIndex+=1
 
                 #getting 'for' info
                 if keyword in for_array:
                     flag=self.find_start_index(keyword,tspIndex,1)
                     if flag==False:
                         return flag
-                    if keyword==constants.FOR:
+                    if keyword in start_end_dict.values():
                         for_keywords[tspIndex]=keyword
                     copy_for_keywords[tspIndex]=keyword
 
@@ -314,7 +306,7 @@ class Handler():
 
 
 
-    def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo):
+    def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name):
         """
         def : create_step
         purpose : creates an object of each step
@@ -322,34 +314,19 @@ class Handler():
         return : object
 
         """
-        key_lower=keyword.lower()
-        print key_lower,constants.JUMP_TO
-        key=(index,key_lower)
-        if key_lower in for_array:
-            if for_info.has_key(key):
-                tsp_step=for_step.For(index,keyword,inputval,outputval,stepnum,testscript_name,for_info[key],False,apptype)
-            else:
-                logger.log(str(start_end_dict[key_lower])+' missing in script:'+str(testscript_name))
-                return False
-        elif key_lower in if_array:
+        key=(index,keyword)
+        if keyword in for_array:
+            tsp_step=For(index,keyword,inputval,outputval,stepnum,testscript_name,for_info[key],False)
+        elif keyword in if_array:
             if if_info.has_key(key):
-                tsp_step=if_step.If(index,keyword,inputval,outputval,stepnum,testscript_name,if_info[key],False,apptype)
+                tsp_step=If(index,keyword,inputval,outputval,stepnum,testscript_name,if_info[key],False)
             else:
-                logger.log(key_lower+' keyword missing in script:'+str(testscript_name))
+                logger.log("'endIf' keyword missing in script:"+str(testscript_name))
                 return False
-        elif key_lower in get_param:
-            if get_param_info.has_key(key):
-                tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False,apptype)
-            else:
-                logger.log(key_lower+' keyword missing in script:'+str(testscript_name))
-                return False
-        elif key_lower == constants.JUMP_BY:
-            print 'key_lower',key_lower
-            tsp_step=jumpBy.JumpBy(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype)
-        elif key_lower == constants.JUMP_TO:
-            tsp_step=jumpTo.JumpTo(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype)
+        elif keyword in get_param:
+            tsp_step=GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False)
         else:
-            tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo)
+            tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name)
         return tsp_step
 
     def extract_field(self,step,index,testscript_name):
@@ -360,7 +337,7 @@ class Handler():
         return : object/None
 
         """
-        keyword=step['keywordVal']
+        keyword=step['keywordVal'].lower()
         apptype=step['appType']
         inputval=step['inputVal']
         objectname=step['objectName']
@@ -368,12 +345,9 @@ class Handler():
         stepnum=step['stepNo']
         url=step['url']
         custname=step['custname']
-        additionalinfo = ''
         outputArray=outputval.split(';')
         if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
-            global tspIndex2
-            tspIndex2+=1
-            return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo)
+            return self.create_step(index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name)
         return None
 
 
@@ -389,14 +363,13 @@ class Handler():
         testcase.pop()
         flag=self.parse_condition(testcase)
         for x in testcase:
+            global tspIndex2
+            tspIndex2+=1
             step=self.extract_field(x,tspIndex2,testscript_name)
             if step is not None and step != False:
                 tspList.append(step)
             elif step == False:
-                return step
-
-        return True
-
+                break
 
 
 
@@ -409,11 +382,11 @@ class Handler():
         return :
 
         """
+        self.print_dict(if_info)
         logger.log('TSP list\n')
         for x in tspList:
             x.print_step()
             logger.log('\n')
-        return tspList
 
     def print_dict(self,d):
         """
@@ -425,3 +398,4 @@ class Handler():
         """
         for k, v in d.items():
             print(k,':', v)
+
