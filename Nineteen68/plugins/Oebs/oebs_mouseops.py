@@ -111,6 +111,7 @@ def slide(a,b,speed=0):
 
 
 def click():
+    print 'HERE on oebs_mouseops_114'
     windll.user32.SendInput(2,pointer(x),sizeof(x[0]))
 
 def doubleClick():

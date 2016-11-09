@@ -26,3 +26,5 @@ SENDFUNCTION_KEYS_DICT = {'!':'1',
                           '(':'9',
                           ')':'0'}
 OEBS_SCRAPE_KEYWORDS=['clickandadd','fullscrape']
+
+INVALID_KEYWORD='Invalid keyword'

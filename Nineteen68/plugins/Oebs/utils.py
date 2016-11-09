@@ -100,7 +100,7 @@ class Utils:
                     break;
         if self.aut_handle is not None:
             oebs_dispatcher.windowname=windowname
-            self.set_to_foreground(windowname)
+##            self.set_to_foreground(windowname)
             status=True
         return status
 
