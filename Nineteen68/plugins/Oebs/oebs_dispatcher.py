@@ -122,7 +122,6 @@ class OebsDispatcher:
             else:
                 logger.log(oebs_constants.INVALID_KEYWORD)
          except Exception as e:
-            print 'EXCEPITONNNNNN'
             Exceptions.error(e)
 
 
