@@ -59,9 +59,11 @@ class If():
         if self.name.lower() in [constants.IF,constants.ELSE_IF]:
             logical_eval_obj=Logical_eval()
             input_expression=self.inputval
+            logger.log('Input_expression is '+input_expression)
             res=logical_eval_obj.eval_expression(input_expression)
+            logger.log('Condition is '+str(self))
             if res==True:
-                logger.log('Started executing If')
+                logger.log('Started executing '+self.name)
                 return self.execution(next_index,next_target,last_target)
             elif res==constants.INVALID:
                 return last_target.keys()[0]
