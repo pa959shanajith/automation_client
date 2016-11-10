@@ -161,6 +161,7 @@ class ButtonOperations:
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
+            print 'charinfo',charinfo.name
             logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_BUTTONOPS,DEF_DOUBLECLICK)
             objstates = charinfo.states
             x_coor = int(charinfo.x + (0.5 * charinfo.width))

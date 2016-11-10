@@ -501,7 +501,7 @@ class Utilities:
             if contextInfo.role == 'list':
                 accessContext = childacc
                 break
-            looptolist(childacc)
+            self.looptolist(childacc)
         return accessContext
 
     def clientresponse(self):
@@ -648,7 +648,7 @@ class Utilities:
         if(int(eleIndex) < 0):
             return eleproperties
         descriptiongiven=xpathsplitarr[10]
-        acccontext(acc,tempne,xpath,0,window)
+        self.acccontext(acc,tempne,xpath,0,window)
         verifyflag=False
         for i in range(len(tempne)):
             xpatharr=(str(tempne[i].get('xpath'))).split(';')

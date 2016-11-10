@@ -23,7 +23,7 @@ class DropdownListboxOperations:
     def __init__(self):
         self.utilities_obj=oebs_serverUtilities.Utilities()
         self.utilops_obj=UtilOperations()
-        self.keyboardops=KeywordOperations()
+        self.keyboardops_obj=KeywordOperations()
 
     #Method to get dropdown/listbox values of given Object/XPATH
     def getselected(self,acc):
@@ -543,12 +543,13 @@ class DropdownListboxOperations:
                                         labelcontext=labelobj.getAccessibleContextInfo()
                                         if 'selected' in labelcontext.states:
                                             currentselection=labelcontext.indexInParent
+
                                     if currentselection != childindex:
                                         moveloc=0
                                         if currentselection>childindex:
                                             moveloc=currentselection-childindex
                                             for index in range(int(moveloc)):
-                                                self.keyboardops_obj.KeyboardOperation('keypress','A_UP')
+                                                self.keyboardops_obj.KeyboardOperations('keypress','A_UP')
                                                 time.sleep(0.1)
                                             requiredcontext=self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
