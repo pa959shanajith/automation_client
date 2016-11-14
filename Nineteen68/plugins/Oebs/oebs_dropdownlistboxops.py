@@ -23,7 +23,7 @@ class DropdownListboxOperations:
     def __init__(self):
         self.utilities_obj=oebs_serverUtilities.Utilities()
         self.utilops_obj=UtilOperations()
-        self.keyboardops=KeywordOperations()
+        self.keyboardops_obj=KeywordOperations()
 
     #Method to get dropdown/listbox values of given Object/XPATH
     def getselected(self,acc):
@@ -51,7 +51,7 @@ class DropdownListboxOperations:
             #check for listbox
             elif charinfo.role == 'list':
                 #calling getselected def to get all selected values in list
-                selectedvalue = getselectedlist(acc)
+                selectedvalue = self.getselectedlist(acc)
                 keywordresult = MSG_PASS
             else:
                 logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_GETSELECTED,MSG_INVALID_INPUT,MSG_INVALID_OBJECT)
@@ -99,7 +99,7 @@ class DropdownListboxOperations:
             #check for dropdown
             if charinfo.role == 'combo box':
                 childAcc = self.utilities_obj.looptolist(acc)
-                selectedvalue = getselectedlist(childAcc)
+                selectedvalue = self.getselectedlist(childAcc)
                 inputValue = oebs_key_objects.keyword_input
                 if selectedvalue == inputValue:
                     keywordresult=MSG_PASS
@@ -108,7 +108,7 @@ class DropdownListboxOperations:
             elif charinfo.role == 'list':
                 inputValue = oebs_key_objects.keyword_input
                 #calling getselected def to get all selected values in list
-                selectedvalue = getselectedlist(acc)
+                selectedvalue = self.getselectedlist(acc)
                 #verifys selected values with given input
                 if selectedvalue == inputValue:
                     keywordresult=MSG_PASS
@@ -204,14 +204,14 @@ class DropdownListboxOperations:
             #check for dropdown
             if charinfo.role == 'combo box':
                 #calling getvaluesdropdown def to get all values in dropdown
-                    generatedvalues  = getvaluesdropdown(acc)
+                    generatedvalues  = self.getvaluesdropdown(acc)
                     if generatedvalues == inputValues:
                         keywordresult=MSG_PASS
                         verifyresponse = MSG_TRUE
             #check for listbox
             elif charinfo.role == 'list':
                 #calling getvalueslist def to get all values in list
-                listvalues = getvalueslist(acc)
+                listvalues = self.getvalueslist(acc)
                 if listvalues == inputValues:
                         keywordresult=MSG_PASS
                         verifyresponse =MSG_TRUE
@@ -247,7 +247,7 @@ class DropdownListboxOperations:
                 #check for dropdown
                 if charinfo.role == 'combo box':
                     #calling getvaluesdropdown def to get all values in dropdown
-                    generatedvalues  = getvaluesdropdown(acc)
+                    generatedvalues  = self.getvaluesdropdown(acc)
                     inputlength = len(inputValues)
                     for i in range(0,inputlength):
                         if inputValues[i] in generatedvalues:
@@ -259,7 +259,7 @@ class DropdownListboxOperations:
                 #check for listbox
                 elif charinfo.role == 'list':
                     #calling getvalueslist def to get all values in list
-                    listvalues = getvalueslist(acc)
+                    listvalues = self.getvalueslist(acc)
                     inputlength = len(inputValues)
                     for i in range(0,inputlength):
                         if inputValues[i] in listvalues:
@@ -543,12 +543,13 @@ class DropdownListboxOperations:
                                         labelcontext=labelobj.getAccessibleContextInfo()
                                         if 'selected' in labelcontext.states:
                                             currentselection=labelcontext.indexInParent
+
                                     if currentselection != childindex:
                                         moveloc=0
                                         if currentselection>childindex:
                                             moveloc=currentselection-childindex
                                             for index in range(int(moveloc)):
-                                                self.keyboardops_obj.KeyboardOperation('keypress','A_UP')
+                                                self.keyboardops_obj.KeyboardOperations('keypress','A_UP')
                                                 time.sleep(0.1)
                                             requiredcontext=self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                                             listObj = self.utilities_obj.looptolist(requiredcontext)

@@ -18,6 +18,7 @@ import oebs_serverUtilities
 import logging
 import oebs_mouseops
 import oebs_keyboardops
+from oebs_keyboardops import KeywordOperations
 import oebs_utilops
 import time
 
@@ -116,6 +117,7 @@ class InternalFrameOperations:
             charinfo = acc.getAccessibleContextInfo()
             logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_INTERNALFRAMEOPS,DEF_TOGGLEMINIMIZE)
             objstates = charinfo.states
+            keywordop_obj=KeywordOperations()
             if 'enabled' in objstates:
                 accessibleactionsinfo = acc.getAccessibleActions()
                 actioncount = accessibleactionsinfo.actionsCount
@@ -124,7 +126,7 @@ class InternalFrameOperations:
                         actiontext = accessibleactionsinfo.actionInfo[i].name
                         if(str(actiontext) == 'Toggle Minimized'):
                             oebs_utilops.rightclick(acc)
-                            oebs_keyboardops.KeyboardOperation('keypress','R')
+                            keywordop_obj.KeyboardOperation('keypress','R')
                             verifyresponse = MSG_TRUE
                             keywordresult=MSG_PASS
                         else:
@@ -137,8 +139,8 @@ class InternalFrameOperations:
                         if(str(actiontext) == 'Toggle Minimized'):
                             oebs_utilops.rightclick(acc)
                             for i in range(0,4):
-                                oebs_keyboardops.KeyboardOperation('keypress','A_DOWN')
-                            oebs_keyboardops.KeyboardOperation('keypress','ENTER')
+                                keywordop_obj.KeyboardOperation('keypress','A_DOWN')
+                            keywordop_obj.KeyboardOperation('keypress','ENTER')
                             verifyresponse = MSG_TRUE
                             keywordresult=MSG_PASS
                         else:

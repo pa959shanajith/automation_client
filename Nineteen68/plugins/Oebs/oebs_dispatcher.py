@@ -70,6 +70,9 @@ class OebsDispatcher:
                   'clickelement':self.oebs_keywords.clickelement,
 
                   'selectmultiplevaluesbytext':self.oebs_keywords.selectmultiplevaluesbytext,
+                  'selectallvalues':self.oebs_keywords.selectallvalues,
+                  'selectmultiplevaluesbyindexes':self.oebs_keywords.selectmultiplevaluesbyindexes,
+                  'selectvaluebytext':self.oebs_keywords.selectvaluebytext,
                   'selectvaluebyindex':self.oebs_keywords.selectvaluebyindex,
                   'getvaluebyindex':self.oebs_keywords.getvaluebyindex,
                   'deselectall':self.oebs_keywords.deselectall,
@@ -98,7 +101,6 @@ class OebsDispatcher:
                   'rightclick':self.oebs_keywords.rightclick,
                   'verifydoesnotexists':self.oebs_keywords.verifydoesnotexists,
                   'verifyexists':self.oebs_keywords.verifyexists,
-                  'gettooltiptext':self.oebs_keywords.gettooltiptext,
                   'verifyreadonly':self.oebs_keywords.verifyreadonly,
                   'verifyhidden':self.oebs_keywords.verifyhidden,
                   'verifyvisible':self.oebs_keywords.verifyvisible,
@@ -118,7 +120,7 @@ class OebsDispatcher:
             if keyword in dict.keys():
                 return dict[keyword](*message)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.log(oebs_constants.INVALID_KEYWORD)
          except Exception as e:
             Exceptions.error(e)
 

@@ -264,7 +264,9 @@ class UtilOperations:
             x_coor = int(curaccinfo.x + (0.5 * curaccinfo.width))
             y_coor = int(curaccinfo.y + (0.5 * curaccinfo.height))
             #Visibility check for scrollbar
+            print 'Visibility',self.getObjectVisibility(acc,x_coor,y_coor)
             if(self.getObjectVisibility(acc,x_coor,y_coor)):
+                print objstates
                 if 'visible' and 'showing' in objstates:
                     verifyresponse = MSG_FALSE
                     keywordresult=MSG_FAIL
@@ -327,6 +329,7 @@ class UtilOperations:
                     #x_coor = int(currinfo.x + (0.5 * currinfo.width))
                     #y_coor = int(currinfo.y + (0.5 * currinfo.height))
                     #Visibility check for scrollbar
+
                     if(self.getObjectVisibility(acc,x_coor,y_coor)):
                         oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                         oebs_keyboardops.KeyboardOperation('keypress','A_DOWN')
@@ -650,7 +653,7 @@ class UtilOperations:
     #Visibility check for scrollbar
     def getObjectVisibility(self,acc,x_coor,y_coor):
         try:
-            localacc = viewportacc(acc)
+            localacc = self.viewportacc(acc)
             if(localacc):
                 curaccinfo1 = localacc.getAccessibleContextInfo()
                 x1_coor = curaccinfo1.x
@@ -682,7 +685,7 @@ class UtilOperations:
                 accontext = parentacc
                 count+=1
             if(count==0):
-                viewportacc(parentacc)
+                self.viewportacc(parentacc)
         return accontext
 
 

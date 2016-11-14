@@ -52,6 +52,7 @@ class ClickAndAdd:
         if operation == 'STARTCLICKANDADD':
             objectmap={}
 
+
             try:
                 class OutlookThread(Thread):
 
@@ -325,6 +326,7 @@ class ClickAndAdd:
 
                         #calling buildJson method with key(resultant xpath)
                         buildJson(acc,key,'',0,windowname)
+
 
                     def abort(self):
                         self._want_continue = 0

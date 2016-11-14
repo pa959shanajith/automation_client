@@ -118,8 +118,8 @@ class RadioCheckboxOperations:
     def unselectcheckbox(self,acc):
         del oebs_key_objects.custom_msg[:]
         #sets the keywordresult to FAIL
-        keywordresult=oebs_msg.MSG_FAIL
-        verifyresponse = oebs_msg.MSG_FALSE
+        keywordresult=MSG_FAIL
+        verifyresponse = MSG_FALSE
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()

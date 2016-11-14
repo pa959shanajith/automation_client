@@ -170,9 +170,9 @@ class TableOperations:
             if(parentcontext.role == 'table' and childcontext.role== 'label' ):
                 rowinput=int(oebs_key_objects.keyword_input[0])-1
                 coulmninput=int(oebs_key_objects.keyword_input[1])-1
-                getrowcount(acc)
+                self.getrowcount(acc)
                 actualrowcount = int(oebs_key_objects.keyword_output[1])
-                getcolumncount(acc)
+                self.getcolumncount(acc)
                 actualcoulmncount = int(oebs_key_objects.keyword_output[1])
                 if( rowinput    <   actualrowcount  and rowinput >= 0 and coulmninput <   actualcoulmncount  and coulmninput >= 0 ):
                     index = (rowinput*actualcoulmncount)+coulmninput
@@ -193,9 +193,9 @@ class TableOperations:
                 else:
                     rowinput=int(oebs_key_objects.keyword_input[0])-2
                     coulmninput=int(oebs_key_objects.keyword_input[1])-1
-                    getrowcount(acc)
+                    self.getrowcount(acc)
                     actualrowcount = int(oebs_key_objects.keyword_output[1])
-                    getcolumncount(acc)
+                    self.getcolumncount(acc)
                     actualcoulmncount = int(oebs_key_objects.keyword_output[1])
                     curaccinfo=acc.getAccessibleContextInfo()
                     childrencount=curaccinfo.childrenCount
@@ -234,7 +234,7 @@ class TableOperations:
                     tablechildcontext=tablechild.getAccessibleContextInfo()
                     #
                     if(tablechildcontext.role =='row header' or tablechildcontext.role =='column header'):
-                        result=getcellvalueOebs(acc)
+                        result=self.getcellvalueOebs(acc)
                         if(result):
                                 if'value' in result:
                                     splitval=result.split("value",1)[1]
@@ -254,7 +254,7 @@ class TableOperations:
                                 keywordresult=MSG_PASS
                             break
                         elif parentinfo.role == 'table':
-                            result = getcellvalueOebs(acc)
+                            result = self.getcellvalueOebs(acc)
                             if(result):
                                 if'value' in result:
                                     splitval=result.split("value",1)[1]
@@ -288,7 +288,7 @@ class TableOperations:
             logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_TABLEOPS,DEF_VERIFYCELLVALUE)
             #getting cell value using getCellValue method
             inputcellvalue = oebs_key_objects.keyword_input[2]
-            getcellvalue(acc)
+            self.getcellvalue(acc)
             fetchedcellvalue = oebs_key_objects.keyword_output[1]
             if inputcellvalue == fetchedcellvalue:
                 keywordresult=MSG_PASS
@@ -322,9 +322,9 @@ class TableOperations:
             for count in range (childrencount):
                     tablechild=acc.getAccessibleChildFromContext(count)
                     tablechildcontext=tablechild.getAccessibleContextInfo()
-                    #
                     if(tablechildcontext.role =='row header' or tablechildcontext.role =='column header'):
-                        result=cellclickoebs(acc)
+
+                        result=self.cellclickoebs(acc)
                         if(result):
                             keywordresponse=MSG_TRUE
                             keywordresult=MSG_PASS
@@ -338,7 +338,7 @@ class TableOperations:
                                 keywordresult=MSG_PASS
                             break
                         elif parentinfo.role == 'table':
-                            result = cellclickoebs(acc)
+                            result =self.cellclickoebs(acc)
                             if(result):
                                 keywordresponse=MSG_TRUE
                                 keywordresult=MSG_PASS
@@ -352,8 +352,6 @@ class TableOperations:
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(keywordresponse))
-
-
 
 
 
@@ -383,9 +381,9 @@ class TableOperations:
             if(parentcontext.role == 'table' and childcontext.role== 'label' ):
                 rowinput=int(oebs_key_objects.keyword_input[0])-1
                 coulmninput=int(oebs_key_objects.keyword_input[1])-1
-                getrowcount(acc)
+                self.getrowcount(acc)
                 actualrowcount = int(oebs_key_objects.keyword_output[1])
-                getcolumncount(acc)
+                self.getcolumncount(acc)
                 actualcoulmncount = int(oebs_key_objects.keyword_output[1])
                 if( rowinput    <   actualrowcount  and rowinput >= 0 and coulmninput <   actualcoulmncount  and coulmninput >= 0 ):
                     index = (rowinput*actualcoulmncount)+coulmninput
