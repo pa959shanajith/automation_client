@@ -8,7 +8,7 @@
 # Copyright:   (c) rakesh.v 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-
+import os
 import date_ops_keywords
 import string_ops_keywords
 import file_operations
@@ -22,6 +22,8 @@ import math_operation_keywords
 import screenshot_keywords
 import logical_operation_keywords
 import batch_operation_keyword
+import delay_operations
+import sendfunction_keys
 
 class GenericKeywordDispatcher:
     generic_date = date_ops_keywords.DateOperation()
@@ -34,6 +36,8 @@ class GenericKeywordDispatcher:
     generic_math=math_operation_keywords.NumericStringParser()
     generic_screenshot=screenshot_keywords.Screenshot()
     generic_logical=logical_operation_keywords.logical_eval()
+    generic_delay=delay_operations.Delay_keywords()
+    generic_sendkeys=sendfunction_keys.SendFunctionKeys()
     def dispatcher(self,keyword,*message):
          logger.log('Keyword is '+keyword)
          try:
@@ -87,7 +91,10 @@ class GenericKeywordDispatcher:
                   'evalLogicalExpression':self.generic_logical.eval_expression,
                   'captureScreenshot':self.generic_screenshot.captureScreenshot,
                   'executeFile':self.generic_batch.executeFile,
-                  'evaluate':self.generic_math.eval
+                  'evaluate':self.generic_math.eval,
+                  'wait':self.generic_delay.wait,
+                  'pause':self.generic_delay.pause,
+                  'sendFunctionKeys':self.generic_sendkeys.sendfunction_keys
                 }
             if keyword in dict.keys():
                 return dict[keyword](*message)

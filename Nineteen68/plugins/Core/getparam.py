@@ -337,7 +337,6 @@ class GetParam():
         if data !=None:
             teststepproperty =handler.tspList[paramindex]
             inputval = teststepproperty.inputval
-            print 'inputval :',inputval
             inputlistwithval = []
             inputlistwithval = (list)( inputval)
             for i in range(0,len(inputval)):
@@ -425,18 +424,6 @@ class GetParam():
                         else:
                             filter1 = fileinfo[1]
                             filter = int(filter1)
-        ##            elif len(fileinfo) == 3 :
-        ##                if fileinfo[2].find(constants.HYPHEN) != -1:
-        ##                    filters = fileinfo[2].split(constants.HYPHEN)
-        ##                    start = filters[0]
-        ##                    #start - check for dynamic variable
-        ##                    end = filters[1]
-        ##                    #end - check for dynamic variable
-        ##                    startRow = int(start);
-        ##                    endRow = int(end);
-        ##                else:
-        ##                    filter1 = fileinfo[2]
-        ##                    filter = int(filter1)
 
                 if startRow !=None and endRow != None:
                     print '***Data Parameterization started***'
@@ -446,18 +433,18 @@ class GetParam():
                             paramindex = self.index+2;
                             if (inputval != None):
                                 j = 0
+                                print '***Data Param: Iteration ',k, ' started***'
                                 iterations = len(data.values()[0])
                                 while (paramindex <= endlopnum):
-                                    print '***Data Param: Iteration ',k, ' started***'
                                     j+=1
                                     if (j < iterations):
                                         input = self.retrievestaticvariable(data,paramindex,i-1)
                                         paramindex =con.methodinvocation(paramindex,input)
                                         paramindex = paramindex + 1
-                                        print '***Data Param: Iteration ',k, ' completed***\n\n'
-                                        k = k + 1
                                     else:
                                         return endlopnum + 1
+                            print '***Data Param: Iteration ',k, ' completed***\n\n'
+                            k = k + 1
                     return paramindex
                     print '***Data Parameterization completed***'
                 elif filter != None:
@@ -467,18 +454,18 @@ class GetParam():
                         paramindex = self.index+2;
                         if (inputval != None):
                             j = 0
+                            print '***Data Param: Iteration ',k, ' started***'
                             iterations = len(data.values()[0])
                             while (paramindex <= endlopnum):
-                                print '***Data Param: Iteration ',k, ' started***'
                                 j+=1
                                 if (j < iterations):
                                     input = self.retrievestaticvariable(data,paramindex,filter-1)
                                     paramindex =con.methodinvocation(paramindex,input)
                                     paramindex = paramindex + 1
-                                    print '***Data Param: Iteration ',k, ' completed***\n\n'
-                                    k = k + 1
                                 else:
                                     return endlopnum + 1
+                        print '***Data Param: Iteration ',k, ' completed***\n\n'
+                        k = k + 1
                     print '***Data Parameterization completed***'
                     return paramindex
 
@@ -490,37 +477,27 @@ class GetParam():
                             paramindex = self.index+2;
                             if (inputval != None):
                                 j = 0
+                                print '***Data Param: Iteration ',k, ' started***'
                                 iterations = len(data.values()[0])
                                 while (paramindex <= endlopnum):
-                                    print '***Data Param: Iteration ',k, ' started***'
                                     j+=1
                                     if (j < iterations):
                                         input = self.retrievestaticvariable(data,paramindex,i)
                                         paramindex =con.methodinvocation(paramindex,input)
                                         paramindex = paramindex + 1
-                                        print '***Data Param: Iteration ',k, ' completed***\n\n'
-                                        k = k + 1
                                     else:
                                         return endlopnum + 1
+                            print '***Data Param: Iteration ',k, ' completed***\n\n'
+                            k = k + 1
 
                     print '***Data Parameterization completed***'
                     return paramindex
             else:
-                print 'Cannot perform dataparam please check file name ,sheetname'
                 return endlopnum + 1
         except Exception as e:
             Exceptions.error(e)
         def getendloop(self):
             return self.info_dict[0].keys()[0]
-
-
-##if __name__ == '__main__':
-##    obj = GetParam()
-##    input = """D:\\MsSQL_exportdata1.csv"""
-####    input = """D:\\dat.xlsx;Sheet1;2-5"""
-####    input = """D:\\param.xml;1-3"""
-####    obj.performdataparam(input,'|Project|','|SubProjectStatus|')
-##    obj.performdataparam(input,'|Project|')
 
 
 

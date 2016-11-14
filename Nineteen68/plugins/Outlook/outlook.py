@@ -11,7 +11,7 @@
 
 from  win32com.client import Dispatch
 import logger
-import constants
+import outlook_constants
 from   pywintypes import  com_error
 
 ## This class will have the methods to automate Outlook Application
@@ -25,7 +25,7 @@ class OutlookKeywords:
             self.Subject=''
             self.ToMailID=''
             self.FromMailId=''
-            self.AttachmentStatus=constants.ATTACH_STATUS_NO
+            self.AttachmentStatus=outlook_constants.ATTACH_STATUS_NO
             self.Body=''
             self.message=''
             self.Content=None
@@ -44,7 +44,7 @@ class OutlookKeywords:
                 self.subject=subject
                 self.toMail=toMail
                 self.outlook = Dispatch('Outlook.Application').GetNamespace('MAPI')
-                inbox = self.outlook.GetDefaultFolder(constants.INBOX_FOLDER)
+                inbox = self.outlook.GetDefaultFolder(outlook_constants.INBOX_FOLDER)
                 all_inbox = inbox.Items
                 folders = inbox.Folders
                 all_inbox=reversed(list(all_inbox))
@@ -57,15 +57,15 @@ class OutlookKeywords:
                                     self.Subject = msg.Subject
                                     self.Body= msg.Body
                                     if msg.SenderEmailType=='EX':
-                                         self.FromMailId= msg.Sender.PropertyAccessor.GetProperty(constants.PR_SMTP_ADDRESS)
+                                         self.FromMailId= msg.Sender.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS)
                                     else:
                                         self.FromMailId=msg.SenderEmailAddress
                                     for recipient in  msg.Recipients:
                                         if recipient.Type==1:
-                                            self.ToMailID+=recipient.PropertyAccessor.GetProperty(constants.PR_SMTP_ADDRESS)+';'
+                                            self.ToMailID+=recipient.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS)+';'
                                     self.ToMailID=self.ToMailID[:-1]
                                     if msg.Attachments.Count>0:
-                                        self.AttachmentStatus=constants.ATTACH_STATUS_YES
+                                        self.AttachmentStatus=outlook_constants.ATTACH_STATUS_YES
 ##                                    message="From : "+msg.SenderName+" <"+self.FromMailId+">"+"\n"+ "To: "+ self.ToMailID + "\n"+ "Date: "+str(msg.SentOn)+ "\n"+ "Subject: "+ msg.Subject+ "\n"+ str(msg.Attachments.Count)+ " attachments." + "\n"+ msg.Body
                                     self.Flag=True
                                     msg.Display(False)
@@ -87,7 +87,7 @@ class OutlookKeywords:
                 return self.FromMailId
             else:
                 logger.log('Error : No such mail id found')
-                return constants.STATUS_FAIL
+                return outlook_constants.STATUS_FAIL
 
 
         def GetAttachmentStatus(self):
@@ -95,28 +95,28 @@ class OutlookKeywords:
                 return self.AttachmentStatus
             else:
                 logger.log('Error : mail does''t have such info')
-                return constants.STATUS_FAIL
+                return outlook_constants.STATUS_FAIL
 
         def GetSubject(self):
             if self.Flag==True:
                 return self.Subject
             else:
                 logger.log('Error : No subject found')
-                return constants.STATUS_FAIL
+                return outlook_constants.STATUS_FAIL
 
         def GetToMailID(self):
             if self.Flag==True:
                 return self.ToMailID
             else:
                 logger.log('Error : No such mail id found')
-                return constants.STATUS_FAIL
+                return outlook_constants.STATUS_FAIL
 
         def GetBody(self):
             if self.Flag==True:
                 return self.Body
             else:
                 logger.log('Error : No Body found')
-                return constants.STATUS_FAIL
+                return outlook_constants.STATUS_FAIL
 
         def VerifyEmail(self,FilePath):
             if self.Flag==True:
@@ -146,5 +146,5 @@ class OutlookKeywords:
                     logger.log('Error occured : File not found')
             else:
                 logger.log('Error : No such mail found')
-                return constants.STATUS_FAIL
+                return outlook_constants.STATUS_FAIL
 
