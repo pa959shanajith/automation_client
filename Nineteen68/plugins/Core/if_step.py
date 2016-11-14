@@ -61,19 +61,21 @@ class If():
             input_expression=self.inputval
             logger.log('Input_expression is '+input_expression)
             res=logical_eval_obj.eval_expression(input_expression)
-            logger.log('Condition is '+str(self))
+            logger.log('Condition is '+str(res))
             if res==True:
-                logger.log('Started executing '+self.name)
+                logger.log('Started executing:'+self.name)
                 return self.execution(next_index,next_target,last_target)
             elif res==constants.INVALID:
+                logger.log('Invalid conditional expression')
                 return last_target.keys()[0]
             else:
                 return next_target.keys()[0]
         elif self.name.lower() in [constants.ELSE]:
+            logger.log('Executing:'+self.name)
             return self.execution(next_index,next_target,last_target)
 
         else:
-            print self.name
+            logger.log('Encountered:'+self.name)
             return next_index
 
     def execution(self,next_index,next_target,last_target):

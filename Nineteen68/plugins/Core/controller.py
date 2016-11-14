@@ -22,9 +22,32 @@ import Exceptions
 import handler
 import os,sys
 
+
 #index for iterating the teststepproperty for executor
 i = 0
+
 class Controller():
+
+    generic_dispatcher_obj = None
+    web_dispatcher_obj = None
+    oebs_dispatcher_obj = None
+    webservice_dispatcher_obj = None
+    outlook_dispatcher_obj = None
+
+    def __init__(self):
+        self.get_all_the_imports()
+        import generic_dispatcher
+        self.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
+        import web_dispatcher
+        self.web_dispatcher_obj = web_dispatcher.Dispatcher()
+        import oebs_dispatcher
+        self.oebs_dispatcher_obj = oebs_dispatcher.OebsDispatcher()
+        import websevice_dispatcher
+        self.webservice_dispatcher_obj = websevice_dispatcher.Dispatcher()
+        import outlookdispatcher
+        self.outlook_dispatcher_obj = outlookdispatcher.Dispatcher()
+
+
     def checkfordynamicvariables(self,outputval):
         #checks whether the output value contains dynamic Variables
         status = False;
@@ -43,20 +66,16 @@ class Controller():
     def methodinvocation(self,index,*args):
         tsp = handler.tspList[index]
         if tsp != None and isinstance(tsp,TestStepProperty) :
-            print
             index = self.keywordinvocation(index,*args)
         elif tsp != None and isinstance(tsp,if_step.If):
-            print
             index = tsp.invoke_condtional_keyword()
         elif tsp != None and isinstance(tsp,for_step.For):
-            print
             index = tsp.invokeFor()
         elif tsp != None and isinstance(tsp,getparam.GetParam):
             index = tsp.performdataparam()
         elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
             index = tsp.invoke_jumpby()
         elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
-            print
             index = tsp.invoke_jumpto()
 
         return index
@@ -81,55 +100,31 @@ class Controller():
         #Check the apptype and pass to perticular module
         if teststepproperty.apptype.lower() == constants.APPTYPE_GENERIC:
             #Generic apptype module call goes here
-            currentdir =  os.getcwd()
-            os.chdir('..')
-            maindir = os.getcwd()
-            plug_path = maindir + '\Nineteen68\plugins\Generic'
-            sys.path.append(plug_path)
-            os.chdir(plug_path)
-            import generic_dispatcher
-
-            dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
-            result = self.invokegenerickeyword(teststepproperty,dispatcher_obj,inpval)
+            result = self.invokegenerickeyword(teststepproperty,self.generic_dispatcher_obj,inpval)
             print 'Result in methodinvocation : ',result
-            os.chdir(currentdir)
+##            os.chdir(currentdir)
 
         elif teststepproperty.apptype.lower() == constants.APPTYPE_WEB:
             #Web apptype module call goes here
-            print 'Dont forget to implement me'
+
+            result = self.invokewebkeyword(teststepproperty,self.web_dispatcher_obj,inpval)
+            print 'Result in methodinvocation------ : ',result, '\n\n'
+
         elif teststepproperty.apptype.lower() == constants.APPTYPE_WEBSERVICE:
             #Webservice apptype module call goes here
              #OEBS apptype module call goes here
-            currentdir =  os.getcwd()
-            os.chdir('..')
-            maindir = os.getcwd()
-            plug_path = maindir + '\Nineteen68\plugins\WebServices'
-            sys.path.append(plug_path)
-            os.chdir(plug_path)
-            import dispatcher
-
-            dispatcher_obj = dispatcher.Dispatcher()
-            result = self.invokewebservicekeyword(teststepproperty,dispatcher_obj,inpval)
+            result = self.invokewebservicekeyword(teststepproperty,self.webservice_dispatcher_obj,inpval)
             print 'Result in methodinvocation : ',result
-            os.chdir(currentdir)
+##            os.chdir(currentdir)
         elif teststepproperty.apptype.lower() == constants.APPTYPE_DESKTOP:
             #Desktop apptype module call goes here
             print 'Dont forget to implement me'
         elif teststepproperty.apptype.lower() == constants.APPTYPE_DESKTOP_JAVA:
 
             #OEBS apptype module call goes here
-            currentdir =  os.getcwd()
-            os.chdir('..')
-            maindir = os.getcwd()
-            plug_path = maindir + '\Nineteen68\plugins\Oebs'
-            sys.path.append(plug_path)
-            os.chdir(plug_path)
-            import oebs_dispatcher
-
-            dispatcher_obj = oebs_dispatcher.OebsDispatcher()
-            result = self.invokeoebskeyword(teststepproperty,dispatcher_obj,inpval)
+            result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
             print 'Result in methodinvocation : ',result
-            os.chdir(currentdir)
+##            os.chdir(currentdir)
         return index+1
 
 
@@ -175,36 +170,27 @@ class Controller():
                     i = self.keywordinvocation(i)
                 else:
                     i = self.methodinvocation(i)
-##                elif tsp != None and isinstance(tsp,if_step.If):
-##                    print
-##                    i = self.methodinvocation(i)
-##                elif tsp != None and isinstance(tsp,for_step.For):
-##                    print
-##                    i = self.methodinvocation(i)
-##                elif tsp != None and isinstance(tsp,getparam.GetParam):
-##                    print
-##                    i = self.methodinvocation(i)
-##                elif tsp != None and isinstance(tsp,getparam.GetParam):
-##                    print
-##                    i = self.methodinvocation(i)
 
             except Exception as e:
                 Exceptions.error(e)
+                i=i+1
+                print i
 
 
     def invokegenerickeyword(self,teststepproperty,dispatcher_obj,inputval):
 
         keyword = teststepproperty.name
-##        print "----Keyword :",keyword,' execution Started----\n'
+        print "----Keyword :",keyword,' execution Started----\n'
         res = dispatcher_obj.dispatcher(keyword,*inputval)
 
-##        print "----Keyword :",keyword,' execution completed----\n\n'
+        print "----Keyword :",keyword,' execution completed----\n\n'
         return res
 
     def invokeoebskeyword(self,teststepproperty,dispatcher_obj,inputval):
 
         keyword = teststepproperty.name
         print "----Keyword :",keyword,' execution Started----\n'
+
         res = dispatcher_obj.dispatcher(keyword,*inputval)
         print "----Keyword :",keyword,' execution completed----\n\n'
         return res
@@ -216,15 +202,36 @@ class Controller():
         res = dispatcher_obj.dispatcher(keyword,*inputval)
         print "----Keyword :",keyword,' execution completed----\n\n'
         return res
+    def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval):
+
+        keyword = teststepproperty.name
+        print "----Keyword :",keyword,' execution Started----\n'
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval)
+        print "----Keyword :",keyword,' execution completed----\n\n'
+        return res
+    def get_all_the_imports(self):
+        maindir = os.getcwd()
+        os.chdir('..')
+        curdir = os.getcwd()
+        path= curdir + '\Nineteen68\plugins'
+        for root, dirs, files in os.walk(path):
+            for d in dirs:
+                p = path + '\\' + d
+                sys.path.append(p)
+        os.chdir(maindir)
 
 if __name__ == '__main__':
     obj = Controller()
     print 'Controller object created'
 
-    t = test.Test()
-    list = t.gettsplist()
 
-    obj.executor(list,'debug')
+
+    t = test.Test()
+    list,flag = t.gettsplist()
+    if flag:
+        obj.executor(list,'debug')
+    else:
+        print 'Invalid script'
 
 
 
