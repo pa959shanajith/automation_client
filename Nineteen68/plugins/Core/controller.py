@@ -191,7 +191,7 @@ class Controller():
         keyword = teststepproperty.name
         print "----Keyword :",keyword,' execution Started----\n'
 
-        res = dispatcher_obj.dispatcher(keyword,*inputval)
+        res = dispatcher_obj.dispatcher(teststepproperty,*inputval)
         print "----Keyword :",keyword,' execution completed----\n\n'
         return res
 
