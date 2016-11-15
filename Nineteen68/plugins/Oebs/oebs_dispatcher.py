@@ -21,13 +21,20 @@ class OebsDispatcher:
 
     oebs_keywords=OebsKeywords()
     utils_obj=utils.Utils()
-    def dispatcher(self,keyword,*message):
-         logger.log('Keyword is '+keyword)
+    def assign_url_objectname(self,tsp):
+        message=[tsp.url,tsp.objectname,tsp.name,tsp.inputval,tsp.outputval]
+        return message
+
+    def dispatcher(self,tsp,*message):
+         logger.log('Keyword is '+tsp.name)
+         keyword=tsp.name
+
 
          if keyword in oebs_constants.OEBS_SCRAPE_KEYWORDS:
             self.utils_obj.find_window_and_attach(message[0])
          if windowname is not None:
             self.utils_obj.set_to_foreground(windowname)
+         message=self.assign_url_objectname(tsp)
 ##         else:
 ##            logger.log('Windowname is Unavailable')
 
@@ -70,9 +77,6 @@ class OebsDispatcher:
                   'clickelement':self.oebs_keywords.clickelement,
 
                   'selectmultiplevaluesbytext':self.oebs_keywords.selectmultiplevaluesbytext,
-                  'selectallvalues':self.oebs_keywords.selectallvalues,
-                  'selectmultiplevaluesbyindexes':self.oebs_keywords.selectmultiplevaluesbyindexes,
-                  'selectvaluebytext':self.oebs_keywords.selectvaluebytext,
                   'selectvaluebyindex':self.oebs_keywords.selectvaluebyindex,
                   'getvaluebyindex':self.oebs_keywords.getvaluebyindex,
                   'deselectall':self.oebs_keywords.deselectall,
@@ -83,6 +87,9 @@ class OebsDispatcher:
                   'verifyallvalues':self.oebs_keywords.verifyallvalues,
                   'verifycount':self.oebs_keywords.verifycount,
                   'getcount':self.oebs_keywords.getcount,
+                  'selectmultiplevaluesbyindexes':self.oebs_keywords.selectmultiplevaluesbyindexes,
+                  'selectvaluebytext':self.oebs_keywords.selectvaluebytext,
+                  'selectallvalues':self.oebs_keywords.selectallvalues,
 
                   'getselected':self.oebs_keywords.getselected,
                   'getstatus':self.oebs_keywords.getstatus,
@@ -101,6 +108,8 @@ class OebsDispatcher:
                   'rightclick':self.oebs_keywords.rightclick,
                   'verifydoesnotexists':self.oebs_keywords.verifydoesnotexists,
                   'verifyexists':self.oebs_keywords.verifyexists,
+                  'gettooltiptext':self.oebs_keywords.gettooltiptext,
+                  'verifytooltiptext':self.oebs_keywords.verifytooltiptext,
                   'verifyreadonly':self.oebs_keywords.verifyreadonly,
                   'verifyhidden':self.oebs_keywords.verifyhidden,
                   'verifyvisible':self.oebs_keywords.verifyvisible,
@@ -120,7 +129,7 @@ class OebsDispatcher:
             if keyword in dict.keys():
                 return dict[keyword](*message)
             else:
-                logger.log(oebs_constants.INVALID_KEYWORD)
+                logger.log(generic_constants.INVALID_INPUT)
          except Exception as e:
             Exceptions.error(e)
 
