@@ -29,6 +29,53 @@ class OutlookKeywords:
             self.Body=''
             self.message=''
             self.Content=None
+            self.targetFolder=None
+            self.outlook=None
+            self.store=None
+
+
+#To support seperate accounts and  subFolders this method is implemented , Input should be the folder path in properties of outlook folder
+        def switchToFolder(self,folderPath):
+            try:
+                logger.log('switching to the folder')
+                folderPath=folderPath.strip('\\')
+                folders=folderPath.split('\\')
+                accountname=folders[0]
+                self.outlook = Dispatch('Outlook.Application').GetNamespace('MAPI')
+#               get the message stores in outlook
+                stores=self.outlook.Stores
+                if accountname!='':
+                    for store in stores:
+                        if store.DisplayName==accountname:
+                            self.store=store
+                            if folders[1]=='Inbox':
+                                inbox_folder = self.outlook.GetDefaultFolder(outlook_constants.INBOX_FOLDER)
+                                index=0;
+                                folder=None
+                                for foldername in folders:
+                                    if index==0 or index==1 or index==2:
+                                        folder=inbox_folder
+                                    else:
+                                        folder=folder.Folders.Item(folders[index-1])
+
+                                    self.targetFolder=self.findFolder(foldername,folder)
+                                    index+=1
+                                if(self.targetFolder==None):
+                                    logger.log('Unable to find the target folder')
+                                    break
+                                else:
+                                    logger.log('Switched to folder')
+                                    return True
+                            else:
+                                logger.log('The given path is invalid')
+                else:
+                    logger.log('Check the path given')
+                    return False
+            except Exception as e:
+                return False
+                logger.log('Error occured: unable to switch to the folder')
+            return False
+
 
 ##  This method takes 3 params
 ##  1. senderName (Display name  in Outlook application)
@@ -43,8 +90,11 @@ class OutlookKeywords:
                 self.senderEmail=senderEmail
                 self.subject=subject
                 self.toMail=toMail
-                self.outlook = Dispatch('Outlook.Application').GetNamespace('MAPI')
-                inbox = self.outlook.GetDefaultFolder(outlook_constants.INBOX_FOLDER)
+                if (self.outlook==None):
+                    self.outlook = Dispatch('Outlook.Application').GetNamespace('MAPI')
+                    inbox = self.outlook.GetDefaultFolder(outlook_constants.INBOX_FOLDER)
+                else:
+                    inbox=self.targetFolder
                 all_inbox = inbox.Items
                 folders = inbox.Folders
                 all_inbox=reversed(list(all_inbox))
@@ -147,4 +197,21 @@ class OutlookKeywords:
             else:
                 logger.log('Error : No such mail found')
                 return outlook_constants.STATUS_FAIL
+
+# Internal method to search for a folder in given folder
+        def findFolder(self,folderName,searchIn):
+            try:
+                lowerAccount = searchIn.Folders
+                for x in lowerAccount:
+                    if x.Name == folderName:
+##                        print 'found it %s '%x.Name
+                        objective = x
+                        return objective
+##                    else:
+##                        print folderName+' folder not found'
+                return None
+            except Exception as error:
+                logger.log( "Looks like we had an issue accessing the searchIn object")
+                return None
+
 

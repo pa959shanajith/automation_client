@@ -26,7 +26,8 @@ class Dispatcher:
                   'GetSubject'     : self.outook_obj.GetSubject,
                   'GetToMailID'  : self.outook_obj.GetToMailID,
                   'GetBody' : self.outook_obj.GetBody,
-                  'VerifyEmail' : self.outook_obj.VerifyEmail
+                  'VerifyEmail' : self.outook_obj.VerifyEmail,
+                  'switchToFolder':self.outook_obj.switchToFolder
                 }
             if keyword in dict.keys():
                     return dict[keyword](*message)

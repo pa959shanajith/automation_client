@@ -21,6 +21,8 @@ class outlooktestcase(unittest.TestCase):
         fromMail="Skill Central"
         subject="Skill Central - Primary Skill(s) in your profile"
         toMail="Prudhvi Prem Gujjuboyina"
+
+        self.assertTrue(a.switchToFolder('\\prudhvi.gujjuboyina@slkgroup.com\Inbox\test\git\demo'))
 ## Test the mail
         self.assertTrue(a.GetEmail(fromMail, subject, toMail))
 ## verify Subject
