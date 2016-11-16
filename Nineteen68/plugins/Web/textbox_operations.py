@@ -15,6 +15,7 @@ from webconstants import *
 from utilweb_operations import UtilWebKeywords
 import logger
 import Exceptions
+from encryption_utility import AESCipher
 class TextboxKeywords:
 
     def set_text(self,webelement,input,*args):
@@ -176,6 +177,36 @@ class TextboxKeywords:
                     if length==input:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
+            except Exception as e:
+                    Exceptions.error(e)
+        return status,methodoutput
+        
+    def setsecuretext(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        visibilityFlag=True
+        if webelement is not None:
+            try:
+                if webelement.is_enabled():
+                    utilobj=UtilWebKeywords()
+                    is_visble=utilobj.is_visible(webelement)
+                    if len(args)>0:
+                        visibilityFlag=args[0]
+                    input=input[0]
+                    logger.log('Input is '+input)
+                    if input is not None:
+                        if not(visibilityFlag and is_visble):
+                            self.clear_text(webelement)
+                        else:
+                            logger.log('Hidden')
+                            webelement.clear()
+                        encryption_obj = AESCipher()
+                        input_val = encryption_obj.decrypt(input)
+                        browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                else:
+                    logger.log('Element is disabled')
             except Exception as e:
                     Exceptions.error(e)
         return status,methodoutput
