@@ -15,7 +15,7 @@ from Crypto.Cipher import AES
 import hashlib
 import logger
 import generic_constants
-import exceptions
+import Exceptions
 
 BS = 16
 pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
@@ -24,12 +24,11 @@ unpad = lambda s : s[0:-ord(s[-1])]
 class AESCipher:
 
     def __init__( self ):
-        self.key = ''
+        self.key = b'\xbf\xc0\x85)\x10nc\x94\x02)j\xdf\xcb\xc4\x94\x9d(\x9e[EX\xc8\xd5\xbfI{\xa2$\x05(\xd5\x18'
 
     def encrypt( self, raw ):
         try:
             if not (raw is None and raw is ''):
-                self.key = b'\xbf\xc0\x85)\x10nc\x94\x02)j\xdf\xcb\xc4\x94\x9d(\x9e[EX\xc8\xd5\xbfI{\xa2$\x05(\xd5\x18'
                 raw = pad(raw)
                 iv = Random.new().read( AES.block_size )
                 cipher = AES.new( self.key, AES.MODE_ECB, iv )
@@ -100,7 +99,7 @@ class AESCipher:
 
 
 ##cipher = AESCipher()
-##encrypted = cipher.encrypt('Rakesh')
+##encrypted = cipher.encrypt('version2.0_Test')
 ##decrypted = cipher.decrypt(encrypted)
 ##print encrypted
 ##print decrypted
