@@ -21,18 +21,19 @@ class StringOperation:
         param  : string to be converted
         return : string with lower case
         """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
         try:
             if not (input is None and input is ''):
                 output = input.lower()
                 logger.log(output)
-                return output
+                status=generic_constants.TEST_RESULT_PASS
+                result=generic_constants.TEST_RESULT_TRUE
             else:
                 logger.log(generic_constants.INVALID_INPUT)
-                return False
         except Exception as e:
             Exceptions.error(e)
-            return False
-
+        return status,result,output
 
     def toUpperCase(self,input):
         """
@@ -41,17 +42,19 @@ class StringOperation:
         param  : string to be converted
         return : string with upper case
         """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
         try:
             if not (input is None and input is ''):
                 output = input.upper()
                 logger.log(output)
-                return output
+                status=generic_constants.TEST_RESULT_PASS
+                result=generic_constants.TEST_RESULT_TRUE
             else:
                 logger.log(generic_constants.INVALID_INPUT)
-                return False
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return status,result,output
 
     def trim(self, input):
         """
@@ -60,17 +63,19 @@ class StringOperation:
         param  : string to be trim
         return : string with removed spaces
         """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
         try:
             if not (input is None and input is ''):
                 output = input.strip()
                 logger.log(output)
-                return output
+                status=generic_constants.TEST_RESULT_PASS
+                result=generic_constants.TEST_RESULT_TRUE
             else:
                 logger.log(generic_constants.INVALID_INPUT)
-                return False
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return status,result,output
 
     def left(self, actual_string,index):
         """
@@ -79,19 +84,21 @@ class StringOperation:
         param  : string and index position
         return : string
         """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
         try:
             if not (actual_string is None and actual_string is ''):
                 if not (index is None and index is ''):
                     index_toint = int(index)
                     output = actual_string[:index_toint]
                     logger.log(output)
-                    return output
+                    status=generic_constants.TEST_RESULT_PASS
+                    result=generic_constants.TEST_RESULT_TRUE
                 else:
                     logger.log(generic_constants.INVALID_INPUT)
-                    return False
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return status,result,output
 
     def right(self, actual_string,index):
         """
@@ -100,6 +107,8 @@ class StringOperation:
         param  : string and index position
         return : string
         """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
         try:
             if not (actual_string is None and actual_string is ''):
                 if not (index is None and index is ''):
@@ -107,15 +116,15 @@ class StringOperation:
                     if index_toint > 0:
                         output = actual_string[-index_toint:]
                         logger.log(output)
-                        return output
+                        status=generic_constants.TEST_RESULT_PASS
+                        result=generic_constants.TEST_RESULT_TRUE
                     else:
                         logger.log(generic_constants.INVALID_INPUT)
                 else:
                     logger.log(generic_constants.INVALID_INPUT)
-                    return False
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return status,result,output
 
     def mid(self,input):
         """
@@ -124,6 +133,8 @@ class StringOperation:
         param  : string
         return : string
         """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
         try:
             if not (input is None and input is ''):
                 input_len = len(input)
@@ -131,18 +142,19 @@ class StringOperation:
                     even_inp = input_len/2
                     output = input[even_inp]
                     logger.log(output)
-                    return True
+                    status=generic_constants.TEST_RESULT_PASS
+                    result=generic_constants.TEST_RESULT_TRUE
                 else:
                     odd_inp = input_len/2
                     output = input[odd_inp]
                     logger.log(output)
-                    return True
+                    status=generic_constants.TEST_RESULT_PASS
+                    result=generic_constants.TEST_RESULT_TRUE
             else:
                 logger.log(generic_constants.INVALID_INPUT)
-                return False
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return status,result,output
 
     def getStringLength(self, input):
         """
@@ -151,17 +163,19 @@ class StringOperation:
         param  : string
         return : length
         """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
         try:
             if not (input is None and input is ''):
                 output = len(input)
                 logger.log(output)
-                return output
+                status=generic_constants.TEST_RESULT_PASS
+                result=generic_constants.TEST_RESULT_TRUE
             else:
                 logger.log(generic_constants.INVALID_INPUT)
-                return False
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return status,result,output
 
     def find(self, actual_string,to_find):
         """
@@ -170,17 +184,21 @@ class StringOperation:
         param  : string , string
         return : boolean
         """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
         try:
             if not (actual_string is None and actual_string is ''):
                 if not (to_find is None and to_find is ''):
                     output = actual_string.find(to_find)
                     if(output == -1):
-                        return False
+                        status=generic_constants.TEST_RESULT_FAIL
+                        result=generic_constants.TEST_RESULT_FALSE
                     else:
-                        return True
+                        status=generic_constants.TEST_RESULT_PASS
+                        result=generic_constants.TEST_RESULT_TRUE
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return status,result
 
     def replace(self, actual_string, to_be_replaced , value ):
         """
@@ -189,6 +207,8 @@ class StringOperation:
         param  : string , string , string
         return : string
         """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
         try:
             if not (actual_string is None and actual_string is ''):
                 if not (to_be_replaced is None):
@@ -196,22 +216,19 @@ class StringOperation:
                         if (actual_string not in to_be_replaced):
                             output =  actual_string.replace(to_be_replaced,value)
                             logger.log(output)
-                            return output
+                            status=generic_constants.TEST_RESULT_PASS
+                            result=generic_constants.TEST_RESULT_TRUE
                         else:
                             logger.log("Input Value " + actual_string+ " does not contain " + to_be_replaced);
-                            return False
                     else:
                         logger.log(generic_constants.INVALID_INPUT)
-                        return False
                 else:
                     logger.log(generic_constants.INVALID_INPUT)
-                    return False
             else:
                 logger.log(generic_constants.INVALID_INPUT)
-                return False
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return status,result,output
 
     def split(self,input,character):
         """
@@ -220,21 +237,22 @@ class StringOperation:
         param  : string , string
         return : multidimensional array
         """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
         try:
             if not (input is None and input is ''):
                 if not (character is None):
                     output = input.split(character)
                     logger.log(output)
-                    return True
+                    status=generic_constants.TEST_RESULT_PASS
+                    result=generic_constants.TEST_RESULT_TRUE
                 else:
                     logger.log(generic_constants.INVALID_INPUT)
-                    return False
             else:
                 logger.log(generic_constants.INVALID_INPUT)
-                return False
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return status,result,output
 
     def concatenate(self,input1,input2):
         """
@@ -243,21 +261,22 @@ class StringOperation:
         param  : string , string
         return : string
         """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
         try:
             if not (input1 is None and input1 is ''):
                 if not (input2 is None and input2 is ''):
                     output = input1 + input2
                     logger.log(output)
-                    return output
+                    status=generic_constants.TEST_RESULT_PASS
+                    result=generic_constants.TEST_RESULT_TRUE
                 else:
                     logger.log(generic_constants.INVALID_INPUT)
-                    return False
             else:
                 logger.log(generic_constants.INVALID_INPUT)
-                return False
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return status,result,output
 
     def getSubString(self,actual_string,index):
         """
@@ -266,6 +285,8 @@ class StringOperation:
         param  : string , string
         return : string
         """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
         try:
             if not (actual_string is None and actual_string is ''):
                 if not (index is None and index is ''):
@@ -278,21 +299,21 @@ class StringOperation:
                         high_range = int(high_range)
                         output = actual_string[low_range:high_range]
                         logger.log(output)
-                        return output
+                        status=generic_constants.TEST_RESULT_PASS
+                        result=generic_constants.TEST_RESULT_TRUE
                     else:
                         to_int_index = int(index)
                         output = actual_string[to_int_index:]
                         logger.log(output)
-                        return output
+                        status=generic_constants.TEST_RESULT_PASS
+                        result=generic_constants.TEST_RESULT_TRUE
                 else:
                     logger.log(generic_constants.INVALID_INPUT)
-                    return False
             else:
                 logger.log(generic_constants.INVALID_INPUT)
-                return False
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return status,result,output
 
     def stringGeneration(self,data_type,data_length):
         """
@@ -301,6 +322,8 @@ class StringOperation:
         param  : string , string
         return : string
         """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
         try:
             if not (data_type is None and data_type is ''):
                 if not (data_length is None and data_length is ''):
@@ -310,23 +333,22 @@ class StringOperation:
                         if (data_type == 'char'):
                             output = ''.join(random.choice(string.lowercase + string.uppercase) for i in range(data_length_int))
                             logger.log(output)
-                            return output
+                            status=generic_constants.TEST_RESULT_PASS
+                            result=generic_constants.TEST_RESULT_TRUE
                         elif (data_type == 'num'):
                             output = ''.join(random.choice(string.digits) for i in range(data_length_int))
                             logger.log(output)
-                            return output
+                            status=generic_constants.TEST_RESULT_PASS
+                            result=generic_constants.TEST_RESULT_TRUE
                     else:
                         logger.log(generic_constants.INP_VAL_EXCEEDS)
-                        return False
                 else:
                     logger.log(generic_constants.INVALID_INPUT)
-                    return False
             else:
                 logger.log(generic_constants.INVALID_INPUT)
-                return False
         except Exception as e:
             Exceptions.error(e)
-            return False
+        return status,result,output
 
 ##obj =StringOperation()
 ##obj.toLowerCase('RAkESH')
