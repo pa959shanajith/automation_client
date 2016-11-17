@@ -78,8 +78,8 @@ class RadioCheckboxKeywords:
         visibilityFlag=True
         if webelement is not None:
             try:
-                if ele.is_enabled():
-                    if ele.is_selected():
+                if webelement.is_enabled():
+                    if webelement.is_selected():
                         is_visible=self.utilobj.is_visible(webelement)
                         if len(args)>0:
                             visibilityFlag=args[0]

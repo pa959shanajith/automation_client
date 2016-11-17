@@ -30,7 +30,7 @@ class ElementKeywords:
             text=webelement.get_attribute('href')
         return text
 
-    def __get_tooltip(self,webelemnt):
+    def __get_tooltip(self,webelement):
         return webelement.get_attribute('title')
 
 
@@ -135,7 +135,7 @@ class ElementKeywords:
                    methodoutput=TEST_RESULT_TRUE
             except Exception as e:
                     Exceptions.error(e)
-        logger.log('Result is '+text)
+        logger.log('Result is '+tool_tip)
         return status,methodoutput,tool_tip
 
 
@@ -158,6 +158,7 @@ class ElementKeywords:
         return status,methodoutput
 
     def waitforelement_visible(self,webelement,objectname,*args):
+        import browser_Keywords
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         try:
@@ -168,7 +169,7 @@ class ElementKeywords:
                 from selenium.common.exceptions import TimeoutException
                 from selenium.webdriver.common.by import By
                 element_present = EC.presence_of_element_located((By.XPATH, objectname))
-                WebDriverWait(d, delay).until(element_present)
+                WebDriverWait(browser_Keywords.driver_obj, delay).until(element_present)
                 logger.log('Element is visible')
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE

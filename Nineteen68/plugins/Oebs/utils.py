@@ -14,8 +14,12 @@ import win32process
 import win32con
 import win32api
 import oebsServer
+import oebs_api
+from oebs_msg import *
 import logger
+import logging
 import Exceptions
+import json
 
 
 
@@ -29,6 +33,12 @@ class Utils:
     def __init__(self):
         self.windowname=''
         self.aut_handle=None
+
+    def save_json(self,scrape_data):
+        with open('domelements.json', 'w') as outfile:
+                logger.log('Writing scrape data to domelements.json file')
+                json.dump(scrape_data, outfile, indent=4, sort_keys=False)
+        outfile.close()
 
     def set_to_foreground(self,windowname):
         self.windowname=windowname
@@ -81,7 +91,7 @@ class Utils:
             Exceptions.error(e)
         return status
 
-    def find_window_and_attach(self,windowname,*args):
+    def find_oebswindow_and_attach(self,windowname,*args):
         logger.log('windowname is '+windowname)
         status=False
         import oebs_dispatcher
@@ -104,12 +114,66 @@ class Utils:
             status=True
         return status
 
+    def find_window_and_attach(self,url,objectname,keyword,windowname,*args):
+        windowname=windowname[0]
+        status=self.find_oebswindow_and_attach(windowname)
+##        logger.log('windowname is '+windowname)
+##        status=False
+##        import oebs_dispatcher
+##        import time
+##        load_timeout=1
+##        if len(args)>0:
+##            load_timeout=args[0]
+##
+##        if not(windowname is None and windowname is ''):
+##            start_time = time.time()
+##            while (time.time() - start_time) < load_timeout:
+##                handle=self.find_window(windowname)
+##                if handle is not None:
+##                    self.aut_handle=handle
+##                    logger.log('Application handle found')
+##                    break;
+##        if self.aut_handle is not None:
+##            oebs_dispatcher.windowname=windowname
+####            self.set_to_foreground(windowname)
+##            status=True
+##        return status
+
 
     def find_window(self,windowname):
         aut_handle = win32gui.FindWindow(None,windowname)
         if int(aut_handle) > 0:
             return aut_handle
         return None
+
+    def windowsrun(self):
+        logging.debug('FILE: %s , DEF: %s',FILE_OEBSSERVER,DEF_WINDOWSRUN)
+        return (oebs_api.bridgeDll.Windows_run())
+
+    #Confirm open window is a java window
+    def isjavawindow(self,windowname):
+        logging.debug('FILE: %s , DEF: %s , MSG: Window Name Received: %s',FILE_OEBSSERVER,DEF_ISJAVAWINDOW, windowname)
+        isjavares = False
+        logging.debug('FILE: %s , DEF: %s , MSG: Window BRIDGE DLL Status: %s',FILE_OEBSSERVER,DEF_ISJAVAWINDOW,oebs_api.bridgeDll )
+        if (oebs_api.bridgeDll != None):
+            self.windowsrun()
+            hwnd = self.GetHwndFromWindowName(windowname)
+            logging.debug('FILE: %s , DEF: %s , MSG: API Call for Java window check',FILE_OEBSSERVER,DEF_ISJAVAWINDOW)
+            isjavares = oebs_api.isJavaWindow(hwnd)
+            return (isjavares, hwnd)
+        else:
+            logging.debug('FILE: %s , DEF: %s ,MSG: %s.',FILE_OEBSSERVER,DEF_ISJAVAWINDOW,MSG_ACCESS_BRIDGE_INIT_ERROR)
+            return (isjavares, MSG_ACCESS_BRIDGE_INIT_ERROR)
+
+    #Function to get HWND using window name
+    def GetHwndFromWindowName(self,windowname):
+        try:
+            hwnd = win32gui.FindWindow(None, windowname)
+            logging.debug('FILE: %s , DEF: %s MSG: Window Handle Fetched',FILE_OEBSSERVER,DEF_GETHWNDFROMWINDOWNAME)
+        except:
+            logging.debug('FILE: %s , DEF: %s , MSG: Window Handle Fetch Fail',FILE_OEBSSERVER,DEF_GETHWNDFROMWINDOWNAME)
+            hwnd = None
+        return hwnd
 
 
 

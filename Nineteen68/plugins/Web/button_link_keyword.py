@@ -25,7 +25,7 @@ class ButtonLinkKeyword():
 ##        driver = webdriver.Ie(executable_path = 'D:\Drivers\iedriverserver64')
 
 
-    def click(self,webelement,input,output,*args):
+    def click(self,webelement,*args):
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
         #click keyword implementation

@@ -92,6 +92,7 @@ class Dispatcher:
                   'clearText':self.textbox_object.clear_text,
                   'getTextboxLength':self.textbox_object.gettextbox_length,
                   'verifyTextboxLength':self.textbox_object.verifytextbox_length,
+                  'setSecureText':self.textbox_object.setsecuretext,
 
                   'selectValueByIndex':self.dropdown_list_object.selectValueByIndex,
                   'getCount':self.dropdown_list_object.getCount,

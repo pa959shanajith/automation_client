@@ -10,6 +10,8 @@
 #-------------------------------------------------------------------------------
 
 from oebsServer import OebsKeywords
+import oebs_fullscrape
+import oebsclickandadd
 import utils
 import logger
 import Exceptions
@@ -21,37 +23,23 @@ class OebsDispatcher:
 
     oebs_keywords=OebsKeywords()
     utils_obj=utils.Utils()
-    def assign_url_objectname(self,tsp):
-        message=[tsp.url,tsp.objectname,tsp.name,tsp.inputval,tsp.outputval]
+    scrape_obj=oebs_fullscrape.FullScrape()
+    clickandadd_obj=oebsclickandadd.ClickAndAdd()
+
+    def assign_url_objectname(self,tsp,input):
+        message=[tsp.url,tsp.objectname,tsp.name,input,tsp.outputval]
         return message
 
-    def dispatcher(self,tsp,*message):
+    def dispatcher(self,tsp,input,*message):
          logger.log('Keyword is '+tsp.name)
          keyword=tsp.name
 
-
-         if keyword in oebs_constants.OEBS_SCRAPE_KEYWORDS:
-            self.utils_obj.find_window_and_attach(message[0])
          if windowname is not None:
             self.utils_obj.set_to_foreground(windowname)
-         message=self.assign_url_objectname(tsp)
-##         else:
-##            logger.log('Windowname is Unavailable')
-
-
-
+         message=self.assign_url_objectname(tsp,input)
 
          try:
             dict={'findwindowandattach':self.utils_obj.find_window_and_attach,
-                  'highlight':self.utils_obj.higlight,
-                  'fullscrape': self.oebs_keywords.getentireobjectlist,
-                  'getentireobjectlist':self.oebs_keywords.getentireobjectlist,
-                  'clickandadd':self.oebs_keywords.clickandadd,
-                  'createObjetctMap':self.oebs_keywords.createObjetctMap,
-                  'getallstates':self.oebs_keywords.getallstates,
-                  'getobjectsize':self.oebs_keywords.getobjectsize,
-                  'windowsrun':self.oebs_keywords.windowsrun,
-
                   'getobjectforcustom' : self.oebs_keywords.getobjectforcustom,
                   'drop'    : self.oebs_keywords.drop,
                   'drag'     : self.oebs_keywords.drag,
@@ -122,7 +110,8 @@ class OebsDispatcher:
                   'verifytextboxlength':self.oebs_keywords.verifytextboxlength,
                   'gettextboxlength':self.oebs_keywords.gettextboxlength,
                   'settext':self.oebs_keywords.settext,
-                  'gettext':self.oebs_keywords.gettext
+                  'gettext':self.oebs_keywords.gettext,
+                  'closeapplictaion':''
 
                 }
             keyword=keyword.lower()
@@ -132,6 +121,7 @@ class OebsDispatcher:
                 logger.log(generic_constants.INVALID_INPUT)
          except Exception as e:
             Exceptions.error(e)
+
 
 
 

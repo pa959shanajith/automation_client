@@ -17,6 +17,7 @@ import win32api
 import oebsServer
 import oebs_api
 import oebs_serverUtilities
+from oebs_msg import *
 
 import re
 import time
@@ -25,6 +26,13 @@ import win32com.client
 import win32process
 import socket
 import logging
+import utils
+import ast
+access=''
+index=0
+states = []
+objectDict = {}
+activeframename=''
 from threading import Thread
 ctrldownflag = False
 stopumpingmsgs = False
@@ -48,7 +56,112 @@ a = None
 
 class ClickAndAdd:
 
-    def clickandadd(self,acc,objectmap,windowname,operation):
+    def __init__(self):
+        self.utils_obj=utils.Utils()
+
+
+    def clickandadd(self,windowname,operation):
+        operation=operation.upper()
+        self.utils_obj.windowsrun()
+        logging.debug('FILE: %s , DEF: %s , MSG:\nWindows Run Executed.',FILE_OEBSSERVER,DEF_CLICKANDADD)
+        isjavares, hwnd = self.utils_obj.isjavawindow(windowname)
+        logging.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',FILE_OEBSCLICKANADD,DEF_CLICKANDADD,str(isjavares))
+        if (isjavares):
+            map = {}
+            if(operation == 'STARTCLICKANDADD'):
+                map = self.createObjectMap(windowname)
+            result = self.perform_clickandadd(oebs_api.JABContext(hwnd),map,windowname,operation)
+            logging.debug('FILE: %s , DEF: %s , MSG:\n',FILE_OEBSSERVER,DEF_CLICKANDADD)
+            return result
+        else:
+            logging.debug('FILE: %s , DEF: %s , MSG: %s',FILE_OEBSSERVER,DEF_CLICKANDADD,MSG_NOT_JAVA_WINDOW_INFO)
+            return 'fail'
+
+    def createObjectMap(self,windowname):
+        tempne = []
+        self.utils_obj.windowsrun()
+        logging.debug('FILE: %s , DEF: %s , MSG:\nWindows Run Executed.',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST)
+        isjavares, hwnd = self.utils_obj.isjavawindow(windowname)
+        logging.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST,str(isjavares))
+        if (isjavares):
+            map = self.createMap(oebs_api.JABContext(hwnd), tempne,'',0,windowname)
+            logging.debug('FILE: %s , DEF: %s , MSG:\n',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST)
+            return map
+        else:
+            logging.debug('FILE: %s , DEF: %s , MSG: %s',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST,MSG_NOT_JAVA_WINDOW_INFO)
+            return 'fail'
+
+    def createMap(self,acc, tempne,xpath,j,window):
+        path=''
+        size = ''
+        global index
+        if index is 0:
+            global access
+            access=acc
+            index=1
+
+        curaccinfo = acc.getAccessibleContextInfo()
+        tagrole = curaccinfo.role
+        tagname = curaccinfo.name
+        text = curaccinfo.name
+
+        if xpath == '':
+            if len(curaccinfo.name.strip()) == 0:
+                path = curaccinfo.role + '[' + str(j) + ']'
+            else:
+                if 'panel' in curaccinfo.role:
+                    path = curaccinfo.role  + '[' + str(j) + ']'
+                else:
+                   path  = curaccinfo.role + '[' + str(curaccinfo.name.strip()) + ']'
+        else:
+            if len(curaccinfo.name.strip()) == 0:
+                 path = xpath + '/' + curaccinfo.role  + '[' + str(j) + ']'
+            else:
+                if 'panel' in curaccinfo.role:
+                    path = xpath + '/' + curaccinfo.role  + '[' + str(j) + ']'
+                else:
+                    path = xpath + '/' + curaccinfo.role  + '[' + str(curaccinfo.name.strip()) + ']'
+
+        if 'showing' in  curaccinfo.states:
+            x = curaccinfo.x
+            y = curaccinfo.y
+            w = curaccinfo.width
+            h = curaccinfo.height
+            size=str(x)+','+str(y)+','+str(w)+','+str(h)
+            global activeframename
+            states=curaccinfo.states
+            if('internal frame' in path):
+                if(not(activeframename)):
+                    if(curaccinfo.role == 'internal frame'):
+                        if('active' in states):
+                            regularexp = re.compile('(internal frame(.*?|\s)*[\]]+)')
+                            newxpath = regularexp.findall(path)
+                            newlist2=[]
+                            for i in range(len(newxpath)):
+                                newlist2.append(newxpath[i][0])
+                            framename=newlist2[(len(newlist2)-1)]
+                            activeframename=framename
+                            objectDict[size] = path
+
+                else:
+                    if(activeframename in path):
+                        objectDict[size] = path
+            else:
+                objectDict[size] = path
+
+            size = ''
+
+        for i in range(curaccinfo.childrenCount):
+            childacc = acc.getAccessibleChildFromContext(i)
+            acc.releaseJavaObject()
+            self.createMap(childacc, tempne,path,i,window)
+
+        return objectDict
+
+
+    def perform_clickandadd(self,acc,objectmap,windowname,operation):
+        global e
+        global a
         if operation == 'STARTCLICKANDADD':
             objectmap={}
 
@@ -60,22 +173,26 @@ class ClickAndAdd:
                         """Init Worker Thread Class."""
                         Thread.__init__(self)
                         self._want_continue = 1
+                        self.utils_obj=utils.Utils()
+                        self.clickandadd_obj=ClickAndAdd()
                         self.start()    # start the thread
+
 
                     def run(self):
                         tempne=[]
                         objects = []
+
                         activewindowobjects=[]
-                        server_obj=oebsServer.OebsKeywords()
-                        utilities_obj=oebs_serverUtilities.Utilities()
-                        isjavares, hwnd =server_obj.isjavawindow(windowname)
+##                        server_obj=oebsServer.OebsKeywords()
+##                        utilities_obj=oebs_serverUtilities.Utilities()
+                        isjavares, hwnd =self.utils_obj.isjavawindow(windowname)
                         self.currForeWin = win32gui.GetForegroundWindow()
                         point=win32gui.GetCursorPos()
-                        utilities_obj.activeframename=''
-                        utilities_obj.objectDict={}
+                        activeframename=''
+                        objectDict={}
 
                         #calling createMap on every click
-                        objectmap = utilities_obj.createMap(oebs_api.JABContext(hwnd), tempne,'',0,windowname)
+                        objectmap = self.clickandadd_obj.createMap(oebs_api.JABContext(hwnd), tempne,'',0,windowname)
 
                         #method returns 1 if the coordinates passed of any xpath, is near to the curson postion coordinates
                         #returns 0 if if coordinates doesnot fit into the condition
@@ -400,13 +517,11 @@ class ClickAndAdd:
 
         elif operation == 'STOPCLICKANDADD':
             try:
-                global e
                 ie = {'view': e}
                 scrapeJson =  json.dumps(ie)
-                global e
                 e = []
-                global a
                 a.StopPump()
+                self.utils_obj.save_json(ast.literal_eval(scrapeJson))
                 return scrapeJson
             except Exception as esxception:
                 print esxception

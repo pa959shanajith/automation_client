@@ -1,0 +1,56 @@
+{
+    "view": [
+        {
+            "xpath": "frame[Oracle Applications - Tiger]/panel[1]/panel[1]/scroll pane[0]/viewport[0]/desktop pane[0]/internal frame[Transaction Batches Summary (Progress FR: EUR)]/panel[0]/scroll pane[2]/viewport[0]/panel[0]/scroll pane[0]/viewport[0]/panel[0]/text[SourceList of Values];SourceList of Values;1;0;;frame[Oracle Applications - Tiger]/panel[1]/panel[1]/scroll pane[0]/viewport[0]/desktop pane[0]/internal frame[Transaction Batches Summary (Progress FR: EUR)]/panel[0]/scroll pane[2]/viewport[0]/panel[0]/scroll pane[0]/viewport[0]/panel[0];89;0;panel;text;SourceList of Values", 
+            "url": "Oracle Applications - Tiger", 
+            "text": "SourceList of Values", 
+            "hiddentag": "No", 
+            "height": 24, 
+            "custname": "SourceList of Values", 
+            "width": 178, 
+            "tag": "text", 
+            "x_coor": 59, 
+            "id": "null", 
+            "y_coor": 179
+        }, 
+        {
+            "xpath": "frame[Oracle Applications - Tiger]/panel[1]/panel[1]/scroll pane[0]/viewport[0]/desktop pane[0]/internal frame[Transaction Batches Summary (Progress FR: EUR)]/panel[0]/scroll pane[2]/viewport[0]/panel[0]/scroll pane[0]/viewport[0]/panel[0]/text[Name];Name;11;0;;frame[Oracle Applications - Tiger]/panel[1]/panel[1]/scroll pane[0]/viewport[0]/desktop pane[0]/internal frame[Transaction Batches Summary (Progress FR: EUR)]/panel[0]/scroll pane[2]/viewport[0]/panel[0]/scroll pane[0]/viewport[0]/panel[0];89;0;panel;text;Name", 
+            "url": "Oracle Applications - Tiger", 
+            "text": "Name", 
+            "hiddentag": "No", 
+            "height": 24, 
+            "custname": "Name", 
+            "width": 182, 
+            "tag": "text", 
+            "x_coor": 253, 
+            "id": "null", 
+            "y_coor": 179
+        }, 
+        {
+            "xpath": "frame[Oracle Applications - Tiger]/panel[1]/panel[1]/scroll pane[0]/viewport[0]/desktop pane[0]/internal frame[Transaction Batches Summary (Progress FR: EUR)]/panel[0]/scroll pane[2]/viewport[0]/panel[0]/scroll pane[0]/viewport[0]/panel[0]/text[DateList of Values];DateList of Values;21;0;;frame[Oracle Applications - Tiger]/panel[1]/panel[1]/scroll pane[0]/viewport[0]/desktop pane[0]/internal frame[Transaction Batches Summary (Progress FR: EUR)]/panel[0]/scroll pane[2]/viewport[0]/panel[0]/scroll pane[0]/viewport[0]/panel[0];89;0;panel;text;DateList of Values", 
+            "url": "Oracle Applications - Tiger", 
+            "text": "16-NOV-2016", 
+            "hiddentag": "No", 
+            "height": 24, 
+            "custname": "16-NOV-2016", 
+            "width": 106, 
+            "tag": "text", 
+            "x_coor": 437, 
+            "id": "null", 
+            "y_coor": 179
+        }, 
+        {
+            "xpath": "frame[Oracle Applications - Tiger]/panel[1]/panel[1]/scroll pane[0]/viewport[0]/desktop pane[0]/internal frame[Transaction Batches Summary (Progress FR: EUR)]/panel[0]/scroll pane[2]/viewport[0]/panel[0]/scroll pane[0]/viewport[0]/panel[0]/text[CurrencyList of Values];CurrencyList of Values;31;0;;frame[Oracle Applications - Tiger]/panel[1]/panel[1]/scroll pane[0]/viewport[0]/desktop pane[0]/internal frame[Transaction Batches Summary (Progress FR: EUR)]/panel[0]/scroll pane[2]/viewport[0]/panel[0]/scroll pane[0]/viewport[0]/panel[0];89;0;panel;text;CurrencyList of Values", 
+            "url": "Oracle Applications - Tiger", 
+            "text": "EUR", 
+            "hiddentag": "No", 
+            "height": 24, 
+            "custname": "EUR", 
+            "width": 67, 
+            "tag": "text", 
+            "x_coor": 545, 
+            "id": "null", 
+            "y_coor": 179
+        }
+    ]
+}

@@ -42,6 +42,14 @@ VBS_FILE_TYPE='.vbs'
 
 EXE_FILE_TYPE='.exe'
 
+TEST_RESULT_PASS = "Pass";
+
+TEST_RESULT_FAIL = "Fail";
+
+TEST_RESULT_TRUE = "True";
+
+TEST_RESULT_FALSE = "False";
+
 
 
 

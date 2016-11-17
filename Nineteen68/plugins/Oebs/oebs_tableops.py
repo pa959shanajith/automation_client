@@ -131,17 +131,17 @@ class TableOperations:
         try:
             logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_TABLEOPS,DEF_GETCELLVALUEJAVA)
             if(oebs_key_objects.keyword_input[0] =='1'):
-                parentcontext=getparent(acc)
-                keywordresponse=getheader(parentcontext)
+                parentcontext=self.getparent(acc)
+                keywordresponse=self.getheader(parentcontext)
             else:
                 #gets the inputs which user has passed and subtracting 1 or 2 to match the values which user passes with the table index as table index starts with 0
                 rowinput=int(oebs_key_objects.keyword_input[0])-2
                 coulmninput=int(oebs_key_objects.keyword_input[1])-1
-                getrowcount(acc)
+                self.getrowcount(acc)
                 #gets the output from getrowcount method
                 actualrowcount = int(oebs_key_objects.keyword_output[1])
                 tablecontextinfo=acc.getAccessibleTableInfo()
-                getcolumncount(acc)
+                self.getcolumncount(acc)
                 #gets the output from getcoulmncount method
                 actualcoulmncount = int(oebs_key_objects.keyword_output[1])
                 if( rowinput    <   actualrowcount  and rowinput >= 0 and coulmninput <   actualcoulmncount  and coulmninput >= 0 ):
@@ -185,11 +185,11 @@ class TableOperations:
 
             elif(childcontext.role== 'table'):
                 if(oebs_key_objects.keyword_input[0] =='1'):
-                    parentcontext=getparent(acc)
+                    parentcontext=self.getparent(acc)
                     if(parentcontext):
-                        keywordresponse=getheader(parentcontext)
+                        keywordresponse=self.getheader(parentcontext)
                     else:
-                        keywordresponse=getheader(acc)
+                        keywordresponse=self.getheader(acc)
                 else:
                     rowinput=int(oebs_key_objects.keyword_input[0])-2
                     coulmninput=int(oebs_key_objects.keyword_input[1])-1
@@ -249,7 +249,7 @@ class TableOperations:
                         parentacc = acc.getAccessibleParentFromContext()
                         parentinfo = parentacc.getAccessibleContextInfo()
                         if parentinfo.role == 'viewport':
-                            keywordresponse = getcellvaluejava(acc)
+                            keywordresponse = self.getcellvaluejava(acc)
                             if(keywordresponse):
                                 keywordresult=MSG_PASS
                             break

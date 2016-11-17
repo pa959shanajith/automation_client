@@ -14,6 +14,7 @@ import oebs_key_objects
 
 import oebs_textops
 import oebs_serverUtilities
+import utils
 
 from oebs_utilops import UtilOperations
 from oebs_buttonops import ButtonOperations
@@ -52,57 +53,13 @@ class OebsKeywords:
         self.tableops_obj=TableOperations()
         self.scrollbarops_obj=ScrollbarOperations()
         self.internalframeops_obj=InternalFrameOperations()
+        self.utils_obj=utils.Utils()
 
-
-    def windowsrun(self):
-        logging.debug('FILE: %s , DEF: %s',FILE_OEBSSERVER,DEF_WINDOWSRUN)
-        return (oebs_api.bridgeDll.Windows_run())
-
-    #Function to get HWND using window name
-    def GetHwndFromWindowName(self,windowname):
-        try:
-            hwnd = win32gui.FindWindow(None, windowname)
-            logging.debug('FILE: %s , DEF: %s MSG: Window Handle Fetched',FILE_OEBSSERVER,DEF_GETHWNDFROMWINDOWNAME)
-        except:
-            logging.debug('FILE: %s , DEF: %s , MSG: Window Handle Fetch Fail',FILE_OEBSSERVER,DEF_GETHWNDFROMWINDOWNAME)
-            hwnd = None
-        return hwnd
-
-    #Confirm open window is a java window
-    def isjavawindow(self,windowname):
-        logging.debug('FILE: %s , DEF: %s , MSG: Window Name Received: %s',FILE_OEBSSERVER,DEF_ISJAVAWINDOW, windowname)
-        isjavares = False
-        logging.debug('FILE: %s , DEF: %s , MSG: Window BRIDGE DLL Status: %s',FILE_OEBSSERVER,DEF_ISJAVAWINDOW,oebs_api.bridgeDll )
-        if (oebs_api.bridgeDll != None):
-            self.windowsrun()
-            hwnd = self.GetHwndFromWindowName(windowname)
-            logging.debug('FILE: %s , DEF: %s , MSG: API Call for Java window check',FILE_OEBSSERVER,DEF_ISJAVAWINDOW)
-            isjavares = oebs_api.isJavaWindow(hwnd)
-            return (isjavares, hwnd)
-        else:
-            logging.debug('FILE: %s , DEF: %s ,MSG: %s.',FILE_OEBSSERVER,DEF_ISJAVAWINDOW,MSG_ACCESS_BRIDGE_INIT_ERROR)
-            return (isjavares, MSG_ACCESS_BRIDGE_INIT_ERROR)
-
-    #Full scrape method
-    def getentireobjectlist(self,windowname):
-        tempne = []
-        self.windowsrun()
-        logging.debug('FILE: %s , DEF: %s , MSG:\nWindows Run Executed.',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST)
-        isjavares, hwnd = self.isjavawindow(windowname)
-        logging.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST,str(isjavares))
-        if (isjavares):
-            self.utilities_obj.acccontext(oebs_api.JABContext(hwnd), tempne,'',0,windowname)
-            logging.debug('FILE: %s , DEF: %s , MSG:\nThe Scraped Data is:\n %s',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST,tempne)
-            vie = {'view': tempne}
-            return json.dumps(vie)
-        else:
-            logging.debug('FILE: %s , DEF: %s , MSG: %s',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST,MSG_NOT_JAVA_WINDOW_INFO)
-            return 'fail'
 
     def getobjectsize(self,windowname,path):
-        self.windowsrun()
+        self.utils_obj.windowsrun()
         logging.debug('FILE: %s , DEF: %s , MSG:\nWindows Run Executed.',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST)
-        isjavares, hwnd = self.isjavawindow(windowname)
+        isjavares, hwnd = self.utils_obj.javawindow(windowname)
         logging.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST,str(isjavares))
         if (isjavares):
             logging.debug('FILE: %s , DEF: %s , MSG:\nThe Scraped Data is:\n %s',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST)
@@ -635,7 +592,7 @@ class OebsKeywords:
 
     def getallstates(self,windowname,path):
     ##    windowsrun()
-        isjavares, hwnd = self.isjavawindow(windowname)
+        isjavares, hwnd = self.utils_obj.isjavawindow(windowname)
         state =  self.utilities_obj.getstate(oebs_api.JABContext(hwnd),path,windowname,0,'')
         state = str(state)
         return state
@@ -687,38 +644,6 @@ class OebsKeywords:
                 self.elementsops_obj.verifyelementtext(accessContext)
         logging.debug('FILE: %s , DEF: %s , MSG:Keyword response : %s',FILE_OEBSSERVER,DEF_CLICKELEMENT,oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
-
-    def createObjetctMap(self,windowname):
-        tempne = []
-        self.windowsrun()
-        logging.debug('FILE: %s , DEF: %s , MSG:\nWindows Run Executed.',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST)
-        isjavares, hwnd = self.isjavawindow(windowname)
-        logging.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST,str(isjavares))
-        if (isjavares):
-            map = self.utilities_obj.createMap(oebs_api.JABContext(hwnd), tempne,'',0,windowname)
-            logging.debug('FILE: %s , DEF: %s , MSG:\n',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST)
-            return map
-        else:
-            logging.debug('FILE: %s , DEF: %s , MSG: %s',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST,MSG_NOT_JAVA_WINDOW_INFO)
-            return 'fail'
-
-    def clickandadd(self,windowname,operation):
-        operation=operation.upper()
-        self.windowsrun()
-        logging.debug('FILE: %s , DEF: %s , MSG:\nWindows Run Executed.',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST)
-        isjavares, hwnd = self.isjavawindow(windowname)
-        logging.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST,str(isjavares))
-        if (isjavares):
-            map = {}
-            if(operation == 'STARTCLICKANDADD'):
-                map = self.createObjetctMap(windowname)
-            result = self.oebsclickandadd_obj.clickandadd(oebs_api.JABContext(hwnd),map,windowname,operation)
-            logging.debug('FILE: %s , DEF: %s , MSG:\n',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST)
-            return result
-        else:
-            logging.debug('FILE: %s , DEF: %s , MSG: %s',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST,MSG_NOT_JAVA_WINDOW_INFO)
-            return 'fail'
-
 
     def getrowcount(self,applicationname,objectname,keyword,inputs,outputs):
         # accessContext object gets value on call of swoopToElement definition
@@ -799,7 +724,7 @@ class OebsKeywords:
             oebs_key_objects.keyword_input.append(inputs[index])
     #output thats to be sent from the server to client
         oebs_key_objects.keyword_output = outputs.split(';')
-        isjavares, hwnd = self.isjavawindow(applicationname)
+        isjavares, hwnd = self.utils_obj.isjavawindow(applicationname)
     #root object is taken
         accessContext=oebs_api.JABContext(hwnd)
     #root object is sent to the keyword ie., frame's object is taken to definition
@@ -924,9 +849,9 @@ class OebsKeywords:
 
     def getobjectforcustom(self,windowname,parentXpath,type,eleIndex):
         tempne = []
-        self.windowsrun()
+        self.utils_obj.windowsrun()
         logging.debug('FILE: %s , DEF: %s , MSG:\nWindows Run Executed.',FILE_OEBSSERVER,DEF_GETOBJECTFORCUSTOM)
-        isjavares, hwnd = self.isjavawindow(windowname)
+        isjavares, hwnd = self.utils_obj.isjavawindow(windowname)
         logging.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',FILE_OEBSSERVER,DEF_GETOBJECTFORCUSTOM,str(isjavares))
         if (isjavares):
             eleproperty=self.utilities_obj.getobjectforcustom(oebs_api.JABContext(hwnd),windowname,parentXpath,type,eleIndex)

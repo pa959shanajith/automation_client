@@ -48,6 +48,7 @@ MSG_ELEMENT_NOT_VISIBLE = 'Element is not visible.'
 
 
 ## Logging Related Constants FILE NAMES
+FILE_OEBSCLICKANADD='oebsclickandadd'
 FILE_OEBSSERVER = 'oebsServer'
 OEBS_TEXTOPS = 'oebs_textops'
 OEBS_UTILOPS = 'oebs_utilops'
@@ -60,6 +61,7 @@ OEBS_SCROLLBAR = 'oebs_scrollbarops'
 OEBS_INTERNALFRAMEOPS = 'oebs_internalframeops'
 
     #DEFINITIONS RELATED TO oebsServer
+DEF_CLICKANDADD = 'clickandadd'
 DEF_WINDOWSRUN = 'windowsrun'
 DEF_GETHWNDFROMWINDOWNAME = 'GetHwndFromWindowName'
 DEF_GETENTIREOBJECTLIST = 'getentireobjectlist'
