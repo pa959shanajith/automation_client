@@ -183,6 +183,7 @@ class Utilities:
 
 
     def object_generator(self,applicationname,locator,keyword,inputs,outputs):
+        global accessContext
         #OBJECTLOCATION for the object is sent from the user
         del oebs_key_objects.keyword_input[:]
         oebs_key_objects.xpath = locator
@@ -251,7 +252,7 @@ class Utilities:
                 parentInfo = retacc.getAccessibleContextInfo()
                 accarrname = []
                 accarrdesc = []
-                global accessContext
+
                 for index in range(parentInfo.childrenCount):
                     elementObj = retacc.getAccessibleChildFromContext(index)
                     childInfo = elementObj.getAccessibleContextInfo()
@@ -323,7 +324,7 @@ class Utilities:
             oebs_key_objects.keyword_input.append(inputs[index])
         #output thats to be sent from the server to client
         oebs_key_objects.keyword_output = outputs.split(';')
-        global accessContext
+
         if flag == 'true' :
              return accessContext
         else :
