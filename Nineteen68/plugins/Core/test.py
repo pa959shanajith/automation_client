@@ -17,68 +17,6 @@ class Test():
         obj=handler.Handler()
         dataList=[]
 
-##        data = [{
-##	"template": "",
-##	"testscript_name": "Script1",
-##	"testcase": [{
-##		"outputVal": "",
-##		"keywordVal": "concatenate",
-##		"objectName": "",
-##		"inputVal": ["Wasim;akram"],
-##		"appType": "Generic",
-##		"stepNo": 1,
-##		"url": "",
-##		"custname": "@Generic"
-##	}, {
-##		"outputVal": "",
-##		"keywordVal": "getParam",
-##		"objectName": "",
-##		"inputVal": ["D:/data2.xlsx;Sheet1"],
-##		"appType": "Generic",
-##		"stepNo": 2,
-##		"url": "",
-##		"custname": "@Generic"
-##	}, {
-##		"outputVal": "",
-##		"keywordVal": "startLoop",
-##		"objectName": "",
-##		"inputVal": [""],
-##		"appType": "Generic",
-##		"stepNo": 3,
-##		"url": "",
-##		"custname": "@Generic"
-##	}, {
-##		"outputVal": "",
-##		"keywordVal": "concatenate",
-##		"objectName": "",
-##		"inputVal": ["|Username|;|Password|"],
-##		"appType": "Generic",
-##		"stepNo": 4,
-##		"url": "",
-##		"custname": "@Generic"
-##	},
-##    {
-##		"outputVal": "",
-##		"keywordVal": "toUpperCase",
-##		"objectName": "",
-##		"inputVal": ["|Username|"],
-##		"appType": "Generic",
-##		"stepNo": 4,
-##		"url": "",
-##		"custname": "@Generic"
-##	}, {
-##		"outputVal": "",
-##		"keywordVal": "endLoop",
-##		"objectName": "",
-##		"inputVal": [""],
-##		"appType": "Generic",
-##		"stepNo": 5,
-##		"url": "",
-##		"custname": "@Generic"
-##	}, {
-##		"comments": ""
-##	}]
-##}]
         data =[{
         	"template": "",
         	"testscript_name": "Script1",
@@ -274,7 +212,7 @@ class Test():
         	"testscript_name": "Script1",
         	"testcase": [
             {
-        		"outputVal": "##",
+        		"outputVal": "",
         		"keywordVal": "getparam",
         		"objectName": "",
         		"_id_": "3",
@@ -315,7 +253,7 @@ class Test():
         		"url": "",
         		"custname": "@Generic"
         	},{
-        		"outputVal": "",
+        		"outputVal": "##",
         		"keywordVal": "jumpBy",
         		"objectName": "",
         		"_id_": "3",

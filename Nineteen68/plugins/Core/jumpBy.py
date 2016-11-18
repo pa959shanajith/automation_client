@@ -59,14 +59,9 @@ class  JumpBy():
 
     def __validate_jumpbystep(self,input):
         import handler
-        print 'JUMPPPPP',input
         condition_list= handler.condition_keywords.keys()
         number=min(condition_list, key=lambda x:abs(x-self.index))
-##        start_index=
-##        if condition_list[0] < self.index < condition_list[1]:
 
-##        if get_step.name==constants.IF or index<keys:
-##            return True
 
 
 

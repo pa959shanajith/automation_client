@@ -427,10 +427,9 @@ class Handler():
         return :
 
         """
-        logger.log('TSP list\n')
+
         logger.log('-------------------------')
-        self.print_dict(if_info)
-        self.print_dict(for_info)
+        logger.log('TSP list\n')
         logger.log('-------------------------')
         for x in tspList:
             x.print_step()
@@ -447,6 +446,5 @@ class Handler():
         """
         if len(d)==0:
             print d,' is empty'
-        print 'LENGTH',len(d)
         for k, v in d.items():
             print(k,':', v)
