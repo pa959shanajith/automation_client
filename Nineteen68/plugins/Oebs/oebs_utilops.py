@@ -484,17 +484,18 @@ class UtilOperations:
         verifyresponse = MSG_FALSE
         try:
             #gets the entire context information
-            curaccinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_UTILOPS,DEF_VERIFYDOESNOTEXISTS)
-
-            if ('showing' in curaccinfo.states and 'visible' in curaccinfo.states) :
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYDOESNOTEXISTS,MSG_ELEMENT_EXIST)
-                oebs_key_objects.custom_msg.append(MSG_ELEMENT_EXIST)
+            if(str(acc)!='fail'):
+                curaccinfo = acc.getAccessibleContextInfo()
+                logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_UTILOPS,DEF_VERIFYDOESNOTEXISTS)
+                if(acc):
+                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYDOESNOTEXISTS,MSG_ELEMENT_EXIST)
+                    oebs_key_objects.custom_msg.append(MSG_ELEMENT_EXIST)
+                else:
+                    verifyresponse = MSG_TRUE
+                    keywordresult = MSG_PASS
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYDOESNOTEXISTS,MSG_HIDDEN_OBJECT)
                 verifyresponse = MSG_TRUE
                 keywordresult = MSG_PASS
-                oebs_key_objects.custom_msg.append("ERR_HIDDEN_OBJECT")
         except Exception as e:
             verifyresponse = MSG_TRUE
             keywordresult = MSG_PASS
@@ -568,7 +569,7 @@ class UtilOperations:
                     framename = oebs_key_objects.keyword_input[0]
                     logging.debug('FILE: %s , DEF: %s MSG: %s is the frame name.',OEBS_UTILOPS,DEF_SWITCHTOFRAME,framename)
                     menuobj=self.utilities_obj.menugenerator(acc)
-                    getactiveframes(acc)
+                    self.getactiveframes(acc)
                     activeframelist=[]
                     for activeframeindex in range(len(activeframes)):
                         if  str(activeframes[activeframeindex]).startswith(framename):
@@ -648,7 +649,7 @@ class UtilOperations:
                         activeframes.append(desktopchildcontext.name)
                 break
             else:
-                getactiveframes(elementobj)
+                self.getactiveframes(elementobj)
 
     #Visibility check for scrollbar
     def getObjectVisibility(self,acc,x_coor,y_coor):
