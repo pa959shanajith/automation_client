@@ -56,15 +56,18 @@ if_array=[constants.IF,constants.ELSE_IF,constants.ELSE,constants.ENDIF]
 get_param=[constants.GETPARAM,constants.STARTLOOP,constants.ENDLOOP]
 
 """Dict to store the start-end of for info"""
-for_info={}
+for_info=OrderedDict()
+##for_info={}
 """Dict to store the start-end of if info"""
-if_info={}
+##if_info={}
+if_info=OrderedDict()
 """Dict to store the start-end of getparam info"""
 get_param_info={}
 
 """Dict to store information about the possible start of each conditional keyword"""
 start_end_dict={constants.ENDFOR:[constants.FOR],
                 constants.FOR:[constants.ENDFOR],
+##                constants.IF:[constants.ENDIF,constants.ELSE_IF,constants.ELSE],
                 constants.ENDIF:[constants.IF,constants.ELSE_IF,constants.ELSE],
                 constants.ELSE_IF:[constants.IF,constants.ELSE_IF],
                 constants.ELSE:[constants.IF,constants.ELSE_IF],
@@ -121,7 +124,7 @@ class Handler():
     def insert_into_getParamdict(self,keyword_index,keyword,start_index):
         """
         def : insert_into_getParamdict
-        purpose : inserts the '(indexOfgetParam,for)' as 'key' and its respective startLoop and endLoop as values and vice versa
+        purpose : inserts the '(indexOfgetParam,getparam)' as 'key' and its respective startLoop and endLoop as values and vice versa
         param : keyword_index,keyword,start_index
         return :
 
@@ -133,7 +136,7 @@ class Handler():
                 else:
                     get_param_info[start_index]=[{keyword_index:keyword}]
         else:
-            if_info[(keyword_index,keyword)]=None
+            get_param_info[(keyword_index,keyword)]=None
 
     def insert_into_ifdict(self,keyword_index,keyword,start_index):
         """
@@ -165,11 +168,17 @@ class Handler():
 
         if len(for_keywords) != 0:
             start_index=for_keywords.items()[-1]
-            if keyword == constants.ENDFOR and self.validate(keyword,start_index[1]):
+##            if keyword == constants.ENDFOR and self.validate(keyword,start_index[1]):
+            if keyword == constants.ENDFOR:
                 self.insert_into_fordict(keyword_index,keyword,start_index)
             elif keyword== constants.ENDFOR:
                 logger.log('For is missing: Invalid script ')
                 flag=False
+            elif keyword==constants.FOR:
+                self.insert_into_fordict(keyword_index,keyword,None)
+        else:
+            self.insert_into_fordict(keyword_index,keyword,None)
+
         return flag
 
 
@@ -279,7 +288,7 @@ class Handler():
             outputval=step['outputVal'].strip()
             outputArray=outputval.split(';')
             if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
-##                logger.log(str(x)+' '+keyword)
+                logger.log(str(x)+' '+keyword)
                 keyword=keyword.lower()
                 global tspIndex
                 tspIndex+=1
@@ -322,31 +331,41 @@ class Handler():
         return : object
 
         """
+
         key_lower=keyword.lower()
         key=(index,key_lower)
+
+        #block which creates the step of instances of (for,endFor)
         if key_lower in for_array:
-            if for_info.has_key(key):
-                tsp_step=for_step.For(index,keyword,inputval,outputval,stepnum,testscript_name,for_info[key],False,apptype)
-            else:
+            if for_info[key] is None:
                 logger.log(str(start_end_dict[key_lower])+' missing in script:'+str(testscript_name))
-                return False
+            tsp_step=for_step.For(index,keyword,inputval,outputval,stepnum,testscript_name,for_info[key],False,apptype)
+
+        #block which creates the step of instances (if,elseIf,else,endIf)
         elif key_lower in if_array:
-            if if_info.has_key(key):
-                tsp_step=if_step.If(index,keyword,inputval,outputval,stepnum,testscript_name,if_info[key],False,apptype)
-            else:
-                logger.log(key_lower+' keyword missing in script:'+str(testscript_name))
-                return False
+            if not(if_info.has_key(key)):
+                self.insert_into_ifdict(index,key_lower,None)
+                logger.log(str(start_end_dict[key_lower])+' keyword missing in script:'+str(testscript_name))
+
+            tsp_step=if_step.If(index,keyword,inputval,outputval,stepnum,testscript_name,if_info[key],False,apptype)
+
+        #block which creates the step of instances of (getparam,startloop,endloop)
         elif key_lower in get_param:
-            if get_param_info.has_key(key):
-                tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False,apptype)
-            else:
+            if not(get_param_info.has_key(key)):
+                self.insert_into_getParamdict(index,key_lower,None)
                 logger.log(key_lower+' keyword missing in script:'+str(testscript_name))
-                return False
+
+            tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False,apptype)
+
+        #block which creates the step of instances of (jumpBy)
         elif key_lower == constants.JUMP_BY:
-            print 'key_lower',key_lower
             tsp_step=jumpBy.JumpBy(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype)
+
+        #block which creates the step of instances of (jumpTo)
         elif key_lower == constants.JUMP_TO:
             tsp_step=jumpTo.JumpTo(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype)
+
+        #block which creates the step of instances of (Keywords)
         else:
             tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo)
         return tsp_step
@@ -369,6 +388,7 @@ class Handler():
         custname=step['custname']
         additionalinfo = ''
         outputArray=outputval.split(';')
+        #check if the step is commented before adding to the tsplist
         if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
             global tspIndex2
             tspIndex2+=1
@@ -384,7 +404,7 @@ class Handler():
         return :
 
         """
-        #popping the comments key in testcase before parsing
+        #popping the comments key in testcase json before parsing
         testcase.pop()
         flag=self.parse_condition(testcase)
         for x in testcase:
@@ -393,7 +413,6 @@ class Handler():
                 tspList.append(step)
             elif step == False:
                 return step
-
         return True
 
 
@@ -408,6 +427,8 @@ class Handler():
         return :
 
         """
+
+        logger.log('-------------------------')
         logger.log('TSP list\n')
         logger.log('-------------------------')
         for x in tspList:
@@ -423,5 +444,7 @@ class Handler():
         return :
 
         """
+        if len(d)==0:
+            print d,' is empty'
         for k, v in d.items():
             print(k,':', v)

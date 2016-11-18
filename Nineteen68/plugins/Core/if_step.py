@@ -14,7 +14,7 @@ from sympy.logic.inference import satisfiable
 import Exceptions
 import logger
 import handler
-import constants
+from constants import *
 import controller
 
 
@@ -45,7 +45,7 @@ class If():
         return :
 
         """
-
+        logger.log('Encountered :'+self.name+'\n')
         self.executed=True
         index=self.index
         end_info=self.info_dict
@@ -56,35 +56,32 @@ class If():
             last_target=next_target
 
         next_index=index+1
-        if self.name.lower() in [constants.IF,constants.ELSE_IF]:
+        #block to execute if,elseIf part
+        if self.name.lower() in [IF,ELSE_IF]:
             logical_eval_obj=Logical_eval()
             input_expression=self.inputval
             logger.log('Input_expression is '+input_expression)
             res=logical_eval_obj.eval_expression(input_expression)
-            logger.log('Condition is '+str(res))
+            logger.log(self.name+': Condition is '+str(res)+'\n')
             if res==True:
-                logger.log('Started executing:'+self.name)
-                return self.execution(next_index,next_target,last_target)
-            elif res==constants.INVALID:
-                logger.log('Invalid conditional expression')
+                logger.log('***Started executing:'+self.name+'***\n')
+                return self.index+1
+            elif res==INVALID:
+                logger.log('Invalid conditional expression\n')
                 return last_target.keys()[0]
             else:
                 return next_target.keys()[0]
-        elif self.name.lower() in [constants.ELSE]:
-            logger.log('Executing:'+self.name)
-            return self.execution(next_index,next_target,last_target)
 
+        #block to execute else part
+        elif self.name.lower() in [ELSE]:
+            logger.log('***Started executing:'+self.name+'***\n')
+            return self.index+1
+
+        #block to execute endIf
         else:
-            logger.log('Encountered:'+self.name)
+            logger.log('***If execution completed ***\n')
             return next_index
 
-    def execution(self,next_index,next_target,last_target):
-        obj=controller.Controller()
-        while (next_index<next_target.keys()[0]):
-            next_index=obj.methodinvocation(next_index)
-        if next_index==next_target.keys()[0]:
-            next_index=last_target.keys()[0]
-        return next_index
 
 
 class Logical_eval():
@@ -101,7 +98,6 @@ class Logical_eval():
             else:
                 return False
         except Exception as e:
-            Exceptions.error(e)
-            return constants.INVALID
+            return INVALID
 
 

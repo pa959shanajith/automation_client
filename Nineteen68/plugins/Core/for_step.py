@@ -10,6 +10,7 @@
 #-------------------------------------------------------------------------------
 import logger
 import controller
+import handler
 import constants
 class For():
 
@@ -23,37 +24,54 @@ class For():
         self.outputval=outputval
         self.stepnum=stepnum
         self.executed=executed
-        self.apptype=apptype
+        self.apptype=apptype,
+        self.count=0
+
 
     def print_step(self):
         logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
 
     def invokeFor(self):
         obj=controller.Controller()
+
+        #block to execute endFor
         if self.name.lower() == constants.ENDFOR:
+            self.executed=True
             index=self.getEndfor()
+            logger.log('***For: Iteration completed***\n\n')
             return index
 
+        #block to execute for
         if self.name==constants.FOR:
+            logger.log('Encountered :'+self.name+'\n')
             endForNum = self.info_dict[0].keys()[0]
-            inputval = int(self.inputval)
+            try:
+                inputval = int(self.inputval)
+            except ValueError:
+                logger.log('Invalid for count '+self.inputval+'\n')
+                self.executed=False
+                forIndex=endForNum+1
+                return forIndex
+
             forIndex = self.index+1;
             if (inputval > 0 and inputval != 0):
-                j =0
-                while (forIndex <= endForNum):
-                    if forIndex != endForNum:
-                        forIndex = obj.methodinvocation(forIndex)
-                    else:
-                        j+=1
-                        if (j < inputval):
-                            index=obj.methodinvocation(forIndex)
-                            forIndex = index + 1
-                        else:
-                            return endForNum+1
-            else:
-                return endForNum+1
+                self.count=self.count+1
 
+                if not(self.count<= inputval):
+                    self.count=0
+                    self.executed=False
+                    forIndex=endForNum+1
+                else:
+                    self.executed=True
+                    logger.log('***For: Iteration '+str(self.count)+ ' started***')
 
+            return forIndex
 
     def getEndfor(self):
-        return self.info_dict[0].keys()[0]
+        index=None
+        if self.info_dict is not None:
+            index= self.info_dict[0].keys()[0]
+        return index
+
+
+

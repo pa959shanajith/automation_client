@@ -132,7 +132,7 @@ class BrowserKeywords():
             if not (input_url is None and input_url is ''):
                 url= driver_obj.current_url
                 url.strip()
-                input_url.strip()
+                input_url=input_url[0].strip()
                 if (url == input_url):
                     logger.log('verified current url')
                     status=webconstants.TEST_RESULT_PASS

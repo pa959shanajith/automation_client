@@ -65,6 +65,8 @@ PIPE = '|'
 
 INVALID='Invalid'
 
+TERMINATE='Terminate'
+
 
 
 

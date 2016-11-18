@@ -674,9 +674,9 @@ class UtilOperations:
 
     #parent access context
     def viewportacc(self,acc):
+        global accontext
         count = 0
         accontext = ''
-        global accontext
         parentacc = acc.getAccessibleParentFromContext()
         if(parentacc):
             parentinfo = parentacc.getAccessibleContextInfo()

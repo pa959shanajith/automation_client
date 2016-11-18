@@ -379,6 +379,15 @@ class GetParam():
             input = self.inputval
             con= controller.Controller()
             endlopnum = self.info_dict[0].keys()[0]
+            self.executed=True
+
+            if self.name.lower() == constants.ENDLOOP:
+                return self.index + 1
+
+            if self.name.lower() == constants.STARTLOOP:
+                return self.index + 1
+
+
 
             if self.getparam(input) == constants.TEST_RESULT_PASS :
                 fileinfo = input.split(';')
@@ -430,42 +439,35 @@ class GetParam():
                     for i in range(startRow,endRow+1):
                         if self.name.lower()==constants.GETPARAM:
                             inputval = self.inputval
-                            paramindex = self.index+2;
+                            paramindex = self.index+1;
                             if (inputval != None):
                                 j = 0
                                 print '***Data Param: Iteration ',k, ' started***'
                                 iterations = len(data.values()[0])
                                 while (paramindex <= endlopnum):
-                                    j+=1
-                                    if (j < iterations):
-                                        input = self.retrievestaticvariable(data,paramindex,i-1)
-                                        paramindex =con.methodinvocation(paramindex,input)
-                                        paramindex = paramindex + 1
-                                    else:
-                                        return endlopnum + 1
-                            print '***Data Param: Iteration ',k, ' completed***\n\n'
-                            k = k + 1
+                                    input = self.retrievestaticvariable(data,paramindex,i-1)
+                                    paramindex =con.methodinvocation(paramindex,input)
+                                    if paramindex==constants.TERMINATE:
+                                        return paramindex
+                                print '***Data Param: Iteration ',k, ' completed***\n\n'
+                                k = k + 1
                     return paramindex
                     print '***Data Parameterization completed***'
                 elif filter != None:
                     print '***Data Parameterization started***'
                     if self.name.lower()==constants.GETPARAM:
                         inputval = self.inputval
-                        paramindex = self.index+2;
+                        paramindex = self.index+1;
                         if (inputval != None):
-                            j = 0
                             print '***Data Param: Iteration ',k, ' started***'
                             iterations = len(data.values()[0])
                             while (paramindex <= endlopnum):
-                                j+=1
-                                if (j < iterations):
                                     input = self.retrievestaticvariable(data,paramindex,filter-1)
                                     paramindex =con.methodinvocation(paramindex,input)
-                                    paramindex = paramindex + 1
-                                else:
-                                    return endlopnum + 1
-                        print '***Data Param: Iteration ',k, ' completed***\n\n'
-                        k = k + 1
+                                    if paramindex==constants.TERMINATE:
+                                        return paramindex
+                            print '***Data Param: Iteration ',k, ' completed***\n\n'
+                            k = k + 1
                     print '***Data Parameterization completed***'
                     return paramindex
 
@@ -474,21 +476,18 @@ class GetParam():
                     for i in range(len(data.values()[0])):
                         if self.name.lower()==constants.GETPARAM:
                             inputval = self.inputval
-                            paramindex = self.index+2;
+                            paramindex = self.index+1;
                             if (inputval != None):
-                                j = 0
                                 print '***Data Param: Iteration ',k, ' started***'
                                 iterations = len(data.values()[0])
-                                while (paramindex <= endlopnum):
-                                    j+=1
-                                    if (j < iterations):
-                                        input = self.retrievestaticvariable(data,paramindex,i)
-                                        paramindex =con.methodinvocation(paramindex,input)
-                                        paramindex = paramindex + 1
-                                    else:
-                                        return endlopnum + 1
-                            print '***Data Param: Iteration ',k, ' completed***\n\n'
-                            k = k + 1
+                                print 'Iterations : ',iterations
+                                while (paramindex < endlopnum):
+                                    input = self.retrievestaticvariable(data,paramindex,i)
+                                    paramindex =con.methodinvocation(paramindex,input)
+                                    if paramindex==constants.TERMINATE:
+                                        return paramindex
+                                print '***Data Param: Iteration ',k, ' completed***\n\n'
+                                k = k + 1
 
                     print '***Data Parameterization completed***'
                     return paramindex
@@ -496,8 +495,7 @@ class GetParam():
                 return endlopnum + 1
         except Exception as e:
             Exceptions.error(e)
-        def getendloop(self):
-            return self.info_dict[0].keys()[0]
+
 
 
 

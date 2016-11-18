@@ -21,10 +21,16 @@ import test
 import Exceptions
 import handler
 import os,sys
+import logger
+from constants import *
+
 
 
 #index for iterating the teststepproperty for executor
 i = 0
+
+#Terminate Flag
+terminate_flag=False
 
 class Controller():
 
@@ -36,16 +42,47 @@ class Controller():
 
     def __init__(self):
         self.get_all_the_imports()
-        import generic_dispatcher
-        self.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
-        import web_dispatcher
-        self.web_dispatcher_obj = web_dispatcher.Dispatcher()
-        import oebs_dispatcher
-        self.oebs_dispatcher_obj = oebs_dispatcher.OebsDispatcher()
-        import websevice_dispatcher
-        self.webservice_dispatcher_obj = websevice_dispatcher.Dispatcher()
-        import outlookdispatcher
-        self.outlook_dispatcher_obj = outlookdispatcher.Dispatcher()
+        self.__load_generic()
+        self.__load_web()
+        self.__load_webservice()
+        self.__load_oebs()
+        self.__load_outlook()
+
+
+    def __load_generic(self):
+        try:
+            import generic_dispatcher
+            self.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
+        except Exception as e:
+            logger.log('')
+
+    def __load_webservice(self):
+        try:
+            import websevice_dispatcher
+            self.webservice_dispatcher_obj = websevice_dispatcher.Dispatcher()
+        except Exception as e:
+            logger.log('')
+
+    def __load_oebs(self):
+        try:
+            import oebs_dispatcher
+            self.oebs_dispatcher_obj = oebs_dispatcher.OebsDispatcher()
+        except Exception as e:
+            logger.log('')
+
+    def __load_outlook(self):
+        try:
+            import outlookdispatcher
+            self.outlook_dispatcher_obj = outlookdispatcher.Dispatcher()
+        except Exception as e:
+             logger.log('')
+
+    def __load_web(self):
+        try:
+            import web_dispatcher
+            self.web_dispatcher_obj = web_dispatcher.Dispatcher()
+        except Exception as e:
+             logger.log('')
 
 
     def checkfordynamicvariables(self,outputval):
@@ -63,124 +100,169 @@ class Controller():
         generickeywordresult = GenericKeywordResult()
         status = constants.TEST_RESULT_FAIL
 
+    def check_dangling(self,tsp,index):
+        status=True
+        if tsp.__class__.__name__.lower() in [IF,FOR,GETPARAM]:
+            info_dict=tsp.info_dict
+            if info_dict is not None :
+                if tsp.name.lower() in [ENDFOR,ENDIF,ENDLOOP,ELSE_IF,ELSE]:
+                    index=info_dict[0].keys()[0]
+                    step=handler.tspList[index]
+                    status=step.executed
+            else:
+                status=False
+            if tsp.name.lower()==ENDLOOP and len(info_dict)<2:
+                status=False
+
+        if not(status):
+            logger.log('Dangling: '+tsp.name +' in '+tsp.testscript_name+'\n')
+        return status
+
+
+
     def methodinvocation(self,index,*args):
         tsp = handler.tspList[index]
-        if tsp != None and isinstance(tsp,TestStepProperty) :
-            index = self.keywordinvocation(index,*args)
-        elif tsp != None and isinstance(tsp,if_step.If):
-            index = tsp.invoke_condtional_keyword()
-        elif tsp != None and isinstance(tsp,for_step.For):
-            index = tsp.invokeFor()
-        elif tsp != None and isinstance(tsp,getparam.GetParam):
-            index = tsp.performdataparam()
-        elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
-            index = tsp.invoke_jumpby()
-        elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
-            index = tsp.invoke_jumpto()
+        if not(terminate_flag):
+            if(self.check_dangling(tsp,index)):
 
+                if tsp != None and isinstance(tsp,TestStepProperty) :
+                    index = self.keywordinvocation(index,*args)
+
+                elif tsp != None and isinstance(tsp,if_step.If):
+                    index = tsp.invoke_condtional_keyword()
+                elif tsp != None and isinstance(tsp,for_step.For):
+                    index = tsp.invokeFor()
+                elif tsp != None and isinstance(tsp,getparam.GetParam):
+                    index = tsp.performdataparam()
+                elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
+                    index = tsp.invoke_jumpby()
+                elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
+                    index = tsp.invoke_jumpto()
+
+
+            else:
+
+                index= constants.TERMINATE
+        else:
+            index= constants.TERMINATE
         return index
 
     def keywordinvocation(self,index,*args):
-        inpval = []
-        #if termination flag is true then thorough Testautomation exception else do the following
-        teststepproperty = handler.tspList[index]
-        rawinput = teststepproperty.inputval
-        if len(args) > 0:
-            rawinput = args[0]
 
-        inputs = rawinput[0].split(constants.SEMICOLON)
-        for i in range(0,len(inputs )):
-            inpval.append(inputs[i])
-            print 'Input: ',i + 1 , '= ',inputs[i]
+        if not(terminate_flag):
+            inpval = []
+            #if termination flag is true then thorough Testautomation exception else do the following
+            teststepproperty = handler.tspList[index]
+            rawinput = teststepproperty.inputval
+            if len(args) > 0:
+                rawinput = args[0]
+
+            inputs = rawinput[0].split(constants.SEMICOLON)
+            for i in range(0,len(inputs )):
+                inpval.append(inputs[i])
+                print 'Input: ',i + 1 , '= ',inputs[i]
 
 
-        #get the output varible from the teststep property
-        outputstring = teststepproperty.outputval
+            #get the output varible from the teststep property
+            outputstring = teststepproperty.outputval
 
-        #Check the apptype and pass to perticular module
-        if teststepproperty.apptype.lower() == constants.APPTYPE_GENERIC:
-            #Generic apptype module call goes here
-            result = self.invokegenerickeyword(teststepproperty,self.generic_dispatcher_obj,inpval)
-            print 'Result in methodinvocation : ',result
-##            os.chdir(currentdir)
+            #Check the apptype and pass to perticular module
+            if teststepproperty.apptype.lower() == constants.APPTYPE_GENERIC:
+                #Generic apptype module call goes here
+                result = self.invokegenerickeyword(teststepproperty,self.generic_dispatcher_obj,inpval)
+                print 'Result in methodinvocation : ',result
 
-        elif teststepproperty.apptype.lower() == constants.APPTYPE_WEB:
-            #Web apptype module call goes here
+            elif teststepproperty.apptype.lower() == constants.APPTYPE_WEB:
+                #Web apptype module call goes here
 
-            result = self.invokewebkeyword(teststepproperty,self.web_dispatcher_obj,inpval)
-            print 'Result in methodinvocation------ : ',result, '\n\n'
+                result = self.invokewebkeyword(teststepproperty,self.web_dispatcher_obj,inpval)
+                print 'Result in methodinvocation------ : ',result, '\n\n'
 
-        elif teststepproperty.apptype.lower() == constants.APPTYPE_WEBSERVICE:
-            #Webservice apptype module call goes here
-             #OEBS apptype module call goes here
-            result = self.invokewebservicekeyword(teststepproperty,self.webservice_dispatcher_obj,inpval)
-            print 'Result in methodinvocation : ',result
-##            os.chdir(currentdir)
-        elif teststepproperty.apptype.lower() == constants.APPTYPE_DESKTOP:
-            #Desktop apptype module call goes here
-            print 'Dont forget to implement me'
-        elif teststepproperty.apptype.lower() == constants.APPTYPE_DESKTOP_JAVA:
+            elif teststepproperty.apptype.lower() == constants.APPTYPE_WEBSERVICE:
+                #Webservice apptype module call goes here
+                 #OEBS apptype module call goes here
+                result = self.invokewebservicekeyword(teststepproperty,self.webservice_dispatcher_obj,inpval)
+                print 'Result in methodinvocation : ',result
 
-            #OEBS apptype module call goes here
-            result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
-            print 'Result in methodinvocation : ',result
-##            os.chdir(currentdir)
-        return index+1
+            elif teststepproperty.apptype.lower() == constants.APPTYPE_DESKTOP:
+                #Desktop apptype module call goes here
+                print 'Dont forget to implement me'
+            elif teststepproperty.apptype.lower() == constants.APPTYPE_DESKTOP_JAVA:
+
+                #OEBS apptype module call goes here
+                result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
+                print 'Result in methodinvocation : ',result
+            return index+1
+        else:
+            return constants.TERMINATE
 
 
     def executor(self,tsplist,action):
         i = 0
-        #populate all the keywords here
-        #NonWebKeywords
-        #CustomKeyword
-        #CustomDesktopKeywords
-        #CustomOebsKeywords
-        #multipleOutputKeyword
-        #SwitchToWindowKeywords
-##        next_index=0
+        status=True
+
         while (i < len(tsplist)):
             tsp = tsplist[i]
-            try:
-                methodstatus = ''
-                #and isinstance(tsplist,TestStepProperty)
-                if tsp != None and isinstance(tsp,TestStepProperty) :
-                    keyword = tsp.name
-                    input = tsp.inputval[0]
-                    addtionalinfo = tsp.additionalinfo
-                    apptype = tsp.apptype
-                    print 'Keyword : ',keyword
-                    print 'Input :',input
-                    print 'Apptype : ',apptype
-                    #skip the step if  <<Ignore.This.Step>> Constants passed in input
-                    if input.find(constants.IGNORE_THIS_STEP) != -1 :
-                        #Skip the current step execution
-                        #update in the report
-                        #increment the tsp index to point to next step and continue
-                        i = i + 1
-                        continue
+            if not(terminate_flag):
+                try:
+                    methodstatus = ''
+                    #and isinstance(tsplist,TestStepProperty)
+                    if tsp != None and isinstance(tsp,TestStepProperty) :
+                        keyword = tsp.name
+                        input = tsp.inputval[0]
+                        addtionalinfo = tsp.additionalinfo
+                        apptype = tsp.apptype
+                        print 'Keyword : ',keyword
+                        print 'Input :',input
+                        print 'Apptype : ',apptype
+                        #skip the step if  <<Ignore.This.Step>> Constants passed in input
+                        if input.find(constants.IGNORE_THIS_STEP) != -1 :
+                            #Skip the current step execution
+                            #update in the report
+                            #increment the tsp index to point to next step and continue
+                            i = i + 1
+                            continue
+                        else:
+                            if addtionalinfo != None:
+                                if addtionalinfo == constants.IGNORE_THIS_STEP:
+                                    #Skip the current step execution
+                                    #update in the report
+                                    #increment the tsp index to point to next step and continue
+                                    i = i + 1
+                                    continue
+
+                        i = self.keywordinvocation(i)
+                        if i== constants.TERMINATE:
+                            logger.log('Terminating the execution')
+                            status=i
+                            break
+
                     else:
-                        if addtionalinfo != None:
-                            if addtionalinfo == constants.IGNORE_THIS_STEP:
-                                #Skip the current step execution
-                                #update in the report
-                                #increment the tsp index to point to next step and continue
-                                i = i + 1
-                                continue
 
-                    i = self.keywordinvocation(i)
-                else:
-                    i = self.methodinvocation(i)
+                        i = self.methodinvocation(i)
+                        if i== constants.TERMINATE:
+                            logger.log('Terminating the execution')
+                            status=i
+                            break
 
-            except Exception as e:
-                Exceptions.error(e)
-                i=i+1
-                print i
+
+                except Exception as e:
+                    Exceptions.error(e)
+                    status=False
+                    i=i+1
+            else:
+                logger.log('Terminating the execution')
+                status=constants.TERMINATE
+                break
+
+
+        return status
 
 
     def invokegenerickeyword(self,teststepproperty,dispatcher_obj,inputval):
 
         keyword = teststepproperty.name
-        print "----Keyword :",keyword,' execution Started----\n'
+        print "----Keyword :",keyword,' execution Started----'
         res = dispatcher_obj.dispatcher(keyword,*inputval)
 
         print "----Keyword :",keyword,' execution completed----\n\n'
@@ -189,7 +271,7 @@ class Controller():
     def invokeoebskeyword(self,teststepproperty,dispatcher_obj,inputval):
 
         keyword = teststepproperty.name
-        print "----Keyword :",keyword,' execution Started----\n'
+        print "----Keyword :",keyword,' execution Started----'
 
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
         print "----Keyword :",keyword,' execution completed----\n\n'
@@ -198,17 +280,19 @@ class Controller():
     def invokewebservicekeyword(self,teststepproperty,dispatcher_obj,inputval):
 
         keyword = teststepproperty.name
-        print "----Keyword :",keyword,' execution Started----\n'
+        print "----Keyword :",keyword,' execution Started----'
         res = dispatcher_obj.dispatcher(keyword,*inputval)
         print "----Keyword :",keyword,' execution completed----\n\n'
         return res
+
     def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval):
 
         keyword = teststepproperty.name
-        print "----Keyword :",keyword,' execution Started----\n'
+        print "----Keyword :",keyword,' execution Started----'
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
         print "----Keyword :",keyword,' execution completed----\n\n'
         return res
+
     def get_all_the_imports(self):
         maindir = os.getcwd()
         os.chdir('..')
@@ -220,19 +304,29 @@ class Controller():
                 sys.path.append(p)
         os.chdir(maindir)
 
+
+    def invoke_controller(self,action):
+        global terminate_flag
+        terminate_flag=False
+        obj = Controller()
+        t = test.Test()
+        list,flag = t.gettsplist()
+        if flag:
+            status=obj.executor(list,action)
+            return status
+        else:
+            print 'Invalid script'
+
+#main method
 if __name__ == '__main__':
     obj = Controller()
     print 'Controller object created'
-
-
-
     t = test.Test()
     list,flag = t.gettsplist()
     if flag:
-        obj.executor(list,'debug')
+       obj.executor(list,'debug')
     else:
         print 'Invalid script'
-
 
 
 
