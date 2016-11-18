@@ -1,0 +1,91 @@
+{
+    "view": [
+        {
+            "WebBanking##WebLogin": [
+                {
+                    "data": [
+                        {
+                            "custname": "j_username_txtbox", 
+                            "url": "https://www.irctc.co.in/eticketing/loginHome.jsf", 
+                            "tag": "input", 
+                            "hiddentag": "No", 
+                            "xpath": "//*[@id=\"usernameId\"];usernameId;/html/body/div/div/div[11]/form/div[1]/div[2]/table[1]/tbody/tr[1]/td[2]/input;j_username;input[3];loginUserId"
+                        }, 
+                        {
+                            "custname": "j_password_txtbox", 
+                            "url": "https://www.irctc.co.in/eticketing/loginHome.jsf", 
+                            "tag": "input", 
+                            "hiddentag": "No", 
+                            "xpath": "//*[@id=\"loginFormId\"]/div[1]/div[2]/table[1]/tbody/tr[2]/td[2]/input;null;/html/body/div/div/div[11]/form/div[1]/div[2]/table[1]/tbody/tr[2]/td[2]/input;j_password;input[4];loginPassword"
+                        }, 
+                        {
+                            "custname": "j_captcha_txtbox", 
+                            "url": "https://www.irctc.co.in/eticketing/loginHome.jsf", 
+                            "tag": "input", 
+                            "hiddentag": "No", 
+                            "xpath": "//*[@id=\"loginFormId\"]/div[1]/div[2]/table[1]/tbody/tr[3]/td[2]/input;null;/html/body/div/div/div[11]/form/div[1]/div[2]/table[1]/tbody/tr[3]/td[2]/input;j_captcha;input[5];loginCaptcha"
+                        }, 
+                        {
+                            "custname": "submit0_btn", 
+                            "url": "https://www.irctc.co.in/eticketing/loginHome.jsf", 
+                            "tag": "button", 
+                            "hiddentag": "No", 
+                            "xpath": "//*[@id=\"loginbutton\"];loginbutton;/html/body/div/div/div[11]/form/div[1]/div[4]/input[1];submit[0];input[7];grid_4 pull_4 omega"
+                        }
+                    ]
+                }, 
+                {
+                    "dependent": []
+                }
+            ]
+        }, 
+        {
+            "WebBanking##WebPayment": [
+                {
+                    "data": [
+                        {
+                            "custname": "NONAME1_tblcell", 
+                            "url": "https://www.irctc.co.in/eticketing/userSignUp.jsf", 
+                            "tag": "tablecell", 
+                            "hiddentag": "No", 
+                            "xpath": "//*[@id=\"userRegistrationForm:j_idt149_body\"]/table/tbody/tr[1]/td/table/tbody/tr[10]/td;null;/html/body/div[3]/div[2]/form/div[2]/div[2]/table/tbody/tr[1]/td/table/tbody/tr[10]/td;null;td[67];null"
+                        }, 
+                        {
+                            "custname": "userRegistrationForm:userName_txtbox", 
+                            "url": "https://www.irctc.co.in/eticketing/userSignUp.jsf", 
+                            "tag": "input", 
+                            "hiddentag": "No", 
+                            "xpath": "//*[@id=\"userRegistrationForm:userName\"];userRegistrationForm:userName;/html/body/div[3]/div[2]/form/div[2]/div[2]/table/tbody/tr[1]/td/table/tbody/tr[9]/td[2]/input;userRegistrationForm:userName;input[7];null"
+                        }, 
+                        {
+                            "custname": "NONAME2_tblcell", 
+                            "url": "https://www.irctc.co.in/eticketing/userSignUp.jsf", 
+                            "tag": "tablecell", 
+                            "hiddentag": "No", 
+                            "xpath": "//*[@id=\"userRegistrationForm:j_idt149_body\"]/table/tbody/tr[1]/td/table/tbody/tr[13]/td[2];null;/html/body/div[3]/div[2]/form/div[2]/div[2]/table/tbody/tr[1]/td/table/tbody/tr[13]/td[2];null;td[75];null"
+                        }, 
+                        {
+                            "custname": "userRegistrationForm:securityQ_select", 
+                            "url": "https://www.irctc.co.in/eticketing/userSignUp.jsf", 
+                            "tag": "select", 
+                            "hiddentag": "No", 
+                            "xpath": "//*[@id=\"userRegistrationForm:securityQ\"];userRegistrationForm:securityQ;/html/body/div[3]/div[2]/form/div[2]/div[2]/table/tbody/tr[1]/td/table/tbody/tr[19]/td[2]/select;userRegistrationForm:securityQ;select[0];labeltxt[2]"
+                        }, 
+                        {
+                            "custname": "userRegistrationForm:prelan_select", 
+                            "url": "https://www.irctc.co.in/eticketing/userSignUp.jsf", 
+                            "tag": "select", 
+                            "hiddentag": "No", 
+                            "xpath": "//*[@id=\"userRegistrationForm:prelan\"];userRegistrationForm:prelan;/html/body/div[3]/div[2]/form/div[2]/div[2]/table/tbody/tr[1]/td/table/tbody/tr[23]/td[2]/select;userRegistrationForm:prelan;select[1];null"
+                        }
+                    ]
+                }, 
+                {
+                    "dependent": [
+                        "WebBanking##WebLogin"
+                    ]
+                }
+            ]
+        }
+    ]
+}
