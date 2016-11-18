@@ -30,7 +30,6 @@ class  JumpBy():
 
     def invoke_jumpby(self):
         try:
-            print '----------JUMPPPPPPPPPPPPPPPPP-------------'
             index=int(self.index)
             stepToJump=int(self.inputval)
             tspList=handler.tspList
@@ -46,7 +45,9 @@ class  JumpBy():
 
             if jumpByStepNum<0:
                 logger.log('Invalid Input')
+
             elif jumpByStepNum<len(tspList):
+                flag=self.__validate_jumpbystep(jumpByStepNum)
                 return jumpByStepNum
             else:
                 logger.log('ERR_JUMPY_STEP_DOESN''T_EXISTS')
@@ -56,25 +57,16 @@ class  JumpBy():
         return -1
 
 
-if __name__ == '__main__':
-    data=[{ 	"template": "", 	"testscript_name": "getParam", 	"testcase": [{ 		"outputVal": "", 		"keywordVal": "createDynVariable", 		"objectName": "", 		"_id_": "1", 		"inputVal": ["{a};1"], 		"stepNo": 1, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "createDynVariable", 		"objectName": "", 		"_id_": "2", 		"inputVal": ["{b};1"], 		"stepNo": 2, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "if", 		"objectName": "", 		"_id_": "3", 		"inputVal": ["(1;!=;1)"], 		"stepNo": 3, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "displayVariableValue", 		"objectName": "", 		"_id_": "4", 		"inputVal": ["{a}"], 		"stepNo": 4, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "elseIf", 		"objectName": "", 		"_id_": "5", 		"inputVal": ["({a};!=;{b})"], 		"stepNo": 5, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "displayVariableValue", 		"objectName": "", 		"_id_": "6", 		"inputVal": ["{a}"], 		"stepNo": 6, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "elseIf", 		"objectName": "", 		"_id_": "7", 		"inputVal": ["({a};==;{b})"], 		"stepNo": 7, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "displayVariableValue", 		"objectName": "", 		"_id_": "8", 		"inputVal": ["{b}"], 		"stepNo": 8, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "endIf", 		"objectName": "", 		"_id_": "9", 		"inputVal": [""], 		"stepNo": 9, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "{1}", 		"keywordVal": "concatenate", 		"objectName": "", 		"_id_": "10", 		"inputVal": ["abc;a"], 		"stepNo": 10, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "jumpBy", 		"objectName": "", 		"_id_": "11", 		"inputVal": ["2"], 		"stepNo": 11, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "copyValue", 		"objectName": "", 		"_id_": "12", 		"inputVal": ["{c};{b}"], 		"stepNo": 12, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "{2}", 		"keywordVal": "getCurrentDate", 		"objectName": "", 		"_id_": "13", 		"inputVal": ["MM:dd:yyyy"], 		"stepNo": 13, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "toLowerCase", 		"objectName": "", 		"_id_": "14", 		"inputVal": ["ABC"], 		"stepNo": 14, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "toUpperCase", 		"objectName": "", 		"_id_": "15", 		"inputVal": ["abc"], 		"stepNo": 15, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"comments": "" 	}] }]
-    data1=[{ 	"template": "", 	"testscript_name": "getParam", 	"testcase": [{ 		"outputVal": "", 		"keywordVal": "createDynVariable", 		"objectName": "", 		"_id_": "1", 		"inputVal": ["{a};1"], 		"stepNo": 1, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "createDynVariable", 		"objectName": "", 		"_id_": "2", 		"inputVal": ["{b};1"], 		"stepNo": 2, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "if", 		"objectName": "", 		"_id_": "3", 		"inputVal": ["(1;!=;1)"], 		"stepNo": 3, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "displayVariableValue", 		"objectName": "", 		"_id_": "4", 		"inputVal": ["{a}"], 		"stepNo": 4, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "elseIf", 		"objectName": "", 		"_id_": "5", 		"inputVal": ["({a};!=;{b})"], 		"stepNo": 5, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "displayVariableValue", 		"objectName": "", 		"_id_": "6", 		"inputVal": ["{a}"], 		"stepNo": 6, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "elseIf", 		"objectName": "", 		"_id_": "7", 		"inputVal": ["({a};==;{b})"], 		"stepNo": 7, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "displayVariableValue", 		"objectName": "", 		"_id_": "8", 		"inputVal": ["{b}"], 		"stepNo": 8, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "endIf", 		"objectName": "", 		"_id_": "9", 		"inputVal": [""], 		"stepNo": 9, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "{1}", 		"keywordVal": "concatenate", 		"objectName": "", 		"_id_": "10", 		"inputVal": ["abc;a"], 		"stepNo": 10, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "jumpBy", 		"objectName": "", 		"_id_": "11", 		"inputVal": ["2"], 		"stepNo": 11, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "copyValue", 		"objectName": "", 		"_id_": "12", 		"inputVal": ["{c};{b}"], 		"stepNo": 12, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "{2}", 		"keywordVal": "getCurrentDate", 		"objectName": "", 		"_id_": "13", 		"inputVal": ["MM:dd:yyyy"], 		"stepNo": 13, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "toLowerCase", 		"objectName": "", 		"_id_": "14", 		"inputVal": ["ABC"], 		"stepNo": 14, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"outputVal": "", 		"keywordVal": "toUpperCase", 		"objectName": "", 		"_id_": "15", 		"inputVal": ["abc"], 		"stepNo": 15, 		"appType": "Generic", 		"custname": "@Generic", 		"url": "" 	}, { 		"comments": "" 	}] }]
-    dataList=[]
-    dataList.append(data)
-    dataList.append(data1)
-    obj=handler.Handler()
-    for d in dataList:
-        flag=obj.parse_json(d)
-        if flag == False:
-            break
-    print '\n'
-    obj.read_step()
-    tspList=handler.tspList
-    a=JumpByHandler()
-    print len(handler.tspList)
-    for tsp in  handler.tspList:
+    def __validate_jumpbystep(self,input):
+        import handler
+        print 'JUMPPPPP',input
+        condition_list= handler.condition_keywords.keys()
+        number=min(condition_list, key=lambda x:abs(x-self.index))
+##        start_index=
+##        if condition_list[0] < self.index < condition_list[1]:
 
-        if  ( tsp.keyword=='jumpBy'):
-            print tsp.index
-            print a.jumpBy(tsp.index,2,False)
+##        if get_step.name==constants.IF or index<keys:
+##            return True
+
+
 
