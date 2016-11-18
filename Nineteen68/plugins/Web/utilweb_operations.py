@@ -87,6 +87,10 @@ class UtilWebKeywords:
         try:
             script="""var isVisible = (function() {     function inside(schild, sparent) {         while (schild) {             if (schild === sparent) return true;             schild = schild.parentNode;         }         return false;     };     return function(selem) {         if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0) return false;         var srect = selem.getBoundingClientRect();         if (window.getComputedStyle || selem.currentStyle) {             var sel = selem,                 scomp = null;             while (sel) {                 if (sel === document) {                     break;                 } else if (!sel.parentNode) return false;                 scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;                 if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && scomp.opacity != 1))) return false;                 sel = sel.parentNode;             }         }         return true;     } })(); var s = arguments[0]; return isVisible(s);"""
             flag= browser_Keywords.driver_obj.execute_script(script,webelement)
+            if flag:
+                logger.log('Element is not hidden')
+            else:
+                logger.log('Element is hidden')
         except Exception as e:
             Exceptions.error(e)
         return flag
@@ -98,11 +102,12 @@ class UtilWebKeywords:
     def verify_visible(self,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        print 'webelement',webelement
         try:
             if webelement is not None:
                 #call to highlight the webelement
                 self.highlight(webelement)
-                status=self.is_visible()
+                status=self.is_visible(webelement)
                 if status:
                     status=str(status)
                     methodoutput=TEST_RESULT_TRUE
@@ -143,6 +148,9 @@ class UtilWebKeywords:
                 if webelement.is_enabled():
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                    logger.log('Element is enabled')
+                else:
+                    logger.log('Element is not enabled')
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -157,6 +165,9 @@ class UtilWebKeywords:
                 if not(webelement.is_enabled()):
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                    logger.log('Element is disabled')
+                else:
+                    logger.log('Element is not disabled')
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -166,10 +177,12 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         try:
             if webelement is not None:
-                status=self.is_visible()
+                status=self.is_visible(webelement)
                 if not(status):
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                else:
+                    status=TEST_RESULT_FAIL
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -181,10 +194,12 @@ class UtilWebKeywords:
             if webelement is not None:
                 #call to highlight the webelement
                 self.highlight(webelement)
-                readonly_value=webelement.get_attribute("readonly").lower()
-                if readonly_value =='true' or readonly_value is '':
+                readonly_value=webelement.get_attribute("readonly")
+                if readonly_value is not None and readonly_value.lower() =='true' or readonly_value is '':
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                else:
+                    logger.log('Element is not readonly')
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -259,8 +274,6 @@ class UtilWebKeywords:
                 else:
                     obj.enumwindows()
                     obj.mouse_move(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6))
-##                    actwindow = win32gui.GetForegroundWindow()
-##                    win32gui.EnumChildWindows(actwindow, self.__loop_childwindows,location)
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
@@ -268,13 +281,7 @@ class UtilWebKeywords:
         return status,methodoutput
 
 
-##    def __loop_childwindows(self,actwindow,param):
-##        class_name = win32gui.GetClassName(actwindow)
-##        if class_name == 'Internet Explorer_Server' or class_name == 'Chrome_RenderWidgetHostHWND' or class_name == 'WebKit2WebViewWindowClass':
-##            rect=win32gui.GetWindowRect(actwindow)
-##            robot=Robot()
-##            robot.set_mouse_pos(int(param.get('x')+9),int(param.get('y')+rect[1]+6))
-##        return True
+
 
     def tab(self,webelement,*args):
         status=TEST_RESULT_FAIL
