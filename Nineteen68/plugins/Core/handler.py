@@ -62,7 +62,7 @@ for_info=OrderedDict()
 ##if_info={}
 if_info=OrderedDict()
 """Dict to store the start-end of getparam info"""
-get_param_info={}
+get_param_info=OrderedDict()
 
 """Dict to store information about the possible start of each conditional keyword"""
 start_end_dict={constants.ENDFOR:[constants.FOR],
@@ -196,6 +196,8 @@ class Handler():
             start_index=condition_keywords.items()[-1]
             if not (keyword in if_endIf) and self.validate(keyword,start_index[1]):
                 self.insert_into_ifdict(keyword_index,keyword,start_index)
+                #New change to insert even the satrt of the keyword
+                self.insert_into_ifdict(start_index[0],start_index[1],(keyword_index,keyword))
             elif keyword==constants.ENDIF:
                 #insert 'endIf' key to dict
                 self.insert_into_ifdict(keyword_index,keyword,None)
@@ -215,10 +217,13 @@ class Handler():
                         flag=False
                         break
             elif keyword==constants.IF:
-                self.insert_into_ifdict(keyword_index,keyword,None)
+##                self.insert_into_ifdict(keyword_index,keyword,None)
+                  #New change to Map 'if' to 'if'
+                  self.insert_into_ifdict(keyword_index,keyword,(keyword_index,keyword))
+
 
         else:
-            self.insert_into_ifdict(keyword_index,keyword,None)
+            self.insert_into_ifdict(keyword_index,keyword,(keyword_index,keyword))
         return flag
 
     def getparam_index(self,keyword,keyword_index):

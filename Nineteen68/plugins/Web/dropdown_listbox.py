@@ -34,7 +34,7 @@ class DropdownKeywords():
                     isvisble=utilobj.is_visible(webelement)
                     if len(args)>0:
                         visibilityFlag=args[0]
-                        logger.log('Input is '+input)
+##                        logger.log('Input is '+input)
                     if input is not None:
 ##                        if not(visibilityFlag and isvisble):
                         input_val = int(input[0])
@@ -69,7 +69,7 @@ class DropdownKeywords():
                     isvisble=utilobj.is_visible(webelement)
                     if len(args)>0:
                         visibilityFlag=args[0]
-                        logger.log('Input is '+input)
+##                        logger.log('Input is '+input)
                     if input is not None:
 ##                        if not(visibilityFlag and isvisble):
                         select = Select(webelement)
@@ -101,7 +101,7 @@ class DropdownKeywords():
                     isvisble=utilobj.is_visible(webelement)
                     if len(args)>0:
                         visibilityFlag=args[0]
-                        logger.log('Input is '+input)
+##                        logger.log('Input is '+input)
                     if input is not None:
 ##                        if not(visibilityFlag and isvisble):
                         inp_val = input[0]
@@ -131,7 +131,7 @@ class DropdownKeywords():
                     isvisble=utilobj.is_visible(webelement)
                     if len(args)>0:
                         visibilityFlag=args[0]
-                        logger.log('Input is '+input)
+##                        logger.log('Input is '+input)
                     if input is not None:
 ##                        if not(visibilityFlag and isvisble):
                         select = Select(webelement)
@@ -162,7 +162,7 @@ class DropdownKeywords():
                     isvisble=utilobj.is_visible(webelement)
                     if len(args)>0:
                         visibilityFlag=args[0]
-                        logger.log('Input is '+input)
+##                        logger.log('Input is '+input)
                     if input is not None:
 ##                        if not(visibilityFlag and isvisble):
                         select = Select(webelement)
@@ -281,7 +281,7 @@ class DropdownKeywords():
                     check = webelement.get_attribute('multiple')
                     if len(args)>0:
                         visibilityFlag=args[0]
-                        logger.log('Input is '+input)
+##                        logger.log('Input is '+input)
                     if input is not None:
 ##                        if not(visibilityFlag and isvisble):
                         select = Select(webelement)
@@ -383,7 +383,7 @@ class DropdownKeywords():
                     isvisble=utilobj.is_visible(webelement)
                     if len(args)>0:
                         visibilityFlag=args[0]
-                        logger.log('Input is '+input)
+##                        logger.log('Input is '+input)
                     if input is not None:
 ##                        if not(visibilityFlag and isvisble):
                         select = Select(webelement)
@@ -415,7 +415,7 @@ class DropdownKeywords():
                     isvisble=utilobj.is_visible(webelement)
                     if len(args)>0:
                         visibilityFlag=args[0]
-                        logger.log('Input is '+input)
+##                        logger.log('Input is '+input)
                     if input is not None:
 ##                        if not(visibilityFlag and isvisble):
                         input_val = int(input[0])
@@ -454,7 +454,7 @@ class DropdownKeywords():
                 flag = True
                 for x in range(0,opt_len):
                     internal_val = select.options[x].text
-                    str(inp_val_len)
+                    str(internal_val)
                     temp.append(internal_val)
                 count = 0
                 for y in range(0,inp_val_len):
@@ -463,7 +463,7 @@ class DropdownKeywords():
                         count+=1
                     else:
                         flag = False
-                if(count == opt_len):
+                if(not(flag == False)):
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
                 else:
@@ -483,7 +483,7 @@ class DropdownKeywords():
                     isvisble=utilobj.is_visible(webelement)
                     if len(args)>0:
                         visibilityFlag=args[0]
-                        logger.log('Input is '+input)
+##                        logger.log('Input is '+input)
                     if input is not None:
 ##                        if not(visibilityFlag and isvisble):
                         select = Select(webelement)

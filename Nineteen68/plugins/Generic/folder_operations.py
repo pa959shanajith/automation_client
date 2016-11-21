@@ -40,6 +40,8 @@ class FolderOperations:
             else:
                 logger.log(generic_constants.INVALID_INPUT)
                 return False
+        except WindowsError as e:
+            logger.log("A Folder/File name can't contain any of the following characters "+generic_constants.INVALID_CHARS)
         except Exception as e:
             Exceptions.error(e)
             return False
@@ -122,7 +124,7 @@ class FolderOperations:
                         logger.log(generic_constants.FOLDER_NOT_EXISTS)
                         return False
                 except ValueError,WindowsError:
-                    Exception.message('Error occured')
+                    logger.log(generic_constants.INVALID_INPUT)
 
             else:
                 logger.log(generic_constants.INVALID_INPUT)
@@ -132,10 +134,9 @@ class FolderOperations:
             return False
 
     def validateFolderName(self,name):
-        invalid_chars='\/:*?"<>|'
         chars = set(invalid_chars)
         if any((c in chars) for c in name):
-            logger.log("A Folder/File name can't contain any of the following characters "+invalid_chars)
+            logger.log("A Folder/File name can't contain any of the following characters "+generic_constants.INVALID_CHARS)
             return False
         else:
             return True

@@ -45,11 +45,11 @@ class ExcelFile:
         'get_colcount_.xls':self.get_colcount_xls,
         'get_colcount_.xlsx':self.get_colcount_xlsx,
         }
-        self.cell_type={'string' : 's',
+        self.cell_type={'string' : 'General',
         'formula': 'f',
-        'numeric': 'n',
+        'number': '0.00',
         'date':'n',
-        'bool': 'b',
+        'Boolean': 'b',
         'null':'n',
         'inline': 'inlineStr',
         'error': 'e',
@@ -143,7 +143,7 @@ class ExcelFile:
         try:
             file_ext,status=self.__get_ext(self.excel_path)
             if status == True:
-                logger.log('Row is'+str(row)+'and col is'+str(col))
+                logger.log('Row is '+str(row)+' col is '+str(col)+' and Value: '+str(value))
                 status=self.dict['write_cell_'+file_ext](int(row),int(col),value,*args)
                 return status
         except Exception as e:
@@ -433,7 +433,7 @@ class ExcelFile:
         return True
 
 
-    def clear_excel_path(self):
+    def clear_excel_path(self,*args):
         """
         def : clear_excel_path
         purpose : celars the excel path
@@ -582,7 +582,7 @@ class ExcelFile:
         return : bool
 
         """
-        logger.log(generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname)
+##        logger.log(generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname)
         #loads the xls workbook
         workook_info=self.__load_workbook_xls(self.excel_path,self.sheetname)
         #writes to the cell in given row,col
@@ -601,16 +601,33 @@ class ExcelFile:
         return : bool
 
         """
+        status=False
         try:
            sheet=book.get_sheet_by_name(sheetname)
            cell=sheet.cell(row=row,column=col)
-           cell.value=value
-           book.save(input_path)
-           return True
+           if len(args)>0 and args[0] is not None:
+            type=args[0].lower()
+            if type in self.cell_type.keys():
+                type=self.cell_type[type]
+                if type=='0.00':
+                    cell.number_format=type
+                    value=int(value)
+                elif type in ['f','b']:
+                    value='='+value
+                else:
+                    value=str(value)
+                cell.value=value
+                status=True
+            else:
+                logger.log('Cell Type not supported')
+           else:
+                cell.value=value
+                status=True
         except Exception as e:
+            logger.log('Invalid input')
             Exceptions.error(e)
         book.save(input_path)
-        return False
+        return status
 
     def __load_workbook_xlsx(self,inputpath,sheetname):
         """
@@ -644,7 +661,7 @@ class ExcelFile:
         return : bool
 
         """
-        logger.log(generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname)
+##        logger.log(generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname)
         #loads the xls workbook
         workbook_info=self.__load_workbook_xlsx(self.excel_path,self.sheetname)
         #writes to the cell in given row,col

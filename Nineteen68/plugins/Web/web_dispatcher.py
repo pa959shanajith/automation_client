@@ -84,6 +84,8 @@ class Dispatcher:
                   'clickElement' : self.element_object.click_element,
                   'getToolTipText' : self.element_object.get_tooltip_text,
                   'verifyToolTipText' : self.element_object.verify_tooltip_text,
+                  'drag':self.element_object.drag,
+                  'drop':self.element_object.drop,
 
                   'setText':self.textbox_object.set_text,
                   'sendValue':self.textbox_object.send_value,
