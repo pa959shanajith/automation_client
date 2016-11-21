@@ -100,15 +100,35 @@ class Controller():
         generickeywordresult = GenericKeywordResult()
         status = constants.TEST_RESULT_FAIL
 
+    def dangling_status(self,index):
+        step=handler.tspList[index]
+        return step.executed
+
     def check_dangling(self,tsp,index):
         status=True
         if tsp.__class__.__name__.lower() in [IF,FOR,GETPARAM]:
             info_dict=tsp.info_dict
-            if info_dict is not None :
-                if tsp.name.lower() in [ENDFOR,ENDIF,ENDLOOP,ELSE_IF,ELSE]:
+            if info_dict is not None:
+                if tsp.name.lower() in [ENDFOR,ENDLOOP]:
                     index=info_dict[0].keys()[0]
-                    step=handler.tspList[index]
-                    status=step.executed
+                    status=self.dangling_status(index)
+
+                if tsp.name.lower() in [IF,ELSE_IF,ELSE,ENDIF]:
+
+                    if tsp.name.lower() in [IF]:
+                        status= info_dict[-1].values()[0].lower() == ENDIF
+
+                    elif tsp.name.lower() in [ELSE_IF,ELSE]:
+                        status1= info_dict[-1].values()[0] == ENDIF
+                        status2= info_dict[0].keys()[0] != index
+                        status = status1 and status2
+
+                    elif tsp.name.lower() in [ENDIF]:
+                        index=info_dict[-1].keys()[0]
+                        status=self.dangling_status(index)
+
+
+
             else:
                 status=False
             if tsp.name.lower()==ENDLOOP and len(info_dict)<2:
@@ -297,7 +317,8 @@ class Controller():
         maindir = os.getcwd()
         os.chdir('..')
         curdir = os.getcwd()
-        path= curdir + '\Nineteen68\plugins'
+        path= 'D:\Master' + '\Nineteen68\plugins'
+        print 'path',path
         for root, dirs, files in os.walk(path):
             for d in dirs:
                 p = path + '\\' + d
@@ -324,7 +345,7 @@ if __name__ == '__main__':
     t = test.Test()
     list,flag = t.gettsplist()
     if flag:
-       obj.executor(list,'debug')
+        obj.executor(list,'debug')
     else:
         print 'Invalid script'
 

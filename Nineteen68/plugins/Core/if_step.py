@@ -29,6 +29,7 @@ class If():
         self.outputval=outputval
         self.stepnum=stepnum
         self.executed=executed
+        self.status=False
         self.apptype=apptype
 
     def print_step(self):
@@ -45,25 +46,37 @@ class If():
         return :
 
         """
-        logger.log('Encountered :'+self.name+'\n')
+
         self.executed=True
         index=self.index
         end_info=self.info_dict
-        next_target=self.info_dict[0]
-        if len(self.info_dict)>1:
-            last_target=self.info_dict[1]
+        start_step=self.info_dict[0]
+        next_target=self.info_dict[1]
+        if len(self.info_dict)>2:
+            last_target=self.info_dict[2]
         else:
             last_target=next_target
 
         next_index=index+1
         #block to execute if,elseIf part
         if self.name.lower() in [IF,ELSE_IF]:
+
+            #Check is made when elseIf is encountered to ensure it is to be executed or not
+            if self.name.lower() == ELSE_IF:
+                step=handler.tspList[start_step.keys()[0]]
+                if step.status==True:
+                    return last_target.keys()[0]
+
+            logger.log('Encountered :'+self.name+'\n')
             logical_eval_obj=Logical_eval()
             input_expression=self.inputval
             logger.log('Input_expression is '+input_expression)
             res=logical_eval_obj.eval_expression(input_expression)
             logger.log(self.name+': Condition is '+str(res)+'\n')
+
+
             if res==True:
+                self.status=True
                 logger.log('***Started executing:'+self.name+'***\n')
                 return self.index+1
             elif res==INVALID:
@@ -72,13 +85,20 @@ class If():
             else:
                 return next_target.keys()[0]
 
+
+
         #block to execute else part
         elif self.name.lower() in [ELSE]:
-            logger.log('***Started executing:'+self.name+'***\n')
-            return self.index+1
+            step=handler.tspList[start_step.keys()[0]]
+            if step.status==False:
+                logger.log('***Started executing:'+self.name+'***\n')
+                return self.index+1
+            else:
+                return last_target.keys()[0]
 
         #block to execute endIf
         else:
+            logger.log('Encountered :'+self.name+'\n')
             logger.log('***If execution completed ***\n')
             return next_index
 
