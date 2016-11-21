@@ -51,6 +51,10 @@ TEST_RESULT_TRUE = "True";
 TEST_RESULT_FALSE = "False";
 
 
+INVALID_CHARS='\/:*?"<>|'
+
+DYNAMIC_STATIC=['dynamic','static']
+
 
 
 

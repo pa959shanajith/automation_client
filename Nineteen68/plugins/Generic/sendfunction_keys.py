@@ -68,7 +68,7 @@ class SendFunctionKeys:
 
     def get_args(self,args):
         if len(args)>0 and args[0] is not None:
-            if args[0] in generic_constants.DYNAMIC_STATIC:
+            if args[0] in DYNAMIC_STATIC:
                 return 'type'
             else:
                 return int(args[0])
