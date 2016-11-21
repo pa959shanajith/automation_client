@@ -317,7 +317,7 @@ class Controller():
         maindir = os.getcwd()
         os.chdir('..')
         curdir = os.getcwd()
-        path= 'D:\Master' + '\Nineteen68\plugins'
+        path= curdir + '\Nineteen68\plugins'
         print 'path',path
         for root, dirs, files in os.walk(path):
             for d in dirs:
