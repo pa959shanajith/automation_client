@@ -16,7 +16,7 @@ import Exceptions
 import logger
 import browser_Keywords
 from sendfunction_keys import SendFunctionKeys
-from utils import Utils
+from utils_web import Utils
 from webconstants import *
 import win32gui
 
@@ -87,10 +87,6 @@ class UtilWebKeywords:
         try:
             script="""var isVisible = (function() {     function inside(schild, sparent) {         while (schild) {             if (schild === sparent) return true;             schild = schild.parentNode;         }         return false;     };     return function(selem) {         if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0) return false;         var srect = selem.getBoundingClientRect();         if (window.getComputedStyle || selem.currentStyle) {             var sel = selem,                 scomp = null;             while (sel) {                 if (sel === document) {                     break;                 } else if (!sel.parentNode) return false;                 scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;                 if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && scomp.opacity != 1))) return false;                 sel = sel.parentNode;             }         }         return true;     } })(); var s = arguments[0]; return isVisible(s);"""
             flag= browser_Keywords.driver_obj.execute_script(script,webelement)
-            if flag:
-                logger.log('Element is not hidden')
-            else:
-                logger.log('Element is hidden')
         except Exception as e:
             Exceptions.error(e)
         return flag
@@ -109,8 +105,11 @@ class UtilWebKeywords:
                 self.highlight(webelement)
                 status=self.is_visible(webelement)
                 if status:
+                    logger.log('Element is visible')
                     status=str(status)
                     methodoutput=TEST_RESULT_TRUE
+                else:
+                    logger.log('Element is not visible')
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -123,6 +122,7 @@ class UtilWebKeywords:
             if webelement is not None:
                 #call to highlight the webelement
                 self.highlight(webelement)
+                logger.log('Element exists')
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
@@ -133,6 +133,7 @@ class UtilWebKeywords:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         if webelement is None:
+            logger.log('Element does not exists')
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         return status,methodoutput
@@ -179,9 +180,11 @@ class UtilWebKeywords:
             if webelement is not None:
                 status=self.is_visible(webelement)
                 if not(status):
+                    logger.log('Element is hidden')
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
+                    logger.log('Element is not hidden')
                     status=TEST_RESULT_FAIL
         except Exception as e:
             Exceptions.error(e)

@@ -10,10 +10,6 @@
 #-------------------------------------------------------------------------------
 import os
 import sys
-##print 'IN WEB',os.getcwd()
-##curdir=os.getcwd()
-##plug_path=curdir+'\Nineteen68\plugins'
-##sys.path.append(plug_path+'\Generic')
 from pyrobot import Robot
 import win32gui
 

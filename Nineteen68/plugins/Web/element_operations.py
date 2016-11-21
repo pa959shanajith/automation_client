@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 import logger
 import Exceptions
-from utils import Utils
+from utils_web import Utils
 from button_link_keyword import ButtonLinkKeyword
 from webconstants import *
 class ElementKeywords:
@@ -131,11 +131,11 @@ class ElementKeywords:
             try:
                tool_tip=self.__get_tooltip(webelement)
                if tool_tip is not None:
+                   logger.log('Result is '+tool_tip)
                    status=TEST_RESULT_PASS
                    methodoutput=TEST_RESULT_TRUE
             except Exception as e:
                     Exceptions.error(e)
-        logger.log('Result is '+tool_tip)
         return status,methodoutput,tool_tip
 
 
@@ -162,8 +162,8 @@ class ElementKeywords:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         try:
-            if objectname is not None and len(args)>0:
-                delay=args[0]
+            if objectname is not None:
+                delay=3
                 from selenium.webdriver.support.ui import WebDriverWait
                 from selenium.webdriver.support import expected_conditions as EC
                 from selenium.common.exceptions import TimeoutException
@@ -173,9 +173,6 @@ class ElementKeywords:
                 logger.log('Element is visible')
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
-            else:
-                logger.log('wait time is not given')
-                logger.log('Invalid input')
 
         except Exception as e:
             e_type=Exceptions.error(e)
