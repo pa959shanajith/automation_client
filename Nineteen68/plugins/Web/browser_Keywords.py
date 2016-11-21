@@ -12,8 +12,6 @@ from selenium import webdriver
 import Exceptions
 import logger
 import webconstants
-
-
 driver_obj = None
 parent_handle=None
 webdriver_list = []
@@ -24,7 +22,6 @@ class BrowserKeywords():
     def openBrowser(self,webelement,browser_num,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
-        print 'browser_num',browser_num
         self.browser_num=browser_num[0]
         try:
             global driver_obj
@@ -96,7 +93,6 @@ class BrowserKeywords():
         try:
             if (driver_obj!= None):
                 page_title= driver_obj.title
-                print page_title is ''
                 if (page_title is ''):
                     page_title= driver_obj.current_url
                 page_title.strip()
@@ -107,7 +103,28 @@ class BrowserKeywords():
                 logger.log('Driver object is null')
         except Exception as e:
             Exceptions.error(e)
-        return status,result,page_titlek
+        return status,result,page_title
+
+    def verify_page_title(self,webelement,input_val,*args):
+        status=webconstants.TEST_RESULT_FAIL
+        result=webconstants.TEST_RESULT_FALSE
+        try:
+            if (driver_obj!= None):
+                page_title= driver_obj.title
+                if (page_title is ''):
+                    page_title= driver_obj.current_url
+                    page_title.strip()
+                    if(page_title == input_val[0]):
+                        logger.log(page_title)
+                        logger.log(input_val[0])
+                        status=webconstants.TEST_RESULT_PASS
+                        result=webconstants.TEST_RESULT_TRUE
+            else:
+                logger.log('Driver object is null')
+        except Exception as e:
+            Exceptions.error(e)
+        return status,result
+
 
     def getCurrentURL(self,*args):
         status=webconstants.TEST_RESULT_FAIL
@@ -150,7 +167,6 @@ class BrowserKeywords():
         result=webconstants.TEST_RESULT_FALSE
         if(len(webdriver_list) > 0):
             try:
-                print webdriver_list
                 driver_instance = len(webdriver_list)-1
                 winHandles = webdriver_list[driver_instance].window_handles
                 current_handle = webdriver_list[driver_instance].current_window_handle
@@ -207,7 +223,7 @@ class BrowserKeywords():
                         driver_obj.close()
                         logger.log('Closed sub windows')
                     except Exception as e:
-                        print
+                        Exceptions.error(e)
             after_close = driver_obj.window_handles
             after_close = driver_obj.window_handles
             if(len(after_close) == 1):
@@ -230,7 +246,6 @@ class Singleton_DriverUtil():
             choptions.add_argument('start-maximized')
             choptions.add_argument('--disable-extensions')
             import os
-            print os.getcwd()
             driver = webdriver.Chrome(chrome_options=choptions, executable_path=webconstants.CHROME_DRIVER_PATH)
             logger.log('Chrome browser started')
 
