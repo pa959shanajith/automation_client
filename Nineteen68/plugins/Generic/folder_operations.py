@@ -134,7 +134,7 @@ class FolderOperations:
             return False
 
     def validateFolderName(self,name):
-        chars = set(invalid_chars)
+        chars = set(generic_constants.INVALID_CHARS)
         if any((c in chars) for c in name):
             logger.log("A Folder/File name can't contain any of the following characters "+generic_constants.INVALID_CHARS)
             return False
