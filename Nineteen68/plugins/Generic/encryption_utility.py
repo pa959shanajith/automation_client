@@ -17,6 +17,7 @@ import logger
 import generic_constants
 import Exceptions
 
+##standard padding and unpadding based on PKCS5PADDING standard
 BS = 16
 pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
 unpad = lambda s : s[0:-ord(s[-1])]
@@ -24,15 +25,14 @@ unpad = lambda s : s[0:-ord(s[-1])]
 class AESCipher:
 
     def __init__( self ):
-        self.key = b'\xbf\xc0\x85)\x10nc\x94\x02)j\xdf\xcb\xc4\x94\x9d(\x9e[EX\xc8\xd5\xbfI{\xa2$\x05(\xd5\x18'
+        self.key = b'\x74\x68\x69\x73\x49\x73\x41\x53\x65\x63\x72\x65\x74\x4b\x65\x79'
 
     def encrypt( self, raw ):
         try:
             if not (raw is None and raw is ''):
                 raw = pad(raw)
-                iv = Random.new().read( AES.block_size )
-                cipher = AES.new( self.key, AES.MODE_ECB, iv )
-                return base64.b64encode( iv + cipher.encrypt( raw ) )
+                cipher = AES.new( self.key, AES.MODE_ECB)
+                return base64.b64encode(cipher.encrypt( raw ) )
             else:
                 logger.log(generic_constants.INVALID_INPUT)
         except Exception as e:
@@ -42,9 +42,8 @@ class AESCipher:
         try:
             if not (enc is None and enc is ''):
                 enc = base64.b64decode(enc)
-                iv = enc[:16]
-                cipher = AES.new(self.key, AES.MODE_ECB, iv )
-                return unpad(cipher.decrypt( enc[16:] ))
+                cipher = AES.new(self.key, AES.MODE_ECB )
+                return unpad(cipher.decrypt( enc))
             else:
                 logger.log(generic_constants.INVALID_INPUT)
         except Exception as e:
@@ -99,7 +98,7 @@ class AESCipher:
 
 
 ##cipher = AESCipher()
-##encrypted = cipher.encrypt('version2.0_Test')
+##encrypted = cipher.encrypt('bytestringbyrrrbytestringbyrrr12bytestringrrr123')
 ##decrypted = cipher.decrypt(encrypted)
 ##print encrypted
 ##print decrypted
@@ -107,3 +106,4 @@ class AESCipher:
 ##print a
 ##b = cipher.encrypt_base64('Rakesh')
 ##print b
+

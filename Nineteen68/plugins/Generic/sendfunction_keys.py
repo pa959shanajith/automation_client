@@ -67,7 +67,7 @@ class SendFunctionKeys:
         robot.key_release(key)
 
     def get_args(self,args):
-        if len(args)>0 and args[0] is not None:
+        if len(args)>0 and args[0] is not None and args[0] != '':
             if args[0] in DYNAMIC_STATIC:
                 return 'type'
             else:
