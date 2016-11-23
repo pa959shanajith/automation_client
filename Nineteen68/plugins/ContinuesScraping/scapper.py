@@ -15,7 +15,7 @@ class ScrapeWindow(wx.Frame):
     #----------------------------------------------------------------------
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent, title=title,
-                   pos=(300, 150),  size=(300, 400) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
+                   pos=(300, 150),  size=(280, 350) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
         self.SetBackgroundColour(   (245,222,179))
         curdir = os.getcwd()
         browser=raw_input("""Enter the browser name to  open : IE - Internet Explorer, CH - Google Chrome, FX - Mozilla Firefox:\n""")
@@ -31,7 +31,7 @@ class ScrapeWindow(wx.Frame):
         self.icon = wx.StaticBitmap(self.panel, bitmap=wx.Bitmap(self.iconpath))
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
-        self.sizer.Add(self.icon, pos=(0, 4), flag=wx.TOP | wx.RIGHT | wx.ALIGN_RIGHT,
+        self.sizer.Add(self.icon, pos=(0, 3), flag=wx.TOP | wx.RIGHT | wx.ALIGN_RIGHT,
                        border=5)
         self.screenname = ''
         self.modulename = ''
@@ -80,11 +80,11 @@ class ScrapeWindow(wx.Frame):
         self.savescrapebutton.Bind(wx.EVT_BUTTON, self.savescrape)   # need to implement OnExtract()
         self.savescrapebutton.SetToolTip(wx.ToolTip("To save SCRAPE data"))
         self.savescrapebutton.Disable()
-        self.cancelbutton = wx.Button(self.panel, label="Exit" ,pos=(12, 258), size=(175, 28))
-        self.cancelbutton.Bind(wx.EVT_BUTTON, self.OnExit)   # need to implement OnExit(). Leave notrace
-        self.cancelbutton.SetToolTip(wx.ToolTip("To exit and close the browser"))
-        self.label1 = wx.StaticText(self.panel,label = "@ 2016 SLK Software Services Pvt. Ltd.",pos=(12, 308), size=(220, 28))
-        self.label1 = wx.StaticText(self.panel,label =" All Rights Reserved. Patent Pending",pos=(12, 328), size=(220, 28))
+##        self.cancelbutton = wx.Button(self.panel, label="Exit" ,pos=(12, 258), size=(175, 28))
+##        self.cancelbutton.Bind(wx.EVT_BUTTON, self.OnExit)   # need to implement OnExit(). Leave notrace
+##        self.cancelbutton.SetToolTip(wx.ToolTip("To exit and close the browser"))
+        self.label1 = wx.StaticText(self.panel,label = "@ 2016 SLK Software Services Pvt. Ltd.",pos=(12, 268), size=(220, 28))
+        self.label1 = wx.StaticText(self.panel,label =" All Rights Reserved. Patent Pending",pos=(12, 298), size=(220, 28))
 
         self.sizer.AddGrowableCol(2)
         self.panel.SetSizer(self.sizer)
@@ -112,10 +112,10 @@ class ScrapeWindow(wx.Frame):
         self.depscreens.append(self.screenname)
         if self.scrapecount == 0:
             k = []
-            clickandaddoj.stopclickandadd(self.screenname,k)
+            fullscrapeobj.stopclickandadd(self.screenname,k)
         else:
             depscreen = self.depscreens[0:(len(self.depscreens) - 1)]
-            clickandaddoj.stopclickandadd(self.screenname,depscreen)
+            fullscrapeobj.stopclickandadd(self.screenname,depscreen)
         self.scrapecount = self.scrapecount + 1
         self.startbutton.Enable()
         self.fullscrapebutton.Enable()
@@ -135,7 +135,7 @@ class ScrapeWindow(wx.Frame):
             wx.MessageBox('Please select the screen name', 'Info', wx.OK | wx.ICON_INFORMATION)
             self.startbutton.Enable()
             return
-        clickandaddoj.startclickandadd()
+        fullscrapeobj.startclickandadd()
         self.stopbutton.Enable()
         self.fullscrapebutton.Disable()
         self.savescrapebutton.Disable()
@@ -145,8 +145,9 @@ class ScrapeWindow(wx.Frame):
     def fullscrape(self,event):
         print 'Performing full scrape'
         self.startbutton.Disable()
+        self.modulename =  self.choice1.GetString(self.choice1.GetSelection())
         self.screenname =  self.choice2.GetString(self.choice2.GetSelection())
-        self.screenname =  self.modulename + '##' + self.screenname
+
         self.depscreens.append( self.screenname)
         if self.modulename == '':
             wx.MessageBox('Please select the module name', 'Info', wx.OK | wx.ICON_INFORMATION)
@@ -157,6 +158,7 @@ class ScrapeWindow(wx.Frame):
             wx.MessageBox('Please select the screen name', 'Info', wx.OK | wx.ICON_INFORMATION)
             self.fullscrapebutton.Enable()
             return
+        self.screenname =  self.modulename + '##' + self.screenname
         if self.scrapecount == 0:
             k = []
             fullscrapeobj.fullscrape(self.screenname,k)
@@ -173,22 +175,25 @@ class ScrapeWindow(wx.Frame):
         print 'Saving scraped data'
         data = clickandadd.vie
         if len(data) > 0:
-            clickandaddoj.save_json_data()
+            fullscrapeobj.save_json_data()
         else:
             fullscrapeobj.save_json_data()
+        self.Close()
+        driver = browserops.driver
+        driver.close()
         print 'Scrapped data saved successfully in domelements.json file'
 
     #----------------------------------------------------------------------
     def OnChoiceScreen(self,event):
-
-        print "You selected "+ self.screenname +" from Choice1"
+        self.screenname =  self.choice2.GetString(self.choice2.GetSelection())
+        print "You selected "+ self.screenname +" from screen selection"
 
     #----------------------------------------------------------------------
     def OnChoiceModule(self,event):
         self.modulename =  self.choice1.GetString(self.choice1.GetSelection())
         self.screennames = self.modulescreens[self.modulename]
         self.choice2.SetItems(self.screennames)
-        print "You selected "+ self.modulename +" from Choice1"
+        print "You selected "+ self.modulename +" from module selection"
 
 #----------------------------------------------------------------------
 if __name__ == '__main__':
