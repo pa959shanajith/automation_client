@@ -15,7 +15,7 @@ class ScrapeWindow(wx.Frame):
     #----------------------------------------------------------------------
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent, title=title,
-                   pos=(300, 150),  size=(400, 400))
+                   pos=(300, 150),  size=(300, 400) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
         self.SetBackgroundColour(   (245,222,179))
         curdir = os.getcwd()
         browser=raw_input("""Enter the browser name to  open : IE - Internet Explorer, CH - Google Chrome, FX - Mozilla Firefox:\n""")
@@ -44,7 +44,6 @@ class ScrapeWindow(wx.Frame):
                              'MobileBanking' : ['MobileLogin','MobilePayment','MobileTranzaction','MobileLogout'],
                              'PapaerBanking' : ['PaperLogin','PaperPayment','PaperTranzaction','PaperLogout']
 
-
                             }
 
         self.screennames = []
@@ -55,6 +54,7 @@ class ScrapeWindow(wx.Frame):
         box.Add(self.choice1,1,wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL,5)
         box.AddStretchSpacer()
         self.choice1.Bind(wx.EVT_CHOICE, self.OnChoiceModule)
+        self.choice1.SetToolTip(wx.ToolTip("Select the module name"))
 
 
 
@@ -63,6 +63,7 @@ class ScrapeWindow(wx.Frame):
         box.Add(self.choice2,1,wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL,5)
         box.AddStretchSpacer()
         self.choice2.Bind(wx.EVT_CHOICE, self.OnChoiceScreen)
+        self.choice2.SetToolTip(wx.ToolTip("Select the screen name"))
 
 
         self.startbutton = wx.Button(self.panel, label="Start ClickAndAdd",pos=(12, 128), size=(175, 28))
@@ -88,7 +89,12 @@ class ScrapeWindow(wx.Frame):
         self.sizer.AddGrowableCol(2)
         self.panel.SetSizer(self.sizer)
         self.Centre()
+        style = self.GetWindowStyle()
+        self.SetWindowStyle( style|wx.STAY_ON_TOP )
+        wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
         self.Show()
+
+
 
     #----------------------------------------------------------------------
     def OnExit(self, event):
@@ -100,6 +106,8 @@ class ScrapeWindow(wx.Frame):
     def stopcliclandadd(self,event):
         self.stopbutton.Disable()
         self.screenname =  self.choice2.GetString(self.choice2.GetSelection())
+        self.modulename =  self.choice1.GetString(self.choice1.GetSelection())
+
         self.screenname = self.modulename + '##' +self.screenname
         self.depscreens.append(self.screenname)
         if self.scrapecount == 0:
@@ -117,6 +125,16 @@ class ScrapeWindow(wx.Frame):
     #----------------------------------------------------------------------
     def startcliclandadd(self,event):
         self.startbutton.Disable()
+        self.modulename =  self.choice1.GetString(self.choice1.GetSelection())
+        if self.modulename == '':
+            wx.MessageBox('Please select the module name', 'Info', wx.OK | wx.ICON_INFORMATION)
+            self.startbutton.Enable()
+            return
+        self.screenname =  self.choice2.GetString(self.choice2.GetSelection())
+        if self.screenname == '':
+            wx.MessageBox('Please select the screen name', 'Info', wx.OK | wx.ICON_INFORMATION)
+            self.startbutton.Enable()
+            return
         clickandaddoj.startclickandadd()
         self.stopbutton.Enable()
         self.fullscrapebutton.Disable()
@@ -130,6 +148,15 @@ class ScrapeWindow(wx.Frame):
         self.screenname =  self.choice2.GetString(self.choice2.GetSelection())
         self.screenname =  self.modulename + '##' + self.screenname
         self.depscreens.append( self.screenname)
+        if self.modulename == '':
+            wx.MessageBox('Please select the module name', 'Info', wx.OK | wx.ICON_INFORMATION)
+            self.fullscrapebutton.Enable()
+            return
+        self.screenname =  self.choice2.GetString(self.choice2.GetSelection())
+        if self.screenname == '':
+            wx.MessageBox('Please select the screen name', 'Info', wx.OK | wx.ICON_INFORMATION)
+            self.fullscrapebutton.Enable()
+            return
         if self.scrapecount == 0:
             k = []
             fullscrapeobj.fullscrape(self.screenname,k)

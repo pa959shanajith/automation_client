@@ -492,9 +492,14 @@ class GetParam():
                     print '***Data Parameterization completed***'
                     return paramindex
             else:
+                print 'Data parameterization failed'
+                print 'Wrong file name/ Sheet name given, Please check and provide valid one'
                 return endlopnum + 1
         except Exception as e:
+            print 'Data parameterization failed'
+            print 'Wrong filters given, please check and provide correct one'
             Exceptions.error(e)
+            return endlopnum + 1
 
 
 

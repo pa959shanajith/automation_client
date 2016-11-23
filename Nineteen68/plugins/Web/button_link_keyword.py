@@ -257,11 +257,7 @@ class ButtonLinkKeyword():
             robot.key_release(Keys.n)
             robot.key_release(Keys.alt)
             robot.sleep(0.5)
-            robot.key_press(Keys.ctrl)
-            robot.key_press(Keys.v)
-            robot.sleep(0.5)
-            robot.key_release(Keys.v)
-            robot.key_release(Keys.ctrl)
+            robot.paste()
             robot.sleep(0.5)
             robot.key_press(Keys.enter)
             robot.sleep(0.5)
@@ -273,9 +269,11 @@ class ButtonLinkKeyword():
         return status
 
     def __set_clipboard_data(self,inputfile):
+        status = False
         try:
             robot = Robot()
-            robot.add_to_clipboard(inputfile)
+            robot.add_to_clipboard(str(inputfile))
+            status = True
         except Exception as e:
             Exceptions.error(e)
         return status
