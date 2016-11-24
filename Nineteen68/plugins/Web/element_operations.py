@@ -55,7 +55,7 @@ class ElementKeywords:
             try:
                 input=input[0]
                 if input is not None:
-                   text=self.__get_text(webelement)
+                   text=self.__getelement_text(webelement)
                    if text==input:
                        status=TEST_RESULT_PASS
                        methodoutput=TEST_RESULT_TRUE
@@ -91,8 +91,9 @@ class ElementKeywords:
                     logger.log('location is '+str(location))
                     obj.enumwindows()
                     obj.mouse_move(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6))
+                    import time
+                    time.sleep(1)
                     obj.mouse_press(LEFT_BUTTON)
-
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
@@ -112,7 +113,10 @@ class ElementKeywords:
                     location=obj.get_element_location(webelement)
                     logger.log('location is '+str(location))
                     obj.enumwindows()
+                    import time
+                    time.sleep(1)
                     obj.slide(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6), 0);
+                    time.sleep(1)
                     obj.mouse_release(LEFT_BUTTON)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
