@@ -141,8 +141,8 @@ class Dispatcher:
                   'closeBrowser':self.browser_object.closeBrowser,
                   'closeSubWindows':self.browser_object.closeSubWindows,
                   'switchToWindow':self.util_object.switch_to_window,
-
-                  'verifyTextExists':self.statict_text_object.verify_text_exists
+                  'verifyTextExists':self.statict_text_object.verify_text_exists,
+                  'verifyPageTitle':self.browser_object.verify_page_title
                 }
             if keyword in dict.keys():
                 import time
