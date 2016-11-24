@@ -51,11 +51,13 @@ class If():
         index=self.index
         end_info=self.info_dict
         start_step=self.info_dict[0]
-        next_target=self.info_dict[1]
-        if len(self.info_dict)>2:
-            last_target=self.info_dict[2]
-        else:
-            last_target=next_target
+        #NO need to keep track of next targets when endIf is encountered
+        if self.name.lower() != ENDIF:
+            next_target=self.info_dict[1]
+            if len(self.info_dict)>2:
+                last_target=self.info_dict[2]
+            else:
+                last_target=next_target
 
         next_index=index+1
         #block to execute if,elseIf part
@@ -106,6 +108,7 @@ class If():
 
 class Logical_eval():
 
+    #Block to evaluate conditional expression
     def eval_expression(self,expression):
         expression=str(expression)
         expression=expression.replace('AND','and').replace('OR','or').replace('NOT','not')
