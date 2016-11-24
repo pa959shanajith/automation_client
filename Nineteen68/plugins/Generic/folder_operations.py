@@ -29,7 +29,7 @@ class FolderOperations:
         """
         try:
             logger.log(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
-            if not (inputpath is None and inputpath is '') and self.validateFolderName(folder_name):
+            if not (inputpath is None and inputpath is '') and self.validateFolderName(inputpath,'path') and self.validateFolderName(folder_name):
                 if not os.path.exists(inputpath+'/'+folder_name):
                     os.makedirs(inputpath+'/'+folder_name)
                     return True
@@ -133,11 +133,12 @@ class FolderOperations:
             Exceptions.error(e)
             return False
 
-    def validateFolderName(self,name):
+    def validateFolderName(self,name,*args):
         chars = set(generic_constants.INVALID_CHARS)
+        if len(args)>0 and args[0]=='path':
+            chars=set(generic_constants.INVALID_CHARS_PATH)
         if any((c in chars) for c in name):
             logger.log("A Folder/File name can't contain any of the following characters "+generic_constants.INVALID_CHARS)
             return False
         else:
             return True
-
