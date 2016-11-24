@@ -79,7 +79,7 @@ class GetParam():
                     if os.access(filepath, os.R_OK):
                         wb = open_workbook(filepath)
                         for s in wb.sheets():
-                            if s.name.capitalize() == sheetname:
+                            if s.name == sheetname:
                                 for col in range(s.ncols):
                                     data = s.cell(0,col).value
                                     if data != '':
