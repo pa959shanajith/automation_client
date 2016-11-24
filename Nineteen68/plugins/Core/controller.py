@@ -39,6 +39,7 @@ class Controller():
     oebs_dispatcher_obj = None
     webservice_dispatcher_obj = None
     outlook_dispatcher_obj = None
+    desktop_dispatcher_obj = None
 
     def __init__(self):
         self.get_all_the_imports()
@@ -47,6 +48,7 @@ class Controller():
         self.__load_webservice()
         self.__load_oebs()
         self.__load_outlook()
+        self.__load_desktop()
 
 
     def __load_generic(self):
@@ -81,6 +83,13 @@ class Controller():
         try:
             import web_dispatcher
             self.web_dispatcher_obj = web_dispatcher.Dispatcher()
+        except Exception as e:
+             logger.log('')
+
+    def __load_desktop(self):
+        try:
+            import desktop_dispatcher
+            self.desktop_dispatcher_obj = desktop_dispatcher.DesktopDispatcher()
         except Exception as e:
              logger.log('')
 
@@ -206,7 +215,9 @@ class Controller():
 
             elif teststepproperty.apptype.lower() == constants.APPTYPE_DESKTOP:
                 #Desktop apptype module call goes here
-                print 'Dont forget to implement me'
+                result = self.invokeDesktopkeyword(teststepproperty,self.desktop_dispatcher_obj,inpval)
+                print 'Result in methodinvocation : ',result
+
             elif teststepproperty.apptype.lower() == constants.APPTYPE_DESKTOP_JAVA:
 
                 #OEBS apptype module call goes here
@@ -307,6 +318,13 @@ class Controller():
 
     def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval):
 
+        keyword = teststepproperty.name
+        print "----Keyword :",keyword,' execution Started----'
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval)
+        print "----Keyword :",keyword,' execution completed----\n\n'
+        return res
+
+    def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval):
         keyword = teststepproperty.name
         print "----Keyword :",keyword,' execution Started----'
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
