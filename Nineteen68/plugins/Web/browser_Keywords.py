@@ -251,7 +251,6 @@ class Singleton_DriverUtil():
 
         elif(browser_num == '2'):
             driver = webdriver.Firefox()
-            driver = webdriver.Firefox()
             logger.log('Firefox browser started')
 
         elif(browser_num == '3'):
