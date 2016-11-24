@@ -147,7 +147,7 @@ class ScrapeWindow(wx.Frame):
         self.startbutton.Disable()
         self.modulename =  self.choice1.GetString(self.choice1.GetSelection())
         self.screenname =  self.choice2.GetString(self.choice2.GetSelection())
-
+        self.screenname = self.modulename + '##' +self.screenname
         self.depscreens.append( self.screenname)
         if self.modulename == '':
             wx.MessageBox('Please select the module name', 'Info', wx.OK | wx.ICON_INFORMATION)

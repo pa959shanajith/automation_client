@@ -19,6 +19,7 @@ import element_operations
 import textbox_operations
 import dropdown_listbox
 import utilweb_operations
+import static_text_keywords
 import Exceptions
 import logger
 import webconstants
@@ -33,6 +34,7 @@ class Dispatcher:
     textbox_object = textbox_operations.TextboxKeywords()
     dropdown_list_object = dropdown_listbox.DropdownKeywords()
     util_object = utilweb_operations.UtilWebKeywords()
+    statict_text_object = static_text_keywords.StaticTextKeywords()
 
 
     def dispatcher(self,teststepproperty,input):
@@ -138,7 +140,9 @@ class Dispatcher:
                   'verifyCurrentURL':self.browser_object.verifyCurrentURL,
                   'closeBrowser':self.browser_object.closeBrowser,
                   'closeSubWindows':self.browser_object.closeSubWindows,
-                  'switchToWindow':self.util_object.switch_to_window
+                  'switchToWindow':self.util_object.switch_to_window,
+
+                  'verifyTextExists':self.statict_text_object.verify_text_exists
                 }
             if keyword in dict.keys():
                 import time

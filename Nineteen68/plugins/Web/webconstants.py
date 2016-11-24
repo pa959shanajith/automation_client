@@ -49,3 +49,9 @@ RIGHT_BUTTON='right'
 
 MOUSE_HOVER_FF="""return window.mozInnerScreenY"""
 
+IFRAME = 'iframe'
+
+FRAME = 'frame'
+
+HTML = 'html'
+
