@@ -220,6 +220,7 @@ class ButtonLinkKeyword():
         methodoutput = webconstants.TEST_RESULT_FALSE
         #upload_file keyword implementation
         try:
+            driver = browser_Keywords.driver_obj
             filepath = inputs[0]
             filename = inputs[1]
             inputfile = filepath + '\\' + filename
@@ -234,7 +235,7 @@ class ButtonLinkKeyword():
                         status = webconstants.TEST_RESULT_PASS
                         methodoutput = webconstants.TEST_RESULT_TRUE
                     else:
-                        if  self.__click_for_file_upload(webelement):
+                        if  self.__click_for_file_upload(driver,webelement):
                             filestatus =self.__upload_operation(inputfile)
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
@@ -277,7 +278,7 @@ class ButtonLinkKeyword():
         except Exception as e:
             Exceptions.error(e)
         return status
-    def __click_for_file_upload(self,webelement):
+    def __click_for_file_upload(self,driver,webelement):
         status = False
         try:
             if isinstance(driver,webdriver.Ie):
