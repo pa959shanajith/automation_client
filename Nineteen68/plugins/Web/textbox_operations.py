@@ -57,7 +57,7 @@ class TextboxKeywords:
                 logger.log('InvalidElementState')
 
             except Exception as e:
-                    Exceptions.error(e)
+                Exceptions.error(e)
 
         return status,methodoutput
 
@@ -95,7 +95,7 @@ class TextboxKeywords:
             except InvalidElementStateException as e:
                 logger.log('InvalidElementState')
             except Exception as e:
-                    Exceptions.error(e)
+                Exceptions.error(e)
 
         return status,methodoutput
 
@@ -154,19 +154,25 @@ class TextboxKeywords:
         if webelement is not None:
             try:
                 if webelement.is_enabled():
-                    obj=UtilWebKeywords()
-                    if obj.is_visible(webelement):
-                        webelement.clear()
-                        from selenium.webdriver.common.keys import Keys
-                        webelement.send_keys(Keys.BACK_SPACE)
+                    readonly_value=webelement.get_attribute("readonly")
+                    if readonly_value is not None and readonly_value.lower() =='true' or readonly_value is '':
+                        obj=UtilWebKeywords()
+                        if obj.is_visible(webelement):
+                            webelement.clear()
+                            from selenium.webdriver.common.keys import Keys
+                            webelement.send_keys(Keys.BACK_SPACE)
+                        else:
+                            self.__clear_text(webelement)
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
                     else:
-                        self.__clear_text(webelement)
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
+                        logger.log('Element is read only')
                 else:
                     logger.log('Element is disabled')
+            except InvalidElementStateException as e:
+                logger.log('InvalidElementState')
             except Exception as e:
-                    Exceptions.error(e)
+                Exceptions.error(e)
         return status,methodoutput
 
     def gettextbox_length(self,webelement,*args):
@@ -235,7 +241,7 @@ class TextboxKeywords:
             except InvalidElementStateException as e:
                 logger.log('InvalidElementState')
             except Exception as e:
-                    Exceptions.error(e)
+                Exceptions.error(e)
         return status,methodoutput
 
 
