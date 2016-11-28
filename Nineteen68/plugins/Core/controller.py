@@ -23,6 +23,8 @@ import handler
 import os,sys
 import logger
 from constants import *
+import pause_execution
+
 
 
 
@@ -31,6 +33,8 @@ i = 0
 
 #Terminate Flag
 terminate_flag=False
+pause_flag=False
+break_point=-1
 
 class Controller():
 
@@ -91,7 +95,8 @@ class Controller():
             import desktop_dispatcher
             self.desktop_dispatcher_obj = desktop_dispatcher.DesktopDispatcher()
         except Exception as e:
-             logger.log('')
+            print '-----------------------------------------------'
+            logger.log('')
 
 
     def checkfordynamicvariables(self,outputval):
@@ -106,8 +111,31 @@ class Controller():
         return status
 
     def checkyynamicvariableinsidedynamicvariable(self,inputvar):
+        input_dict=handler.dynamic_variable_map
         generickeywordresult = GenericKeywordResult()
         status = constants.TEST_RESULT_FAIL
+        if inputvar.startswith('{') and inputvar.endswith('}'):
+            pattern = '\\[(.*?)\\]'
+            regularexp = re.compile(pattern)
+            inputafterre = regularexp.findall(inputvar)
+            if len(inputafterre) > 0 :
+                for i in range(len(inputafterre)):
+                    replacestring = ''
+                    if input_dict.has_key(inputafterre[i]):
+                        replacestring = input_dict.get(inputafterre[i])
+                        inputvar = inputvar.replace(inputafterre[i],replacestring)
+            return inputvar
+        elif (inputvar.count('{') > 0) and (inputvar.count('}') > 0):
+            pattern = '\\[(.*?)\\]'
+            regularexp = re.compile(pattern)
+            inputafterre = regularexp.findall(inputvar)
+            if len(inputafterre) > 0 :
+                for i in range(len(inputafterre)):
+                    replacestring = ''
+                    if input_dict.has_key(inputafterre[i]):
+                        replacestring = input_dict.get(inputafterre[i])
+                        inputvar = inputvar.replace(inputafterre[i],replacestring)
+            return inputvar
 
     def dangling_status(self,index):
         step=handler.tspList[index]
@@ -150,8 +178,14 @@ class Controller():
 
 
     def methodinvocation(self,index,*args):
+
+        if break_point != -1 and break_point == index:
+            index = constants.BREAK_POINT
+            return index
         tsp = handler.tspList[index]
         if not(terminate_flag):
+            if pause_flag:
+                pause_execution.execute('pause')
             if(self.check_dangling(tsp,index)):
 
                 if tsp != None and isinstance(tsp,TestStepProperty) :
@@ -177,8 +211,11 @@ class Controller():
         return index
 
     def keywordinvocation(self,index,*args):
-
+        import time
+        time.sleep(1)
         if not(terminate_flag):
+            if pause_flag:
+                    pause_execution.execute('pause')
             inpval = []
             #if termination flag is true then thorough Testautomation exception else do the following
             teststepproperty = handler.tspList[index]
@@ -235,6 +272,9 @@ class Controller():
         while (i < len(tsplist)):
             tsp = tsplist[i]
             if not(terminate_flag):
+                if pause_flag:
+                    pause_execution.execute('pause')
+
                 try:
                     methodstatus = ''
                     #and isinstance(tsplist,TestStepProperty)
@@ -267,12 +307,20 @@ class Controller():
                             logger.log('Terminating the execution')
                             status=i
                             break
+                        elif i==constants.BREAK_POINT:
+                            logger.log('Debug Stopped')
+                            status=i
+                            break
 
                     else:
 
                         i = self.methodinvocation(i)
                         if i== constants.TERMINATE:
                             logger.log('Terminating the execution')
+                            status=i
+                            break
+                        elif i==constants.BREAK_POINT:
+                            logger.log('Debug Stopped')
                             status=i
                             break
 
@@ -335,7 +383,8 @@ class Controller():
         maindir = os.getcwd()
         os.chdir('..')
         curdir = os.getcwd()
-        path= curdir + '\Nineteen68\plugins'
+        path= curdir + '//Nineteen68//plugins'
+        print path
         for root, dirs, files in os.walk(path):
             for d in dirs:
                 p = path + '\\' + d
@@ -343,13 +392,20 @@ class Controller():
         os.chdir(maindir)
 
 
-    def invoke_controller(self,action):
-        global terminate_flag
+    def invoke_controller(self,action,input_breakpoint):
+        global terminate_flag,break_point,pause_flag
         terminate_flag=False
+        pause_flag=False
         obj = Controller()
         t = test.Test()
         list,flag = t.gettsplist()
         if flag:
+            try:
+                input_breakpoint=int(input_breakpoint)
+                if input_breakpoint >=0:
+                    break_point=input_breakpoint+1
+            except ValueError,NameError:
+                logger.log('Invalid breakpoint number')
             status=obj.executor(list,action)
             return status
         else:

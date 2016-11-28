@@ -89,10 +89,16 @@ class ElementKeywords:
                      #find the location of the element w.r.t viewport
                     location=obj.get_element_location(webelement)
                     logger.log('location is '+str(location))
-                    obj.enumwindows()
-                    obj.mouse_move(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6))
+                    import browser_Keywords
+                    from selenium import webdriver
+                    if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
+                        yoffset=browser_Keywords.driver_obj.execute_script(MOUSE_HOVER_FF)
+                        obj.mouse_move(int(location.get('x')+9),int(location.get('y')+yoffset))
+                    else:
+                        obj.enumwindows()
+                        obj.mouse_move(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6))
                     import time
-                    time.sleep(1)
+                    time.sleep(0.5)
                     obj.mouse_press(LEFT_BUTTON)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
@@ -112,11 +118,17 @@ class ElementKeywords:
                      #find the location of the element w.r.t viewport
                     location=obj.get_element_location(webelement)
                     logger.log('location is '+str(location))
-                    obj.enumwindows()
                     import time
-                    time.sleep(1)
-                    obj.slide(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6), 0);
-                    time.sleep(1)
+                    time.sleep(0.5)
+                    import browser_Keywords
+                    from selenium import webdriver
+                    if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
+                        yoffset=browser_Keywords.driver_obj.execute_script(MOUSE_HOVER_FF)
+                        obj.slide(int(location.get('x')+9),int(location.get('y')+yoffset), 0);
+                    else:
+                        obj.enumwindows()
+                        obj.slide(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6), 0);
+                    time.sleep(0.5)
                     obj.mouse_release(LEFT_BUTTON)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
@@ -177,11 +189,10 @@ class ElementKeywords:
                 logger.log('Element is visible')
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
-
+        except TimeoutException as e:
+            logger.log('Delay timeout exceeded')
         except Exception as e:
             e_type=Exceptions.error(e)
-            if isinstance(e_type,TimeoutException):
-                logger.log('Delay timeout exceeded')
         return status,methodoutput
 
 
