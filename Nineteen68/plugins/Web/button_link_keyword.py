@@ -230,7 +230,7 @@ class ButtonLinkKeyword():
                     if isinstance(driver,webdriver.Firefox):
                         logger.log('Mozilla Firefox Instance')
                         clickinfo = driver.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
-                        logger.log('upload_file click info',clickinfo)
+                        logger.log('upload_file click info'+clickinfo)
                         filestatus = self.__upload_operation(inputfile)
                         status = webconstants.TEST_RESULT_PASS
                         methodoutput = webconstants.TEST_RESULT_TRUE
