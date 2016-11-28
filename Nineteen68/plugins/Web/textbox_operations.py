@@ -16,6 +16,7 @@ from utilweb_operations import UtilWebKeywords
 import logger
 import Exceptions
 from encryption_utility import AESCipher
+from selenium.common.exceptions import *
 class TextboxKeywords:
 
     def set_text(self,webelement,input,*args):
@@ -39,15 +40,22 @@ class TextboxKeywords:
                     input=input[0]
                     logger.log('Input is '+input)
                     if input is not None:
-                        if not(visibilityFlag and is_visble):
-                            self.clear_text(webelement)
+                        readonly_value=webelement.get_attribute("readonly")
+                        if readonly_value is not None and readonly_value.lower() =='true' or readonly_value is '':
+                            if not(visibilityFlag and is_visble):
+                                self.clear_text(webelement)
+                            else:
+                                webelement.clear()
+                            browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                         else:
-                            webelement.clear()
-                        browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                            logger.log('Element is read only')
                 else:
                     logger.log('Element is disabled')
+            except InvalidElementStateException as e:
+                logger.log('InvalidElementState')
+
             except Exception as e:
                     Exceptions.error(e)
 
@@ -70,16 +78,22 @@ class TextboxKeywords:
                         max_length=self.__gettexbox_length(webelement)
                         if max_length is not None:
                             input=input[0:max_length]
-                        if not(visibilityFlag and isvisble):
-                            self.clear_text(webelement)
-                            browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
+                        readonly_value=webelement.get_attribute("readonly")
+                        if readonly_value is not None and readonly_value.lower() =='true' or readonly_value is '':
+                            if not(visibilityFlag and isvisble):
+                                self.clear_text(webelement)
+                                browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
+                            else:
+                                webelement.clear()
+                                webelement.send_keys(input)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                         else:
-                            webelement.clear()
-                            webelement.send_keys(input)
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                            logger.log('Element is read only')
                 else:
                     logger.log('Element is disabled')
+            except InvalidElementStateException as e:
+                logger.log('InvalidElementState')
             except Exception as e:
                     Exceptions.error(e)
 
@@ -140,7 +154,13 @@ class TextboxKeywords:
         if webelement is not None:
             try:
                 if webelement.is_enabled():
-                    self.__clear_text(webelement)
+                    obj=UtilWebKeywords()
+                    if obj.is_visible(webelement):
+                        webelement.clear()
+                        from selenium.webdriver.common.keys import Keys
+                        webelement.send_keys(Keys.BACK_SPACE)
+                    else:
+                        self.__clear_text(webelement)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
@@ -196,18 +216,24 @@ class TextboxKeywords:
                     input=input[0]
                     logger.log('Input is '+input)
                     if input is not None:
-                        if not(visibilityFlag and is_visble):
-                            self.clear_text(webelement)
+                        readonly_value=webelement.get_attribute("readonly")
+                        if readonly_value is not None and readonly_value.lower() =='true' or readonly_value is '':
+                            if not(visibilityFlag and is_visble):
+                                self.clear_text(webelement)
+                            else:
+                                logger.log('Hidden')
+                                webelement.clear()
+                            encryption_obj = AESCipher()
+                            input_val = encryption_obj.decrypt(input)
+                            browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                         else:
-                            logger.log('Hidden')
-                            webelement.clear()
-                        encryption_obj = AESCipher()
-                        input_val = encryption_obj.decrypt(input)
-                        browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                            logger.log('Element is read only')
                 else:
                     logger.log('Element is disabled')
+            except InvalidElementStateException as e:
+                logger.log('InvalidElementState')
             except Exception as e:
                     Exceptions.error(e)
         return status,methodoutput
