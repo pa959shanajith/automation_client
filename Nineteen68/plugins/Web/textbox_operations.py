@@ -41,7 +41,7 @@ class TextboxKeywords:
                     logger.log('Input is '+input)
                     if input is not None:
                         readonly_value=webelement.get_attribute("readonly")
-                        if readonly_value is not None and readonly_value.lower() =='true' or readonly_value is '':
+                        if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
                             if not(visibilityFlag and is_visble):
                                 self.clear_text(webelement)
                             else:
@@ -79,7 +79,7 @@ class TextboxKeywords:
                         if max_length is not None:
                             input=input[0:max_length]
                         readonly_value=webelement.get_attribute("readonly")
-                        if readonly_value is not None and readonly_value.lower() =='true' or readonly_value is '':
+                        if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
                             if not(visibilityFlag and isvisble):
                                 self.clear_text(webelement)
                                 browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
@@ -155,7 +155,7 @@ class TextboxKeywords:
             try:
                 if webelement.is_enabled():
                     readonly_value=webelement.get_attribute("readonly")
-                    if readonly_value is not None and readonly_value.lower() =='true' or readonly_value is '':
+                    if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
                         obj=UtilWebKeywords()
                         if obj.is_visible(webelement):
                             webelement.clear()
@@ -223,7 +223,7 @@ class TextboxKeywords:
                     logger.log('Input is '+input)
                     if input is not None:
                         readonly_value=webelement.get_attribute("readonly")
-                        if readonly_value is not None and readonly_value.lower() =='true' or readonly_value is '':
+                        if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
                             if not(visibilityFlag and is_visble):
                                 self.clear_text(webelement)
                             else:
