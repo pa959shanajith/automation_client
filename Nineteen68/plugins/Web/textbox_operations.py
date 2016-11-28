@@ -34,7 +34,7 @@ class TextboxKeywords:
                 if webelement.is_enabled():
                     utilobj=UtilWebKeywords()
                     is_visble=utilobj.is_visible(webelement)
-                    if len(args)>0:
+                    if len(args)>0 and args[0] != '':
                         visibilityFlag=args[0]
                     input=input[0]
                     logger.log('Input is '+input)
@@ -42,7 +42,6 @@ class TextboxKeywords:
                         if not(visibilityFlag and is_visble):
                             self.clear_text(webelement)
                         else:
-                            logger.log('Hidden')
                             webelement.clear()
                         browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
                         status=TEST_RESULT_PASS
@@ -63,7 +62,7 @@ class TextboxKeywords:
                 if webelement.is_enabled():
                     utilobj=UtilWebKeywords()
                     isvisble=utilobj.is_visible(webelement)
-                    if len(args)>0:
+                    if len(args)>0 and args[0] != '':
                         visibilityFlag=args[0]
                     input=input[0]
                     logger.log('Input is '+input)
@@ -98,6 +97,7 @@ class TextboxKeywords:
 
     def __gettexbox_length(self,webelement):
         return webelement.get_attribute('maxlength')
+
 
     def get_text(self,webelement,*args):
         status=TEST_RESULT_FAIL
@@ -156,11 +156,12 @@ class TextboxKeywords:
         if webelement is not None:
             try:
                 length = self.__gettexbox_length(webelement)
-                status=TEST_RESULT_PASS
-                methodoutput=TEST_RESULT_TRUE
+                if length is not None:
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
             except Exception as e:
-                    Exceptions.error(e)
-        logger.log('Textbox length is '+length)
+                Exceptions.error(e)
+        logger.log('Textbox length is '+str(length))
         return status,methodoutput,length
 
     def verifytextbox_length(self,webelement,input,*args):
@@ -172,7 +173,7 @@ class TextboxKeywords:
                 length = self.__gettexbox_length(webelement)
                 input=input[0]
                 logger.log('Input is:'+input)
-                logger.log('Actual length is:'+length)
+                logger.log('Actual length is:'+str(length))
                 if not (length is None and length is ''):
                     if length==input:
                         status=TEST_RESULT_PASS
@@ -180,7 +181,7 @@ class TextboxKeywords:
             except Exception as e:
                     Exceptions.error(e)
         return status,methodoutput
-        
+
     def setsecuretext(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
@@ -190,7 +191,7 @@ class TextboxKeywords:
                 if webelement.is_enabled():
                     utilobj=UtilWebKeywords()
                     is_visble=utilobj.is_visible(webelement)
-                    if len(args)>0:
+                    if len(args)>0 and args[0] != '':
                         visibilityFlag=args[0]
                     input=input[0]
                     logger.log('Input is '+input)
