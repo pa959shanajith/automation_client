@@ -189,11 +189,10 @@ class ElementKeywords:
                 logger.log('Element is visible')
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
-
+        except TimeoutException as e:
+            logger.log('Delay timeout exceeded')
         except Exception as e:
             e_type=Exceptions.error(e)
-            if isinstance(e_type,TimeoutException):
-                logger.log('Delay timeout exceeded')
         return status,methodoutput
 
 
