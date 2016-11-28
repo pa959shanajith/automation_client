@@ -149,7 +149,7 @@ class Dispatcher:
                 time.sleep(2)
                 if keyword.lower()=='waitforelementvisible':
                     identifiers = objectname.split(';')
-                    input=identifiers[2]
+                    input=identifiers[0]
                 return dict[keyword](webelement,input,output)
             else:
                 logger.log(webconstants.METHOD_INVALID)
