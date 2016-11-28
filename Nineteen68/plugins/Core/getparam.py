@@ -447,7 +447,7 @@ class GetParam():
                                 while (paramindex <= endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,i-1)
                                     paramindex =con.methodinvocation(paramindex,input)
-                                    if paramindex==constants.TERMINATE:
+                                    if paramindex in [constants.TERMINATE,constants.BREAK_POINT]:
                                         return paramindex
                                 print '***Data Param: Iteration ',k, ' completed***\n\n'
                                 k = k + 1
@@ -464,7 +464,7 @@ class GetParam():
                             while (paramindex <= endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,filter-1)
                                     paramindex =con.methodinvocation(paramindex,input)
-                                    if paramindex==constants.TERMINATE:
+                                    if paramindex in [constants.TERMINATE,constants.BREAK_POINT]:
                                         return paramindex
                             print '***Data Param: Iteration ',k, ' completed***\n\n'
                             k = k + 1
@@ -484,7 +484,7 @@ class GetParam():
                                 while (paramindex < endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,i)
                                     paramindex =con.methodinvocation(paramindex,input)
-                                    if paramindex==constants.TERMINATE:
+                                    if paramindex in [constants.TERMINATE,constants.BREAK_POINT]:
                                         return paramindex
                                 print '***Data Param: Iteration ',k, ' completed***\n\n'
                                 k = k + 1

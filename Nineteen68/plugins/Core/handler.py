@@ -74,6 +74,8 @@ start_end_dict={constants.ENDFOR:[constants.FOR],
                 constants.GETPARAM:[constants.STARTLOOP],
                 constants.STARTLOOP:[constants.ENDLOOP]}
 
+dynamic_variable_map=OrderedDict()
+
 class Handler():
 
     def parse_json(self,test_data):
