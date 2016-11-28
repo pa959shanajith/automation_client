@@ -67,6 +67,8 @@ INVALID='Invalid'
 
 TERMINATE='Terminate'
 
+BREAK_POINT='Debug Stopped'
+
 
 
 
