@@ -97,9 +97,9 @@ class Fullscrape():
                         logger.log('FILE: fullscrape.py , DEF: callback_scrape1() , MSG: full scrape operation on iframe page is done and data is obtained')
                         tempne.extend(temp)
                         for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
-                            path = path + str(frames) + 'f' +  '/'
-                            if switchtoframe_scrape1(path):
-                                itemp = driver.execute_script(javascript_scrape, path)
+                            inpath = path + str(frames) + 'f' +  '/'
+                            if switchtoframe_scrape1(inpath):
+                                itemp = driver.execute_script(javascript_scrape, inpath)
                                 logger.log('FILE: fullscrape.py , DEF: callback_scrape1() , MSG: full scrape operation on frame page is done and data is obtained')
                                 tempne.extend(itemp)
 
@@ -117,9 +117,9 @@ class Fullscrape():
                         logger.log('FILE: fullscrape.py , DEF: callback_scrape2() , MSG: full scrape operation on frame page is done and data is obtained')
                         tempne.extend(temp)
                         for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
-                            path = path + str(frames) + 'i' +  '/'
-                            if switchtoframe_scrape1(path):
-                                itemp = driver.execute_script(javascript_scrape, path)
+                            inpath = path + str(frames) + 'i' +  '/'
+                            if switchtoframe_scrape1(inpath):
+                                itemp = driver.execute_script(javascript_scrape, inpath)
                                 logger.log('FILE: fullscrape.py , DEF: callback_scrape2() , MSG: full scrape operation on iframe page is done and data is obtained')
                                 tempne.extend(itemp)
                         callback_scrape2(path, tempne)
@@ -232,10 +232,10 @@ class Fullscrape():
                         driver.execute_script(javascript_clicknadd, path,browser)
                         logger.log('FILE: clickandadd.py , DEF: callback_clicknadd1() , MSG: Performing the click and add operation on iframe/frame page done')
                         for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
-                            path = path + str(frames) + 'f' + '/'
-                            if switchtoframe_clicknadd1(path):
+                            inpath = path + str(frames) + 'f' + '/'
+                            if switchtoframe_clicknadd1(inpath):
                                 logger.log('FILE: clickandadd.py , DEF: callback_clicknadd1() , MSG: Performing the click and add operation on frame/iframe page')
-                                driver.execute_script(javascript_clicknadd, path,browser)
+                                driver.execute_script(javascript_clicknadd, inpath,browser)
                                 logger.log('FILE: clickandadd.py , DEF: callback_clicknadd1() , MSG: Performing the click and add operation on frame/iframe page done')
                         callback_clicknadd1(path)
 
@@ -249,10 +249,10 @@ class Fullscrape():
                         driver.execute_script(javascript_clicknadd, path,browser)
                         logger.log('FILE: clickandadd.py , DEF: callback_clicknadd2() , MSG: Performing the click and add operation on frame/iframe page done')
                         for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
-                            path = path + str(frames) + 'i' + '/'
-                            if switchtoframe_clicknadd1(path):
+                            inpath = path + str(frames) + 'i' + '/'
+                            if switchtoframe_clicknadd1(inpath):
                                 logger.log('FILE: clickandadd.py , DEF: callback_clicknadd2() , MSG: Performing the click and add operation on iframe/frame page')
-                                driver.execute_script(javascript_clicknadd, path,browser)
+                                driver.execute_script(javascript_clicknadd, inpath,browser)
                                 logger.log('FILE: clickandadd.py , DEF: callback_clicknadd2() , MSG: Performing the click and add operation on iframe/frame page done')
                         callback_clicknadd2(path)
 
@@ -321,8 +321,8 @@ class Fullscrape():
                         logger.log('FILE: clickandadd.py , DEF: callback_stopclicknadd1() , MSG: stopclicknadd operation on iframe page is done and data is obtained')
                         tempne_stopclicknadd.extend(temp)
                         for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
-                            path = path + str(frames) + 'f' + '/'
-                            if switchtoframe_clicknadd1(path):
+                            inpath = path + str(frames) + 'f' + '/'
+                            if switchtoframe_stopclicknadd1(inpath):
                                 itemp = driver.execute_script(javascript_stopclicknadd)
                                 logger.log('FILE: clickandadd.py , DEF: callback_stopclicknadd1() , MSG: before stopclicknadd operation on frame page is done and data is obtained')
                                 tempne_stopclicknadd.extend(itemp)
@@ -340,8 +340,8 @@ class Fullscrape():
                         logger.log('FILE: clickandadd.py , DEF: callback_stopclicknadd2() , MSG: stopclicknadd operation on frame page is done and data is obtained')
                         tempne_stopclicknadd.extend(temp)
                         for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
-                            path = path + str(frames) + 'i' + '/'
-                            if switchtoframe_clicknadd1(path):
+                            inpath = path + str(frames) + 'i' + '/'
+                            if switchtoframe_stopclicknadd1(inpath):
                                 logger.log('FILE: clickandadd.py , DEF: callback_stopclicknadd2() , MSG: before stopclicknadd operation on iframe page is done and data is obtained')
                                 itemp = driver.execute_script(javascript_stopclicknadd)
                                 logger.log('FILE: clickandadd.py , DEF: callback_stopclicknadd2() , MSG: stopclicknadd operation on iframe page is done and data is obtained')

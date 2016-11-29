@@ -113,12 +113,12 @@ class BrowserKeywords():
                 page_title= driver_obj.title
                 if (page_title is ''):
                     page_title= driver_obj.current_url
-                    page_title.strip()
-                    if(page_title == input_val[0]):
-                        logger.log(page_title)
-                        logger.log(input_val[0])
-                        status=webconstants.TEST_RESULT_PASS
-                        result=webconstants.TEST_RESULT_TRUE
+                page_title.strip()
+                if(page_title == input_val[0]):
+                    logger.log(page_title)
+                    logger.log(input_val[0])
+                    status=webconstants.TEST_RESULT_PASS
+                    result=webconstants.TEST_RESULT_TRUE
             else:
                 logger.log('Driver object is null')
         except Exception as e:

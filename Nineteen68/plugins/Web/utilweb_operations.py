@@ -294,8 +294,14 @@ class UtilWebKeywords:
                 webelement.send_keys(Keys.TAB)
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
-        except Exception as e:
-            Exceptions.error(e)
+        except WebDriverException as e:
+            if isinstance(browser_Keywords.driver_obj,webdriver.Chrome):
+                self.__setfocus(webelement)
+                robot=Robot()
+                robot.key_press('tab')
+                robot.key_release('tab')
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
         return status,methodoutput
 
     def sendfunction_keys(self,webelement,input,*args):
