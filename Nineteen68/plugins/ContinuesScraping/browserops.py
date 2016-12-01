@@ -18,7 +18,7 @@ import psutil
 import win32process
 import xml.etree.ElementTree as ET
 import domconstants
-import utils
+import utils_cs
 import win32gui
 import logger
 import Exceptions
@@ -63,7 +63,7 @@ class BrowserOperations():
                 try:
                     global browser
                     browser = 3
-                    util = utils.Utils()
+                    util = utils_cs.Utils()
                     caps = webdriver.DesiredCapabilities.INTERNETEXPLORER
                     caps['INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS'] = True
                     caps['ignoreProtectedModeSettings'] = True
@@ -101,7 +101,7 @@ class BrowserOperations():
         try:
             global browser
             browser = 1
-            util = utils.Utils()
+            util = utils_cs.Utils()
             choptions = webdriver.ChromeOptions()
             choptions.add_argument('start-maximized')
             logger.log('FILE: browserops.py , DEF: openChromeBrowser() , MSG: Reading config.xml file.....')
@@ -142,7 +142,7 @@ class BrowserOperations():
         try:
             global browser
             browser = 2
-            util = utils.Utils()
+            util = utils_cs.Utils()
             logger.log('FILE: browserops.py , DEF: openFirefoxBrowser() , MSG: Opening Chrome browser.....')
             driver = webdriver.Firefox()
             driver.maximize_window()
