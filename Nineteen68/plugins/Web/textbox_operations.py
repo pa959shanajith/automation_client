@@ -19,6 +19,15 @@ from encryption_utility import AESCipher
 from selenium.common.exceptions import *
 class TextboxKeywords:
 
+    def validate_input(self,webelement,input):
+        user_input=None
+        max_len=self.__gettexbox_length(webelement)
+        if not(max_len is None or max_len is ''):
+            max_len=int(max_len)
+            if len(input) > max_len:
+                user_input=input[0:max_len]
+        return user_input
+
     def set_text(self,webelement,input,*args):
         """
         def : set_text
@@ -42,6 +51,9 @@ class TextboxKeywords:
                     if input is not None:
                         readonly_value=webelement.get_attribute("readonly")
                         if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
+                            user_input=self.validate_input(webelement,input)
+                            if user_input is not None:
+                                input=user_input
                             if not(visibilityFlag and is_visble):
                                 self.clear_text(webelement)
                             else:
@@ -75,11 +87,11 @@ class TextboxKeywords:
                     input=input[0]
                     logger.log('Input is '+input)
                     if input is not None:
-                        max_length=self.__gettexbox_length(webelement)
-                        if max_length is not None:
-                            input=input[0:max_length]
                         readonly_value=webelement.get_attribute("readonly")
                         if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
+                            user_input=self.validate_input(webelement,input)
+                            if user_input is not None:
+                                input=user_input
                             if not(visibilityFlag and isvisble):
                                 self.clear_text(webelement)
                                 browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
@@ -127,7 +139,7 @@ class TextboxKeywords:
                     logger.log('Element is disabled')
             except Exception as e:
                     Exceptions.error(e)
-        logger.log('Result is '+text)
+        logger.log('Result is '+str(text))
         return status,methodoutput,text
 
     def verify_text(self,webelement,input,*args):
@@ -139,7 +151,7 @@ class TextboxKeywords:
                text=self.__get_text(webelement)
                input=input[0]
                logger.log('Input text is:'+input)
-               logger.log('Actual text is:'+text)
+               logger.log('Actual text is:'+str(text))
                if text==input:
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
@@ -231,6 +243,9 @@ class TextboxKeywords:
                                 webelement.clear()
                             encryption_obj = AESCipher()
                             input_val = encryption_obj.decrypt(input)
+                            user_input=self.validate_input(webelement,input_val)
+                            if user_input is not None:
+                                input_val=user_input
                             browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
