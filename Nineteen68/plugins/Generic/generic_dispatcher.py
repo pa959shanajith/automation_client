@@ -24,6 +24,7 @@ import logical_operation_keywords
 import batch_operation_keyword
 import delay_operations
 import sendfunction_keys
+import xml_operations
 
 class GenericKeywordDispatcher:
     generic_date = date_ops_keywords.DateOperation()
@@ -38,6 +39,7 @@ class GenericKeywordDispatcher:
     generic_logical=logical_operation_keywords.logical_eval()
     generic_delay=delay_operations.Delay_keywords()
     generic_sendkeys=sendfunction_keys.SendFunctionKeys()
+    xml_oper = xml_operations.XMLOperations()
     def dispatcher(self,keyword,*message):
          logger.log('Keyword is '+keyword)
          try:
@@ -98,7 +100,10 @@ class GenericKeywordDispatcher:
                   'evaluate':self.generic_math.eval,
                   'wait':self.generic_delay.wait,
                   'pause':self.generic_delay.pause,
-                  'sendFunctionKeys':self.generic_sendkeys.sendfunction_keys
+                  'sendFunctionKeys':self.generic_sendkeys.sendfunction_keys,
+                  'getBlockCount' : self.xml_oper.get_block_count,
+                  'getTagValue' : self.xml_oper.get_tag_value,
+                  'getBlockValue' : self.xml_oper.get_block_value
                 }
             if keyword in dict.keys():
                 return dict[keyword](*message)

@@ -43,5 +43,14 @@ CONTENT_TYPE_SOAP_XML = 'application/soap+xml'
 ##
 ##TYPE_SOAP_XML="""Content-Type:application/soap+xml;"""
 
+TEST_RESULT_PASS = "Pass";
+
+TEST_RESULT_FAIL = "Fail";
+
+TEST_RESULT_TRUE = "True";
+
+TEST_RESULT_FALSE = "False";
+
+
 
 
