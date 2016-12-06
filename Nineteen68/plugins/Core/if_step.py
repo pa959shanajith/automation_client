@@ -20,10 +20,10 @@ import controller
 
 class If():
     """Object instantiation of 'for' object"""
-    def __init__(self,index,name,inputval,outputval,stepnum,testscript_name,info_dict,executed,apptype):
+    def __init__(self,index,name,inputval,outputval,stepnum,testscript_name,info_dict,executed,apptype,additionalinfo):
         self.index=index
         self.name=name
-        self.inputval=inputval[0]
+        self.inputval=inputval
         self.info_dict=info_dict
         self.testscript_name=testscript_name
         self.outputval=outputval
@@ -31,6 +31,7 @@ class If():
         self.executed=executed
         self.status=False
         self.apptype=apptype
+        self.additionalinfo = additionalinfo
 
     def print_step(self):
         logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
@@ -71,7 +72,7 @@ class If():
 
             logger.log('Encountered :'+self.name+'\n')
             logical_eval_obj=Logical_eval()
-            input_expression=self.inputval
+            input_expression=self.inputval[0]
             logger.log('Input_expression is '+input_expression)
             res=logical_eval_obj.eval_expression(input_expression)
             logger.log(self.name+': Condition is '+str(res)+'\n')

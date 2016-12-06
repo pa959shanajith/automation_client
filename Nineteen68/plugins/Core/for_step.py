@@ -10,22 +10,22 @@
 #-------------------------------------------------------------------------------
 import logger
 import controller
-import handler
 import constants
 class For():
 
     """Object instantiation of 'for,endfor' object"""
-    def __init__(self,index,name,inputval,outputval,stepnum,testscript_name,info_dict,executed,apptype):
+    def __init__(self,index,name,inputval,outputval,stepnum,testscript_name,info_dict,executed,apptype,additionalinfo):
         self.index=index
         self.name=name
-        self.inputval=inputval[0]
+        self.inputval=inputval
         self.info_dict=info_dict
         self.testscript_name=testscript_name
         self.outputval=outputval
         self.stepnum=stepnum
         self.executed=executed
         self.apptype=apptype,
-        self.count=0
+        self.count=0,
+        self.additionalinfo = additionalinfo
 
 
     def print_step(self):
@@ -46,9 +46,9 @@ class For():
             logger.log('Encountered :'+self.name+'\n')
             endForNum = self.info_dict[0].keys()[0]
             try:
-                inputval = int(self.inputval)
+                inputval = int(self.inputval[0])
             except ValueError:
-                logger.log('Invalid for count '+self.inputval+'\n')
+                logger.log('Invalid for count '+self.inputval[0]+'\n')
                 self.executed=False
                 forIndex=endForNum+1
                 return forIndex

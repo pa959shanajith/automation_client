@@ -241,9 +241,9 @@ class Keys(object):
   x=88
   y=89
   z=90
-  left_windows__natural_board=91
+  windows=91
   right_windows__natural_board=92
-  applications__natural_board=93
+  menu=93
   reserved=94
   computer_sleep=95
   numeric_pad_0=96

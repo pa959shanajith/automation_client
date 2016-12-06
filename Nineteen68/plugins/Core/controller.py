@@ -35,6 +35,7 @@ i = 0
 terminate_flag=False
 pause_flag=False
 break_point=-1
+verify_exists=False
 
 class Controller():
 
@@ -46,7 +47,6 @@ class Controller():
     desktop_dispatcher_obj = None
 
     def __init__(self):
-        self.kill_process()
         self.get_all_the_imports()
         self.__load_generic()
         self.__load_web()
@@ -54,7 +54,9 @@ class Controller():
         self.__load_oebs()
         self.__load_outlook()
         self.__load_desktop()
-
+        self.previous_step=''
+        self.verify_dict={'web':VERIFY_EXISTS,
+        'oebs':VERIFY_VISIBLE}
 
     def __load_generic(self):
         try:
@@ -184,10 +186,36 @@ class Controller():
             index = constants.BREAK_POINT
             return index
         tsp = handler.tspList[index]
+        #Check for 'terminate_flag' before execution
         if not(terminate_flag):
+            #Check for 'pause_flag' before executionee
             if pause_flag:
-                pause_execution.execute('pause')
+                pause_execution.execute(PAUSE)
             if(self.check_dangling(tsp,index)):
+
+                keyword = tsp.name
+
+                print tsp.inputval
+                input = tsp.inputval[0]
+                addtionalinfo = tsp.additionalinfo
+                apptype = tsp.apptype
+                print 'Keyword : ',keyword
+                print 'Input :',input
+                print 'Apptype : ',apptype
+
+                if input.find(constants.IGNORE_THIS_STEP) != -1 :
+                    #Skip the current step execution
+                    #update in the report
+                    #increment the tsp index to point to next step and continue
+                    index += 1
+
+                else:
+                    if addtionalinfo != None:
+                        if addtionalinfo == constants.IGNORE_THIS_STEP:
+                            #Skip the current step execution
+                            #update in the report
+                            #increment the tsp index to point to next step and continue
+                            index += 1
 
                 if tsp != None and isinstance(tsp,TestStepProperty) :
                     index = self.keywordinvocation(index,*args)
@@ -214,11 +242,14 @@ class Controller():
     def keywordinvocation(self,index,*args):
         import time
         time.sleep(1)
+        global verify_exists
+        #Check for 'terminate_flag' before execution
         if not(terminate_flag):
+            #Check for 'pause_flag' before execution
             if pause_flag:
-                    pause_execution.execute('pause')
+                    pause_execution.execute(PAUSE)
             inpval = []
-            #if termination flag is true then thorough Testautomation exception else do the following
+
             teststepproperty = handler.tspList[index]
             rawinput = teststepproperty.inputval
             if len(args) > 0:
@@ -228,6 +259,21 @@ class Controller():
             for i in range(0,len(inputs )):
                 inpval.append(inputs[i])
                 print 'Input: ',i + 1 , '= ',inputs[i]
+
+            #Custom object implementation for Web
+            if teststepproperty.objectname==CUSTOM:
+                if verify_exists==False:
+                    previous_step=handler.tspList[index-1]
+                    if previous_step.name==self.verify_dict[previous_step.apptype.lower()]:
+                        self.previous_step=previous_step
+                        verify_exists=True
+                    else:
+                        logger.log('ERR_CUSTOM_VERIFYEXISTS: Previous step VerifyExists is missing')
+                if verify_exists==True:
+                    teststepproperty.parent_xpath=self.previous_step.objectname
+                    teststepproperty.url=self.previous_step.url
+            elif teststepproperty.name==VERIFY_EXISTS and verify_exists:
+                verify_exists=False
 
 
             #get the output varible from the teststep property
@@ -272,59 +318,21 @@ class Controller():
 
         while (i < len(tsplist)):
             tsp = tsplist[i]
+            #Check for 'terminate_flag' before execution
             if not(terminate_flag):
+                #Check for 'pause_flag' before execution
                 if pause_flag:
-                    pause_execution.execute('pause')
-
+                    pause_execution.execute(PAUSE)
                 try:
-                    methodstatus = ''
-                    #and isinstance(tsplist,TestStepProperty)
-                    if tsp != None and isinstance(tsp,TestStepProperty) :
-                        keyword = tsp.name
-                        input = tsp.inputval[0]
-                        addtionalinfo = tsp.additionalinfo
-                        apptype = tsp.apptype
-                        print 'Keyword : ',keyword
-                        print 'Input :',input
-                        print 'Apptype : ',apptype
-                        #skip the step if  <<Ignore.This.Step>> Constants passed in input
-                        if input.find(constants.IGNORE_THIS_STEP) != -1 :
-                            #Skip the current step execution
-                            #update in the report
-                            #increment the tsp index to point to next step and continue
-                            i = i + 1
-                            continue
-                        else:
-                            if addtionalinfo != None:
-                                if addtionalinfo == constants.IGNORE_THIS_STEP:
-                                    #Skip the current step execution
-                                    #update in the report
-                                    #increment the tsp index to point to next step and continue
-                                    i = i + 1
-                                    continue
-
-                        i = self.keywordinvocation(i)
-                        if i== constants.TERMINATE:
-                            logger.log('Terminating the execution')
-                            status=i
-                            break
-                        elif i==constants.BREAK_POINT:
-                            logger.log('Debug Stopped')
-                            status=i
-                            break
-
-                    else:
-
-                        i = self.methodinvocation(i)
-                        if i== constants.TERMINATE:
-                            logger.log('Terminating the execution')
-                            status=i
-                            break
-                        elif i==constants.BREAK_POINT:
-                            logger.log('Debug Stopped')
-                            status=i
-                            break
-
+                    i = self.methodinvocation(i)
+                    if i== constants.TERMINATE:
+                        logger.log('Terminating the execution')
+                        status=i
+                        break
+                    elif i==constants.BREAK_POINT:
+                        logger.log('Debug Stopped')
+                        status=i
+                        break
 
                 except Exception as e:
                     Exceptions.error(e)
@@ -337,7 +345,6 @@ class Controller():
 
 
         return status
-
 
     def invokegenerickeyword(self,teststepproperty,dispatcher_obj,inputval):
 
@@ -411,16 +418,6 @@ class Controller():
             return status
         else:
             print 'Invalid script'
-
-    def kill_process(self):
-        try:
-            os.system("TASKKILL /F /IM chromedriver.exe")
-            os.system("TASKKILL /F /IM IEDriverServer.exe")
-            os.system("TASKKILL /F /IM IEDriverServer64.exe")
-            os.system("TASKKILL /F /IM CobraWinLDTP.exe")
-            logger.log( 'Stale processes killed')
-        except Exception as e:
-            Exceptions.error(e)
 
 #main method
 if __name__ == '__main__':

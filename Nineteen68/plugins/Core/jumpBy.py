@@ -14,15 +14,16 @@ import logger
 import Exceptions
 import constants
 class  JumpBy():
-    def __init__(self,index,name,inputval,outputval,stepnum,testscript_name,executed,apptype):
+    def __init__(self,index,name,inputval,outputval,stepnum,testscript_name,executed,apptype,additionalinfo):
         self.index=index
         self.name=name
-        self.inputval=inputval[0]
+        self.inputval=inputval
         self.testscript_name=testscript_name
         self.outputval=outputval
         self.stepnum=stepnum
         self.executed=executed
         self.apptype=apptype
+        self.additionalinfo=additionalinfo
 
     def print_step(self):
         logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name)
@@ -31,7 +32,7 @@ class  JumpBy():
     def invoke_jumpby(self):
         try:
             index=int(self.index)
-            stepToJump=int(self.inputval)
+            stepToJump=int(self.inputval[0])
             tspList=handler.tspList
 
             if (stepToJump > 0) :
