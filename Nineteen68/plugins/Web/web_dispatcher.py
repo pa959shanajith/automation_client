@@ -23,6 +23,7 @@ import static_text_keywords
 import Exceptions
 import logger
 import webconstants
+import custom_keyword
 
 class Dispatcher:
     button_link_object = button_link_keyword.ButtonLinkKeyword()
@@ -35,6 +36,7 @@ class Dispatcher:
     dropdown_list_object = dropdown_listbox.DropdownKeywords()
     util_object = utilweb_operations.UtilWebKeywords()
     statict_text_object = static_text_keywords.StaticTextKeywords()
+    custom_object=custom_keyword.CustomKeyword()
 
 
     def dispatcher(self,teststepproperty,input):
@@ -45,11 +47,41 @@ class Dispatcher:
         driver = browser_Keywords.driver_obj
         webelement = None
         element = None
-##        if objectname != '@Browser' or objectname != '@BrowserPopUp' or objectname != '@Custom':
+
         if driver != None:
-            webelement = self.getwebelement(driver,objectname)
-            if webelement != None:
-                webelement = webelement[0]
+
+            #check if the element is in iframe or frame
+            url=teststepproperty.url.strip()
+            if url !=  '' and self.custom_object.is_int(url):
+                self.custom_object.switch_to_iframe(url,driver.driver.current_window_handle)
+                driver = browser_Keywords.driver_obj
+            if objectname==webconstants.CUSTOM:
+                reference_element=self.getwebelement(driver,teststepproperty.parent_xpath)
+                if reference_element != None:
+                    reference_element = reference_element[0]
+                    if len(input)>=3:
+                        webelement=self.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url)
+
+                        input.reverse()
+                        for x in range(0,3):
+                            input.pop()
+                    else:
+                        logger.log('Insufficient Input to find custom object')
+                        logger.log('Custom object not found')
+                else:
+                    logger.log('Reference Element is null')
+                    logger.log('Custom object not found')
+
+            else:
+                webelement = self.getwebelement(driver,objectname)
+                if webelement != None:
+                    webelement = webelement[0]
+                    logger.log('WebElement is found')
+
+
+
+
+
 
         try:
             dict={ 'click': self.button_link_object.click,
@@ -145,8 +177,6 @@ class Dispatcher:
                   'verifyPageTitle':self.browser_object.verify_page_title
                 }
             if keyword in dict.keys():
-                import time
-                time.sleep(2)
                 if keyword.lower()=='waitforelementvisible':
                     identifiers = objectname.split(';')
                     input=identifiers[0]
@@ -159,34 +189,37 @@ class Dispatcher:
 
     def getwebelement(self,driver,objectname):
         objectname = str(objectname)
-        identifiers = objectname.split(';')
-        try:
-            #find by rxpath
-            tempwebElement = driver.find_elements_by_xpath(identifiers[0])
-            if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                tempwebElement = driver.find_elements_by_id(identifiers[1])
-                if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                    tempwebElement = driver.find_elements_by_xpath(identifiers[2])
-                    if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                        tempwebElement = None
-            webElement = tempwebElement
+        webElement = None
+        if objectname.strip() != '':
+            identifiers = objectname.split(';')
 
-        except Exception as webEx:
             try:
-                #find by id
-                tempwebElement = driver.find_elements_by_id(identifiers[1])
+                #find by rxpath
+                tempwebElement = driver.find_elements_by_xpath(identifiers[0])
                 if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                    tempwebElement = driver.find_elements_by_xpath(identifiers[2])
+                    tempwebElement = driver.find_elements_by_id(identifiers[1])
                     if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                        tempwebElement = None
+                        tempwebElement = driver.find_elements_by_xpath(identifiers[2])
+                        if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                            tempwebElement = None
                 webElement = tempwebElement
+
             except Exception as webEx:
                 try:
-                    tempwebElement = driver.find_elements_by_xpath(identifiers[2])
+                    #find by id
+                    tempwebElement = driver.find_elements_by_id(identifiers[1])
                     if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                        tempwebElement = None
+                        tempwebElement = driver.find_elements_by_xpath(identifiers[2])
+                        if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                            tempwebElement = None
                     webElement = tempwebElement
                 except Exception as webEx:
-                    webElement = None
+                    try:
+                        tempwebElement = driver.find_elements_by_xpath(identifiers[2])
+                        if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                            tempwebElement = None
+                        webElement = tempwebElement
+                    except Exception as webEx:
+                        logger.log('WebElement is not found')
         return webElement
 

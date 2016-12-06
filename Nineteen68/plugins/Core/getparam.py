@@ -41,16 +41,17 @@ import xml.etree.ElementTree as ET
 import constants
 class GetParam():
     """Object instantiation of 'getparam,startloop,endloop' object"""
-    def __init__(self,index,name,inputval,outputval,stepnum,testscript_name,info_dict,executed,apptype):
+    def __init__(self,index,name,inputval,outputval,stepnum,testscript_name,info_dict,executed,apptype,additionalinfo):
         self.index=index
         self.name=name
-        self.inputval=inputval[0]
+        self.inputval=inputval
         self.info_dict=info_dict
         self.testscript_name=testscript_name
         self.outputval=outputval
         self.stepnum=stepnum
         self.executed=executed
         self.apptype=apptype
+        self.additionalinfo = additionalinfo
 
     def print_step(self):
         logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
@@ -376,7 +377,7 @@ class GetParam():
 
     def performdataparam(self):
         try:
-            input = self.inputval
+            input = self.inputval[0]
             con= controller.Controller()
             endlopnum = self.info_dict[0].keys()[0]
             self.executed=True
@@ -438,7 +439,7 @@ class GetParam():
                     print '***Data Parameterization started***'
                     for i in range(startRow,endRow+1):
                         if self.name.lower()==constants.GETPARAM:
-                            inputval = self.inputval
+                            inputval = self.inputval[0]
                             paramindex = self.index+1;
                             if (inputval != None):
                                 j = 0
@@ -456,7 +457,7 @@ class GetParam():
                 elif filter != None:
                     print '***Data Parameterization started***'
                     if self.name.lower()==constants.GETPARAM:
-                        inputval = self.inputval
+                        inputval = self.inputval[0]
                         paramindex = self.index+1;
                         if (inputval != None):
                             print '***Data Param: Iteration ',k, ' started***'
@@ -475,7 +476,7 @@ class GetParam():
                     print '***Data Parameterization started***'
                     for i in range(len(data.values()[0])):
                         if self.name.lower()==constants.GETPARAM:
-                            inputval = self.inputval
+                            inputval = self.inputval[0]
                             paramindex = self.index+1;
                             if (inputval != None):
                                 print '***Data Param: Iteration ',k, ' started***'

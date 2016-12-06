@@ -23,10 +23,10 @@ class TestStepProperty():
         self.custname=custname
         self.testscript_name=testscript_name
         self.additionalinfo = additionalinfo
+        self.parent_xpath=''
 
     def print_step(self):
         logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+self.apptype)
-
 
 
 

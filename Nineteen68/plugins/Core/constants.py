@@ -69,7 +69,15 @@ TERMINATE='Terminate'
 
 BREAK_POINT='Debug Stopped'
 
+PAUSE='pause'
 
+CONTINUE='continue'
+
+CUSTOM='@Custom'
+
+VERIFY_EXISTS='verifyExists'
+
+VERIFY_VISIBLE='verifyVisible'
 
 
 
