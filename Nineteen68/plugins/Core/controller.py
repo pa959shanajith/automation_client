@@ -419,9 +419,20 @@ class Controller():
         else:
             print 'Invalid script'
 
+    def kill_process(self):
+        try:
+            os.system("TASKKILL /F /IM chromedriver.exe")
+            os.system("TASKKILL /F /IM IEDriverServer.exe")
+            os.system("TASKKILL /F /IM IEDriverServer64.exe")
+            os.system("TASKKILL /F /IM CobraWinLDTP.exe")
+            logger.log( 'Stale processes killed')
+        except Exception as e:
+            Exceptions.error(e)
+
 #main method
 if __name__ == '__main__':
     obj = Controller()
+    obj.kill_process()
     print 'Controller object created'
     t = test.Test()
     list,flag = t.gettsplist()
