@@ -110,12 +110,13 @@ class GenericKeywordDispatcher:
                   'typeCast':self.util_operation_obj.type_cast,
                   'verifyValues':self.util_operation_obj.verify_values,
                   'verifyFileImages':self.util_operation_obj.verify_file_images,
+                  'stop':self.util_operation_obj.stop
 
 
                 }
             if keyword in dict.keys():
                 return dict[keyword](*message)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.log(generic_constants.INVALID_KEYWORD)
          except Exception as e:
             Exceptions.error(e)

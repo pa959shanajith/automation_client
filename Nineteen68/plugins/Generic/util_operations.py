@@ -112,7 +112,7 @@ class UtilOperations:
                 logger.log('Invalid Input files')
         except Exception as e:
             Exceptions.error(e)
-        return status
+        return status,methodoutput
 
     def verify_values(self,input1,input2):
         status=TEST_RESULT_FAIL
@@ -130,7 +130,17 @@ class UtilOperations:
                     logger.log('Values are not equal')
         except Exception as e:
             Exceptions.error(e)
-        return status
+        return status,methodoutput
+
+    def stop(self,*args):
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        logger.log('Stopping the Execution')
+        import handler
+        output=len(handler.tspList)
+        return status,methodoutput,output
+
+
 
 
 

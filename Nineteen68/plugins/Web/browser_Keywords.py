@@ -236,6 +236,30 @@ class BrowserKeywords():
             driver_obj.switch_to.window(parent_handle)
         return status,result
 
+    def clear_cache(self,*args):
+        status=webconstants.TEST_RESULT_FAIL
+        result=webconstants.TEST_RESULT_FALSE
+        try:
+            if driver_obj != None and isinstance(driver_obj,webdriver.Ie):
+                #get all the cookies
+                cookies=driver_obj.get_cookies()
+                if len(cookies)>0:
+                    cookies_list=[]
+                    for x in cookies:
+                        cookies_list.append(x['name'])
+                    logger.log('Cookies are ',cookies_list)
+                    #delete_all_cookies()
+                    driver_obj.delete_all_cookies()
+
+                else:
+                    logger.log('No Cookies found')
+            else:
+				 logger.log("This feature is available only for Internet Explorer.")
+        except Exception as e:
+            Exceptions.error(e)
+
+        return status,result
+
 
 class Singleton_DriverUtil():
     def driver(self,browser_num):

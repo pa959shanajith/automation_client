@@ -307,7 +307,11 @@ class Controller():
                 #OEBS apptype module call goes here
                 result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
                 print 'Result in methodinvocation : ',result
-            return index+1
+
+            index+=1
+            if teststepproperty.name=='stop':
+                index=len(handler.tspList)
+            return index
         else:
             return constants.TERMINATE
 

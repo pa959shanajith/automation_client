@@ -212,6 +212,17 @@ class Test():
         	"testscript_name": "Script1",
         	"testcase": [
             {
+        		"outputVal": "##",
+        		"keywordVal": "stop",
+        		"objectName": "",
+        		"_id_": "3",
+        		"inputVal": ["D:/data.xlsx;Sheet1"],
+        		"appType": "Generic",
+        		"stepNo": 3,
+        		"url": "",
+        		"custname": "@Generic"
+        	},
+            {
         		"outputVal": "",
         		"keywordVal": "getparam",
         		"objectName": "",

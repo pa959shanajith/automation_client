@@ -12,6 +12,8 @@
 
 INVALID_INPUT='Invalid Input'
 
+INVALID_KEYWORD='Invalid Keyword'
+
 FILE_EXISTS='File exists'
 
 FOLDER_EXISTS='Folder exists'
