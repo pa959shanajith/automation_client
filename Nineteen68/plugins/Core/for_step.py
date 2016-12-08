@@ -24,7 +24,7 @@ class For():
         self.stepnum=stepnum
         self.executed=executed
         self.apptype=apptype,
-        self.count=0,
+        self.count=0
         self.additionalinfo = additionalinfo
 
 

@@ -39,6 +39,7 @@ class Dispatcher:
     custom_object=custom_keyword.CustomKeyword()
 
 
+
     def dispatcher(self,teststepproperty,input):
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
@@ -47,24 +48,45 @@ class Dispatcher:
         driver = browser_Keywords.driver_obj
         webelement = None
         element = None
+        custom_dict={
+                    'getStatus': ['radio','checkbox'],
+                    'selectRadioButton': ['radio'],
+                    'selectCheckbox': ['checkbox'],
+                    'unselectCheckbox': ['checkbox'],
+
+                    'selectValueByIndex':['dropdown','listbox'],
+                    'selectValueByText': ['dropdown','listbox'],
+
+                    'setText': ['textbox','textarea','password','number','email','url'],
+                    'sendValue':['textbox','textarea','password','number','email','url'],
+                    'getText': ['textbox','textarea','password','number','email','url'],
+                    'setSecureText':['textbox','password']
+
+                    }
+        custom_dict_element={'element':['clickElement','doubleClick','rightClick','getElementText','verifyElementText','drag', 'drop','getToolTipText','verifyToolTipText','verifyExists', 'verifyDoesNotExists', 'verifyHidden','verifyVisible', 'switchToTab','switchToWindow','setFocus','sendFunctionKeys',
+                                        'tab','waitForElementVisible','mouseHover','saveFile']}
+
+
 
         if driver != None:
 
             #check if the element is in iframe or frame
             url=teststepproperty.url.strip()
             if url !=  '' and self.custom_object.is_int(url):
-                self.custom_object.switch_to_iframe(url,driver.driver.current_window_handle)
+                self.custom_object.switch_to_iframe(url,driver.current_window_handle)
                 driver = browser_Keywords.driver_obj
             if objectname==webconstants.CUSTOM:
                 reference_element=self.getwebelement(driver,teststepproperty.parent_xpath)
                 if reference_element != None:
                     reference_element = reference_element[0]
                     if len(input)>=3:
-                        webelement=self.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url)
-
-                        input.reverse()
-                        for x in range(0,3):
-                            input.pop()
+                        if (keyword in custom_dict and input[0].lower() in custom_dict[keyword]) or keyword in custom_dict_element.values()[0]:
+                            webelement=self.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url)
+                            input.reverse()
+                            for x in range(0,3):
+                                input.pop()
+                        else:
+                            logger.log('Keyword and Type Mismatch')
                     else:
                         logger.log('Insufficient Input to find custom object')
                         logger.log('Custom object not found')
@@ -174,7 +196,8 @@ class Dispatcher:
                   'closeSubWindows':self.browser_object.closeSubWindows,
                   'switchToWindow':self.util_object.switch_to_window,
                   'verifyTextExists':self.statict_text_object.verify_text_exists,
-                  'verifyPageTitle':self.browser_object.verify_page_title
+                  'verifyPageTitle':self.browser_object.verify_page_title,
+                  'clearCache':self.browser_object.clear_cache
                 }
             if keyword in dict.keys():
                 if keyword.lower()=='waitforelementvisible':

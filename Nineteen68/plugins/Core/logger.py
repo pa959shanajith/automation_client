@@ -9,8 +9,9 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-def log(message):
+def log(message,*args):
 
-    print message
+	#Printing variable number of argumnents in loggers
+    print message,''.join(repr(i) for i in args)
 
 

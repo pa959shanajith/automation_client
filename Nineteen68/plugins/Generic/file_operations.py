@@ -327,6 +327,46 @@ class FileOperations:
             Exceptions.error(e)
         return status
 
+    def save_file(self,folder_path,file_path):
+        """
+        def : save_file
+        purpose : Saving a file in windows
+        param : folder_path,file_path
+        return :
+
+        """
+        try:
+            status=False
+            folder_path=str(folder_path)
+            file_path=str(file_path)
+            logger.log('Folder path is '+folder_path+' and File is '+file_path)
+            if (not(folder_path is None or folder_path == '' or file_path is None or file_path == '') and os.path.exists(folder_path)):
+                from sendfunction_keys import SendFunctionKeys
+                obj=SendFunctionKeys()
+                #Get the focus on Windows Dialog box by pressing 'alt+d'
+                obj.press_multiple_keys(['alt','d'],1)
+                #Enter the folder path
+                obj.type(folder_path)
+                #Press 'Enter' key
+                obj.execute_key('enter',1)
+                #Press 'tab' key to get the focus on 'search tab'
+                obj.execute_key('tab',1)
+                #Press 'alt+n' key to create a new file
+                obj.press_multiple_keys(['alt','n'],1)
+                #Enter the file name
+                obj.type(file_path)
+                #Press 'Enter' key
+                obj.execute_key('enter',1)
+                #Press 'ctrl+y' key in case if the file is already existing
+                obj.press_multiple_keys(['ctrl','y'],1)
+
+            else:
+                logger.log('Invalid input')
+
+        except Exception as e:
+            Exceptions.error(e)
+        return status
+
     def __split(self,*args):
         """
         def : __split
