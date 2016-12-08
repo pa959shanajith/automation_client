@@ -25,6 +25,7 @@ import batch_operation_keyword
 import delay_operations
 import sendfunction_keys
 import xml_operations
+import util_operations
 
 class GenericKeywordDispatcher:
     generic_date = date_ops_keywords.DateOperation()
@@ -40,6 +41,7 @@ class GenericKeywordDispatcher:
     generic_delay=delay_operations.Delay_keywords()
     generic_sendkeys=sendfunction_keys.SendFunctionKeys()
     xml_oper = xml_operations.XMLOperations()
+    util_operation_obj=util_operations.UtilOperations()
     def dispatcher(self,keyword,*message):
          logger.log('Keyword is '+keyword)
          try:
@@ -63,6 +65,7 @@ class GenericKeywordDispatcher:
                   'dateAddition'    : self.generic_date.dateAddition,
                   'changeDateFormat'     : self.generic_date.changeDateFormat,
                   'dateCompare'  : self.generic_date.dateCompare,
+                  'saveFile':self.generic_file.save_file,
                   'createFile':self.generic_file.create_file,
                   'renameFile':self.generic_file.rename_file,
                   'deleteFile':self.generic_file.delete_file,
@@ -103,7 +106,12 @@ class GenericKeywordDispatcher:
                   'sendFunctionKeys':self.generic_sendkeys.sendfunction_keys,
                   'getBlockCount' : self.xml_oper.get_block_count,
                   'getTagValue' : self.xml_oper.get_tag_value,
-                  'getBlockValue' : self.xml_oper.get_block_value
+                  'getBlockValue' : self.xml_oper.get_block_value,
+                  'typeCast':self.util_operation_obj.type_cast,
+                  'verifyValues':self.util_operation_obj.verify_values,
+                  'verifyFileImages':self.util_operation_obj.verify_file_images,
+
+
                 }
             if keyword in dict.keys():
                 return dict[keyword](*message)

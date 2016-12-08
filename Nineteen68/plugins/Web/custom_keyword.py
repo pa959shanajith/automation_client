@@ -58,7 +58,7 @@ class CustomKeyword:
                         logger.log('It is  frame')
                     if j=='':
                         continue
-                    browser_Keywords.driver_obj.switch_to.frame(driver.find_elements_by_tag_name(frame_iframe)[int(j)])
+                    browser_Keywords.driver_obj.switch_to.frame(browser_Keywords.driver_obj.find_elements_by_tag_name(frame_iframe)[int(j)])
 
             logger.log('Control switched to frame/iframe '+input_url)
         except WebDriverException as e:
