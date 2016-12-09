@@ -27,9 +27,10 @@ class Dropdown_Keywords():
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
             item_index=int(input_val[0])
+            print item_index
             try:
-                if launch_keywords.window_name!=None:
-                    if object_xpath[0:3]=='cbo':
+
+                if object_xpath[0:3]=='cbo':
                         if item_index>0:
                             try:
                                 time.sleep(0.5)
@@ -62,7 +63,7 @@ class Dropdown_Keywords():
                                        list_count= list_count+1
                                 if item_index>0 and len(children_list)-list_count>item_index:
                                     item_index=item_index+list_count
-                                    select=ldtp.selectindex(launch_keywords.window_name,object_xpath, itemIndex)
+                                    select=ldtp.selectindex(launch_keywords.window_name,object_xpath, item_index)
                                     if select==1:
                                         status=desktop_constants.TEST_RESULT_PASS
                                         result=desktop_constants.TEST_RESULT_TRUE
@@ -73,6 +74,8 @@ class Dropdown_Keywords():
                             logger.log('element not found')
                     except Exception as e:
                         Exceptions.error(e)
+                else:
+                    print 'not a list'
 
             except Exception as e:
                 Exceptions.error(e)
@@ -176,7 +179,7 @@ class Dropdown_Keywords():
                                                             if sub_index==0:
                                                                 mutli_text=label_text
                                                             else:
-                                                                mutli_text=mutli_text+';'+label_text
+                                                                mutli_text=mutli_text+'~@~'+label_text
                                                             sub_index=sub_index+1
                                                         selected_text.append(mutli_text)
                                                     else:
@@ -247,7 +250,7 @@ class Dropdown_Keywords():
                                                         if sub_index==0:
                                                             mutli_text=label_text
                                                         else:
-                                                            mutli_text=mutli_text+';'+label_text
+                                                            mutli_text=mutli_text+'~@~'+label_text
                                                         sub_index=sub_index+1
                                                     selected_text.append(mutli_text)
                                                 else:
@@ -369,8 +372,6 @@ class Dropdown_Keywords():
                                         status=desktop_constants.TEST_RESULT_PASS
                                         result=desktop_constants.TEST_RESULT_TRUE
                                         return status,result
-                                    else:
-                                        logger.log('unable to verify the count')
                             else:
                                 logger.log('element not found')
                         except Exception as e:
@@ -434,11 +435,10 @@ class Dropdown_Keywords():
                                                     if sub_index==0:
                                                         mutli_text=label_text
                                                     else:
-                                                        mutli_text=mutli_text+';'+label_text
+                                                        mutli_text=mutli_text+'~@~'+label_text
                                                     sub_index=sub_index+1
                                                 selected_text.append(mutli_text)
                                             else:
-                                                print ldtp.getobjectproperty(launch_keywords.window_name,element, desktop_constants.LABEL)
                                                 selected_text.append(ldtp.getobjectproperty(launch_keywords.window_name,element, desktop_constants.LABEL))
                                         if selected_text!=None:
 
@@ -514,7 +514,7 @@ class Dropdown_Keywords():
                                                     if sub_index==0:
                                                         mutli_text=label_text
                                                     else:
-                                                        mutli_text=mutli_text+';'+label_text
+                                                        mutli_text=mutli_text+'~@~'+label_text
                                                     sub_index=sub_index+1
                                                 selected_text.append(mutli_text)
                                             else:
@@ -597,7 +597,7 @@ class Dropdown_Keywords():
                                                         if sub_index==0:
                                                             mutli_text=label_text
                                                         else:
-                                                            mutli_text=mutli_text+';'+label_text
+                                                            mutli_text=mutli_text+'~@~'+label_text
                                                         sub_index=sub_index+1
                                                     selected_text.append(mutli_text)
                                                 else:
@@ -646,7 +646,7 @@ class Dropdown_Keywords():
                                                         if sub_index==0:
                                                             mutli_text=label_text
                                                         else:
-                                                            mutli_text=mutli_text+';'+label_text
+                                                            mutli_text=mutli_text+'~@~'+label_text
                                                         sub_index=sub_index+1
                                                     selected_text.append(mutli_text)
                                                 else:
@@ -669,6 +669,7 @@ class Dropdown_Keywords():
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
             try:
+
                     if ldtp.getobjectproperty(launch_keywords.window_name, object_xpath,desktop_constants.CLASS)==desktop_constants.LIST_BOX:
                         if object_xpath!=None and editable_text.verify_parent(object_xpath,parent) :
                             states=ldtp.getallstates(launch_keywords.window_name,object_xpath)

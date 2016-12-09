@@ -123,7 +123,7 @@ class Util_Keywords():
                 try:
                     if launch_keywords.window_name!=None:
                         if object_xpath!=None and  editable_text.verify_parent(object_xpath,parent):
-                            states=ldtp.getAllStates(launch_keywords.window_name,object_xpath)
+                            states=ldtp.getallstates(launch_keywords.window_name,object_xpath)
                             if   desktop_constants.VISIBLE_CHECK in states and desktop_constants.ENABLED_CHECK in states:
                                 classID=ldtp.istextstateenabled(object_xpath)
                                 if int(classID)!=1:
@@ -151,7 +151,7 @@ class Util_Keywords():
                             objCoordinates=ldtp.getobjectsize(launch_keywords.window_name,object_xpath)
                             xCoordinate = objCoordinates[0] + (50);
                             yCoordinate = objCoordinates[1] + (objCoordinates[3]/2);
-                            flagEnable=ldtpObj.simulateousemove(0, 0, xCoordinate, yCoordinate);
+                            flagEnable=ldtp.simulateousemove(0, 0, xCoordinate, yCoordinate);
                             if flagEnable==1:
                                 status=desktop_constants.TEST_RESULT_PASS
                                 result=desktop_constants.TEST_RESULT_TRUE

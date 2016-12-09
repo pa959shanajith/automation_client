@@ -21,6 +21,8 @@ import win32com.client
 import win32process
 from threading import Thread
 from ldtp import *
+from ldtp.client_exception import LdtpExecutionError
+
 ctrldownflag = False
 stopumpingmsgs = False
 pressedescape = False
@@ -36,6 +38,7 @@ ids = []
 ne = []
 jsonArray = []
 obj_ref = None
+
 
 class Scrape:
 

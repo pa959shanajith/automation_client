@@ -154,7 +154,6 @@ class Text_Box:
             real_parent = real_parent.replace(' ','')
             parent = parent.replace(' ','')
             if(real_parent == parent):
-                logger.log('verify parent is true')
                 return True
             else:
                 logger.log('verify parent is false')

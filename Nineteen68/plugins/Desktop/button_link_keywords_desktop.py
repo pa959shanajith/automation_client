@@ -14,6 +14,7 @@ from editable_text import Text_Box
 import ldtp
 import launch_keywords
 from launch_keywords import Launch_Keywords
+from ldtp.client_exception import LdtpExecutionError
 
 class ButtonLinkKeyword():
     def double_click(self, element , parent  , *args):
