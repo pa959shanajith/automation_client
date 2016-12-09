@@ -26,8 +26,10 @@ from PIL.ImageOps import flip
 import struct
 from ctypes import wintypes
 import ldtp
+from ldtp.client_exception import LdtpExecutionError
 
 window_name=None
+window_handle=None
 class Launch_Keywords():
 
 
@@ -85,10 +87,10 @@ class Launch_Keywords():
     def closeApplication(self,*args):
         status=desktop_constants.TEST_RESULT_FAIL
         try:
-            if self.windowHandle!=None:
-                win32gui.PostMessage(self.windowHandle,win32con.WM_CLOSE,0,0)
+            if window_handle!=None:
+                win32gui.PostMessage(window_handle,win32con.WM_CLOSE,0,0)
                 status=desktop_constants.TEST_RESULT_PASS
-                return status,self.windowname
+                return status
         except Exception as e:
             Exceptions.error(e)
         return status
@@ -178,30 +180,40 @@ class Launch_Keywords():
 
 
     def set_to_foreground(self):
-        windowname=self.windowname
-        aut_handle = win32gui.FindWindow(None,windowname)
-        if aut_handle> 0:
-            foreground=win32gui.GetForegroundWindow()
-            application_pid=win32process.GetWindowThreadProcessId(aut_handle)
-            foreground_pid=win32process.GetWindowThreadProcessId(foreground)
-            if application_pid!=foreground_pid:
-                process_id=    win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
-                i= win32gui.GetWindowRect(aut_handle)
-                if i[0] <= -32000:
-                    fg_thread, fg_process = win32process.GetWindowThreadProcessId(foreground)
-                    aut_thread, aut_process = win32process.GetWindowThreadProcessId(aut_handle)
-                    win32process.AttachThreadInput(aut_thread, fg_thread, True)
-                    self.bring_to_top(aut_handle,4)
+        try:
+            windowname=window_name
+            aut_handle = win32gui.FindWindow(None,windowname)
+            if aut_handle> 0:
+                foreground=win32gui.GetForegroundWindow()
+                application_pid=win32process.GetWindowThreadProcessId(aut_handle)
+                foreground_pid=win32process.GetWindowThreadProcessId(foreground)
+                if application_pid!=foreground_pid:
+                    process_id=    win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
+                    i= win32gui.GetWindowRect(aut_handle)
+                    if i[0] <= -32000:
+                        fg_thread, fg_process = win32process.GetWindowThreadProcessId(foreground)
+                        aut_thread, aut_process = win32process.GetWindowThreadProcessId(aut_handle)
+                        win32process.AttachThreadInput(aut_thread, fg_thread, True)
+                        self.bring_to_top(aut_handle,4)
+                        return True
+                    else:
+                        self.bring_to_top(aut_handle,5)
+                        return True
                 else:
-                    self.bring_to_top(aut_handle,5)
-            else:
-                self.bring_to_top(aut_handle,1)
+                    self.bring_to_top(aut_handle,1)
+                    return True
+        except Exception as e:
+            Exceptions.error(e)
+
         return False
 
     def bring_to_top(self,aut_handle,value):
-        win32gui.BringWindowToTop(aut_handle)
-        win32gui.ShowWindow(aut_handle,value)
-        win32gui.SetForegroundWindow(aut_handle)
+       try:
+            win32gui.BringWindowToTop(aut_handle)
+            win32gui.ShowWindow(aut_handle,value)
+            #win32gui.SetForegroundWindow(aut_handle)
+       except Exception as e:
+            Exceptions.error(e)
 
     def higlight(self,objectname,parent,*args):
         status=False
@@ -260,12 +272,16 @@ class Launch_Keywords():
                     elif len(title_matched_windows)==1:
                         self.windowHandle=title_matched_windows[0]
                         self.windowname=self.getWindowText(self.windowHandle)
+
                         self.set_to_foreground()
+                        time.sleep(0.5)
                         logger.log('Application handle found')
 ##                        tempTitle = windowTitle.replaceAll("[^a-zA-Z0-9]", "*")
                         # need  to create a ldtp object here
                         global window_name
                         window_name=self.windowname
+                        global window_handle
+                        window_handle=title_matched_windows[0]
                         break
                     if(self.windowname!=''):
                         break
@@ -286,7 +302,7 @@ class Launch_Keywords():
 
     def verifyWindowTitle(self):
         try:
-            newWindowName=self.getWindowText(self.windowHandle)
+            newWindowName=self.getWindowText(window_handle)
             if newWindowName!=self.windowname:
                 self.windowname=newWindowName
                 window_name=newWindowName

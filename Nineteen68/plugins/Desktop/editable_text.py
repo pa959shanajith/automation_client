@@ -14,6 +14,7 @@ from encryption_utility import AESCipher
 import logger
 import Exceptions
 import launch_keywords
+from ldtp.client_exception import LdtpExecutionError
 
 class Text_Box:
     def set_text(self , element , parent , input_val ,*args):
@@ -154,7 +155,6 @@ class Text_Box:
             real_parent = real_parent.replace(' ','')
             parent = parent.replace(' ','')
             if(real_parent == parent):
-                logger.log('verify parent is true')
                 return True
             else:
                 logger.log('verify parent is false')

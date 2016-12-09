@@ -19,8 +19,8 @@ class RadioCheckboxKeywords:
 
     def __init__(self):
         self.utilobj=UtilWebKeywords()
-        self.status={'radio':'Checked',
-                    'checkbox':'Selected'}
+        self.status={'radio':'Selected',
+                    'checkbox':'Checked'}
 
 
     def select_radiobutton(self,webelement,*args):
