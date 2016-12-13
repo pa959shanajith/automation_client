@@ -55,15 +55,19 @@ class WSkeywords:
         return : Returns True if it sets the url else False
 
         """
-        url=url.strip()
-        if not (url is None or url is ''):
-
-             self.baseEndPointURL = url
-             return True
-        else:
-            logger.log(ws_constants.METHOD_INVALID_INPUT)
-            return False
-
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        try:
+            url=url.strip()
+            if not (url is None or url is ''):
+                 self.baseEndPointURL = url
+                 status = ws_constants.TEST_RESULT_PASS
+                 methodoutput = ws_constants.TEST_RESULT_TRUE
+            else:
+                logger.log(ws_constants.METHOD_INVALID_INPUT)
+        except Exception as e:
+            Exceptions.error(e)
+        return status,methodoutput
 
      def setOperations(self,operation):
         """
@@ -73,14 +77,20 @@ class WSkeywords:
         return : Returns True if it sets the url else False
 
         """
-        if type(operation) is 'str':
-            operation=operation.strip()
-        if not (operation is None or operation is ''):
-             self.baseOperation = str(operation)
-             return True
-        else:
-            logger.log(ws_constants.METHOD_INVALID_INPUT)
-            return False
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        try:
+            if type(operation) is str:
+                operation=operation.strip()
+            if not (operation is None or operation is ''):
+                 self.baseOperation = str(operation)
+                 status = ws_constants.TEST_RESULT_PASS
+                 methodoutput = ws_constants.TEST_RESULT_TRUE
+            else:
+                logger.log(ws_constants.METHOD_INVALID_INPUT)
+        except Exception as e:
+            Exceptions.error(e)
+        return status,methodoutput
 
      def setMethods(self,method):
         """
@@ -89,18 +99,23 @@ class WSkeywords:
         param method : method of the webservice to set
         return : Returns True if it sets the url else False
         """
-        method=method.strip().upper()
-        if not (method is None or method is ''):
-            if method in ws_constants.METHOD_ARRAY:
-                self.baseMethod = method
-                logger.log("baseMethod is:"+self.baseMethod)
-                return True
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        try:
+            if not (method is None or method is ''):
+            	method=method.strip().upper()
+                if method in ws_constants.METHOD_ARRAY:
+                    self.baseMethod = method
+                    logger.log("baseMethod is:"+self.baseMethod)
+                    status = ws_constants.TEST_RESULT_PASS
+                    methodoutput = ws_constants.TEST_RESULT_TRUE
+                else:
+                    logger.log(ws_constants.METHOD_INVALID)
             else:
-                logger.log(ws_constants.METHOD_INVALID)
-                return False
-        else:
-            logger.log(ws_constants.METHOD_INVALID_INPUT)
-            return False
+                logger.log(ws_constants.METHOD_INVALID_INPUT)
+        except Exception as e:
+            Exceptions.error(e)
+        return status,methodoutput
 
      def setHeader(self,header):
         """
@@ -109,6 +124,8 @@ class WSkeywords:
         param header : header of the webservice to set
         return : Returns True if it sets the url else False
         """
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
         try:
             if not(header is None and header is ''):
                 header = str(header).replace('\n','').replace("'",'')
@@ -128,13 +145,14 @@ class WSkeywords:
                         self.content_type=header_dict['Content-Type']
                 else:
                     self.baseReqHeader=header[0]
-                return True
+                status = ws_constants.TEST_RESULT_PASS
+                methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
                 logger.log(ws_constants.METHOD_INVALID_INPUT)
 
         except Exception as e:
             Exceptions.error(e)
-        return False
+        return status,methodoutput
 
      def setWholeBody(self,body):
         """
@@ -144,12 +162,16 @@ class WSkeywords:
         return : Returns True if it sets the url else False
 
         """
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
         if not (body is None or body is ''):
              self.baseReqBody = body
-             return True
+             status = ws_constants.TEST_RESULT_PASS
+             methodoutput = ws_constants.TEST_RESULT_TRUE
         else:
             logger.log(ws_constants.METHOD_INVALID_INPUT)
-            return False
+        return status,methodoutput
+
 
      def __saveResults(self,response):
         logger.log(response.status_code)
@@ -159,73 +181,109 @@ class WSkeywords:
         logger.log(ws_constants.RESPONSE_HEADER+str(self.baseResHeader))
         self.baseResBody=response.content
         logger.log(ws_constants.RESPONSE_BODY+str(self.baseResBody))
+        status = ws_constants.TEST_RESULT_PASS
+        methodoutput = ws_constants.TEST_RESULT_TRUE
+        output=(self.baseResHeader,self.baseResBody)
+        return status,methodoutput,output
 
      def post(self):
-        if  ws_constants.CONTENT_TYPE_JSON in self.content_type.lower():
-            response = requests.post(self.baseEndPointURL,data = json.dumps(self.baseReqBody), headers=self.baseReqHeader)
-            self.__saveResults(response)
-            return self.baseResHeader,self.baseResBody
-        elif ws_constants.CONTENT_TYPE_XML in self.content_type.lower() or ws_constants.CONTENT_TYPE_SOAP_XML in self.content_type.lower():
-            if not (self.baseEndPointURL is '' or self.baseReqBody is '' or self.baseReqHeader is ''):
-                response = requests.post(self.baseEndPointURL,data=self.baseReqBody,headers=self.baseReqHeader)
-                self.__saveResults(response)
-                return self.baseResHeader,self.baseResBody
-        else:
-            logger.log(ws_constants.METHOD_INVALID_INPUT)
-            return None
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        output=None
+        try:
+            if  ws_constants.CONTENT_TYPE_JSON in self.content_type.lower():
+                response = requests.post(self.baseEndPointURL,data = json.dumps(self.baseReqBody), headers=self.baseReqHeader)
+                status,methodoutput,output=self.__saveResults(response)
+            elif ws_constants.CONTENT_TYPE_XML in self.content_type.lower() or ws_constants.CONTENT_TYPE_SOAP_XML in self.content_type.lower():
+                if not (self.baseEndPointURL is '' or self.baseReqBody is '' or self.baseReqHeader is ''):
+                    response = requests.post(self.baseEndPointURL,data=self.baseReqBody,headers=self.baseReqHeader)
+                    status,methodoutput,output=self.__saveResults(response)
+            else:
+                logger.log(ws_constants.METHOD_INVALID_INPUT)
+        except Exception as e:
+            Exceptions.error(e)
+        return status,methodoutput,output
 
      def get(self):
-        if not (self.baseEndPointURL is '' or self.baseOperation is '' or self.baseReqHeader is ''):
-            print self.baseReqHeader
-            req=self.baseEndPointURL+'/'+self.baseOperation+'?'+self.baseReqHeader
-        elif not (self.baseEndPointURL is ''):
-            req=self.baseEndPointURL
-        response=requests.get(req)
-        self.__saveResults(response)
-        return self.baseResHeader,self.baseResBody
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        output=None
+        try:
+            if not (self.baseEndPointURL is '' or self.baseOperation is '' or self.baseReqHeader is ''):
+                print self.baseReqHeader
+                req=self.baseEndPointURL+'/'+self.baseOperation+'?'+self.baseReqHeader
+            elif not (self.baseEndPointURL is ''):
+                req=self.baseEndPointURL
+            response=requests.get(req)
+            status,methodoutput,output=self.__saveResults(response)
+
+        except Exception as e:
+            Exceptions.error(e)
+        return status,methodoutput,output
 
      def put(self):
-         s=Session()
-         if not (self.baseEndPointURL is '' or self.baseReqBody is '' or self.baseOperation is ''):
-            reqUrl=self.baseEndPointURL+'/'+self.baseOperation
-            req = requests.Request(method=self.baseMethod, url=reqUrl, data=self.baseReqBody)
-            prep=req.prepare()
-            response=s.send(prep)
-            self.__saveResults(response)
-            return self.baseResHeader,self.baseResBody
-         else:
-            logger.log(ws_constants.METHOD_INVALID_INPUT)
-            return None
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        output=None
+        try:
+             s=Session()
+             if not (self.baseEndPointURL is '' or self.baseReqBody is '' or self.baseOperation is ''):
+                reqUrl=self.baseEndPointURL+'/'+self.baseOperation
+                req = requests.Request(method=self.baseMethod, url=reqUrl, data=self.baseReqBody)
+                prep=req.prepare()
+                response=s.send(prep)
+                status,methodoutput,output=self.__saveResults(response)
+             else:
+                logger.log(ws_constants.METHOD_INVALID_INPUT)
+        except Exception as e:
+            Exceptions.error(e)
+        return status,methodoutput,output
 
      def delete(self):
-        s=Session()
-        if not (self.baseEndPointURL is '' or self.baseOperation is ''):
-            reqUrl=self.baseEndPointURL+'/'+self.baseOperation
-            req = requests.Request(method=self.baseMethod, url=reqUrl)
-            prep=req.prepare()
-            response=s.send(prep)
-            self.__saveResults(response)
-            return self.baseResHeader,self.baseResBody
-        else:
-            logger.log(ws_constants.METHOD_INVALID_INPUT)
-            return None
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        output=None
+        try:
+            s=Session()
+            if not (self.baseEndPointURL is '' or self.baseOperation is ''):
+                reqUrl=self.baseEndPointURL+'/'+self.baseOperation
+                req = requests.Request(method=self.baseMethod, url=reqUrl)
+                prep=req.prepare()
+                response=s.send(prep)
+                status,methodoutput,output=self.__saveResults(response)
+            else:
+                logger.log(ws_constants.METHOD_INVALID_INPUT)
+        except Exception as e:
+            Exceptions.error(e)
+        return status,methodoutput,output
 
      def head(self):
-        s=Session()
-        if not (self.baseEndPointURL is '' or self.baseOperation is ''):
-            reqUrl=self.baseEndPointURL+'/'+self.baseOperation
-            req = requests.Request(method=self.baseMethod, url=reqUrl)
-            prep=req.prepare()
-            response=s.send(prep)
-            self.baseResHeader=response.headers
-            logger.log(ws_constants.RESPONSE_HEADER+str(self.baseResHeader))
-            return self.baseResHeader
-        else:
-            logger.log(ws_constants.METHOD_INVALID_INPUT)
-            return None
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        output=None
+        try:
+            s=Session()
+
+            if not (self.baseEndPointURL is '' or self.baseOperation is ''):
+                reqUrl=self.baseEndPointURL+'/'+self.baseOperation
+                req = requests.Request(method=self.baseMethod, url=reqUrl)
+                prep=req.prepare()
+                response=s.send(prep)
+                self.baseResHeader=response.headers
+                logger.log(ws_constants.RESPONSE_HEADER+str(self.baseResHeader))
+                status = ws_constants.TEST_RESULT_PASS
+                methodoutput = ws_constants.TEST_RESULT_TRUE
+                output= self.baseResHeader
+            else:
+                logger.log(ws_constants.METHOD_INVALID_INPUT)
+        except Exception as e:
+            Exceptions.error(e)
+        return status,methodoutput,output
 
      def executeRequest(self):
 
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
         dict={'GET':WSkeywords.get,
         'POST':WSkeywords.post,
         'PUT':WSkeywords.put,
@@ -235,69 +293,111 @@ class WSkeywords:
             return dict[self.baseMethod](self)
         else:
             logger.log(ws_constants.METHOD_INVALID)
+            return status,methodoutput
 
      def getHeader(self,*args):
-        if len(args) == 0:
-            logger.log(ws_constants.RESULT+str(self.baseResHeader))
-            return self.baseResHeader
-        elif len(args) == 1:
-            key=args[0]
-            logger.log(ws_constants.RESULT+str(self.baseResHeader[key]))
-            return self.baseResHeader[key]
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        output=None
+        try:
+            if len(args) == 0:
+                logger.log(ws_constants.RESULT+str(self.baseResHeader))
+                status = ws_constants.TEST_RESULT_PASS
+                methodoutput = ws_constants.TEST_RESULT_TRUE
+                output=self.baseResHeader
+            elif len(args) == 1:
+                key=args[0]
+                logger.log(ws_constants.RESULT+str(self.baseResHeader[key]))
+                status = ws_constants.TEST_RESULT_PASS
+                methodoutput = ws_constants.TEST_RESULT_TRUE
+                output=self.baseResHeader[key]
+        except Exception as e:
+            Exceptions.error(e)
+        return status,methodoutput,output
 
 
      def getBody(self,*args):
-        if len(args) == 0:
-                logger.log(ws_constants.RESULT+self.baseResBody)
-                return self.baseResBody
-        elif len(args) == 2:
-            key=args[0]
-            if not(self.baseResBody is None):
-                str=self.baseResBody
-                if not (args[0] is '' or args[1] is ''):
-                    start=str.find(args[0])+len(args[0])
-                    end=str.find(args[1])
-                    str=str[start:end]
-                    logger.log(ws_constants.RESULT+str)
-                    return str
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        output=None
+        try:
+            if len(args) == 0:
+                    logger.log(ws_constants.RESULT+self.baseResBody)
+                    return self.baseResBody
+            elif len(args) == 2:
+                key=args[0]
+                if not(self.baseResBody is None):
+                    response_body=self.baseResBody
+                    if not (args[0] is '' or args[1] is ''):
+                        start=response_body.find(args[0])+len(args[0])
+                        end=response_body.find(args[1])
+                        response_body=response_body[start:end]
+                        logger.log(ws_constants.RESULT+response_body)
+                        status = ws_constants.TEST_RESULT_PASS
+                        methodoutput = ws_constants.TEST_RESULT_TRUE
+                        output=response_body
+        except Exception as e:
+            Exceptions.error(e)
+        return status,methodoutput,output
 
 
      def addClientCertificate(self,filepath_key,filepath_cert,url):
-        response=requests.get(url, cert=(filepath_cert, filepath_key))
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        try:
+            response=requests.get(url, cert=(filepath_cert, filepath_key))
+            status = ws_constants.TEST_RESULT_PASS
+            methodoutput = ws_constants.TEST_RESULT_TRUE
+        except Exception as e:
+            Exceptions.error(e)
+        return status,methodoutput
 
      def setTagValue(self,tagname,tagvalue):
-        if not (self.baseReqBody is None or self.baseReqBody is ''):
-            from lxml import etree
-            doc=etree.fromstring(self.baseReqBody)
-            doc.find('.//'+tagname).text=tagvalue
-            self.baseReqBody=etree.tostring(doc)
-            return True
-        else:
-            logger.log(ws_constants.METHOD_INVALID_INPUT)
-            return False
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        try:
+            if not (self.baseReqBody is None or self.baseReqBody is ''):
+                from lxml import etree
+                doc=etree.fromstring(self.baseReqBody)
+                doc.find('.//'+tagname).text=tagvalue
+                self.baseReqBody=etree.tostring(doc)
+                status = ws_constants.TEST_RESULT_PASS
+                methodoutput = ws_constants.TEST_RESULT_TRUE
+            else:
+                logger.log(ws_constants.METHOD_INVALID_INPUT)
+        except Exception as e:
+            Exceptions.error(e)
+        return status,methodoutput
 
 
      def getServerCertificate(self,url,filepath):
-        import ssl
-        import re
-        url=url.strip()
-        if not(url is None or url is '' or filepath is None or filepath is ''):
-            p = '(?:https.*://)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*'
-            m = re.search(p,url)
-            hostname=m.group('host')
-            port=m.group('port')
-            if str(port) is '':
-                port=443
-            cert = ssl.get_server_certificate((hostname, int(str(port))))
-            cert=str(cert)
-            cert=cert.replace('\n','')
-            with open(filepath, 'w') as text_file:
-                text_file.write(cert)
-                text_file.close()
-                return True
-        else:
-            logger.log(ws_constants.METHOD_INVALID_INPUT)
-            return False
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        try:
+            import ssl
+            import re
+            url=url.strip()
+            if not(url is None or url is '' or filepath is None or filepath is ''):
+                p = '(?:https.*://)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*'
+                m = re.search(p,url)
+                hostname=m.group('host')
+                port=m.group('port')
+                if str(port) is '':
+                    port=443
+                cert = ssl.get_server_certificate((hostname, int(str(port))))
+                cert=str(cert)
+                cert=cert.replace('\n','')
+                with open(filepath, 'w') as text_file:
+                    text_file.write(cert)
+                    text_file.close()
+                    status = ws_constants.TEST_RESULT_PASS
+                    methodoutput = ws_constants.TEST_RESULT_TRUE
+            else:
+                logger.log(ws_constants.METHOD_INVALID_INPUT)
+        except Exception as e:
+            Exceptions.error(e)
+
+        return status,methodoutput
 
      def verifyObjects(self,object_string1,object_string2):
         """
