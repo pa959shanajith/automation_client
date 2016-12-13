@@ -26,6 +26,7 @@ import delay_operations
 import sendfunction_keys
 import xml_operations
 import util_operations
+import dynamic_variable
 
 class GenericKeywordDispatcher:
     generic_date = date_ops_keywords.DateOperation()
@@ -42,6 +43,8 @@ class GenericKeywordDispatcher:
     generic_sendkeys=sendfunction_keys.SendFunctionKeys()
     xml_oper = xml_operations.XMLOperations()
     util_operation_obj=util_operations.UtilOperations()
+    dyn_var_obj=dynamic_variable.DynamicVariables()
+
     def dispatcher(self,keyword,*message):
          logger.log('Keyword is '+keyword)
          try:
@@ -110,7 +113,11 @@ class GenericKeywordDispatcher:
                   'typeCast':self.util_operation_obj.type_cast,
                   'verifyValues':self.util_operation_obj.verify_values,
                   'verifyFileImages':self.util_operation_obj.verify_file_images,
-                  'stop':self.util_operation_obj.stop
+                  'stop':self.util_operation_obj.stop,
+                  'createDynVariable':self.dyn_var_obj.create_dynamic_variable,
+                  'copyValue':self.dyn_var_obj.copy_value,
+                  'modifyValue':self.dyn_var_obj.modify_value,
+                  'deleteDynVariable':self.dyn_var_obj.delete_dyn_value
 
 
                 }
@@ -120,3 +127,4 @@ class GenericKeywordDispatcher:
                 logger.log(generic_constants.INVALID_KEYWORD)
          except Exception as e:
             Exceptions.error(e)
+         return False

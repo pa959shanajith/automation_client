@@ -74,8 +74,7 @@ class AppFrame2(wx.Frame):
 
 
         self.Centre()
-##        self.Show()
-        self.timer(5)
+        self.Show()
         t = threading.Timer(5,self.hello)
         t.start()
 

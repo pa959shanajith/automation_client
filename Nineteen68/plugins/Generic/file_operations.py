@@ -13,6 +13,7 @@ import sys
 import os
 import logger
 import generic_constants
+from constants import *
 import folder_operations
 from file_comparison_operations import TextFile,PdfFile,XML
 from excel_operations import ExcelFile
@@ -70,20 +71,22 @@ class FileOperations:
 
         """
         try:
-            status=False
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             inputpath=inputpath.strip()
             logger.log(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             if not (input is None and input is '') and self.folder.validateFolderName(file_name) :
                 if not os.path.isfile(inputpath+'/'+file_name):
                     open(inputpath+'/'+file_name, 'w').close()
-                    status=True
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
                 else:
                     logger.log(generic_constants.FILE_EXISTS)
             else:
                 logger.log(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
-        return status
+        return status,methodoutput
 
 
     def verify_file_exists(self,inputpath,file_name):
@@ -95,21 +98,23 @@ class FileOperations:
 
         """
         try:
-            status=False
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             inputpath=inputpath.strip()
             logger.log(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             if not (input is None and input is ''):
                 if file_name is not '':inputpath=inputpath+'/'+file_name
                 if os.path.isfile(inputpath):
                     logger.log(generic_constants.FILE_EXISTS)
-                    status=True
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
                 else:
                     logger.log(generic_constants.FILE_NOT_EXISTS)
             else:
                 logger.log(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
-        return status
+        return status,methodoutput
 
     def rename_file(self,inputpath,file_name,rename_file):
         """
@@ -120,7 +125,8 @@ class FileOperations:
 
         """
         try:
-            status=False
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             inputpath=inputpath.strip()
             logger.log(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             if not (inputpath is None and inputpath is ''):
@@ -128,15 +134,15 @@ class FileOperations:
                 inputpath=inputpath+'/'+file_name
                 if os.path.isfile(inputpath):
                     os.rename(inputpath,rename_path)
-                    status= True
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
                 else:
                     logger.log(generic_constants.FILE_NOT_EXISTS)
             else:
                 logger.log(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
-        return status
-
+        return status,methodoutput
 
     def delete_file(self,inputpath,file_name):
         """
@@ -147,20 +153,21 @@ class FileOperations:
 
         """
         try:
-            status=False
-            inputpath=inputpath.strip()
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             logger.log(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             if not (input is None and input is ''):
                 if os.path.isfile(inputpath+'/'+file_name):
                     os.remove(inputpath+'/'+file_name)
-                    status= True
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
                 else:
                     logger.log(generic_constants.FILE_NOT_EXISTS)
             else:
                 logger.log(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
-        return status
+        return status,methodoutput
 
 
     def verify_content(self,input_path,content,*args):
@@ -172,15 +179,17 @@ class FileOperations:
 
         """
         try:
-            status=False
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             params=self.__split(input_path,content,*args)
             if self.verify_file_exists(params[0],'') == True:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
-                    status= self.dict[file_ext+'_verify_content'](*params)
+                    status,methodoutput= self.dict[file_ext+'_verify_content'](*params)
+
         except Exception as e:
             Exceptions.error(e)
-        return status
+        return status,methodoutput
 
 
     def __get_ext(self,input_path):
@@ -212,7 +221,8 @@ class FileOperations:
 
         """
         try:
-            status=False
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             params=self.__split(input_path1,input_path2,*args)
             path2=params[1]
             if len(params)>2:
@@ -221,10 +231,10 @@ class FileOperations:
                 file_ext1,status1=self.__get_ext(params[0])
                 file_ext2,status2=self.__get_ext(path2)
                 if status1 == True and status2==True and file_ext1==file_ext2:
-                    status=self.dict[file_ext1+'_compare_content'](*params)
+                    status,methodoutput=self.dict[file_ext1+'_compare_content'](*params)
         except Exception as e:
             Exceptions.error(e)
-        return status
+        return status,methodoutput
 
     def clear_content(self,input_path):
         """
@@ -235,15 +245,16 @@ class FileOperations:
 
         """
         try:
-            status=False
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             params=self.__split(input_path)
             if self.verify_file_exists(params[0],'') == True:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
-                    status=self.dict[file_ext+'_clear_content'](*params)
+                    status,methodoutput=self.dict[file_ext+'_clear_content'](*params)
         except Exception as e:
             Exceptions.error(e)
-        return status
+        return status,methodoutput
 
     def get_content(self,input_path,*args):
         """
@@ -254,16 +265,17 @@ class FileOperations:
 
         """
         try:
-            status=False
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             params=self.__split(input_path,*args)
 
             if self.verify_file_exists(params[0],'') == True:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
-                    status=self.dict[file_ext+'_get_content'](*params)
+                    status,methodoutput=self.dict[file_ext+'_get_content'](*params)
         except Exception as e:
             Exceptions.error(e)
-        return status
+        return status,methodoutput
 
     def replace_content(self,input_path,existing_content,replace_content):
         """
@@ -274,15 +286,16 @@ class FileOperations:
 
         """
         try:
-            status=False
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             params=self.__split(input_path,existing_content,replace_content)
             if self.verify_file_exists(params[0],'') == True:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
-                    status=self.dict[file_ext+'_replace_content'](*params)
+                    status,methodoutput=self.dict[file_ext+'_replace_content'](*params)
         except Exception as e:
             Exceptions.error(e)
-        return status
+        return status,methodoutput
 
     def write_to_file(self,input_path,content,*args):
         """
@@ -293,16 +306,17 @@ class FileOperations:
 
         """
         try:
-            status=False
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             params=self.__split(input_path,content,*args)
             if self.verify_file_exists(params[0],'') == True:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
-                    status = self.dict[file_ext+'_write_to_file'](*params)
+                    status,methodoutput = self.dict[file_ext+'_write_to_file'](*params)
                     return status
         except Exception as e:
             Exceptions.error(e)
-        return status
+        return status,methodoutput
 
     def get_line_number(self,input_path,content):
         """
@@ -314,7 +328,8 @@ class FileOperations:
 
         """
         try:
-            status=False
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             params=self.__split(input_path,content)
             if self.verify_file_exists(params[0],'') == True:
                 file_ext,res=self.__get_ext(params[0])
@@ -322,10 +337,11 @@ class FileOperations:
                     linenumbers= self.dict[file_ext+'_get_line_number'](*params)
                     logger.log(linenumbers)
                     if linenumbers is not None and len(linenumbers) !=0:
-                        status=True
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             Exceptions.error(e)
-        return status
+        return status,methodoutput
 
     def save_file(self,folder_path,file_path):
         """
@@ -336,7 +352,8 @@ class FileOperations:
 
         """
         try:
-            status=False
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             folder_path=str(folder_path)
             file_path=str(file_path)
             logger.log('Folder path is '+folder_path+' and File is '+file_path)
@@ -359,13 +376,15 @@ class FileOperations:
                 obj.execute_key('enter',1)
                 #Press 'ctrl+y' key in case if the file is already existing
                 obj.press_multiple_keys(['ctrl','y'],1)
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
 
             else:
                 logger.log('Invalid input')
 
         except Exception as e:
             Exceptions.error(e)
-        return status
+        return status,methodoutput
 
     def __split(self,*args):
         """
