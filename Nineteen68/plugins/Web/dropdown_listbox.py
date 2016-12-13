@@ -136,7 +136,7 @@ class DropdownKeywords():
                     if len(args)>0:
                         visibilityFlag=args[0]
 ##                        logger.log('Input is '+input)
-                    if input is not None:
+                    if ((input is not None) and (len(input) == 1)) :
 ##                        if not(visibilityFlag and isvisble):
                         select = Select(webelement)
                         first_value = select.first_selected_option.text
@@ -229,7 +229,7 @@ class DropdownKeywords():
                             flag = False
                             break
 
-                    if(flag == True):
+                    if(len(temp) ==  0 and flag == True):
                         status=webconstants.TEST_RESULT_PASS
                         result=webconstants.TEST_RESULT_TRUE
 
