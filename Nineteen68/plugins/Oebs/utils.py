@@ -24,6 +24,7 @@ import json
 
 
 
+
 class Utils:
     """win32 utilities
     def : bring_Window_Front
@@ -115,29 +116,14 @@ class Utils:
         return status
 
     def find_window_and_attach(self,url,objectname,keyword,windowname,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
         windowname=windowname[0]
-        status=self.find_oebswindow_and_attach(windowname)
-##        logger.log('windowname is '+windowname)
-##        status=False
-##        import oebs_dispatcher
-##        import time
-##        load_timeout=1
-##        if len(args)>0:
-##            load_timeout=args[0]
-##
-##        if not(windowname is None and windowname is ''):
-##            start_time = time.time()
-##            while (time.time() - start_time) < load_timeout:
-##                handle=self.find_window(windowname)
-##                if handle is not None:
-##                    self.aut_handle=handle
-##                    logger.log('Application handle found')
-##                    break;
-##        if self.aut_handle is not None:
-##            oebs_dispatcher.windowname=windowname
-####            self.set_to_foreground(windowname)
-##            status=True
-##        return status
+        res=self.find_oebswindow_and_attach(windowname)
+        if status:
+            status=TEST_RESULT_PASS
+            methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput
 
 
     def find_window(self,windowname):

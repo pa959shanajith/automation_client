@@ -15,6 +15,7 @@ MSG_TRUE = True
 MSG_FALSE = False
 MSG_KEYWORD_NA = "Keyword Not Available"
 
+
 MSG_TEXTBOX_CLEARED = 'The Text in the TextBox is Cleared.'
 
 MSG_STATUS = "Executed and the status is:"
@@ -158,3 +159,9 @@ DEF_CELLCLICK = 'cellclick'
 
 #waitForElementVisible
 DEF_WAITFORELEMENTVISIBLE = "waitforelementvisible"
+
+#New constants
+TEST_RESULT_PASS = 'Pass'
+TEST_RESULT_FAIL = 'Fail'
+TEST_RESULT_FALSE = 'False'
+TEST_RESULT_TRUE = 'True'

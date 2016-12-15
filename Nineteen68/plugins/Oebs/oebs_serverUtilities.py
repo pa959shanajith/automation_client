@@ -29,6 +29,7 @@ objectDict = {}
 objectDictWithNameDesc={}
 activeframename=''
 deletedobjectlist=[]
+import logger
 
 class Utilities:
 
@@ -396,22 +397,30 @@ class Utilities:
         return accessContext
 
     def clientresponse(self):
-        clientresp=[]
+        clientresp=()
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=None
         if(oebs_key_objects.keyword_output[0] != ''):
-            clientresp.append({
-                "keywordStatus" : oebs_key_objects.keyword_output[0],
-                "keywordResponse" : oebs_key_objects.keyword_output[1],
-                "keywordMessage" : oebs_key_objects.custom_msg
-            })
+            if oebs_key_objects.keyword_output[0]== MSG_PASS:
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+                output=oebs_key_objects.keyword_output[1]
+            else:
+                output=oebs_key_objects.keyword_output[1]
+
         else:
             oebs_key_objects.custom_msg.append[:]
             oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_FOUND)
-            clientresp.append({
-                "keywordMessage" : oebs_key_objects.custom_msg
-            })
+            logger.log(MSG_ELEMENT_NOT_FOUND)
+
+        clientresp=(status,methodoutput,output)
+        if methodoutput==output:
+            clientresp=(status,methodoutput)
+
         global accessContext
         accessContext.releaseJavaObject()
-        return str(clientresp)
+        return clientresp
 
     def cleardata(self):
         del oebs_key_objects.keyword_input[:]
