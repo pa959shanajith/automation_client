@@ -82,7 +82,7 @@ class DropdownListboxOperations:
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(keywordresponse))
+        oebs_key_objects.keyword_output.append(selectedvalue)
 
 
     #Method to verify dropdown selected value of given Object/XPATH
@@ -396,6 +396,7 @@ class DropdownListboxOperations:
         keywordresult=MSG_FAIL
         #this is the response obtained from the keyword
         keywordresponse=''
+        output_list=None
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
@@ -403,6 +404,7 @@ class DropdownListboxOperations:
             if 'multiselectable' in curaccinfo.states:
                 valueslength = len(oebs_key_objects.keyword_input)
                 if valueslength >=  1:
+                    output_list=[]
                     for index in range (valueslength):
                         i = oebs_key_objects.keyword_input[index]
                         actualelement=acc.getAccessibleChildFromContext(int(i))
@@ -410,10 +412,12 @@ class DropdownListboxOperations:
                         if index == 0:
                             keywordresponse=elementcontext.name
                             keywordresponse=keywordresponse + ';'
+
                         else:
                             keywordresponse=keywordresponse + elementcontext.name
                             if(index !=valueslength-1):
                              keywordresponse=keywordresponse + ';'
+                        output_list.append(elementcontext.name)
                     keywordresult=MSG_PASS
                 else:
                     logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_GETMULTIPLEVALUESBYINDEXES,MSG_INVALID_INPUT)
@@ -429,7 +433,7 @@ class DropdownListboxOperations:
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(keywordresponse))
+        oebs_key_objects.keyword_output.append(output_list)
 
 
     def selectvaluebyindex(self,acc):

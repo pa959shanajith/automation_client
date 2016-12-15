@@ -24,7 +24,7 @@ import os,sys
 import logger
 from constants import *
 import pause_execution
-
+import dynamic_handler
 
 
 
@@ -57,6 +57,7 @@ class Controller():
         self.previous_step=''
         self.verify_dict={'web':VERIFY_EXISTS,
         'oebs':VERIFY_VISIBLE}
+        self.dynamic_handler_obj=dynamic_handler.DynamicVariables()
 
     def __load_generic(self):
         try:
@@ -98,47 +99,7 @@ class Controller():
             import desktop_dispatcher
             self.desktop_dispatcher_obj = desktop_dispatcher.DesktopDispatcher()
         except Exception as e:
-            print '-----------------------------------------------'
             logger.log('')
-
-
-    def checkfordynamicvariables(self,outputval):
-        #checks whether the output value contains dynamic Variables
-        status = False;
-        if outputval != None and outputval != '':
-            if outputval.startswith('{') and outputval.endswith('}'):
-                status = True
-				 #the following block ignores check for dynamic variable when
-				 #the given input is a JSON Token
-                 #NEED TO IMPLEMENT
-        return status
-
-    def checkyynamicvariableinsidedynamicvariable(self,inputvar):
-        input_dict=handler.dynamic_variable_map
-        generickeywordresult = GenericKeywordResult()
-        status = constants.TEST_RESULT_FAIL
-        if inputvar.startswith('{') and inputvar.endswith('}'):
-            pattern = '\\[(.*?)\\]'
-            regularexp = re.compile(pattern)
-            inputafterre = regularexp.findall(inputvar)
-            if len(inputafterre) > 0 :
-                for i in range(len(inputafterre)):
-                    replacestring = ''
-                    if input_dict.has_key(inputafterre[i]):
-                        replacestring = input_dict.get(inputafterre[i])
-                        inputvar = inputvar.replace(inputafterre[i],replacestring)
-            return inputvar
-        elif (inputvar.count('{') > 0) and (inputvar.count('}') > 0):
-            pattern = '\\[(.*?)\\]'
-            regularexp = re.compile(pattern)
-            inputafterre = regularexp.findall(inputvar)
-            if len(inputafterre) > 0 :
-                for i in range(len(inputafterre)):
-                    replacestring = ''
-                    if input_dict.has_key(inputafterre[i]):
-                        replacestring = input_dict.get(inputafterre[i])
-                        inputvar = inputvar.replace(inputafterre[i],replacestring)
-            return inputvar
 
     def dangling_status(self,index):
         step=handler.tspList[index]
@@ -178,6 +139,14 @@ class Controller():
             logger.log('Dangling: '+tsp.name +' in '+tsp.testscript_name+'\n')
         return status
 
+    def __print_details(self,tsp,input,inpval):
+        print 'Keyword : ',tsp.name
+        print 'Input :',input
+        print 'Output :',tsp.outputval
+        print 'Apptype : ',str(tsp.apptype)
+        for i in range(len(inpval)):
+            print 'Input: ',i + 1 , '= ',inpval[i]
+
 
 
     def methodinvocation(self,index,*args):
@@ -193,15 +162,10 @@ class Controller():
                 pause_execution.execute(PAUSE)
             if(self.check_dangling(tsp,index)):
 
-                keyword = tsp.name
-
-                print tsp.inputval
                 input = tsp.inputval[0]
                 addtionalinfo = tsp.additionalinfo
-                apptype = tsp.apptype
-                print 'Keyword : ',keyword
-                print 'Input :',input
-                print 'Apptype : ',apptype
+
+
 
                 if input.find(constants.IGNORE_THIS_STEP) != -1 :
                     #Skip the current step execution
@@ -217,19 +181,30 @@ class Controller():
                             #increment the tsp index to point to next step and continue
                             index += 1
 
-                if tsp != None and isinstance(tsp,TestStepProperty) :
-                    index = self.keywordinvocation(index,*args)
+                #Logic to split input and handle dynamic variables
+                rawinput = tsp.inputval
+                if len(args) > 0:
+                    rawinput = args[0]
 
+
+                inpval=self.split_input(rawinput,tsp.name)
+                if tsp.name.lower() not in [FOR,ENDFOR] :
+                    self.__print_details(tsp,input,inpval)
+
+
+                if tsp != None and isinstance(tsp,TestStepProperty) :
+
+                    index = self.keywordinvocation(index,inpval,*args)
                 elif tsp != None and isinstance(tsp,if_step.If):
-                    index = tsp.invoke_condtional_keyword()
+                    index = tsp.invoke_condtional_keyword(inpval)
                 elif tsp != None and isinstance(tsp,for_step.For):
-                    index = tsp.invokeFor()
+                    index = tsp.invokeFor(inpval)
                 elif tsp != None and isinstance(tsp,getparam.GetParam):
-                    index = tsp.performdataparam()
+                    index = tsp.performdataparam(inpval)
                 elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
-                    index = tsp.invoke_jumpby()
+                    index = tsp.invoke_jumpby(inpval)
                 elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
-                    index = tsp.invoke_jumpto()
+                    index = tsp.invoke_jumpto(inpval)
 
 
             else:
@@ -239,7 +214,37 @@ class Controller():
             index= constants.TERMINATE
         return index
 
-    def keywordinvocation(self,index,*args):
+    def split_input(self,input,keyword):
+        inpval = []
+        input_list=[]
+        if not(keyword in DYNAMIC_KEYWORDS):
+            input_list = input[0].split(constants.SEMICOLON)
+        else:
+            string=input[0]
+            index=string.find(';')
+            if index >-1:
+                input_list.append(string[0:index])
+                input_list.append(string[index+1:len(string)])
+            elif string != '':
+                input_list.append(string)
+        for x in input_list:
+            x=self.dynamic_handler_obj.replace_dynamic_variable(x,keyword)
+            inpval.append(x)
+        return inpval
+
+    def store_result(self,result,tsp):
+        output=tsp.outputval.split(constants.SEMICOLON)
+        logger.log('Result obtained is ',result[-1])
+
+        if len(output)>0 and output[0] != '':
+            if len(result)>2:
+                self.dynamic_handler_obj.store_dynamic_value(output[0],result[2])
+            else:
+                self.dynamic_handler_obj.store_dynamic_value(output[0],result[1])
+        if len(output)>1:
+            self.dynamic_handler_obj.store_dynamic_value(output[1],result[1])
+
+    def keywordinvocation(self,index,inpval,*args):
         import time
         time.sleep(1)
         global verify_exists
@@ -247,18 +252,9 @@ class Controller():
         if not(terminate_flag):
             #Check for 'pause_flag' before execution
             if pause_flag:
-                    pause_execution.execute(PAUSE)
-            inpval = []
+                pause_execution.execute(PAUSE)
 
             teststepproperty = handler.tspList[index]
-            rawinput = teststepproperty.inputval
-            if len(args) > 0:
-                rawinput = args[0]
-
-            inputs = rawinput[0].split(constants.SEMICOLON)
-            for i in range(0,len(inputs )):
-                inpval.append(inputs[i])
-                print 'Input: ',i + 1 , '= ',inputs[i]
 
             #Custom object implementation for Web
             if teststepproperty.objectname==CUSTOM:
@@ -281,32 +277,29 @@ class Controller():
 
             #Check the apptype and pass to perticular module
             if teststepproperty.apptype.lower() == constants.APPTYPE_GENERIC:
-                #Generic apptype module call goes here
+                #Generic apptype module call
                 result = self.invokegenerickeyword(teststepproperty,self.generic_dispatcher_obj,inpval)
-                print 'Result in methodinvocation : ',result
 
             elif teststepproperty.apptype.lower() == constants.APPTYPE_WEB:
-                #Web apptype module call goes here
-
+                #Web apptype module call
                 result = self.invokewebkeyword(teststepproperty,self.web_dispatcher_obj,inpval)
-                print 'Result in methodinvocation------ : ',result, '\n\n'
 
             elif teststepproperty.apptype.lower() == constants.APPTYPE_WEBSERVICE:
-                #Webservice apptype module call goes here
-                 #OEBS apptype module call goes here
+                #Webservice apptype module call
                 result = self.invokewebservicekeyword(teststepproperty,self.webservice_dispatcher_obj,inpval)
-                print 'Result in methodinvocation : ',result
 
             elif teststepproperty.apptype.lower() == constants.APPTYPE_DESKTOP:
-                #Desktop apptype module call goes here
+                #Desktop apptype module call
                 result = self.invokeDesktopkeyword(teststepproperty,self.desktop_dispatcher_obj,inpval)
-                print 'Result in methodinvocation : ',result
 
             elif teststepproperty.apptype.lower() == constants.APPTYPE_DESKTOP_JAVA:
-
-                #OEBS apptype module call goes here
+                #OEBS apptype module call
                 result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
-                print 'Result in methodinvocation : ',result
+
+            print 'Result in methodinvocation : ', teststepproperty.name,' : ',result
+            self.store_result(result,teststepproperty)
+            print '\n'
+
 
             index+=1
             if teststepproperty.name=='stop':
@@ -318,6 +311,7 @@ class Controller():
 
     def executor(self,tsplist,action):
         i = 0
+
         status=True
 
         while (i < len(tsplist)):
@@ -354,9 +348,9 @@ class Controller():
 
         keyword = teststepproperty.name
         print "----Keyword :",keyword,' execution Started----'
-        res = dispatcher_obj.dispatcher(keyword,*inputval)
+        res = dispatcher_obj.dispatcher(teststepproperty,*inputval)
 
-        print "----Keyword :",keyword,' execution completed----\n\n'
+        print "----Keyword :",keyword,' execution completed----\n'
         return res
 
     def invokeoebskeyword(self,teststepproperty,dispatcher_obj,inputval):
@@ -365,7 +359,7 @@ class Controller():
         print "----Keyword :",keyword,' execution Started----'
 
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
-        print "----Keyword :",keyword,' execution completed----\n\n'
+        print "----Keyword :",keyword,' execution completed----\n'
         return res
 
     def invokewebservicekeyword(self,teststepproperty,dispatcher_obj,inputval):
@@ -373,7 +367,7 @@ class Controller():
         keyword = teststepproperty.name
         print "----Keyword :",keyword,' execution Started----'
         res = dispatcher_obj.dispatcher(keyword,*inputval)
-        print "----Keyword :",keyword,' execution completed----\n\n'
+        print "----Keyword :",keyword,' execution completed----\n'
         return res
 
     def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval):
@@ -381,14 +375,14 @@ class Controller():
         keyword = teststepproperty.name
         print "----Keyword :",keyword,' execution Started----'
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
-        print "----Keyword :",keyword,' execution completed----\n\n'
+        print "----Keyword :",keyword,' execution completed----\n'
         return res
 
     def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval):
         keyword = teststepproperty.name
         print "----Keyword :",keyword,' execution Started----'
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
-        print "----Keyword :",keyword,' execution completed----\n\n'
+        print "----Keyword :",keyword,' execution completed----\n'
         return res
 
     def get_all_the_imports(self):
@@ -405,6 +399,7 @@ class Controller():
 
     def invoke_controller(self,action,input_breakpoint):
         global terminate_flag,break_point,pause_flag
+        handler.tspList=[]
         terminate_flag=False
         pause_flag=False
         obj = Controller()
@@ -413,11 +408,13 @@ class Controller():
         if flag:
             try:
                 input_breakpoint=int(input_breakpoint)
-                if input_breakpoint >=0:
-                    break_point=input_breakpoint+1
+                if input_breakpoint >0:
+                    break_point=input_breakpoint-1
             except ValueError,NameError:
                 logger.log('Invalid breakpoint number')
             status=obj.executor(list,action)
+            logger.log('STATUS '+str(status))
+            logger.log('-----------------------COMPLETED---------------')
             return status
         else:
             print 'Invalid script'
@@ -434,13 +431,23 @@ class Controller():
 
 #main method
 if __name__ == '__main__':
+    try:
+        os.system("TASKKILL /F /IM chromedriver.exe")
+        os.system("TASKKILL /F /IM IEDriverServer.exe")
+        os.system("TASKKILL /F /IM IEDriverServer64.exe")
+        os.system("TASKKILL /F /IM CobraWinLDTP.exe")
+        logger.log( 'Stale processes killed')
+    except Exception as e:
+        Exceptions.error(e)
     obj = Controller()
-    obj.kill_process()
+##    obj.kill_process()
     print 'Controller object created'
     t = test.Test()
     list,flag = t.gettsplist()
     if flag:
+        logger.log('--------------EXECUTION STARTED-----------------')
         obj.executor(list,'debug')
+        logger.log('--------------EXECUTION COMPLETED---------------')
     else:
         print 'Invalid script'
 

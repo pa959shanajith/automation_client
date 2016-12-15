@@ -11,6 +11,7 @@
 
 import wx
 import threading
+t=''
 
 
 class AppFrame(wx.Frame):
@@ -31,7 +32,6 @@ class AppFrame(wx.Frame):
         self.panel.SetSizer(self.sizer)
         self.CenterOnScreen()
         self.Centre()
-##        self.ToggleWindowStyle(wx.STAY_ON_TOP)
         self.Show()
 
 
@@ -53,10 +53,12 @@ def execute():
 
 
 class AppFrame2(wx.Frame):
+
     def __init__(self, parent, title):
+        global t
         str=title
         title="SLK Nineteen68 - Display Value"
-        wx.Frame.__init__(self, parent, title=title)
+        wx.Frame.__init__(self, parent, title=title,style=wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
 
         self.panel = wx.Panel(self)
         self.sizer = wx.GridBagSizer(1, 2)
@@ -67,17 +69,17 @@ class AppFrame2(wx.Frame):
         self.sizer.Add(self.line, pos=(1, 0),flag= wx.Center, border=50)
         self.okbutton = wx.Button(self.panel, label="OK")
         self.okbutton.Bind(wx.EVT_BUTTON, self.OnOk)   # need to implement OnExit(). Leave notrace
-        self.sizer.Add(self.okbutton, pos=(2, 1), flag=wx.TOP | wx.ALIGN_CENTER, border=5)
+        self.sizer.Add(self.okbutton, pos=(5, 1), flag=wx.TOP | wx.ALIGN_CENTER, border=5)
         self.sizer.AddGrowableCol(1)
 
         self.panel.SetSizer(self.sizer)
 
 
         self.Centre()
-##        self.Show()
-        self.timer(5)
-        t = threading.Timer(5,self.hello)
+        self.Show()
+        t = threading.Timer(3,self.hello)
         t.start()
+
 
 
 
@@ -91,11 +93,13 @@ class AppFrame2(wx.Frame):
             self.Close()
 
 
+
 def display_value(input):
     app = wx.App()
     AppFrame2(None, title=input)
     app.MainLoop()
-    print 'DONE'
+    global t
+    t.cancel()
     return True
 
 

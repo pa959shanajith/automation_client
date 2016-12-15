@@ -13,6 +13,7 @@
 from selenium import webdriver
 import Exceptions
 import webconstants
+from constants import *
 import logger
 import json
 from  selenium.webdriver.common import action_chains
@@ -21,10 +22,12 @@ import browser_Keywords
 driver=''
 class TableOperationKeywords():
 
+
 #   returns the row count of table if the table found with the given xpath
         def getRowCount(self,element,*args):
             driver=browser_Keywords.driver_obj
-            status=webconstants.TEST_RESULT_FAIL
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             print element
             row_count=None
             visibleFlag=True
@@ -34,17 +37,19 @@ class TableOperationKeywords():
                         js='var targetTable = arguments[0]; var rowCount = targetTable.rows; return rowCount.length;'
                         row_count = driver.execute_script(js,element)
                         if(row_count>=0):
-                            status=webconstants.TEST_RESULT_PASS
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                             return status,row_count
                 except Exception as e:
                     Exceptions.error(e)
             else:
                 logger.log('hidden object')
-            return status,row_count
+            return status,methodoutput,row_count
 
 #   returns the no of coloumns of the table if the table found with the given xpath
         def getColoumnCount(self,element,*args):
-            status=webconstants.TEST_RESULT_FAIL
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             coloumn_count=None
             driver=browser_Keywords.driver_obj
             visibleFlag=True
@@ -55,18 +60,20 @@ class TableOperationKeywords():
                         js='var targetTable = arguments[0]; var columnCount = 0; var rows = targetTable.rows; if(rows.length > 0) { 	for (var i = 0; i < rows.length; i++) { 		var cells = rows[i].cells; 		var tempColumnCount = 0; 		for (var j = 0; j < cells.length; j++) { 			tempColumnCount += cells[j].colSpan; 		} 		if (tempColumnCount > columnCount) { 			columnCount = tempColumnCount; 		} 	} } return columnCount;'
                         coloumn_count = driver.execute_script(js,element)
                         if(coloumn_count>=0):
-                            status=webconstants.TEST_RESULT_PASS
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                             print coloumn_count
                             return status,coloumn_count
                 except Exception as e:
                     Exceptions.error(e)
             else:
                 logger.log('hidden object')
-            return status,coloumn_count
+            return status,methodoutput,coloumn_count
 
 #   returns the cell value of cell with ',' seperated values, if the table found with the given xpath
         def getCellValue(self,element,input_val,output):
-            status=webconstants.TEST_RESULT_FAIL
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             cellVal=None
             driver=browser_Keywords.driver_obj
             visibleFlag=True
@@ -82,16 +89,18 @@ class TableOperationKeywords():
                         remoteWebElement=self.javascriptExecutor(element,row_num-1,col_num-1)
                         cellVal=self.getChildNodes(remoteWebElement)
                         cellVal=cellVal.strip()
-                        status=webconstants.TEST_RESULT_PASS
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
                 else:
                     print 'hidden object'
             except Exception as e:
                 Exceptions.error(e)
-            return status,cellVal
+            return status,methodoutput,cellVal
 
 #   verifies the cell value with the given text input, if the table found with the given xpath
         def verifyCellValue(self,element,input_val,output_val):
-            status=webconstants.TEST_RESULT_FAIL
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             cellVal=None
             driver=browser_Keywords.driver_obj
             visibleFlag=True
@@ -111,16 +120,18 @@ class TableOperationKeywords():
                         cellVal=cellVal.strip()
                         expected_value=input_val[2].strip()
                         if(cellVal == expected_value):
-                            status=webconstants.TEST_RESULT_PASS
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                 else:
                     print 'hidden object'
             except Exception as e:
                 Exceptions.error(e)
-            return status
+            return status,methodoutput
 
 #   returns the  tooltip text  of given cell, if the table found with the given xpath
         def getCellToolTip(self,element,input_val,output):
-            status=webconstants.TEST_RESULT_FAIL
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             tooltip=None
             driver=browser_Keywords.driver_obj
             visibleFlag=True
@@ -137,17 +148,19 @@ class TableOperationKeywords():
     							col_number);
                         if contents !=None:
                             tooltip=contents
-                            status=webconstants.TEST_RESULT_PASS
-                            return status,contents
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+
                 except Exception as e:
                     Exceptions.error(e)
             else:
                 logger.log('hidden object')
-            return status,tooltip
+            return status,methodoutput,tooltip
 
 #   lclicks on the given cell, if the table found with the given xpath
         def cellClick(self,element,input_arr,*args):
-            status=webconstants.TEST_RESULT_FAIL
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             row_number=int(input_arr[0])-1
             col_number=int(input_arr[1])-1
             driver=browser_Keywords.driver_obj
@@ -171,14 +184,16 @@ class TableOperationKeywords():
                                         except Exceptions as e:
                                             action=action_chains.ActionChains(driver)
                                             action.move_to_element(cell).click(cell).perform()
-                                            status=webconstants.TEST_RESULT_PASS
+                                            status=TEST_RESULT_PASS
+                                            methodoutput=TEST_RESULT_TRUE
                                     else:
                                         try:
                                             cell.click()
                                         except Exception as e:
                                             js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
                                             click=driver.execute_script(js,element)
-                                            status=webconstants.TEST_RESULT_PASS
+                                            status=TEST_RESULT_PASS
+                                            methodoutput=TEST_RESULT_TRUE
                         except Exception as e:
                             Exceptions.error(e)
                     elif len(input_arr)>2:
@@ -294,7 +309,8 @@ class TableOperationKeywords():
                                             except Exception as e:
                                                 js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
                                                 click=driver.execute_script(js,cellChild)
-                                                status=webconstants.TEST_RESULT_PASS
+                                                status=TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
                                                 break
 
 
@@ -305,13 +321,14 @@ class TableOperationKeywords():
                     Exceptions.error(e)
             else:
                 logger.log('hidden object')
-            return status
+            return status,methodoutput
 
 
 
 
         def getRowNumByText(self,element,text,*args):
-            status=webconstants.TEST_RESULT_FAIL
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             row_number=None
             text=text[0].strip()
             driver=browser_Keywords.driver_obj
@@ -320,15 +337,17 @@ class TableOperationKeywords():
                 try:
                     js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return yyy + cell.rowSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return yyy + cell.rowSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return yyy + cell.rowSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
                     row_number=driver.execute_script(js,element,text)
-                    status=webconstants.TEST_RESULT_PASS
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
                 except Exception as e:
                     Exceptions.error(e)
             else:
                 logger.log('hidden object')
-            return status,row_number
+            return status,methodoutput,row_number
 
         def getColNumByText(self,element,text,*args):
-            status=webconstants.TEST_RESULT_FAIL
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
             col_number=None
             driver=browser_Keywords.driver_obj
             visibleFlag=True
@@ -337,12 +356,13 @@ class TableOperationKeywords():
                 try:
                     js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return xx + cell.colSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return xx + cell.colSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return xx + cell.colSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
                     col_number=driver.execute_script(js,element,text)
-                    status=webconstants.TEST_RESULT_PASS
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
                 except Exception as e:
                     Exceptions.error(e)
             else:
                 logger.log('hidden object')
-            return status,col_number
+            return status,methodoutput,col_number
 
 
         def getChildNodes(self,element):
@@ -392,6 +412,37 @@ class TableOperationKeywords():
             except Exception as e:
                 Exceptions.error(e)
             return xpath
+
+
+        def getInnerTable(self,element,input_val,*args):
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
+            web_element=None
+
+            if((element is not None) and (input_val is not None)):
+                try:
+                    if(len(input_val) == 2):
+                        cell_row = input_val[0]
+                        cell_col = input_val[1]
+                        script ="""var temp = fun(arguments[0], arguments[1], arguments[2]); return temp;  function fun(table, x, y) {     row = table.rows[x];     cell = row.cells[y];     tableCheck = cell.getElementsByTagName('table'); if(tableCheck.length > 0){        console.log(tableCheck[0]);       return tableCheck[0];    }else{      return null; } }"""
+                        web_element = browser_Keywords.driver_obj.execute_script(script,element,cell_row,cell_col)
+                        if( web_element.tag_name == 'table'):
+                             status=TEST_RESULT_PASS
+                             methodoutput=TEST_RESULT_TRUE
+                    elif(len(input_val) == 1):
+                        row_no = input_val[0]
+                        script = """var ele = arguments[0]; var row = arguments[1]; var temp = fun(ele, row); return temp;  function fun(tableEle, rowNo) {     row = tableEle.rows[rowNo];     flag = false;     count = 0;     a = [];     eleCollection = row.getElementsByTagName('table');     if (eleCollection.length > 0) {         return eleCollection[0];     } else {         if (flag != true) {             child = tableEle.children;             ele = child[0];             trCount = ele.childElementCount;             for (i = rowNo; i < trCount; i++) {                 count++;                 if (count > 1) {                     row = a[1];                 }                 a = recursfunc(row);                 if (a[0] == true) {                     return a[1];                     break;                 }             }         }     }     return "null"; }  function recursfunc(innerTable) {     check = [];     chk = false;     firstRef = innerTable.nextElementSibling;     relativeRef = firstRef.getElementsByTagName('table');     if (relativeRef.length > 0) {         actual_ref = relativeRef[0];         flag = true;         chk = true;         check[0] = chk;         check[1] = actual_ref;         return check;     } else {         check[0] = chk;         check[1] = firstRef;         return check;     } } """
+                        web_element = browser_Keywords.driver_obj.execute_script(script,element,row_no)
+                        if( web_element.tag_name == 'table'):
+                             status=TEST_RESULT_PASS
+                             methodoutput=TEST_RESULT_TRUE
+##                    elif(len(input_val == 0)):
+##                        script = """var ele = arguments[0]; var temp = fun(ele); console.log(temp); return temp;  function fun(tableEle) {     eleCollection = tableEle.getElementsByTagName('table');     if (eleCollection.length > 0) {         console.log(eleCollection.length);         return eleCollection[0];     }     return "null";     console.log("No Inner Table") };"""
+##                        web_element = browser_Keywords.driver_obj.execute_script(script)
+                except Exception as e:
+                    Exceptions.error(e)
+            return status,methodoutput,web_element
+
 
 ##if __name__ == '__main__':
 ##

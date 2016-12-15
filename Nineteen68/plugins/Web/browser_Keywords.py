@@ -96,7 +96,7 @@ class BrowserKeywords():
                 if (page_title is ''):
                     page_title= driver_obj.current_url
                 page_title.strip()
-                logger.log(page_title)
+                logger.log('Page title is ',page_title)
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             else:
@@ -115,8 +115,7 @@ class BrowserKeywords():
                     page_title= driver_obj.current_url
                 page_title.strip()
                 if(page_title == input_val[0]):
-                    logger.log(page_title)
-                    logger.log(input_val[0])
+                    logger.log('Page title is ',page_title)
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
             else:

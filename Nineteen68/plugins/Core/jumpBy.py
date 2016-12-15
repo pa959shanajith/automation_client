@@ -29,10 +29,10 @@ class  JumpBy():
         logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name)
 
 
-    def invoke_jumpby(self):
+    def invoke_jumpby(self,input):
         try:
             index=int(self.index)
-            stepToJump=int(self.inputval[0])
+            stepToJump=int(input[0])
             tspList=handler.tspList
 
             if (stepToJump > 0) :

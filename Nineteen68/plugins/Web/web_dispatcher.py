@@ -24,6 +24,7 @@ import Exceptions
 import logger
 import webconstants
 import custom_keyword
+from collections import OrderedDict
 
 class Dispatcher:
     button_link_object = button_link_keyword.ButtonLinkKeyword()
@@ -37,6 +38,7 @@ class Dispatcher:
     util_object = utilweb_operations.UtilWebKeywords()
     statict_text_object = static_text_keywords.StaticTextKeywords()
     custom_object=custom_keyword.CustomKeyword()
+    webelement_map=OrderedDict()
 
 
 
@@ -48,6 +50,7 @@ class Dispatcher:
         driver = browser_Keywords.driver_obj
         webelement = None
         element = None
+
         custom_dict={
                     'getStatus': ['radio','checkbox'],
                     'selectRadioButton': ['radio'],
@@ -133,6 +136,7 @@ class Dispatcher:
                   'cellClick' : self.table_object.cellClick,
                   'getRowNumByText' : self.table_object.getRowNumByText,
                   'getColNumByText' : self.table_object.getColNumByText,
+                  'getInnerTable' : self.table_object.getInnerTable,
 
 
                   'getElementText' : self.element_object.get_element_text,
@@ -157,12 +161,12 @@ class Dispatcher:
                   'selectValueByText':self.dropdown_list_object.selectValueByText,
                   'verifySelectedValue':self.dropdown_list_object.verifySelectedValue,
                   'verifyCount':self.dropdown_list_object.verifyCount,
-                  'selectAllValues':self.dropdown_list_object.verifyAllValues,
+                  'selectAllValues':self.dropdown_list_object.selectAllValues,
                   'selectMultipleValuesByIndexes':self.dropdown_list_object.selectMultipleValuesByIndexes,
                   'getSelected':self.dropdown_list_object.getSelected,
                   'selectMultipleValuesByText':self.dropdown_list_object.selectMultipleValuesByText,
                   'getMultipleValuesByIndexes':self.dropdown_list_object.getMultipleValuesByIndexes,
-                  'selectAllValues':self.dropdown_list_object.selectAllValues,
+                  'verifyAllValues':self.dropdown_list_object.verifyAllValues,
                   'getValueByIndex':self.dropdown_list_object.getValueByIndex,
                   'verifyValuesExists':self.dropdown_list_object.verifyValuesExists,
                   'deselectAll':self.dropdown_list_object.deselectAll,
@@ -199,50 +203,66 @@ class Dispatcher:
                   'verifyPageTitle':self.browser_object.verify_page_title,
                   'clearCache':self.browser_object.clear_cache
                 }
+
+
             if keyword in dict.keys():
                 if keyword.lower()=='waitforelementvisible':
                     identifiers = objectname.split(';')
                     input=identifiers[0]
-                return dict[keyword](webelement,input,output)
+                result= dict[keyword](webelement,input,output)
+                if keyword == 'getInnerTable' and (output != '' and output.startswith('{') and output.endswith('}')):
+                    self.webelement_map[output]=result[2]
+                return result
             else:
                 logger.log(webconstants.METHOD_INVALID)
         except Exception as e:
-            print 'Exception at dispatcher'
             Exceptions.error(e)
+        return 'Pass','False'
 
     def getwebelement(self,driver,objectname):
         objectname = str(objectname)
         webElement = None
         if objectname.strip() != '':
+
             identifiers = objectname.split(';')
-
-            try:
-                #find by rxpath
-                tempwebElement = driver.find_elements_by_xpath(identifiers[0])
-                if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                    tempwebElement = driver.find_elements_by_id(identifiers[1])
-                    if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                        tempwebElement = driver.find_elements_by_xpath(identifiers[2])
-                        if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                            tempwebElement = None
-                webElement = tempwebElement
-
-            except Exception as webEx:
+            if len(identifiers)>=3:
                 try:
-                    #find by id
-                    tempwebElement = driver.find_elements_by_id(identifiers[1])
+                    #find by rxpath
+                    tempwebElement = driver.find_elements_by_xpath(identifiers[0])
                     if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                        tempwebElement = driver.find_elements_by_xpath(identifiers[2])
+                        tempwebElement = driver.find_elements_by_id(identifiers[1])
                         if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                            tempwebElement = None
+                            tempwebElement = driver.find_elements_by_xpath(identifiers[2])
+                            if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                tempwebElement = None
                     webElement = tempwebElement
+
                 except Exception as webEx:
                     try:
-                        tempwebElement = driver.find_elements_by_xpath(identifiers[2])
+                        #find by id
+                        tempwebElement = driver.find_elements_by_id(identifiers[1])
                         if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                            tempwebElement = None
+                            tempwebElement = driver.find_elements_by_xpath(identifiers[2])
+                            if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                tempwebElement = None
                         webElement = tempwebElement
                     except Exception as webEx:
-                        logger.log('WebElement is not found')
+                        try:
+                            tempwebElement = driver.find_elements_by_xpath(identifiers[2])
+                            if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                tempwebElement = None
+                            webElement = tempwebElement
+                        except Exception as webEx:
+                            logger.log('WebElement is not found')
+
+            elif objectname.startswith('{') and objectname.endswith('}') and self.webelement_map.has_key(objectname):
+                if len(self.webelement_map)<=4:
+                    webElement=[]
+                    webElement.append(self.webelement_map[objectname])
+                else:
+                    logger.log('Maximum size of Web element map is 4 ')
+                    logger.log('WebElement is not found')
+
+
         return webElement
 

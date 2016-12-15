@@ -24,10 +24,15 @@ class PdfFile:
         return : bool
 
         """
-        pdf_content=self.get_content(input_path,pagenumber,content,'_internal_verify_content')
-        if content in pdf_content.replace('\n',''):
-            return True
-        return False
+        status=False
+        try:
+            pdf_content=self.get_content(input_path,pagenumber,content,'_internal_verify_content')
+            if content in pdf_content.replace('\n',''):
+                status=True
+        except Exception as e:
+            Exceptions.error(e)
+
+        return status
 
     def compare_content(self,input_path1,input_path2):
         """
@@ -37,8 +42,13 @@ class PdfFile:
         return : bool
 
         """
-        import filecmp
-        return filecmp.cmp(input_path1,input_path2)
+        status=False
+        try:
+            import filecmp
+            status=filecmp.cmp(input_path1,input_path2)
+        except Exception as e:
+            Exceptions.error(e)
+        return status
 
 
     def get_content(self,input_path,pagenumber,*args):
@@ -49,6 +59,8 @@ class PdfFile:
         return : bool
 
         """
+        status=False
+        content=None
         from PyPDF2 import PdfFileReader, PdfFileWriter
         try:
              reader=PdfFileReader(open(input_path,'rb'))
@@ -75,12 +87,13 @@ class PdfFile:
                         file.write(content)
                         file.close()
                 logger.log(content)
-                return content
+                status=True
              else:
                 logger.log(generic_constants.INVALID_INPUT)
 
         except ValueError as e:
             Exception.message(generic_constants.INVALID_INPUT)
+        return status,content
 
 
 
@@ -94,13 +107,16 @@ class TextFile:
         return : bool
 
         """
-        with open(input_path) as myFile:
-            for num, line in enumerate(myFile, 1):
-                print line
-                if content in line:
-                    print 'found at line:'+str(num)
-                    return True
-        return False
+        status=False
+        try:
+            with open(input_path) as myFile:
+                for num, line in enumerate(myFile, 1):
+                    if content in line:
+                        logger.log('found at line:',(num))
+                        status=True
+        except Exception as e:
+            Exceptions.error(e)
+        return status
 
 
     def compare_content(self,input_path1,input_path2):
@@ -111,13 +127,18 @@ class TextFile:
         return : bool
 
         """
-        content1=self.get_content(input_path1)
-        content2=self.get_content(input_path2)
-        logger.log('File1 content is '+content1)
-        logger.log('File2 content is '+content2)
-        if content1==content2:
-            print 'pass'
-            return True
+        status=False
+        try:
+            content1=self.get_content(input_path1)
+            content2=self.get_content(input_path2)
+            logger.log('File1 content is '+content1)
+            logger.log('File2 content is '+content2)
+            if content1==content2:
+                status=True
+        except Exception as e:
+            Exceptions.error(e)
+        return status
+
 
 
     def clear_content(self,input_path):
@@ -128,10 +149,15 @@ class TextFile:
         return : bool
 
         """
-        with open(input_path,'w') as myFile:
-            myFile.write('')
-            myFile.close()
-            return True
+        status=False
+        try:
+            with open(input_path,'w') as myFile:
+                myFile.write('')
+                myFile.close()
+                status=True
+        except Exception as e:
+            Exceptions.error(e)
+        return status
 
 
     def get_content(self,input_path):
@@ -142,11 +168,16 @@ class TextFile:
         return : bool
 
         """
-        str=""
-        with open(input_path) as myFile:
-            str=myFile.read()
-        logger.log(str)
-        return str
+        status=False
+        content=None
+        try:
+            with open(input_path) as myFile:
+                str=myFile.read()
+                logger.log(str)
+                content=str
+        except Exception as e:
+            Exceptions.error(e)
+        return status,content
 
     def get_linenumber(self,input_path,content):
         """
@@ -156,14 +187,19 @@ class TextFile:
         return : bool
 
         """
+        status=False
         line_numbers=[]
-        with open(input_path) as myFile:
-            for num, line in enumerate(myFile, 1):
-                if content in line:
-                    print 'found at line:', num
-                    line_numbers.append(num)
-        logger.log(line_numbers)
-        return line_numbers
+        try:
+            with open(input_path) as myFile:
+                for num, line in enumerate(myFile, 1):
+                    if content in line:
+                        print 'found at line:', num
+                        line_numbers.append(num)
+                        status=True
+            logger.log(line_numbers)
+        except Exception as e:
+            Exceptions.error(e)
+        return status,line_numbers
 
 
 
@@ -176,6 +212,7 @@ class TextFile:
 
         """
         filecontent=''
+        status=False
         try:
             with open(input_path,'r') as myFile:
                 filecontent=myFile.read()
@@ -183,14 +220,14 @@ class TextFile:
             with open(input_path, 'w') as file:
                     file.write(filecontent)
                     file.close()
-            return True
+                    status= True
         except:
             Exception.message('Error occurred')
-        return False
+        return status
 
 
 
-    def write_to_file(self,input_path,content):
+    def write_to_file(self,input_path,content,*args):
         """
         def : write_to_file
         purpose : writes the content to given text file
@@ -198,15 +235,18 @@ class TextFile:
         return : bool
 
         """
+        status=False
         logger.log('Writing to text file')
         try:
+            if len(args)>0:
+                content+=' '.join(args)
             with open(input_path, 'a') as file:
                 file.write(content)
                 file.close()
-                return True
+                status= True
         except (OSError, IOError) as e:
             Exception.message('Cannot open file')
-        return False
+        return status
 
 
 class XML:
@@ -219,6 +259,7 @@ class XML:
         return : bool
 
         """
+        status=False
         logger.log('Writing to XML file')
         import xml.dom.minidom as minidom
         from xml.etree import ElementTree as ET
@@ -232,10 +273,10 @@ class XML:
             with open(input_path, 'a') as file:
                 file.write(val)
                 file.close()
-                return True
+                status=True
         except Exception as e:
             Exceptions.error(e)
-        return False
+        return status
 
 
     def clear_content(self,input_path):

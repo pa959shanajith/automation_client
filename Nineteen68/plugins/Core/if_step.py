@@ -38,7 +38,7 @@ class If():
 
 
 
-    def invoke_condtional_keyword(self):
+    def invoke_condtional_keyword(self,input):
 
         """
         def : invoke_condtional_keyword
@@ -72,7 +72,7 @@ class If():
 
             logger.log('Encountered :'+self.name+'\n')
             logical_eval_obj=Logical_eval()
-            input_expression=self.inputval[0]
+            input_expression=input[0]
             logger.log('Input_expression is '+input_expression)
             res=logical_eval_obj.eval_expression(input_expression)
             logger.log(self.name+': Condition is '+str(res)+'\n')
