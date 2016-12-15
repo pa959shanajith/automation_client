@@ -11,7 +11,7 @@
 import sys,os
 
 def error(e):
-    print 'Exception occured is : ', e.args[0]
+    print 'Exception occured is : ', e.args
     exc_type, exc_obj, exc_tb = sys.exc_info()
     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
     print 'Line number',fname, exc_tb.tb_lineno

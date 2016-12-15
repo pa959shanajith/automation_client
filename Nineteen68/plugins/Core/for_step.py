@@ -9,8 +9,9 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import logger
-import controller
 import constants
+iteration_count=0
+
 class For():
 
     """Object instantiation of 'for,endfor' object"""
@@ -31,38 +32,44 @@ class For():
     def print_step(self):
         logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
 
-    def invokeFor(self):
-        obj=controller.Controller()
+    def invokeFor(self,input):
+        global iteration_count
+
 
         #block to execute endFor
         if self.name.lower() == constants.ENDFOR:
+            logger.log('\nEncountered :'+self.name+'\n')
             self.executed=True
             index=self.getEndfor()
-            logger.log('***For: Iteration completed***\n\n')
+            logger.log('***For: Iteration '+str(iteration_count)+' completed***\n\n')
             return index
 
         #block to execute for
         if self.name==constants.FOR:
-            logger.log('Encountered :'+self.name+'\n')
             endForNum = self.info_dict[0].keys()[0]
             try:
-                inputval = int(self.inputval[0])
+                inputval = int(input[0])
             except ValueError:
-                logger.log('Invalid for count '+self.inputval[0]+'\n')
+                logger.log('\nEncountered :'+self.name+'\n')
+                logger.log('Invalid for count '+input[0]+'\n')
                 self.executed=False
                 forIndex=endForNum+1
                 return forIndex
+                iteration_count=0
 
             forIndex = self.index+1;
             if (inputval > 0 and inputval != 0):
                 self.count=self.count+1
 
                 if not(self.count<= inputval):
+                    iteration_count=0
                     self.count=0
                     self.executed=False
                     forIndex=endForNum+1
                 else:
+                    logger.log('\nEncountered :'+self.name+'\n')
                     self.executed=True
+                    iteration_count=self.count
                     logger.log('***For: Iteration '+str(self.count)+ ' started***')
 
             return forIndex

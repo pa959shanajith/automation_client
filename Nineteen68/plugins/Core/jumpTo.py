@@ -28,7 +28,7 @@ class  JumpTo():
         self.apptype=apptype
         self.additionalinfo=additionalinfo
 
-    def print_step(self):
+    def print_step(self,input):
         logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name)
 
     # returns jumpTo index of step to executed by taking the script name as parameter
@@ -39,7 +39,7 @@ class  JumpTo():
             i=-1
             for tsp in tspList:
                 i+=1
-                inputVal=self.inputval[0]
+                inputVal=input[0]
                 if inputVal==tsp.testscript_name:
                     flag=True
                     logger.log('Target index ' +str(i))

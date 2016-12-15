@@ -66,7 +66,8 @@ class GetParam():
         status = constants.TEST_RESULT_FAIL
         try:
             """Logic to find the input file is valid or not"""
-            fileinfo = input.split(';')
+##            fileinfo = input.split(';')
+            fileinfo = input
             filepath = fileinfo[0]
             #need to check dynamic variable for filepath
             filename, file_extension = os.path.splitext(filepath)
@@ -286,7 +287,8 @@ class GetParam():
         """
 
         try:
-            fileinfo = input.split(';')
+##            fileinfo = input.split(';')
+            fileinfo = input
             #check for dynamic variables for fileinfo
             filepath = fileinfo[0]
             getparamres = self.getparam(input)
@@ -335,35 +337,39 @@ class GetParam():
         param input : data - Dictionary, variable - static variable , row i
         return : Returns actual value of the static variable
         """
+
         if data !=None:
             teststepproperty =handler.tspList[paramindex]
             inputval = teststepproperty.inputval
             inputlistwithval = []
             inputlistwithval = (list)( inputval)
-            for i in range(0,len(inputval)):
-                inputvalstring = inputval[i]
-                resultinput = inputvalstring
-                inputresult = ''
-##                staticlist = []
+            try:
+                for i in range(0,len(inputval)):
+                    inputvalstring = inputval[i]
+                    resultinput = inputvalstring
+                    inputresult = ''
+    ##                staticlist = []
 
-                # A check should be made to see static variables in evaluate keyword, like |b| - |c|
-##                staticlist.append(inputvalstring)
-                variable = ''
-                temp = ''
-                columnname = ''
-                arr = inputvalstring.split(';')
-                for item in arr:
-                    if self.checkforstaticvariable(item.strip()):
-                        p = 0
-                        while p < len(item.strip()) - 1:
-                            if(item.find(constants.PIPE) != -1):
-                                temp = item[p+1 : len(item)]
-                                columnname = temp[0:temp.find(constants.PIPE)]
-                                variable = constants.PIPE + columnname + constants.PIPE
-                                p = p + len(variable)
-                                inputresult = data[columnname][row]
-                                resultinput = resultinput.replace(variable,inputresult)
-                                inputlistwithval.insert(i,resultinput)
+                    # A check should be made to see static variables in evaluate keyword, like |b| - |c|
+    ##                staticlist.append(inputvalstring)
+                    variable = ''
+                    temp = ''
+                    columnname = ''
+                    arr = inputvalstring.split(';')
+                    for item in arr:
+                        if self.checkforstaticvariable(item.strip()):
+                            p = 0
+                            while p < len(item.strip()) - 1:
+                                if(item.find(constants.PIPE) != -1):
+                                    temp = item[p+1 : len(item)]
+                                    columnname = temp[0:temp.find(constants.PIPE)]
+                                    variable = constants.PIPE + columnname + constants.PIPE
+                                    p = p + len(variable)
+                                    inputresult = data[columnname][row]
+                                    resultinput = resultinput.replace(variable,str(inputresult))
+                                    inputlistwithval.insert(i,resultinput)
+            except Exception as e:
+                Exceptions.error(e)
             return inputlistwithval
 
     def checkforstaticvariable(self, statvariable):
@@ -375,9 +381,9 @@ class GetParam():
         """
         return (statvariable.startswith('|') and statvariable.endswith('|'))
 
-    def performdataparam(self):
+    def performdataparam(self,input):
         try:
-            input = self.inputval[0]
+##            input = self.inputval[0]
             con= controller.Controller()
             endlopnum = self.info_dict[0].keys()[0]
             self.executed=True
@@ -391,7 +397,8 @@ class GetParam():
 
 
             if self.getparam(input) == constants.TEST_RESULT_PASS :
-                fileinfo = input.split(';')
+##                fileinfo = input.split(';')
+                fileinfo = input
                 filepath = fileinfo[0]
                 data = self.invokegetparam(input)
                 startRow = None

@@ -57,9 +57,9 @@ get_param=[constants.GETPARAM,constants.STARTLOOP,constants.ENDLOOP]
 
 """Dict to store the start-end of for info"""
 for_info=OrderedDict()
-##for_info={}
+
 """Dict to store the start-end of if info"""
-##if_info={}
+
 if_info=OrderedDict()
 """Dict to store the start-end of getparam info"""
 get_param_info=OrderedDict()
@@ -74,7 +74,7 @@ start_end_dict={constants.ENDFOR:[constants.FOR],
                 constants.GETPARAM:[constants.STARTLOOP],
                 constants.STARTLOOP:[constants.ENDLOOP]}
 
-dynamic_variable_map=OrderedDict()
+##dynamic_variable_map=OrderedDict()
 
 class Handler():
 
