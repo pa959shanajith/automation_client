@@ -161,7 +161,7 @@ class ElementKeywords:
         if webelement is not None:
             try:
                 input=input[0]
-                if input is not None:
+                if input is not None or input != '':
                     tool_tip=self.__get_tooltip(webelement)
                     if input==tool_tip:
                        status=TEST_RESULT_PASS
