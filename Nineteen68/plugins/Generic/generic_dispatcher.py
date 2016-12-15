@@ -45,7 +45,8 @@ class GenericKeywordDispatcher:
     util_operation_obj=util_operations.UtilOperations()
     dyn_var_obj=dynamic_variable.DynamicVariables()
 
-    def dispatcher(self,keyword,*message):
+    def dispatcher(self,tsp,*message):
+         keyword=tsp.name
          logger.log('Keyword is '+keyword)
          try:
             dict={'toLowerCase': self.generic_string.toLowerCase,
@@ -88,6 +89,7 @@ class GenericKeywordDispatcher:
                   'readCell':self.generic_excel.read_cell,
                   'clearCell':self.generic_excel.clear_cell,
                   'setExcelPath':self.generic_excel.set_excel_path,
+                  'storeExcelPath':self.generic_excel.set_excel_path,
                   'clearExcelPath':self.generic_excel.clear_excel_path,
                   'deleteRow':self.generic_excel.delete_row,
                   'getRowCount':self.generic_excel.get_rowcount,
@@ -117,14 +119,20 @@ class GenericKeywordDispatcher:
                   'createDynVariable':self.dyn_var_obj.create_dynamic_variable,
                   'copyValue':self.dyn_var_obj.copy_value,
                   'modifyValue':self.dyn_var_obj.modify_value,
-                  'deleteDynVariable':self.dyn_var_obj.delete_dyn_value
+                  'deleteDynVariable':self.dyn_var_obj.delete_dyn_value,
+                  'displayVariableValue':self.generic_delay.display_variable_value
 
 
                 }
             if keyword in dict.keys():
+                if keyword in ['displayVariableValue']:
+                    actual_input=tsp.inputval[0].split(';')
+                    message=list(message)
+                    message.append(';')
+                    message.extend(actual_input)
                 return dict[keyword](*message)
             else:
                 logger.log(generic_constants.INVALID_KEYWORD)
          except Exception as e:
             Exceptions.error(e)
-         return False
+         return 'Pass','False'
