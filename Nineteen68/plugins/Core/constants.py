@@ -39,6 +39,10 @@ TEST_RESULT_PASS = 'Pass'
 
 TEST_RESULT_FAIL = 'Fail'
 
+TEST_RESULT_FALSE = 'False'
+
+TEST_RESULT_TRUE = 'True'
+
 HYPHEN = '-'
 
 APPTYPE_WEB = 'web'
@@ -78,6 +82,8 @@ CUSTOM='@Custom'
 VERIFY_EXISTS='verifyExists'
 
 VERIFY_VISIBLE='verifyVisible'
+
+DYNAMIC_KEYWORDS=['createDynVariable','copyValue','modifyValue','deleteDynVariable']
 
 
 
