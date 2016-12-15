@@ -45,13 +45,9 @@ class DatabaseOperation():
                 cursor.execute(query)
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
-##                rows = cursor.fetchall()
-##                for row in rows:
-##                    print row
 
         except Exception as e:
             Exceptions.error(e)
-            return False
         finally:
             cursor.close()
             cnxn.close()

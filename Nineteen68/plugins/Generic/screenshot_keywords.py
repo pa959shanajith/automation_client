@@ -17,9 +17,13 @@ import logger
 import Exceptions
 import generic_constants
 import os
+from constants import *
+
 class Screenshot():
     status=False
     def captureScreenshot(self,fileDir):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
         try:
             if not os.path.exists(fileDir):
                 os.makedirs(fileDir)
@@ -28,13 +32,13 @@ class Screenshot():
             logger.log('capturing the screenshot')
             img=ImageGrab.grab()
             img.save(filePath+'.png', "png")
-            status=True
-            return status
+            status=TEST_RESULT_PASS
+            methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             raise e
-            return status
             logger.log('unable to capture the screenshot')
             Exceptions.error(e)
+        return status,methodoutput
 
     def generateUniqueFileName(self):
         filename=datetime.datetime.now().strftime("%Y-%m-%d-%H_%M_%S_"+str(time.strftime("%Y%m%d%H%M%S")))

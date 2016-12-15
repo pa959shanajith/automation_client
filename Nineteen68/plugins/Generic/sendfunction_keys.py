@@ -10,16 +10,18 @@
 #-------------------------------------------------------------------------------
 from pyrobot import Robot
 from generic_constants import *
+from constants import *
 import logger
 import Exceptions
 import time
 class SendFunctionKeys:
 
     def sendfunction_keys(self,input,*args):
-        status=False
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
         try:
             input=str(input)
-            if not(input is None and input is ''):
+            if not(input is None or input is ''):
                 count=self.get_args(args)
                 if count == 'type':
                     self.type(input)
@@ -30,14 +32,15 @@ class SendFunctionKeys:
 
                     else:
                         self.execute_key(input,count)
-                    status=True
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
             else:
                 logger.log('Invalid input')
 
         except Exception as e:
             logger.log('Invalid input')
             Exceptions.error(e)
-        return status
+        return status,methodoutput
 
     def execute_key(self,key,count):
         for x in range(count):
@@ -67,8 +70,11 @@ class SendFunctionKeys:
         robot.key_release(key)
 
     def get_args(self,args):
-        if len(args)>0 and args[0] is not None and args[0] != '':
-            if args[0] in DYNAMIC_STATIC:
+        if len(args)>0 :
+            var=args[0]
+            if var is not None or var != '' and var in DYNAMIC_STATIC:
+##            if (var.startswith('|') and var.endswith('|')) or (var.startswith('{') and var.endswith('}')):
+##            if args[0] in DYNAMIC_STATIC:
                 return 'type'
             else:
                 return int(args[0])

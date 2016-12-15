@@ -83,6 +83,7 @@ class NumericStringParser(object):
                 "trunc" : lambda a: int(a),
                 "round" : round,
                 "sgn" : lambda a: abs(a)>epsilon and cmp(a,0) or 0}
+
     def evaluateStack(self, s ):
         op = s.pop()
         if op == 'unary -':
@@ -101,14 +102,21 @@ class NumericStringParser(object):
             return 0
         else:
             return float( op )
+
     def eval(self,num_string,parseAll=True):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=None
         self.exprStack=[]
         try:
             logger.log('Parsing the expression')
             results=self.bnf.parseString(num_string,parseAll)
             logger.log('Evaluating the expression')
             val=self.evaluateStack( self.exprStack[:] )
-            return val
+            status=TEST_RESULT_PASS
+            methodoutput=TEST_RESULT_TRUE
+            output=val
         except ParseException as e:
             Exceptions.error(e)
+        return status,methodoutput,output
 
