@@ -271,6 +271,7 @@ class DropdownKeywords():
                             temp.append(value)
                         output = ';'.join(temp)
                         logger.log(output)
+                        output=temp
                         status=webconstants.TEST_RESULT_PASS
                         result=webconstants.TEST_RESULT_TRUE
                 else:
@@ -323,9 +324,9 @@ class DropdownKeywords():
                             out=select.options[input_val].text
                             value = str(out)
                             temp.append(value)
-
                         output = ';'.join(temp)
                         logger.log(output)
+                        output=temp
                         status=webconstants.TEST_RESULT_PASS
                         result=webconstants.TEST_RESULT_TRUE
                     else:

@@ -346,7 +346,8 @@ class UtilWebKeywords:
         try:
             input=input[0]
             logger.log('Input is '+input)
-            if not(input is None and int(input) >0):
+            input=float(str(input))
+            if not(input is None or int(input) >0):
                 to_window=int(input)
                 window_handles=self.__get_window_handles()
                 cur_handle=browser_Keywords.driver_obj.current_window_handle
@@ -366,15 +367,18 @@ class UtilWebKeywords:
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             etype=Exceptions.error(e)
-            if isinstance(etype,NoSuchWindowException):
-                window_handles=self.__get_window_handles()
-                if len(window_handles)>0:
-                    total_handles=len(window_handles)
-                    browser_Keywords.driver_obj.switch_to.window(window_handles[total_handles-1])
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
-                else:
-                    logger.log('No handles found')
+            try:
+                if isinstance(etype,NoSuchWindowException):
+                    window_handles=self.__get_window_handles()
+                    if len(window_handles)>0:
+                        total_handles=len(window_handles)
+                        browser_Keywords.driver_obj.switch_to.window(window_handles[total_handles-1])
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                    else:
+                        logger.log('No handles found')
+            except Exception as e:
+                etype=Exceptions.error(e)
         return status,methodoutput
 
     def __get_window_handles(self):

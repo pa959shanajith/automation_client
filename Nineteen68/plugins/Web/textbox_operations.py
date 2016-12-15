@@ -212,7 +212,9 @@ class TextboxKeywords:
                 input=input[0]
                 logger.log('Input is:'+input)
                 logger.log('Actual length is:'+str(length))
-                if not (length is None and length is ''):
+                if not (length is None or length is ''):
+                    if '.' in input:
+                        input=input[0:input.find('.')]
                     if length==input:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
