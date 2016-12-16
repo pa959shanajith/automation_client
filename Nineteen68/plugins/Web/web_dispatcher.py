@@ -201,7 +201,8 @@ class Dispatcher:
                   'switchToWindow':self.util_object.switch_to_window,
                   'verifyTextExists':self.statict_text_object.verify_text_exists,
                   'verifyPageTitle':self.browser_object.verify_page_title,
-                  'clearCache':self.browser_object.clear_cache
+                  'clearCache':self.browser_object.clear_cache,
+                  'navigateWithAuthenticate':self.browser_object.navigate_with_authenticate
                 }
 
 
@@ -209,7 +210,7 @@ class Dispatcher:
                 if keyword.lower()=='waitforelementvisible':
                     identifiers = objectname.split(';')
                     input=identifiers[0]
-                result= dict[keyword](webelement,input,output)
+                result= dict[keyword](webelement,input)
                 if keyword == 'getInnerTable' and (output != '' and output.startswith('{') and output.endswith('}')):
                     self.webelement_map[output]=result[2]
                 return result

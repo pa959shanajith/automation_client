@@ -248,6 +248,7 @@ class Controller():
         import time
         time.sleep(1)
         global verify_exists
+        result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE)
         #Check for 'terminate_flag' before execution
         if not(terminate_flag):
             #Check for 'pause_flag' before execution

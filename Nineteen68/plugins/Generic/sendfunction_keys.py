@@ -32,8 +32,8 @@ class SendFunctionKeys:
 
                     else:
                         self.execute_key(input,count)
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
             else:
                 logger.log('Invalid input')
 
@@ -57,8 +57,11 @@ class SendFunctionKeys:
 
 
     def type(self,input):
-        robot=Robot()
-        robot.type_string(input,1)
+        try:
+            robot=Robot()
+            robot.type_string(str(input),1)
+        except Exception as e:
+            Exceptions.error(e)
 
 
     def press_key(self,key):
@@ -72,10 +75,9 @@ class SendFunctionKeys:
     def get_args(self,args):
         if len(args)>0 :
             var=args[0]
-            if var is not None or var != '' and var in DYNAMIC_STATIC:
-##            if (var.startswith('|') and var.endswith('|')) or (var.startswith('{') and var.endswith('}')):
-##            if args[0] in DYNAMIC_STATIC:
-                return 'type'
+            if var is not None or var != '':
+                if (var.startswith('|') and var.endswith('|')) or (var.startswith('{') and var.endswith('}')):
+                    return 'type'
             else:
                 return int(args[0])
         else:
