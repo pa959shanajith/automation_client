@@ -16,7 +16,8 @@ from constants import *
 class Delay_keywords:
 
     def wait(self,input):
-        status=False
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
         try:
             import time
             if not(input is None and input is ''):
@@ -24,10 +25,11 @@ class Delay_keywords:
                 logger.log('wait method started')
                 time.sleep(input)
                 logger.log('wait method completed')
-                status=True
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             Exceptions.error(e)
-        return status
+        return status,methodoutput
 
     def pause(self,*args):
         status=TEST_RESULT_FAIL
