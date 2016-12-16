@@ -15,7 +15,6 @@ from selenium.common.exceptions import *
 import Exceptions
 import logger
 import browser_Keywords
-from sendfunction_keys import SendFunctionKeys
 from utils_web import Utils
 from webconstants import *
 from pyrobot import Robot
@@ -305,6 +304,12 @@ class UtilWebKeywords:
                 methodoutput=TEST_RESULT_TRUE
         return status,methodoutput
 
+    def generic_sendfucntion_keys(self,input,*args):
+        from sendfunction_keys import SendFunctionKeys
+        obj=SendFunctionKeys()
+        obj.sendfunction_keys(input,*args)
+
+
     def sendfunction_keys(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
@@ -312,13 +317,14 @@ class UtilWebKeywords:
             if webelement is not None:
                 input=input[0]
                 self.__setfocus(webelement)
+
                 if len(args)==0 and input in self.keys_info.keys():
-                    webelement.send_keys(self.keys_info[input.lower()])
+                    if webelement.get_attribute('type')!='text':
+                        webelement.send_keys(self.keys_info[input.lower()])
+                    else:
+                        self.generic_sendfucntion_keys(input.lower(),*args)
                 else:
-                    obj=SendFunctionKeys()
-                    import time
-                    time.sleep(2)
-                    obj.sendfunction_keys(input,*args)
+                    self.generic_sendfucntion_keys(input.lower(),*args)
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:

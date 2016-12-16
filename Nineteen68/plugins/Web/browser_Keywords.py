@@ -15,6 +15,31 @@ import webconstants
 driver_obj = None
 parent_handle=None
 webdriver_list = []
+
+import threading
+import time
+
+#New Thread to navigate to given url for the keyword 'naviagteWithAut'
+class TestThread(threading.Thread):
+    """Test Worker Thread Class."""
+
+    #----------------------------------------------------------------------
+    def __init__(self,url):
+        """Init Worker Thread Class."""
+        threading.Thread.__init__(self)
+        self.url=url
+        self.start()
+          # start the thread
+
+    #----------------------------------------------------------------------
+    def run(self):
+        """Run Worker Thread."""
+        # This is the code executing in the new thread.
+        time.sleep(2)
+        driver_obj.get(self.url[0])
+
+
+
 class BrowserKeywords():
     def __init__(self):
         self.browser_num=''
@@ -74,9 +99,9 @@ class BrowserKeywords():
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         try:
+            url = url[0]
             if not (url is None and url is ''):
-                url = url[0]
-                url.strip()
+            	url.strip()
                 driver_obj.get(url)
                 logger.log('Navigated to URL')
                 status=webconstants.TEST_RESULT_PASS
@@ -86,6 +111,53 @@ class BrowserKeywords():
         except Exception as e:
             Exceptions.error(e)
         return status,result
+
+    def type(self,url):
+        """thread worker function"""
+        try:
+            from sendfunction_keys import SendFunctionKeys
+            obj=SendFunctionKeys()
+            username=url[1].strip()
+            password=url[2]
+            obj.type(username)
+            obj.execute_key('tab',1)
+            obj.type(password)
+            obj.execute_key('tab',1)
+            obj.execute_key('enter',1)
+        except Exception as e:
+            Exceptions.error(e)
+        return
+
+
+
+    def navigate_with_authenticate(self ,webelement, url , *args):
+        status=webconstants.TEST_RESULT_FAIL
+        result=webconstants.TEST_RESULT_FALSE
+        try:
+            if url[0] is not None and url[0] != '':
+                from encryption_utility import AESCipher
+                encryption_obj = AESCipher()
+                input_val = encryption_obj.decrypt(url[2])
+                url[2]=input_val
+                t=TestThread(url)
+                import win32gui
+
+                if len(url)>3:
+                    timeout=url[3]
+                    time.sleep(int(timeout))
+                hwndMain = win32gui.FindWindow(None, "Authentication Required")
+                if hwndMain>0:
+                    self.type(url)
+                    status=webconstants.TEST_RESULT_PASS
+                    result=webconstants.TEST_RESULT_TRUE
+                else:
+                    logger.log('Authentication popup not found')
+            else:
+                logger.log(webconstants.INVALID_INPUT)
+        except Exception as e:
+            Exceptions.error(e)
+        return status,result
+
 
     def getPageTitle(self,*args):
         status=webconstants.TEST_RESULT_FAIL
@@ -268,12 +340,12 @@ class Singleton_DriverUtil():
             choptions = webdriver.ChromeOptions()
             choptions.add_argument('start-maximized')
             choptions.add_argument('--disable-extensions')
-            import os
             driver = webdriver.Chrome(chrome_options=choptions, executable_path=webconstants.CHROME_DRIVER_PATH)
             logger.log('Chrome browser started')
 
         elif(browser_num == '2'):
             driver = webdriver.Firefox()
+            driver.maximize_window()
             logger.log('Firefox browser started')
 
         elif(browser_num == '3'):
@@ -295,6 +367,9 @@ class Singleton_DriverUtil():
             logger.log('Safari browser started')
 ##        print __driver
         return driver
+
+
+
 
 ##driver = Singleton_DriverUtil()
 ##driver.driver('1','D:\Browser\chromedriver.exe')
