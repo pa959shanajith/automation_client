@@ -125,10 +125,11 @@ class GenericKeywordDispatcher:
 
                 }
             if keyword in dict.keys():
-                if keyword in ['displayVariableValue']:
+                if keyword in ['displayVariableValue','sendFunctionKeys']:
                     actual_input=tsp.inputval[0].split(';')
                     message=list(message)
-                    message.append(';')
+                    if keyword != 'sendFunctionKeys':
+                        message.append(';')
                     message.extend(actual_input)
                 return dict[keyword](*message)
             else:
