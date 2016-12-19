@@ -92,7 +92,8 @@ class Controller():
             import web_dispatcher
             self.web_dispatcher_obj = web_dispatcher.Dispatcher()
         except Exception as e:
-             logger.log('')
+            Exceptions.error(e)
+            logger.log('')
 
     def __load_desktop(self):
         try:
@@ -390,7 +391,7 @@ class Controller():
         maindir = os.getcwd()
         os.chdir('..')
         curdir = os.getcwd()
-        path= curdir + '//Nineteen68//plugins'
+        path= 'D://64Bit' + '//Nineteen68//plugins'
         for root, dirs, files in os.walk(path):
             for d in dirs:
                 p = path + '\\' + d

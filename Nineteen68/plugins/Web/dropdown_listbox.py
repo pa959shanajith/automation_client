@@ -16,7 +16,12 @@ from selenium.webdriver.support.ui import Select
 import webconstants
 from utilweb_operations import UtilWebKeywords
 import logger
+import radio_checkbox_operations
 class DropdownKeywords():
+
+    def __init__(self):
+        self.radioKeywordsObj=radio_checkbox_operations.RadioCheckboxKeywords()
+
     def selectValueByIndex(self,webelement,input,*args):
         """
         def : selectValueByIndex
@@ -28,9 +33,11 @@ class DropdownKeywords():
         result=webconstants.TEST_RESULT_FALSE
         visibilityFlag=True
         if webelement is not None:
+            if webelement.tag_name=='table':
+                    webelement=self.radioKeywordsObj.getActualElement(webelement,input)
             if ((webelement.is_enabled()) and webelement.is_displayed()):
                 try:
-                    if ((input is not None) and (len(input) == 1)) :
+                    if (input is not None) :
                         input_val = int(input[0])
                         select = Select(webelement)
                         iList = select.options
@@ -87,11 +94,17 @@ class DropdownKeywords():
         result=webconstants.TEST_RESULT_FALSE
         visibilityFlag=True
         if webelement is not None:
+            if webelement.tag_name=='table':
+                    if len(input)==5:
+                        webelement=self.radioKeywordsObj.getActualElement(webelement,input)
             if ((webelement.is_enabled()) and webelement.is_displayed()):
                 try:
-                    if ((input is not None) and (len(input) == 1)) :
+                    if (input is not None) :
 ##                        if not(visibilityFlag and isvisble):
-                        inp_val = input[0]
+                        if len(input)==1:
+                            inp_val = input[0]
+                        elif len(input)==5:
+                            inp_val = input[4]
                         select = Select(webelement)
                         select.select_by_visible_text(inp_val)
                         status=webconstants.TEST_RESULT_PASS
@@ -241,7 +254,7 @@ class DropdownKeywords():
             Exceptions.error(e)
         return status,result
 
-    def getSelected(self,webelement,*args):
+    def getSelected(self,webelement,input,*args):
         """
         def : getSelected
         purpose : to retrieve all selected objects in dropdown/listbox
@@ -254,6 +267,8 @@ class DropdownKeywords():
         output = None
         try:
             if webelement is not None:
+                if webelement.tag_name=='table':
+                    webelement=self.radioKeywordsObj.getActualElement(webelement,input)
                 if webelement.is_displayed():
                     select = Select(webelement)
                     index = select.all_selected_options
