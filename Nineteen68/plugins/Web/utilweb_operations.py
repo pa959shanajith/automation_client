@@ -19,6 +19,9 @@ from utils_web import Utils
 from webconstants import *
 from pyrobot import Robot
 import win32gui
+import pyrobot
+import table_keywords
+import time
 
 class UtilWebKeywords:
     def __create_keyinfo_dict(self):
@@ -385,6 +388,42 @@ class UtilWebKeywords:
                         logger.log('No handles found')
             except Exception as e:
                 etype=Exceptions.error(e)
+        return status,methodoutput
+
+    def mouse_click(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        try:
+            if webelement !=None:
+                if not(input is None ):
+                    row_num=int(input[0])
+                    col_num=int(input[1])
+                    table_keywords_obj=table_keywords.TableOperationKeywords()
+                    actual_xpath=table_keywords_obj.getElemntXpath(webelement)
+                    element = browser_Keywords.driver_obj.find_element_by_xpath(actual_xpath)
+                    cell=table_keywords_obj.javascriptExecutor(element,row_num-1,col_num-1)
+                    ele_coordinates=cell.location_once_scrolled_into_view
+                    hwnd=win32gui.GetForegroundWindow()
+                    if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
+                        javascript = "return window.mozInnerScreenY"
+                        value=browser_Keywords.driver_obj.execute_script(javascript)
+                        offset=int(value)
+                        robot=pyrobot.Robot()
+                        robot.set_mouse_pos(ele_coordinates.get('x')+9,ele_coordinates.get('y')+offset)
+                        robot.mouse_down('left')
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                    else:
+                        utils=Utils()
+                        utils.enumwindows()
+                        rect=utils.rect
+                        robot=pyrobot.Robot()
+                        robot.set_mouse_pos(ele_coordinates.get('x')+9,ele_coordinates.get('y')+rect[0])
+                        robot.mouse_down('left')
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+        except Exception as e:
+            Exceptions.error(e)
         return status,methodoutput
 
     def __get_window_handles(self):

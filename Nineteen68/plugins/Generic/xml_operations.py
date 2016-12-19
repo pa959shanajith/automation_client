@@ -83,7 +83,7 @@ class XMLOperations():
                 Exceptions.error(e)
         return status,methodoutput,tagvalue
 
-    def get_block_value(self,input_string,input_tag,block_number):
+    def get_block_value(self,input_string,block_number,input_tag):
         """
         def : get_block_value
         purpose : get_block_value is used to get the Block Value of the specified tag in the given XML
@@ -94,8 +94,7 @@ class XMLOperations():
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
         block_count = 0
-        invalidinput = False
-        blockvalue = ''
+        blockvalue = []
         try:
             print 'input1 : ',input_string, '\ninput2 : ',input_tag,'\ninput3 : ',block_number
             root = ET.fromstring(str(input_string))
@@ -104,13 +103,8 @@ class XMLOperations():
                 block_count = len(blocks)
                 block_number = int(block_number)
                 block = blocks[block_number-1].getchildren()
-                blockvalue = '<' + blocks[block_number-1].tag + '>'
-                insidedata = ''
                 for child in block:
-                    line = '<' + child.tag + '>' + child.text +  '</' + child.tag + '>'
-                    insidedata = insidedata + line
-
-                blockvalue = blockvalue + insidedata +'</' + blocks[block_number-1].tag + '>'
+                   blockvalue.append(  '<' + child.tag + '>' + child.text +  '</' + child.tag + '>')
                 status = TEST_RESULT_PASS
                 methodoutput = TEST_RESULT_TRUE
                 if status == TEST_RESULT_FAIL:
