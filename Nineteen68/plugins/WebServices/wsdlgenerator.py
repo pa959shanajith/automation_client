@@ -9,12 +9,17 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import zeep
+
 from suds.client import Client
-import zeep.xsd.indicators
 from lxml import etree
 import logger
-
+import os
+maindir = os.getcwd()
+path = maindir + '\Nineteen68\plugins\WebServices\zeep'
+import sys
+sys.path.append(path)
+import zeep
+import zeep.xsd.indicators
 ## This class will have the methods to generate request header and body of WSDL
 class WebservicesWSDL():
 
@@ -140,6 +145,17 @@ class BodyGenarator():
 ##xyz = re.requestBody()
 ##http://www.webservicex.net/ConverPower.asmx?wsdl
 ##http://www.webservicex.com/BibleWebservice.asmx?wsdl
+
+##WCF
+##clsobject = WebservicesWSDL()
+##clsobject.listOfOperation('http://10.41.133.135:8500/Service1.svc?wsdl')
+####clsobject.requestBody('http://10.41.133.135:8500/Service1.svc?wsdl','GetData',0)
+##re = BodyGenarator('http://10.41.133.135:8500/Service1.svc?wsdl','GetData',0)
+##abc = re.requestHeader()
+##print abc
+##xyz = re.requestBody()
+##print xyz
+
 
 
 

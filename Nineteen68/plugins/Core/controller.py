@@ -391,7 +391,7 @@ class Controller():
         maindir = os.getcwd()
         os.chdir('..')
         curdir = os.getcwd()
-        path= 'D://64Bit' + '//Nineteen68//plugins'
+        path= curdir + '//Nineteen68//plugins'
         for root, dirs, files in os.walk(path):
             for d in dirs:
                 p = path + '\\' + d

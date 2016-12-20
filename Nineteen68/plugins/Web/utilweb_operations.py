@@ -22,6 +22,7 @@ import win32gui
 import pyrobot
 import table_keywords
 import time
+import urllib, cStringIO
 
 class UtilWebKeywords:
     def __create_keyinfo_dict(self):
@@ -422,6 +423,30 @@ class UtilWebKeywords:
                         robot.mouse_down('left')
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
+        except Exception as e:
+            Exceptions.error(e)
+        return status,methodoutput
+
+    def verify_web_images(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        try:
+            from PIL import Image
+            img_src = webelement.get_attribute("src")
+            file1 = cStringIO.StringIO(urllib.urlopen(img_src).read())
+            file2=input[0]
+            if file1 != None and file2 != None and  file2 != '' and os.path.exists(file2) :
+                from PIL import Image
+                img1 = Image.open(file1)
+                img2 = Image.open(file2)
+                if img1==img2:
+                    logger.log('Images comparision is Pass')
+                    methodoutput=TEST_RESULT_TRUE
+                    status=TEST_RESULT_PASS
+                else:
+                    logger.log('Images comparision is Fail')
+            else:
+                logger.log('Invalid Input files')
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput

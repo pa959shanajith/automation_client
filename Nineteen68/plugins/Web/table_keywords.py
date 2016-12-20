@@ -429,6 +429,8 @@ class TableOperationKeywords():
                         if( web_element.tag_name == 'table'):
                              status=TEST_RESULT_PASS
                              methodoutput=TEST_RESULT_TRUE
+                        else:
+                            web_element = None
                     elif(len(input_val) == 1):
                         row_no = input_val[0]
                         script = """var ele = arguments[0]; var row = arguments[1]; var temp = fun(ele, row); return temp;  function fun(tableEle, rowNo) {     row = tableEle.rows[rowNo];     flag = false;     count = 0;     a = [];     eleCollection = row.getElementsByTagName('table');     if (eleCollection.length > 0) {         return eleCollection[0];     } else {         if (flag != true) {             child = tableEle.children;             ele = child[0];             trCount = ele.childElementCount;             for (i = rowNo; i < trCount; i++) {                 count++;                 if (count > 1) {                     row = a[1];                 }                 a = recursfunc(row);                 if (a[0] == true) {                     return a[1];                     break;                 }             }         }     }     return "null"; }  function recursfunc(innerTable) {     check = [];     chk = false;     firstRef = innerTable.nextElementSibling;     relativeRef = firstRef.getElementsByTagName('table');     if (relativeRef.length > 0) {         actual_ref = relativeRef[0];         flag = true;         chk = true;         check[0] = chk;         check[1] = actual_ref;         return check;     } else {         check[0] = chk;         check[1] = firstRef;         return check;     } } """
@@ -436,6 +438,8 @@ class TableOperationKeywords():
                         if( web_element.tag_name == 'table'):
                              status=TEST_RESULT_PASS
                              methodoutput=TEST_RESULT_TRUE
+                        else:
+                            web_element = None
 ##                    elif(len(input_val == 0)):
 ##                        script = """var ele = arguments[0]; var temp = fun(ele); console.log(temp); return temp;  function fun(tableEle) {     eleCollection = tableEle.getElementsByTagName('table');     if (eleCollection.length > 0) {         console.log(eleCollection.length);         return eleCollection[0];     }     return "null";     console.log("No Inner Table") };"""
 ##                        web_element = browser_Keywords.driver_obj.execute_script(script)
