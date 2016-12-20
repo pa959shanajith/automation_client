@@ -14,7 +14,8 @@ import logger
 import ws_constants
 class Dispatcher:
     webservice = webservices.WSkeywords()
-    def dispatcher(self,keyword,*message):
+    def dispatcher(self,tsp,*message):
+        keyword=tsp.name
         try:
             dict={'setEndPointURL': self.webservice.setEndPointURL,
                   'setOperations' : self.webservice.setOperations,
@@ -26,9 +27,14 @@ class Dispatcher:
                   'getBody'      : self.webservice.getBody,
                   'addClientCertificate':self.webservice.addClientCertificate,
                   'setTagValue' : self.webservice.setTagValue,
-                  'getServerCertificate' : self.webservice.getServerCertificate
+                  'getServerCertificate' : self.webservice.getServerCertificate,
+                  'setAttributeValue':self.webservice.setAttributeValue,
+                  'setHeaderTemplate':self.webservice.setHeaderTemplate
                 }
             if keyword in dict.keys():
+                if keyword in ['setTagValue','setAttributeValue']:
+                    message=list(message)
+                    message.append(tsp.objectname)
                 return dict[keyword](*message)
             else:
                 logger.log(ws_constants.METHOD_INVALID)
