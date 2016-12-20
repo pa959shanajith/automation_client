@@ -217,7 +217,9 @@ class Controller():
     def split_input(self,input,keyword):
         inpval = []
         input_list=[]
-        if not(keyword in DYNAMIC_KEYWORDS):
+        if keyword in WS_KEYWORDS:
+            inpval.append(input[0])
+        elif not(keyword in DYNAMIC_KEYWORDS):
             input_list = input[0].split(constants.SEMICOLON)
         else:
             string=input[0]
@@ -367,7 +369,7 @@ class Controller():
 
         keyword = teststepproperty.name
         print "----Keyword :",keyword,' execution Started----'
-        res = dispatcher_obj.dispatcher(keyword,*inputval)
+        res = dispatcher_obj.dispatcher(teststepproperty,*inputval)
         print "----Keyword :",keyword,' execution completed----\n'
         return res
 
