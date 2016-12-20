@@ -276,7 +276,7 @@ class OebsKeywords:
         logging.debug('FILE: %s , DEF: %s , MSG:Keyword response : %s',FILE_OEBSSERVER,DEF_GETTOOLTIPTEXT,oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
 
-    def verifytooltiptext(applicationname,objectname,keyword,inputs,outputs):
+    def verifytooltiptext(self,applicationname,objectname,keyword,inputs,outputs):
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         logging.debug('FILE: %s , DEF: %s , MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',FILE_OEBSSERVER,DEF_VERIFYTOOLTIPTEXT,applicationname,objectname,keyword,inputs,outputs)

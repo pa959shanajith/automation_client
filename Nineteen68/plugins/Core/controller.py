@@ -92,7 +92,8 @@ class Controller():
             import web_dispatcher
             self.web_dispatcher_obj = web_dispatcher.Dispatcher()
         except Exception as e:
-             logger.log('')
+            Exceptions.error(e)
+            logger.log('')
 
     def __load_desktop(self):
         try:

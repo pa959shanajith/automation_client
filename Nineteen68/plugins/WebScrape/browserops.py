@@ -144,6 +144,7 @@ class BrowserOperations():
             browser = 2
             util = utils_sc.Utils()
             logger.log('FILE: browserops.py , DEF: openFirefoxBrowser() , MSG: Opening Chrome browser.....')
+            global driver
             driver = webdriver.Firefox()
             driver.maximize_window()
             logger.log('FILE: browserops.py , DEF: openFirefoxBrowser() , MSG:  Navigating to blank page')

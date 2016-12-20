@@ -184,6 +184,8 @@ class Dispatcher:
                   'tab':self.util_object.tab,
                   'sendFunctionKeys':self.util_object.sendfunction_keys,
                   'rightClick':self.util_object.rightclick,
+                  'mouseClick':self.util_object.mouse_click,
+                  'verifyWebImages':self.util_object.verify_web_images,
                   'waitForElementVisible':self.element_object.waitforelement_visible,
 
 
