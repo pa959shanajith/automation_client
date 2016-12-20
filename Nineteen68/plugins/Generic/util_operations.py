@@ -45,7 +45,7 @@ class UtilOperations:
                     output=input
                 elif to_type=='int':
                     output=float(input)
-                    if fmt_type.strip().lower()=='roundoff':
+                    if fmt_type!=None and fmt_type.strip().lower()=='roundoff':
                         output=round(input)
                     else:
                         output=int(input)

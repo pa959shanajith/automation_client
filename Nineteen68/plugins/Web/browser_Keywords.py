@@ -162,6 +162,7 @@ class BrowserKeywords():
     def getPageTitle(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
+        page_title = None
         try:
             if (driver_obj!= None):
                 page_title= driver_obj.title

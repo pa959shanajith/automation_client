@@ -92,8 +92,7 @@ class Controller():
             import web_dispatcher
             self.web_dispatcher_obj = web_dispatcher.Dispatcher()
         except Exception as e:
-            Exceptions.error(e)
-            logger.log('')
+             logger.log('')
 
     def __load_desktop(self):
         try:
@@ -218,7 +217,9 @@ class Controller():
     def split_input(self,input,keyword):
         inpval = []
         input_list=[]
-        if not(keyword in DYNAMIC_KEYWORDS):
+        if keyword in WS_KEYWORDS:
+            inpval.append(input[0])
+        elif not(keyword in DYNAMIC_KEYWORDS):
             input_list = input[0].split(constants.SEMICOLON)
         else:
             string=input[0]
@@ -368,7 +369,7 @@ class Controller():
 
         keyword = teststepproperty.name
         print "----Keyword :",keyword,' execution Started----'
-        res = dispatcher_obj.dispatcher(keyword,*inputval)
+        res = dispatcher_obj.dispatcher(teststepproperty,*inputval)
         print "----Keyword :",keyword,' execution completed----\n'
         return res
 
@@ -391,7 +392,7 @@ class Controller():
         maindir = os.getcwd()
         os.chdir('..')
         curdir = os.getcwd()
-        path= 'D://64Bit' + '//Nineteen68//plugins'
+        path= curdir + '//Nineteen68//plugins'
         for root, dirs, files in os.walk(path):
             for d in dirs:
                 p = path + '\\' + d
@@ -421,18 +422,7 @@ class Controller():
         else:
             print 'Invalid script'
 
-    def kill_process(self):
-        try:
-            os.system("TASKKILL /F /IM chromedriver.exe")
-            os.system("TASKKILL /F /IM IEDriverServer.exe")
-            os.system("TASKKILL /F /IM IEDriverServer64.exe")
-            os.system("TASKKILL /F /IM CobraWinLDTP.exe")
-            logger.log( 'Stale processes killed')
-        except Exception as e:
-            Exceptions.error(e)
-
-#main method
-if __name__ == '__main__':
+def kill_process():
     try:
         os.system("TASKKILL /F /IM chromedriver.exe")
         os.system("TASKKILL /F /IM IEDriverServer.exe")
@@ -441,8 +431,11 @@ if __name__ == '__main__':
         logger.log( 'Stale processes killed')
     except Exception as e:
         Exceptions.error(e)
+
+#main method
+if __name__ == '__main__':
+    kill_process()
     obj = Controller()
-##    obj.kill_process()
     print 'Controller object created'
     t = test.Test()
     list,flag = t.gettsplist()
@@ -450,8 +443,10 @@ if __name__ == '__main__':
         logger.log('--------------EXECUTION STARTED-----------------')
         obj.executor(list,'debug')
         logger.log('--------------EXECUTION COMPLETED---------------')
+
     else:
         print 'Invalid script'
+    kill_process()
 
 
 

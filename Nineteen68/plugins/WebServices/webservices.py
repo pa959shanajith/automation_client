@@ -117,6 +117,22 @@ class WSkeywords:
             Exceptions.error(e)
         return status,methodoutput
 
+     def setHeaderTemplate(self,header):
+        """
+        def : setHeader
+        purpose : sets the header provided in param header
+        param header : header of the webservice to set
+        return : Returns True if it sets the url else False
+        """
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        try:
+            self.setHeader(header)
+        except Exception as e:
+            Exceptions.error(e)
+        return status,methodoutput
+
+
      def setHeader(self,header):
         """
         def : setHeader
@@ -280,7 +296,7 @@ class WSkeywords:
             Exceptions.error(e)
         return status,methodoutput,output
 
-     def executeRequest(self):
+     def executeRequest(self,*args):
 
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
@@ -300,17 +316,19 @@ class WSkeywords:
         methodoutput = ws_constants.TEST_RESULT_FALSE
         output=None
         try:
-            if len(args) == 0:
-                logger.log(ws_constants.RESULT+str(self.baseResHeader))
-                status = ws_constants.TEST_RESULT_PASS
-                methodoutput = ws_constants.TEST_RESULT_TRUE
-                output=self.baseResHeader
-            elif len(args) == 1:
+            if len(args) == 1:
                 key=args[0]
-                logger.log(ws_constants.RESULT+str(self.baseResHeader[key]))
-                status = ws_constants.TEST_RESULT_PASS
-                methodoutput = ws_constants.TEST_RESULT_TRUE
-                output=self.baseResHeader[key]
+                if key!= None and key != '':
+                    logger.log(ws_constants.RESULT+str(self.baseResHeader[key]))
+                    status = ws_constants.TEST_RESULT_PASS
+                    methodoutput = ws_constants.TEST_RESULT_TRUE
+                    output=self.baseResHeader[key]
+                else:
+                    logger.log(ws_constants.RESULT+str(self.baseResHeader))
+                    status = ws_constants.TEST_RESULT_PASS
+                    methodoutput = ws_constants.TEST_RESULT_TRUE
+                    output=self.baseResHeader
+
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput,output
@@ -321,9 +339,11 @@ class WSkeywords:
         methodoutput = ws_constants.TEST_RESULT_FALSE
         output=None
         try:
-            if len(args) == 0:
+            if len(args) == 1:
                     logger.log(ws_constants.RESULT+self.baseResBody)
-                    return self.baseResBody
+                    status = ws_constants.TEST_RESULT_PASS
+                    methodoutput = ws_constants.TEST_RESULT_TRUE
+                    output= self.baseResBody
             elif len(args) == 2:
                 key=args[0]
                 if not(self.baseResBody is None):
@@ -352,17 +372,66 @@ class WSkeywords:
             Exceptions.error(e)
         return status,methodoutput
 
-     def setTagValue(self,tagname,tagvalue):
+     def parse_xml(self,input_xml,path,value,attribute_name,flag):
+        result=None
+        from lxml import etree
+        doc=etree.fromstring(self.baseReqBody)
+        namespaces={}
+        xyz={}
+
+        for ns in doc.xpath('//namespace::*'):
+            namespaces[ns[0]]=ns[1]
+
+        new_path=path.split('/')
+        new_path= new_path[1:]
+        for x in new_path:
+            x=x.split(':')
+            xyz[x[0]]=namespaces[x[0]]
+        element=doc.xpath(path,namespaces=xyz)
+        if len(element)>0:
+            element=element[0]
+            if flag=='tagname':
+                element.text=value
+            elif flag=='attribute':
+                element.attrib[attribute_name]=value
+            result=etree.tostring(doc,pretty_print=True)
+        else:
+            logger.log('Element not found')
+        return result
+
+     def setAttributeValue(self,attribute_name,attribute_value,element_path):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
+        import handler
+        if self.baseReqBody == '':
+            self.baseReqBody=handler.ws_template
         try:
             if not (self.baseReqBody is None or self.baseReqBody is ''):
-                from lxml import etree
-                doc=etree.fromstring(self.baseReqBody)
-                doc.find('.//'+tagname).text=tagvalue
-                self.baseReqBody=etree.tostring(doc)
-                status = ws_constants.TEST_RESULT_PASS
-                methodoutput = ws_constants.TEST_RESULT_TRUE
+                result=self.parse_xml(self.baseReqBody,element_path,attribute_value,attribute_name,'attribute')
+                if result != None:
+                    self.baseReqBody=result
+                    status = ws_constants.TEST_RESULT_PASS
+                    methodoutput = ws_constants.TEST_RESULT_TRUE
+            else:
+                logger.log(ws_constants.METHOD_INVALID_INPUT)
+        except Exception as e:
+            Exceptions.error(e)
+        return status,methodoutput
+
+
+     def setTagValue(self,value,element_path):
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        import handler
+        if self.baseReqBody == '':
+            self.baseReqBody=handler.ws_template
+        try:
+            if not (self.baseReqBody is None or self.baseReqBody is ''):
+                result=self.parse_xml(self.baseReqBody,element_path,value,'','tagname')
+                if result != None:
+                    self.baseReqBody=result
+                    status = ws_constants.TEST_RESULT_PASS
+                    methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
                 logger.log(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:

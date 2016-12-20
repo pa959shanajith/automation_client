@@ -74,6 +74,8 @@ start_end_dict={constants.ENDFOR:[constants.FOR],
                 constants.GETPARAM:[constants.STARTLOOP],
                 constants.STARTLOOP:[constants.ENDLOOP]}
 
+ws_template=''
+
 ##dynamic_variable_map=OrderedDict()
 
 class Handler():
@@ -86,11 +88,13 @@ class Handler():
         return : None
 
         """
+        global ws_template
         logger.log('Parsing')
         json_string = json.dumps(test_data)
         new_obj = json.loads(json_string)
         if len(new_obj)==1:
             json_data=new_obj[0]
+        ws_template=json_data['template']
         testcase=json_data['testcase']
 
         comments=testcase[len(testcase)-1]['comments']
