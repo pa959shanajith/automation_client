@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        dynamic_handler
+# Name:        dynamic_variable_handler
 # Purpose:
 #
 # Author:      sushma.p
