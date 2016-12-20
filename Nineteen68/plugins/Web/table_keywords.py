@@ -83,7 +83,7 @@ class TableOperationKeywords():
                     col_num=int(input_val[1])
                     row_count=self.getRowCountJs(element)
                     col_count=self.getColoumnCountJs(element)
-                    if row_num>row_count or col_num>col_count:
+                    if row_num-1>row_count or col_num-1>col_count:
                         logger.log('Invalid Input')
                     else:
                         remoteWebElement=self.javascriptExecutor(element,row_num-1,col_num-1)

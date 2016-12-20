@@ -92,8 +92,7 @@ class Controller():
             import web_dispatcher
             self.web_dispatcher_obj = web_dispatcher.Dispatcher()
         except Exception as e:
-            Exceptions.error(e)
-            logger.log('')
+             logger.log('')
 
     def __load_desktop(self):
         try:
@@ -423,18 +422,7 @@ class Controller():
         else:
             print 'Invalid script'
 
-    def kill_process(self):
-        try:
-            os.system("TASKKILL /F /IM chromedriver.exe")
-            os.system("TASKKILL /F /IM IEDriverServer.exe")
-            os.system("TASKKILL /F /IM IEDriverServer64.exe")
-            os.system("TASKKILL /F /IM CobraWinLDTP.exe")
-            logger.log( 'Stale processes killed')
-        except Exception as e:
-            Exceptions.error(e)
-
-#main method
-if __name__ == '__main__':
+def kill_process():
     try:
         os.system("TASKKILL /F /IM chromedriver.exe")
         os.system("TASKKILL /F /IM IEDriverServer.exe")
@@ -443,8 +431,11 @@ if __name__ == '__main__':
         logger.log( 'Stale processes killed')
     except Exception as e:
         Exceptions.error(e)
+
+#main method
+if __name__ == '__main__':
+    kill_process()
     obj = Controller()
-##    obj.kill_process()
     print 'Controller object created'
     t = test.Test()
     list,flag = t.gettsplist()
@@ -452,8 +443,10 @@ if __name__ == '__main__':
         logger.log('--------------EXECUTION STARTED-----------------')
         obj.executor(list,'debug')
         logger.log('--------------EXECUTION COMPLETED---------------')
+
     else:
         print 'Invalid script'
+    kill_process()
 
 
 

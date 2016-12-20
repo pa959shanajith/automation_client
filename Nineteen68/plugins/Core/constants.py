@@ -85,7 +85,7 @@ VERIFY_VISIBLE='verifyVisible'
 
 DYNAMIC_KEYWORDS=['createDynVariable','copyValue','modifyValue','deleteDynVariable']
 
-WS_KEYWORDS=['setHeader']
+WS_KEYWORDS=['setHeader','setHeaderTemplate']
 
 
 
