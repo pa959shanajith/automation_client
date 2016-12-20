@@ -27,7 +27,7 @@ class DateOperation:
         result=generic_constants.TEST_RESULT_FALSE
         try:
             if not (input is None and input is ''):
-                ret_format = self.__validate(input)
+                ret_format = self.validate(input)
                 if ret_format != -1:
                     cur_date = datetime.datetime.now()
                     output = cur_date.strftime(ret_format)
@@ -54,7 +54,7 @@ class DateOperation:
         result=generic_constants.TEST_RESULT_FALSE
         try:
             if not (input is None and input is ''):
-                ret_format = self.__validate(input)
+                ret_format = self.validate(input)
                 if ret_format != -1:
                     cur_time = datetime.datetime.now()
                     output = cur_time.strftime(ret_format)
@@ -80,7 +80,7 @@ class DateOperation:
         result=generic_constants.TEST_RESULT_FALSE
         try:
             if not (input is None and input is ''):
-                ret_format = self.__validate(input)
+                ret_format = self.validate(input)
                 if ret_format != -1:
                     cur_date_time = datetime.datetime.now()
                     output = cur_date_time.strftime(ret_format)
@@ -108,7 +108,7 @@ class DateOperation:
             if not (input_date is None and input_date is ''):
                 if not (date_or_count is None and date_or_count is ''):
                     if not (date_format is None and date_format is ''):
-                        ret_inp_format = self.__validate(date_format)
+                        ret_inp_format = self.validate(date_format)
                         if ret_inp_format != -1:
                             if(len(input_date) == len(date_or_count)):
                                 date1 = datetime.datetime.strptime(input_date, ret_inp_format)
@@ -150,7 +150,7 @@ class DateOperation:
             if not (input_date is None and input_date is ''):
                 if not (date_or_count is None and date_or_count is ''):
                     if not (date_format is None and date_format is ''):
-                        ret_inp_format = self.__validate(date_format)
+                        ret_inp_format = self.validate(date_format)
                         if ret_inp_format != -1:
                                 count = datetime.datetime.strptime(input_date, ret_inp_format)
                                 days = int(date_or_count)
@@ -188,8 +188,8 @@ class DateOperation:
             if not (inp_date is None and inp_date is ''):
                  if not (inp_date_format is None and inp_date_format is ''):
                     if not (out_format is None and out_format is ''):
-                        ret_inp_format = self.__validate(inp_date_format)
-                        ret_out_format = self.__validate(out_format)
+                        ret_inp_format = self.validate(inp_date_format)
+                        ret_out_format = self.validate(out_format)
                         if ret_inp_format != -1:
                             if ret_out_format != -1:
                                 output=datetime.datetime.strptime(inp_date, ret_inp_format).strftime(ret_out_format)
@@ -231,7 +231,7 @@ class DateOperation:
                             status=generic_constants.TEST_RESULT_FAIL
                             result=generic_constants.TEST_RESULT_FALSE
                     else:
-                        ret_inp_format = self.__validate(input_format)
+                        ret_inp_format = self.validate(input_format)
                         if ret_inp_format != -1:
                             date1 = datetime.datetime.strptime(input_from, ret_inp_format )
                             date2 = datetime.datetime.strptime(input_to, ret_inp_format )
@@ -252,7 +252,7 @@ class DateOperation:
             Exceptions.error(e)
         return status,result
 
-    def __validate(self,input):
+    def validate(self,input):
         try:
             dict={'dd/MM/yyyy': '%d/%m/%Y',
             'MM/dd/yyyy': '%m/%d/%Y',

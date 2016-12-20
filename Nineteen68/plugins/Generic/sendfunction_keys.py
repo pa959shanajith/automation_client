@@ -73,15 +73,17 @@ class SendFunctionKeys:
         robot.key_release(key)
 
     def get_args(self,args):
+        value=1
         if len(args)>0 :
             var=args[0]
             if var is not None or var != '':
+                import re
                 if (var.startswith('|') and var.endswith('|')) or (var.startswith('{') and var.endswith('}')):
-                    return 'type'
-            else:
-                return int(args[0])
-        else:
-            return 1
+                    value= 'type'
+                elif re.match(('^\d+$'),var):
+                    value=int(var)
+
+        return value
 
 
 
