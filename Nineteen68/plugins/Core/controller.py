@@ -57,7 +57,7 @@ class Controller():
         self.previous_step=''
         self.verify_dict={'web':VERIFY_EXISTS,
         'oebs':VERIFY_VISIBLE}
-        dynamic_var_handler_obj=dynamic_variable_handler.DynamicVariables()
+        self.dynamic_var_handler_obj=dynamic_variable_handler.DynamicVariables()
 
     def __load_generic(self):
         try:
@@ -230,7 +230,7 @@ class Controller():
             elif string != '':
                 input_list.append(string)
         for x in input_list:
-            x=dynamic_var_handler_obj.replace_dynamic_variable(x,keyword)
+            x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword)
             inpval.append(x)
         return inpval
 
@@ -240,11 +240,11 @@ class Controller():
 
         if len(output)>0 and output[0] != '':
             if len(result)>2:
-                dynamic_var_handler_obj.store_dynamic_value(output[0],result[2])
+                self.dynamic_var_handler_obj.store_dynamic_value(output[0],result[2])
             else:
-                dynamic_var_handler_obj.store_dynamic_value(output[0],result[1])
+                self.dynamic_var_handler_obj.store_dynamic_value(output[0],result[1])
         if len(output)>1:
-            dynamic_var_handler_obj.store_dynamic_value(output[1],result[1])
+            self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1])
 
     def keywordinvocation(self,index,inpval,*args):
         import time
