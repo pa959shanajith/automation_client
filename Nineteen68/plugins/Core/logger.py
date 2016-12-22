@@ -12,6 +12,6 @@
 def log(message,*args):
 
 	#Printing variable number of argumnents in loggers
-    print message,''.join(repr(i) for i in args)
+    print message,''.join(str(i) if (type(i)==unicode or type(i)==str) else  repr(i) for i in args)
 
 

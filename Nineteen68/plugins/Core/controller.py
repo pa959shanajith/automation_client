@@ -193,7 +193,6 @@ class Controller():
 
 
                 if tsp != None and isinstance(tsp,TestStepProperty) :
-
                     index = self.keywordinvocation(index,inpval,*args)
                 elif tsp != None and isinstance(tsp,if_step.If):
                     index = tsp.invoke_condtional_keyword(inpval)
@@ -217,11 +216,14 @@ class Controller():
     def split_input(self,input,keyword):
         inpval = []
         input_list=[]
+
+        input_list = input[0].split(constants.SEMICOLON)
+
         if keyword in WS_KEYWORDS:
-            inpval.append(input[0])
-        elif not(keyword in DYNAMIC_KEYWORDS):
-            input_list = input[0].split(constants.SEMICOLON)
-        else:
+            input_list=[input[0]]
+
+        elif keyword in DYNAMIC_KEYWORDS:
+            input_list=[]
             string=input[0]
             index=string.find(';')
             if index >-1:
@@ -229,9 +231,11 @@ class Controller():
                 input_list.append(string[index+1:len(string)])
             elif string != '':
                 input_list.append(string)
+
         for x in input_list:
             x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword)
             inpval.append(x)
+
         return inpval
 
     def store_result(self,result,tsp):
@@ -392,7 +396,7 @@ class Controller():
         maindir = os.getcwd()
         os.chdir('..')
         curdir = os.getcwd()
-        path= curdir + '//Nineteen68//plugins'
+        path= 'D://git//Nineteen68_Logger' + '//Nineteen68//plugins'
         for root, dirs, files in os.walk(path):
             for d in dirs:
                 p = path + '\\' + d
