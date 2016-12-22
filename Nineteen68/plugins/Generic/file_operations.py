@@ -285,11 +285,14 @@ class FileOperations:
 
             if self.verify_file_exists(params[0],'')[1]:
                 file_ext,res=self.__get_ext(params[0])
-                if res == True:
-                    res,content=self.dict[file_ext+'_get_content'](*params)
-                    if res:
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                if file_ext not in ['.xls','.xlsx']:
+                    if res == True:
+                        res,content=self.dict[file_ext+'_get_content'](*params)
+                        if res:
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                else:
+                    logger.log('Excel files are not supported')
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput,content
