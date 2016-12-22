@@ -24,7 +24,7 @@ import os,sys
 import logger
 from constants import *
 import pause_execution
-import dynamic_handler
+import dynamic_variable_handler
 
 
 
@@ -57,7 +57,7 @@ class Controller():
         self.previous_step=''
         self.verify_dict={'web':VERIFY_EXISTS,
         'oebs':VERIFY_VISIBLE}
-        self.dynamic_handler_obj=dynamic_handler.DynamicVariables()
+        self.dynamic_var_handler_obj=dynamic_variable_handler.DynamicVariables()
 
     def __load_generic(self):
         try:
@@ -193,7 +193,6 @@ class Controller():
 
 
                 if tsp != None and isinstance(tsp,TestStepProperty) :
-
                     index = self.keywordinvocation(index,inpval,*args)
                 elif tsp != None and isinstance(tsp,if_step.If):
                     index = tsp.invoke_condtional_keyword(inpval)
@@ -217,11 +216,14 @@ class Controller():
     def split_input(self,input,keyword):
         inpval = []
         input_list=[]
+
+        input_list = input[0].split(constants.SEMICOLON)
+
         if keyword in WS_KEYWORDS:
-            inpval.append(input[0])
-        elif not(keyword in DYNAMIC_KEYWORDS):
-            input_list = input[0].split(constants.SEMICOLON)
-        else:
+            input_list=[input[0]]
+
+        elif keyword in DYNAMIC_KEYWORDS:
+            input_list=[]
             string=input[0]
             index=string.find(';')
             if index >-1:
@@ -229,9 +231,11 @@ class Controller():
                 input_list.append(string[index+1:len(string)])
             elif string != '':
                 input_list.append(string)
+
         for x in input_list:
-            x=self.dynamic_handler_obj.replace_dynamic_variable(x,keyword)
+            x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword)
             inpval.append(x)
+
         return inpval
 
     def store_result(self,result,tsp):
@@ -240,11 +244,11 @@ class Controller():
 
         if len(output)>0 and output[0] != '':
             if len(result)>2:
-                self.dynamic_handler_obj.store_dynamic_value(output[0],result[2])
+                self.dynamic_var_handler_obj.store_dynamic_value(output[0],result[2])
             else:
-                self.dynamic_handler_obj.store_dynamic_value(output[0],result[1])
+                self.dynamic_var_handler_obj.store_dynamic_value(output[0],result[1])
         if len(output)>1:
-            self.dynamic_handler_obj.store_dynamic_value(output[1],result[1])
+            self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1])
 
     def keywordinvocation(self,index,inpval,*args):
         import time

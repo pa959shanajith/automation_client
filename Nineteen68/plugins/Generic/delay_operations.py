@@ -53,7 +53,11 @@ class Delay_keywords:
             values=input_list[0:index]
             variables=input_list[index+1:len(input_list)]
             for x, y in zip(variables, values):
-                display_input+=str(x)+' = '+str(y)+'\n'
+                if type(x)==unicode or type(x)==str:
+                    x=str(x)
+                if type(y)==unicode or type(y)==str:
+                    y=str(y)
+                display_input+=repr(x)+' = '+repr(y)+'\n'
             pause_display_operation.display_value(display_input)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
