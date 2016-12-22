@@ -427,7 +427,7 @@ class ExcelXLS:
             file2=pd.ExcelFile(input_path2)
             data2=file2.parse(sheetname2)
 ##            logger.log('File content2'+str(data2))
-            status= (list(data1)==list(data2))
+            status= (str(data1)==str(data2))
         except Exception as e:
            Exceptions.error(e)
         return status
