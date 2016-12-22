@@ -261,6 +261,15 @@ class ExcelXLS:
 
     def __init__(self):
         self.excel_obj=''
+        self.cell_type={'string' : 'General',
+        'formula': 'f',
+        'number': '0.00',
+        'date':'n',
+        'boolean': 'b',
+        'null':'n',
+        'inline': 'inlineStr',
+        'error': 'e',
+        'formula_cache': 'str'}
 
 
     def __load_workbook_xls(self,inputpath,sheetname):
@@ -284,7 +293,7 @@ class ExcelXLS:
 
 
 
-    def __write_to_cell_xls(self,input_path,book,sheetname,row,col,value):
+    def __write_to_cell_xls(self,input_path,book,sheetname,row,col,value,*args):
         """
         def : __write_to_cell_xls(private method)
         purpose : writes to the the cell in the given row and column of .xls file
@@ -298,7 +307,21 @@ class ExcelXLS:
         try:
             sheetnum=sheets.index(sheetname)
             s = workbook.get_sheet(sheetnum)
-            s.write(int(row),int(col),value)
+            if len(args)>0 and args[0] is not None:
+                type=args[0].lower()
+                if type in self.cell_type.keys():
+                    type=self.cell_type[type]
+                    if type=='0.00':
+                        value=int(value)
+                    elif type in ['f','b']:
+                        value='='+value
+                    else:
+                        value=str(value)
+                    s.write(int(row),int(col),value)
+                workbook.save(input_path)
+                return True
+            else:
+                logger.log('Cell Type not supported')
             workbook.save(input_path)
             return True
         except IOError:
@@ -522,7 +545,7 @@ class ExcelXLS:
         if(int(row)>0 and int(col)>0):
             row=int(row)-1
             col=int(col)-1
-            status=self.__write_to_cell_xls(excel_path,workook_info[0],sheetname,row,col,value)
+            status=self.__write_to_cell_xls(excel_path,workook_info[0],sheetname,row,col,value,*args)
         return status
 
     def get_rowcount_xls(self,excel_path,sheetname,*args):

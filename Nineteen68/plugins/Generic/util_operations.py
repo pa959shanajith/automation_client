@@ -46,9 +46,9 @@ class UtilOperations:
                 elif to_type=='int':
                     output=float(input)
                     if fmt_type!=None and fmt_type.strip().lower()=='roundoff':
-                        output=round(input)
+                        output=round(output)
                     else:
-                        output=int(input)
+                        output=int(output)
                 elif to_type=='float':
                     output=np.float32(input)
 
@@ -77,7 +77,7 @@ class UtilOperations:
                             else:
                                 if fmt_type!=-1:
                                     tempDate = datetime.datetime(1900, 1, 1)
-                                    deltaDays = datetime.timedelta(days=int(input)-2)
+                                    deltaDays = datetime.timedelta(days=int(float(input))-2)
                                     date_output = (tempDate + deltaDays )
                                     output= date_output.strftime(fmt_type)
 
