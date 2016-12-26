@@ -302,6 +302,7 @@ class ExcelXLS:
 
         """
         from xlutils.copy import copy
+        from xlwt import easyxf,XFStyle
         workbook = copy(book)
         sheets=book.sheet_names()
         try:
@@ -312,12 +313,20 @@ class ExcelXLS:
                 if type in self.cell_type.keys():
                     type=self.cell_type[type]
                     if type=='0.00':
+                    	#Setting cell format to number
+                        style=XFStyle()
+                        style.num_format_str=type
                         value=int(value)
+                        s.write(int(row),int(col),value,style)
                     elif type in ['f','b']:
-                        value='='+value
+                    	#Evaluating formula
+                        value=xlwt.ExcelFormula.Formula(value)
+##                        value='='+value
+                        s.write(int(row),int(col),value)
                     else:
                         value=str(value)
-                    s.write(int(row),int(col),value)
+                        s.write(int(row),int(col),value)
+
                 workbook.save(input_path)
                 return True
             else:
@@ -935,7 +944,7 @@ class ExcelXLSX:
         status=False
         row_count=None
         try:
-            logger.log(generic_constants.INPUT_IS+self.excel_obj.excel_path+' '+self.excel_obj.sheetname)
+            logger.log(generic_constants.INPUT_IS+excel_path+' '+sheetname)
             book=openpyxl.load_workbook(excel_path)
             sheet=book.get_sheet_by_name(sheetname)
             row_count=sheet.max_row
