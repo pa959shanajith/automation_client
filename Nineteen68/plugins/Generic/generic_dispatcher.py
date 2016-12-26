@@ -111,7 +111,7 @@ class GenericKeywordDispatcher:
                   'sendFunctionKeys':self.generic_sendkeys.sendfunction_keys,
                   'getBlockCount' : self.xml_oper.get_block_count,
                   'getTagValue' : self.xml_oper.get_tag_value,
-                  'getBlockValue' : self.xml_oper.get_block_value,
+                  'GetBlockValue' : self.xml_oper.get_block_value,
                   'typeCast':self.util_operation_obj.type_cast,
                   'verifyValues':self.util_operation_obj.verify_values,
                   'verifyFileImages':self.util_operation_obj.verify_file_images,
