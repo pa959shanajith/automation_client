@@ -15,6 +15,8 @@ def error(e):
     exc_type, exc_obj, exc_tb = sys.exc_info()
     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
     print 'Line number',fname, exc_tb.tb_lineno
+    import traceback
+    traceback.print_exc()
     return type(e)
 
 
