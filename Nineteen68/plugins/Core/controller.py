@@ -270,14 +270,17 @@ class Controller():
                     apptype=previous_step.apptype.lower()
                     if previous_step.name==self.verify_dict[apptype]:
                         self.previous_step=previous_step
+                        teststepproperty.custom_flag=True
                         verify_exists=True
                     else:
                         logger.log('ERR_CUSTOM_VERIFYEXISTS: Previous step ',self.verify_dict[apptype],' is missing')
                 if verify_exists==True:
+                    teststepproperty.custom_flag=True
                     teststepproperty.parent_xpath=self.previous_step.objectname
                     teststepproperty.url=self.previous_step.url
             elif teststepproperty.name==VERIFY_EXISTS and verify_exists:
                 verify_exists=False
+
 
 
             #get the output varible from the teststep property
