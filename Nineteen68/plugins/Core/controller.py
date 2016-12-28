@@ -56,7 +56,7 @@ class Controller():
         self.__load_desktop()
         self.previous_step=''
         self.verify_dict={'web':VERIFY_EXISTS,
-        'oebs':VERIFY_VISIBLE}
+        'desktopjava':VERIFY_VISIBLE}
         self.dynamic_var_handler_obj=dynamic_variable_handler.DynamicVariables()
 
     def __load_generic(self):
@@ -267,11 +267,12 @@ class Controller():
             if teststepproperty.objectname==CUSTOM:
                 if verify_exists==False:
                     previous_step=handler.tspList[index-1]
-                    if previous_step.name==self.verify_dict[previous_step.apptype.lower()]:
+                    apptype=previous_step.apptype.lower()
+                    if previous_step.name==self.verify_dict[apptype]:
                         self.previous_step=previous_step
                         verify_exists=True
                     else:
-                        logger.log('ERR_CUSTOM_VERIFYEXISTS: Previous step VerifyExists is missing')
+                        logger.log('ERR_CUSTOM_VERIFYEXISTS: Previous step ',self.verify_dict[apptype],' is missing')
                 if verify_exists==True:
                     teststepproperty.parent_xpath=self.previous_step.objectname
                     teststepproperty.url=self.previous_step.url
