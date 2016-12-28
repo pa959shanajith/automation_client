@@ -17,6 +17,7 @@ import logger
 import Exceptions
 import oebs_constants
 windowname=None
+import constants
 
 
 class OebsDispatcher:
@@ -26,14 +27,63 @@ class OebsDispatcher:
     scrape_obj=oebs_fullscrape.FullScrape()
     clickandadd_obj=oebsclickandadd.ClickAndAdd()
 
+    custom_dict={
+                    'getstatus': ['radio button','check box'],
+                    'selectradiobutton': ['radio button'],
+                    'selectcheckbox': ['check box'],
+                    'unselectcheckbox': ['check box'],
+
+                    'selectvaluebyindex':['combo box','list'],
+                    'selectvaluebytext': ['combo box','list'],
+
+                    'settext': ['text'],
+                    'gettext': ['text']
+
+                    }
+
+    get_ele_type={
+                    'radio': 'radio button',
+                    'checkbox':'check box',
+                    'dropdown':'combo box',
+                    'Listbox':'list',
+                    'textbox':'text',
+                    'button':'push button'
+
+                        }
+    custom_dict_element={'element':['clickelement','setfocus','doubleclick','rightclick','getelementtext','verifyelementtext','verifyexists', 'verifydoesnotexists', 'verifyreadonly','verifyhidden','verifyvisible','sendfunctionkeys','waitforelementvisible']}
+
     def assign_url_objectname(self,tsp,input):
-        message=[tsp.url,tsp.objectname,tsp.name,input,tsp.outputval]
+        keyword=tsp.name.lower()
+        objectname=tsp.objectname
+        if objectname==oebs_constants.CUSTOM:
+            parent_xpath=tsp.parent_xpath
+            if len(input)>=3:
+                ele_type=input[0].lower()
+                if ele_type in self.get_ele_type:
+                    ele_type=self.get_ele_type[ele_type]
+                if (keyword in self.custom_dict and ele_type in self.custom_dict[keyword]) or keyword in self.custom_dict_element.values()[0]:
+                    custom_oebs_element=self.oebs_keywords.getobjectforcustom(windowname,parent_xpath,ele_type,input[2])
+                    print 'custom_oebs_element', custom_oebs_element
+                    if custom_oebs_element != '':
+                        input.reverse()
+                        for x in range(0,3):
+                            input.pop()
+                        objectname=custom_oebs_element
+                    else:
+                        logger.log('Custom object not found')
+
+                else:
+                    logger.log('Keyword and Type Mismatch')
+            else:
+                logger.log('Insufficient Input to find custom object')
+                logger.log('Custom object not found')
+        message=[tsp.url,objectname,tsp.name,input,tsp.outputval]
         return message
 
     def dispatcher(self,tsp,input,*message):
          logger.log('Keyword is '+tsp.name)
          keyword=tsp.name
-
+         result=(constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE)
          if windowname is not None:
             self.utils_obj.set_to_foreground(windowname)
          message=self.assign_url_objectname(tsp,input)
@@ -116,11 +166,12 @@ class OebsDispatcher:
                 }
             keyword=keyword.lower()
             if keyword in dict.keys():
-                return dict[keyword](*message)
+                result=dict[keyword](*message)
             else:
                 logger.log(generic_constants.INVALID_INPUT)
          except Exception as e:
             Exceptions.error(e)
+         return result
 
 
 
