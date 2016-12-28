@@ -82,7 +82,9 @@ class Dispatcher:
                 reference_element=self.getwebelement(driver,teststepproperty.parent_xpath)
                 if reference_element != None:
                     reference_element = reference_element[0]
-                    if len(input)>=3:
+                    if keyword=='getObjectCount':
+                        webelement=reference_element
+                    elif len(input)>=3:
                         if (keyword in custom_dict and input[0].lower() in custom_dict[keyword]) or keyword in custom_dict_element.values()[0]:
                             webelement=self.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url)
                             input.reverse()
@@ -109,7 +111,8 @@ class Dispatcher:
 
 
         try:
-            dict={ 'click': self.button_link_object.click,
+            dict={'getObjectCount':self.custom_object.get_object_count,
+                  'click': self.button_link_object.click,
                   'verifyButtonName' : self.button_link_object.verify_button_name,
                   'getLinkText'    : self.button_link_object.get_link_text,
                   'verifyLinkText' : self.button_link_object.verify_link_text,
