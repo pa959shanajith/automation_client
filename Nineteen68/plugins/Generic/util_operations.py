@@ -83,6 +83,8 @@ class UtilOperations:
 
                         else:
                             logger.log('Invalid date format')
+                else:
+                    logger.log('Please provide valid data type for conversion ')
 
 
                 methodoutput=TEST_RESULT_TRUE
@@ -120,8 +122,8 @@ class UtilOperations:
         try:
             if input1 != None and input2 != None and input1 != '' and input2 != '' :
                 from PIL import Image
-                input1=input1.replace('\n','')
-                input2=input2.replace('\n','')
+                input1=str(input1).replace('\n','').replace('\r','')
+                input2=str(input2).replace('\n','').replace('\r','')
                 if input1==input2:
                     logger.log('Values are equal')
                     methodoutput=TEST_RESULT_TRUE

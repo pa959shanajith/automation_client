@@ -57,7 +57,7 @@ class Delay_keywords:
                     x=str(x)
                 if type(y)==unicode or type(y)==str:
                     y=str(y)
-                display_input+=repr(x)+' = '+repr(y)+'\n'
+                display_input+=x+' = '+(y if type(y)==str else repr(y))+'\n'
             pause_display_operation.display_value(display_input)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE

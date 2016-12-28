@@ -27,6 +27,7 @@ import sendfunction_keys
 import xml_operations
 import util_operations
 import dynamic_variable
+import constants
 
 class GenericKeywordDispatcher:
     generic_date = date_ops_keywords.DateOperation()
@@ -113,14 +114,14 @@ class GenericKeywordDispatcher:
                   'getTagValue' : self.xml_oper.get_tag_value,
                   'GetBlockValue' : self.xml_oper.get_block_value,
                   'typeCast':self.util_operation_obj.type_cast,
-                  'verifyValues':self.util_operation_obj.verify_values,
                   'verifyFileImages':self.util_operation_obj.verify_file_images,
                   'stop':self.util_operation_obj.stop,
                   'createDynVariable':self.dyn_var_obj.create_dynamic_variable,
                   'copyValue':self.dyn_var_obj.copy_value,
                   'modifyValue':self.dyn_var_obj.modify_value,
                   'deleteDynVariable':self.dyn_var_obj.delete_dyn_value,
-                  'displayVariableValue':self.generic_delay.display_variable_value
+                  'displayVariableValue':self.generic_delay.display_variable_value,
+                  'VerifyValues':self.util_operation_obj.verify_values
 
 
                 }
@@ -136,4 +137,4 @@ class GenericKeywordDispatcher:
                 logger.log(generic_constants.INVALID_KEYWORD)
          except Exception as e:
             Exceptions.error(e)
-         return 'Pass','False'
+         return constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE
