@@ -48,14 +48,13 @@ class OebsDispatcher:
                     'Listbox':'list',
                     'textbox':'text',
                     'button':'push button'
-
-                        }
+                    }
     custom_dict_element={'element':['clickelement','setfocus','doubleclick','rightclick','getelementtext','verifyelementtext','verifyexists', 'verifydoesnotexists', 'verifyreadonly','verifyhidden','verifyvisible','sendfunctionkeys','waitforelementvisible']}
 
     def assign_url_objectname(self,tsp,input):
         keyword=tsp.name.lower()
         objectname=tsp.objectname
-        if objectname==oebs_constants.CUSTOM:
+        if objectname==oebs_constants.CUSTOM and tsp.custom_flag:
             parent_xpath=tsp.parent_xpath
             if len(input)>=3:
                 ele_type=input[0].lower()
