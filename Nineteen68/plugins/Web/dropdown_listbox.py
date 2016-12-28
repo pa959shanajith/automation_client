@@ -42,6 +42,7 @@ class DropdownKeywords():
                         select = Select(webelement)
                         iList = select.options
                         iListSize = len(iList)
+                        input_val=input_val-1
                         if(input_val < iListSize):
                             for i in range(0,iListSize):
                                 if(input_val == i):

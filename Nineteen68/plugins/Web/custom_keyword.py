@@ -12,6 +12,7 @@
 import logger
 import browser_Keywords
 from webconstants import *
+import constants
 from selenium.common.exceptions import *
 
 class CustomKeyword:
@@ -19,9 +20,13 @@ class CustomKeyword:
     def __init__(self):
         self.tagtype={'link':'a',
         'tablecell':'td',
-        'textbox':'text'
+        'textbox':'text',
+        'radiobutton':'radio',
+        'textbox':'text',
         }
-
+        self.object_count_flag={'dropdown':0,
+                            'listbox':1}
+        self.list_flag=0
     def is_int(self,url):
         import re
         flag=True
@@ -99,7 +104,7 @@ class CustomKeyword:
         logger.log('Element type is '+str(ele_type))
         logger.log('Visible text is '+str(visible_text))
         logger.log('Index is '+str(ele_index))
-        if not(ele_type is None and ele_type=='' and visible_text is None and index is None):
+        if not(ele_type is None or ele_type=='' or visible_text is None or ele_index is None):
             ele_xpath=self.getElementXPath(reference_ele)
             logger.log('Debug: reference_ele_xpath is'+str(ele_xpath))
             try:
@@ -125,6 +130,72 @@ class CustomKeyword:
         else:
             logger.log('Invalid input')
         return custom_element
+
+
+    def get_object_count(self,reference_ele,ele_type):
+        status=constants.TEST_RESULT_FAIL
+        methodoutput=constants.TEST_RESULT_FALSE
+        count=None
+        ele_type=ele_type[0]
+        logger.log('Element type is '+str(ele_type))
+
+        if not(ele_type is None or ele_type==''):
+            ele_type=str(ele_type)
+            ele_xpath=self.getElementXPath(reference_ele)
+            logger.log('Debug: reference_ele_xpath is'+str(ele_xpath))
+
+            ele_type=ele_type.lower()
+            if ele_type in self.tagtype.keys():
+                ele_type=self.tagtype.get(ele_type)
+            elif ele_type=='dropdown' or ele_type=='listbox':
+                self.list_flag=self.object_count_flag[ele_type]
+                ele_type='select'
+
+            array_index=browser_Keywords.driver_obj.execute_script(FIND_INDEX_JS,reference_ele)
+            if array_index!= None:
+                count=self.get_count(0, ele_type,array_index)
+
+
+            if count is not None:
+                logger.log('Number of objects found is ',count)
+                status=constants.TEST_RESULT_PASS
+                methodoutput=constants.TEST_RESULT_TRUE
+            else:
+                logger.log('Count is ',count)
+
+        else:
+            logger.log('Invalid input')
+        return status,methodoutput,count
+
+    def get_count(self,counter,ele_type,index):
+        result=browser_Keywords.driver_obj.execute_script(GET_OBJECT_COUNT_JS,counter,ele_type,index,self.list_flag)
+        counter=result[0]
+        index=result[2]
+        index=index+1
+
+        if len(result)>3:
+            if result[3]=='done':
+                return counter
+        if result[1]!= None:
+            counter=self.get_count_iframe(result[1],counter,ele_type);
+        else:
+            return counter
+
+
+        return self.get_count(counter,ele_type,index)
+
+
+
+    def get_count_iframe(self,iframe_ele,counter,ele_type):
+
+		browser_Keywords.driver_obj.switch_to.frame(iframe_ele)
+		req_elements = None
+		index=0
+		counter=self.get_count(counter, ele_type,index, self.list_flag)
+		browser_Keywords.driver_obj.switch_to.parent_frame()
+		return counter
+
+
 
 
     def getElementXPath(self,webelement):

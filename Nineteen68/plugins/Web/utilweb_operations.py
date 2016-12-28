@@ -357,7 +357,7 @@ class UtilWebKeywords:
             input=input[0]
             logger.log('Input is '+input)
             input=float(str(input))
-            if not(input is None or int(input) >0):
+            if not(input is None or int(input) <0):
                 to_window=int(input)
                 window_handles=self.__get_window_handles()
                 cur_handle=browser_Keywords.driver_obj.current_window_handle

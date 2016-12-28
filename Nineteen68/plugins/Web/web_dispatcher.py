@@ -79,23 +79,26 @@ class Dispatcher:
                 self.custom_object.switch_to_iframe(url,driver.current_window_handle)
                 driver = browser_Keywords.driver_obj
             if objectname==webconstants.CUSTOM:
-                reference_element=self.getwebelement(driver,teststepproperty.parent_xpath)
-                if reference_element != None:
-                    reference_element = reference_element[0]
-                    if len(input)>=3:
-                        if (keyword in custom_dict and input[0].lower() in custom_dict[keyword]) or keyword in custom_dict_element.values()[0]:
-                            webelement=self.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url)
-                            input.reverse()
-                            for x in range(0,3):
-                                input.pop()
+                if teststepproperty.custom_flag:
+                    reference_element=self.getwebelement(driver,teststepproperty.parent_xpath)
+                    if reference_element != None:
+                        reference_element = reference_element[0]
+                        if keyword=='getObjectCount':
+                            webelement=reference_element
+                        elif len(input)>=3:
+                            if (keyword in custom_dict and input[0].lower() in custom_dict[keyword]) or keyword in custom_dict_element.values()[0]:
+                                webelement=self.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url)
+                                input.reverse()
+                                for x in range(0,3):
+                                    input.pop()
+                            else:
+                                logger.log('Keyword and Type Mismatch')
                         else:
-                            logger.log('Keyword and Type Mismatch')
+                            logger.log('Insufficient Input to find custom object')
+                            logger.log('Custom object not found')
                     else:
-                        logger.log('Insufficient Input to find custom object')
+                        logger.log('Reference Element is null')
                         logger.log('Custom object not found')
-                else:
-                    logger.log('Reference Element is null')
-                    logger.log('Custom object not found')
 
             else:
                 webelement = self.getwebelement(driver,objectname)
@@ -109,7 +112,8 @@ class Dispatcher:
 
 
         try:
-            dict={ 'click': self.button_link_object.click,
+            dict={'getObjectCount':self.custom_object.get_object_count,
+                  'click': self.button_link_object.click,
                   'verifyButtonName' : self.button_link_object.verify_button_name,
                   'getLinkText'    : self.button_link_object.get_link_text,
                   'verifyLinkText' : self.button_link_object.verify_link_text,

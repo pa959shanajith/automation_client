@@ -24,6 +24,7 @@ class TestStepProperty():
         self.testscript_name=testscript_name
         self.additionalinfo = additionalinfo
         self.parent_xpath=''
+        self.custom_flag=False
 
     def print_step(self):
         logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+self.apptype)
