@@ -113,6 +113,7 @@ class GenericKeywordDispatcher:
                   'getBlockCount' : self.xml_oper.get_block_count,
                   'getTagValue' : self.xml_oper.get_tag_value,
                   'GetBlockValue' : self.xml_oper.get_block_value,
+                  'VerifyObjects': self.xml_oper.verifyObjects,
                   'typeCast':self.util_operation_obj.type_cast,
                   'verifyFileImages':self.util_operation_obj.verify_file_images,
                   'stop':self.util_operation_obj.stop,

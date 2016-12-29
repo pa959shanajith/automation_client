@@ -26,6 +26,13 @@ from constants import *
 import pause_execution
 import dynamic_variable_handler
 
+from values_from_ui import *
+from concurrent.futures import ThreadPoolExecutor
+import threading
+import time
+import logging
+from loggermessages import *
+
 
 
 #index for iterating the teststepproperty for executor
@@ -36,6 +43,52 @@ terminate_flag=False
 pause_flag=False
 break_point=-1
 verify_exists=False
+
+thread_tracker = []
+log = logging.getLogger("controller.py")
+
+
+class TestThread(threading.Thread):
+    """Test Worker Thread Class."""
+
+    #----------------------------------------------------------------------
+    def __init__(self,browser):
+        """Init Worker Thread Class."""
+        logger.print_on_console( 'Browser number: ',browser)
+        log.debug('Browser number:  %d',browser)
+        threading.Thread.__init__(self)
+        self.browser = browser
+        self.start()    # start the thread
+
+    #----------------------------------------------------------------------
+    def run(self):
+        """Run Worker Thread."""
+        # This is the code executing in the new thread.
+        try:
+
+
+            time.sleep(2)
+            con = Controller()
+            print 'Controller object created'
+##            tsp = handler.tspList
+##            print 'TSP Length:::::',len(tsp)
+##            for k in range(len(tsp)):
+##                print 'Keyword :::::: ',tsp[k].name.lower()
+##                if tsp[k].name.lower() == 'openbrowser':
+##                    print 'openbrowser 1'
+##                    tsp[k].inputval = list( self.browser)
+##                    print 'openbrowser 2'
+
+            status = con.invoke_controller('debug','',self.browser)
+            if status==TERMINATE:
+                print '---------Termination Completed-------'
+            else:
+                logger.print_on_console('***SUITE EXECUTION COMPLETED***')
+
+        except Exception as m:
+            print m
+
+
 
 class Controller():
 
@@ -140,12 +193,20 @@ class Controller():
         return status
 
     def __print_details(self,tsp,input,inpval):
-        print 'Keyword : ',tsp.name
-        print 'Input :',input
-        print 'Output :',tsp.outputval
-        print 'Apptype : ',str(tsp.apptype)
+        keyword = tsp.name
+
+        logger.print_on_console( "***Keyword :",keyword,' execution Started***')
+        log.info(KEYWORD_EXECUTION_STARTED)
+        log.info('Keyword: ' + tsp.name)
+
+##        logger.print_on_console( 'Keyword : ',tsp.name)
+##        print 'Input :',input
+##        logger.print_on_console( 'Output :',tsp.outputval)
+        logger.print_on_console( 'Apptype : ',str(tsp.apptype))
+        log.info('Apptype : '+str(tsp.apptype))
         for i in range(len(inpval)):
-            print 'Input: ',i + 1 , '= ',inpval[i]
+            logger.print_on_console( 'Input: ',i + 1 , '= ',inpval[i])
+            log.info('Input: ' + str( (i + 1)) + '=' +inpval[i])
 
 
 
@@ -307,9 +368,12 @@ class Controller():
                 #OEBS apptype module call
                 result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
 
-            print 'Result in methodinvocation : ', teststepproperty.name,' : ',result
+            logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',result,'\n')
+            log.info('Result in methodinvocation : '+ teststepproperty.name+' : ')
+            log.info(result)
+            log.info(KEYWORD_EXECUTION_COMPLETED+ '\n' )
             self.store_result(result,teststepproperty)
-            print '\n'
+##            print '\n'
 
 
             index+=1
@@ -358,42 +422,42 @@ class Controller():
     def invokegenerickeyword(self,teststepproperty,dispatcher_obj,inputval):
 
         keyword = teststepproperty.name
-        print "----Keyword :",keyword,' execution Started----'
+##        logger.print_on_console( "Keyword :",keyword,' execution Started')
         res = dispatcher_obj.dispatcher(teststepproperty,*inputval)
 
-        print "----Keyword :",keyword,' execution completed----\n'
+        logger.print_on_console( "***Keyword :",keyword,' execution completed***')
         return res
 
     def invokeoebskeyword(self,teststepproperty,dispatcher_obj,inputval):
 
         keyword = teststepproperty.name
-        print "----Keyword :",keyword,' execution Started----'
+##        logger.print_on_console( "----Keyword :",keyword,' execution Started----')
 
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
-        print "----Keyword :",keyword,' execution completed----\n'
+        logger.print_on_console( "----Keyword :",keyword,' execution completed----\n')
         return res
 
     def invokewebservicekeyword(self,teststepproperty,dispatcher_obj,inputval):
 
         keyword = teststepproperty.name
-        print "----Keyword :",keyword,' execution Started----'
+##        logger.print_on_console( "----Keyword :",keyword,' execution Started----')
         res = dispatcher_obj.dispatcher(teststepproperty,*inputval)
-        print "----Keyword :",keyword,' execution completed----\n'
+        logger.print_on_console( "----Keyword :",keyword,' execution completed----\n')
         return res
 
     def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval):
 
         keyword = teststepproperty.name
-        print "----Keyword :",keyword,' execution Started----'
+##        logger.print_on_console( "----Keyword :",keyword,' execution Started----')
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
-        print "----Keyword :",keyword,' execution completed----\n'
+        logger.print_on_console( "----Keyword :",keyword,' execution completed----\n')
         return res
 
     def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval):
         keyword = teststepproperty.name
-        print "----Keyword :",keyword,' execution Started----'
+##        logger.print_on_console( "----Keyword :",keyword,' execution Started----')
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
-        print "----Keyword :",keyword,' execution completed----\n'
+        logger.print_on_console( "----Keyword :",keyword,' execution completed----\n')
         return res
 
     def get_all_the_imports(self):
@@ -408,27 +472,213 @@ class Controller():
         os.chdir(maindir)
 
 
-    def invoke_controller(self,action,input_breakpoint):
+    def invoke_controller(self,action,input_breakpoint,*args):
+        status = False
         global terminate_flag,break_point,pause_flag
-        handler.tspList=[]
-        terminate_flag=False
-        pause_flag=False
+        if execution_mode.lower() == PARALLEL:
+
+            handler.tspList=[]
+            terminate_flag=False
+            pause_flag=False
+            obj = handler.Handler()
+            t = test.Test()
+            suite,flag = t.gettsplist()
+            if flag:
+                try:
+                    input_breakpoint=int(input_breakpoint)
+                    if input_breakpoint >0:
+                        break_point=input_breakpoint-1
+                except ValueError,NameError:
+                    logger.log('Invalid breakpoint number')
+
+
+            #in future this value will come from the UI
+            scenarios = scenario_num
+            print 'Length of Suite : ',len(suite)
+
+            #EXECUTION GOES HERE
+            status = False
+            flag=True
+            #Iterate through the suite
+            log.info('---------------------------------------------------------------------')
+            logger.print_on_console('---------------------------------------------------------------------')
+            log.info('***SUITE EXECUTION STARTED***')
+            logger.print_on_console('***SUITE EXECUTION STARTED***')
+            logger.print_on_console('---------------------------------------------------------------------')
+            for i in range( len(suite)):
+                do_not_execute = False
+                #create a object of controller for each scenario
+                con =Controller()
+                #Check for the disabled scenario
+
+                for k in scenarios:
+                    if k == (i + 1):
+                        do_not_execute = True
+                        break
+
+
+
+                if (not do_not_execute) :
+                    logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
+                    log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
+                    for d in suite[i]:
+            ##            print '===================Script execution started=========================='
+                        flag=obj.parse_json(d)
+            ##            print '===================Script execution started=========================='
+                        if flag == False:
+                            break
+                        print '\n'
+                        tsplist = obj.read_step()
+                        for k in range(len(tsplist)):
+                            if tsplist[k].name.lower() == 'openbrowser':
+                                tsplist[k].inputval = unicode(args[0])
+##                        print 'Controller object created'
+            ##            t = Test()
+            ##            list,flag = t.gettsplist()
+                    if flag:
+
+                        status = con.executor(tsplist,'debug')
+
+
+                    else:
+                        print 'Invalid script'
+                    logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
+                    log.info( '***Scenario' + str((i  + 1 )) +' execution completed***')
+                    obj.clearList()
+                else:
+                    logger.print_on_console ('Scenario ' , (i + 1) ,' has been disabled for execution!!!')
+                    log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
+
+    ##            logger.log('--------------EXECUTION COMPLETED---------------')
+
+    ##            status=obj.executor(list,action)
+    ##            logger.log('STATUS '+str(status))
+    ##            logger.log('-----------------------COMPLETED---------------')
+
+    ##        else:
+    ##            print 'Invalid script'
+        elif execution_mode.lower() == SERIAL:
+            handler.tspList=[]
+            terminate_flag=False
+            pause_flag=False
+            obj = handler.Handler()
+            t = test.Test()
+            suite,flag = t.gettsplist()
+            if flag:
+                try:
+                    input_breakpoint=int(input_breakpoint)
+                    if input_breakpoint >0:
+                        break_point=input_breakpoint-1
+                except ValueError,NameError:
+                    logger.log('Invalid breakpoint number')
+
+
+            #in future this value will come from the UI
+            scenarios = scenario_num
+            logger.print_on_console( 'Length of Suite : ',len(suite))
+
+            #EXECUTION GOES HERE
+            status = False
+            flag=True
+            #Iterate through the suite
+            log.info('-----------------------------------------------')
+            logger.print_on_console('-----------------------------------------------')
+            log.info('***SUITE EXECUTION STARTED***')
+            logger.print_on_console('***SUITE EXECUTION STARTED***')
+            log.info('-----------------------------------------------')
+            logger.print_on_console('-----------------------------------------------')
+            for browser in range( len(browsers)):
+                for i in range( len(suite)):
+                    do_not_execute = False
+                    #create a object of controller for each scenario
+                    con =Controller()
+                    #Check for the disabled scenario
+
+                    for k in scenarios:
+                        if k == (i + 1):
+                            do_not_execute = True
+                            break
+
+
+
+                    if (not do_not_execute) :
+                        logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
+                        log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
+                        for d in suite[i]:
+                ##            print '===================Script execution started=========================='
+                            flag=obj.parse_json(d)
+                ##            print '===================Script execution started=========================='
+                            if flag == False:
+                                break
+                            print '\n'
+                            tsplist = obj.read_step()
+                            for k in range(len(tsplist)):
+                                if tsplist[k].name.lower() == 'openbrowser':
+                                    tsplist[k].inputval = unicode(browsers[browser])
+                ##            t = Test()
+                ##            list,flag = t.gettsplist()
+                        if flag:
+
+                            status = con.executor(tsplist,'debug')
+
+
+                        else:
+                            print 'Invalid script'
+                        logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
+                        log.info( '***Scenario ' + str((i  + 1 )) +' execution completed***')
+                        obj.clearList()
+                    else:
+                        logger.print_on_console( 'Scenario ' , (i + 1) ,' has been disabled for execution!!!')
+                        log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
+
+    ##            logger.log('--------------EXECUTION COMPLETED---------------')
+
+    ##            status=obj.executor(list,action)
+    ##            logger.log('STATUS '+str(status))
+    ##            logger.log('-----------------------COMPLETED---------------')
+
+    ##        else:
+    ##            print 'Invalid script'
+
+        return status
+
+    def invoke_parralel_exe(self,action,input_breakpoint):
+        #create a ThreadPoolExecutor to perform parallel execution
+        executor = ThreadPoolExecutor(max_workers=len(browsers))
+
+        #create Future object of  size number of browsers selected
+        for browser in range(len(browsers)):
+            #create a future object and start execution
+            future = executor.submit(TestThread(browsers[browser]))
+            #Store the future object to track in future
+            thread_tracker.append(future)
+            time.sleep(2)
+        #Get the length of thread_tracker
+        size = len(thread_tracker)
+        task_counter = 0
+        while True:
+            if thread_tracker[0].done():
+                task_counter = task_counter + 1
+                if size == task_counter:
+                    if  TERMINATE:
+                        print 'Update the result json as terminate'
+                    else:
+                        print 'Update the result json as complete'
+                executor.shutdown()
+                break
+
+        print 'Parralel execution completed'
+
+    def execute(self):
+        kill_process()
         obj = Controller()
+##    print 'Controller object created'
         t = test.Test()
-        list,flag = t.gettsplist()
+        list,f = t.gettsplist()
         if flag:
-            try:
-                input_breakpoint=int(input_breakpoint)
-                if input_breakpoint >0:
-                    break_point=input_breakpoint-1
-            except ValueError,NameError:
-                logger.log('Invalid breakpoint number')
-            status=obj.executor(list,action)
-            logger.log('STATUS '+str(status))
-            logger.log('-----------------------COMPLETED---------------')
-            return status
-        else:
-            print 'Invalid script'
+            logger.print_on_console('*** SUITE EXECUTION STARTED***')
+            obj.executor(list,'debug')
+            logger.print_on_console('***SUITE EXECUTION COMPLETED***')
 
 def kill_process():
     try:
@@ -448,9 +698,9 @@ if __name__ == '__main__':
     t = test.Test()
     list,flag = t.gettsplist()
     if flag:
-        logger.log('--------------EXECUTION STARTED-----------------')
+        logger.print_on_console('***SUITE EXECUTION COMPLETED***')
         obj.executor(list,'debug')
-        logger.log('--------------EXECUTION COMPLETED---------------')
+        logger.print_on_console('***SUITE EXECUTION COMPLETED***')
 
     else:
         print 'Invalid script'

@@ -14,6 +14,11 @@ import xml.etree.ElementTree as ET
 import logger
 from generic_constants import *
 import Exceptions
+from loggermessages import *
+import logging
+
+from lxml import etree
+log = logging.getLogger('xml_operations.py')
 class XMLOperations():
     def get_block_count(self,input_string,input_tag):
         """
@@ -26,21 +31,29 @@ class XMLOperations():
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
         block_count = 0
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            print 'input1 : ',input_string, '\ninput2 : ',input_tag
             root = ET.fromstring(str(input_string))
+            log.debug('Root object created with input string')
             items = root.getiterator(str(input_tag))
+            log.debug('Getting children node from the root')
             if len(items) > 0:
+                log.debug('There are children in the root node, get the total number of children')
                 block_count = len(items)
-                logger.log("Block count:  ")
-                logger.log(block_count)
+                log.info('Number of blocks in input XML :'+ str( block_count))
+                logger.print_on_console("Number of blocks in input XML:  ",block_count)
+                log.info(STATUS_METHODOUTPUT_UPDATE)
                 status = TEST_RESULT_PASS
                 methodoutput = TEST_RESULT_TRUE
         except Exception as e:
             if isinstance(e,ET.ParseError):
-                logger.log('Invalid tag/missing tag/blockcount in XML input')
+                logger.print_on_console('Invalid tag/missing tag/blockcount in XML input')
+                log.error('Invalid tag/missing tag/blockcount in XML input')
             else:
-                Exceptions.error(e)
+                logger.print_on_console(EXCEPTION_OCCURED,e)
+                log.error(EXCEPTION_OCCURED)
+                log.error(e)
+        log.info(RETURN_RESULT)
         return status,methodoutput,block_count
 
     def get_tag_value(self,input_string,block_number,input_tag,child_tag):
@@ -56,31 +69,45 @@ class XMLOperations():
         block_count = 0
         invalidinput = False
         tagvalue = ''
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            print 'input1 : ',input_string, '\ninput2 : ',block_number,'\ninput3 : ',input_tag, '\ninput4 : ',child_tag
             root = ET.fromstring(str(input_string))
+            log.debug('Root object created with input string')
             items = root.getiterator(str(input_tag))
+            log.debug('Getting children node from the root')
             if len(items) > 0:
+                log.debug('There are children in the root node, get the total number of children')
                 block_count = len(items)
                 block_number = int(block_number)
                 block = items[block_number-1].getchildren()
+                log.info('Block number: ' + str(block_number))
                 for child in block:
+                    log.info('Iterating child in the block')
                     if child.tag == str(child_tag):
+                        log.info('Child mathed with the input child tag')
                         tagvalue =  child.text
+                        logger.print_on_console('Tag : ',input_tag, '       Tag Value : ',tagvalue)
+                        log.info('Got the child text value and stored in tagvalue')
+                        log.info(STATUS_METHODOUTPUT_UPDATE)
                         status = TEST_RESULT_PASS
                         methodoutput = TEST_RESULT_TRUE
                     else:
                         invalidinput = True
                 if status == TEST_RESULT_FAIL:
-                    logger.log(INVALID_INPUT)
-                    logger.log('Please check the input tag')
+                    log.info(INVALID_INPUT + 'Please check the input tag')
+                    logger.print_on_console(INVALID_INPUT , 'Please check the input tag')
         except Exception as e:
             if isinstance(e,ValueError):
-                logger.log("Block number should be a number")
+                log.error("Block number should be a number")
+                logger.print_on_console("Block number should be a number")
             elif isinstance(e,ET.ParseError):
-                logger.log('Invalid tag/missing tag/blockcount in XML input')
+                logger.print_on_console('Invalid tag/missing tag/blockcount in XML input')
+                log.error('Invalid tag/missing tag/blockcount in XML input')
             else:
-                Exceptions.error(e)
+                log.error(EXCEPTION_OCCURED)
+                log.error(e)
+                logger.print_on_console(EXCEPTION_OCCURED,e)
+        log.info(RETURN_RESULT)
         return status,methodoutput,tagvalue
 
     def get_block_value(self,input_string,block_number,input_tag):
@@ -95,29 +122,99 @@ class XMLOperations():
         methodoutput = TEST_RESULT_FALSE
         block_count = 0
         blockvalue = []
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            print 'input1 : ',input_string, '\ninput2 : ',input_tag,'\ninput3 : ',block_number
             root = ET.fromstring(str(input_string))
+            log.debug('Root object created with input string')
             blocks = root.getiterator(str(input_tag))
+            log.debug('Getting children node from the root')
             if len(blocks) > 0:
+                log.debug('There are children in the root node, get the total number of children')
                 block_count = len(blocks)
                 block_number = int(block_number)
+                log.info('Block number: ' + str(block_number))
                 block = blocks[block_number-1].getchildren()
+                log.info('Iterating child in the block')
                 for child in block:
-                   blockvalue.append(  '<' + child.tag + '>' + child.text +  '</' + child.tag + '>')
+                    log.info('Child text :' + str(child.text))
+                    blockvalue.append(  '<' + child.tag + '>' + child.text +  '</' + child.tag + '>')
                 status = TEST_RESULT_PASS
                 methodoutput = TEST_RESULT_TRUE
+                log.info(STATUS_METHODOUTPUT_UPDATE)
                 if status == TEST_RESULT_FAIL:
-                    logger.log(INVALID_INPUT)
-                    logger.log('Please check the input tag')
+                    log.info(INVALID_INPUT + ' Please check the input tag' )
         except Exception as e:
             if isinstance(e,ValueError):
-                logger.log("Block number should be a number")
+                log.error("Block number should be a number")
+                logger.print_on_console("Block number should be a number")
             elif isinstance(e,ET.ParseError):
-                logger.log('Invalid tag/missing tag/blockcount in XML input')
+                logger.print_on_console('Invalid tag/missing tag/blockcount in XML input')
+                log.error('Invalid tag/missing tag/blockcount in XML input')
             else:
-                Exceptions.error(e)
+                log.error(EXCEPTION_OCCURED)
+                log.error(e)
+                logger.print_on_console(EXCEPTION_OCCURED,e)
+        log.info(RETURN_RESULT)
         return status,methodoutput,blockvalue
+
+    def verifyObjects(self,object_string1,object_string2):
+        """
+        def : verifyObjects
+        purpose : To compare two xml chunks
+        param  : object_string1 and object_string2
+        return : Returns True if xml chunks return True else False
+
+        """
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        try:
+            #Make sure params are strings
+            log.debug('Conver xml param to string')
+            object_string1 = str(object_string1)
+            object_string2 = str(object_string2)
+
+            #Remove new lines
+            log.debug('Remove new lines')
+            object_string1 = object_string1.replace('\n','')
+            object_string2 = object_string2.replace('\n','')
+
+            #Remove spaces between tags
+            log.debug('Remove spaces if more than one')
+            object_string1 = object_string1.replace('  ','')
+            object_string2 = object_string2.replace('  ','')
+
+            #Remove the leading and trailing spaces
+            log.debug('Remove leading and trailing spaces')
+            object_string1 = object_string1.strip()
+            object_string2 = object_string2.strip()
+
+            #Prepare xml element
+            log.debug('Build xml element')
+            tree1 = etree.fromstring(object_string1)
+            tree2 = etree.fromstring(object_string2)
+
+            #Convert tree to strings
+            log.debug('convert to string')
+            tree1_string = etree.tostring(tree2)
+            tree2_string = etree.tostring(tree1)
+
+            #compare the xml strings
+            if tree1_string == tree2_string:
+                logger.print_on_console('xml chunks are equal')
+                log.info('xml chunks are equal')
+                log.info(STATUS_METHODOUTPUT_UPDATE)
+                status = TEST_RESULT_PASS
+                methodoutput = TEST_RESULT_TRUE
+            else:
+                logger.print_on_console('xml chunks are not equal')
+                log.info('xml chunks are not equal')
+
+        except Exception as e:
+            log.error(EXCEPTION_OCCURED)
+            log.error(e)
+            logger.print_on_console(EXCEPTION_OCCURED,e)
+        log.info(RETURN_RESULT)
+        return status,methodoutput
 
 
 ##if __name__ == '__main__':

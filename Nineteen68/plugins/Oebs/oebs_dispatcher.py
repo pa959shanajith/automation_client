@@ -45,7 +45,7 @@ class OebsDispatcher:
                     'radio': 'radio button',
                     'checkbox':'check box',
                     'dropdown':'combo box',
-                    'Listbox':'list',
+                    'listbox':'list',
                     'textbox':'text',
                     'button':'push button'
                     }

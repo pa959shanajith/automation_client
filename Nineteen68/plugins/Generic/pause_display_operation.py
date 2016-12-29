@@ -9,98 +9,82 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import wx
+
+
+from Tkinter import *
+import Tkinter
+
+
 import threading
-t=''
+
+##import logger
 
 
-class AppFrame(wx.Frame):
-    def __init__(self, parent, title):
-        wx.Frame.__init__(self, parent, title=title,
-                          size=(300, 130),style=wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
-        self.panel = wx.Panel(self)
-        self.sizer = wx.GridBagSizer(1, 2)
+class App():
+   def __init__(self):
+       self.root = Tkinter.Tk()
+       self.root.title( 'SLK Nineteen68 - Pause')
+##       win = Tkinter.Toplevel(self.root)
+       self.root.geometry("300x150")
+##       self.root.iconbitmap(default='C:\Users\wasimakram.sutar\Desktop\ForLoggers\Nineteen68\Nineteen68\plugins\Core\slk.ico')
+       button = Tkinter.Button(self.root, text = 'OK',   command=self.quit,width= 100, height = 50)
+##       button.place(relx=6.5, rely=6.5,)
+##       button.place(bordermode=OUTSIDE, height=100, width=100)
 
-        self.text1 = wx.StaticText(self.panel, label="Application Paused!! Click OK to continue")
-        self.sizer.Add(self.text1, pos=(0, 1), flag=wx.TOP | wx.LEFT | wx.BOTTOM,border=10)
-        self.line = wx.StaticLine(self.panel)
-        self.sizer.Add(self.line, pos=(1, 0),flag= wx.Center, border=50)
-        self.okbutton = wx.Button(self.panel, label="OK")
-        self.okbutton.Bind(wx.EVT_BUTTON, self.OnOk)   # need to implement OnExit(). Leave notrace
-        self.sizer.Add(self.okbutton, pos=(2, 1), flag=wx.TOP | wx.ALIGN_CENTER, border=5)
-        self.sizer.AddGrowableCol(1)
-        self.panel.SetSizer(self.sizer)
-        self.CenterOnScreen()
-        self.Centre()
-        self.Show()
+       button.pack()
+       self.center(self.root)
+       self.root.mainloop()
 
+   def quit(self):
+       self.root.destroy()
+       self.root = None
 
-
-    def OnOk(self, event):
-        print 'Before pause called'
-        self.Close()
-        print 'After pause called'
+   def center(self,toplevel):
+        toplevel.update_idletasks()
+        w = toplevel.winfo_screenwidth()
+        h = toplevel.winfo_screenheight()
+        size = tuple(int(_) for _ in toplevel.geometry().split('+')[0].split('x'))
+        x = w/2 - size[0]/2
+        y = h/2 - size[1]/2
+        toplevel.geometry("%dx%d+%d+%d" % (size + (x, y)))
 
 
 def execute():
-    app = wx.App()
-    AppFrame(None, title="SLK Nineteen68 - Pause")
-    app.MainLoop()
-
-    return True
+    app = App()
 
 
 
 
-class AppFrame2(wx.Frame):
+class App2():
+   def __init__(self,input):
+        self.w = Tkinter.Tk()
+        self.w.title( 'SLK Nineteen68 - DisplayVariable')
+        self.w.geometry("300x150")
+        self.w.iconbitmap(default='C:\Users\wasimakram.sutar\Desktop\ForLoggers\Nineteen68\Nineteen68\plugins\Core\slk.ico')
+        label = Label(self.w, text=input )
+        label.pack()
+        button = Tkinter.Button(self.w, text = 'OK', command = self.quit,  width= 100, height = 50)
+        button.pack()
+        self.center(self.w)
+        self.w.after(10000, lambda: self.w.destroy()) # Destroy the widget after 30 seconds
+        self.w.mainloop()
 
-    def __init__(self, parent, title):
-        global t
-        str=title
-        title="SLK Nineteen68 - Display Value"
-        wx.Frame.__init__(self, parent, title=title,style=wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
+   def quit(self):
+       self.w.destroy()
 
-        self.panel = wx.Panel(self)
-        self.sizer = wx.GridBagSizer(1, 2)
-        self.text1 = wx.StaticText(self.panel, label=str)
-        self.sizer.Add(self.text1, pos=(0, 1), flag=wx.TOP | wx.LEFT | wx.BOTTOM,border=10)
-        self.line = wx.StaticLine(self.panel)
-        self.text1.Wrap(330)
-        self.sizer.Add(self.line, pos=(1, 0),flag= wx.Center, border=50)
-        self.okbutton = wx.Button(self.panel, label="OK")
-        self.okbutton.Bind(wx.EVT_BUTTON, self.OnOk)   # need to implement OnExit(). Leave notrace
-        self.sizer.Add(self.okbutton, pos=(5, 1), flag=wx.TOP | wx.ALIGN_CENTER, border=5)
-        self.sizer.AddGrowableCol(1)
-
-        self.panel.SetSizer(self.sizer)
-
-
-        self.Centre()
-        self.Show()
-        t = threading.Timer(3,self.hello)
-        t.start()
-
-
-
-
-    def OnOk(self, event):
-        self.Close()
-
-
-
-    def hello(self):
-        if(self):
-            self.Close()
+   def center(self,toplevel):
+        toplevel.update_idletasks()
+        w = toplevel.winfo_screenwidth()
+        h = toplevel.winfo_screenheight()
+        size = tuple(int(_) for _ in toplevel.geometry().split('+')[0].split('x'))
+        x = w/2 - size[0]/2
+        y = h/2 - size[1]/2
+        toplevel.geometry("%dx%d+%d+%d" % (size + (x, y)))
 
 
 
 def display_value(input):
-    app = wx.App()
-    AppFrame2(None, title=input)
-    app.MainLoop()
-    global t
-    t.cancel()
-    return True
+    app = App(input)
 
 
 

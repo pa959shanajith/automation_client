@@ -87,6 +87,10 @@ DYNAMIC_KEYWORDS=['createDynVariable','copyValue','modifyValue','deleteDynVariab
 
 WS_KEYWORDS=['setHeader','setHeaderTemplate']
 
+PARALLEL = 'parallel'
+
+SERIAL = 'serial'
+
 
 
 

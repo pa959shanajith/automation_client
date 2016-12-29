@@ -459,3 +459,6 @@ class Handler():
             print d,' is empty'
         for k, v in d.items():
             print(k,':', v)
+
+    def clearList(self):
+        del tspList[:]

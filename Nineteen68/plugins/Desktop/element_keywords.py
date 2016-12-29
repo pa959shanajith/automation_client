@@ -108,7 +108,7 @@ class ElementKeywords():
                     logger.log('element not present on the page where operation is trying to be performed')
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
-        return status,result
+        return status,result,label
 
     def verify_element_text(self, element , parent ,input, *args):
         status=desktop_constants.TEST_RESULT_FAIL
