@@ -146,7 +146,7 @@ class ElementKeywords:
         if webelement is not None:
             try:
                tool_tip=self.__get_tooltip(webelement)
-               if tool_tip is not None:
+               if tool_tip is not None and tool_tip != '':
                    logger.log('Result is '+tool_tip)
                    status=TEST_RESULT_PASS
                    methodoutput=TEST_RESULT_TRUE
@@ -161,7 +161,7 @@ class ElementKeywords:
         if webelement is not None:
             try:
                 input=input[0]
-                if input is not None or input != '':
+                if input is not None and input != '':
                     tool_tip=self.__get_tooltip(webelement)
                     if input==tool_tip:
                        status=TEST_RESULT_PASS
