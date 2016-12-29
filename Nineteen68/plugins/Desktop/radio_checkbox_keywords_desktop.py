@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 import desktop_constants
 from editable_text import Text_Box
-import ldtp
+from launch_keywords import ldtp
 import launch_keywords
 from ldtp.client_exception import LdtpExecutionError
 
@@ -42,6 +42,7 @@ class Radio_Checkbox_keywords():
         result=desktop_constants.TEST_RESULT_FALSE
         try:
             if launch_keywords.window_name!=None:
+                print element
                 dektop_element = element.split(';')
                 verify_obj = Text_Box()
                 check = verify_obj.verify_parent(dektop_element[0],parent)
@@ -87,6 +88,7 @@ class Radio_Checkbox_keywords():
     def get_status(self, element , parent  , *args):
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
+        flag=None
         try:
             if launch_keywords.window_name!=None:
                 dektop_element = element.split(';')
@@ -98,13 +100,21 @@ class Radio_Checkbox_keywords():
                         if(dektop_element[0].strip()[0:3] == 'chk'):
                             if(desktop_constants.CHECKED_CHECK in states):
                                 flag = 'Checked'
+                                status=desktop_constants.TEST_RESULT_PASS
+                                result = desktop_constants.TEST_RESULT_TRUE
                             else:
                                 flag = 'UnChecked'
+                                status=desktop_constants.TEST_RESULT_PASS
+                                result = desktop_constants.TEST_RESULT_TRUE
                         if(dektop_element[0].strip()[0:4] == 'rbtn'):
                             if(desktop_constants.SELECTED_CHECK in states):
                                 flag = 'Selected'
+                                status=desktop_constants.TEST_RESULT_PASS
+                                result = desktop_constants.TEST_RESULT_TRUE
                             else:
                                 flag = 'UnSelected'
+                                status=desktop_constants.TEST_RESULT_PASS
+                                result = desktop_constants.TEST_RESULT_TRUE
                     else:
                         logger.log('Element state does not allow to perform the operation')
                 else:

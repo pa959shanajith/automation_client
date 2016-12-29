@@ -8,7 +8,7 @@
 # Copyright:   (c) rakesh.v 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-import ldtp
+from launch_keywords import ldtp
 import desktop_constants
 from encryption_utility import AESCipher
 import logger
@@ -71,6 +71,7 @@ class Text_Box:
     def get_text(self, element , parent  , *args):
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
+        output=None
         try:
             if launch_keywords.window_name!=None:
                 dektop_element = element.split(';')

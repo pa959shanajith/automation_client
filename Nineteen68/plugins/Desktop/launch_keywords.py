@@ -30,6 +30,7 @@ from ldtp.client_exception import LdtpExecutionError
 
 window_name=None
 window_handle=None
+
 class Launch_Keywords():
 
 
@@ -44,7 +45,11 @@ class Launch_Keywords():
         status=desktop_constants.TEST_RESULT_FAIL
         try:
         # check file exists
-            filePath,windowName,timeout=input_val[0],input_val[1],input_val[2]
+            if len(input_val)==2:
+                filePath,windowName=input_val[0],input_val[1]
+                timeout=5
+            elif len(input_val)==3:
+                filePath,windowName,timeout=input_val[0],input_val[1],input_val[2]
             if(os.path.isfile(filePath)):
                 directory = os.path.dirname(filePath)
                 #check for any existing instance of app by window name
@@ -135,6 +140,7 @@ class Launch_Keywords():
         return img
 
 
+
     def getProcessWindows(self,windowName):
         EnumWindows = ctypes.windll.user32.EnumWindows
         EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
@@ -148,11 +154,11 @@ class Launch_Keywords():
                 length = GetWindowTextLength(hwnd)
                 buff = ctypes.create_unicode_buffer(length + 1)
                 GetWindowText(hwnd, buff, length + 1)
-##                titles.append(buff.value)
+    ##                titles.append(buff.value)
                 if self.patternMatching(windowName,buff.value):
                     handles.append(hwnd)
             return True
-        EnumWindows(EnumWindowsProc(foreach_window), 0)
+        win32gui.EnumWindows(foreach_window, None)
         return handles
 
     def patternMatching(self,toMatch,matchIn):

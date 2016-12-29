@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import ldtp
+from launch_keywords import ldtp
 import launch_keywords
 import logger
 import Exceptions
@@ -27,7 +27,6 @@ class Dropdown_Keywords():
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
             item_index=int(input_val[0])
-            print item_index
             try:
 
                 if object_xpath[0:3]=='cbo':
@@ -37,7 +36,7 @@ class Dropdown_Keywords():
                                 if object_xpath!=None and editable_text.verify_parent(object_xpath,parent):
                                     states=ldtp.getallstates(launch_keywords.window_name,object_xpath)
                                     if desktop_constants.ENABLED_CHECK in states:
-                                        select=ldtp.selectindex(launch_keywords.window_name,object_xpath, itemIndex-1)
+                                        select=ldtp.selectindex(launch_keywords.window_name,object_xpath, item_index-1)
                                         if select==1:
                                             status=desktop_constants.TEST_RESULT_PASS
                                             result=desktop_constants.TEST_RESULT_TRUE
@@ -132,7 +131,8 @@ class Dropdown_Keywords():
 
         def getSelected(self,element,parent,input_val, *args):
                 status=desktop_constants.TEST_RESULT_FAIL
-                result=desktop_constants.TEST_RESULT_FALSE
+                method_output=desktop_constants.TEST_RESULT_FALSE
+                result=None
                 object_xpath=element.split(';')[0]
                 object_index=element.split(';')[1]
                 try:
@@ -146,8 +146,9 @@ class Dropdown_Keywords():
                                             select=ldtp.getcombovalue(launch_keywords.window_name,object_xpath)
                                             if select!=None:
                                                 status=desktop_constants.TEST_RESULT_PASS
+                                                method_output=desktop_constants.TEST_RESULT_TRUE
                                                 result=select
-                                                return status,result
+                                                return status,method_output,result
                                             else:
                                                 logger.log('unable to get  the selected item')
                                     else:
@@ -187,8 +188,9 @@ class Dropdown_Keywords():
 
                                             if selected_text!=None:
                                                 status=desktop_constants.TEST_RESULT_PASS
+                                                method_output=desktop_constants.TEST_RESULT_TRUE
                                                 result=selected_text
-                                                return status,result
+                                                return status,method_output,result
                                             else:
                                                 logger.log('unable to get the selected list item')
                                 else:
@@ -197,7 +199,7 @@ class Dropdown_Keywords():
                                 Exceptions.error(e)
                 except Exception as e:
                     Exceptions.error(e)
-                return status,result
+                return status,method_output,result
 
         def verifySelected(self,element,parent,input_val, *args):
             status=desktop_constants.TEST_RESULT_FAIL
@@ -278,7 +280,8 @@ class Dropdown_Keywords():
 
         def getCount(self,element,parent, *args):
             status=desktop_constants.TEST_RESULT_FAIL
-            result=desktop_constants.TEST_RESULT_FALSE
+            method_output=desktop_constants.TEST_RESULT_FALSE
+            result=None
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
             try:
@@ -292,8 +295,9 @@ class Dropdown_Keywords():
                                         select=ldtp.getallitem(launch_keywords.window_name,object_xpath)
                                         if select!=None :
                                             status=desktop_constants.TEST_RESULT_PASS
+                                            method_output=desktop_constants.TEST_RESULT_TRUE
                                             result=len(select)
-                                            return status,result
+                                            return status,method_output,result
                                         else:
                                             logger.log('unable to verify  the selected item')
                                 else:
@@ -316,8 +320,9 @@ class Dropdown_Keywords():
                                     actual_count=len(children_list)-list_count
                                     if actual_count>0:
                                         status=desktop_constants.TEST_RESULT_PASS
+                                        method_output=desktop_constants.TEST_RESULT_TRUE
                                         result=actual_count
-                                        return status,result
+                                        return status,method_output,result
                                     else:
                                         logger.log('unable to select list item')
                             else:
@@ -326,7 +331,7 @@ class Dropdown_Keywords():
                             Exceptions.error(e)
             except Exception as e:
                 Exceptions.error(e)
-            return status,result
+            return status,method_output,result
 
         def verifyCount(self,element,parent,input_val, *args):
             status=desktop_constants.TEST_RESULT_FAIL
@@ -542,10 +547,11 @@ class Dropdown_Keywords():
 
         def getValueByIndex(self,element,parent,input_val, *args):
             status=desktop_constants.TEST_RESULT_FAIL
-            result=desktop_constants.TEST_RESULT_FALSE
+            method_output=desktop_constants.TEST_RESULT_FALSE
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
             index=input_val[0]
+            result=None
             try:
                 if launch_keywords.window_name!=None:
                     if object_xpath[0:3]=='cbo':
@@ -553,16 +559,15 @@ class Dropdown_Keywords():
                             index=int(index)
                             try:
                                 time.sleep(0.5)
-                                if object_xpath!=None :
-                                    elements=ldtp.getallitem(launch_keywords.window_name,object_xpath)
-                                    if elements!=None:
-                                        if len(elements)>int(index) and int(index)>0:
-                                            status=desktop_constants.TEST_RESULT_PASS
-                                            result=elements[index-1]
-                                        else:
-                                            logger.log('invalid input')
+                                if object_xpath!=None  :
+                                    if  index>=0:
+                                        ldtp.showlist(launch_keywords.window_name, object_xpath)
+                                        result=ldtp.getobjectproperty(launch_keywords.window_name,'lst#'+str(index), desktop_constants.LABEL)
+                                        ldtp.hidelist(launch_keywords.window_name, object_xpath)
+                                        status=desktop_constants.TEST_RESULT_PASS
+                                        method_output=desktop_constants.TEST_RESULT_TRUE
                                     else:
-                                        logger.log('unable to verify  the  combo items')
+                                        logger.log('invalid input')
                                 else:
                                     logger.log('element not found')
                             except Exception as e:
@@ -605,6 +610,7 @@ class Dropdown_Keywords():
 
                                     if len(selected_text)>0:
                                         status=desktop_constants.TEST_RESULT_PASS
+                                        method_output=desktop_constants.TEST_RESULT_TRUE
                                         result=selected_text
                             else:
                                 logger.log('element not found')
@@ -612,11 +618,12 @@ class Dropdown_Keywords():
                             Exceptions.error(e)
             except Exception as e:
                 Exceptions.error(e)
-            return status,result
+            return status,method_output,result
 
         def getMultpleValuesByIndexs(self,element,parent,input_val, *args):
             status=desktop_constants.TEST_RESULT_FAIL
-            result=desktop_constants.TEST_RESULT_FALSE
+            result=None
+            method_output=desktop_constants.TEST_RESULT_FALSE
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
             try:
@@ -656,12 +663,13 @@ class Dropdown_Keywords():
                                             break
                                 if len(selected_text)>0:
                                     status=desktop_constants.TEST_RESULT_PASS
+                                    method_output=desktop_constants.TEST_RESULT_PASS
                                     result=selected_text
                         else:
                             logger.log('element not found')
             except Exception as e:
                 Exceptions.error(e)
-            return status,result
+            return status,method_output,result
 
         def selectAllValues(self,element,parent,*args):
             status=desktop_constants.TEST_RESULT_FAIL

@@ -11,7 +11,7 @@
 
 import desktop_constants
 from editable_text import Text_Box
-import ldtp
+from launch_keywords import ldtp
 import launch_keywords
 from launch_keywords import Launch_Keywords
 from ldtp.client_exception import LdtpExecutionError
@@ -93,6 +93,7 @@ class ElementKeywords():
     def get_element_text(self, element , parent , *args):
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
+        label=None
         try:
             if launch_keywords.window_name!=None:
                 dektop_element = element.split(';')

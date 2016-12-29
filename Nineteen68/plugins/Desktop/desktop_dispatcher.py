@@ -68,21 +68,21 @@ class DesktopDispatcher:
                     'verifyvisible' : self.util_keywords_obj.verifyVisible,
                     'verifyexists' : self.util_keywords_obj.verifyExists,
                     'verifyhidden' : self.util_keywords_obj.verifyHidden,
-                    'verifyreadOnly' : self.util_keywords_obj.verifyReadOnly,
+                    'verifyreadonly' : self.util_keywords_obj.verifyReadOnly,
                     'setfocus' : self.util_keywords_obj.setFocus,
                     'selectvaluebyindex': self.dropdown_keywords_obj.selectValueByIndex,
                     'selectvaluebytext': self.dropdown_keywords_obj.selectValueByText,
                     'getselected': self.dropdown_keywords_obj.getSelected,
-                    'verifyselected': self.dropdown_keywords_obj.verifySelected,
+                    'verifyselectedvalue': self.dropdown_keywords_obj.verifySelected,
                     'getcount': self.dropdown_keywords_obj.getCount,
                     'verifycount': self.dropdown_keywords_obj.verifyCount,
                     'verifyvaluesexists': self.dropdown_keywords_obj.verifyValuesExists,
                     'verifyallvalues': self.dropdown_keywords_obj.verifyAllValues,
                     'getvaluebyindex': self.dropdown_keywords_obj.getValueByIndex,
-                    'getmultiplevaluesbyindexs': self.dropdown_keywords_obj.getMultpleValuesByIndexs,
+                    'getmultiplevaluesbyindexes': self.dropdown_keywords_obj.getMultpleValuesByIndexs,
                     'selectallvalues': self.dropdown_keywords_obj.selectAllValues,
                     'deselectall': self.dropdown_keywords_obj.deSelectAll,
-                    'selectmultiplevaluesbyindexs': self.dropdown_keywords_obj.selectMultpleValuesByIndexs,
+                    'selectmultiplevaluesbyindexes': self.dropdown_keywords_obj.selectMultpleValuesByIndexs,
                     'selectmultiplevaluesbytext': self.dropdown_keywords_obj.selectMultpleValuesByText,
                     'selectradiobutton' : self.radio_checkbox_keywords_obj.select_radiobutton,
                     'selectcheckbox' : self.radio_checkbox_keywords_obj.select_checkbox,
@@ -106,8 +106,7 @@ class DesktopDispatcher:
                   'gettomailid'  : 5,
                   'getbody' : 6,
                   'verifyemail' : 7,
-                  'switchtofolder':8,
-                  'getstatus' : 9
+                  'switchtofolder':8
                 }
             keyword=keyword.lower()
             if keyword in dict.keys():
