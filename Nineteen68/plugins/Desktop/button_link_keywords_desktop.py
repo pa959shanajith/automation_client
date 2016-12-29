@@ -11,7 +11,7 @@
 
 import desktop_constants
 from editable_text import Text_Box
-import ldtp
+from launch_keywords import ldtp
 import launch_keywords
 from launch_keywords import Launch_Keywords
 from ldtp.client_exception import LdtpExecutionError
@@ -95,6 +95,7 @@ class ButtonLinkKeyword():
     def get_button_name(self, element , parent , *args):
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
+        label=None
         try:
             if launch_keywords.window_name!=None:
                 dektop_element = element.split(';')
@@ -109,7 +110,7 @@ class ButtonLinkKeyword():
                     logger.log('element not present on the page where operation is trying to be performed')
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
-        return status,result
+        return status,result,label
 
     def right_click(self, element , parent , *args):
         status=desktop_constants.TEST_RESULT_FAIL
@@ -133,6 +134,7 @@ class ButtonLinkKeyword():
     def get_link_text(self, element , parent , *args):
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
+        link_text=None
         try:
             if launch_keywords.window_name!=None:
                 dektop_element = element.split(';')

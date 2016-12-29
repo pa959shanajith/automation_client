@@ -38,6 +38,8 @@ class OutlookKeywords:
 
 #To support seperate accounts and  subFolders this method is implemented , Input should be the folder path in properties of outlook folder
         def switchToFolder(self,input,*args):
+            status=desktop_constants.TEST_RESULT_FAIL
+            method_output=desktop_constants.TEST_RESULT_FALSE
             try:
                 logger.log('switching to the folder')
                 folderPath=input[0]
@@ -68,15 +70,16 @@ class OutlookKeywords:
                                     break
                                 else:
                                     logger.log('Switched to folder')
-                                    return True
+                                    status=desktop_constants.TEST_RESULT_PASS
+                                    method_output=desktop_constants.TEST_RESULT_TRUE
+
                             else:
                                 logger.log('The given path is invalid')
                 else:
                     logger.log('Check the path given')
-                    return False
             except Exception as e:
                 Exceptions.error(e)
-            return False
+            return status,method_output
 
 
 ##  This method takes 3 params
@@ -90,6 +93,7 @@ class OutlookKeywords:
 ##   Get the Outlook com object registry
             try:
                 status=desktop_constants.TEST_RESULT_FAIL
+                method_output=desktop_constants.TEST_RESULT_FALSE
                 self.senderEmail=input[0]
                 self.subject=input[2]
                 self.toMail=input[1]
@@ -123,6 +127,7 @@ class OutlookKeywords:
                                     self.Flag=True
                                     msg.Display(False)
                                     status=desktop_constants.TEST_RESULT_PASS
+                                    method_output=desktop_constants.TEST_RESULT_TRUE
                                 else:
                                     continue
                             else:
@@ -133,75 +138,90 @@ class OutlookKeywords:
                     logger.log('Error: No such mail found')
             except Exception as e:
                 Exceptions.error(e)
-            return status
+            return status,method_output
 
         def GetFromMailId(self,input,*args):
             try:
                 status=desktop_constants.TEST_RESULT_FAIL
+                method_output=desktop_constants.TEST_RESULT_FALSE
                 res=None
                 if self.Flag==True:
                     res= self.FromMailId
                     status=desktop_constants.TEST_RESULT_PASS
+                    method_output=desktop_constants.TEST_RESULT_TRUE
                 else:
                     logger.log('Error : No such mail id found')
             except Exception as  e:
                 Exceptions.error(e)
-            return status,res
+            return status,method_output,res
 
 
         def GetAttachmentStatus(self,input,*args):
             try:
                 status=desktop_constants.TEST_RESULT_FAIL
+                method_output=desktop_constants.TEST_RESULT_FALSE
                 res=None
                 if self.Flag==True:
                     res= self.AttachmentStatus
                     status=desktop_constants.TEST_RESULT_PASS
+                    method_output=desktop_constants.TEST_RESULT_TRUE
                 else:
                     logger.log('Error : mail does''t have such info')
             except Exception as  e:
                 Exceptions.error(e)
-            return status,res
+            return status,method_output,res
 
         def GetSubject(self,input,*args):
             try:
                 status=desktop_constants.TEST_RESULT_FAIL
+                method_output=desktop_constants.TEST_RESULT_FALSE
                 res=None
                 if self.Flag==True:
                     res= self.Subject
                     status=desktop_constants.TEST_RESULT_PASS
+                    method_output=desktop_constants.TEST_RESULT_TRUE
                 else:
                     logger.log('Error : No subject found')
             except Exception as  e:
                 Exceptions.error(e)
-            return status,res
+            return status,method_output,res
 
         def GetToMailID(self,input,*args):
+            status=desktop_constants.TEST_RESULT_FAIL
+            method_output=desktop_constants.TEST_RESULT_FALSE
+            res=None
             try:
                 if self.Flag==True:
                     res= self.ToMailID
                     status=desktop_constants.TEST_RESULT_PASS
+                    method_output=desktop_constants.TEST_RESULT_TRUE
                 else:
                     logger.log('Error : No such mail id found')
             except Exception as  e:
                 Exceptions.error(e)
-            return status,res
+            return status,method_output,res
 
 
         def GetBody(self,input,*args):
+            status=desktop_constants.TEST_RESULT_FAIL
+            method_output=desktop_constants.TEST_RESULT_FALSE
+            res=None
             try:
                 if self.Flag==True:
                     res= self.Body
                     status=desktop_constants.TEST_RESULT_PASS
+                    method_output=desktop_constants.TEST_RESULT_TRUE
                 else:
                     logger.log('Error : No Body found')
             except Exception as  e:
                     Exceptions.error(e)
-            return status,str(res)
+            return status,method_output,str(res)
 
 
         def VerifyEmail(self,input,*args):
             try:
                 status=desktop_constants.TEST_RESULT_FAIL
+                method_output=desktop_constants.TEST_RESULT_FALSE
                 if self.Flag==True:
                     try:
                         FilePath=input[0]
@@ -213,6 +233,7 @@ class OutlookKeywords:
                                         if str(self.Content.Attachments)==str(mail_content.Attachments):
                                             if self.Content.SentOn==mail_content.SentOn:
                                                 status=desktop_constants.TEST_RESULT_PASS
+                                                method_output=desktop_constants.TEST_RESULT_TRUE
 
 
                     except (com_error):
@@ -221,7 +242,7 @@ class OutlookKeywords:
                     logger.log('Error : No such mail found')
             except Exception as  e:
                 Exceptions.error(e)
-            return status
+            return status,method_output
 
 # Internal method to search for a folder in given folder
         def findFolder(self,folderName,searchIn):
