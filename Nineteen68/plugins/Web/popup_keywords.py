@@ -21,7 +21,7 @@ from loggermessages import *
 
 log = logging.getLogger('popup_keywords.py')
 class PopupKeywords():
-    def accept_popup(self,webelement,input,output,*args):
+    def accept_popup(self,webelement,*args):
         driver = browser_Keywords.driver_obj
         log.debug('Got the driver object from browser keyword class')
         log.debug(driver)
@@ -44,7 +44,7 @@ class PopupKeywords():
         log.info(RETURN_RESULT)
         return status,methodoutput
 
-    def dismiss_popup(self,webelement,input,output,*args):
+    def dismiss_popup(self,webelement,*args):
         driver = browser_Keywords.driver_obj
         log.debug('Got the driver object from browser keyword class')
         log.debug(driver)
@@ -67,7 +67,7 @@ class PopupKeywords():
         log.info(RETURN_RESULT)
         return status,methodoutput
 
-    def get_popup_text(self,webelement,input,output,*args):
+    def get_popup_text(self,webelement,*args):
         driver = browser_Keywords.driver_obj
         log.debug('Got the driver object from browser keyword class')
         log.debug(driver)
@@ -92,7 +92,7 @@ class PopupKeywords():
         log.info(RETURN_RESULT)
         return status,methodoutput,text
 
-    def verify_popup_text(self,webelement,inputs,output,*args):
+    def verify_popup_text(self,webelement,inputs,*args):
         driver = browser_Keywords.driver_obj
         log.debug('Got the driver object from browser keyword class')
         log.debug(driver)
