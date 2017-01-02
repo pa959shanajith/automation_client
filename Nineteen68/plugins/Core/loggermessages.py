@@ -16,3 +16,13 @@ EXCEPTION_OCCURED = 'Exception occured'
 
 RETURN_RESULT = 'Returning Result of keyword execution'
 
+WEB_ELEMENT_FOUND = 'Web Element found'
+
+WEB_ELEMENT_NOT_FOUND = 'Web Element not found'
+
+WEB_ELEMENT_ENABLED = 'Web Element Enabled'
+
+WEB_ELEMENT_DISABLED = 'Web Element is disabled, hence cannot perform operation'
+
+INVALID_INPUT = 'Invalid input, Please provide the valid input'
+
