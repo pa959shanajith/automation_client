@@ -1,0 +1,33 @@
+#-------------------------------------------------------------------------------
+# Name:        reporting_pojo
+# Purpose:
+#
+# Author:      sushma.p
+#
+# Created:
+# Copyright:   (c) sushma.p
+# Licence:     <your licence>
+#-------------------------------------------------------------------------------
+
+class ReportingStep:
+    """
+        def : __init__
+        purpose :Constructor to create a pojo of each step in the report
+        param : _id,name,parent_id,status,step,comments,step_description,ellapsedtime,testscript_name
+
+    """
+
+    def __init__(self,_id,name,parent_id,status,step,comments,step_description,ellapsedtime,testscript_name):
+        self._id=_id
+        self.name=name
+        self.parent_id=parent_id
+        self.status=status
+        self.step=step
+        self.comments=comments
+        self.step_description=step_description
+        self.ellapsedtime=ellapsedtime
+        self.testscript_name=testscript_name
+
+
+
+
