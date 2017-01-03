@@ -14,6 +14,7 @@ import browser_Keywords
 from webconstants import *
 import constants
 from selenium.common.exceptions import *
+import Exceptions
 
 class CustomKeyword:
 
@@ -138,33 +139,37 @@ class CustomKeyword:
         count=None
         ele_type=ele_type[0]
         logger.log('Element type is '+str(ele_type))
+        try:
 
-        if not(ele_type is None or ele_type==''):
-            ele_type=str(ele_type)
-            ele_xpath=self.getElementXPath(reference_ele)
-            logger.log('Debug: reference_ele_xpath is'+str(ele_xpath))
+            if not(ele_type is None or ele_type==''):
+                ele_type=str(ele_type)
+                ele_xpath=self.getElementXPath(reference_ele)
+                logger.log('Debug: reference_ele_xpath is'+str(ele_xpath))
 
-            ele_type=ele_type.lower()
-            if ele_type in self.tagtype.keys():
-                ele_type=self.tagtype.get(ele_type)
-            elif ele_type=='dropdown' or ele_type=='listbox':
-                self.list_flag=self.object_count_flag[ele_type]
-                ele_type='select'
+                ele_type=ele_type.lower()
+                if ele_type in self.tagtype.keys():
+                    ele_type=self.tagtype.get(ele_type)
+                elif ele_type=='dropdown' or ele_type=='listbox':
+                    self.list_flag=self.object_count_flag[ele_type]
+                    ele_type='select'
 
-            array_index=browser_Keywords.driver_obj.execute_script(FIND_INDEX_JS,reference_ele)
-            if array_index!= None:
-                count=self.get_count(0, ele_type,array_index)
+                array_index=browser_Keywords.driver_obj.execute_script(FIND_INDEX_JS,reference_ele)
+                if array_index!= None:
+                    count=self.get_count(0, ele_type,array_index)
 
 
-            if count is not None:
-                logger.log('Number of objects found is ',count)
-                status=constants.TEST_RESULT_PASS
-                methodoutput=constants.TEST_RESULT_TRUE
+                if count is not None:
+                    logger.log('Number of objects found is ',count)
+                    status=constants.TEST_RESULT_PASS
+                    methodoutput=constants.TEST_RESULT_TRUE
+                else:
+                    logger.log('Count is ',count)
+
             else:
-                logger.log('Count is ',count)
+                logger.log('Invalid input')
+        except Exception as e:
+            Exceptions.error(e)
 
-        else:
-            logger.log('Invalid input')
         return status,methodoutput,count
 
     def get_count(self,counter,ele_type,index):
@@ -199,7 +204,10 @@ class CustomKeyword:
 
 
     def getElementXPath(self,webelement):
-        return browser_Keywords.driver_obj.execute_script(GET_XPATH_SCRIPT,webelement)
+        try:
+            return browser_Keywords.driver_obj.execute_script(GET_XPATH_SCRIPT,webelement)
+        except Exception as e:
+            logger.log('Exception occurred in getElementXPath ')
 
 
 

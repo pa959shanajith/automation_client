@@ -413,7 +413,7 @@ class Utilities:
 
         else:
 ##            oebs_key_objects.custom_msg.append[:]
-            oebs_key_objects.custom_msg=[]
+            del oebs_key_objects.custom_msg[:]
             oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_FOUND)
             logger.log(MSG_ELEMENT_NOT_FOUND)
 
