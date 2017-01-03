@@ -22,13 +22,38 @@ class Reporting:
     """
     def __init__(self):
         self.report_string=[]
-        self.overallstatus=[]
-        self.report_json={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus}
+        self.overallstatus_array=[]
+        self.report_json={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_array}
         self.nested_flag=False
         self.pid_list=[]
         self.parent_id=0
         self.id_counter=1
         self.testscript_name=None
+        self.overallstatus=TEST_RESULT_PASS
+        self.browser_version='-'
+        self.browser_type='-'
+        self.start_time=''
+        self.end_time=''
+        self.ellapsed_time=''
+
+    def build_overallstatus(self,start_time,end_time,ellapsed_time):
+        """
+        def : build_overallstatus
+        purpose : builds the overallstatus field of report_json
+        param : start_time,end_time,ellapsed_time
+
+        """
+        self.start_time=str(start_time)
+        self.end_time=str(end_time)
+        self.ellapsed_time=str(ellapsed_time)
+        obj={}
+        obj[ELLAPSED_TIME]=self.ellapsed_time
+        obj[END_TIME]=self.end_time
+        obj[BROWSER_VERSION]=self.browser_version
+        obj[START_TIME]=self.start_time
+        obj[OVERALLSTATUS]=self.overallstatus
+        obj[BROWSER_TYPE]=self.browser_type
+        self.overallstatus_array.append(obj)
 
     def get_pid(self):
         """
@@ -127,10 +152,11 @@ class Reporting:
             step_description=tsp.step_description
             name=self.name
 
-        reporting_pojo_obj=reporting_pojo.ReportingStep(self.id_counter,name,parent_id,status,STEP+str(tsp.stepnum),'',step_description,ellapsedtime,tsp.testscript_name)
+        reporting_pojo_obj=reporting_pojo.ReportingStep(self.id_counter,name,parent_id,status,STEP+str(tsp.stepnum),'',step_description,str(ellapsedtime),tsp.testscript_name)
 
         self.generate_keyword_step(reporting_pojo_obj)
         self.id_counter+=1
+
 
 
     def print_report_json(self):

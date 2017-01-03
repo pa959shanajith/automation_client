@@ -12,7 +12,7 @@
 class ReportingStep:
     """
         def : __init__
-        purpose :Constructor to create a pojo of each step in the report
+        purpose : Constructor to create a pojo of each step in the report
         param : _id,name,parent_id,status,step,comments,step_description,ellapsedtime,testscript_name
 
     """
