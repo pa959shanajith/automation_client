@@ -52,6 +52,16 @@ class ExcelFile:
 
         }
 
+    def open_and_save_file(self,input_path):
+        #win32 part opening and clsoing of file to claculate and save values of the formula
+        #This is to support the feature of   simulataneous writing and reading to a file
+        from win32com.client.gencache import EnsureDispatch
+        excel = EnsureDispatch("Excel.Application")
+        excel.DisplayAlerts = False
+        print input_path
+        excel_file = excel.Workbooks.Open(input_path)
+        excel_file.Close(True)
+
 
 
     def __get_ext(self,input_path):
@@ -305,6 +315,8 @@ class ExcelXLS:
         from xlwt import easyxf,XFStyle
         workbook = copy(book)
         sheets=book.sheet_names()
+        status=False
+        self.excel_obj=ExcelFile()
         try:
             sheetnum=sheets.index(sheetname)
             s = workbook.get_sheet(sheetnum)
@@ -328,17 +340,18 @@ class ExcelXLS:
                         s.write(int(row),int(col),value)
 
                 workbook.save(input_path)
-                return True
+                status= True
             else:
                 logger.log('Cell Type not supported')
             workbook.save(input_path)
-            return True
+
         except IOError:
             logger.log('Permisson denied to perform write operation')
         except Exception as e:
             Exceptions.error(e)
             workbook.save(input_path)
-        return False
+        self.excel_obj.open_and_save_file(input_path)
+        return status
 
     def get_linenumber_xls(self,input_path,sheetname,content):
         """
@@ -686,6 +699,7 @@ class ExcelXLSX:
 
         return book,sheet,last_row,last_col,sheet.max_row
 
+
     def __write_to_cell_xlsx(self,input_path,book,sheetname,row,col,value,*args):
         """
         def : __write_to_cell_xlsx(private method)
@@ -695,6 +709,7 @@ class ExcelXLSX:
 
         """
         status=False
+        self.excel_obj=ExcelFile()
         try:
            sheet=book.get_sheet_by_name(sheetname)
            cell=sheet.cell(row=row,column=col)
@@ -720,6 +735,7 @@ class ExcelXLSX:
             logger.log('Invalid input')
             Exceptions.error(e)
         book.save(input_path)
+        self.excel_obj.open_and_save_file(input_path)
         return status
 
     def __get_formatted_date(self,val,fmt):
