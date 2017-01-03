@@ -18,6 +18,7 @@ import Exceptions
 import oebs_constants
 windowname=None
 import constants
+import oebs_msg
 
 
 class OebsDispatcher:
@@ -166,6 +167,8 @@ class OebsDispatcher:
             keyword=keyword.lower()
             if keyword in dict.keys():
                 result=dict[keyword](*message)
+                if not(oebs_msg.ELEMENT_FOUND):
+                    result=constants.TERMINATE
             else:
                 logger.log(generic_constants.INVALID_INPUT)
          except Exception as e:

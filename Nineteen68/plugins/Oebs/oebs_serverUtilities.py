@@ -329,8 +329,10 @@ class Utilities:
         oebs_key_objects.keyword_output = outputs.split(';')
 
         if flag == 'true' :
+             ELEMENT_FOUND=True
              return accessContext
         else :
+            ELEMENT_FOUND=False
             return 'fail'
 
     def getsize(self,xpath,windowname):
