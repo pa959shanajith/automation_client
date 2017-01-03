@@ -25,7 +25,7 @@ TEST_RESULT_FALSE = "False";
 
 METHOD_INVALID='Invalid Keyword'
 
-CHROME_DRIVER_PATH = os.getcwd()+'\chromedriver.exe'
+CHROME_DRIVER_PATH = 'D:\chromedriver.exe'
 
 
 IE_DRIVER_PATH_64 = os.getcwd()+'\IEDriverServer64.exe'
@@ -125,6 +125,19 @@ STATUS_CODE_DICT={520: 'Unknown Error',
             508: 'Loop Detected',
             510: 'Not Extended',
             511: 'Network Authentication Required'}
+
+GET_OBJECT_COUNT='getObjectCount'
+
+WAIT_FOR_ELEMENT_VISIBLE='waitForElementVisible'
+
+GET_INNER_TABLE='getInnerTable'
+
+OPEN_BROWSER='openBrowser'
+
+OPEN_NEW_BROWSER='openNewBrowser'
+
+CLOSE_BROWSER='closeBrowser'
+
 
 
 

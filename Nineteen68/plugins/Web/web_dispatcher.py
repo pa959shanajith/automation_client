@@ -22,9 +22,11 @@ import utilweb_operations
 import static_text_keywords
 import Exceptions
 import logger
-import webconstants
+from webconstants import *
 import custom_keyword
 from collections import OrderedDict
+import constants
+import requests
 
 class Dispatcher:
     button_link_object = button_link_keyword.ButtonLinkKeyword()
@@ -42,14 +44,16 @@ class Dispatcher:
 
 
 
-    def dispatcher(self,teststepproperty,input):
+    def dispatcher(self,teststepproperty,input,reporting_obj):
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
+        url=teststepproperty.url.strip()
         keyword = teststepproperty.name
         driver = browser_Keywords.driver_obj
         webelement = None
         element = None
+
 
         custom_dict={
                     'getStatus': ['radio','checkbox'],
@@ -69,45 +73,53 @@ class Dispatcher:
         custom_dict_element={'element':['clickElement','doubleClick','rightClick','getElementText','verifyElementText','drag', 'drop','getToolTipText','verifyToolTipText','verifyExists', 'verifyDoesNotExists', 'verifyHidden','verifyVisible', 'switchToTab','switchToWindow','setFocus','sendFunctionKeys',
                                         'tab','waitForElementVisible','mouseHover','saveFile']}
 
+        result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE)
 
+        def send_webelement_to_keyword(driver,objectname,url):
+            if driver != None:
+                webelement=None
 
-        if driver != None:
+                #check if the element is in iframe or frame
 
-            #check if the element is in iframe or frame
-            url=teststepproperty.url.strip()
-            if url !=  '' and self.custom_object.is_int(url):
-                self.custom_object.switch_to_iframe(url,driver.current_window_handle)
-                driver = browser_Keywords.driver_obj
-            if objectname==webconstants.CUSTOM:
-                if teststepproperty.custom_flag:
-                    reference_element=self.getwebelement(driver,teststepproperty.parent_xpath)
-                    if reference_element != None:
-                        reference_element = reference_element[0]
-                        if keyword=='getObjectCount':
-                            webelement=reference_element
-                        elif len(input)>=3:
-                            if (keyword in custom_dict and input[0].lower() in custom_dict[keyword]) or keyword in custom_dict_element.values()[0]:
-                                webelement=self.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url)
-                                input.reverse()
-                                for x in range(0,3):
-                                    input.pop()
+                if url !=  '' and self.custom_object.is_int(url):
+                    self.custom_object.switch_to_iframe(url,driver.current_window_handle)
+                    driver = browser_Keywords.driver_obj
+                if objectname==CUSTOM:
+                    if teststepproperty.custom_flag:
+                        reference_element=self.getwebelement(driver,teststepproperty.parent_xpath)
+                        if reference_element != None:
+                            reference_element = reference_element[0]
+                            if keyword==GET_OBJECT_COUNT:
+                                webelement=reference_element
+                            elif len(input)>=3:
+                                if (keyword in custom_dict and input[0].lower() in custom_dict[keyword]) or keyword in custom_dict_element.values()[0]:
+                                    webelement=self.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url)
+                                    input.reverse()
+                                    for x in range(0,3):
+                                        input.pop()
+                                else:
+                                    logger.log('Keyword and Type Mismatch')
                             else:
-                                logger.log('Keyword and Type Mismatch')
+                                logger.log('Insufficient Input to find custom object')
+                                logger.log('Custom object not found')
                         else:
-                            logger.log('Insufficient Input to find custom object')
+                            logger.log('Reference Element is null')
                             logger.log('Custom object not found')
-                    else:
-                        logger.log('Reference Element is null')
-                        logger.log('Custom object not found')
 
-            else:
-                webelement = self.getwebelement(driver,objectname)
-                if webelement != None:
-                    webelement = webelement[0]
-                    logger.log('WebElement is found')
+                else:
+                    webelement = self.getwebelement(driver,objectname)
+                    if webelement != None:
+                        webelement = webelement[0]
+                        logger.log('WebElement is found')
+            return webelement
 
 
-
+        def find_browser_info(reporting_obj):
+            #Find the browser type and browser name if driver_obj is not None
+            if browser_Keywords.driver_obj is not None:
+                browser_info=browser_Keywords.driver_obj.capabilities
+                reporting_obj.browser_version=browser_info.get('version')
+                reporting_obj.browser_type=browser_info.get('browserName')
 
 
 
@@ -211,20 +223,51 @@ class Dispatcher:
                   'navigateWithAuthenticate':self.browser_object.navigate_with_authenticate
                 }
 
-
             if keyword in dict.keys():
-                if keyword.lower()=='waitforelementvisible':
+
+                #Finding the webelement for NON_WEBELEMENT_KEYWORDS
+                if keyword not in NON_WEBELEMENT_KEYWORDS:
+                    webelement=send_webelement_to_keyword(driver,objectname,url)
+                    if webelement == None:
+                        result=constants.TERMINATE
+
+                elif keyword==WAIT_FOR_ELEMENT_VISIBLE:
                     identifiers = objectname.split(';')
                     input=identifiers[0]
-                result= dict[keyword](webelement,input)
-                if keyword == 'getInnerTable' and (output != '' and output.startswith('{') and output.endswith('}')):
-                    self.webelement_map[output]=result[2]
-                return result
+
+                if result != constants.TERMINATE:
+                    result= dict[keyword](webelement,input)
+                    if keyword == GET_INNER_TABLE and (output != '' and output.startswith('{') and output.endswith('}')):
+                        self.webelement_map[output]=result[2]
+
+                    elif keyword not in [OPEN_BROWSER,OPEN_NEW_BROWSER,CLOSE_BROWSER]:
+                        res,value=self.check_url_error_code()
+                        if res:
+                            result=constants.TERMINATE
+
+                    elif keyword==OPEN_BROWSER:
+                        find_browser_info(reporting_obj)
+
+
             else:
-                logger.log(webconstants.METHOD_INVALID)
+                logger.log(METHOD_INVALID)
         except Exception as e:
             Exceptions.error(e)
-        return 'Pass','False'
+        return result
+
+
+    def check_url_error_code(self):
+        status=False
+        value=None
+        if browser_Keywords.driver_obj != None:
+            response=requests.get(browser_Keywords.driver_obj.current_url)
+            status_code=response.status_code
+            if status_code in STATUS_CODE_DICT:
+                value=STATUS_CODE_DICT[status_code]
+                logger.log('Error code ',status_code,' : ',value)
+                status=True
+        return status,value
+
 
     def getwebelement(self,driver,objectname):
         objectname = str(objectname)
