@@ -24,38 +24,50 @@ class  JumpBy():
         self.executed=executed
         self.apptype=apptype
         self.additionalinfo=additionalinfo
+        self.parent_id=0
+        self.step_description=''
+        self.status=False
 
     def print_step(self):
         logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name)
 
 
-    def invoke_jumpby(self,input):
+    def invoke_jumpby(self,input,reporting_obj):
         try:
             index=int(self.index)
             stepToJump=int(input[0])
             tspList=handler.tspList
+            jumpByStepNum=-1
+
 
             if (stepToJump > 0) :
                 jumpByStepNum = index + 1+ stepToJump
             elif (stepToJump==0):
                 logger.log('ERR_JUMPBY_CAN''T_BE_0')
-                return -1
             else:
 				jumpByStepNum = index - 1+ stepToJump
 
 
             if jumpByStepNum<0:
                 logger.log('Invalid Input')
+                jumpByStepNum=-1
 
             elif jumpByStepNum<len(tspList):
                 flag=self.__validate_jumpbystep(jumpByStepNum)
-                return jumpByStepNum
+                self.status=True
+
             else:
+                jumpByStepNum=-1
                 logger.log('ERR_JUMPY_STEP_DOESN''T_EXISTS')
 
         except Exception as e:
             Exceptions.error(e)
-        return -1
+
+        #Reporting part
+        self.step_description='JumpBy executed and the result is '+self.status
+        self.parent_id=reporting_obj.get_pid()
+        #Reporting part ends
+        return jumpByStepNum
 
 
     def __validate_jumpbystep(self,input):

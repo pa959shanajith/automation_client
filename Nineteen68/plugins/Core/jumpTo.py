@@ -27,12 +27,16 @@ class  JumpTo():
         self.executed=executed
         self.apptype=apptype
         self.additionalinfo=additionalinfo
+        self.parent_id=0
+        self.step_description=''
+        self.status=False
 
-    def print_step(self,input):
+    def print_step(self):
         logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name)
 
     # returns jumpTo index of step to executed by taking the script name as parameter
-    def invoke_jumpto(self):
+    def invoke_jumpto(self,reporting_obj):
+        return_value=self.index+1
         try:
             tspList=handler.tspList
             flag=False
@@ -43,10 +47,16 @@ class  JumpTo():
                 if inputVal==tsp.testscript_name:
                     flag=True
                     logger.log('Target index ' +str(i))
-                    return i
+                    return_value=i
+                    self.status=True
             if(flag==False):
                 logger.log('Test script name not found')
         except Exception as e:
             Exceptions.error(e)
+
+        #Reporting part
+        self.step_description='JumpTo executed and the result is '+self.status
+        self.parent_id=reporting_obj.get_pid()
+        #Reporting part ends
         return self.index+1
 

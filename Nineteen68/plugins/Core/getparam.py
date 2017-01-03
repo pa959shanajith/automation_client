@@ -52,6 +52,8 @@ class GetParam():
         self.executed=executed
         self.apptype=apptype
         self.additionalinfo = additionalinfo
+        self.parent_id=0
+        self.step_description=''
 
     def print_step(self):
         logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
@@ -381,23 +383,51 @@ class GetParam():
         """
         return (statvariable.startswith('|') and statvariable.endswith('|'))
 
-    def performdataparam(self,input):
+    def add_report_end_iteration(self,reporting_obj,step_description,iteration_count,loop_count):
+        #Reporting part
+        self.step_description=step_description
+        self.parent_id=reporting_obj.get_pid()
+        reporting_obj.pop_pid()
+        #(iteration_count<loop_count-1) condition i smade to avoid adding of  the Iteration completed message of last iteration step twice t
+        # the report
+        #since it is added in the 'methodInvocation' in controller
+        if self.name.lower() != constants.ENDLOOP and (iteration_count<loop_count-1):
+            reporting_obj.generate_report_step(self,'',step_description,'3.00',False)
+            print 'coming here'
+        reporting_obj.remove_nested_flag()
+        #Reporting part ends
+
+    def add_report_step_getparam(self,reporting_obj,step_description):
+        #Reporting part
+        self.step_description=step_description
+        self.parent_id=reporting_obj.get_pid()
+        reporting_obj.add_pid(reporting_obj.name)
+        reporting_obj.generate_report_step(self,'',step_description,'3.00',False)
+        #Reporting part ends
+
+    def performdataparam(self,input,con,reporting_obj):
         try:
-##            input = self.inputval[0]
-            con= controller.Controller()
+
             endlopnum = self.info_dict[0].keys()[0]
+            return_value=endlopnum + 1
             self.executed=True
 
             if self.name.lower() == constants.ENDLOOP:
+                step_description='EndLoop : Data Parameterization completed'
+                #Reporting part
+                self.add_report_end_iteration(reporting_obj,step_description,0,0)
+                #Reporting part ends
                 return self.index + 1
 
             if self.name.lower() == constants.STARTLOOP:
+                self.step_description='StartLoop'
+                self.parent_id=reporting_obj.get_pid()
                 return self.index + 1
 
 
 
             if self.getparam(input) == constants.TEST_RESULT_PASS :
-##                fileinfo = input.split(';')
+                step_description='Data Parameterization started'
                 fileinfo = input
                 filepath = fileinfo[0]
                 data = self.invokegetparam(input)
@@ -444,6 +474,10 @@ class GetParam():
 
                 if startRow !=None and endRow != None:
                     print '***Data Parameterization started***'
+                    #Reporting part
+                    reporting_obj.name=constants.GETPARAM
+                    self.add_report_step_getparam(reporting_obj,step_description)
+                    #Reporting part ends
                     for i in range(startRow,endRow+1):
                         if self.name.lower()==constants.GETPARAM:
                             inputval = self.inputval[0]
@@ -451,42 +485,76 @@ class GetParam():
                             if (inputval != None):
                                 j = 0
                                 print '***Data Param: Iteration ',k, ' started***'
+                                step_description='Data Param: Iteration '+str(k)+' started'
+                                reporting_obj.name='Iteration '+str(k)
+                                self.add_report_step_getparam(reporting_obj,step_description)
                                 iterations = len(data.values()[0])
-                                while (paramindex <= endlopnum):
+                                while (paramindex < endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,i-1)
                                     paramindex =con.methodinvocation(paramindex,input)
                                     if paramindex in [constants.TERMINATE,constants.BREAK_POINT]:
                                         return paramindex
                                 print '***Data Param: Iteration ',k, ' completed***\n\n'
+                                #Reporting part
+                                step_description='Data Param: Iteration '+str(k)+' completed'
+                                reporting_obj.name='Iteration '+str(k)
+                                self.add_report_end_iteration(reporting_obj,step_description,k,endRow+1)
+                                #Reporting part ends
                                 k = k + 1
-                    return paramindex
                     print '***Data Parameterization completed***'
+                    return_value=paramindex
+
                 elif filter != None:
                     print '***Data Parameterization started***'
+                    #Reporting part
+                    reporting_obj.name=constants.GETPARAM
+                    self.add_report_step_getparam(reporting_obj,step_description)
+                    #Reporting part ends
                     if self.name.lower()==constants.GETPARAM:
                         inputval = self.inputval[0]
                         paramindex = self.index+1;
                         if (inputval != None):
                             print '***Data Param: Iteration ',k, ' started***'
+                            #Reporting part
+                            step_description='Data Param: Iteration '+str(k)+' started'
+                            reporting_obj.name='Iteration '+str(k)
+                            self.add_report_step_getparam(reporting_obj,step_description)
+                            #Reporting part ends
                             iterations = len(data.values()[0])
-                            while (paramindex <= endlopnum):
+                            while (paramindex < endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,filter-1)
                                     paramindex =con.methodinvocation(paramindex,input)
                                     if paramindex in [constants.TERMINATE,constants.BREAK_POINT]:
                                         return paramindex
                             print '***Data Param: Iteration ',k, ' completed***\n\n'
+                            #Reporting part
+                            step_description='Data Param: Iteration '+str(k)+' completed'
+                            reporting_obj.name='Iteration '+str(k)
+                            self.add_report_end_iteration(reporting_obj,step_description,k,k)
+                            #Reporting part ends
                             k = k + 1
                     print '***Data Parameterization completed***'
-                    return paramindex
+
+                    return_value=paramindex
 
                 else:
                     print '***Data Parameterization started***'
-                    for i in range(len(data.values()[0])):
+                    #Reporting part
+                    reporting_obj.name=constants.GETPARAM
+                    self.add_report_step_getparam(reporting_obj,step_description)
+                    #Reporting part ends
+                    count=len(data.values()[0])
+                    for i in range(count):
                         if self.name.lower()==constants.GETPARAM:
                             inputval = self.inputval[0]
                             paramindex = self.index+1;
                             if (inputval != None):
                                 print '***Data Param: Iteration ',k, ' started***'
+                                #Reporting part
+                                reporting_obj.name='Iteration '+str(k)
+                                step_description='Data Param: Iteration '+str(k)+' started'
+                                self.add_report_step_getparam(reporting_obj,step_description)
+                                #Reporting part ends
                                 iterations = len(data.values()[0])
                                 print 'Iterations : ',iterations
                                 while (paramindex < endlopnum):
@@ -495,19 +563,35 @@ class GetParam():
                                     if paramindex in [constants.TERMINATE,constants.BREAK_POINT]:
                                         return paramindex
                                 print '***Data Param: Iteration ',k, ' completed***\n\n'
+                                #Reporting part
+                                step_description='Data Param: Iteration '+str(k)+' completed'
+                                reporting_obj.name='Iteration '+str(k)
+                                self.add_report_end_iteration(reporting_obj,step_description,k,count)
+                                #Reporting part ends
                                 k = k + 1
 
                     print '***Data Parameterization completed***'
-                    return paramindex
+                    return_value=paramindex
             else:
-                print 'Data parameterization failed'
+                print 'Data parameterization failed : Wrong file name/ Sheet name given'
                 print 'Wrong file name/ Sheet name given, Please check and provide valid one'
-                return endlopnum + 1
+                #Reporting part
+                step_description='Data Parameterization failed'
+                self.add_report_step_getparam(reporting_obj,step_description)
+                #Reporting part ends
+
         except Exception as e:
             print 'Data parameterization failed'
             print 'Wrong filters given, please check and provide correct one'
+            #Reporting part
+            step_description='Data Parameterization failed : Wrong filters given'
+            self.add_report_end_iteration(reporting_obj,step_description,0,0)
+            #Reporting part ends
+
             Exceptions.error(e)
-            return endlopnum + 1
+
+
+        return return_value
 
 
 
