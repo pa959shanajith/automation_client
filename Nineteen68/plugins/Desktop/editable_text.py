@@ -145,6 +145,7 @@ class Text_Box:
 
     def verify_parent(self,element,parent):
         try:
+            desktop_constants.ELEMENT_FOUND=False
             real_parent=ldtp.getobjectproperty(launch_keywords.window_name,element,'parent')
             parent=parent.strip()
             if(parent == 'pagetitle'):
@@ -156,11 +157,11 @@ class Text_Box:
             real_parent = real_parent.replace(' ','')
             parent = parent.replace(' ','')
             if(real_parent == parent):
-                return True
+                desktop_constants.ELEMENT_FOUND=True
             else:
                 logger.log('verify parent is false')
-                return False
         except Exception as e:
             Exceptions.error(e)
+        return desktop_constants.ELEMENT_FOUND
 
 

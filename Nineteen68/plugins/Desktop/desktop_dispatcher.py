@@ -20,6 +20,7 @@ import logger
 import desktop_constants
 import radio_checkbox_keywords_desktop
 import outlook
+import constants
 
 class DesktopDispatcher:
     button_link_keywords_obj = button_link_keywords_desktop.ButtonLinkKeyword()
@@ -39,6 +40,7 @@ class DesktopDispatcher:
         objectname = objectname.strip()
         keyword = teststepproperty.name
         url = teststepproperty.url
+        result=(desktop_constants.TEST_RESULT_FAIL,desktop_constants.TEST_RESULT_FALSE)
 ##        if objectname != '@Browser' or objectname != '@BrowserPopUp' or objectname != '@Custom':
 
 
@@ -111,15 +113,20 @@ class DesktopDispatcher:
             keyword=keyword.lower()
             if keyword in dict.keys():
                 if keyword=='launchapplication' or keyword in email_dict.keys() :
-                    return dict[keyword](input,output)
+                    result= dict[keyword](input,output)
                 else:
                     self.launch_keywords_obj.verifyWindowTitle()
-                    return dict[keyword](objectname,url,input,output)
+                    result= dict[keyword](objectname,url,input,output)
+
+                if not(desktop_constants.ELEMENT_FOUND):
+                    result=constants.TERMINATE
             else:
                 logger.log(desktop_constants.INVALID_KEYWORD)
         except Exception as e:
             print 'Exception at dispatcher'
             Exceptions.error(e)
+
+        return result
 
 
 
