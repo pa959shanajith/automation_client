@@ -16,7 +16,7 @@ from generic_constants import *
 import Exceptions
 from loggermessages import *
 import logging
-
+from constants import *
 from lxml import etree
 log = logging.getLogger('xml_operations.py')
 class XMLOperations():
