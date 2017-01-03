@@ -105,7 +105,7 @@ ERROR_CODE_DICT ={
                     'ERR_OBJECTUNSELECTED':'Element already Unselected',
                     'MSG_SELECETED':'The Selected values are :',
                     'MSG_ELEMENT_NOT_FOUND':'Element not found.',
-                    'ERR_OBJECT_ENABLED':'The object is enabled.',
+                    'MSB_OBJECT_ENABLED':'The object is enabled.',
                     'ERR_OBJECT_DISABLED':'The object is disabled.',
                     'ERR_UNABLE_TO_SELECT':'Unable to select.',
                     'ERR_CURRENT_STATE':'The current operation cannot be performed because of the object state.',
@@ -171,7 +171,8 @@ ERROR_CODE_DICT ={
                     'ERR_EMPTY_STACK_EVAL_EXCEPTION': 'Input error:Verify syntax.',
 
                     'ERR_PARSE_EXCEPTION': 'Input Error:Please provide valid input.',
-
+                    'ERR_INVALID_OPERATION': 'Invalid input: Operation name invalid or missing.',
+                    'ERR_INVALID_HEADER': 'Invalid input: Header name invalid or missing.',
                     'ERR_INVALID_METHOD': 'Invalid input: Method name invalid or missing.',
                     'ERR_INVALID_END_POINT_URL': 'Invalid input: End Point URL is invalid or missing.',
                     'ERR_VALUE_NOT_FETCHED': 'Sorry! Values could not be fetched.',

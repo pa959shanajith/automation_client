@@ -112,11 +112,20 @@ class PopupKeywords():
             logger.print_on_console('Input text : ' , input)
             log.info('Input text= '+ str( input))
             if text == input:
-                logger.print_on_console('Text matched')
-                log.info('Text matched')
+                logger.print_on_console('Alert Text matched')
+                log.info('Alert Text matched')
                 log.info(STATUS_METHODOUTPUT_UPDATE)
                 status = webconstants.TEST_RESULT_PASS
                 methodoutput = webconstants.TEST_RESULT_TRUE
+            else:
+                logger.print_on_console('Alert Text mismatched')
+                log.info('Alert Text mismatched')
+                logger.print_on_console('Expected: ',text)
+                log.info('Expected:')
+                log.info(text)
+                logger.print_on_console('Actual: ',input)
+                log.info('Actual:')
+                log.info(input)
         except Exception as e:
             logger.print_on_console(EXCEPTION_OCCURED,e)
             log.error(EXCEPTION_OCCURED)

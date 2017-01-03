@@ -207,8 +207,14 @@ class ButtonLinkKeyword():
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
                         else:
-                            log.error('Link text does not matched with the input, set the status to Fail')
-                            logger.print_on_console('Link Text not matched')
+                            logger.print_on_console('Link Text mismatched')
+                            log.info('Link Text mismatched')
+                            logger.print_on_console('Expected: ',text)
+                            log.info('Expected:')
+                            log.info(text)
+                            logger.print_on_console('Actual: ',input)
+                            log.info('Actual:')
+                            log.info(input)
 ##                            status = webconstants.TEST_RESULT_FAIL
 ##                            methodoutput = webconstants.TEST_RESULT_FAIL
                 else:
