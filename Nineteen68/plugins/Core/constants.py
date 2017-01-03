@@ -248,5 +248,29 @@ ERROR_CODE_DICT ={
                 }
 
 
+#Reporting constants
 
+ROWS='rows'
+
+OVERALLSTATUS='overallstatus'
+
+ID='id'
+
+PARENT_ID='parentId'
+
+STATUS='status'
+
+STEP='Step'
+
+COMMENTS='Comments'
+
+STEP_DESCRIPTION='StepDescription'
+
+ELLAPSED_TIME='ellapsedTime'
+
+STEP='Step '
+
+KEYWORD='Keyword'
+
+TEST_SCRIPT_NAME='Testscriptname'
 
