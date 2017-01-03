@@ -105,7 +105,7 @@ ERROR_CODE_DICT ={
                     'ERR_OBJECTUNSELECTED':'Element already Unselected',
                     'MSG_SELECETED':'The Selected values are :',
                     'MSG_ELEMENT_NOT_FOUND':'Element not found.',
-                    'ERR_OBJECT_ENABLED':'The object is enabled.',
+                    'MSB_OBJECT_ENABLED':'The object is enabled.',
                     'ERR_OBJECT_DISABLED':'The object is disabled.',
                     'ERR_UNABLE_TO_SELECT':'Unable to select.',
                     'ERR_CURRENT_STATE':'The current operation cannot be performed because of the object state.',
