@@ -45,6 +45,7 @@ class ElementKeywords:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         text=None
+        err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -56,15 +57,18 @@ class ElementKeywords:
                status=TEST_RESULT_PASS
                methodoutput=TEST_RESULT_TRUE
             except Exception as e:
-                logger.print_on_console(EXCEPTION_OCCURED,e)
-                log.error(EXCEPTION_OCCURED)
                 log.error(e)
+                log.error(e.msg)
+                logger.print_on_console(e.msg)
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         log.info(RETURN_RESULT)
-        return status,methodoutput,text
+        return status,methodoutput,text,err_msg
 
     def verify_element_text(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTAN
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -88,18 +92,22 @@ class ElementKeywords:
                         log.info(input)
                 else:
                     log.error(INVALID_INPUT)
+                    err_msg=INVALID_INPUT
                     logger.print_on_console(INVALID_INPUT)
             except Exception as e:
-                logger.print_on_console(EXCEPTION_OCCURED,e)
-                log.error(EXCEPTION_OCCURED)
                 log.error(e)
+                log.error(e.msg)
+                logger.print_on_console(e.msg)
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
     def click_element(self,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTAN
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -113,18 +121,22 @@ class ElementKeywords:
                     methodoutput=TEST_RESULT_TRUE
                 else:
                     log.error(ERR_DISABLED_OBJECT)
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
                     logger.print_on_console(ERR_DISABLED_OBJECT)
             except Exception as e:
-                logger.print_on_console(EXCEPTION_OCCURED,e)
-                log.error(EXCEPTION_OCCURED)
                 log.error(e)
+                log.error(e.msg)
+                logger.print_on_console(e.msg)
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
     def drag(self,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTAN
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -152,18 +164,22 @@ class ElementKeywords:
                     methodoutput=TEST_RESULT_TRUE
                 else:
                     log.error(ERR_DISABLED_OBJECT)
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
                     logger.print_on_console(ERR_DISABLED_OBJECT)
             except Exception as e:
-                logger.print_on_console(EXCEPTION_OCCURED,e)
-                log.error(EXCEPTION_OCCURED)
                 log.error(e)
+                log.error(e.msg)
+                logger.print_on_console(e.msg)
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
     def drop(self,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTAN
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -192,42 +208,48 @@ class ElementKeywords:
                     methodoutput=TEST_RESULT_TRUE
                 else:
                     log.error(ERR_DISABLED_OBJECT)
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
                     logger.print_on_console(ERR_DISABLED_OBJECT)
             except Exception as e:
-                logger.print_on_console(EXCEPTION_OCCURED,e)
-                log.error(EXCEPTION_OCCURED)
                 log.error(e)
+                log.error(e.msg)
+                logger.print_on_console(e.msg)
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
 
     def get_tooltip_text(self,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         tool_tip=None
+        err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
                tool_tip=self.__get_tooltip(webelement)
                if tool_tip is not None and tool_tip != '':
                    log.info('Tool tip text: ')
-                   log.info(+tool_tip)
+                   log.info(tool_tip)
                    log.info(STATUS_METHODOUTPUT_UPDATE)
                    status=TEST_RESULT_PASS
                    methodoutput=TEST_RESULT_TRUE
             except Exception as e:
-                logger.print_on_console(EXCEPTION_OCCURED,e)
-                log.error(EXCEPTION_OCCURED)
                 log.error(e)
+                log.error(e.msg)
+                logger.print_on_console(e.msg)
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
-        return status,methodoutput,tool_tip
+        return status,methodoutput,tool_tip,err_msg
 
 
     def verify_tooltip_text(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTAN
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -251,19 +273,23 @@ class ElementKeywords:
                         log.info(input)
                 else:
                     log.error(INVALID_INPUT)
+                    err_msg=INVALID_INPUT
                     logger.print_on_console(INVALID_INPUT)
             except Exception as e:
-                logger.print_on_console(EXCEPTION_OCCURED,e)
-                log.error(EXCEPTION_OCCURED)
                 log.error(e)
+                log.error(e.msg)
+                logger.print_on_console(e.msg)
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
     def waitforelement_visible(self,webelement,objectname,*args):
         import browser_Keywords
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTAN
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if objectname is not None:
@@ -281,14 +307,16 @@ class ElementKeywords:
                 methodoutput=TEST_RESULT_TRUE
         except TimeoutException as e:
             logger.print_on_console('Delay timeout exceeded')
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg='Delay timeout exceeded'
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
-        return status,methodoutput
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        return status,methodoutput,output,err_msg
 
 
 
