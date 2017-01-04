@@ -32,6 +32,8 @@ class ButtonLinkKeyword():
         log.debug(driver)
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         #click keyword implementation
         try:
@@ -79,16 +81,20 @@ class ButtonLinkKeyword():
                             methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
                     log.info(WEB_ELEMENT_DISABLED)
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
     def verify_button_name(self,webelement,inputs,*args):
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         #verify_button_name keyword implementation
         try:
@@ -134,17 +140,19 @@ class ButtonLinkKeyword():
                         logger.print_on_console('Button name not matched')
                 else:
                     log.error(INVALID_INPUT)
+                    err_msg=INVALID_INPUT
                     logger.print_on_console(INVALID_INPUT)
 ##            else:
 ##                log.info('Please pass the valid web element')
 ##            logger.print_on_console('Keyword result: ' + status)
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
     def get_link_text(self,webelement,input,*args):
         #get_link_text keyword implementation
@@ -152,6 +160,7 @@ class ButtonLinkKeyword():
         methodoutput = webconstants.TEST_RESULT_FALSE
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         linktext = ''
+        err_msg = None
         try:
             if webelement != None:
                 log.info('Recieved web element from the web dispatcher')
@@ -175,17 +184,20 @@ class ButtonLinkKeyword():
 ##            print 'Keyword result: ',status
 
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
-        return status,methodoutput,linktext
+        return status,methodoutput,linktext,err_msg
 
     def verify_link_text(self,webelement,inputs,*args):
         #verify_link_text keyword implementation
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement != None:
@@ -219,23 +231,27 @@ class ButtonLinkKeyword():
 ##                            methodoutput = webconstants.TEST_RESULT_FAIL
                 else:
                     log.error(INVALID_INPUT)
+                    err_msg=INVALID_INPUT
                     logger.print_on_console(INVALID_INPUT)
 ##            else:
 ##                logger.print_on_console('Element not found')
 ##            print 'Keyword result: ',status
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
 
         #return status and methodoutput
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,
 
     #Below keyword specifically written for to support mnt CBU
     def press(self,webelement,input,*args):
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
        #press keyword implementation
         try:
@@ -253,17 +269,22 @@ class ButtonLinkKeyword():
                     methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
                     log.info(WEB_ELEMENT_DISABLED)
+                    err_msg = WEB_ELEMENT_DISABLED
+                    logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
     def double_click(self,webelement,input,*args):
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
        #double_click keyword implementation
         try:
@@ -279,17 +300,22 @@ class ButtonLinkKeyword():
                     methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
                     log.info(WEB_ELEMENT_DISABLED)
+                    err_msg = WEB_ELEMENT_DISABLED
+                    logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
     def right_click(self,webelement,input,*args):
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
        #right_click keyword implementation
         try:
@@ -305,17 +331,22 @@ class ButtonLinkKeyword():
                     methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
                     log.info(WEB_ELEMENT_DISABLED)
+                    err_msg = WEB_ELEMENT_DISABLED
+                    logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
     def upload_file(self,webelement,inputs,*args):
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         #upload_file keyword implementation
         try:
@@ -345,13 +376,16 @@ class ButtonLinkKeyword():
                             methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
                     log.info(WEB_ELEMENT_DISABLED)
+                    err_msg = WEB_ELEMENT_DISABLED
+                    logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
     def __upload_operation(self,inputfile):
         status = False

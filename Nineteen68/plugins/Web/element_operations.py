@@ -68,7 +68,7 @@ class ElementKeywords:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTAN
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -107,7 +107,7 @@ class ElementKeywords:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTAN
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -136,7 +136,7 @@ class ElementKeywords:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTAN
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -179,7 +179,7 @@ class ElementKeywords:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTAN
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -249,7 +249,7 @@ class ElementKeywords:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTAN
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -289,7 +289,7 @@ class ElementKeywords:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTAN
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if objectname is not None:
