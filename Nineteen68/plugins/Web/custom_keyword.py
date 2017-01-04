@@ -12,10 +12,12 @@
 import logger
 import browser_Keywords
 from webconstants import *
-import constants
+from constants import *
 from selenium.common.exceptions import *
 import Exceptions
 import logging
+
+
 log = logging.getLogger('custom_keyword.py')
 
 class CustomKeyword:
@@ -68,16 +70,17 @@ class CustomKeyword:
                     j = i.rstrip(i[-1:])
                     if i[-1:] == 'i':
                         frame_iframe = 'iframe'
-                        logger.print_on_console('It is  iframe')
-                    else:
-                        logger.print_on_console('It is  frame')
+                    logger.print_on_console('It is '+frame_iframe)
                     if j=='':
                         continue
                     browser_Keywords.driver_obj.switch_to.frame(browser_Keywords.driver_obj.find_elements_by_tag_name(frame_iframe)[int(j)])
-
-            logger.print_on_console('Control switched to frame/iframe '+input_url)
+            log_msg='Control switched to frame/iframe '+input_url
+            logger.print_on_console(log_msg)
+            log.info(log_msg)
         except WebDriverException as e:
-            logger.print_on_console('Control failed to switched to frame/iframe '+input_url)
+            err_msg='Control failed to switched to frame/iframe '+input_url
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
 
 
 
@@ -85,19 +88,20 @@ class CustomKeyword:
         return_list=browser_Keywords.driver_obj.execute_script(CUSTOM_JS,'', array_index, ele_type, visible_text, ele_index,local_index)
         if return_list[0] == 'null':
 			return None
-        elif return_list[0] == 'found':
-            logger.print_on_console('Element is found')
+        elif return_list[0] == FOUND:
+            logger.print_on_console(WEB_ELEMENT_FOUND)
             return return_list[4]
         elif return_list[0] == 'stf':
-            logger.print_on_console('Debug : Inside iframe')
+            log.debug('Inside iframe/frame')
             iframe_ele=return_list[1]
             browser_Keywords.driver_obj.switch_to.frame(iframe_ele)
 
             iframe_list = browser_Keywords.driver_obj.execute_script(CUSTOM_IFRAME_JS,'', 0,ele_type, visible_text, ele_index,return_list[2])
             return_list[2]=iframe_list[2]
-            if iframe_list[0]=='found':
-			  logger.print_on_console('Element is found inside iframe ')
-			  return iframe_list[4]
+            if iframe_list[0]==FOUND:
+                logger.print_on_console(WEB_ELEMENT_FOUND_INSIDE_IFRAME)
+                log.info(WEB_ELEMENT_FOUND_INSIDE_IFRAME)
+                return iframe_list[4]
             if self.is_int(url):
                 self.switch_to_iframe(url,"");
             else:
@@ -111,16 +115,24 @@ class CustomKeyword:
 
     def getCustomobject(self,reference_ele,ele_type,visible_text,ele_index,url):
         custom_element=None
-        logger.print_on_console('Element type is '+str(ele_type))
-        logger.print_on_console('Visible text is '+str(visible_text))
-        logger.print_on_console('Index is '+str(ele_index))
+        msg1='Element type is '+str(ele_type)
+        msg2='Visible text is '+str(visible_text)
+        msg3='Index is '+str(ele_index)
+
+        logger.print_on_console(msg1)
+        log.info(msg1)
+        logger.print_on_console(msg2)
+        log.info(msg1)
+        logger.print_on_console(msg3)
+        log.info(msg3)
+
         if not(ele_type is None or ele_type=='' or visible_text is None or ele_index is None):
             ele_xpath=self.getElementXPath(reference_ele)
             logger.print_on_console('Debug: reference_ele_xpath is'+str(ele_xpath))
             try:
                 ele_index=int(ele_index)
                 if ele_index<0:
-                    logger.print_on_console('Element index should be positive ')
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_NEGATIVE_ELEMENT_INDEX'])
                 else:
                     ele_type=ele_type.lower()
                     if ele_type in self.tagtype.keys():
@@ -128,32 +140,38 @@ class CustomKeyword:
                     array_index=browser_Keywords.driver_obj.execute_script(FIND_INDEX_JS,reference_ele)
                     custom_element=self.find_object(array_index, ele_type, visible_text, url, ele_index,0);
                     if custom_element is not None:
-                        logger.print_on_console('Custom object is found')
+                        logger.print_on_console(MSG_CUSTOM_FOUND)
+                        log.info(MSG_CUSTOM_FOUND)
                     else:
-                        logger.print_on_console('Custom object not found')
+                        logger.print_on_console(ERROR_CODE_DICT['ERR_CUSTOM_NOTFOUND'])
+                        log.info(ERROR_CODE_DICT['ERR_CUSTOM_NOTFOUND'])
 
 
 
             except ValueError:
-                logger.print_on_console('Invalid element index')
+                log.error(INVALID_INPUT)
+                logger.print_on_console(ERROR_CODE_DICT['ERR_NUMBER_FORMAT_EXCEPTION'])
 
         else:
-            logger.print_on_console('Invalid input')
+            logger.print_on_console(INVALID_INPUT)
         return custom_element
 
 
     def get_object_count(self,reference_ele,ele_type):
-        status=constants.TEST_RESULT_FAIL
-        methodoutput=constants.TEST_RESULT_FALSE
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
         count=None
         ele_type=ele_type[0]
-        logger.print_on_console('Element type is '+str(ele_type))
+        err_msg=None
+        msg1='Element type is '+str(ele_type)
+        logger.print_on_console(msg1)
+        log.info(msg1)
         try:
 
             if not(ele_type is None or ele_type==''):
                 ele_type=str(ele_type)
                 ele_xpath=self.getElementXPath(reference_ele)
-                logger.print_on_console('Debug: reference_ele_xpath is'+str(ele_xpath))
+                log.debug('reference_ele_xpath is'+str(ele_xpath))
 
                 ele_type=ele_type.lower()
                 if ele_type in self.tagtype.keys():
@@ -169,24 +187,33 @@ class CustomKeyword:
 
                 if count is not None:
                     logger.print_on_console('Number of objects found is ',count)
-                    status=constants.TEST_RESULT_PASS
-                    methodoutput=constants.TEST_RESULT_TRUE
+                    log.info('Number of objects found is ')
+                    log.info(count)
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
                 else:
                     logger.print_on_console('Count is ',count)
+                    log.info('Count is ')
+                    log.info(count)
 
             else:
-                logger.print_on_console('Invalid input')
+                logger.print_on_console(INVALID_INPUT)
+                err_msg=INVALID_INPUT
+                log.error(INVALID_INPUT)
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
 
-        return status,methodoutput,count
+
+        return status,methodoutput,count,err_msg
 
     def get_count(self,counter,ele_type,index):
         result=browser_Keywords.driver_obj.execute_script(GET_OBJECT_COUNT_JS,counter,ele_type,index,self.list_flag)
         counter=result[0]
         index=result[2]
         index=index+1
-
         if len(result)>3:
             if result[3]=='done':
                 return counter
@@ -202,12 +229,13 @@ class CustomKeyword:
 
     def get_count_iframe(self,iframe_ele,counter,ele_type):
 
-		browser_Keywords.driver_obj.switch_to.frame(iframe_ele)
-		req_elements = None
-		index=0
-		counter=self.get_count(counter, ele_type,index, self.list_flag)
-		browser_Keywords.driver_obj.switch_to.parent_frame()
-		return counter
+        log.debug('Inside get_count_iframe method')
+        browser_Keywords.driver_obj.switch_to.frame(iframe_ele)
+        req_elements = None
+        index=0
+        counter=self.get_count(counter, ele_type,index, self.list_flag)
+        browser_Keywords.driver_obj.switch_to.parent_frame()
+        return counter
 
 
 
@@ -216,7 +244,9 @@ class CustomKeyword:
         try:
             return browser_Keywords.driver_obj.execute_script(GET_XPATH_SCRIPT,webelement)
         except Exception as e:
-            logger.print_on_console('Exception occurred in getElementXPath ')
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
 
 
 
