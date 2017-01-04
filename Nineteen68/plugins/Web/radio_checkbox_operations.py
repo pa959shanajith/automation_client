@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        radio_checkbox_operations.py
 # Purpose:
 #
 # Author:      sushma.p
@@ -10,13 +10,16 @@
 #-------------------------------------------------------------------------------
 
 import selenium
-import Exceptions
-from webconstants import *
 import logger
 import browser_Keywords
 from utilweb_operations import UtilWebKeywords
 import table_keywords
 import webconstants
+from constants import *
+import logging
+
+log = logging.getLogger('radio_checkbox_operations.py')
+
 class RadioCheckboxKeywords():
 
     def __init__(self):
@@ -28,39 +31,50 @@ class RadioCheckboxKeywords():
     def select_radiobutton(self,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
         visibilityFlag=True
+        err_msg=None
         if webelement is not None:
             try:
                 if webelement.is_enabled():
+                    log.debug(WEB_ELEMENT_ENABLED)
                     is_visible=self.utilobj.is_visible(webelement)
                     if len(args)>0:
                         visibilityFlag=args[0]
-                        if not(visibilityFlag and is_visible):
-                            browser_Keywords.driver_obj.execute_script(CLICK_RADIO_CHECKBOX,webelement)
-                        else:
-                            webelement.click()
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                    if not(visibilityFlag and is_visible):
+                        browser_Keywords.driver_obj.execute_script(webconstants.CLICK_RADIO_CHECKBOX,webelement)
+                    else:
+                        webelement.click()
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
                 else:
-                    logger.print_on_console('Element is disabled')
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
+                    logger.print_on_console(err_msg)
             except Exception as e:
-                    Exceptions.error(e)
-        return status,methodoutput
+                log.error(e)
+                log.error(e.msg)
+                logger.print_on_console(e.msg)
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+
+        return status,methodoutput,output,err_msg
 
 
     def select_checkbox(self,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         visibilityFlag=True
+        output=OUTPUT_CONSTANT
+        err_msg=None
         if webelement is not None:
             try:
                 if webelement.is_enabled():
+                    log.debug(WEB_ELEMENT_ENABLED)
                     if not(webelement.is_selected()):
                         is_visble=self.utilobj.is_visible(webelement)
                         if len(args)>0:
                             visibilityFlag=args[0]
                         if not(visibilityFlag and is_visble ):
-                            browser_Keywords.driver_obj.execute_script(CLICK_RADIO_CHECKBOX,webelement)
+                            browser_Keywords.driver_obj.execute_script(webconstants.CLICK_RADIO_CHECKBOX,webelement)
                         else:
                             webelement.click()
                         status=TEST_RESULT_PASS
@@ -68,25 +82,33 @@ class RadioCheckboxKeywords():
                     else:
                         logger.print_on_console('Checkbox is already selected')
                 else:
-                    logger.print_on_console('Element is disabled')
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
+                    logger.print_on_console(err_msg)
             except Exception as e:
-                    Exceptions.error(e)
-        return status,methodoutput
+                log.error(e)
+                log.error(e.msg)
+                logger.print_on_console(e.msg)
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+
+        return status,methodoutput,output,err_msg
 
 
     def unselect_checkbox(self,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         visibilityFlag=True
+        output=OUTPUT_CONSTANT
+        err_msg=None
         if webelement is not None:
             try:
                 if webelement.is_enabled():
+                    log.debug(WEB_ELEMENT_ENABLED)
                     if webelement.is_selected():
                         is_visible=self.utilobj.is_visible(webelement)
                         if len(args)>0:
                             visibilityFlag=args[0]
                         if not(visibilityFlag and is_visible ):
-                            browser_Keywords.driver_obj.execute_script(CLICK_RADIO_CHECKBOX,webelement)
+                            browser_Keywords.driver_obj.execute_script(webconstants.CLICK_RADIO_CHECKBOX,webelement)
                         else:
                             webelement.click()
                         status=TEST_RESULT_PASS
@@ -94,15 +116,21 @@ class RadioCheckboxKeywords():
                     else:
                         logger.print_on_console('Checkbox is already Unselected')
                 else:
-                    logger.print_on_console('Element is disabled')
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
+                    logger.print_on_console(err_msg)
             except Exception as e:
-                    Exceptions.error(e)
-        return status,methodoutput
+                log.error(e)
+                log.error(e.msg)
+                logger.print_on_console(e.msg)
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        return status,methodoutput,output,err_msg
 
     def get_status(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         visibilityFlag=True
+        output=OUTPUT_CONSTANT
+        err_msg=None
         status=None
         if webelement is not None:
             try:
@@ -112,25 +140,30 @@ class RadioCheckboxKeywords():
                     elif len(input)==3:
                         temp_status=self.__fetch_status_array(webelement,input)
                         status=temp_status[0]
-##                        status=TEST_RESULT_PASS
                 if status==None and webelement!=None:
                     status,methodoutput=self.__fetch_status(webelement)
-##                logger.print_on_console('Status is:'+status)
+
             except Exception as e:
-                    Exceptions.error(e)
-        return status,methodoutput
+                log.error(e)
+                log.error(e.msg)
+                logger.print_on_console(e.msg)
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        return status,methodoutput,output,err_msg
 
     def __fetch_status(self,webelement,*args):
         try:
-            type=webelement.get_attribute('type').lower();
+            input_type=webelement.get_attribute('type').lower();
+            log.debug('Type is '+input_type)
             if webelement.is_selected():
-                status=self.status[type]
+                status=self.status[input_type]
                 methodoutput=TEST_RESULT_TRUE
             else:
-                status='Un'+self.status[type].lower()
+                status='Un'+self.status[input_type].lower()
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         return status,methodoutput
 
     def __fetch_status_array(self,webelement,input):
@@ -145,6 +178,7 @@ class RadioCheckboxKeywords():
             cell=driver.execute_script(webconstants.GET_CELL_JS,webelement,row_num-1,col_num-1)
             element_list=cell.find_elements_by_xpath('.//*')
             if tag_name=='radio' or tag_name=='checkbox':
+                log.debug('Tagname is',tag_name)
                 for element in element_list:
                     element_xpath=driver.execute_script(webconstants.GET_XPATH_JS,element)
                     child=driver.find_element_by_xpath(element_xpath)
@@ -157,8 +191,10 @@ class RadioCheckboxKeywords():
                             status_list.append(self.__fetch_status(child))
 
         except Exception as e:
-            Exceptions.error(e)
-        print status_list
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+        log.debug(status_list)
         return status_list
 
     def getActualElement(self,element,input):
@@ -232,6 +268,8 @@ class RadioCheckboxKeywords():
                     actualElement=cellChild
                     break
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
 
         return actualElement
