@@ -121,7 +121,7 @@ class DesktopDispatcher:
                 if not(desktop_constants.ELEMENT_FOUND):
                     result=constants.TERMINATE
             else:
-                logger.log(desktop_constants.INVALID_KEYWORD)
+                logger.print_on_console(desktop_constants.INVALID_KEYWORD)
         except Exception as e:
             print 'Exception at dispatcher'
             Exceptions.error(e)

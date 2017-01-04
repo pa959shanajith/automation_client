@@ -34,7 +34,7 @@ class Util_Keywords():
                             result=desktop_constants.TEST_RESULT_TRUE
                             return status,result
                     else:
-                        logger.log('element not found')
+                        logger.print_on_console('element not found')
             except Exception as e:
                 Exceptions.error(e)
             return status,result
@@ -53,7 +53,7 @@ class Util_Keywords():
                             result=desktop_constants.TEST_RESULT_TRUE
                             return status,result
                     else:
-                        logger.log('element not found')
+                        logger.print_on_console('element not found')
             except Exception as e:
                 Exceptions.error(e)
             return status,result
@@ -72,7 +72,7 @@ class Util_Keywords():
                                 result=desktop_constants.TEST_RESULT_TRUE
                                 return status,result
                         else:
-                            logger.log('element not found')
+                            logger.print_on_console('element not found')
                 except Exception as e:
                     Exceptions.error(e)
                 return status,result
@@ -91,7 +91,7 @@ class Util_Keywords():
                                 result=desktop_constants.TEST_RESULT_TRUE
                                 return status,result
                         else:
-                            logger.log('element not found')
+                            logger.print_on_console('element not found')
                 except Exception as e:
                     Exceptions.error(e)
                 return status,result
@@ -110,7 +110,7 @@ class Util_Keywords():
                                 result=desktop_constants.TEST_RESULT_TRUE
                                 return status,result
                         else:
-                            logger.log('element not found')
+                            logger.print_on_console('element not found')
                 except Exception as e:
                     Exceptions.error(e)
                 return status,result
@@ -131,7 +131,7 @@ class Util_Keywords():
                                     result=desktop_constants.TEST_RESULT_TRUE
                                     return status,result
                         else:
-                            logger.log('element not found')
+                            logger.print_on_console('element not found')
                 except Exception as e:
                     Exceptions.error(e)
                 return status,result
@@ -157,7 +157,7 @@ class Util_Keywords():
                                 result=desktop_constants.TEST_RESULT_TRUE
                                 return status,result
                         else:
-                            logger.log('element not found')
+                            logger.print_on_console('element not found')
                 except Exception as e:
                     Exceptions.error(e)
                 return status,result

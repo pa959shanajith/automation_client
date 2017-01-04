@@ -41,7 +41,7 @@ class OutlookKeywords:
             status=desktop_constants.TEST_RESULT_FAIL
             method_output=desktop_constants.TEST_RESULT_FALSE
             try:
-                logger.log('switching to the folder')
+                logger.print_on_console('switching to the folder')
                 folderPath=input[0]
                 folderPath=folderPath.strip('\\')
                 folders=folderPath.split('\\')
@@ -66,17 +66,17 @@ class OutlookKeywords:
                                         self.targetFolder=self.findFolder(foldername,folder)
                                     index+=1
                                 if(self.targetFolder==None):
-                                    logger.log('Unable to find the target folder')
+                                    logger.print_on_console('Unable to find the target folder')
                                     break
                                 else:
-                                    logger.log('Switched to folder')
+                                    logger.print_on_console('Switched to folder')
                                     status=desktop_constants.TEST_RESULT_PASS
                                     method_output=desktop_constants.TEST_RESULT_TRUE
 
                             else:
-                                logger.log('The given path is invalid')
+                                logger.print_on_console('The given path is invalid')
                 else:
-                    logger.log('Check the path given')
+                    logger.print_on_console('Check the path given')
             except Exception as e:
                 Exceptions.error(e)
             return status,method_output
@@ -135,7 +135,7 @@ class OutlookKeywords:
                         else :
                             continue
                 if self.Flag!=True:
-                    logger.log('Error: No such mail found')
+                    logger.print_on_console('Error: No such mail found')
             except Exception as e:
                 Exceptions.error(e)
             return status,method_output
@@ -150,7 +150,7 @@ class OutlookKeywords:
                     status=desktop_constants.TEST_RESULT_PASS
                     method_output=desktop_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log('Error : No such mail id found')
+                    logger.print_on_console('Error : No such mail id found')
             except Exception as  e:
                 Exceptions.error(e)
             return status,method_output,res
@@ -166,7 +166,7 @@ class OutlookKeywords:
                     status=desktop_constants.TEST_RESULT_PASS
                     method_output=desktop_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log('Error : mail does''t have such info')
+                    logger.print_on_console('Error : mail does''t have such info')
             except Exception as  e:
                 Exceptions.error(e)
             return status,method_output,res
@@ -181,7 +181,7 @@ class OutlookKeywords:
                     status=desktop_constants.TEST_RESULT_PASS
                     method_output=desktop_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log('Error : No subject found')
+                    logger.print_on_console('Error : No subject found')
             except Exception as  e:
                 Exceptions.error(e)
             return status,method_output,res
@@ -196,7 +196,7 @@ class OutlookKeywords:
                     status=desktop_constants.TEST_RESULT_PASS
                     method_output=desktop_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log('Error : No such mail id found')
+                    logger.print_on_console('Error : No such mail id found')
             except Exception as  e:
                 Exceptions.error(e)
             return status,method_output,res
@@ -212,7 +212,7 @@ class OutlookKeywords:
                     status=desktop_constants.TEST_RESULT_PASS
                     method_output=desktop_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log('Error : No Body found')
+                    logger.print_on_console('Error : No Body found')
             except Exception as  e:
                     Exceptions.error(e)
             return status,method_output,str(res)
@@ -237,9 +237,9 @@ class OutlookKeywords:
 
 
                     except (com_error):
-                        logger.log('Error occured : File not found')
+                        logger.print_on_console('Error occured : File not found')
                 else:
-                    logger.log('Error : No such mail found')
+                    logger.print_on_console('Error : No such mail found')
             except Exception as  e:
                 Exceptions.error(e)
             return status,method_output
@@ -257,7 +257,7 @@ class OutlookKeywords:
 ##                        print folderName+' folder not found'
                 return None
             except Exception as error:
-                logger.log( "Looks like we had an issue accessing the searchIn object")
+                logger.print_on_console( "Looks like we had an issue accessing the searchIn object")
                 return None
 
 

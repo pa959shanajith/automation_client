@@ -34,9 +34,9 @@ class Text_Box:
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                     else:
-                        logger.log('Element state does not allow to perform the operation')
+                        logger.print_on_console('Element state does not allow to perform the operation')
                 else:
-                    logger.log('element not present on the page where operation is trying to be performed')
+                    logger.print_on_console('element not present on the page where operation is trying to be performed')
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
         return status,result
@@ -61,9 +61,9 @@ class Text_Box:
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                     else:
-                        logger.log('Element state does not allow to perform the operation')
+                        logger.print_on_console('Element state does not allow to perform the operation')
                 else:
-                    logger.log('element not present on the page where operation is trying to be performed')
+                    logger.print_on_console('element not present on the page where operation is trying to be performed')
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
         return status,result
@@ -85,9 +85,9 @@ class Text_Box:
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                     else:
-                        logger.log('Element state does not allow to perform the operation')
+                        logger.print_on_console('Element state does not allow to perform the operation')
                 else:
-                    logger.log('element not present on the page where operation is trying to be performed')
+                    logger.print_on_console('element not present on the page where operation is trying to be performed')
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
         return status,result,output
@@ -109,9 +109,9 @@ class Text_Box:
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                     else:
-                        logger.log('Element state does not allow to perform the operation')
+                        logger.print_on_console('Element state does not allow to perform the operation')
                 else:
-                    logger.log('element not present on the page where operation is trying to be performed')
+                    logger.print_on_console('element not present on the page where operation is trying to be performed')
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
         return status,result
@@ -134,9 +134,9 @@ class Text_Box:
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                     else:
-                        logger.log('Element state does not allow to perform the operation')
+                        logger.print_on_console('Element state does not allow to perform the operation')
                 else:
-                    logger.log('element not present on the page where operation is trying to be performed')
+                    logger.print_on_console('element not present on the page where operation is trying to be performed')
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
         return status,result,output
@@ -159,7 +159,7 @@ class Text_Box:
             if(real_parent == parent):
                 desktop_constants.ELEMENT_FOUND=True
             else:
-                logger.log('verify parent is false')
+                logger.print_on_console('verify parent is false')
         except Exception as e:
             Exceptions.error(e)
         return desktop_constants.ELEMENT_FOUND

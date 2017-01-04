@@ -32,9 +32,9 @@ class ButtonLinkKeyword():
                        status = desktop_constants.TEST_RESULT_PASS
                        result = desktop_constants.TEST_RESULT_TRUE
                     else:
-                        logger.log('Element state does not allow to perform the operation')
+                        logger.print_on_console('Element state does not allow to perform the operation')
                 else:
-                    logger.log('element not present on the page where operation is trying to be performed')
+                    logger.print_on_console('element not present on the page where operation is trying to be performed')
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
         return status,result
@@ -65,9 +65,9 @@ class ButtonLinkKeyword():
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                     else:
-                        logger.log('Element state does not allow to perform the operation')
+                        logger.print_on_console('Element state does not allow to perform the operation')
                 else:
-                    logger.log('element not present on the page where operation is trying to be performed')
+                    logger.print_on_console('element not present on the page where operation is trying to be performed')
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
         return status,result
@@ -87,7 +87,7 @@ class ButtonLinkKeyword():
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log('element not present on the page where operation is trying to be performed')
+                    logger.print_on_console('element not present on the page where operation is trying to be performed')
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
         return status,result
@@ -107,7 +107,7 @@ class ButtonLinkKeyword():
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log('element not present on the page where operation is trying to be performed')
+                    logger.print_on_console('element not present on the page where operation is trying to be performed')
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
         return status,result,label
@@ -126,7 +126,7 @@ class ButtonLinkKeyword():
                     status = desktop_constants.TEST_RESULT_PASS
                     result = desktop_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log('element not present on the page where operation is trying to be performed')
+                    logger.print_on_console('element not present on the page where operation is trying to be performed')
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
         return status,result
@@ -146,7 +146,7 @@ class ButtonLinkKeyword():
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log('element not present on the page where operation is trying to be performed')
+                    logger.print_on_console('element not present on the page where operation is trying to be performed')
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
         return status,result,link_text
@@ -166,7 +166,7 @@ class ButtonLinkKeyword():
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log('element not present on the page where operation is trying to be performed')
+                    logger.print_on_console('element not present on the page where operation is trying to be performed')
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
         return status,result
