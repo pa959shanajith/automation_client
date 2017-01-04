@@ -37,7 +37,7 @@ class Dispatcher:
                     message.append(tsp.objectname)
                 return dict[keyword](*message)
             else:
-                logger.log(ws_constants.METHOD_INVALID)
+                logger.print_on_console(ws_constants.METHOD_INVALID)
         except Exception as e:
             Exceptions.error(e)
 
