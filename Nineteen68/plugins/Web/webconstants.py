@@ -25,7 +25,7 @@ TEST_RESULT_FALSE = "False";
 
 METHOD_INVALID='Invalid Keyword'
 
-CHROME_DRIVER_PATH = 'D:\chromedriver.exe'
+CHROME_DRIVER_PATH = os.getcwd()+'\chromedriver.exe'
 
 
 IE_DRIVER_PATH_64 = os.getcwd()+'\IEDriverServer64.exe'
@@ -142,4 +142,6 @@ CLOSE_BROWSER='closeBrowser'
 NON_WEBELEMENT_KEYWORDS=['openBrowser','openNewBrowser','navigateToURL','getPageTitle','verifyPageTitle','getCurrentURL','verifyCurrentURL','closeBrowser',
 'switchToWindow','closeSubWindows','verifyTextExists','waitforelementvisible','refresh','maximizeBrowser','getCurrentURL','acceptPopUp','dismissPopUp',
 'getPopUpText','verifyPopUpText','clearCache','navigateWithAuthenticate']
+
+FOUND='found'
 
