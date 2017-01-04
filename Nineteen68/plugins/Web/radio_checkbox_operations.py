@@ -81,7 +81,9 @@ class RadioCheckboxKeywords():
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        logger.print_on_console('Checkbox is already selected')
+                        err_msg=ERROR_CODE_DICT['ERR_OBJECTSELECTED']
+                        logger.print_on_console(err_msg)
+                        log.error(err_msg)
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
                     logger.print_on_console(err_msg)
@@ -116,7 +118,9 @@ class RadioCheckboxKeywords():
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        logger.print_on_console('Checkbox is already Unselected')
+                        err_msg=ERROR_CODE_DICT['ERR_OBJECTUNSELECTED']
+                        logger.print_on_console(err_msg)
+                        log.error(err_msg)
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
                     logger.print_on_console(err_msg)
