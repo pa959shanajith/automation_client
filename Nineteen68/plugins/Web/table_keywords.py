@@ -43,7 +43,7 @@ class TableOperationKeywords():
                 except Exception as e:
                     Exceptions.error(e)
             else:
-                logger.log('hidden object')
+                logger.print_on_console('hidden object')
             return status,methodoutput,row_count
 
 #   returns the no of coloumns of the table if the table found with the given xpath
@@ -67,7 +67,7 @@ class TableOperationKeywords():
                 except Exception as e:
                     Exceptions.error(e)
             else:
-                logger.log('hidden object')
+                logger.print_on_console('hidden object')
             return status,methodoutput,coloumn_count
 
 #   returns the cell value of cell with ',' seperated values, if the table found with the given xpath
@@ -84,7 +84,7 @@ class TableOperationKeywords():
                     row_count=self.getRowCountJs(element)
                     col_count=self.getColoumnCountJs(element)
                     if row_num-1>row_count or col_num-1>col_count:
-                        logger.log('Invalid Input')
+                        logger.print_on_console('Invalid Input')
                     else:
                         remoteWebElement=self.javascriptExecutor(element,row_num-1,col_num-1)
                         cellVal=self.getChildNodes(remoteWebElement)
@@ -111,7 +111,7 @@ class TableOperationKeywords():
                     row_count=self.getRowCountJs(element)
                     col_count=self.getColoumnCountJs(element)
                     if row_num>row_count or col_num>col_count:
-                        logger.log('Invalid Input')
+                        logger.print_on_console('Invalid Input')
                     else:
                         actual_rowNum=row_num-1
                         actual_colNum=col_num-1
@@ -142,7 +142,7 @@ class TableOperationKeywords():
                     row_count=self.getRowCountJs(element)
                     col_count=self.getColoumnCountJs(element)
                     if row_number>row_count or col_number>col_count:
-                        logger.log('Invalid Input')
+                        logger.print_on_console('Invalid Input')
                     else:
                         contents = self.getTooltip(element, row_number,
     							col_number);
@@ -154,7 +154,7 @@ class TableOperationKeywords():
                 except Exception as e:
                     Exceptions.error(e)
             else:
-                logger.log('hidden object')
+                logger.print_on_console('hidden object')
             return status,methodoutput,tooltip
 
 #   lclicks on the given cell, if the table found with the given xpath
@@ -320,7 +320,7 @@ class TableOperationKeywords():
                 except Exception as e:
                     Exceptions.error(e)
             else:
-                logger.log('hidden object')
+                logger.print_on_console('hidden object')
             return status,methodoutput
 
 
@@ -342,7 +342,7 @@ class TableOperationKeywords():
                 except Exception as e:
                     Exceptions.error(e)
             else:
-                logger.log('hidden object')
+                logger.print_on_console('hidden object')
             return status,methodoutput,row_number
 
         def getColNumByText(self,element,text,*args):
@@ -361,7 +361,7 @@ class TableOperationKeywords():
                 except Exception as e:
                     Exceptions.error(e)
             else:
-                logger.log('hidden object')
+                logger.print_on_console('hidden object')
             return status,methodoutput,col_number
 
 

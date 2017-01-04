@@ -109,11 +109,11 @@ class UtilWebKeywords:
                 self.highlight(webelement)
                 status=self.is_visible(webelement)
                 if status:
-                    logger.log('Element is visible')
+                    logger.print_on_console('Element is visible')
                     status=str(status)
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    logger.log('Element is not visible')
+                    logger.print_on_console('Element is not visible')
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -126,7 +126,7 @@ class UtilWebKeywords:
             if webelement is not None:
                 #call to highlight the webelement
                 self.highlight(webelement)
-                logger.log('Element exists')
+                logger.print_on_console('Element exists')
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
@@ -137,7 +137,7 @@ class UtilWebKeywords:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         if webelement is None:
-            logger.log('Element does not exists')
+            logger.print_on_console('Element does not exists')
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         return status,methodoutput
@@ -153,9 +153,9 @@ class UtilWebKeywords:
                 if webelement.is_enabled():
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
-                    logger.log('Element is enabled')
+                    logger.print_on_console('Element is enabled')
                 else:
-                    logger.log('Element is not enabled')
+                    logger.print_on_console('Element is not enabled')
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -170,9 +170,9 @@ class UtilWebKeywords:
                 if not(webelement.is_enabled()):
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
-                    logger.log('Element is disabled')
+                    logger.print_on_console('Element is disabled')
                 else:
-                    logger.log('Element is not disabled')
+                    logger.print_on_console('Element is not disabled')
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -184,11 +184,11 @@ class UtilWebKeywords:
             if webelement is not None:
                 status=self.is_visible(webelement)
                 if not(status):
-                    logger.log('Element is hidden')
+                    logger.print_on_console('Element is hidden')
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    logger.log('Element is not hidden')
+                    logger.print_on_console('Element is not hidden')
                     status=TEST_RESULT_FAIL
         except Exception as e:
             Exceptions.error(e)
@@ -206,7 +206,7 @@ class UtilWebKeywords:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    logger.log('Element is not readonly')
+                    logger.print_on_console('Element is not readonly')
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -217,7 +217,7 @@ class UtilWebKeywords:
                 browser_info=browser_Keywords.driver_obj.capabilities
                 browser_name=browser_info.get('browserName')
                 browser_version=browser_info.get('version')
-                logger.log('Browser is:'+browser_name+'Version is:'+browser_version)
+                logger.print_on_console('Browser is:'+browser_name+'Version is:'+browser_version)
                 #get the original style of the element
                 original_style = webelement.get_attribute('style')
                 #Apply css to the element
@@ -273,10 +273,10 @@ class UtilWebKeywords:
                 obj=Utils()
                  #find the location of the element w.r.t viewport
                 location=obj.get_element_location(webelement)
-                logger.log('location is '+str(location))
+                logger.print_on_console('location is '+str(location))
                 if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
                     yoffset=browser_Keywords.driver_obj.execute_script(MOUSE_HOVER_FF)
-                    logger.log('y offset is '+str(yoffset))
+                    logger.print_on_console('y offset is '+str(yoffset))
                     obj.mouse_move(int(location.get('x')+9),int(location.get('y')+yoffset))
                 else:
                     obj.enumwindows()
@@ -355,7 +355,7 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         try:
             input=input[0]
-            logger.log('Input is '+input)
+            logger.print_on_console('Input is '+input)
             input=float(str(input))
             if not(input is None or int(input) <0):
                 to_window=int(input)
@@ -366,13 +366,13 @@ class UtilWebKeywords:
                     from_window=window_handles.index(cur_handle)+1
                 if from_window>-1:
                     browser_Keywords.driver_obj.switch_to.window(window_handles[to_window-1])
-                    logger.log('Switched to window handle'+browser_Keywords.driver_obj.current_window_handle)
-                    logger.log('Control switched from window ' + str(from_window)
+                    logger.print_on_console('Switched to window handle'+browser_Keywords.driver_obj.current_window_handle)
+                    logger.print_on_console('Control switched from window ' + str(from_window)
 							+ " to window " + str(to_window))
                 else:
-                    logger.log('Current window handle not found')
+                    logger.print_on_console('Current window handle not found')
             else:
-                logger.log('Invalid input')
+                logger.print_on_console('Invalid input')
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
@@ -386,7 +386,7 @@ class UtilWebKeywords:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        logger.log('No handles found')
+                        logger.print_on_console('No handles found')
             except Exception as e:
                 etype=Exceptions.error(e)
         return status,methodoutput
@@ -440,13 +440,13 @@ class UtilWebKeywords:
                 img1 = Image.open(file1)
                 img2 = Image.open(file2)
                 if img1==img2:
-                    logger.log('Images comparision is Pass')
+                    logger.print_on_console('Images comparision is Pass')
                     methodoutput=TEST_RESULT_TRUE
                     status=TEST_RESULT_PASS
                 else:
-                    logger.log('Images comparision is Fail')
+                    logger.print_on_console('Images comparision is Fail')
             else:
-                logger.log('Invalid Input files')
+                logger.print_on_console('Invalid Input files')
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -454,7 +454,7 @@ class UtilWebKeywords:
     def __get_window_handles(self):
         window_handles=browser_Keywords.driver_obj.window_handles
         window_handles=browser_Keywords.driver_obj.window_handles
-        logger.log('Window handles size '+str(len(window_handles)))
+        logger.print_on_console('Window handles size '+str(len(window_handles)))
         return window_handles
 
 

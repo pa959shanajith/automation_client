@@ -47,7 +47,7 @@ class TextboxKeywords:
                     if len(args)>0 and args[0] != '':
                         visibilityFlag=args[0]
                     input=input[0]
-                    logger.log('Input is '+input)
+                    logger.print_on_console('Input is '+input)
                     if input is not None:
                         readonly_value=webelement.get_attribute("readonly")
                         if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
@@ -62,11 +62,11 @@ class TextboxKeywords:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:
-                            logger.log('Element is read only')
+                            logger.print_on_console('Element is read only')
                 else:
-                    logger.log('Element is disabled')
+                    logger.print_on_console('Element is disabled')
             except InvalidElementStateException as e:
-                logger.log('InvalidElementState')
+                logger.print_on_console('InvalidElementState')
 
             except Exception as e:
                 Exceptions.error(e)
@@ -85,7 +85,7 @@ class TextboxKeywords:
                     if len(args)>0 and args[0] != '':
                         visibilityFlag=args[0]
                     input=input[0]
-                    logger.log('Input is '+input)
+                    logger.print_on_console('Input is '+input)
                     if input is not None:
                         readonly_value=webelement.get_attribute("readonly")
                         if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
@@ -101,11 +101,11 @@ class TextboxKeywords:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:
-                            logger.log('Element is read only')
+                            logger.print_on_console('Element is read only')
                 else:
-                    logger.log('Element is disabled')
+                    logger.print_on_console('Element is disabled')
             except InvalidElementStateException as e:
-                logger.log('InvalidElementState')
+                logger.print_on_console('InvalidElementState')
             except Exception as e:
                 Exceptions.error(e)
 
@@ -136,10 +136,10 @@ class TextboxKeywords:
                    status=TEST_RESULT_PASS
                    methodoutput=TEST_RESULT_TRUE
                 else:
-                    logger.log('Element is disabled')
+                    logger.print_on_console('Element is disabled')
             except Exception as e:
                     Exceptions.error(e)
-        logger.log('Result is '+str(text))
+        logger.print_on_console('Result is '+str(text))
         return status,methodoutput,text
 
     def verify_text(self,webelement,input,*args):
@@ -150,8 +150,8 @@ class TextboxKeywords:
             try:
                text=self.__get_text(webelement)
                input=input[0]
-               logger.log('Input text is:'+input)
-               logger.log('Actual text is:'+str(text))
+               logger.print_on_console('Input text is:'+input)
+               logger.print_on_console('Actual text is:'+str(text))
                if text==input:
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
@@ -178,11 +178,11 @@ class TextboxKeywords:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        logger.log('Element is read only')
+                        logger.print_on_console('Element is read only')
                 else:
-                    logger.log('Element is disabled')
+                    logger.print_on_console('Element is disabled')
             except InvalidElementStateException as e:
-                logger.log('InvalidElementState')
+                logger.print_on_console('InvalidElementState')
             except Exception as e:
                 Exceptions.error(e)
         return status,methodoutput
@@ -199,7 +199,7 @@ class TextboxKeywords:
                     methodoutput=TEST_RESULT_TRUE
             except Exception as e:
                 Exceptions.error(e)
-        logger.log('Textbox length is '+str(length))
+        logger.print_on_console('Textbox length is '+str(length))
         return status,methodoutput,length
 
     def verifytextbox_length(self,webelement,input,*args):
@@ -210,8 +210,8 @@ class TextboxKeywords:
             try:
                 length = self.__gettexbox_length(webelement)
                 input=input[0]
-                logger.log('Input is:'+input)
-                logger.log('Actual length is:'+str(length))
+                logger.print_on_console('Input is:'+input)
+                logger.print_on_console('Actual length is:'+str(length))
                 if not (length is None or length is ''):
                     if '.' in input:
                         input=input[0:input.find('.')]
@@ -234,14 +234,14 @@ class TextboxKeywords:
                     if len(args)>0 and args[0] != '':
                         visibilityFlag=args[0]
                     input=input[0]
-                    logger.log('Input is '+input)
+                    logger.print_on_console('Input is '+input)
                     if input is not None:
                         readonly_value=webelement.get_attribute("readonly")
                         if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
                             if not(visibilityFlag and is_visble):
                                 self.clear_text(webelement)
                             else:
-                                logger.log('Hidden')
+                                logger.print_on_console('Hidden')
                                 webelement.clear()
                             encryption_obj = AESCipher()
                             input_val = encryption_obj.decrypt(input)
@@ -252,11 +252,11 @@ class TextboxKeywords:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:
-                            logger.log('Element is read only')
+                            logger.print_on_console('Element is read only')
                 else:
-                    logger.log('Element is disabled')
+                    logger.print_on_console('Element is disabled')
             except InvalidElementStateException as e:
-                logger.log('InvalidElementState')
+                logger.print_on_console('InvalidElementState')
             except Exception as e:
                 Exceptions.error(e)
         return status,methodoutput

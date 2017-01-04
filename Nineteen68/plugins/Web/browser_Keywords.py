@@ -56,7 +56,7 @@ class BrowserKeywords():
             driver_obj=driver.driver(self.browser_num)
             webdriver_list.append(driver_obj)
             parent_handle = driver_obj.current_window_handle
-            logger.log('Opened browser')
+            logger.print_on_console('Opened browser')
             status=webconstants.TEST_RESULT_PASS
             result=webconstants.TEST_RESULT_TRUE
         except Exception as e:
@@ -74,7 +74,7 @@ class BrowserKeywords():
             driver_obj=driver.driver(self.browser_num)
             webdriver_list.append(driver_obj)
             parent_handle = driver_obj.current_window_handle
-            logger.log('Opened new browser')
+            logger.print_on_console('Opened new browser')
             status=webconstants.TEST_RESULT_PASS
             result=webconstants.TEST_RESULT_TRUE
         except Exception as e:
@@ -87,7 +87,7 @@ class BrowserKeywords():
         try:
             if(driver_obj != None):
                 driver_obj.refresh()
-                logger.log('Browser refreshed')
+                logger.print_on_console('Browser refreshed')
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
         except Exception as e:
@@ -103,11 +103,11 @@ class BrowserKeywords():
             if not (url is None and url is ''):
             	url.strip()
                 driver_obj.get(url)
-                logger.log('Navigated to URL')
+                logger.print_on_console('Navigated to URL')
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             else:
-                logger.log(webconstants.INVALID_INPUT)
+                logger.print_on_console(webconstants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result
@@ -151,9 +151,9 @@ class BrowserKeywords():
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
                 else:
-                    logger.log('Authentication popup not found')
+                    logger.print_on_console('Authentication popup not found')
             else:
-                logger.log(webconstants.INVALID_INPUT)
+                logger.print_on_console(webconstants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result
@@ -169,11 +169,11 @@ class BrowserKeywords():
                 if (page_title is ''):
                     page_title= driver_obj.current_url
                 page_title.strip()
-                logger.log('Page title is ',page_title)
+                logger.print_on_console('Page title is ',page_title)
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             else:
-                logger.log('Driver object is null')
+                logger.print_on_console('Driver object is null')
         except Exception as e:
             Exceptions.error(e)
         return status,result,page_title
@@ -188,11 +188,11 @@ class BrowserKeywords():
                     page_title= driver_obj.current_url
                 page_title.strip()
                 if(page_title == input_val[0]):
-                    logger.log('Page title is ',page_title)
+                    logger.print_on_console('Page title is ',page_title)
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
             else:
-                logger.log('Driver object is null')
+                logger.print_on_console('Driver object is null')
         except Exception as e:
             Exceptions.error(e)
         return status,result
@@ -205,11 +205,11 @@ class BrowserKeywords():
             if (driver_obj!= None):
                 url= driver_obj.current_url
                 url.strip()
-                logger.log(url)
+                logger.print_on_console(url)
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             else:
-                logger.log('Driver object is null')
+                logger.print_on_console('Driver object is null')
         except Exception as e:
             Exceptions.error(e)
         return status,result,url
@@ -223,11 +223,11 @@ class BrowserKeywords():
                 url.strip()
                 input_url=input_url[0].strip()
                 if (url == input_url):
-                    logger.log('verified current url')
+                    logger.print_on_console('verified current url')
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
             else:
-                logger.log(webconstants.INVALID_INPUT)
+                logger.print_on_console(webconstants.INVALID_INPUT)
 
         except Exception as e:
             Exceptions.error(e)
@@ -250,7 +250,7 @@ class BrowserKeywords():
 
                 count = count - 2
                 webdriver_list[driver_instance].close()
-                logger.log('browser closed')
+                logger.print_on_console('browser closed')
                 if(len(winHandles) > 1):
                     webdriver_list[driver_instance].switch_to.window(winHandles[count])
                 if(len(winHandles) == 1):
@@ -262,7 +262,7 @@ class BrowserKeywords():
             except Exception as e:
                 Exceptions.error(e)
         else:
-            logger.log('For this close browser open browser or open new browser is not present')
+            logger.print_on_console('For this close browser open browser or open new browser is not present')
         return status,result
 
 
@@ -272,11 +272,11 @@ class BrowserKeywords():
         try:
             if(driver_obj!= None):
                 driver_obj.maximize_window()
-                logger.log('browser maximized')
+                logger.print_on_console('browser maximized')
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             else:
-                logger.log('Driver object is null')
+                logger.print_on_console('Driver object is null')
         except Exception as e:
             Exceptions.error(e)
         return status,result
@@ -293,7 +293,7 @@ class BrowserKeywords():
                         driver_obj.switch_to.window(parent_handle)
                         driver_obj.switch_to.window(x)
                         driver_obj.close()
-                        logger.log('Closed sub windows')
+                        logger.print_on_console('Closed sub windows')
                     except Exception as e:
                         Exceptions.error(e)
             after_close = driver_obj.window_handles
@@ -319,14 +319,14 @@ class BrowserKeywords():
                     cookies_list=[]
                     for x in cookies:
                         cookies_list.append(x['name'])
-                    logger.log('Cookies are ',cookies_list)
+                    logger.print_on_console('Cookies are ',cookies_list)
                     #delete_all_cookies()
                     driver_obj.delete_all_cookies()
 
                 else:
-                    logger.log('No Cookies found')
+                    logger.print_on_console('No Cookies found')
             else:
-				 logger.log("This feature is available only for Internet Explorer.")
+				 logger.print_on_console("This feature is available only for Internet Explorer.")
         except Exception as e:
             Exceptions.error(e)
 
@@ -342,12 +342,12 @@ class Singleton_DriverUtil():
             choptions.add_argument('start-maximized')
             choptions.add_argument('--disable-extensions')
             driver = webdriver.Chrome(chrome_options=choptions, executable_path=webconstants.CHROME_DRIVER_PATH)
-            logger.log('Chrome browser started')
+            logger.print_on_console('Chrome browser started')
 
         elif(browser_num == '2'):
             driver = webdriver.Firefox()
             driver.maximize_window()
-            logger.log('Firefox browser started')
+            logger.print_on_console('Firefox browser started')
 
         elif(browser_num == '3'):
             caps = webdriver.DesiredCapabilities.INTERNETEXPLORER
@@ -357,15 +357,15 @@ class Singleton_DriverUtil():
             caps['ignoreZoomSetting'] = True
             caps['NATIVE_EVENTS'] = True
             driver = webdriver.Ie(capabilities=caps,executable_path=webconstants.IE_DRIVER_PATH_64)
-            logger.log('IE browser started')
+            logger.print_on_console('IE browser started')
 
         elif(browser_num == '4'):
             driver = webdriver.Opera()
-            logger.log('Opera browser started')
+            logger.print_on_console('Opera browser started')
 
         elif(browser_num == '5'):
             driver = webdriver.Safari()
-            logger.log('Safari browser started')
+            logger.print_on_console('Safari browser started')
 ##        print __driver
         return driver
 

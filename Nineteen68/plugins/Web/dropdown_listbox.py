@@ -50,11 +50,11 @@ class DropdownKeywords():
                                     status=webconstants.TEST_RESULT_PASS
                                     result=webconstants.TEST_RESULT_TRUE
                     else:
-                        logger.log('Invalid input')
+                        logger.print_on_console('Invalid input')
                 except Exception as e:
                     Exceptions.error(e)
             else:
-                logger.log('Element is not enabled or dispalyed')
+                logger.print_on_console('Element is not enabled or dispalyed')
         return status,result
 
     def getCount(self,webelement,*args):
@@ -74,14 +74,14 @@ class DropdownKeywords():
                     select = Select(webelement)
                     iList = select.options
                     iListSize = len(iList)
-                    logger.log(iListSize)
+                    logger.print_on_console(iListSize)
                     if (iListSize > 0):
                         status=webconstants.TEST_RESULT_PASS
                         result=webconstants.TEST_RESULT_TRUE
                 except Exception as e:
                     Exceptions.error(e)
             else:
-                logger.log('Element is not dispalyed')
+                logger.print_on_console('Element is not dispalyed')
         return status,result,str(iListSize)
 
     def selectValueByText(self,webelement,input,*args):
@@ -111,11 +111,11 @@ class DropdownKeywords():
                         status=webconstants.TEST_RESULT_PASS
                         result=webconstants.TEST_RESULT_TRUE
                     else:
-                        logger.log('Invalid input')
+                        logger.print_on_console('Invalid input')
                 except Exception as e:
                     Exceptions.error(e)
             else:
-                logger.log('Element is not enabled or dispalyed')
+                logger.print_on_console('Element is not enabled or dispalyed')
         return status,result
 
     def verifySelectedValue(self,webelement,input,*args):
@@ -140,11 +140,11 @@ class DropdownKeywords():
                             status=webconstants.TEST_RESULT_PASS
                             result=webconstants.TEST_RESULT_TRUE
                     else:
-                        logger.log('Invalid input')
+                        logger.print_on_console('Invalid input')
                 except Exception as e:
                     Exceptions.error(e)
             else:
-                logger.log('Element is not dispalyed')
+                logger.print_on_console('Element is not dispalyed')
         return status,result
 
     def verifyCount(self,webelement,input,*args):
@@ -165,17 +165,17 @@ class DropdownKeywords():
                         select = Select(webelement)
                         iList = select.options
                         iListSize = len(iList)
-                        logger.log(iListSize)
+                        logger.print_on_console(iListSize)
                         input_val = int(input[0])
                         if (iListSize == input_val):
                             status=webconstants.TEST_RESULT_PASS
                             result=webconstants.TEST_RESULT_TRUE
                     else:
-                        logger.log('Invalid input')
+                        logger.print_on_console('Invalid input')
                 except Exception as e:
                     Exceptions.error(e)
             else:
-                logger.log('Element is not dispalyed')
+                logger.print_on_console('Element is not dispalyed')
         return status,result
 
     def verifyAllValues(self,webelement,input,*args):
@@ -215,9 +215,9 @@ class DropdownKeywords():
                             status=webconstants.TEST_RESULT_PASS
                             result=webconstants.TEST_RESULT_TRUE
                     else:
-                        logger.log('Element is not dispalyed')
+                        logger.print_on_console('Element is not dispalyed')
             else:
-                logger.log('Provided input not present in element')
+                logger.print_on_console('Provided input not present in element')
 
         except Exception as e:
             Exceptions.error(e)
@@ -248,9 +248,9 @@ class DropdownKeywords():
                         status=webconstants.TEST_RESULT_PASS
                         result=webconstants.TEST_RESULT_TRUE
                     else:
-                        logger.log('Element is not enabled or displayed')
+                        logger.print_on_console('Element is not enabled or displayed')
             else:
-                logger.log('Invalid input')
+                logger.print_on_console('Invalid input')
         except Exception as e:
             Exceptions.error(e)
         return status,result
@@ -276,7 +276,7 @@ class DropdownKeywords():
                     if (len(index) == '1'):
                         output = select.all_selected_options[i].text
                         str(output)
-                        logger.log(output)
+                        logger.print_on_console(output)
                         status=webconstants.TEST_RESULT_PASS
                         result=webconstants.TEST_RESULT_TRUE
                     else:
@@ -286,12 +286,12 @@ class DropdownKeywords():
                             value = str(out)
                             temp.append(value)
                         output = ';'.join(temp)
-                        logger.log(output)
+                        logger.print_on_console(output)
                         output=temp
                         status=webconstants.TEST_RESULT_PASS
                         result=webconstants.TEST_RESULT_TRUE
                 else:
-                    logger.log('Element is not displayed')
+                    logger.print_on_console('Element is not displayed')
         except Exception as e:
             Exceptions.error(e)
         return status, result, output
@@ -317,7 +317,7 @@ class DropdownKeywords():
                 except Exception as e:
                     Exceptions.error(e)
             else:
-                logger.log('Element is not enabled or displayed')
+                logger.print_on_console('Element is not enabled or displayed')
         return status,result
 
     def getMultipleValuesByIndexes(self,webelement,input,*args):
@@ -341,14 +341,14 @@ class DropdownKeywords():
                             value = str(out)
                             temp.append(value)
                         output = ';'.join(temp)
-                        logger.log(output)
+                        logger.print_on_console(output)
                         output=temp
                         status=webconstants.TEST_RESULT_PASS
                         result=webconstants.TEST_RESULT_TRUE
                     else:
-                        logger.log('Element is not displayed')
+                        logger.print_on_console('Element is not displayed')
             else:
-                logger.log('Invalid input')
+                logger.print_on_console('Invalid input')
         except Exception as e:
             Exceptions.error(e)
         return status,result,output
@@ -376,7 +376,7 @@ class DropdownKeywords():
                 except Exception as e:
                     Exceptions.error(e)
             else:
-                logger.log('Element is not enabled or displayed')
+                logger.print_on_console('Element is not enabled or displayed')
         return status,result
 
     def getValueByIndex(self,webelement,input,*args):
@@ -400,11 +400,11 @@ class DropdownKeywords():
                                     status=webconstants.TEST_RESULT_PASS
                                     result=webconstants.TEST_RESULT_TRUE
                     else:
-                        logger.log('Invalid input')
+                        logger.print_on_console('Invalid input')
                 except Exception as e:
                     Exceptions.error(e)
             else:
-                logger.log('Element is not displayed')
+                logger.print_on_console('Element is not displayed')
         return status,result,output
 
     def verifyValuesExists(self,webelement,input,*args):
@@ -436,11 +436,11 @@ class DropdownKeywords():
                             status=webconstants.TEST_RESULT_PASS
                             result=webconstants.TEST_RESULT_TRUE
                         else:
-                            logger.log('Inputs does not match')
+                            logger.print_on_console('Inputs does not match')
                     else:
-                        logger.log('Element is not displayed')
+                        logger.print_on_console('Element is not displayed')
             else:
-                logger.log('Invalid input')
+                logger.print_on_console('Invalid input')
         except Exception as e:
             Exceptions.error(e)
         return status,result
@@ -461,5 +461,5 @@ class DropdownKeywords():
                 except Exception as e:
                     Exceptions.error(e)
             else:
-                logger.log('Element is not displayed or enabled ')
+                logger.print_on_console('Element is not displayed or enabled ')
         return status,result

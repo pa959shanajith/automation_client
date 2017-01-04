@@ -42,7 +42,7 @@ class RadioCheckboxKeywords():
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                 else:
-                    logger.log('Element is disabled')
+                    logger.print_on_console('Element is disabled')
             except Exception as e:
                     Exceptions.error(e)
         return status,methodoutput
@@ -66,9 +66,9 @@ class RadioCheckboxKeywords():
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        logger.log('Checkbox is already selected')
+                        logger.print_on_console('Checkbox is already selected')
                 else:
-                    logger.log('Element is disabled')
+                    logger.print_on_console('Element is disabled')
             except Exception as e:
                     Exceptions.error(e)
         return status,methodoutput
@@ -92,9 +92,9 @@ class RadioCheckboxKeywords():
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        logger.log('Checkbox is already Unselected')
+                        logger.print_on_console('Checkbox is already Unselected')
                 else:
-                    logger.log('Element is disabled')
+                    logger.print_on_console('Element is disabled')
             except Exception as e:
                     Exceptions.error(e)
         return status,methodoutput
@@ -115,7 +115,7 @@ class RadioCheckboxKeywords():
 ##                        status=TEST_RESULT_PASS
                 if status==None and webelement!=None:
                     status,methodoutput=self.__fetch_status(webelement)
-##                logger.log('Status is:'+status)
+##                logger.print_on_console('Status is:'+status)
             except Exception as e:
                     Exceptions.error(e)
         return status,methodoutput

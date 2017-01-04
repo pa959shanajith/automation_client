@@ -137,7 +137,7 @@ class ButtonLinkKeyword():
                     logger.print_on_console(INVALID_INPUT)
 ##            else:
 ##                log.info('Please pass the valid web element')
-##            logger.log('Keyword result: ' + status)
+##            logger.print_on_console('Keyword result: ' + status)
         except Exception as e:
             logger.print_on_console(EXCEPTION_OCCURED,e)
             log.error(EXCEPTION_OCCURED)
@@ -171,7 +171,7 @@ class ButtonLinkKeyword():
                     log.error('Web element is not a link')
                     logger.print_on_console('Web element is not a link')
 ##            else:
-##                logger.log('Element not found')
+##                logger.print_on_console('Element not found')
 ##            print 'Keyword result: ',status
 
         except Exception as e:
@@ -221,7 +221,7 @@ class ButtonLinkKeyword():
                     log.error(INVALID_INPUT)
                     logger.print_on_console(INVALID_INPUT)
 ##            else:
-##                logger.log('Element not found')
+##                logger.print_on_console('Element not found')
 ##            print 'Keyword result: ',status
         except Exception as e:
             logger.print_on_console(EXCEPTION_OCCURED,e)
@@ -434,7 +434,7 @@ class ButtonLinkKeyword():
 ##
 ####    element = driver.find_element_by_name('btnI')
 ##    obj = ButtonLinkKeyword()
-##    logger.log('ButtonLinkKeyword object created')
+##    logger.print_on_console('ButtonLinkKeyword object created')
 ##
 ##    obj.click(element)
 ##    print ' ***click exected ***\n\n'

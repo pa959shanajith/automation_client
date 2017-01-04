@@ -98,19 +98,19 @@ class Dispatcher:
                                     for x in range(0,3):
                                         input.pop()
                                 else:
-                                    logger.log('Keyword and Type Mismatch')
+                                    logger.print_on_console('Keyword and Type Mismatch')
                             else:
-                                logger.log('Insufficient Input to find custom object')
-                                logger.log('Custom object not found')
+                                logger.print_on_console('Insufficient Input to find custom object')
+                                logger.print_on_console('Custom object not found')
                         else:
-                            logger.log('Reference Element is null')
-                            logger.log('Custom object not found')
+                            logger.print_on_console('Reference Element is null')
+                            logger.print_on_console('Custom object not found')
 
                 else:
                     webelement = self.getwebelement(driver,objectname)
                     if webelement != None:
                         webelement = webelement[0]
-                        logger.log('WebElement is found')
+                        logger.print_on_console('WebElement is found')
             return webelement
 
 
@@ -250,7 +250,7 @@ class Dispatcher:
 
 
             else:
-                logger.log(METHOD_INVALID)
+                logger.print_on_console(METHOD_INVALID)
         except Exception as e:
             Exceptions.error(e)
         return result
@@ -264,7 +264,7 @@ class Dispatcher:
             status_code=response.status_code
             if status_code in STATUS_CODE_DICT:
                 value=STATUS_CODE_DICT[status_code]
-                logger.log('Error code ',status_code,' : ',value)
+                logger.print_on_console('Error code ',status_code,' : ',value)
                 status=True
         return status,value
 
@@ -303,15 +303,15 @@ class Dispatcher:
                                 tempwebElement = None
                             webElement = tempwebElement
                         except Exception as webEx:
-                            logger.log('WebElement is not found')
+                            logger.print_on_console('WebElement is not found')
 
             elif objectname.startswith('{') and objectname.endswith('}') and self.webelement_map.has_key(objectname):
                 if len(self.webelement_map)<=4:
                     webElement=[]
                     webElement.append(self.webelement_map[objectname])
                 else:
-                    logger.log('Maximum size of Web element map is 4 ')
-                    logger.log('WebElement is not found')
+                    logger.print_on_console('Maximum size of Web element map is 4 ')
+                    logger.print_on_console('WebElement is not found')
 
 
         return webElement
