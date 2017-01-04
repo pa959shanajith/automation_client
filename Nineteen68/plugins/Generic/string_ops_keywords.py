@@ -26,11 +26,11 @@ class StringOperation:
         try:
             if not (input is None and input is ''):
                 output = input.lower()
-                logger.log(output)
+                logger.print_on_console(output)
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result,output
@@ -47,11 +47,11 @@ class StringOperation:
         try:
             if not (input is None and input is ''):
                 output = input.upper()
-                logger.log(output)
+                logger.print_on_console(output)
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result,output
@@ -68,11 +68,11 @@ class StringOperation:
         try:
             if not (input is None and input is ''):
                 output = input.strip()
-                logger.log(output)
+                logger.print_on_console(output)
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result,output
@@ -91,11 +91,11 @@ class StringOperation:
                 if not (index is None and index is ''):
                     index_toint = int(index)
                     output = actual_string[:index_toint]
-                    logger.log(output)
+                    logger.print_on_console(output)
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result,output
@@ -115,13 +115,13 @@ class StringOperation:
                     index_toint = int(index)
                     if index_toint > 0:
                         output = actual_string[-index_toint:]
-                        logger.log(output)
+                        logger.print_on_console(output)
                         status=generic_constants.TEST_RESULT_PASS
                         result=generic_constants.TEST_RESULT_TRUE
                     else:
-                        logger.log(generic_constants.INVALID_INPUT)
+                        logger.print_on_console(generic_constants.INVALID_INPUT)
                 else:
-                    logger.log(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result,output
@@ -141,17 +141,17 @@ class StringOperation:
                 if (input_len % 2 == 0):
                     even_inp = input_len/2
                     output = input[even_inp]
-                    logger.log(output)
+                    logger.print_on_console(output)
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
                 else:
                     odd_inp = input_len/2
                     output = input[odd_inp]
-                    logger.log(output)
+                    logger.print_on_console(output)
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result,output
@@ -168,11 +168,11 @@ class StringOperation:
         try:
             if not (input is None and input is ''):
                 output = len(input)
-                logger.log(output)
+                logger.print_on_console(output)
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result,output
@@ -215,17 +215,17 @@ class StringOperation:
                     if not (value is None):
                         if (actual_string not in to_be_replaced):
                             output =  actual_string.replace(to_be_replaced,value)
-                            logger.log(output)
+                            logger.print_on_console(output)
                             status=generic_constants.TEST_RESULT_PASS
                             result=generic_constants.TEST_RESULT_TRUE
                         else:
-                            logger.log("Input Value " + actual_string+ " does not contain " + to_be_replaced);
+                            logger.print_on_console("Input Value " + actual_string+ " does not contain " + to_be_replaced);
                     else:
-                        logger.log(generic_constants.INVALID_INPUT)
+                        logger.print_on_console(generic_constants.INVALID_INPUT)
                 else:
-                    logger.log(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(generic_constants.INVALID_INPUT)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result,output
@@ -243,13 +243,13 @@ class StringOperation:
             if not (input is None and input is ''):
                 if not (character is None):
                     output = input.split(character)
-                    logger.log(output)
+                    logger.print_on_console(output)
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(generic_constants.INVALID_INPUT)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result,output
@@ -267,13 +267,13 @@ class StringOperation:
             if not (input1 is None and input1 is ''):
                 if not (input2 is None and input2 is ''):
                     output = input1 + input2
-                    logger.log(output)
+                    logger.print_on_console(output)
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(generic_constants.INVALID_INPUT)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result,output
@@ -298,19 +298,19 @@ class StringOperation:
                         high_range = val[1]
                         high_range = int(high_range)
                         output = actual_string[low_range:high_range]
-                        logger.log(output)
+                        logger.print_on_console(output)
                         status=generic_constants.TEST_RESULT_PASS
                         result=generic_constants.TEST_RESULT_TRUE
                     else:
                         to_int_index = int(index)
                         output = actual_string[to_int_index:]
-                        logger.log(output)
+                        logger.print_on_console(output)
                         status=generic_constants.TEST_RESULT_PASS
                         result=generic_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(generic_constants.INVALID_INPUT)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result,output
@@ -332,20 +332,20 @@ class StringOperation:
                         data_type=data_type.lower()
                         if (data_type == 'char'):
                             output = ''.join(random.choice(string.lowercase + string.uppercase) for i in range(data_length_int))
-                            logger.log(output)
+                            logger.print_on_console(output)
                             status=generic_constants.TEST_RESULT_PASS
                             result=generic_constants.TEST_RESULT_TRUE
                         elif (data_type == 'num'):
                             output = ''.join(random.choice(string.digits) for i in range(data_length_int))
-                            logger.log(output)
+                            logger.print_on_console(output)
                             status=generic_constants.TEST_RESULT_PASS
                             result=generic_constants.TEST_RESULT_TRUE
                     else:
-                        logger.log(generic_constants.INP_VAL_EXCEEDS)
+                        logger.print_on_console(generic_constants.INP_VAL_EXCEEDS)
                 else:
-                    logger.log(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(generic_constants.INVALID_INPUT)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result,output

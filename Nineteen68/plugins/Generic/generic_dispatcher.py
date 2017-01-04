@@ -48,7 +48,7 @@ class GenericKeywordDispatcher:
 
     def dispatcher(self,tsp,*message):
          keyword=tsp.name
-         logger.log('Keyword is '+keyword)
+         logger.print_on_console('Keyword is '+keyword)
          try:
             dict={'toLowerCase': self.generic_string.toLowerCase,
                   'toUpperCase' : self.generic_string.toUpperCase,
@@ -135,7 +135,7 @@ class GenericKeywordDispatcher:
                     message.extend(actual_input)
                 return dict[keyword](*message)
             else:
-                logger.log(generic_constants.INVALID_KEYWORD)
+                logger.print_on_console(generic_constants.INVALID_KEYWORD)
          except Exception as e:
             Exceptions.error(e)
          return constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE

@@ -109,9 +109,9 @@ class NumericStringParser(object):
         output=None
         self.exprStack=[]
         try:
-            logger.log('Parsing the expression')
+            logger.print_on_console('Parsing the expression')
             results=self.bnf.parseString(num_string,parseAll)
-            logger.log('Evaluating the expression')
+            logger.print_on_console('Evaluating the expression')
             val=self.evaluateStack( self.exprStack[:] )
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE

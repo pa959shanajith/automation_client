@@ -33,7 +33,7 @@ class UtilOperations:
         to_type=str(to_type)
         fmt_type=None
         output=None
-        logger.log('Input is '+input+' type to be converted is '+to_type)
+        logger.print_on_console('Input is '+input+' type to be converted is '+to_type)
 
         if not (input is None or input is '' or to_type is None or to_type is ''):
             try:
@@ -82,18 +82,18 @@ class UtilOperations:
                                     output= date_output.strftime(fmt_type)
 
                         else:
-                            logger.log('Invalid date format')
+                            logger.print_on_console('Invalid date format')
                 else:
-                    logger.log('Please provide valid data type for conversion ')
+                    logger.print_on_console('Please provide valid data type for conversion ')
 
 
                 methodoutput=TEST_RESULT_TRUE
                 status=TEST_RESULT_PASS
-                logger.log('Result is ',output)
+                logger.print_on_console('Result is ',output)
             except ValueError as e:
-                logger.log('Invalid input format')
+                logger.print_on_console('Invalid input format')
         else:
-            logger.log(generic_constants.INVALID_INPUT)
+            logger.print_on_console(generic_constants.INVALID_INPUT)
         return status,methodoutput,output
 
     def verify_file_images(self,file1,file2):
@@ -105,13 +105,13 @@ class UtilOperations:
                 img1 = Image.open(file1)
                 img2 = Image.open(file2)
                 if img1==img2:
-                    logger.log('Images comparision is Pass')
+                    logger.print_on_console('Images comparision is Pass')
                     methodoutput=TEST_RESULT_TRUE
                     status=TEST_RESULT_PASS
                 else:
-                    logger.log('Images comparision is Fail')
+                    logger.print_on_console('Images comparision is Fail')
             else:
-                logger.log('Invalid Input files')
+                logger.print_on_console('Invalid Input files')
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -125,11 +125,11 @@ class UtilOperations:
                 input1=str(input1).replace('\n','').replace('\r','')
                 input2=str(input2).replace('\n','').replace('\r','')
                 if input1==input2:
-                    logger.log('Values are equal')
+                    logger.print_on_console('Values are equal')
                     methodoutput=TEST_RESULT_TRUE
                     status=TEST_RESULT_PASS
                 else:
-                    logger.log('Values are not equal')
+                    logger.print_on_console('Values are not equal')
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -137,7 +137,7 @@ class UtilOperations:
     def stop(self,*args):
         status=TEST_RESULT_PASS
         methodoutput=TEST_RESULT_TRUE
-        logger.log('Stopping the Execution')
+        logger.print_on_console('Stopping the Execution')
         import handler
         output=len(handler.tspList)
         return status,methodoutput,output

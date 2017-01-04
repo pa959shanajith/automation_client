@@ -19,7 +19,7 @@ class logical_eval():
         expression=str(expression)
         expression=expression.replace('AND','and').replace('OR','or').replace('NOT','not')
         try:
-            logger.log('Evaluationg the expression')
+            logger.print_on_console('Evaluationg the expression')
             result=satisfiable(expression)
             if type(result)==dict:
                 for res in result.iterkeys():

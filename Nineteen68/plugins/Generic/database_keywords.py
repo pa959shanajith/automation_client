@@ -85,7 +85,7 @@ class DatabaseOperation():
             cursor.execute(query)
             rows = cursor.fetchall()
             for row in rows:
-                logger.log(row)
+                logger.print_on_console(row)
             status=generic_constants.TEST_RESULT_PASS
             result=generic_constants.TEST_RESULT_TRUE
         except Exception as e:
@@ -156,9 +156,9 @@ class DatabaseOperation():
                         result=generic_constants.TEST_RESULT_FALSE
 
                 else:
-                    logger.log(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(generic_constants.INVALID_INPUT)
             else:
-                logger.log(generic_constants.FILE_NOT_EXISTS)
+                logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
             Exceptions.error(e)
         finally:
@@ -233,9 +233,9 @@ class DatabaseOperation():
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(generic_constants.INVALID_INPUT)
             else:
-                logger.log(generic_constants.FILE_NOT_EXISTS)
+                logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
             Exceptions.error(e)
             return False
@@ -288,7 +288,7 @@ class DatabaseOperation():
             if file_ext in generic_constants.FILE_TYPES:
                 status=True
             else:
-                logger.log(generic_constants.INVALID_FILE_FORMAT)
+                logger.print_on_console(generic_constants.INVALID_FILE_FORMAT)
             return file_ext
         except Exception as e:
             Exceptions.error(e)

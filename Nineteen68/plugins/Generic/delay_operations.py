@@ -22,9 +22,9 @@ class Delay_keywords:
             import time
             if not(input is None and input is ''):
                 input=int(input)
-                logger.log('wait method started')
+                logger.print_on_console('wait method started')
                 time.sleep(input)
-                logger.log('wait method completed')
+                logger.print_on_console('wait method completed')
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:

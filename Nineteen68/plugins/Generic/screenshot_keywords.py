@@ -29,14 +29,14 @@ class Screenshot():
                 os.makedirs(fileDir)
             filename=self.generateUniqueFileName()
             filePath=str(fileDir)+filename
-            logger.log('capturing the screenshot')
+            logger.print_on_console('capturing the screenshot')
             img=ImageGrab.grab()
             img.save(filePath+'.png', "png")
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             raise e
-            logger.log('unable to capture the screenshot')
+            logger.print_on_console('unable to capture the screenshot')
             Exceptions.error(e)
         return status,methodoutput
 

@@ -33,11 +33,11 @@ class DynamicVariables:
                         dynamic_variable_handler.dynamic_variable_map[variable]=value
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
-                        logger.log('Variable created is '+str(variable)+'='+str(value))
+                        logger.print_on_console('Variable created is '+str(variable)+'='+str(value))
                     else:
-                        logger.log('Variable already exists')
+                        logger.print_on_console('Variable already exists')
             else:
-                logger.log('Invalid input')
+                logger.print_on_console('Invalid input')
 
 
         except Exception as e:
@@ -63,11 +63,11 @@ class DynamicVariables:
                         dynamic_variable_handler.dynamic_variable_map[variable]=value
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
-                        logger.log('Variable modified: Old value '+str(variable)+'='+str(oldvalue)+'New value '+str(variable)+'='+str(value))
+                        logger.print_on_console('Variable modified: Old value '+str(variable)+'='+str(oldvalue)+'New value '+str(variable)+'='+str(value))
                     else:
-                        logger.log('Variable does not exists')
+                        logger.print_on_console('Variable does not exists')
             else:
-                logger.log('Invalid input')
+                logger.print_on_console('Invalid input')
 
 
         except Exception as e:
@@ -92,14 +92,14 @@ class DynamicVariables:
                             dynamic_variable_handler.dynamic_variable_map[variable]=value
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
-                            logger.log('Variable copied is '+str(variable)+'='+str(value))
+                            logger.print_on_console('Variable copied is '+str(variable)+'='+str(value))
                         else:
-                            logger.log('Invalid Input: 2nd input should be dynamic variable')
+                            logger.print_on_console('Invalid Input: 2nd input should be dynamic variable')
 
                     else:
-                        logger.log('Variable already exists')
+                        logger.print_on_console('Variable already exists')
                 else:
-                    logger.log('Invalid input')
+                    logger.print_on_console('Invalid input')
 
         except Exception as e:
             Exceptions.error(e)
@@ -117,13 +117,13 @@ class DynamicVariables:
                     #Check if the variable already exists
                     if dynamic_variable_handler.dynamic_variable_map.has_key(variable):
                         value=dynamic_variable_handler.dynamic_variable_map.pop(variable)
-                        logger.log('Variable deleted is '+str(variable)+'='+str(value))
+                        logger.print_on_console('Variable deleted is '+str(variable)+'='+str(value))
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        logger.log('Variable does not exists')
+                        logger.print_on_console('Variable does not exists')
                 else:
-                    logger.log('Invalid input')
+                    logger.print_on_console('Invalid input')
 
         except Exception as e:
             Exceptions.error(e)

@@ -77,16 +77,16 @@ class FileOperations:
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             inputpath=inputpath.strip()
-            logger.log(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
+            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             if not (input is None and input is '') and self.folder.validateFolderName(file_name) :
                 if not os.path.isfile(inputpath+'/'+file_name):
                     open(inputpath+'/'+file_name, 'w').close()
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    logger.log(generic_constants.FILE_EXISTS)
+                    logger.print_on_console(generic_constants.FILE_EXISTS)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -104,17 +104,17 @@ class FileOperations:
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             inputpath=inputpath.strip()
-            logger.log(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
+            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             if not (input is None and input is ''):
                 if file_name is not '':inputpath=inputpath+'/'+file_name
                 if os.path.isfile(inputpath):
-                    logger.log(generic_constants.FILE_EXISTS)
+                    logger.print_on_console(generic_constants.FILE_EXISTS)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    logger.log(generic_constants.FILE_NOT_EXISTS)
+                    logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -131,7 +131,7 @@ class FileOperations:
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             inputpath=inputpath.strip()
-            logger.log(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
+            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             if not (inputpath is None and inputpath is ''):
                 rename_path=inputpath+'/'+rename_file
                 inputpath=inputpath+'/'+file_name
@@ -140,9 +140,9 @@ class FileOperations:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    logger.log(generic_constants.FILE_NOT_EXISTS)
+                    logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -158,16 +158,16 @@ class FileOperations:
         try:
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
-            logger.log(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
+            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             if not (input is None and input is ''):
                 if os.path.isfile(inputpath+'/'+file_name):
                     os.remove(inputpath+'/'+file_name)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    logger.log(generic_constants.FILE_NOT_EXISTS)
+                    logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -212,7 +212,7 @@ class FileOperations:
             if file_ext in generic_constants.FILE_TYPES:
                 status=True
             else:
-                logger.log(generic_constants.INVALID_FILE_FORMAT)
+                logger.print_on_console(generic_constants.INVALID_FILE_FORMAT)
             return file_ext,status
         except Exception as e:
             Exceptions.error(e)
@@ -292,7 +292,7 @@ class FileOperations:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                 else:
-                    logger.log('Excel files are not supported')
+                    logger.print_on_console('Excel files are not supported')
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput,content
@@ -361,7 +361,7 @@ class FileOperations:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
                     res,linenumbers= self.dict[file_ext+'_get_line_number'](*params)
-                    logger.log(linenumbers)
+                    logger.print_on_console(linenumbers)
                     if linenumbers is not None:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -382,7 +382,7 @@ class FileOperations:
             methodoutput=TEST_RESULT_FALSE
             folder_path=str(folder_path)
             file_path=str(file_path)
-            logger.log('Folder path is '+folder_path+' and File is '+file_path)
+            logger.print_on_console('Folder path is '+folder_path+' and File is '+file_path)
             if (not(folder_path is None or folder_path == '' or file_path is None or file_path == '') and os.path.exists(folder_path)):
                 from sendfunction_keys import SendFunctionKeys
                 obj=SendFunctionKeys()
@@ -406,7 +406,7 @@ class FileOperations:
                 methodoutput=TEST_RESULT_TRUE
 
             else:
-                logger.log('Invalid input')
+                logger.print_on_console('Invalid input')
 
         except Exception as e:
             Exceptions.error(e)

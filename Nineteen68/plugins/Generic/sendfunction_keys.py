@@ -35,10 +35,10 @@ class SendFunctionKeys:
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
             else:
-                logger.log('Invalid input')
+                logger.print_on_console('Invalid input')
 
         except Exception as e:
-            logger.log('Invalid input')
+            logger.print_on_console('Invalid input')
             Exceptions.error(e)
         return status,methodoutput
 

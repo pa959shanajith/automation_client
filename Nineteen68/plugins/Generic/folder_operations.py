@@ -31,18 +31,18 @@ class FolderOperations:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         try:
-            logger.log(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
+            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
             if not (inputpath is None and inputpath is '') and self.validateFolderName(inputpath,'path') and self.validateFolderName(folder_name):
                 if not os.path.exists(inputpath+'/'+folder_name):
                     os.makedirs(inputpath+'/'+folder_name)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    logger.log(generic_constants.FOLDER_EXISTS)
+                    logger.print_on_console(generic_constants.FOLDER_EXISTS)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except WindowsError as e:
-            logger.log("A Folder/File name can't contain any of the following characters "+generic_constants.INVALID_CHARS)
+            logger.print_on_console("A Folder/File name can't contain any of the following characters "+generic_constants.INVALID_CHARS)
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -60,16 +60,16 @@ class FolderOperations:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         try:
-            logger.log(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
+            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
             if not (inputpath is None and inputpath is ''):
                 if os.path.exists(inputpath+'/'+folder_name):
-                    logger.log(generic_constants.FOLDER_EXISTS)
+                    logger.print_on_console(generic_constants.FOLDER_EXISTS)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    logger.log(generic_constants.FOLDER_NOT_EXISTS)
+                    logger.print_on_console(generic_constants.FOLDER_NOT_EXISTS)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -85,7 +85,7 @@ class FolderOperations:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         try:
-            logger.log(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name+' new folder name '+rename_folder)
+            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name+' new folder name '+rename_folder)
             if not (inputpath is None and inputpath is ''):
                 old_path=inputpath+'/'+folder_name
                 rename_path=inputpath+'/'+rename_folder
@@ -94,9 +94,9 @@ class FolderOperations:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    logger.log(generic_constants.FOLDER_NOT_EXISTS)
+                    logger.print_on_console(generic_constants.FOLDER_NOT_EXISTS)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -114,7 +114,7 @@ class FolderOperations:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         try:
-            logger.log(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
+            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
             if not (inputpath is None and inputpath is ''):
                 try:
 
@@ -127,11 +127,11 @@ class FolderOperations:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        logger.log(generic_constants.FOLDER_NOT_EXISTS)
+                        logger.print_on_console(generic_constants.FOLDER_NOT_EXISTS)
                 except ValueError,WindowsError:
-                    logger.log(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(generic_constants.INVALID_INPUT)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,methodoutput
@@ -141,7 +141,7 @@ class FolderOperations:
         if len(args)>0 and args[0]=='path':
             chars=set(generic_constants.INVALID_CHARS_PATH)
         if any((c in chars) for c in name):
-            logger.log("A Folder/File name can't contain any of the following characters "+generic_constants.INVALID_CHARS)
+            logger.print_on_console("A Folder/File name can't contain any of the following characters "+generic_constants.INVALID_CHARS)
             return False
         else:
             return True

@@ -31,13 +31,13 @@ class DateOperation:
                 if ret_format != -1:
                     cur_date = datetime.datetime.now()
                     output = cur_date.strftime(ret_format)
-                    logger.log(output)
+                    logger.print_on_console(output)
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log('Format not supported')
+                    logger.print_on_console('Format not supported')
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result,output
@@ -58,13 +58,13 @@ class DateOperation:
                 if ret_format != -1:
                     cur_time = datetime.datetime.now()
                     output = cur_time.strftime(ret_format)
-                    logger.log(output)
+                    logger.print_on_console(output)
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log('Format not supported')
+                    logger.print_on_console('Format not supported')
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result,output
@@ -84,13 +84,13 @@ class DateOperation:
                 if ret_format != -1:
                     cur_date_time = datetime.datetime.now()
                     output = cur_date_time.strftime(ret_format)
-                    logger.log(output)
+                    logger.print_on_console(output)
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
                 else:
-                    logger.log('Format not supported')
+                    logger.print_on_console('Format not supported')
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result,output
@@ -114,7 +114,7 @@ class DateOperation:
                                 date1 = datetime.datetime.strptime(input_date, ret_inp_format)
                                 date2 = datetime.datetime.strptime(date_or_count, ret_inp_format)
                                 output = abs((date2 - date1).days)
-                                logger.log(output)
+                                logger.print_on_console(output)
                                 status=generic_constants.TEST_RESULT_PASS
                                 result=generic_constants.TEST_RESULT_TRUE
                             else:
@@ -122,17 +122,17 @@ class DateOperation:
                                 days = int(date_or_count)
                                 temp = count - timedelta(days = days)
                                 output = temp.strftime(ret_inp_format)
-                                logger.log(output)
+                                logger.print_on_console(output)
                                 status=generic_constants.TEST_RESULT_PASS
                                 result=generic_constants.TEST_RESULT_TRUE
                         else:
-                            logger.log('Format not supported')
+                            logger.print_on_console('Format not supported')
                     else:
-                        logger.log(generic_constants.INVALID_INPUT)
+                        logger.print_on_console(generic_constants.INVALID_INPUT)
                 else:
-                    logger.log(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(generic_constants.INVALID_INPUT)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result,output
@@ -156,17 +156,17 @@ class DateOperation:
                                 days = int(date_or_count)
                                 temp = count + timedelta(days = days)
                                 output = temp.strftime(ret_inp_format)
-                                logger.log(output)
+                                logger.print_on_console(output)
                                 status=generic_constants.TEST_RESULT_PASS
                                 result=generic_constants.TEST_RESULT_TRUE
                         else:
-                            logger.log('Format not supported')
+                            logger.print_on_console('Format not supported')
                     else:
-                        logger.log(generic_constants.INVALID_INPUT)
+                        logger.print_on_console(generic_constants.INVALID_INPUT)
                 else:
-                    logger.log(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(generic_constants.INVALID_INPUT)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
 
         except Exception as e:
             Exceptions.error(e)
@@ -193,17 +193,17 @@ class DateOperation:
                         if ret_inp_format != -1:
                             if ret_out_format != -1:
                                 output=datetime.datetime.strptime(inp_date, ret_inp_format).strftime(ret_out_format)
-                                logger.log(output)
+                                logger.print_on_console(output)
                                 status=generic_constants.TEST_RESULT_PASS
                                 result=generic_constants.TEST_RESULT_TRUE
                         else:
-                            logger.log('Format not supported')
+                            logger.print_on_console('Format not supported')
                     else:
-                        logger.log(generic_constants.INVALID_INPUT)
+                        logger.print_on_console(generic_constants.INVALID_INPUT)
                  else:
-                    logger.log(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(generic_constants.INVALID_INPUT)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result,output
@@ -224,7 +224,7 @@ class DateOperation:
                         date1 = datetime.datetime.strptime(input_from, generic_constants.DATE_FORMAT )
                         date2 = datetime.datetime.strptime(input_to, generic_constants.DATE_FORMAT )
                         if date1 == date2:
-                            logger.log(date1 == date2)
+                            logger.print_on_console(date1 == date2)
                             status=generic_constants.TEST_RESULT_PASS
                             result=generic_constants.TEST_RESULT_TRUE
                         else:
@@ -236,18 +236,18 @@ class DateOperation:
                             date1 = datetime.datetime.strptime(input_from, ret_inp_format )
                             date2 = datetime.datetime.strptime(input_to, ret_inp_format )
                             if date1 == date2:
-                                logger.log(date1 == date2)
+                                logger.print_on_console(date1 == date2)
                                 status=generic_constants.TEST_RESULT_PASS
                                 result=generic_constants.TEST_RESULT_TRUE
                             else:
                                 status=generic_constants.TEST_RESULT_FAIL
                                 result=generic_constants.TEST_RESULT_FALSE
                         else:
-                            logger.log('Format not supported')
+                            logger.print_on_console('Format not supported')
                  else:
-                    logger.log(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(generic_constants.INVALID_INPUT)
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
         except Exception as e:
             Exceptions.error(e)
         return status,result
