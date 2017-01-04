@@ -62,6 +62,8 @@ class WSkeywords:
         """
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             url=url.strip()
@@ -74,13 +76,14 @@ class WSkeywords:
                  methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
                 log.info(ERROR_CODE_DICT['ERR_INVALID_END_POINT_URL'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_END_POINT_URL']
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_END_POINT_URL'])
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
      def setOperations(self,operation):
         """
@@ -92,6 +95,8 @@ class WSkeywords:
         """
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if type(operation) is str:
@@ -108,13 +113,14 @@ class WSkeywords:
                  methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
                 log.info(ERROR_CODE_DICT['ERR_INVALID_OPERATION'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_OPERATION']
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_OPERATION'])
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
      def setMethods(self,method):
         """
@@ -125,6 +131,8 @@ class WSkeywords:
         """
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if not (method is None or method is ''):
@@ -141,16 +149,18 @@ class WSkeywords:
                     methodoutput = ws_constants.TEST_RESULT_TRUE
                 else:
                     log.info(ERROR_CODE_DICT['ERR_INVALID_METHOD'])
+                    err_msg = ERROR_CODE_DICT['ERR_INVALID_METHOD']
                     logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_METHOD'])
             else:
                 log.info(ERROR_CODE_DICT['ERR_INVALID_METHOD'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_METHOD']
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_METHOD'])
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
      def setHeaderTemplate(self,header):
         """
@@ -161,6 +171,8 @@ class WSkeywords:
         """
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if not (method is None or method is ''):
@@ -172,13 +184,14 @@ class WSkeywords:
                 methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
                 log.info(ERROR_CODE_DICT['ERR_INVALID_HEADER'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_HEADER']
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_HEADER'])
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
 
      def setHeader(self,header):
@@ -190,6 +203,8 @@ class WSkeywords:
         """
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if not(header is None and header is ''):
@@ -218,12 +233,13 @@ class WSkeywords:
                 methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
                 log.info(ERROR_CODE_DICT['ERR_INVALID_HEADER'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_HEADER']
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_HEADER'])
 
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
         return status,methodoutput
 
@@ -237,6 +253,8 @@ class WSkeywords:
         """
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if not (body is None or body is ''):
@@ -247,11 +265,12 @@ class WSkeywords:
                  methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
                 log.info(ws_constants.METHOD_INVALID_INPUT)
+                err_msg = ws_constants.METHOD_INVALID_INPUT
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
         return status,methodoutput
 
@@ -276,9 +295,9 @@ class WSkeywords:
             methodoutput = ws_constants.TEST_RESULT_TRUE
             output=(self.baseResHeader,self.baseResBody)
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,output
 
@@ -299,9 +318,9 @@ class WSkeywords:
                 log.info(ws_constants.METHOD_INVALID_INPUT)
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,output
 
@@ -321,9 +340,9 @@ class WSkeywords:
             log.info(response)
             status,methodoutput,output=self.__saveResults(response)
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,output
 
@@ -344,9 +363,9 @@ class WSkeywords:
                 log.info(ws_constants.METHOD_INVALID_INPUT)
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,output
 
@@ -367,9 +386,9 @@ class WSkeywords:
                 log.info(ws_constants.METHOD_INVALID_INPUT)
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,output
 
@@ -396,9 +415,9 @@ class WSkeywords:
                 log.info(ws_constants.METHOD_INVALID_INPUT)
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,output
 
@@ -406,6 +425,8 @@ class WSkeywords:
 
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         dict={'GET':WSkeywords.get,
         'POST':WSkeywords.post,
         'PUT':WSkeywords.put,
@@ -419,12 +440,14 @@ class WSkeywords:
             return dict[self.baseMethod](self)
         else:
             log.info(ERROR_CODE_DICT['ERR_INVALID_METHOD'])
+            err_msg = ERROR_CODE_DICT['ERR_INVALID_METHOD']
             logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_METHOD'])
-            return status,methodoutput
+            return status,methodoutput,output,err_msg
 
      def getHeader(self,*args):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
         output=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
@@ -443,17 +466,18 @@ class WSkeywords:
                     methodoutput = ws_constants.TEST_RESULT_TRUE
                     output=self.baseResHeader
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
-        return status,methodoutput,output
+        return status,methodoutput,output,err_msg
 
 
      def getBody(self,*args):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        err_msg=None
         output=None
         try:
             if len(args) == 1:
@@ -476,16 +500,18 @@ class WSkeywords:
                         methodoutput = ws_constants.TEST_RESULT_TRUE
                         output=response_body
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
-        return status,methodoutput,output
+        return status,methodoutput,output,err_msg
 
 
      def addClientCertificate(self,filepath_key,filepath_cert,url):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             response=requests.get(url, cert=(filepath_cert, filepath_key))
@@ -493,11 +519,11 @@ class WSkeywords:
             status = ws_constants.TEST_RESULT_PASS
             methodoutput = ws_constants.TEST_RESULT_TRUE
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
      def parse_xml(self,input_xml,path,value,attribute_name,flag):
         result=None
@@ -529,6 +555,8 @@ class WSkeywords:
      def setAttributeValue(self,attribute_name,attribute_value,element_path):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         import handler
         if self.baseReqBody == '':
@@ -543,18 +571,21 @@ class WSkeywords:
                     methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
                 log.info(ws_constants.METHOD_INVALID_INPUT)
+                err_msg = ws_constants.METHOD_INVALID_INPUT
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
 
      def setTagValue(self,value,element_path):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         import handler
         if self.baseReqBody == '':
@@ -569,18 +600,21 @@ class WSkeywords:
                     methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
                 log.info(ws_constants.METHOD_INVALID_INPUT)
+                err_msg = ws_constants.METHOD_INVALID_INPUT
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
             log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
 
      def getServerCertificate(self,url,filepath):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             import ssl
@@ -604,11 +638,12 @@ class WSkeywords:
                     methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
                 log.info(ws_constants.METHOD_INVALID_INPUT)
+                err_msg = ws_constants.METHOD_INVALID_INPUT
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:
-           logger.print_on_console(EXCEPTION_OCCURED,e)
-           log.error(EXCEPTION_OCCURED)
            log.error(e)
+           log.error(e.msg)
+           logger.print_on_console(e.msg)
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
