@@ -56,7 +56,7 @@ class GetParam():
         self.step_description=''
 
     def print_step(self):
-        logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
+        logger.print_on_console(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
 
     def getparam(self,input):
         """

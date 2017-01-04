@@ -90,7 +90,6 @@ class Controller():
     webservice_dispatcher_obj = None
     outlook_dispatcher_obj = None
     desktop_dispatcher_obj = None
-    reporting_pojo_obj=None
     reporting_obj=reporting.Reporting()
     verify_exists=False
 
@@ -116,42 +115,42 @@ class Controller():
             import generic_dispatcher
             self.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
         except Exception as e:
-            logger.log('')
+            logger.print_on_console('')
 
     def __load_webservice(self):
         try:
             import websevice_dispatcher
             self.webservice_dispatcher_obj = websevice_dispatcher.Dispatcher()
         except Exception as e:
-            logger.log('')
+            logger.print_on_console('')
 
     def __load_oebs(self):
         try:
             import oebs_dispatcher
             self.oebs_dispatcher_obj = oebs_dispatcher.OebsDispatcher()
         except Exception as e:
-            logger.log('')
+            logger.print_on_console('')
 
     def __load_outlook(self):
         try:
             import outlookdispatcher
             self.outlook_dispatcher_obj = outlookdispatcher.Dispatcher()
         except Exception as e:
-             logger.log('')
+             logger.print_on_console('')
 
     def __load_web(self):
         try:
             import web_dispatcher
             self.web_dispatcher_obj = web_dispatcher.Dispatcher()
         except Exception as e:
-             logger.log('')
+             logger.print_on_console('')
 
     def __load_desktop(self):
         try:
             import desktop_dispatcher
             self.desktop_dispatcher_obj = desktop_dispatcher.DesktopDispatcher()
         except Exception as e:
-            logger.log('')
+            logger.print_on_console('')
 
     def dangling_status(self,index):
         step=handler.tspList[index]
@@ -188,7 +187,7 @@ class Controller():
                 status=False
 
         if not(status):
-            logger.log('Dangling: '+tsp.name +' in '+tsp.testscript_name+'\n')
+            logger.print_on_console('Dangling: '+tsp.name +' in '+tsp.testscript_name+'\n')
         return status
 
     def __print_details(self,tsp,input,inpval):
@@ -319,7 +318,7 @@ class Controller():
 
     def store_result(self,result,tsp):
         output=tsp.outputval.split(constants.SEMICOLON)
-        logger.log('Result obtained is ',result[-1])
+        logger.print_on_console('Result obtained is ',result[-1])
 
         if len(output)>0 and output[0] != '':
             if len(result)>2:
@@ -353,7 +352,7 @@ class Controller():
                         self.verify_exists=True
                     else:
                         apptype=teststepproperty.apptype.lower()
-                        logger.log('ERR_CUSTOM_VERIFYEXISTS: Previous step ',self.verify_dict[apptype],' is missing')
+                        logger.print_on_console('ERR_CUSTOM_VERIFYEXISTS: Previous step ',self.verify_dict[apptype],' is missing')
                 if self.verify_exists==True:
                     teststepproperty.custom_flag=True
                     teststepproperty.parent_xpath=self.previous_step.objectname
@@ -430,11 +429,11 @@ class Controller():
                 try:
                     i = self.methodinvocation(i)
                     if i== constants.TERMINATE:
-                        logger.log('Terminating the execution')
+                        logger.print_on_console('Terminating the execution')
                         status=i
                         break
                     elif i==constants.BREAK_POINT:
-                        logger.log('Debug Stopped')
+                        logger.print_on_console('Debug Stopped')
                         status=i
                         break
 
@@ -443,7 +442,7 @@ class Controller():
                     status=False
                     i=i+1
             else:
-                logger.log('Terminating the execution')
+                logger.print_on_console('Terminating the execution')
                 status=constants.TERMINATE
                 break
 
@@ -515,7 +514,7 @@ class Controller():
                     if input_breakpoint >0:
                         break_point=input_breakpoint-1
                 except ValueError,NameError:
-                    logger.log('Invalid breakpoint number')
+                    logger.print_on_console('Invalid breakpoint number')
 
 
             #in future this value will come from the UI
@@ -584,7 +583,7 @@ class Controller():
                     if input_breakpoint >0:
                         break_point=input_breakpoint-1
                 except ValueError,NameError:
-                    logger.log('Invalid breakpoint number')
+                    logger.print_on_console('Invalid breakpoint number')
 
 
             #in future this value will come from the UI
@@ -689,7 +688,7 @@ def kill_process():
         os.system("TASKKILL /F /IM IEDriverServer.exe")
         os.system("TASKKILL /F /IM IEDriverServer64.exe")
         os.system("TASKKILL /F /IM CobraWinLDTP.exe")
-        logger.log( 'Stale processes killed')
+        logger.print_on_console( 'Stale processes killed')
     except Exception as e:
         Exceptions.error(e)
 

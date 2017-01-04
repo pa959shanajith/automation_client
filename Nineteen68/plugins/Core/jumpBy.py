@@ -29,7 +29,7 @@ class  JumpBy():
         self.status=False
 
     def print_step(self):
-        logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name)
+        logger.print_on_console(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name)
 
 
     def invoke_jumpby(self,input,reporting_obj):
@@ -43,13 +43,13 @@ class  JumpBy():
             if (stepToJump > 0) :
                 jumpByStepNum = index + 1+ stepToJump
             elif (stepToJump==0):
-                logger.log('ERR_JUMPBY_CAN''T_BE_0')
+                logger.print_on_console('ERR_JUMPBY_CAN''T_BE_0')
             else:
 				jumpByStepNum = index - 1+ stepToJump
 
 
             if jumpByStepNum<0:
-                logger.log('Invalid Input')
+                logger.print_on_console('Invalid Input')
                 jumpByStepNum=-1
 
             elif jumpByStepNum<len(tspList):
@@ -58,7 +58,7 @@ class  JumpBy():
 
             else:
                 jumpByStepNum=-1
-                logger.log('ERR_JUMPY_STEP_DOESN''T_EXISTS')
+                logger.print_on_console('ERR_JUMPY_STEP_DOESN''T_EXISTS')
 
         except Exception as e:
             Exceptions.error(e)

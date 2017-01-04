@@ -89,7 +89,7 @@ class Handler():
 
         """
         global ws_template
-        logger.log('Parsing')
+        logger.print_on_console('Parsing')
         json_string = json.dumps(test_data)
         new_obj = json.loads(json_string)
         if len(new_obj)==1:
@@ -178,7 +178,7 @@ class Handler():
             if keyword == constants.ENDFOR:
                 self.insert_into_fordict(keyword_index,keyword,start_index)
             elif keyword== constants.ENDFOR:
-                logger.log('For is missing: Invalid script ')
+                logger.print_on_console('For is missing: Invalid script ')
                 flag=False
             elif keyword==constants.FOR:
                 self.insert_into_fordict(keyword_index,keyword,None)
@@ -219,7 +219,7 @@ class Handler():
                         self.insert_into_ifdict(start_index[0],start_index[1],(keyword_index,keyword))
                         condition_keywords.popitem()
                     else:
-                        logger.log('IF is missing: Invalid script ')
+                        logger.print_on_console('IF is missing: Invalid script ')
                         flag=False
                         break
             elif keyword==constants.IF:
@@ -258,7 +258,7 @@ class Handler():
                         self.insert_into_getParamdict(start_index[0],start_index[1],(keyword_index,keyword))
                         getparam_keywords.popitem()
                     else:
-                        logger.log('Getparam is missing: Invalid script ')
+                        logger.print_on_console('Getparam is missing: Invalid script ')
                         flag=False
                         break
         else:
@@ -299,7 +299,7 @@ class Handler():
             outputval=step['outputVal'].strip()
             outputArray=outputval.split(';')
             if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
-                logger.log(str(x)+' '+keyword)
+                logger.print_on_console(str(x)+' '+keyword)
                 keyword=keyword.lower()
                 global tspIndex
                 tspIndex+=1
@@ -329,7 +329,7 @@ class Handler():
                     getparam_keywords[tspIndex]=keyword
                     copy_getparam_keywords[tspIndex]=keyword
             else:
-                logger.log('Commented step '+str(step['stepNo']))
+                logger.print_on_console('Commented step '+str(step['stepNo']))
         return flag
 
 
@@ -349,14 +349,14 @@ class Handler():
         #block which creates the step of instances of (for,endFor)
         if key_lower in for_array:
             if for_info[key] is None:
-                logger.log(str(start_end_dict[key_lower])+' missing in script:'+str(testscript_name))
+                logger.print_on_console(str(start_end_dict[key_lower])+' missing in script:'+str(testscript_name))
             tsp_step=for_step.For(index,keyword,inputval,outputval,stepnum,testscript_name,for_info[key],False,apptype,additionalinfo)
 
         #block which creates the step of instances (if,elseIf,else,endIf)
         elif key_lower in if_array:
             if not(if_info.has_key(key)):
                 self.insert_into_ifdict(index,key_lower,None)
-                logger.log(str(start_end_dict[key_lower])+' keyword missing in script:'+str(testscript_name))
+                logger.print_on_console(str(start_end_dict[key_lower])+' keyword missing in script:'+str(testscript_name))
 
             tsp_step=if_step.If(index,keyword,inputval,outputval,stepnum,testscript_name,if_info[key],False,apptype,additionalinfo)
 
@@ -364,7 +364,7 @@ class Handler():
         elif key_lower in get_param:
             if not(get_param_info.has_key(key)):
                 self.insert_into_getParamdict(index,key_lower,None)
-                logger.log(key_lower+' keyword missing in script:'+str(testscript_name))
+                logger.print_on_console(key_lower+' keyword missing in script:'+str(testscript_name))
 
             tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo)
 
@@ -439,12 +439,12 @@ class Handler():
 
         """
 
-        logger.log('-------------------------')
-        logger.log('TSP list\n')
-        logger.log('-------------------------')
+        logger.print_on_console('-------------------------')
+        logger.print_on_console('TSP list\n')
+        logger.print_on_console('-------------------------')
         for x in tspList:
             x.print_step()
-            logger.log('\n')
+            logger.print_on_console('\n')
         return tspList
 
     def print_dict(self,d):

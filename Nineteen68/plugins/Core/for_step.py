@@ -33,7 +33,7 @@ class For():
 
 
     def print_step(self):
-        logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
+        logger.print_on_console(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
 
     def add_report_step(self,reporting_obj,step_description):
         #Reporting part
@@ -59,8 +59,8 @@ class For():
         #Reporting part ends
 
     def invalid_for_input(self,endForNum,inputval,reporting_obj):
-        logger.log('\nEncountered :'+self.name+'\n')
-        logger.log('Invalid for count '+inputval+'\n')
+        logger.print_on_console('\nEncountered :'+self.name+'\n')
+        logger.print_on_console('Invalid for count '+inputval+'\n')
         #Reporting part
         self.step_description='Encountered :'+self.name+' Invalid for count '+inputval
         reporting_obj.name=constants.ENDFOR
@@ -79,10 +79,10 @@ class For():
 
         #block to execute endFor
         if self.name.lower() == constants.ENDFOR:
-            logger.log('\nEncountered :'+self.name+'\n')
+            logger.print_on_console('\nEncountered :'+self.name+'\n')
             self.executed=True
             index=self.getEndfor()
-            logger.log('***For: Iteration '+str(iteration_count)+' completed***\n\n')
+            logger.print_on_console('***For: Iteration '+str(iteration_count)+' completed***\n\n')
             #Reporting part
             self.add_report_step(reporting_obj,'For: Iteration '+str(iteration_count)+' completed')
             #Reporting part ends
@@ -122,13 +122,13 @@ class For():
 
                 else:
                     if self.count==1:
-                        logger.log('\nEncountered :'+self.name+'\n')
+                        logger.print_on_console('\nEncountered :'+self.name+'\n')
                         #Reporting part
                         self.add_report_step_for(reporting_obj,'Encountered :'+self.name)
                         #Reporting part ends
                     self.executed=True
                     iteration_count=self.count
-                    logger.log('***For: Iteration '+str(self.count)+ ' started***')
+                    logger.print_on_console('***For: Iteration '+str(self.count)+ ' started***')
 
                     #Reporting part
                     self.add_report_step_iteration(reporting_obj,'For: Iteration '+str(iteration_count)+' started')

@@ -36,7 +36,7 @@ class If():
         self.step_description=''
 
     def print_step(self):
-        logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
+        logger.print_on_console(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
 
 
 
@@ -78,12 +78,12 @@ class If():
                     self.parent_id=reporting_obj.get_pid()
                     return last_target.keys()[0]
 
-            logger.log('Encountered :'+self.name+'\n')
+            logger.print_on_console('Encountered :'+self.name+'\n')
             logical_eval_obj=Logical_eval()
             input_expression=input[0]
-            logger.log('Input_expression is '+input_expression)
+            logger.print_on_console('Input_expression is '+input_expression)
             res=logical_eval_obj.eval_expression(input_expression)
-            logger.log(self.name+': Condition is '+str(res)+'\n')
+            logger.print_on_console(self.name+': Condition is '+str(res)+'\n')
             self.step_description='Encountered :'+self.name+ ' Condition is '+str(res)
 
 
@@ -94,14 +94,14 @@ class If():
                 #Reporting part ends
 
                 self.status=True
-                logger.log('***Started executing:'+self.name+'***\n')
+                logger.print_on_console('***Started executing:'+self.name+'***\n')
                 return self.index+1
             elif res==INVALID:
                 if self.name==IF:
                     self.parent_id=reporting_obj.get_pid()
                     reporting_obj.add_pid(self.name)
 
-                logger.log('Invalid conditional expression\n')
+                logger.print_on_console('Invalid conditional expression\n')
                 return last_target.keys()[0]
             else:
                 return next_target.keys()[0]
@@ -121,7 +121,7 @@ class If():
                 reporting_obj.add_pid(self.name)
                 #Reporting part ends
 
-                logger.log('***Started executing:'+self.name+'***\n')
+                logger.print_on_console('***Started executing:'+self.name+'***\n')
                 return self.index+1
             else:
                 return last_target.keys()[0]
@@ -135,8 +135,8 @@ class If():
             self.step_description='Encountered :'+self.name
             #Reporting part ends
 
-            logger.log('Encountered :'+self.name+'\n')
-            logger.log('***If execution completed ***\n')
+            logger.print_on_console('Encountered :'+self.name+'\n')
+            logger.print_on_console('***If execution completed ***\n')
             return next_index
 
 
