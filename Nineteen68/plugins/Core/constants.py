@@ -150,7 +150,7 @@ ERROR_CODE_DICT ={
                     'ERR_ARRAY_INDEX_OUT_OF_BOUNDS_EXCEPTION': 'Input Error: Invalid number of inputs.',
                     'ERR_STRING_INDEX_OUT_OF_BOUNDS_EXCEPTION': 'Input Error: Invalid number of inputs.',
                     'ERR_INPUT_EXCEEDS': 'The input provided exceeds the number of windows open',
-                    'ERR_WEB_DRIVER_EXCEPTION': 'Web driver not found.',
+                    'ERR_WEB_DRIVER_EXCEPTION': 'Error thrown by webdriver',
                     'ERR_NO_SUCH_WINDOW_EXCEPTION': """Requested web page can't be found.""",
                     'ERR_UNHANDELED_ALERT_EXCEPTION': 'Error occurred due to unexpected alert.',
                     'ERR_INVALID_SELECTOR_EXCEPTION': 'Object Not Found.',
@@ -285,6 +285,40 @@ BROWSER_TYPE='browserType'
 START_TIME='StartTime'
 
 TIME_FORMAT='%Y-%m-%d %H:%M:%S'
+
+#Logger constants
+
+KEYWORD_EXECUTION_STARTED = 'Keyword  execution started'
+
+KEYWORD_STATUS = 'Keyword %s executed Successfully and the status is %s'
+
+KEYWORD_EXECUTION_COMPLETED = 'Keyword  execution completed'
+
+METHOD_OUTPUT = 'Result of the Keyword: '
+
+KEYWORD_EXECUTION_FAIL_DUE_TO_NO_WEBELEMENT = 'Keyword Execution failed, Reason : Web Element not found'
+
+STATUS_METHODOUTPUT_LOCALVARIABLES = 'Status, Method output and local variable are initialised to default values'
+
+STATUS_METHODOUTPUT_UPDATE = 'Updating  Status and Method output to Pass and True respectively'
+
+EXCEPTION_OCCURED = 'Exception occured'
+
+RETURN_RESULT = 'Returning Result of keyword execution'
+
+WEB_ELEMENT_FOUND = 'Web Element found'
+
+WEB_ELEMENT_NOT_FOUND = 'Web Element not found'
+
+WEB_ELEMENT_ENABLED = 'Web Element Enabled'
+
+WEB_ELEMENT_DISABLED = 'Web Element is disabled, hence cannot perform operation'
+
+INVALID_INPUT = 'Invalid input, Please provide the valid input'
+
+WEB_ELEMENT_FOUND_INSIDE_IFRAME='Web Element is found inside iframe/frame '
+
+OUTPUT_CONSTANT="""9cc33d6fe25973868b30f4439f09901a"""
 
 
 
