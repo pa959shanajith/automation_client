@@ -70,18 +70,18 @@ class OebsDispatcher:
                             input.pop()
                         objectname=custom_oebs_element
                     else:
-                        logger.log('Custom object not found')
+                        logger.print_on_console('Custom object not found')
 
                 else:
-                    logger.log('Keyword and Type Mismatch')
+                    logger.print_on_console('Keyword and Type Mismatch')
             else:
-                logger.log('Insufficient Input to find custom object')
-                logger.log('Custom object not found')
+                logger.print_on_console('Insufficient Input to find custom object')
+                logger.print_on_console('Custom object not found')
         message=[tsp.url,objectname,tsp.name,input,tsp.outputval]
         return message
 
     def dispatcher(self,tsp,input,*message):
-         logger.log('Keyword is '+tsp.name)
+         logger.print_on_console('Keyword is '+tsp.name)
          keyword=tsp.name
          result=(constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE)
          if windowname is not None:
@@ -170,7 +170,7 @@ class OebsDispatcher:
                 if not(oebs_msg.ELEMENT_FOUND):
                     result=constants.TERMINATE
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
          except Exception as e:
             Exceptions.error(e)
          return result

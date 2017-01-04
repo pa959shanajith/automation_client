@@ -37,7 +37,7 @@ class Utils:
 
     def save_json(self,scrape_data):
         with open('domelements.json', 'w') as outfile:
-                logger.log('Writing scrape data to domelements.json file')
+                logger.print_on_console('Writing scrape data to domelements.json file')
                 json.dump(scrape_data, outfile, indent=4, sort_keys=False)
         outfile.close()
 
@@ -74,7 +74,7 @@ class Utils:
             self.set_to_foreground(self.windowname)
             obj=oebsServer.OebsKeywords()
             size=obj.getobjectsize(self.windowname,objectname)
-            logger.log( 'object size '+str(size))
+            logger.print_on_console( 'object size '+str(size))
             rgn1=win32gui.CreateRectRgnIndirect((size[0] + 1, size[1] + 1,
     							size[0] + size[2] - 1, size[1] + size[3] - 1))
             rgn2=win32gui.CreateRectRgnIndirect((size[0] + 4, size[1] + 4,
@@ -93,7 +93,7 @@ class Utils:
         return status
 
     def find_oebswindow_and_attach(self,windowname,*args):
-        logger.log('windowname is '+windowname)
+        logger.print_on_console('windowname is '+windowname)
         status=False
         import oebs_dispatcher
         import time
@@ -107,7 +107,7 @@ class Utils:
                 handle=self.find_window(windowname)
                 if handle is not None:
                     self.aut_handle=handle
-                    logger.log('Application handle found')
+                    logger.print_on_console('Application handle found')
                     break;
         if self.aut_handle is not None:
             oebs_dispatcher.windowname=windowname

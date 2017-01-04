@@ -417,7 +417,7 @@ class Utilities:
 ##            oebs_key_objects.custom_msg.append[:]
             del oebs_key_objects.custom_msg[:]
             oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_FOUND)
-            logger.log(MSG_ELEMENT_NOT_FOUND)
+            logger.print_on_console(MSG_ELEMENT_NOT_FOUND)
 
         clientresp=(status,methodoutput,output)
         if methodoutput==output:

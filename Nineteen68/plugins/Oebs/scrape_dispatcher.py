@@ -22,7 +22,7 @@ class ScrapeDispatcher:
         self.clickandadd_obj=oebsclickandadd.ClickAndAdd()
 
     def scrape_dispatcher(self,keyword,*message):
-             logger.log('Keyword is '+keyword)
+             logger.print_on_console('Keyword is '+keyword)
 
 
              if keyword in oebs_constants.OEBS_SCRAPE_KEYWORDS:
@@ -40,6 +40,6 @@ class ScrapeDispatcher:
                 if keyword in dict.keys():
                     return dict[keyword](*message)
                 else:
-                    logger.log(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(generic_constants.INVALID_INPUT)
              except Exception as e:
                 Exceptions.error(e)
