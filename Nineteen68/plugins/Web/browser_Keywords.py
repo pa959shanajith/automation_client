@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        browser_Keywords.py
 # Purpose:
 #
 # Author:      rakesh.v
@@ -18,6 +18,11 @@ webdriver_list = []
 
 import threading
 import time
+
+from constants import *
+import logging
+
+log = logging.getLogger('browser_Keywords.py')
 
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
 class TestThread(threading.Thread):
@@ -47,6 +52,8 @@ class BrowserKeywords():
     def openBrowser(self,webelement,browser_num,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
         self.browser_num=browser_num[0]
         try:
             global driver_obj
@@ -56,17 +63,20 @@ class BrowserKeywords():
             driver_obj=driver.driver(self.browser_num)
             webdriver_list.append(driver_obj)
             parent_handle = driver_obj.current_window_handle
-            logger.print_on_console('Opened browser')
+            logger.print_on_console('Browser opened')
+            log.info('Browser opened')
             status=webconstants.TEST_RESULT_PASS
             result=webconstants.TEST_RESULT_TRUE
         except Exception as e:
-            Exceptions.error(e)
-        return status,result
+            err_msg=self.__web_driver_exception(e)
+        return status,result,output,err_msg
 
 
     def openNewBrowser(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
         try:
             global driver_obj
             global webdriver_list
@@ -75,42 +85,49 @@ class BrowserKeywords():
             webdriver_list.append(driver_obj)
             parent_handle = driver_obj.current_window_handle
             logger.print_on_console('Opened new browser')
+            log.info('Opened new browser')
             status=webconstants.TEST_RESULT_PASS
             result=webconstants.TEST_RESULT_TRUE
         except Exception as e:
-            Exceptions.error(e)
-        return status,result
+            err_msg=self.__web_driver_exception(e)
+        return status,result,output,err_msg
 
     def refresh(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
         try:
             if(driver_obj != None):
                 driver_obj.refresh()
                 logger.print_on_console('Browser refreshed')
+                log.info('Browser refreshed')
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
         except Exception as e:
-            Exceptions.error(e)
-        return status,result
+            err_msg=self.__web_driver_exception(e)
+        return status,result,output,err_msg
 
 
     def navigateToURL(self ,webelement, url , *args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
         try:
             url = url[0]
             if not (url is None and url is ''):
             	url.strip()
                 driver_obj.get(url)
                 logger.print_on_console('Navigated to URL')
+                log.info('Navigated to URL')
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             else:
                 logger.print_on_console(webconstants.INVALID_INPUT)
         except Exception as e:
-            Exceptions.error(e)
-        return status,result
+            err_msg=self.__web_driver_exception(e)
+        return status,result,output,err_msg
 
     def type(self,url):
         """thread worker function"""
@@ -125,7 +142,7 @@ class BrowserKeywords():
             obj.execute_key('tab',1)
             obj.execute_key('enter',1)
         except Exception as e:
-            Exceptions.error(e)
+            err_msg=self.__web_driver_exception(e)
         return
 
 
@@ -133,6 +150,8 @@ class BrowserKeywords():
     def navigate_with_authenticate(self ,webelement, url , *args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
         try:
             if url[0] is not None and url[0] != '':
                 from encryption_utility import AESCipher
@@ -152,17 +171,23 @@ class BrowserKeywords():
                     result=webconstants.TEST_RESULT_TRUE
                 else:
                     logger.print_on_console('Authentication popup not found')
+                    log.error('Authentication popup not found')
+                    err_msg = 'Authentication popup not found'
             else:
                 logger.print_on_console(webconstants.INVALID_INPUT)
+                log.error(webconstants.INVALID_INPUT)
+                err_msg = webconstants.INVALID_INPUT
         except Exception as e:
-            Exceptions.error(e)
-        return status,result
+            err_msg=self.__web_driver_exception(e)
+        return status,result,output,err_msg
 
 
     def getPageTitle(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         page_title = None
+        err_msg=None
+
         try:
             if (driver_obj!= None):
                 page_title= driver_obj.title
@@ -170,17 +195,22 @@ class BrowserKeywords():
                     page_title= driver_obj.current_url
                 page_title.strip()
                 logger.print_on_console('Page title is ',page_title)
+                log.info('Page title is ' + str(page_title))
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             else:
                 logger.print_on_console('Driver object is null')
+                log.error('Driver object is null')
+                err_msg = 'Driver object is null'
         except Exception as e:
-            Exceptions.error(e)
-        return status,result,page_title
+            err_msg=self.__web_driver_exception(e)
+        return status,result,page_title,err_msg
 
     def verify_page_title(self,webelement,input_val,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
         try:
             if (driver_obj!= None):
                 page_title= driver_obj.title
@@ -188,55 +218,86 @@ class BrowserKeywords():
                     page_title= driver_obj.current_url
                 page_title.strip()
                 if(page_title == input_val[0]):
-                    logger.print_on_console('Page title is ',page_title)
+                    logger.print_on_console('Page title matched')
+                    log.info('Page title matched')
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
+                else:
+                    logger.print_on_console('Page title mismatched')
+                    logger.print_on_console(EXPECTED,input_val[0])
+                    log.info(EXPECTED)
+                    log.info(input_val[0])
+                    logger.print_on_console(ACTUAL,page_title)
+                    log.info(ACTUAL)
+                    log.info(page_title)
             else:
+                log.error('Driver object is null')
                 logger.print_on_console('Driver object is null')
+                err_msg = 'Driver object is null'
         except Exception as e:
-            Exceptions.error(e)
-        return status,result
+            err_msg=self.__web_driver_exception(e)
+        return status,result,output,err_msg
 
 
     def getCurrentURL(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
+        url = None
+        err_msg=None
         try:
             if (driver_obj!= None):
                 url= driver_obj.current_url
                 url.strip()
-                logger.print_on_console(url)
+                logger.print_on_console('URL: ',url)
+                log.info('URL: '+ str(url))
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             else:
                 logger.print_on_console('Driver object is null')
+                log.error('Driver object is null')
+                err_msg = 'Driver object is null'
         except Exception as e:
-            Exceptions.error(e)
-        return status,result,url
+            err_msg=self.__web_driver_exception(e)
+        return status,result,url,err_msg
 
     def verifyCurrentURL(self ,webelement, input_url,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
         try:
             if not (input_url is None and input_url is ''):
                 url= driver_obj.current_url
                 url.strip()
                 input_url=input_url[0].strip()
                 if (url == input_url):
-                    logger.print_on_console('verified current url')
+                    logger.print_on_console('Current url matched')
+                    log.info('Current url matched')
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
+                else:
+                    logger.print_on_console('Current url mismatched')
+                    log.error('Current url mismatched')
+                    logger.print_on_console(EXPECTED,input_url)
+                    log.info(EXPECTED)
+                    log.info(input_url)
+                    logger.print_on_console(ACTUAL,url)
+                    log.info(ACTUAL)
+                    log.info(url)
             else:
+                log.error(webconstants.INVALID_INPUT)
                 logger.print_on_console(webconstants.INVALID_INPUT)
-
+                err_msg = webconstants.INVALID_INPUT
         except Exception as e:
-            Exceptions.error(e)
-        return status,result
+            err_msg=self.__web_driver_exception(e)
+        return status,result,output,err_msg
 
 
     def closeBrowser(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
         if(len(webdriver_list) > 0):
             try:
                 driver_instance = len(webdriver_list)-1
@@ -251,6 +312,7 @@ class BrowserKeywords():
                 count = count - 2
                 webdriver_list[driver_instance].close()
                 logger.print_on_console('browser closed')
+                log.info('browser closed')
                 if(len(winHandles) > 1):
                     webdriver_list[driver_instance].switch_to.window(winHandles[count])
                 if(len(winHandles) == 1):
@@ -260,30 +322,38 @@ class BrowserKeywords():
                 result=webconstants.TEST_RESULT_TRUE
 
             except Exception as e:
-                Exceptions.error(e)
+                err_msg=self.__web_driver_exception(e)
         else:
             logger.print_on_console('For this close browser open browser or open new browser is not present')
-        return status,result
+            log.error('For this close browser open browser or open new browser is not present')
+        return status,result,output,err_msg
 
 
     def maximizeBrowser(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
         try:
             if(driver_obj!= None):
                 driver_obj.maximize_window()
                 logger.print_on_console('browser maximized')
+                log.info('browser maximized')
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             else:
                 logger.print_on_console('Driver object is null')
+                log.error('Driver object is null')
+                err_msg = 'Driver object is null'
         except Exception as e:
-            Exceptions.error(e)
-        return status,result
+            err_msg=self.__web_driver_exception(e)
+        return status,result,output,err_msg
 
     def closeSubWindows(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
         try:
             winHandles = driver_obj.window_handles
             winHandles = driver_obj.window_handles
@@ -293,9 +363,10 @@ class BrowserKeywords():
                         driver_obj.switch_to.window(parent_handle)
                         driver_obj.switch_to.window(x)
                         driver_obj.close()
-                        logger.print_on_console('Closed sub windows')
+                        logger.print_on_console('Sub windows closed')
+                        log.info('Sub windows closed')
                     except Exception as e:
-                        Exceptions.error(e)
+                        err_msg=self.__web_driver_exception(e)
             after_close = driver_obj.window_handles
             after_close = driver_obj.window_handles
             if(len(after_close) == 1):
@@ -304,13 +375,15 @@ class BrowserKeywords():
                 result=webconstants.TEST_RESULT_TRUE
 
         except Exception as e:
-            Exceptions.error(e)
+            err_msg=self.__web_driver_exception(e)
             driver_obj.switch_to.window(parent_handle)
-        return status,result
+        return status,result,output,err_msg
 
     def clear_cache(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
         try:
             if driver_obj != None and isinstance(driver_obj,webdriver.Ie):
                 #get all the cookies
@@ -320,34 +393,43 @@ class BrowserKeywords():
                     for x in cookies:
                         cookies_list.append(x['name'])
                     logger.print_on_console('Cookies are ',cookies_list)
+                    log.info('Cookies are: ')
+                    log.info(cookies_list)
                     #delete_all_cookies()
                     driver_obj.delete_all_cookies()
 
                 else:
                     logger.print_on_console('No Cookies found')
+                    log.error('No Cookies found')
+                    err_msg = 'No Cookies found'
             else:
-				 logger.print_on_console("This feature is available only for Internet Explorer.")
+                logger.print_on_console("This feature is available only for Internet Explorer.")
+                log.error("This feature is available only for Internet Explorer.")
+                err_msg = "This feature is available only for Internet Explorer."
         except Exception as e:
-            Exceptions.error(e)
-
-        return status,result
+            err_msg=self.__web_driver_exception(e)
+        return status,result,output,err_msg
 
 
 class Singleton_DriverUtil():
     def driver(self,browser_num):
         driver=None
-        print 'BROWSER NUM',browser_num
+        log.debug('BROWSER NUM: ')
+        log.debug(browser_num)
+        logger.print_on_console( 'BROWSER NUM: ',browser_num)
         if (browser_num == '1'):
             choptions = webdriver.ChromeOptions()
             choptions.add_argument('start-maximized')
             choptions.add_argument('--disable-extensions')
             driver = webdriver.Chrome(chrome_options=choptions, executable_path=webconstants.CHROME_DRIVER_PATH)
             logger.print_on_console('Chrome browser started')
+            log.info('Chrome browser started')
 
         elif(browser_num == '2'):
             driver = webdriver.Firefox()
             driver.maximize_window()
             logger.print_on_console('Firefox browser started')
+            log.info('Firefox browser started')
 
         elif(browser_num == '3'):
             caps = webdriver.DesiredCapabilities.INTERNETEXPLORER
@@ -358,6 +440,7 @@ class Singleton_DriverUtil():
             caps['NATIVE_EVENTS'] = True
             driver = webdriver.Ie(capabilities=caps,executable_path=webconstants.IE_DRIVER_PATH_64)
             logger.print_on_console('IE browser started')
+            log.info('IE browser started')
 
         elif(browser_num == '4'):
             driver = webdriver.Opera()
@@ -366,8 +449,16 @@ class Singleton_DriverUtil():
         elif(browser_num == '5'):
             driver = webdriver.Safari()
             logger.print_on_console('Safari browser started')
+            log.info('Safari browser started')
 ##        print __driver
         return driver
+
+    def __web_driver_exception(self,e):
+        log.error(e)
+        log.error(e.msg)
+        logger.print_on_console(e.msg)
+        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        return err_msg
 
 
 
