@@ -25,11 +25,12 @@ import logger
 from constants import *
 import pause_execution
 import dynamic_variable_handler
+import reporting
 
 from values_from_ui import *
 from concurrent.futures import ThreadPoolExecutor
 import threading
-import time
+from datetime import datetime
 import logging
 from loggermessages import *
 
@@ -42,7 +43,6 @@ i = 0
 terminate_flag=False
 pause_flag=False
 break_point=-1
-verify_exists=False
 
 thread_tracker = []
 log = logging.getLogger("controller.py")
@@ -70,14 +70,6 @@ class TestThread(threading.Thread):
             time.sleep(2)
             con = Controller()
             print 'Controller object created'
-##            tsp = handler.tspList
-##            print 'TSP Length:::::',len(tsp)
-##            for k in range(len(tsp)):
-##                print 'Keyword :::::: ',tsp[k].name.lower()
-##                if tsp[k].name.lower() == 'openbrowser':
-##                    print 'openbrowser 1'
-##                    tsp[k].inputval = list( self.browser)
-##                    print 'openbrowser 2'
 
             status = con.invoke_controller('debug','',self.browser)
             if status==TERMINATE:
@@ -98,6 +90,9 @@ class Controller():
     webservice_dispatcher_obj = None
     outlook_dispatcher_obj = None
     desktop_dispatcher_obj = None
+    reporting_pojo_obj=None
+    reporting_obj=reporting.Reporting()
+    verify_exists=False
 
     def __init__(self):
         self.get_all_the_imports()
@@ -111,6 +106,10 @@ class Controller():
         self.verify_dict={'web':VERIFY_EXISTS,
         'desktopjava':VERIFY_VISIBLE}
         self.dynamic_var_handler_obj=dynamic_variable_handler.DynamicVariables()
+        self.status=TEST_RESULT_FAIL
+        self.scenario_start_time=''
+        self.scenario_end_time=''
+        self.scenario_ellapsed_time=''
 
     def __load_generic(self):
         try:
@@ -193,20 +192,12 @@ class Controller():
         return status
 
     def __print_details(self,tsp,input,inpval):
-        keyword = tsp.name
-
-        logger.print_on_console( "***Keyword :",keyword,' execution Started***')
-        log.info(KEYWORD_EXECUTION_STARTED)
-        log.info('Keyword: ' + tsp.name)
-
-##        logger.print_on_console( 'Keyword : ',tsp.name)
-##        print 'Input :',input
-##        logger.print_on_console( 'Output :',tsp.outputval)
-        logger.print_on_console( 'Apptype : ',str(tsp.apptype))
-        log.info('Apptype : '+str(tsp.apptype))
+        logger.print_on_console('Keyword : '+tsp.name)
+        logger.print_on_console('Input :'+input)
+        logger.print_on_console('Output :'+tsp.outputval)
+        logger.print_on_console('Apptype : '+str(tsp.apptype))
         for i in range(len(inpval)):
-            logger.print_on_console( 'Input: ',i + 1 , '= ',inpval[i])
-            log.info('Input: ' + str( (i + 1)) + '=' +inpval[i])
+            logger.print_on_console('Input: ',i + 1 , '= ',inpval[i])
 
 
 
@@ -216,6 +207,7 @@ class Controller():
             index = constants.BREAK_POINT
             return index
         tsp = handler.tspList[index]
+        keyword_flag=True
         #Check for 'terminate_flag' before execution
         if not(terminate_flag):
             #Check for 'pause_flag' before executionee
@@ -250,21 +242,30 @@ class Controller():
 
                 inpval=self.split_input(rawinput,tsp.name)
                 if tsp.name.lower() not in [FOR,ENDFOR] :
+                    #Print the details of keyword
                     self.__print_details(tsp,input,inpval)
 
+                #Calculating Start time
 
                 if tsp != None and isinstance(tsp,TestStepProperty) :
-                    index = self.keywordinvocation(index,inpval,*args)
-                elif tsp != None and isinstance(tsp,if_step.If):
-                    index = tsp.invoke_condtional_keyword(inpval)
-                elif tsp != None and isinstance(tsp,for_step.For):
-                    index = tsp.invokeFor(inpval)
-                elif tsp != None and isinstance(tsp,getparam.GetParam):
-                    index = tsp.performdataparam(inpval)
-                elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
-                    index = tsp.invoke_jumpby(inpval)
-                elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
-                    index = tsp.invoke_jumpto(inpval)
+                    logger.print_on_console( "----Keyword :",tsp.name,' execution Started----\n')
+                    start_time = datetime.now()
+                    start_time_string=start_time.strftime(TIME_FORMAT)
+                    logger.print_on_console('Step Execution start time is : '+start_time_string)
+                    index = self.keywordinvocation(index,inpval,self.reporting_obj,*args)
+                else:
+                    keyword_flag=False
+                    if tsp != None and isinstance(tsp,if_step.If):
+                        index = tsp.invoke_condtional_keyword(inpval,self.reporting_obj)
+                    elif tsp != None and isinstance(tsp,for_step.For):
+                        index = tsp.invokeFor(inpval,self.reporting_obj)
+                    elif tsp != None and isinstance(tsp,getparam.GetParam):
+                        index = tsp.performdataparam(inpval,self,self.reporting_obj)
+                    elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
+                        index = tsp.invoke_jumpby(inpval,self.reporting_obj)
+                    elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
+                        index = tsp.invoke_jumpto(inpval,self.reporting_obj)
+
 
 
             else:
@@ -272,6 +273,23 @@ class Controller():
                 index= constants.TERMINATE
         else:
             index= constants.TERMINATE
+
+
+
+        ellapsed_time=''
+        if keyword_flag:
+            end_time = datetime.now()
+            end_time_string=end_time.strftime(TIME_FORMAT)
+            logger.print_on_console('Step Execution end time is : '+end_time_string)
+            logger.print_on_console( "----Keyword :",tsp.name,' execution Completed----')
+            ellapsed_time=end_time-start_time
+            logger.print_on_console('Step Elapsed time is : ',str(ellapsed_time)+'\n')
+            #Changing the overallstatus of the scenario if it's Fail or Terminate
+            if self.status==TEST_RESULT_FAIL or self.status==TERMINATE:
+                self.reporting_obj.overallstatus=self.status
+
+        self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED ',ellapsed_time,keyword_flag)
+
         return index
 
     def split_input(self,input,keyword):
@@ -314,7 +332,6 @@ class Controller():
     def keywordinvocation(self,index,inpval,*args):
         import time
         time.sleep(1)
-        global verify_exists
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE)
         #Check for 'terminate_flag' before execution
         if not(terminate_flag):
@@ -326,21 +343,23 @@ class Controller():
 
             #Custom object implementation for Web
             if teststepproperty.objectname==CUSTOM:
-                if verify_exists==False:
+                if self.verify_exists==False:
                     previous_step=handler.tspList[index-1]
                     apptype=previous_step.apptype.lower()
-                    if previous_step.name==self.verify_dict[apptype]:
+
+                    if  apptype in self.verify_dict and previous_step.name==self.verify_dict[apptype]:
                         self.previous_step=previous_step
                         teststepproperty.custom_flag=True
-                        verify_exists=True
+                        self.verify_exists=True
                     else:
+                        apptype=teststepproperty.apptype.lower()
                         logger.log('ERR_CUSTOM_VERIFYEXISTS: Previous step ',self.verify_dict[apptype],' is missing')
-                if verify_exists==True:
+                if self.verify_exists==True:
                     teststepproperty.custom_flag=True
                     teststepproperty.parent_xpath=self.previous_step.objectname
                     teststepproperty.url=self.previous_step.url
-            elif teststepproperty.name==VERIFY_EXISTS and verify_exists:
-                verify_exists=False
+            elif teststepproperty.name==VERIFY_EXISTS and self.verify_exists:
+                self.verify_exists=False
 
 
 
@@ -354,7 +373,7 @@ class Controller():
 
             elif teststepproperty.apptype.lower() == constants.APPTYPE_WEB:
                 #Web apptype module call
-                result = self.invokewebkeyword(teststepproperty,self.web_dispatcher_obj,inpval)
+                result = self.invokewebkeyword(teststepproperty,self.web_dispatcher_obj,inpval,args[0])
 
             elif teststepproperty.apptype.lower() == constants.APPTYPE_WEBSERVICE:
                 #Webservice apptype module call
@@ -369,15 +388,21 @@ class Controller():
                 result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
 
             logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',result,'\n')
-            log.info('Result in methodinvocation : '+ teststepproperty.name+' : ')
-            log.info(result)
+            log.info('Result in methodinvocation : '+ teststepproperty.name+' : ',result)
             log.info(KEYWORD_EXECUTION_COMPLETED+ '\n' )
-            self.store_result(result,teststepproperty)
-##            print '\n'
 
+            if result!=TERMINATE:
+                self.store_result(result,teststepproperty)
+                self.status=result[0]
+                index+=1
+            else:
+                index=result
+                self.status=result
 
-            index+=1
-            if teststepproperty.name=='stop':
+            print '\n'
+
+            #Checking for stop keyword
+            if teststepproperty.name==STOP:
                 index=len(handler.tspList)
             return index
         else:
@@ -385,9 +410,15 @@ class Controller():
 
 
     def executor(self,tsplist,action):
+
         i = 0
 
         status=True
+
+        self.scenario_start_time=datetime.now()
+        start_time_string=self.scenario_start_time.strftime(TIME_FORMAT)
+        logger.print_on_console('Scenario Execution start time is : '+start_time_string)
+
 
         while (i < len(tsplist)):
             tsp = tsplist[i]
@@ -416,48 +447,43 @@ class Controller():
                 status=constants.TERMINATE
                 break
 
+        self.scenario_end_time=datetime.now()
+        end_time_string=self.scenario_end_time.strftime(TIME_FORMAT)
+        logger.print_on_console('Scenario Execution end time is : '+end_time_string)
+
+        self.scenario_ellapsed_time=self.scenario_end_time-self.scenario_start_time
+        self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
+        logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
+
+
+
 
         return status
 
     def invokegenerickeyword(self,teststepproperty,dispatcher_obj,inputval):
-
         keyword = teststepproperty.name
-##        logger.print_on_console( "Keyword :",keyword,' execution Started')
         res = dispatcher_obj.dispatcher(teststepproperty,*inputval)
-
-        logger.print_on_console( "***Keyword :",keyword,' execution completed***')
         return res
 
     def invokeoebskeyword(self,teststepproperty,dispatcher_obj,inputval):
-
         keyword = teststepproperty.name
-##        logger.print_on_console( "----Keyword :",keyword,' execution Started----')
-
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
-        logger.print_on_console( "----Keyword :",keyword,' execution completed----\n')
         return res
 
     def invokewebservicekeyword(self,teststepproperty,dispatcher_obj,inputval):
-
         keyword = teststepproperty.name
-##        logger.print_on_console( "----Keyword :",keyword,' execution Started----')
         res = dispatcher_obj.dispatcher(teststepproperty,*inputval)
-        logger.print_on_console( "----Keyword :",keyword,' execution completed----\n')
         return res
 
-    def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval):
+    def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
 
         keyword = teststepproperty.name
-##        logger.print_on_console( "----Keyword :",keyword,' execution Started----')
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval)
-        logger.print_on_console( "----Keyword :",keyword,' execution completed----\n')
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
         return res
 
     def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval):
         keyword = teststepproperty.name
-##        logger.print_on_console( "----Keyword :",keyword,' execution Started----')
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
-        logger.print_on_console( "----Keyword :",keyword,' execution completed----\n')
         return res
 
     def get_all_the_imports(self):
@@ -522,9 +548,7 @@ class Controller():
                     logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
                     log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
                     for d in suite[i]:
-            ##            print '===================Script execution started=========================='
                         flag=obj.parse_json(d)
-            ##            print '===================Script execution started=========================='
                         if flag == False:
                             break
                         print '\n'
@@ -532,9 +556,7 @@ class Controller():
                         for k in range(len(tsplist)):
                             if tsplist[k].name.lower() == 'openbrowser':
                                 tsplist[k].inputval = unicode(args[0])
-##                        print 'Controller object created'
-            ##            t = Test()
-            ##            list,flag = t.gettsplist()
+
                     if flag:
 
                         status = con.executor(tsplist,'debug')
@@ -549,14 +571,6 @@ class Controller():
                     logger.print_on_console ('Scenario ' , (i + 1) ,' has been disabled for execution!!!')
                     log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
 
-    ##            logger.log('--------------EXECUTION COMPLETED---------------')
-
-    ##            status=obj.executor(list,action)
-    ##            logger.log('STATUS '+str(status))
-    ##            logger.log('-----------------------COMPLETED---------------')
-
-    ##        else:
-    ##            print 'Invalid script'
         elif execution_mode.lower() == SERIAL:
             handler.tspList=[]
             terminate_flag=False
@@ -605,9 +619,7 @@ class Controller():
                         logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
                         log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
                         for d in suite[i]:
-                ##            print '===================Script execution started=========================='
                             flag=obj.parse_json(d)
-                ##            print '===================Script execution started=========================='
                             if flag == False:
                                 break
                             print '\n'
@@ -615,15 +627,14 @@ class Controller():
                             for k in range(len(tsplist)):
                                 if tsplist[k].name.lower() == 'openbrowser':
                                     tsplist[k].inputval = unicode(browsers[browser])
-                ##            t = Test()
-                ##            list,flag = t.gettsplist()
+
                         if flag:
 
                             status = con.executor(tsplist,'debug')
 
 
                         else:
-                            print 'Invalid script'
+                            log.error('Invalid script')
                         logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
                         log.info( '***Scenario ' + str((i  + 1 )) +' execution completed***')
                         obj.clearList()
@@ -631,14 +642,7 @@ class Controller():
                         logger.print_on_console( 'Scenario ' , (i + 1) ,' has been disabled for execution!!!')
                         log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
 
-    ##            logger.log('--------------EXECUTION COMPLETED---------------')
 
-    ##            status=obj.executor(list,action)
-    ##            logger.log('STATUS '+str(status))
-    ##            logger.log('-----------------------COMPLETED---------------')
-
-    ##        else:
-    ##            print 'Invalid script'
 
         return status
 
@@ -672,9 +676,8 @@ class Controller():
     def execute(self):
         kill_process()
         obj = Controller()
-##    print 'Controller object created'
         t = test.Test()
-        list,f = t.gettsplist()
+        list,flag = t.gettsplist()
         if flag:
             logger.print_on_console('*** SUITE EXECUTION STARTED***')
             obj.executor(list,'debug')
@@ -698,9 +701,10 @@ if __name__ == '__main__':
     t = test.Test()
     list,flag = t.gettsplist()
     if flag:
-        logger.print_on_console('***SUITE EXECUTION COMPLETED***')
+        logger.print_on_console('***SUITE EXECUTION STARTED***')
         obj.executor(list,'debug')
         logger.print_on_console('***SUITE EXECUTION COMPLETED***')
+        obj.reporting_obj.print_report_json()
 
     else:
         print 'Invalid script'
