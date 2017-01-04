@@ -320,6 +320,8 @@ WEB_ELEMENT_FOUND_INSIDE_IFRAME='Web Element is found inside iframe/frame '
 
 OUTPUT_CONSTANT="""9cc33d6fe25973868b30f4439f09901a"""
 
+MSG_CUSTOM_FOUND='Custom Object is Found',
+
 
 
 
