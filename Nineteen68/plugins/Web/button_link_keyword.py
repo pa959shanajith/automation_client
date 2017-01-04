@@ -17,7 +17,7 @@ from selenium import webdriver
 from pyrobot import Robot,Keys
 import browser_Keywords
 import logging
-from loggermessages import *
+from constants import *
 
 
 driver = browser_Keywords.driver_obj
@@ -137,14 +137,19 @@ class ButtonLinkKeyword():
                         methodoutput = webconstants.TEST_RESULT_TRUE
                     else:
                         log.info('Button name does not matched with the input, set the status to Fail')
-                        logger.print_on_console('Button name not matched')
+                        logger.print_on_console('Button name mismatched')
+                        logger.print_on_console(EXPECTED,input)
+                        log.info(EXPECTED)
+                        log.info(input)
+                        logger.print_on_console(ACTUAL,buttonname)
+                        log.info(ACTUAL)
+                        log.info(buttonname)
+
                 else:
                     log.error(INVALID_INPUT)
                     err_msg=INVALID_INPUT
                     logger.print_on_console(INVALID_INPUT)
-##            else:
-##                log.info('Please pass the valid web element')
-##            logger.print_on_console('Keyword result: ' + status)
+
         except Exception as e:
             log.error(e)
             log.error(e.msg)
@@ -221,21 +226,19 @@ class ButtonLinkKeyword():
                         else:
                             logger.print_on_console('Link Text mismatched')
                             log.info('Link Text mismatched')
-                            logger.print_on_console('Expected: ',text)
-                            log.info('Expected:')
-                            log.info(text)
-                            logger.print_on_console('Actual: ',input)
-                            log.info('Actual:')
+                            logger.print_on_console(EXPECTED,input)
+                            log.info(EXPECTED)
                             log.info(input)
-##                            status = webconstants.TEST_RESULT_FAIL
-##                            methodoutput = webconstants.TEST_RESULT_FAIL
+                            logger.print_on_console(ACTUAL,text)
+                            log.info(ACTUAL)
+                            log.info(text)
+
+
                 else:
                     log.error(INVALID_INPUT)
                     err_msg=INVALID_INPUT
                     logger.print_on_console(INVALID_INPUT)
-##            else:
-##                logger.print_on_console('Element not found')
-##            print 'Keyword result: ',status
+
         except Exception as e:
             log.error(e)
             log.error(e.msg)

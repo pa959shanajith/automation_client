@@ -166,6 +166,7 @@ class CustomKeyword:
         msg1='Element type is '+str(ele_type)
         logger.print_on_console(msg1)
         log.info(msg1)
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
 
             if not(ele_type is None or ele_type==''):
