@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        delay_operations.py
 # Purpose:
 #
 # Author:      sushma.p
@@ -11,40 +11,57 @@
 import logger
 import Exceptions
 import pause_display_operation
+import logging
 from constants import *
+
+log = logging.getLogger('delay_operations.py')
 
 class Delay_keywords:
 
     def wait(self,input):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
         try:
             import time
             if not(input is None and input is ''):
                 input=int(input)
-                logger.print_on_console('wait method started')
+                log.info('Wait for :' + str(input) + 'seconds')
+                logger.print_on_console('Wait for :' , str(input) , 'seconds')
                 time.sleep(input)
-                logger.print_on_console('wait method completed')
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
+            else:
+                log.error(INVALID_INPUT)
+                err_msg=INVALID_INPUT
+                logger.print_on_console(INVALID_INPUT)
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+        return status,methodoutput,output,err_msg
 
     def pause(self,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
         try:
             pause_display_operation.execute()
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+        return status,methodoutput,output,err_msg
 
     def display_variable_value(self,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
         try:
             import time
             display_input=''
@@ -62,7 +79,9 @@ class Delay_keywords:
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+        return status,methodoutput,output,err_msg
 
 
