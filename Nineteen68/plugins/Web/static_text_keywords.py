@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        static_text_keywords.py
 # Purpose:
 #
 # Author:      wasimakram.sutar
@@ -13,8 +13,12 @@ import logger
 import Exceptions
 import browser_Keywords
 from webconstants import *
+from constants import *
 
 sourcetext= ''
+import logging
+log = logging.getLogger('static_text_keywords.py')
+
 class StaticTextKeywords:
     def switchtoiframe(self,mypath):
         cond_flag = False
@@ -39,6 +43,7 @@ class StaticTextKeywords:
         return cond_flag
 
     def get_source1(self,myipath):
+        global sourcetext
         path = myipath
         for iframes in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(FRAME)))):
             path = myipath + str(iframes) + 'f' +  '/'
@@ -46,19 +51,18 @@ class StaticTextKeywords:
                 element = browser_Keywords.driver_obj.find_element_by_tag_name(HTML)
                 text = str(element.text)
                 text = text.replace('\n','')
-                global sourcetext
                 sourcetext = sourcetext + text
                 for frames in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(IFRAME)))):
-                    path = path + str(frames) + 'i' +  '/'
-                    if self.switchtoiframe(path):
+                    inpath = path + str(frames) + 'i' +  '/'
+                    if self.switchtoiframe(inpath):
                         element = browser_Keywords.driver_obj.find_element_by_tag_name(HTML)
                         text = str(element.text)
                         text = text.replace('\n','')
-                        global sourcetext
                         sourcetext = sourcetext + text
                 self.get_source1(path)
 
     def get_source2(self,myipath):
+        global sourcetext
         path = myipath
         for iframes in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(IFRAME)))):
             path = myipath + str(iframes) + 'i' +  '/'
@@ -66,15 +70,13 @@ class StaticTextKeywords:
                 element = browser_Keywords.driver_obj.find_element_by_tag_name(HTML)
                 text = str(element.text)
                 text = text.replace('\n','')
-                global sourcetext
                 sourcetext = sourcetext + text
                 for frames in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(FRAME)))):
-                    path = path + str(frames) + 'f' +  '/'
-                    if self.switchtoiframe(path):
+                    inpath = path + str(frames) + 'f' +  '/'
+                    if self.switchtoiframe(inpath):
                         element = browser_Keywords.driver_obj.find_element_by_tag_name(HTML)
                         text = str(element.text)
                         text = text.replace('\n','')
-                        global sourcetext
                         sourcetext = sourcetext + text
                 self.get_source2(path)
 
@@ -83,7 +85,10 @@ class StaticTextKeywords:
     def verify_text_exists(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        global sourcetext
         actualtext = str(input[0])
+        err_msg=None
+        output=OUTPUT_CONSTANT
         text=''
         try:
             if actualtext is not None or len(actualtext) > 0:
@@ -91,21 +96,27 @@ class StaticTextKeywords:
                 text = element.text
 ##                text = str(text)
                 text = text.replace('\n','')
-                global sourcetext
                 sourcetext = sourcetext + text
                 browser_Keywords.driver_obj.switch_to.default_content()
                 self.get_source1('')
                 browser_Keywords.driver_obj.switch_to.default_content()
                 self.get_source2('')
                 browser_Keywords.driver_obj.switch_to.default_content()
-                global sourcetext
                 if actualtext in sourcetext:
-                    print 'Text: ', actualtext ,' found'
+                    logger.print_on_console('Text  present')
+                    log.info('Text  present')
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    print 'Text: ', actualtext ,' not found'
+                    logger.print_on_console('Text not present')
+                    log.error('Text not present')
+            else:
+                log.error(INVALID_INPUT)
+                err_msg=INVALID_INPUT
+                logger.print_on_console(INVALID_INPUT)
         except Exception as e:
-                Exceptions.error(e)
-        return status,methodoutput
+                log.error(e)
+                log.error(e.msg)
+                logger.print_on_console(e.msg)
+        return status,methodoutput,output,err_msg
 

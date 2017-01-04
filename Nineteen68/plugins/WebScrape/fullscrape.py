@@ -95,9 +95,9 @@ class Fullscrape():
                         logger.log('FILE: fullscrape.py , DEF: callback_scrape1() , MSG: full scrape operation on iframe page is done and data is obtained')
                         tempne.extend(temp)
                         for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
-                            path = path + str(frames) + 'f' +  '/'
-                            if switchtoframe_scrape1(path):
-                                itemp = driver.execute_script(javascript_scrape, path)
+                            inpath = path + str(frames) + 'f' +  '/'
+                            if switchtoframe_scrape1(inpath):
+                                itemp = driver.execute_script(javascript_scrape, inpath)
                                 logger.log('FILE: fullscrape.py , DEF: callback_scrape1() , MSG: full scrape operation on frame page is done and data is obtained')
                                 tempne.extend(itemp)
 
@@ -115,9 +115,9 @@ class Fullscrape():
                         logger.log('FILE: fullscrape.py , DEF: callback_scrape2() , MSG: full scrape operation on frame page is done and data is obtained')
                         tempne.extend(temp)
                         for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
-                            path = path + str(frames) + 'i' +  '/'
-                            if switchtoframe_scrape1(path):
-                                itemp = driver.execute_script(javascript_scrape, path)
+                            inpath = path + str(frames) + 'i' +  '/'
+                            if switchtoframe_scrape1(inpath):
+                                itemp = driver.execute_script(javascript_scrape, inpath)
                                 logger.log('FILE: fullscrape.py , DEF: callback_scrape2() , MSG: full scrape operation on iframe page is done and data is obtained')
                                 tempne.extend(itemp)
                         callback_scrape2(path, tempne)
