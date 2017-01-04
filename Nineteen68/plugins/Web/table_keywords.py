@@ -20,65 +20,94 @@ from  selenium.webdriver.common import action_chains
 import time
 import browser_Keywords
 driver=''
+from loggermessages import *
+
+log = logging.getLogger('table_keywords.py')
 class TableOperationKeywords():
 
 
 #   returns the row count of table if the table found with the given xpath
         def getRowCount(self,element,*args):
+            log.info(KEYWORD_EXECUTION_STARTED)
+            logger.print_on_console('Executing keyword : %s',getRowCount)
             driver=browser_Keywords.driver_obj
+            logger.debug('got the driver instance from browser keyword')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
-            print element
             row_count=None
             visibleFlag=True
+            error_msg=None
             if visibleFlag==True:
                 try:
+                    log.debug('checking for element')
                     if element!=None:
+                        log.debug('performing java script on element')
                         js='var targetTable = arguments[0]; var rowCount = targetTable.rows; return rowCount.length;'
                         row_count = driver.execute_script(js,element)
                         if(row_count>=0):
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
-                            return status,row_count
+                            logger.print_on_console('Got the result : %s',row_count)
+                    else:
+                        error_msg='Element not found'
+                        log.error('Element not found')
+                        logger.print_on_console('Element not found')
                 except Exception as e:
-                    Exceptions.error(e)
+                     log.error(e)
+                     log.error(e.msg)
+                     logger.print_on_console(e.msg)
+                     error_msg=e.msg
             else:
+                log.error('hidden object')
                 logger.print_on_console('hidden object')
-            return status,methodoutput,row_count
+            return status,methodoutput,row_count,error_msg
 
 #   returns the no of coloumns of the table if the table found with the given xpath
-        def getColoumnCount(self,element,*args):
+        def getColoumnCount(self,webElement,*args):
+            log.info(KEYWORD_EXECUTION_STARTED)
+            logger.print_on_console('Executing keyword : %s',getColoumnCount)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             coloumn_count=None
+            error_msg=None
             driver=browser_Keywords.driver_obj
+            logger.debug('got the driver instance from browser keyword')
             visibleFlag=True
             if visibleFlag==True:
                 try:
-                    webElement=element
+                    log.debug('checking for element')
                     if webElement!=None:
+                        log.debug('performing java script on element')
                         js='var targetTable = arguments[0]; var columnCount = 0; var rows = targetTable.rows; if(rows.length > 0) { 	for (var i = 0; i < rows.length; i++) { 		var cells = rows[i].cells; 		var tempColumnCount = 0; 		for (var j = 0; j < cells.length; j++) { 			tempColumnCount += cells[j].colSpan; 		} 		if (tempColumnCount > columnCount) { 			columnCount = tempColumnCount; 		} 	} } return columnCount;'
                         coloumn_count = driver.execute_script(js,element)
                         if(coloumn_count>=0):
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
-                            print coloumn_count
-                            return status,coloumn_count
+                            log.info('Got the result : %s',coloumn_count)
+                            logger.print_on_console('Got the result : %s',coloumn_count)
                 except Exception as e:
-                    Exceptions.error(e)
+                    log.error(e)
+                    log.error(e.msg)
+                    logger.print_on_console(e.msg)
+                    error_msg=e.msg
             else:
                 logger.print_on_console('hidden object')
-            return status,methodoutput,coloumn_count
+            return status,methodoutput,coloumn_count,error_msg
 
 #   returns the cell value of cell with ',' seperated values, if the table found with the given xpath
         def getCellValue(self,element,input_val,output):
+            log.info(KEYWORD_EXECUTION_STARTED)
+            logger.print_on_console('Executing keyword : %s',getCellValue)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             cellVal=None
+            error_msg=None
             driver=browser_Keywords.driver_obj
+            logger.debug('got the driver instance from browser keyword')
             visibleFlag=True
             try:
                 if visibleFlag==True:
+                    log.debug('reading the inputs')
                     row_num=int(input_val[0])
                     col_num=int(input_val[1])
                     row_count=self.getRowCountJs(element)
@@ -89,23 +118,34 @@ class TableOperationKeywords():
                         remoteWebElement=self.javascriptExecutor(element,row_num-1,col_num-1)
                         cellVal=self.getChildNodes(remoteWebElement)
                         cellVal=cellVal.strip()
+                        log.info('Got the result : %s',cellVal)
+                        logger.print_on_console('Got the result : %s',cellVal)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                 else:
-                    print 'hidden object'
+                    logger.print_on_console('hidden object')
             except Exception as e:
-                Exceptions.error(e)
-            return status,methodoutput,cellVal
+                log.error(e)
+                log.error(e.msg)
+                logger.print_on_console(e.msg)
+                error_msg=e.msg
+            return status,methodoutput,cellVal,error_msg
 
 #   verifies the cell value with the given text input, if the table found with the given xpath
         def verifyCellValue(self,element,input_val,output_val):
+            log.info(KEYWORD_EXECUTION_STARTED)
+            logger.print_on_console('Executing keyword : %s',verifyCellValue)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             cellVal=None
+            error_msg=None
             driver=browser_Keywords.driver_obj
+            logger.debug('got the driver instance from browser keyword')
             visibleFlag=True
+            output_res=MD5_TEMP_RES
             try:
                 if visibleFlag==True:
+                    log.debug('reading the inputs')
                     row_num=int(input_val[0])
                     col_num=int(input_val[1])
                     row_count=self.getRowCountJs(element)
@@ -120,23 +160,33 @@ class TableOperationKeywords():
                         cellVal=cellVal.strip()
                         expected_value=input_val[2].strip()
                         if(cellVal == expected_value):
+                            log.info('Got the result : %s', 'PASS')
+                            logger.print_on_console('Got the result : %s','PASS')
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                 else:
-                    print 'hidden object'
+                    logger.print_on_console('hidden object')
             except Exception as e:
-                Exceptions.error(e)
-            return status,methodoutput
+                log.error(e)
+                log.error(e.msg)
+                logger.print_on_console(e.msg)
+                error_msg=e.msg
+            return status,methodoutput,output_res,error_msg
 
 #   returns the  tooltip text  of given cell, if the table found with the given xpath
         def getCellToolTip(self,element,input_val,output):
+            log.info(KEYWORD_EXECUTION_STARTED)
+            logger.print_on_console('Executing keyword : %s',getCellToolTip)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             tooltip=None
             driver=browser_Keywords.driver_obj
+            error_msg=None
+            logger.debug('got the driver instance from browser keyword')
             visibleFlag=True
             if visibleFlag==True:
                 try:
+                    log.debug('reading the inputs')
                     row_number=int(input_val[0])
                     col_number=int(input_val[1])
                     row_count=self.getRowCountJs(element)
@@ -144,63 +194,98 @@ class TableOperationKeywords():
                     if row_number>row_count or col_number>col_count:
                         logger.print_on_console('Invalid Input')
                     else:
+                        log.debug('perfoming java script on element')
                         contents = self.getTooltip(element, row_number,
     							col_number);
                         if contents !=None:
                             tooltip=contents
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
+                            log.info('Got the result : %s',cellVal)
+                            logger.print_on_console('Got the result : %s',cellVal)
 
                 except Exception as e:
-                    Exceptions.error(e)
+                    log.error(e)
+                    log.error(e.msg)
+                    logger.print_on_console(e.msg)
+                    error_msg=e.msg
             else:
                 logger.print_on_console('hidden object')
-            return status,methodoutput,tooltip
+            return status,methodoutput,tooltip,error_msg
 
 #   lclicks on the given cell, if the table found with the given xpath
         def cellClick(self,element,input_arr,*args):
+            log.info(KEYWORD_EXECUTION_STARTED)
+            logger.print_on_console('Executing keyword : %s',cellClick)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
+            error_msg=None
+            output_val=MD5_TEMP_RES
+            log.debug('reading the inputs')
             row_number=int(input_arr[0])-1
             col_number=int(input_arr[1])-1
             driver=browser_Keywords.driver_obj
+            logger.debug('got the driver instance from browser keyword')
             visibleFlag=True
             if visibleFlag==True:
                 try:
                     if len(input_arr)==2:
+                        log.info('normal cell click')
+                        logger.print_on_console('normal cell click inside the cell')
                         cell=self.javascriptExecutor(element,row_number,col_number)
                         element_list=cell.find_elements_by_xpath('.//*')
                         if len(list(element_list))>0:
                             xpath=self.getElemntXpath(element_list[0])
                             cell=driver.find_element_by_xpath(xpath)
                         try:
+                            log.debug('checking for element not none')
                             if(cell!=None):
+                                log.debug('checking for element enabled')
                                 if cell.is_enabled():
                                     if isinstance(driver,webdriver.Ie):
                                         try:
+                                            log.debug('performing java script click')
                                             js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
                                             click=driver.execute_script(js,element)
                                             status=webconstants.TEST_RESULT_PASS
+                                            log.info('click action performed successfully')
+                                            logger.print_on_console('click action performed successfully')
                                         except Exceptions as e:
+                                            log.debug('error occured so trying action events')
                                             action=action_chains.ActionChains(driver)
                                             action.move_to_element(cell).click(cell).perform()
                                             status=TEST_RESULT_PASS
                                             methodoutput=TEST_RESULT_TRUE
+                                            log.info('click action performed successfully')
+                                            logger.print_on_console('click action performed successfully')
                                     else:
                                         try:
+                                            log.debug('performing click')
                                             cell.click()
+                                            status=TEST_RESULT_PASS
+                                            methodoutput=TEST_RESULT_TRUE
+                                            log.info('click action performed successfully')
+                                            logger.print_on_console('click action performed successfully')
                                         except Exception as e:
                                             js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
                                             click=driver.execute_script(js,element)
                                             status=TEST_RESULT_PASS
                                             methodoutput=TEST_RESULT_TRUE
+                                            log.info('click action performed successfully')
+                                            logger.print_on_console('click action performed successfully')
                         except Exception as e:
-                            Exceptions.error(e)
+                            log.error(e)
+                            log.error(e.msg)
+                            logger.print_on_console(e.msg)
+                            error_msg=e.msg
                     elif len(input_arr)>2:
+                        log.info('click on an element inside a cell')
+                        logger.print_on_console('click on an element inside a cell')
                         tag=input_arr[2]
                         index=input_arr[3]
                         eleStatus=False
                         counter = 1
+                        log.debug('fiding the cell with given inputs')
                         cell=self.javascriptExecutor(element,row_number,col_number)
                         element_list=cell.find_elements_by_xpath('.//*')
                         for member in element_list:
@@ -213,6 +298,7 @@ class TableOperationKeywords():
                               lastElement=xpath_elements[len(xpath_elements)-1]
                               childindex=lastElement[lastElement.find("[")+1:lastElement.find("]")]
                               if tag=='button':
+                                   log.debug('clicking on button')
                                    if( (tagName==('input') and tagType==('button')) or tagType==('submit') or tagType==('reset') or tagType==('file')):
                                       if index==childindex:
                                         eleStatus =True
@@ -223,6 +309,7 @@ class TableOperationKeywords():
                                         else:
                                             counter+=counter
                               elif tag=='image':
+                                  log.debug('clicking on image')
                                   if(tagName==('input') and (tagType==('img') or tagType==('image'))):
                                      if index==childindex:
                                         eleStatus =True
@@ -233,6 +320,7 @@ class TableOperationKeywords():
                                         else:
                                             counter+=counter
                               elif tag=='img':
+                                 log.debug('clicking on img')
                                  if index==childindex:
                                         eleStatus =True
                                  else:
@@ -242,6 +330,7 @@ class TableOperationKeywords():
                                         else:
                                             counter+=counter
                               elif tag=='checkbox':
+                                 log.debug('clicking on check box')
                                  if(tagName==('input') and (tagType==('checkbox')) ):
                                      if index==childindex:
                                         eleStatus =True
@@ -252,6 +341,7 @@ class TableOperationKeywords():
                                         else:
                                             counter+=counter
                               elif tag=='radiobutton':
+                                 log.debug('clicking on radio button')
                                  if (tagName==('input') and tagType==('radio')):
                                     if index==childindex:
                                         eleStatus =True
@@ -262,6 +352,7 @@ class TableOperationKeywords():
                                         else:
                                             counter+=counter
                               elif tag=='textbox':
+                                 log.debug('clicking on radio text box')
                                  if (tagName==('input') and (tagType==('text') or tagType==('email') or tagType==('password') or tagType==('range') or tagType==('search') or tagType==('url')) ):
                                     if index==childindex:
                                         eleStatus =True
@@ -272,6 +363,7 @@ class TableOperationKeywords():
                                         else:
                                             counter+=counter
                               elif tag=='link':
+                                log.debug('clicking on link')
                                 if(tagName==('a')):
                                     if index==childindex:
                                         eleStatus =True
@@ -292,21 +384,28 @@ class TableOperationKeywords():
                                         driver.execute_script("arguments[0].scrollIntoView(true);",cellChild);
                                         if isinstance(driver,webdriver.Ie):
                                             try:
+                                                log.debug('performing click')
                                                 js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
                                                 click=driver.execute_script(js,cellChild)
                                                 status=webconstants.TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
                                                 break;
                                             except Exceptions as e:
+                                                log.debug('performing click')
                                                 action=action_chains.ActionChains(driver)
                                                 action.move_to_element(cellChild).click(cellChild).perform()
                                                 status=webconstants.TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
                                                 break;
                                         else:
                                             try:
+                                                log.debug('performing click')
                                                 cellChild.click()
                                                 status=webconstants.TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
                                                 break
                                             except Exception as e:
+                                                log.debug('performing click')
                                                 js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
                                                 click=driver.execute_script(js,cellChild)
                                                 status=TEST_RESULT_PASS
@@ -315,23 +414,34 @@ class TableOperationKeywords():
 
 
                                     except Exception as e:
-                                     Exceptions.error(e)
+                                         log.error(e)
+                                         log.error(e.msg)
+                                         logger.print_on_console(e.msg)
+                                         error_msg=e.msg
 
                 except Exception as e:
-                    Exceptions.error(e)
+                   log.error(e)
+                   log.error(e.msg)
+                   logger.print_on_console(e.msg)
+                   error_msg=e.msg
             else:
                 logger.print_on_console('hidden object')
-            return status,methodoutput
+            return status,methodoutput,output_val,error_msg
 
 
 
 
         def getRowNumByText(self,element,text,*args):
+            log.info(KEYWORD_EXECUTION_STARTED)
+            logger.print_on_console('Executing keyword : %s',getRowNumByText)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             row_number=None
+            error_msg=None
+            log.debug('reading the inputs')
             text=text[0].strip()
             driver=browser_Keywords.driver_obj
+            logger.debug('got the driver instance from browser keyword')
             visibleFlag=True
             if visibleFlag==True:
                 try:
@@ -339,18 +449,27 @@ class TableOperationKeywords():
                     row_number=driver.execute_script(js,element,text)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                    log.info('Got the result : %s',cellVal)
+                    logger.print_on_console('Got the result : %s',cellVal)
                 except Exception as e:
-                    Exceptions.error(e)
+                    log.error(e)
+                    log.error(e.msg)
+                    logger.print_on_console(e.msg)
+                    error_msg=e.msg
             else:
                 logger.print_on_console('hidden object')
-            return status,methodoutput,row_number
+            return status,methodoutput,row_number,error_msg
 
         def getColNumByText(self,element,text,*args):
+            log.info(KEYWORD_EXECUTION_STARTED)
+            logger.print_on_console('Executing keyword : %s',getColNumByText)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             col_number=None
             driver=browser_Keywords.driver_obj
+            logger.debug('got the driver instance from browser keyword')
             visibleFlag=True
+            log.debug('reading the inputs')
             text=text[0].strip()
             if visibleFlag==True:
                 try:
@@ -358,11 +477,16 @@ class TableOperationKeywords():
                     col_number=driver.execute_script(js,element,text)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                    log.info('Got the result : %s',cellVal)
+                    logger.print_on_console('Got the result : %s',cellVal)
                 except Exception as e:
-                    Exceptions.error(e)
+                    log.error(e)
+                    log.error(e.msg)
+                    logger.print_on_console(e.msg)
+                    error_msg=e.msg
             else:
                 logger.print_on_console('hidden object')
-            return status,methodoutput,col_number
+            return status,methodoutput,col_number,error_msg
 
 
         def getChildNodes(self,element):
@@ -415,37 +539,54 @@ class TableOperationKeywords():
 
 
         def getInnerTable(self,element,input_val,*args):
+            log.info(KEYWORD_EXECUTION_STARTED)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             web_element=None
+            error_msg=None
 
             if((element is not None) and (input_val is not None)):
                 try:
                     if(len(input_val) == 2):
+                        log.info('Input value is 2')
                         cell_row = input_val[0]
+                        log.info('cell row')
+                        log.info(cell_row)
                         cell_col = input_val[1]
+                        log.info('cell_col')
+                        log.info(cell_col)
                         script ="""var temp = fun(arguments[0], arguments[1], arguments[2]); return temp;  function fun(table, x, y) {     row = table.rows[x];     cell = row.cells[y];     tableCheck = cell.getElementsByTagName('table'); if(tableCheck.length > 0){        console.log(tableCheck[0]);       return tableCheck[0];    }else{      return null; } }"""
                         web_element = browser_Keywords.driver_obj.execute_script(script,element,cell_row,cell_col)
                         if( web_element.tag_name == 'table'):
-                             status=TEST_RESULT_PASS
-                             methodoutput=TEST_RESULT_TRUE
+                            logger.print_on_console('Inner table reference obtained')
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                         else:
                             web_element = None
+                            error_msg = 'Table element not found'
                     elif(len(input_val) == 1):
+                        log.info('Input value is 1')
                         row_no = input_val[0]
+                        log.info('row_no')
+                        log.info(row_no)
                         script = """var ele = arguments[0]; var row = arguments[1]; var temp = fun(ele, row); return temp;  function fun(tableEle, rowNo) {     row = tableEle.rows[rowNo];     flag = false;     count = 0;     a = [];     eleCollection = row.getElementsByTagName('table');     if (eleCollection.length > 0) {         return eleCollection[0];     } else {         if (flag != true) {             child = tableEle.children;             ele = child[0];             trCount = ele.childElementCount;             for (i = rowNo; i < trCount; i++) {                 count++;                 if (count > 1) {                     row = a[1];                 }                 a = recursfunc(row);                 if (a[0] == true) {                     return a[1];                     break;                 }             }         }     }     return "null"; }  function recursfunc(innerTable) {     check = [];     chk = false;     firstRef = innerTable.nextElementSibling;     relativeRef = firstRef.getElementsByTagName('table');     if (relativeRef.length > 0) {         actual_ref = relativeRef[0];         flag = true;         chk = true;         check[0] = chk;         check[1] = actual_ref;         return check;     } else {         check[0] = chk;         check[1] = firstRef;         return check;     } } """
                         web_element = browser_Keywords.driver_obj.execute_script(script,element,row_no)
                         if( web_element.tag_name == 'table'):
-                             status=TEST_RESULT_PASS
-                             methodoutput=TEST_RESULT_TRUE
+                            logger.print_on_console('Inner table reference obtained')
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                         else:
                             web_element = None
+                            error_msg = 'Table element not found'
 ##                    elif(len(input_val == 0)):
 ##                        script = """var ele = arguments[0]; var temp = fun(ele); console.log(temp); return temp;  function fun(tableEle) {     eleCollection = tableEle.getElementsByTagName('table');     if (eleCollection.length > 0) {         console.log(eleCollection.length);         return eleCollection[0];     }     return "null";     console.log("No Inner Table") };"""
 ##                        web_element = browser_Keywords.driver_obj.execute_script(script)
                 except Exception as e:
-                    Exceptions.error(e)
-            return status,methodoutput,web_element
+                    log.error(e)
+                    log.error(e.msg)
+                    logger.print_on_console(e.msg)
+                    error_msg=e.msg
+            return status,methodoutput,web_element,error_msg
 
 
 ##if __name__ == '__main__':
