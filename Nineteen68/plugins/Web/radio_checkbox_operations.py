@@ -50,6 +50,7 @@ class RadioCheckboxKeywords():
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
                     logger.print_on_console(err_msg)
+                    log.error(err_msg)
             except Exception as e:
                 log.error(e)
                 log.error(e.msg)
@@ -84,6 +85,7 @@ class RadioCheckboxKeywords():
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
                     logger.print_on_console(err_msg)
+                    log.error(err_msg)
             except Exception as e:
                 log.error(e)
                 log.error(e.msg)
@@ -118,6 +120,7 @@ class RadioCheckboxKeywords():
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
                     logger.print_on_console(err_msg)
+                    log.error(err_msg)
             except Exception as e:
                 log.error(e)
                 log.error(e.msg)
