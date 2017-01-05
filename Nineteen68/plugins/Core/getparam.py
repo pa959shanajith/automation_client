@@ -180,8 +180,8 @@ class GetParam():
             return status
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
 
     def readcsvfile(self,fileinfo):
         """
@@ -255,8 +255,8 @@ class GetParam():
             return myDict
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
 
 
     def readxmlfile(self,fileinfo):
@@ -309,8 +309,8 @@ class GetParam():
                 return sdata
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
 
 
     def readxlsandxlsxfile(self,fileinfo):
@@ -347,8 +347,8 @@ class GetParam():
             return data
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
 
 
 
@@ -394,8 +394,8 @@ class GetParam():
                 return getparamres
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
 
     def invokegetparam(self,input):
         """
@@ -448,8 +448,8 @@ class GetParam():
                                     inputlistwithval.insert(i,resultinput)
             except Exception as e:
                 log.error(e)
-                log.error(e.msg)
-                logger.print_on_console(e.msg)
+                
+                logger.print_on_console(e)
             return inputlistwithval
 
     def checkforstaticvariable(self, statvariable):
@@ -707,8 +707,8 @@ class GetParam():
             #Reporting part ends
 
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return return_value
 
 

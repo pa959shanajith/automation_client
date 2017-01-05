@@ -73,9 +73,9 @@ class  JumpBy():
 
         except Exception as e:
              log.error(e)
-             log.error(e.msg)
-             logger.print_on_console(e.msg)
-             error_msg=e.msg
+             
+             logger.print_on_console(e)
+             error_msg=e
 
         #Reporting part
         self.step_description='JumpBy executed and the result is '+self.status

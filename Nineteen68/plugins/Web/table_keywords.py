@@ -20,7 +20,7 @@ from  selenium.webdriver.common import action_chains
 import time
 import browser_Keywords
 driver=''
-from loggermessages import *
+import logging
 
 log = logging.getLogger('table_keywords.py')
 class TableOperationKeywords():

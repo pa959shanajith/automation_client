@@ -63,8 +63,8 @@ class  JumpTo():
                 logger.print_on_console('Test script name not found')
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
 
 
         #Reporting part
