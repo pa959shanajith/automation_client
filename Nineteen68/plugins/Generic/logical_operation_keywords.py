@@ -12,24 +12,45 @@
 from sympy.logic.inference import satisfiable
 import Exceptions
 import logger
+from constants import *
+from loggermessages import *
+import logging
 
+
+log = logging.getLogger('logical_operation_keywords.py')
 class logical_eval():
 
-    def eval_expression(self,expression):
-        expression=str(expression)
-        expression=expression.replace('AND','and').replace('OR','or').replace('NOT','not')
-        try:
-            logger.print_on_console('Evaluationg the expression')
-            result=satisfiable(expression)
-            if type(result)==dict:
-                for res in result.iterkeys():
-                    status=result[res]
-                    return status
-            else:
-                return False
-        except Exception as e:
-            Exceptions.error(e)
+    def eval_expression(self,expression,*args):
+        log.info(KEYWORD_EXECUTION_STARTED)
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        error_msg=None
+        output_res=MD5_TEMP_RES
+        log.debug('reading the inputs')
+        if len(expression==2):
+            expression=expression[0]+expression[1]+expression[2]
+            expression=expression.replace('AND','and').replace('OR','or').replace('NOT','not')
+            try:
+                logger.print_on_console('Evaluationg the expression')
+                result=satisfiable(expression)
+                if type(result)==dict:
+                    for res in result.iterkeys():
+                        status=result[res]
+                        log.debug('Got the result : %s', status)
+                        if status==True:
+                            log.debug('Got the result : %s', status)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                else:
+                    log.info('Expression evaluation failed')
+            except Exception as e:
+                log.error(e)
+                log.error(e.msg)
+                logger.print_on_console(e.msg)
+                error_msg=e.msg
+        else:
+            log.error('invalid expression')
 
-
+        return status,methodoutput,output_res,error_msg
 
 

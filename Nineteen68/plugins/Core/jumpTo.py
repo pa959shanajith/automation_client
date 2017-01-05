@@ -13,6 +13,12 @@ import handler
 import logger
 import Exceptions
 import constants
+from  constants import *
+from loggermessages import *
+import logging
+
+
+log = logging.getLogger('jumpTo.py')
 
 # Handles JumpTo keyword
 class  JumpTo():
@@ -36,23 +42,30 @@ class  JumpTo():
 
     # returns jumpTo index of step to executed by taking the script name as parameter
     def invoke_jumpto(self,reporting_obj):
+        log.info('JumpTo Execution Started')
         return_value=self.index+1
         try:
+            log.debug('Get the tsp list')
             tspList=handler.tspList
             flag=False
             i=-1
+            log.debug('Searching for Test script name in tsp list')
             for tsp in tspList:
                 i+=1
                 inputVal=input[0]
                 if inputVal==tsp.testscript_name:
                     flag=True
+                    log.debug('Found  target index in tsp list')
                     logger.print_on_console('Target index ' +str(i))
                     return_value=i
                     self.status=True
             if(flag==False):
                 logger.print_on_console('Test script name not found')
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+
 
         #Reporting part
         self.step_description='JumpTo executed and the result is '+self.status

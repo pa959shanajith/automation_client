@@ -16,6 +16,13 @@ import math
 import operator
 import Exceptions
 import logger
+from constants import *
+from loggermessages import *
+import logging
+
+
+log = logging.getLogger('math_operation_keywords.py')
+
 class NumericStringParser(object):
     '''
     Most of this code comes from the fourFn.py pyparsing example
@@ -103,20 +110,29 @@ class NumericStringParser(object):
         else:
             return float( op )
 
-    def eval(self,num_string,parseAll=True):
+    def eval(self,num_string,*args):
+        log.info(KEYWORD_EXECUTION_STARTED)
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=None
+        error_msg=None
         self.exprStack=[]
+        parseAll=True
         try:
+            log.debug('Parsing the expression')
             logger.print_on_console('Parsing the expression')
             results=self.bnf.parseString(num_string,parseAll)
+            log.debug('Evaluating the expression')
             logger.print_on_console('Evaluating the expression')
-            val=self.evaluateStack( self.exprStack[:] )
+            output=self.evaluateStack( self.exprStack[:] )
+            log.debug('Got the result : %s', output)
+            logger.print_on_console('Got the result : %s', output)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
-            output=val
-        except ParseException as e:
-            Exceptions.error(e)
-        return status,methodoutput,output
+        except Exception as e:
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            error_msg=e.msg
+        return status,methodoutput,output,error_msg
 
