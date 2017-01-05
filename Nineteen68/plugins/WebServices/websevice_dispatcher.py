@@ -42,6 +42,6 @@ class Dispatcher:
                 logger.print_on_console(ws_constants.METHOD_INVALID)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
 
