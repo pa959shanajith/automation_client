@@ -47,8 +47,8 @@ class DateOperation:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
 
@@ -81,8 +81,8 @@ class DateOperation:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
     def getCurrentDateAndTime(self,input):
@@ -114,8 +114,8 @@ class DateOperation:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
     def dateDifference(self,input_date, date_or_count ,date_format):
@@ -167,8 +167,8 @@ class DateOperation:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
     def dateAddition(self,input_date, date_or_count ,date_format):
@@ -211,8 +211,8 @@ class DateOperation:
 
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
 
@@ -256,8 +256,8 @@ class DateOperation:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
     def dateCompare(self, input_from , input_to , input_format=None):
@@ -309,8 +309,8 @@ class DateOperation:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,verb,err_msg
 
     def validate(self,input):
@@ -333,8 +333,8 @@ class DateOperation:
                 return -1
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
 
 
 ##obj =DateOperation()

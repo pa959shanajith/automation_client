@@ -42,8 +42,8 @@ class AESCipher:
                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
 
     def decrypt( self, enc ):
         try:
@@ -56,8 +56,8 @@ class AESCipher:
                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
 
     def encrypt_md5(self,input):
         try:
@@ -69,8 +69,8 @@ class AESCipher:
                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
 
     def encrypt_base64(self,input):
         try:
@@ -82,8 +82,8 @@ class AESCipher:
                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
 
     def fieldEncrypt(self,input,*args):
         status=generic_constants.TEST_RESULT_FAIL

@@ -45,9 +45,9 @@ class logical_eval():
                     log.info('Expression evaluation failed')
             except Exception as e:
                 log.error(e)
-                log.error(e.msg)
-                logger.print_on_console(e.msg)
-                error_msg=e.msg
+                
+                logger.print_on_console(e)
+                error_msg=e
         else:
             log.error('invalid expression')
 

@@ -131,8 +131,8 @@ class NumericStringParser(object):
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
-            error_msg=e.msg
+            
+            logger.print_on_console(e)
+            error_msg=e
         return status,methodoutput,output,error_msg
 

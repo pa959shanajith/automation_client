@@ -50,8 +50,8 @@ class BatchOperationKeyword():
                 logger.print_on_console(generic_constants.INVALID_FILE_FORMAT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
-            error_msg=e.msg
+            
+            logger.print_on_console(e)
+            error_msg=e
         return status,methodoutput,output_res,error_msg
 

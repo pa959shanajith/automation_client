@@ -26,14 +26,20 @@ class App():
        self.root.title( 'SLK Nineteen68 - Pause')
 ##       win = Tkinter.Toplevel(self.root)
        self.root.geometry("300x150")
+       label = Label(self.root, text='Application Paused Click OK to Continue')
+       label.pack()
 ##       self.root.iconbitmap(default='C:\Users\wasimakram.sutar\Desktop\ForLoggers\Nineteen68\Nineteen68\plugins\Core\slk.ico')
        button = Tkinter.Button(self.root, text = 'OK',   command=self.quit,width= 100, height = 50)
 ##       button.place(relx=6.5, rely=6.5,)
 ##       button.place(bordermode=OUTSIDE, height=100, width=100)
 
        button.pack()
+       self.root.lift()
+       self.root.attributes('-topmost', True)
        self.center(self.root)
        self.root.mainloop()
+##       self.root.lift()
+
 
    def quit(self):
        self.root.destroy()
@@ -60,11 +66,13 @@ class App2():
         self.w = Tkinter.Tk()
         self.w.title( 'SLK Nineteen68 - DisplayVariable')
         self.w.geometry("300x150")
-        self.w.iconbitmap(default='C:\Users\wasimakram.sutar\Desktop\ForLoggers\Nineteen68\Nineteen68\plugins\Core\slk.ico')
+##        self.w.iconbitmap(default='C:\Users\wasimakram.sutar\Desktop\ForLoggers\Nineteen68\Nineteen68\plugins\Core\slk.ico')
         label = Label(self.w, text=input )
         label.pack()
         button = Tkinter.Button(self.w, text = 'OK', command = self.quit,  width= 100, height = 50)
         button.pack()
+        self.w.lift()
+        self.w.attributes('-topmost', True)
         self.center(self.w)
         self.w.after(10000, lambda: self.w.destroy()) # Destroy the widget after 30 seconds
         self.w.mainloop()
@@ -84,9 +92,7 @@ class App2():
 
 
 def display_value(input):
-    app = App(input)
-
-
+    app = App2(input)
 
 
 

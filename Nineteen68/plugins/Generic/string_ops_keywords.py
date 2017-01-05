@@ -45,8 +45,8 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
     def toUpperCase(self,input):
@@ -74,8 +74,8 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
     def trim(self, input):
@@ -103,8 +103,8 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
     def left(self, actual_string,index):
@@ -134,8 +134,8 @@ class StringOperation:
                     logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
     def right(self, actual_string,index):
@@ -170,8 +170,8 @@ class StringOperation:
                     logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
     def mid(self,input):
@@ -210,8 +210,8 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
     def getStringLength(self, input):
@@ -239,8 +239,8 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
     def find(self, actual_string,to_find):
@@ -273,8 +273,8 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result
 
     def replace(self, actual_string, to_be_replaced , value ):
@@ -315,8 +315,8 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
     def split(self,input,character):
@@ -349,8 +349,8 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
     def concatenate(self,input1,input2):
@@ -383,8 +383,8 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
     def getSubString(self,actual_string,index):
@@ -432,8 +432,8 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
     def stringGeneration(self,data_type,data_length):
@@ -481,8 +481,8 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,result,output,err_msg
 
 ##obj =StringOperation()

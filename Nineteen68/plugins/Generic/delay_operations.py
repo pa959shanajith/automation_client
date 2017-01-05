@@ -38,8 +38,8 @@ class Delay_keywords:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,methodoutput,output,err_msg
 
     def pause(self,*args):
@@ -53,8 +53,8 @@ class Delay_keywords:
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,methodoutput,output,err_msg
 
     def display_variable_value(self,*args):
@@ -80,8 +80,8 @@ class Delay_keywords:
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         return status,methodoutput,output,err_msg
 
 

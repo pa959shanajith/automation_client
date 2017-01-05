@@ -56,9 +56,9 @@ class DatabaseOperation():
 
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
-            err_msg = e.msg
+            
+            logger.print_on_console(e)
+            err_msg = e
         finally:
             cursor.close()
             cnxn.close()
@@ -78,9 +78,9 @@ class DatabaseOperation():
             print status,result
         except Exceptions as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
-            err_msg = e.msg
+            
+            logger.print_on_console(e)
+            err_msg = e
         return status,result,verb,err_msg
 
 
@@ -114,9 +114,9 @@ class DatabaseOperation():
             result=generic_constants.TEST_RESULT_TRUE
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
-            err_msg = e.msg
+            
+            logger.print_on_console(e)
+            err_msg = e
         finally:
             cursor.close()
             cnxn.close()
@@ -136,9 +136,9 @@ class DatabaseOperation():
             status,result,value,err_msg=self.getData(ip,port,userName,decrypted_password,dbName,query,dbtype,temp)
         except Exceptions as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
-            err_msg = e.msg
+            
+            logger.print_on_console(e)
+            err_msg = e
         return status,result,value,err_msg
 
     def verifyData(self, ip , port , userName , password, dbName, query, dbtype,inp_file,inp_sheet):
@@ -195,9 +195,9 @@ class DatabaseOperation():
                 logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
-            err_msg = e.msg
+            
+            logger.print_on_console(e)
+            err_msg = e
         finally:
             os.remove(file_path)
             cursor.close()
@@ -217,9 +217,9 @@ class DatabaseOperation():
             status,result,verb,err_msg=self.verifyData(ip,port,userName,decrypted_password,dbName, query, dbtype,inp_file,inp_sheet)
         except Exceptions as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
-            err_msg = e.msg
+            
+            logger.print_on_console(e)
+            err_msg = e
         return status,result,verb,err_msg
 
     def exportData(self, ip , port , userName , password, dbName, query, dbtype, *args):
@@ -286,9 +286,9 @@ class DatabaseOperation():
                 logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
-            err_msg = e.msg
+            
+            logger.print_on_console(e)
+            err_msg = e
         finally:
             cursor.close()
             cnxn.close()
@@ -308,9 +308,9 @@ class DatabaseOperation():
             status,result,verb,err_msg=self.exportData(ip,port,userName,decrypted_password,dbName, query, dbtype, out_col)
         except Exceptions as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
-            err_msg = e.msg
+            
+            logger.print_on_console(e)
+            err_msg = e
         return status,result,verb,err_msg
 
     def connection(self,dbtype, ip , port , dbName, userName , password):
@@ -327,9 +327,9 @@ class DatabaseOperation():
             return self.cnxn
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
-            err_msg = e.msg
+            
+            logger.print_on_console(e)
+            err_msg = e
 
     def get_ext(self,input_path):
         """
@@ -368,9 +368,9 @@ class DatabaseOperation():
            return path
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
-            err_msg = e.msg
+            
+            logger.print_on_console(e)
+            err_msg = e
 
 
 ##obj = DatabaseOperation()
