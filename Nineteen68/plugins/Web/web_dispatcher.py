@@ -20,7 +20,6 @@ import textbox_operations
 import dropdown_listbox
 import utilweb_operations
 import static_text_keywords
-import Exceptions
 import logger
 from webconstants import *
 import custom_keyword
@@ -280,8 +279,10 @@ class Dispatcher:
 
             else:
                 logger.print_on_console(METHOD_INVALID)
+                log.error(METHOD_INVALID)
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            logger.print_on_console(e)
         return result
 
 
