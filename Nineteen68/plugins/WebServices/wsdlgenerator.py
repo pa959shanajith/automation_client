@@ -20,6 +20,11 @@ import sys
 sys.path.append(path)
 import zeep
 import zeep.xsd.indicators
+import logging
+from loggermessages import *
+import logger
+log = logging.getLogger('wsdlgenerator.py')
+
 ## This class will have the methods to generate request header and body of WSDL
 class WebservicesWSDL():
 
@@ -32,10 +37,13 @@ class WebservicesWSDL():
             self.wsdlURL = wsdlURL
             list_method = Client(wsdlURL)
             obt_list_method = [method for method in list_method.wsdl.services[0].ports[0].methods]
-            logger.print_on_console(obt_list_method)
+            log.info('List of methods obtained')
+            log.info(obt_list_method)
             return obt_list_method
-        except Exception:
-            logger.print_on_console('exception occured')
+        except Exception as e:
+            logger.print_on_console(EXCEPTION_OCCURED,e)
+            log.error(EXCEPTION_OCCURED)
+            log.error(e)
 
 
 class BodyGenarator():
@@ -66,28 +74,37 @@ class BodyGenarator():
         try:
             if self.soap_type == 0:
                 self.client_obj.soaptype = 0
+                log.info('soap type is 0 i.e is soap 11')
                 request_header_soap11 = self.client_obj.service._binding.create_message_header(self.operation_name)
                 request_header_soap11 = str(request_header_soap11)
-                logger.print_on_console(request_header_soap11)
+                log.info('request header of soap11')
+                log.info(request_header_soap11)
                 return request_header_soap11
             elif self.soap_type == 1:
                 self.client_obj.soaptype = 1
+                log.info('soap type is 1 i.e is soap 12')
                 request_header_soap12 = self.client_obj.service._binding.create_message_header(self.operation_name)
                 request_header_soap12 = str(request_header_soap12)
-                logger.print_on_console(request_header_soap12)
+                log.info('request header of soap12')
+                log.info(request_header_soap12)
                 return request_header_soap12
             elif self.soap_type == 2:
                 self.client_obj.soaptype = 0
                 request_header_soap11 = self.client_obj.service._binding.create_message_header(self.operation_name)
                 request_header_soap11 = str(request_header_soap11)
-                logger.print_on_console(request_header_soap11)
+                log.info('request header of soap11')
+                log.info(request_header_soap11)
                 self.client_obj.soaptype = 1
                 request_header_soap12 = self.client_obj.service._binding.create_message_header(self.operation_name)
                 request_header_soap12 = str(request_header_soap12)
-                logger.print_on_console(request_header_soap12)
+                log.info('request header of soap12')
+                log.info(request_header_soap12)
                 return request_header_soap11,request_header_soap12
-        except Exception:
-            logger.print_on_console('Exception occured')
+        except Exception as e:
+            logger.print_on_console(EXCEPTION_OCCURED,e)
+            log.error(EXCEPTION_OCCURED)
+            log.error(e)
+
 
 
 ## 1. requestBody method generates header based on
@@ -98,22 +115,26 @@ class BodyGenarator():
         try:
             if self.soap_type == 0:
                 self.client_obj.soaptype = 0
+                log.info('soap type is 0 i.e is soap 11')
                 self.client_obj.service._binding.create_message(self.operation_name)
                 inp_count = zeep.xsd.indicators.inputParameterCount
                 args=self.get_string(inp_count)
                 obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
                 obt_request_body_soap11 = etree.tostring(obt_body,pretty_print=True)
-                logger.print_on_console(obt_request_body_soap11)
+                log.info('request body of soap11')
+                log.info(obt_request_body_soap11)
                 return obt_request_body_soap11
 
             elif self.soap_type == 1:
                 self.client_obj.soaptype = 1
+                log.info('soap type is 1 i.e is soap 12')
                 self.client_obj.service._binding.create_message(self.operation_name)
                 inp_count = zeep.xsd.indicators.inputParameterCount
                 args=self.get_string(inp_count)
                 obt_body_soap12 = self.client_obj.service._binding.create_message(self.operation_name,*args)
                 obt_request_body_soap12 = etree.tostring(obt_body_soap12,pretty_print=True)
-                logger.print_on_console(obt_request_body_soap12)
+                log.info('request body of soap12')
+                log.info(obt_request_body_soap12)
                 return obt_request_body_soap12
 
             elif self.soap_type == 2:
@@ -123,15 +144,19 @@ class BodyGenarator():
                 args=self.get_string(inp_count)
                 obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
                 obt_request_body_soap11 = etree.tostring(obt_body,pretty_print=True)
-                logger.print_on_console(obt_request_body_soap11)
+                log.info('request body of soap11')
+                log.info(obt_request_body_soap11)
                 self.client_obj.soaptype = 1
                 self.client_obj.service._binding.create_message(self.operation_name)
                 obt_body_soap12 = self.client_obj.service._binding.create_message(self.operation_name,*args)
                 obt_request_body_soap12 = etree.tostring(obt_body_soap12,pretty_print=True)
-                logger.print_on_console(obt_request_body_soap12)
+                log.info('request body of soap12')
+                log.info(obt_request_body_soap12)
                 return obt_request_body_soap11,obt_request_body_soap12
-        except Exception:
-            logger.print_on_console('Exception occured')
+        except Exception as e:
+            logger.print_on_console(EXCEPTION_OCCURED,e)
+            log.error(EXCEPTION_OCCURED)
+            log.error(e)
 
 
 
