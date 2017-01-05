@@ -91,8 +91,8 @@ class UtilWebKeywords:
 
     def __web_driver_exception(self,e):
         log.error(e)
-        log.error(e.msg)
-        logger.print_on_console(e.msg)
+        
+        logger.print_on_console(e)
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         return err_msg
 

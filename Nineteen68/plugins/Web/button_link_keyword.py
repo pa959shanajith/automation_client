@@ -84,8 +84,8 @@ class ButtonLinkKeyword():
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
@@ -152,8 +152,8 @@ class ButtonLinkKeyword():
 
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
@@ -190,8 +190,8 @@ class ButtonLinkKeyword():
 
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
@@ -241,8 +241,8 @@ class ButtonLinkKeyword():
 
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
 
         #return status and methodoutput
@@ -276,8 +276,8 @@ class ButtonLinkKeyword():
                     logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
@@ -307,8 +307,8 @@ class ButtonLinkKeyword():
                     logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
@@ -338,8 +338,8 @@ class ButtonLinkKeyword():
                     logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
@@ -383,8 +383,8 @@ class ButtonLinkKeyword():
                     logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)

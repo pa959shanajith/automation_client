@@ -203,8 +203,8 @@ class CustomKeyword:
                 log.error(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
 
 
@@ -246,8 +246,8 @@ class CustomKeyword:
             return browser_Keywords.driver_obj.execute_script(GET_XPATH_SCRIPT,webelement)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
 
 
 

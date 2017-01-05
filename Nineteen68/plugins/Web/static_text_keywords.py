@@ -116,7 +116,7 @@ class StaticTextKeywords:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
                 log.error(e)
-                log.error(e.msg)
-                logger.print_on_console(e.msg)
+                
+                logger.print_on_console(e)
         return status,methodoutput,output,err_msg
 

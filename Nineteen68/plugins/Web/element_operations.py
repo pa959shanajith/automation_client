@@ -58,8 +58,8 @@ class ElementKeywords:
                methodoutput=TEST_RESULT_TRUE
             except Exception as e:
                 log.error(e)
-                log.error(e.msg)
-                logger.print_on_console(e.msg)
+                
+                logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         log.info(RETURN_RESULT)
         return status,methodoutput,text,err_msg
@@ -96,8 +96,8 @@ class ElementKeywords:
                     logger.print_on_console(INVALID_INPUT)
             except Exception as e:
                 log.error(e)
-                log.error(e.msg)
-                logger.print_on_console(e.msg)
+                
+                logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
@@ -125,8 +125,8 @@ class ElementKeywords:
                     logger.print_on_console(ERR_DISABLED_OBJECT)
             except Exception as e:
                 log.error(e)
-                log.error(e.msg)
-                logger.print_on_console(e.msg)
+                
+                logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
@@ -168,8 +168,8 @@ class ElementKeywords:
                     logger.print_on_console(ERR_DISABLED_OBJECT)
             except Exception as e:
                 log.error(e)
-                log.error(e.msg)
-                logger.print_on_console(e.msg)
+                
+                logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
@@ -212,8 +212,8 @@ class ElementKeywords:
                     logger.print_on_console(ERR_DISABLED_OBJECT)
             except Exception as e:
                 log.error(e)
-                log.error(e.msg)
-                logger.print_on_console(e.msg)
+                
+                logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
@@ -237,8 +237,8 @@ class ElementKeywords:
                    methodoutput=TEST_RESULT_TRUE
             except Exception as e:
                 log.error(e)
-                log.error(e.msg)
-                logger.print_on_console(e.msg)
+                
+                logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
@@ -277,8 +277,8 @@ class ElementKeywords:
                     logger.print_on_console(INVALID_INPUT)
             except Exception as e:
                 log.error(e)
-                log.error(e.msg)
-                logger.print_on_console(e.msg)
+                
+                logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
@@ -308,13 +308,13 @@ class ElementKeywords:
         except TimeoutException as e:
             logger.print_on_console('Delay timeout exceeded')
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
             err_msg='Delay timeout exceeded'
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         return status,methodoutput,output,err_msg
 

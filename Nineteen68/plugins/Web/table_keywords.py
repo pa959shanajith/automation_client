@@ -54,9 +54,9 @@ class TableOperationKeywords():
                         logger.print_on_console('Element not found')
                 except Exception as e:
                      log.error(e)
-                     log.error(e.msg)
-                     logger.print_on_console(e.msg)
-                     error_msg=e.msg
+                     
+                     logger.print_on_console(e)
+                     error_msg=e
             else:
                 log.error('hidden object')
                 logger.print_on_console('hidden object')
@@ -87,9 +87,9 @@ class TableOperationKeywords():
                             logger.print_on_console('Got the result : %s',coloumn_count)
                 except Exception as e:
                     log.error(e)
-                    log.error(e.msg)
-                    logger.print_on_console(e.msg)
-                    error_msg=e.msg
+                    
+                    logger.print_on_console(e)
+                    error_msg=e
             else:
                 logger.print_on_console('hidden object')
             return status,methodoutput,coloumn_count,error_msg
@@ -126,9 +126,9 @@ class TableOperationKeywords():
                     logger.print_on_console('hidden object')
             except Exception as e:
                 log.error(e)
-                log.error(e.msg)
-                logger.print_on_console(e.msg)
-                error_msg=e.msg
+                
+                logger.print_on_console(e)
+                error_msg=e
             return status,methodoutput,cellVal,error_msg
 
 #   verifies the cell value with the given text input, if the table found with the given xpath
@@ -168,9 +168,9 @@ class TableOperationKeywords():
                     logger.print_on_console('hidden object')
             except Exception as e:
                 log.error(e)
-                log.error(e.msg)
-                logger.print_on_console(e.msg)
-                error_msg=e.msg
+                
+                logger.print_on_console(e)
+                error_msg=e
             return status,methodoutput,output_res,error_msg
 
 #   returns the  tooltip text  of given cell, if the table found with the given xpath
@@ -206,9 +206,9 @@ class TableOperationKeywords():
 
                 except Exception as e:
                     log.error(e)
-                    log.error(e.msg)
-                    logger.print_on_console(e.msg)
-                    error_msg=e.msg
+                    
+                    logger.print_on_console(e)
+                    error_msg=e
             else:
                 logger.print_on_console('hidden object')
             return status,methodoutput,tooltip,error_msg
@@ -275,9 +275,9 @@ class TableOperationKeywords():
                                             logger.print_on_console('click action performed successfully')
                         except Exception as e:
                             log.error(e)
-                            log.error(e.msg)
-                            logger.print_on_console(e.msg)
-                            error_msg=e.msg
+                            
+                            logger.print_on_console(e)
+                            error_msg=e
                     elif len(input_arr)>2:
                         log.info('click on an element inside a cell')
                         logger.print_on_console('click on an element inside a cell')
@@ -415,15 +415,15 @@ class TableOperationKeywords():
 
                                     except Exception as e:
                                          log.error(e)
-                                         log.error(e.msg)
-                                         logger.print_on_console(e.msg)
-                                         error_msg=e.msg
+                                         
+                                         logger.print_on_console(e)
+                                         error_msg=e
 
                 except Exception as e:
                    log.error(e)
-                   log.error(e.msg)
-                   logger.print_on_console(e.msg)
-                   error_msg=e.msg
+                   
+                   logger.print_on_console(e)
+                   error_msg=e
             else:
                 logger.print_on_console('hidden object')
             return status,methodoutput,output_val,error_msg
@@ -453,9 +453,9 @@ class TableOperationKeywords():
                     logger.print_on_console('Got the result : %s',cellVal)
                 except Exception as e:
                     log.error(e)
-                    log.error(e.msg)
-                    logger.print_on_console(e.msg)
-                    error_msg=e.msg
+                    
+                    logger.print_on_console(e)
+                    error_msg=e
             else:
                 logger.print_on_console('hidden object')
             return status,methodoutput,row_number,error_msg
@@ -481,9 +481,9 @@ class TableOperationKeywords():
                     logger.print_on_console('Got the result : %s',cellVal)
                 except Exception as e:
                     log.error(e)
-                    log.error(e.msg)
-                    logger.print_on_console(e.msg)
-                    error_msg=e.msg
+                    
+                    logger.print_on_console(e)
+                    error_msg=e
             else:
                 logger.print_on_console('hidden object')
             return status,methodoutput,col_number,error_msg
@@ -583,9 +583,9 @@ class TableOperationKeywords():
 ##                        web_element = browser_Keywords.driver_obj.execute_script(script)
                 except Exception as e:
                     log.error(e)
-                    log.error(e.msg)
-                    logger.print_on_console(e.msg)
-                    error_msg=e.msg
+                    
+                    logger.print_on_console(e)
+                    error_msg=e
             return status,methodoutput,web_element,error_msg
 
 

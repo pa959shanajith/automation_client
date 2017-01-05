@@ -135,9 +135,8 @@ class Dispatcher:
                     webelement = self.getwebelement(driver,objectname)
                     if webelement != None:
                         webelement = webelement[0]
-                        info_msg=ERROR_CODE_DICT['WEB_ELEMENT_FOUND']
-                        log.info(info_msg)
-                        logger.print_on_console(info_msg)
+                        log.info(WEB_ELEMENT_FOUND)
+                        logger.print_on_console(WEB_ELEMENT_FOUND)
             return webelement
 
 
