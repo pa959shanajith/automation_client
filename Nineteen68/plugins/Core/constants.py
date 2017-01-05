@@ -236,6 +236,7 @@ ERROR_CODE_DICT ={
                     'ERR_CUSTOM_MISMATCH':'Input type and keyword mismatch',
                     'ERR_PREVIOUS_CLICKELEMENT':'Previous step ClickElement is missing !',
                     'ERR_PRECONDITION_NOTMET':'PreCondition for CustomObject not met',
+                    'ERR_REF_ELE_NULL':'Reference Element is null',
                     'ERR_IF_FAIL':'IF condition is Fail \n',
                     'ERR_FOR_STARTED':'---------- Started executing FOR ----------\n',
                     'ERR_FOR_END':'EndFor\n',
@@ -326,13 +327,15 @@ WEB_ELEMENT_FOUND_INSIDE_IFRAME='Web Element is found inside iframe/frame '
 
 OUTPUT_CONSTANT="""9cc33d6fe25973868b30f4439f09901a"""
 
-MSG_CUSTOM_FOUND='Custom Object is Found',
+MSG_CUSTOM_FOUND='Custom Object is Found'
 
 EXPECTED='Expected: '
 
 ACTUAL='Actual :'
 
 INPUT_IS='Input is: '
+
+MAX_SIZE_EXCEEDED='Maximum size of Web element map is 4 '
 
 
 
