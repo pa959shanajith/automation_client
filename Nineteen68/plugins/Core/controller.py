@@ -507,7 +507,7 @@ class Controller():
             pause_flag=False
             obj = handler.Handler()
             t = test.Test()
-            suite,flag = t.gettsplist()
+            suites_list,flag = t.gettsplist()
             if flag:
                 try:
                     input_breakpoint=int(input_breakpoint)
@@ -519,88 +519,18 @@ class Controller():
 
             #in future this value will come from the UI
             scenarios = scenario_num
-            print 'Length of Suite : ',len(suite)
-
-            #EXECUTION GOES HERE
-            status = False
-            flag=True
-            #Iterate through the suite
-            log.info('---------------------------------------------------------------------')
-            logger.print_on_console('---------------------------------------------------------------------')
-            log.info('***SUITE EXECUTION STARTED***')
-            logger.print_on_console('***SUITE EXECUTION STARTED***')
-            logger.print_on_console('---------------------------------------------------------------------')
-            for i in range( len(suite)):
-                do_not_execute = False
-                #create a object of controller for each scenario
-                con =Controller()
-                #Check for the disabled scenario
-
-                for k in scenarios:
-                    if k == (i + 1):
-                        do_not_execute = True
-                        break
-
-
-
-                if (not do_not_execute) :
-                    logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
-                    log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
-                    for d in suite[i]:
-                        flag=obj.parse_json(d)
-                        if flag == False:
-                            break
-                        print '\n'
-                        tsplist = obj.read_step()
-                        for k in range(len(tsplist)):
-                            if tsplist[k].name.lower() == 'openbrowser':
-                                tsplist[k].inputval = unicode(args[0])
-
-                    if flag:
-
-                        status = con.executor(tsplist,'debug')
-
-
-                    else:
-                        print 'Invalid script'
-                    logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
-                    log.info( '***Scenario' + str((i  + 1 )) +' execution completed***')
-                    obj.clearList()
-                else:
-                    logger.print_on_console ('Scenario ' , (i + 1) ,' has been disabled for execution!!!')
-                    log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
-
-        elif execution_mode.lower() == SERIAL:
-            handler.tspList=[]
-            terminate_flag=False
-            pause_flag=False
-            obj = handler.Handler()
-            t = test.Test()
-            suite,flag = t.gettsplist()
-            if flag:
-                try:
-                    input_breakpoint=int(input_breakpoint)
-                    if input_breakpoint >0:
-                        break_point=input_breakpoint-1
-                except ValueError,NameError:
-                    logger.print_on_console('Invalid breakpoint number')
-
-
-            #in future this value will come from the UI
-            scenarios = scenario_num
-            logger.print_on_console( 'Length of Suite : ',len(suite))
-
-            #EXECUTION GOES HERE
-            status = False
-            flag=True
-            #Iterate through the suite
-            log.info('-----------------------------------------------')
-            logger.print_on_console('-----------------------------------------------')
-            log.info('***SUITE EXECUTION STARTED***')
-            logger.print_on_console('***SUITE EXECUTION STARTED***')
-            log.info('-----------------------------------------------')
-            logger.print_on_console('-----------------------------------------------')
-            for browser in range( len(browsers)):
+            print 'No  of Suites : ',len(suites_list)
+            j=1
+            for suite in suites_list:
+                #EXECUTION GOES HERE
+                status = False
+                flag=True
+                #Iterate through the suite
+                log.info('---------------------------------------------------------------------')
+                logger.print_on_console('---------------------------------------------------------------------')
+                log.info('***SUITE ', j ,' EXECUTION STARTED***')
+                logger.print_on_console('***SUITE ', j ,' EXECUTION STARTED***')
+                logger.print_on_console('---------------------------------------------------------------------')
                 for i in range( len(suite)):
                     do_not_execute = False
                     #create a object of controller for each scenario
@@ -625,7 +555,7 @@ class Controller():
                             tsplist = obj.read_step()
                             for k in range(len(tsplist)):
                                 if tsplist[k].name.lower() == 'openbrowser':
-                                    tsplist[k].inputval = unicode(browsers[browser])
+                                    tsplist[k].inputval = unicode(args[0])
 
                         if flag:
 
@@ -633,16 +563,101 @@ class Controller():
 
 
                         else:
-                            log.error('Invalid script')
+                            print 'Invalid script'
                         logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
-                        log.info( '***Scenario ' + str((i  + 1 )) +' execution completed***')
+                        log.info( '***Scenario' + str((i  + 1 )) +' execution completed***')
                         obj.clearList()
                     else:
-                        logger.print_on_console( 'Scenario ' , (i + 1) ,' has been disabled for execution!!!')
+                        logger.print_on_console ('Scenario ' , (i + 1) ,' has been disabled for execution!!!')
                         log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
+                log.info('---------------------------------------------------------------------')
+                logger.print_on_console('---------------------------------------------------------------------')
+                log.info('***SUITE ', j ,' EXECUTION COMPLETED***')
+                logger.print_on_console('***SUITE ', j ,' EXECUTION COMPLETED***')
+                logger.print_on_console('---------------------------------------------------------------------')
+                j=j+1
+
+        elif execution_mode.lower() == SERIAL:
+            handler.tspList=[]
+            terminate_flag=False
+            pause_flag=False
+            obj = handler.Handler()
+            t = test.Test()
+            suites_list,flag = t.gettsplist()
+            if flag:
+                try:
+                    input_breakpoint=int(input_breakpoint)
+                    if input_breakpoint >0:
+                        break_point=input_breakpoint-1
+                except ValueError,NameError:
+                    logger.print_on_console('Invalid breakpoint number')
+
+
+            #in future this value will come from the UI
+            scenarios = scenario_num
+            logger.print_on_console( 'Length of Suite : ',len(suites_list))
+
+            #EXECUTION GOES HERE
+            status = False
+            flag=True
+            #Iterate through the suite
+
+            for browser in range( len(browsers)):
+                j=1;
+                for suite in suites_list:
+                    log.info('-----------------------------------------------')
+                    logger.print_on_console('-----------------------------------------------')
+                    log.info('***SUITE ', j ,' EXECUTION STARTED***')
+                    logger.print_on_console('***SUITE ', j ,' EXECUTION STARTED***')
+                    log.info('-----------------------------------------------')
+                    logger.print_on_console('-----------------------------------------------')
+                    for i in range( len(suite)):
+                        do_not_execute = False
+                        #create a object of controller for each scenario
+                        con =Controller()
+                        #Check for the disabled scenario
+
+                        for k in scenarios:
+                            if k == (i + 1):
+                                do_not_execute = True
+                                break
 
 
 
+                        if (not do_not_execute) :
+                            logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
+                            log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
+                            for d in suite[i]:
+                                flag=obj.parse_json(d)
+                                if flag == False:
+                                    break
+                                print '\n'
+                                tsplist = obj.read_step()
+                                for k in range(len(tsplist)):
+                                    if tsplist[k].name.lower() == 'openbrowser':
+                                        tsplist[k].inputval = unicode(browsers[browser])
+
+                            if flag:
+
+                                status = con.executor(tsplist,'debug')
+
+
+                            else:
+                                log.error('Invalid script')
+                            logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
+                            log.info( '***Scenario ' + str((i  + 1 )) +' execution completed***')
+                            obj.clearList()
+                        else:
+                            logger.print_on_console( 'Scenario ' , (i + 1) ,' has been disabled for execution!!!')
+                            log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
+
+                    log.info('-----------------------------------------------')
+                    logger.print_on_console('-----------------------------------------------')
+                    log.info('***SUITE ', j ,' EXECUTION COMPLETED***')
+                    logger.print_on_console('***SUITE ', j ,' EXECUTION COMPLETED***')
+                    log.info('-----------------------------------------------')
+                    logger.print_on_console('-----------------------------------------------')
+                    j=j+1
         return status
 
     def invoke_parralel_exe(self,action,input_breakpoint):
