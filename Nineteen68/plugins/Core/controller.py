@@ -16,9 +16,7 @@ import jumpTo
 import jumpBy
 from teststepproperty import TestStepProperty
 from generickeywordresult import GenericKeywordResult
-import constants
 import test
-import Exceptions
 import handler
 import os,sys
 import logger
@@ -203,7 +201,7 @@ class Controller():
     def methodinvocation(self,index,*args):
 
         if break_point != -1 and break_point == index:
-            index = constants.BREAK_POINT
+            index = BREAK_POINT
             return index
         tsp = handler.tspList[index]
         keyword_flag=True
@@ -219,7 +217,7 @@ class Controller():
 
 
 
-                if input.find(constants.IGNORE_THIS_STEP) != -1 :
+                if input.find(IGNORE_THIS_STEP) != -1 :
                     #Skip the current step execution
                     #update in the report
                     #increment the tsp index to point to next step and continue
@@ -227,7 +225,7 @@ class Controller():
 
                 else:
                     if addtionalinfo != None:
-                        if addtionalinfo == constants.IGNORE_THIS_STEP:
+                        if addtionalinfo == IGNORE_THIS_STEP:
                             #Skip the current step execution
                             #update in the report
                             #increment the tsp index to point to next step and continue
@@ -269,9 +267,9 @@ class Controller():
 
             else:
 
-                index= constants.TERMINATE
+                index= TERMINATE
         else:
-            index= constants.TERMINATE
+            index= TERMINATE
 
 
 
@@ -295,7 +293,7 @@ class Controller():
         inpval = []
         input_list=[]
 
-        input_list = input[0].split(constants.SEMICOLON)
+        input_list = input[0].split(SEMICOLON)
 
         if keyword in WS_KEYWORDS:
             input_list=[input[0]]
@@ -317,7 +315,7 @@ class Controller():
         return inpval
 
     def store_result(self,result,tsp):
-        output=tsp.outputval.split(constants.SEMICOLON)
+        output=tsp.outputval.split(SEMICOLON)
         logger.print_on_console('Result obtained is ',result[-1])
 
         if len(output)>0 and output[0] != '':
@@ -366,23 +364,23 @@ class Controller():
             outputstring = teststepproperty.outputval
 
             #Check the apptype and pass to perticular module
-            if teststepproperty.apptype.lower() == constants.APPTYPE_GENERIC:
+            if teststepproperty.apptype.lower() == APPTYPE_GENERIC:
                 #Generic apptype module call
                 result = self.invokegenerickeyword(teststepproperty,self.generic_dispatcher_obj,inpval)
 
-            elif teststepproperty.apptype.lower() == constants.APPTYPE_WEB:
+            elif teststepproperty.apptype.lower() == APPTYPE_WEB:
                 #Web apptype module call
                 result = self.invokewebkeyword(teststepproperty,self.web_dispatcher_obj,inpval,args[0])
 
-            elif teststepproperty.apptype.lower() == constants.APPTYPE_WEBSERVICE:
+            elif teststepproperty.apptype.lower() == APPTYPE_WEBSERVICE:
                 #Webservice apptype module call
                 result = self.invokewebservicekeyword(teststepproperty,self.webservice_dispatcher_obj,inpval)
 
-            elif teststepproperty.apptype.lower() == constants.APPTYPE_DESKTOP:
+            elif teststepproperty.apptype.lower() == APPTYPE_DESKTOP:
                 #Desktop apptype module call
                 result = self.invokeDesktopkeyword(teststepproperty,self.desktop_dispatcher_obj,inpval)
 
-            elif teststepproperty.apptype.lower() == constants.APPTYPE_DESKTOP_JAVA:
+            elif teststepproperty.apptype.lower() == APPTYPE_DESKTOP_JAVA:
                 #OEBS apptype module call
                 result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
 
@@ -405,7 +403,7 @@ class Controller():
                 index=len(handler.tspList)
             return index
         else:
-            return constants.TERMINATE
+            return TERMINATE
 
 
     def executor(self,tsplist,action):
@@ -428,22 +426,23 @@ class Controller():
                     pause_execution.execute(PAUSE)
                 try:
                     i = self.methodinvocation(i)
-                    if i== constants.TERMINATE:
+                    if i== TERMINATE:
                         logger.print_on_console('Terminating the execution')
                         status=i
                         break
-                    elif i==constants.BREAK_POINT:
+                    elif i==BREAK_POINT:
                         logger.print_on_console('Debug Stopped')
                         status=i
                         break
 
                 except Exception as e:
-                    Exceptions.error(e)
+                    log.error(e)
+                    logger.print_on_console(e)
                     status=False
                     i=i+1
             else:
                 logger.print_on_console('Terminating the execution')
-                status=constants.TERMINATE
+                status=TERMINATE
                 break
 
         self.scenario_end_time=datetime.now()
@@ -705,7 +704,8 @@ def kill_process():
         os.system("TASKKILL /F /IM CobraWinLDTP.exe")
         logger.print_on_console( 'Stale processes killed')
     except Exception as e:
-        Exceptions.error(e)
+        log.error(e)
+        logger.print_on_console(e)
 
 #main method
 if __name__ == '__main__':
