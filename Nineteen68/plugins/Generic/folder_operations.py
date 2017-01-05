@@ -15,7 +15,10 @@ import logger
 import generic_constants
 import Exceptions
 import file_operations
+import logging
+from loggermessages import *
 from constants import *
+log = logging.getLogger('folder_operations.py')
 
 
 class FolderOperations:
@@ -30,6 +33,8 @@ class FolderOperations:
         """
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             logger.print_on_console(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
             if not (inputpath is None and inputpath is '') and self.validateFolderName(inputpath,'path') and self.validateFolderName(folder_name):
@@ -40,12 +45,16 @@ class FolderOperations:
                 else:
                     logger.print_on_console(generic_constants.FOLDER_EXISTS)
             else:
-                logger.print_on_console(generic_constants.INVALID_INPUT)
+                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except WindowsError as e:
             logger.print_on_console("A Folder/File name can't contain any of the following characters "+generic_constants.INVALID_CHARS)
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg = e
+        return status,methodoutput,verb,err_msg
 
 
 
@@ -59,6 +68,8 @@ class FolderOperations:
         """
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             logger.print_on_console(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
             if not (inputpath is None and inputpath is ''):
@@ -69,10 +80,14 @@ class FolderOperations:
                 else:
                     logger.print_on_console(generic_constants.FOLDER_NOT_EXISTS)
             else:
-                logger.print_on_console(generic_constants.INVALID_INPUT)
+                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg = e
+        return status,methodoutput,verb,err_msg
 
     def rename_folder(self,inputpath,folder_name,rename_folder):
         """
@@ -84,6 +99,8 @@ class FolderOperations:
         """
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             logger.print_on_console(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name+' new folder name '+rename_folder)
             if not (inputpath is None and inputpath is ''):
@@ -96,10 +113,14 @@ class FolderOperations:
                 else:
                     logger.print_on_console(generic_constants.FOLDER_NOT_EXISTS)
             else:
-                logger.print_on_console(generic_constants.INVALID_INPUT)
+                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg = e
+        return status,methodoutput,verb,err_msg
 
 
     def delete_folder(self,inputpath,folder_name,*args):
@@ -113,6 +134,8 @@ class FolderOperations:
         """
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             logger.print_on_console(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
             if not (inputpath is None and inputpath is ''):
@@ -129,12 +152,18 @@ class FolderOperations:
                     else:
                         logger.print_on_console(generic_constants.FOLDER_NOT_EXISTS)
                 except ValueError,WindowsError:
-                    logger.print_on_console(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             else:
-                logger.print_on_console(generic_constants.INVALID_INPUT)
+                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg = e
+        return status,methodoutput,verb,err_msg
 
     def validateFolderName(self,name,*args):
         chars = set(generic_constants.INVALID_CHARS)
