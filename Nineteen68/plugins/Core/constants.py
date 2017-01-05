@@ -96,16 +96,16 @@ ERROR_CODE_DICT ={
                     'ERR_INVALID_INPUT':'Input error: please provide the valid input.',
                     'MSG_RESULT':'Executed and the result is:',
                     'ERR_INVALID_OBJECT':'This Element is not Accessible.',
-                    'ERR_HIDDEN_OBJECT':'The object is Hidden.',
+                    'ERR_HIDDEN_OBJECT':'The element is Hidden.',
                     'ERR_DISABLED_OBJECT':'The Element is Disabled.',
                     'ERR_EXCEPTION':'Exception occurred:',
                     'ERR_CODE_ERROR':'Code Error.',
                     'MSG_RESULT_IS':'Result obtained is:',
-                    'ERR_OBJECTSELECTED':'Element already Selected',
-                    'ERR_OBJECTUNSELECTED':'Element already Unselected',
+                    'ERR_OBJECTSELECTED':'Checkbox already Selected',
+                    'ERR_OBJECTUNSELECTED':'Checkbox already Unselected',
                     'MSG_SELECETED':'The Selected values are :',
                     'MSG_ELEMENT_NOT_FOUND':'Element not found.',
-                    'MSG_OBJECT_ENABLED':'The object is enabled.',
+                    'MSG_OBJECT_ENABLED':'The Element is enabled.',
                     'ERR_OBJECT_DISABLED':'The object is disabled.',
                     'MSB_OBJECT_DISPLAYED':'The object is displayed.',
                     'MSB_OBJECT_NOT_DISPLAYED':'The object is not displayed.',
@@ -147,6 +147,8 @@ ERROR_CODE_DICT ={
                     'ERR_FILE_NOT_ACESSIBLE': 'File not found/ file is open',
                     'ERR_ILLEGAL_ARGUMENT_EXCEPTION': 'Input Error: Please provide valid input.',
                     'ERR_NO_IMAGE_SOURCE': 'Image source not available.',
+                    'MSG_IMAGE_COMPARE_PASS':'Image comparision is Pass',
+                    'ERR_IMAGE_COMPARE_FAIl':'Image comparision is Fail',
                     'ERR_NUMBER_FORMAT_EXCEPTION': 'Input Error: Invalid input format.',
                     'ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION': 'Input Error: Invalid number of inputs.',
                     'ERR_ARRAY_INDEX_OUT_OF_BOUNDS_EXCEPTION': 'Input Error: Invalid number of inputs.',
@@ -169,7 +171,7 @@ ERROR_CODE_DICT ={
                     'ERR_ELEMENT_NOT_FOUND_EXCEPTION': 'Object Not Found.',
                     'ERR_IO_EXCEPTION': 'File is read only.',
                     'ERR_ILLEGAL_STATE_EXCEPTION': 'The current operation cannot be performed because of the object state.',
-                    'ERR_OBJECT_VISIBLE': 'The object is visible.',
+                    'ERR_OBJECT_VISIBLE': 'The Element is visible.',
                     'ERR_EMPTY_STACK_EVAL_EXCEPTION': 'Input error:Verify syntax.',
 
                     'ERR_PARSE_EXCEPTION': 'Input Error:Please provide valid input.',
@@ -207,12 +209,14 @@ ERROR_CODE_DICT ={
                     'ERR_OBJECT_IS_NOT_LINK':'Given object is not a link.',
                     'ERR_ELEMENT_NOT_SELECTED':'Object not selected.',
                     'ERR_TEXTBOX_SIZE_UNDEFINED':'Textbox size is not defined.',
-                    'ERR_ELEMENT_NOT_EXISTS':'Object does not exists.',
+                    'MSG_ELEMENT_EXISTS':'Element does not exists.',
+                    'ERR_ELEMENT_NOT_EXISTS':'Element does not exists.',
                     'ERR_GET_COLUMN_COUNT_EXCEPTION':'Exception occured in getColumnCount.',
                     'ERR_ROW_COLUMN':'Row number and Column nunber shoud be greater than 0.',
                     'ERR_SAFARI_EXCEPTION':'This action cannot be performed in safari for encoded elements.',
                     'ERR_SET_FOCUS_EXCEPTION':'Exception occurred in setFocus.',
                     'ERR_ELEMENT_IS_NOT_READONLY':'Element is not readonly.',
+                    'ERR_ELEMENT_IS_READONLY':'Element is readonly.',
                     'ERR_IIO_EXCEPTION':'File not found in the specified path.',
                     'ERR_DRIVER_IS_NULL':'Driver is null. Hence cannot capture screenshot.',
                     'ERR_NO_MATCH':'The Cell value and Expected value do-not Match.',
@@ -324,6 +328,11 @@ OUTPUT_CONSTANT="""9cc33d6fe25973868b30f4439f09901a"""
 
 MSG_CUSTOM_FOUND='Custom Object is Found',
 
+EXPECTED='Expected: '
+
+ACTUAL='Actual :'
+
+INPUT_IS='Input is: '
 
 
 
