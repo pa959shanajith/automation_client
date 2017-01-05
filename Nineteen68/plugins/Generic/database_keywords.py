@@ -56,7 +56,7 @@ class DatabaseOperation():
 
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg = e
         finally:
@@ -78,7 +78,7 @@ class DatabaseOperation():
             print status,result
         except Exceptions as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg = e
         return status,result,verb,err_msg
@@ -114,7 +114,7 @@ class DatabaseOperation():
             result=generic_constants.TEST_RESULT_TRUE
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg = e
         finally:
@@ -136,7 +136,7 @@ class DatabaseOperation():
             status,result,value,err_msg=self.getData(ip,port,userName,decrypted_password,dbName,query,dbtype,temp)
         except Exceptions as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg = e
         return status,result,value,err_msg
@@ -195,7 +195,7 @@ class DatabaseOperation():
                 logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg = e
         finally:
@@ -217,7 +217,6 @@ class DatabaseOperation():
             status,result,verb,err_msg=self.verifyData(ip,port,userName,decrypted_password,dbName, query, dbtype,inp_file,inp_sheet)
         except Exceptions as e:
             log.error(e)
-            
             logger.print_on_console(e)
             err_msg = e
         return status,result,verb,err_msg
@@ -286,7 +285,7 @@ class DatabaseOperation():
                 logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg = e
         finally:
@@ -308,7 +307,7 @@ class DatabaseOperation():
             status,result,verb,err_msg=self.exportData(ip,port,userName,decrypted_password,dbName, query, dbtype, out_col)
         except Exceptions as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg = e
         return status,result,verb,err_msg
@@ -327,7 +326,7 @@ class DatabaseOperation():
             return self.cnxn
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg = e
 
@@ -368,7 +367,7 @@ class DatabaseOperation():
            return path
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg = e
 
