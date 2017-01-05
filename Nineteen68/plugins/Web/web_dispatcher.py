@@ -78,7 +78,7 @@ class Dispatcher:
 
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE)
 
-        def print_error(msg):
+        def print_error(err_msg):
             logger.print_on_console(err_msg)
             log.error(err_msg)
 

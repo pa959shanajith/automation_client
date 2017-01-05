@@ -66,7 +66,7 @@ class DropdownKeywords():
                         log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 except Exception as e:
                     log.error(e)
-                    
+
                     logger.print_on_console(e)
                 log.info(RETURN_RESULT)
             else:
@@ -104,7 +104,7 @@ class DropdownKeywords():
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                 except Exception as e:
                     log.error(e)
-                    
+
                     logger.print_on_console(e)
                 log.info(RETURN_RESULT)
             else:
@@ -151,7 +151,7 @@ class DropdownKeywords():
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 except Exception as e:
                     log.error(e)
-                    
+
                     logger.print_on_console(e)
             else:
                 err_msg = 'Element is not displayed or enabled '
@@ -193,7 +193,7 @@ class DropdownKeywords():
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 except Exception as e:
                     log.error(e)
-                    
+
                     logger.print_on_console(e)
             else:
                 logger.print_on_console('Element is not displayed')
@@ -231,6 +231,14 @@ class DropdownKeywords():
                             status=webconstants.TEST_RESULT_PASS
                             result=webconstants.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
+                        else:
+                            logger.print_on_console('Count mismatched')
+                            logger.print_on_console(EXPECTED,input_val)
+                            log.info(EXPECTED)
+                            log.info(input)
+                            logger.print_on_console(ACTUAL,iListSize)
+                            log.info(ACTUAL)
+                            log.info(iListSize)
                     else:
                         logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -300,7 +308,7 @@ class DropdownKeywords():
 
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
         return status,result,verb,err_msg
 
@@ -351,7 +359,7 @@ class DropdownKeywords():
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
         return status,result,verb,err_msg
 
@@ -404,7 +412,7 @@ class DropdownKeywords():
                     err_msg = ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED']
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
         return status, result, output ,err_msg
 
@@ -439,7 +447,7 @@ class DropdownKeywords():
                     log.info(STATUS_METHODOUTPUT_UPDATE)
                 except Exception as e:
                     log.error(e)
-                    
+
                     logger.print_on_console(e)
             else:
                 err_msg = 'Element is not displayed or enabled '
@@ -492,7 +500,7 @@ class DropdownKeywords():
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
         return status,result,output,err_msg
 
@@ -530,7 +538,7 @@ class DropdownKeywords():
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                 except Exception as e:
                     log.error(e)
-                    
+
                     logger.print_on_console(e)
             else:
                 err_msg = 'Element is not displayed or enabled '
@@ -571,7 +579,7 @@ class DropdownKeywords():
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 except Exception as e:
                     log.error(e)
-                    
+
                     logger.print_on_console(e)
             else:
                 logger.print_on_console('Element is not displayed')
@@ -631,7 +639,7 @@ class DropdownKeywords():
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
         return status,result,verb,err_msg
 
@@ -660,7 +668,7 @@ class DropdownKeywords():
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                 except Exception as e:
                     log.error(e)
-                    
+
                     logger.print_on_console(e)
             else:
                 err_msg = 'Element is not displayed or enabled '

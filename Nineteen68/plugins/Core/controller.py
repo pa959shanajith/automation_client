@@ -385,7 +385,8 @@ class Controller():
                 result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
 
             logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',result,'\n')
-            log.info('Result in methodinvocation : '+ teststepproperty.name+' : ',result)
+            log.info('Result in methodinvocation : '+ str(teststepproperty.name)+' : ')
+            log.info(result)
             log.info(KEYWORD_EXECUTION_COMPLETED+ '\n' )
 
             if result!=TERMINATE:
@@ -602,11 +603,11 @@ class Controller():
             #Iterate through the suite
 
             for browser in range( len(browsers)):
-                j=1;
+                j=1
                 for suite in suites_list:
                     log.info('-----------------------------------------------')
                     logger.print_on_console('-----------------------------------------------')
-                    log.info('***SUITE ', j ,' EXECUTION STARTED***')
+                    log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
                     logger.print_on_console('***SUITE ', j ,' EXECUTION STARTED***')
                     log.info('-----------------------------------------------')
                     logger.print_on_console('-----------------------------------------------')
@@ -652,7 +653,7 @@ class Controller():
 
                     log.info('-----------------------------------------------')
                     logger.print_on_console('-----------------------------------------------')
-                    log.info('***SUITE ', j ,' EXECUTION COMPLETED***')
+                    log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
                     logger.print_on_console('***SUITE ', j ,' EXECUTION COMPLETED***')
                     log.info('-----------------------------------------------')
                     logger.print_on_console('-----------------------------------------------')
