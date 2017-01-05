@@ -25,7 +25,7 @@ import logger
 from webconstants import *
 import custom_keyword
 from collections import OrderedDict
-import constants
+from constants import *
 import requests
 
 import logging
@@ -259,13 +259,13 @@ class Dispatcher:
                 if keyword not in NON_WEBELEMENT_KEYWORDS:
                     webelement=send_webelement_to_keyword(driver,objectname,url)
                     if webelement == None:
-                        result=constants.TERMINATE
+                        result=TERMINATE
 
                 elif keyword==WAIT_FOR_ELEMENT_VISIBLE:
                     identifiers = objectname.split(';')
                     input=identifiers[0]
 
-                if result != constants.TERMINATE:
+                if result != TERMINATE:
                     result= dict[keyword](webelement,input)
                     if keyword == GET_INNER_TABLE and (output != '' and output.startswith('{') and output.endswith('}')):
                         self.webelement_map[output]=result[2]
@@ -273,7 +273,7 @@ class Dispatcher:
                     elif keyword not in [OPEN_BROWSER,OPEN_NEW_BROWSER,CLOSE_BROWSER]:
                         res,value=self.check_url_error_code()
                         if res:
-                            result=constants.TERMINATE
+                            result=TERMINATE
 
                     elif keyword==OPEN_BROWSER:
                         find_browser_info(reporting_obj)
