@@ -80,8 +80,8 @@ class WSkeywords:
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_END_POINT_URL'])
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -117,8 +117,8 @@ class WSkeywords:
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_OPERATION'])
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -157,8 +157,8 @@ class WSkeywords:
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_METHOD'])
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -188,8 +188,8 @@ class WSkeywords:
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_HEADER'])
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -238,8 +238,8 @@ class WSkeywords:
 
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput
 
@@ -269,8 +269,8 @@ class WSkeywords:
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput
 
@@ -296,8 +296,8 @@ class WSkeywords:
             output=(self.baseResHeader,self.baseResBody)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output
 
@@ -319,8 +319,8 @@ class WSkeywords:
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output
 
@@ -341,8 +341,8 @@ class WSkeywords:
             status,methodoutput,output=self.__saveResults(response)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output
 
@@ -364,8 +364,8 @@ class WSkeywords:
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output
 
@@ -387,8 +387,8 @@ class WSkeywords:
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output
 
@@ -416,8 +416,8 @@ class WSkeywords:
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output
 
@@ -467,8 +467,8 @@ class WSkeywords:
                     output=self.baseResHeader
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -501,8 +501,8 @@ class WSkeywords:
                         output=response_body
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -520,8 +520,8 @@ class WSkeywords:
             methodoutput = ws_constants.TEST_RESULT_TRUE
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -575,8 +575,8 @@ class WSkeywords:
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -604,8 +604,8 @@ class WSkeywords:
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            log.error(e.msg)
-            logger.print_on_console(e.msg)
+            
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -642,8 +642,8 @@ class WSkeywords:
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:
            log.error(e)
-           log.error(e.msg)
-           logger.print_on_console(e.msg)
+           
+           logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
