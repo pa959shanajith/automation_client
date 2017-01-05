@@ -112,30 +112,30 @@ class Dispatcher:
                             elif len(input)>=3:
                                 if (keyword in custom_dict and input[0].lower() in custom_dict[keyword]) or keyword in custom_dict_element.values()[0]:
                                     webelement=self.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url)
-                                    log.debug(ERROR_CODE_DICT[MSG_CUSTOM_FOUND])
+                                    log.debug(ERROR_CODE_DICT['MSG_CUSTOM_FOUND'])
                                     input.reverse()
                                     for x in range(0,3):
                                         input.pop()
                                 else:
-                                    err_msg=ERROR_CODE_DICT[ERR_CUSTOM_MISMATCH]
+                                    err_msg=ERROR_CODE_DICT['ERR_CUSTOM_MISMATCH']
                                     print_error(err_msg)
                             else:
-                                err_msg=ERROR_CODE_DICT[ERR_PRECONDITION_NOTMET]
+                                err_msg=ERROR_CODE_DICT['ERR_PRECONDITION_NOTMET']
                                 print_error(err_msg)
-                                err_msg=ERROR_CODE_DICT[ERR_CUSTOM_NOTFOUND]
+                                err_msg=ERROR_CODE_DICT['ERR_CUSTOM_NOTFOUND']
                                 print_error(err_msg)
 
                         else:
-                            err_msg=ERROR_CODE_DICT[ERR_REF_ELE_NULL]
+                            err_msg=ERROR_CODE_DICT['ERR_REF_ELE_NULL']
                             print_error(err_msg)
-                            err_msg=ERROR_CODE_DICT[ERR_CUSTOM_NOTFOUND]
+                            err_msg=ERROR_CODE_DICT['ERR_CUSTOM_NOTFOUND']
                             print_error(err_msg)
 
                 else:
                     webelement = self.getwebelement(driver,objectname)
                     if webelement != None:
                         webelement = webelement[0]
-                        info_msg=ERROR_CODE_DICT[WEB_ELEMENT_FOUND]
+                        info_msg=ERROR_CODE_DICT['WEB_ELEMENT_FOUND']
                         log.info(info_msg)
                         logger.print_on_console(info_msg)
             return webelement
@@ -342,7 +342,7 @@ class Dispatcher:
                             webElement = tempwebElement
                             log.debug('Webelement found by absolute Xpath')
                         except Exception as webEx:
-                            err_msg=ERROR_CODE_DICT[WEB_ELEMENT_NOT_FOUND]
+                            err_msg=WEB_ELEMENT_NOT_FOUND
                             logger.print_on_console(err_msg)
                             log.error(err_msg)
 
@@ -353,7 +353,7 @@ class Dispatcher:
                 else:
                     logger.print_on_console(MAX_SIZE_EXCEEDED)
                     log.error(MAX_SIZE_EXCEEDED)
-                    err_msg=ERROR_CODE_DICT[WEB_ELEMENT_NOT_FOUND]
+                    err_msg=WEB_ELEMENT_NOT_FOUND
                     logger.print_on_console(err_msg)
                     log.error(err_msg)
 
