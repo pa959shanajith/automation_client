@@ -21,6 +21,10 @@ import generic_constants
 import os
 import logger
 from encryption_utility import AESCipher
+import logging
+from loggermessages import *
+from constants import *
+log = logging.getLogger('database_keywords.py')
 
 class DatabaseOperation():
     def runQuery(self, ip , port , userName , password, dbName, query, dbtype):
@@ -32,26 +36,33 @@ class DatabaseOperation():
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
             cursor = cnxn.cursor()
             statement = ['create','update','insert','CREATE','UPDATE','INSERT']
             if any(x in query for x in statement ):
+                log.debug('Inside IF condition')
                 cursor.execute(query)
                 cnxn.commit()
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
             else:
+                log.debug('Inside else condition')
                 cursor.execute(query)
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
 
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg = e.msg
         finally:
             cursor.close()
             cnxn.close()
-        return status,result
+        return status,result,verb,err_msg
 
     def secureRunQuery(self, ip , port , userName , password, dbName, query, dbtype):
         """
@@ -63,14 +74,17 @@ class DatabaseOperation():
         try:
             encryption_obj = AESCipher()
             decrypted_password = encryption_obj.decrypt(password)
-            status,result=self.runQuery(ip,port,userName,decrypted_password,dbName,query,dbtype)
+            status,result,verb,err_msg=self.runQuery(ip,port,userName,decrypted_password,dbName,query,dbtype)
             print status,result
         except Exceptions as e:
-            Exceptions.error(e)
-        return status,result
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg = e.msg
+        return status,result,verb,err_msg
 
 
-    def getData(self, ip , port , userName , password, dbName, query, dbtype):
+    def getData(self, ip , port , userName , password, dbName, query, dbtype, *args):
         """
         def : getData
         purpose : Executes the query and gets the data
@@ -79,24 +93,36 @@ class DatabaseOperation():
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
+        value = None
+        err_msg=None
         try:
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
+            out_tuple = args
+            str(out_tuple)
+            data = re.findall(r'\[([^]]*)\]',out_tuple)
+            row = data[0]
+            col = data[1]
             cursor = cnxn.cursor()
             cursor.execute(query)
             rows = cursor.fetchall()
-            for row in rows:
-                logger.print_on_console(row)
+            value = rows[row][col]
+            log.info('Value obtained :')
+            log.info(value)
+##            for row in rows:
+##                logger.print_on_console(row)
             status=generic_constants.TEST_RESULT_PASS
             result=generic_constants.TEST_RESULT_TRUE
         except Exception as e:
-            Exceptions.error(e)
-            return False
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg = e.msg
         finally:
             cursor.close()
             cnxn.close()
-            return status,result
+            return status,result,value,err_msg
 
-    def secureGetData(self, ip , port , userName , password, dbName, query, dbtype):
+    def secureGetData(self, ip , port , userName , password, dbName, query, dbtype,*args):
         """
         def : secureGetData
         purpose : Executes the query and gets the data
@@ -106,10 +132,14 @@ class DatabaseOperation():
         try:
             encryption_obj = AESCipher()
             decrypted_password = encryption_obj.decrypt(password)
-            status,result=self.getData(ip,port,userName,decrypted_password,dbName,query,dbtype)
+            temp = args
+            status,result,value,err_msg=self.getData(ip,port,userName,decrypted_password,dbName,query,dbtype,temp)
         except Exceptions as e:
-            Exceptions.error(e)
-        return status,result
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg = e.msg
+        return status,result,value,err_msg
 
     def verifyData(self, ip , port , userName , password, dbName, query, dbtype,inp_file,inp_sheet):
         """
@@ -120,6 +150,8 @@ class DatabaseOperation():
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             file_path=self.create_file()
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
@@ -156,16 +188,21 @@ class DatabaseOperation():
                         result=generic_constants.TEST_RESULT_FALSE
 
                 else:
-                    logger.print_on_console(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             else:
                 logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg = e.msg
         finally:
             os.remove(file_path)
             cursor.close()
             cnxn.close()
-        return status,result
+        return status,result,verb,err_msg
 
     def secureVerifyData(self, ip , port , userName , password, dbName, query, dbtype,inp_file,inp_sheet):
         """
@@ -177,10 +214,13 @@ class DatabaseOperation():
         try:
             encryption_obj = AESCipher()
             decrypted_password = encryption_obj.decrypt(password)
-            status,result=self.verifyData(ip,port,userName,decrypted_password,dbName, query, dbtype,inp_file,inp_sheet)
+            status,result,verb,err_msg=self.verifyData(ip,port,userName,decrypted_password,dbName, query, dbtype,inp_file,inp_sheet)
         except Exceptions as e:
-            Exceptions.error(e)
-        return status,result
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg = e.msg
+        return status,result,verb,err_msg
 
     def exportData(self, ip , port , userName , password, dbName, query, dbtype, *args):
         """
@@ -191,6 +231,8 @@ class DatabaseOperation():
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
             cursor = cnxn.cursor()
@@ -206,6 +248,10 @@ class DatabaseOperation():
                 ext = self.get_ext(inp_file)
                 if (ext == '.xls'):
                     inp_sheet = fields[1]
+                    if(inp_sheet == ''):
+                        inp_sheet = 'Sheet1'
+                    log.debug('Input Sheet is :')
+                    log.debug(inp_sheet)
                     obj=excel_operations.ExcelFile()
                     obj.set_excel_path(inp_file,inp_sheet)
                     i=1
@@ -233,16 +279,20 @@ class DatabaseOperation():
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
                 else:
-                    logger.print_on_console(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             else:
                 logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
-            Exceptions.error(e)
-            return False
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg = e.msg
         finally:
             cursor.close()
             cnxn.close()
-        return status,result
+        return status,result,verb,err_msg
 
     def secureExportData(self, ip , port , userName , password, dbName, query, dbtype,*args):
         """
@@ -255,10 +305,13 @@ class DatabaseOperation():
             encryption_obj = AESCipher()
             decrypted_password = encryption_obj.decrypt(password)
             out_col = args
-            status,result=self.exportData(ip,port,userName,decrypted_password,dbName, query, dbtype, out_col)
+            status,result,verb,err_msg=self.exportData(ip,port,userName,decrypted_password,dbName, query, dbtype, out_col)
         except Exceptions as e:
-            Exceptions.error(e)
-        return status,result
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg = e.msg
+        return status,result,verb,err_msg
 
     def connection(self,dbtype, ip , port , dbName, userName , password):
         """
@@ -273,7 +326,10 @@ class DatabaseOperation():
             self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
             return self.cnxn
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg = e.msg
 
     def get_ext(self,input_path):
         """
@@ -311,7 +367,10 @@ class DatabaseOperation():
            wb.save(path)
            return path
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
+            err_msg = e.msg
 
 
 ##obj = DatabaseOperation()

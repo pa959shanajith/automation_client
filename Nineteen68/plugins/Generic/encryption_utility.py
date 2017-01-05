@@ -16,6 +16,10 @@ import hashlib
 import logger
 import generic_constants
 import Exceptions
+import logging
+from loggermessages import *
+from constants import *
+log = logging.getLogger('encryption_utility.py')
 
 ##standard padding and unpadding based on PKCS5PADDING standard
 BS = 16
@@ -34,9 +38,12 @@ class AESCipher:
                 cipher = AES.new( self.key, AES.MODE_ECB)
                 return base64.b64encode(cipher.encrypt( raw ) )
             else:
-                logger.print_on_console(generic_constants.INVALID_INPUT)
+                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
 
     def decrypt( self, enc ):
         try:
@@ -45,9 +52,12 @@ class AESCipher:
                 cipher = AES.new(self.key, AES.MODE_ECB )
                 return unpad(cipher.decrypt( enc))
             else:
-                logger.print_on_console(generic_constants.INVALID_INPUT)
+                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
 
     def encrypt_md5(self,input):
         try:
@@ -55,9 +65,12 @@ class AESCipher:
                 encrypted_md5_output = hashlib.md5(input.encode("utf")).hexdigest()
                 return encrypted_md5_output
             else:
-                logger.print_on_console(generic_constants.INVALID_INPUT)
+                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
 
     def encrypt_base64(self,input):
         try:
@@ -65,9 +78,12 @@ class AESCipher:
                 encrypted_base64_output  = base64.b64encode(input)
                 return encrypted_base64_output
             else:
-                logger.print_on_console(generic_constants.INVALID_INPUT)
+                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            log.error(e.msg)
+            logger.print_on_console(e.msg)
 
     def fieldEncrypt(self,input,*args):
         status=generic_constants.TEST_RESULT_FAIL
