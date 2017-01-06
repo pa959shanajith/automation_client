@@ -12,7 +12,7 @@ import string
 import random
 import logger
 import generic_constants
-import Exceptions
+
 import logging
 from constants import *
 log = logging.getLogger('string_ops_keywords.py')

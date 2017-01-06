@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ET
 
 import logger
 from generic_constants import *
-import Exceptions
+
 from loggermessages import *
 import logging
 from constants import *

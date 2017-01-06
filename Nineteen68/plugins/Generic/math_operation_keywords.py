@@ -14,7 +14,7 @@ from pyparsing import (Literal,CaselessLiteral,Word,Combine,Group,Optional,
                        ZeroOrMore,Forward,nums,alphas,oneOf)
 import math
 import operator
-import Exceptions
+
 import logger
 from constants import *
 from loggermessages import *
@@ -111,11 +111,10 @@ class NumericStringParser(object):
             return float( op )
 
     def eval(self,num_string,*args):
-        log.info(KEYWORD_EXECUTION_STARTED)
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=None
-        error_msg=None
+        err_msg=None
         self.exprStack=[]
         parseAll=True
         try:
@@ -131,8 +130,7 @@ class NumericStringParser(object):
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             log.error(e)
-            
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,output,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output,err_msg
 

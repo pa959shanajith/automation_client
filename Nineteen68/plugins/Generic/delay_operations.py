@@ -9,7 +9,6 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import logger
-import Exceptions
 import pause_display_operation
 import logging
 from constants import *

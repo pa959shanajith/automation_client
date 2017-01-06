@@ -13,7 +13,7 @@ import sys
 import os
 import logger
 from generic_constants import *
-import Exceptions
+
 import file_operations
 from constants import *
 from loggermessages import *
@@ -30,7 +30,7 @@ class UtilOperations:
         return : bool
 
         """
-        log.info(KEYWORD_EXECUTION_STARTED)
+        
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         log.debug('reading the inputs')
@@ -38,7 +38,7 @@ class UtilOperations:
         to_type=str(to_type)
         fmt_type=None
         output=None
-        error_msg=None
+        err_msg=None
         log.info('Input is '+input+' type to be converted is '+to_type)
         logger.print_on_console('Input is '+input+' type to be converted is '+to_type)
 
@@ -108,18 +108,18 @@ class UtilOperations:
             except Exception as e:
                 log.error(e)
                 logger.print_on_console(e)
-                error_msg=e
+                err_msg=INPUT_ERROR
         else:
             log.error(generic_constants.INVALID_INPUT)
             logger.print_on_console(generic_constants.INVALID_INPUT)
-        return status,methodoutput,output,error_msg
+        return status,methodoutput,output,err_msg
 
     def verify_file_images(self,file1,file2):
-        log.info(KEYWORD_EXECUTION_STARTED)
+        
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        output=MD5_TEMP_RES
-        error_msg=None
+        output=OUTPUT_CONSTANT
+        err_msg=None
         try:
             log.debug('reading the inputs')
             if file1 != None and file2 != None and file1 != '' and file2 != '' and os.path.exists(file1) and os.path.exists(file2) :
@@ -141,15 +141,15 @@ class UtilOperations:
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,output,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output,err_msg
 
     def verify_values(self,input1,input2):
-        log.info(KEYWORD_EXECUTION_STARTED)
+        
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        output=MD5_TEMP_RES
-        error_msg=None
+        output=OUTPUT_CONSTANT
+        err_msg=None
         try:
             log.debug('reading the inputs')
             if input1 != None and input2 != None and input1 != '' and input2 != '' :
@@ -167,8 +167,8 @@ class UtilOperations:
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,output,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output,err_msg
 
     def stop(self,*args):
         status=TEST_RESULT_PASS

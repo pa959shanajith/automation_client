@@ -11,9 +11,8 @@
 import logger
 from constants import *
 import dynamic_variable_handler
-import Exceptions
+
 from constants import *
-from loggermessages import *
 import logging
 
 
@@ -26,13 +25,13 @@ class DynamicVariables:
 
 
     def create_dynamic_variable(self,variable,value):
-        log.info(KEYWORD_EXECUTION_STARTED)
+
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        error_msg=None
-        output_res=MD5_TEMP_RES
+        err_msg=None
+        output_res=OUTPUT_CONSTANT
         try:
-            log.debug('reding the inputs')
+            log.debug('Reading the inputs in create_dynamic_variable')
             if not(variable is None or value is None or variable is '' or value is ''):
                 #Check if the given variable to be created is dynamic or not
                 log.debug('Check if the given variable to be created is dynamic or not')
@@ -44,30 +43,31 @@ class DynamicVariables:
                         dynamic_variable_handler.dynamic_variable_map[variable]=value
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
-                        log.debug('Variable created is '+str(variable)+'='+str(value))
+                        log.info('Variable created is '+str(variable)+'='+str(value))
                         logger.print_on_console('Variable created is '+str(variable)+'='+str(value))
                     else:
-                        log.error('Variable already exists')
-                        logger.print_on_console('Variable already exists')
+                        err_msg=ERROR_CODE_DICT['ERR_DYNVAR_ALREADY_EXISTS']
+                        log.error(err_msg)
+                        logger.print_on_console(err_msg)
             else:
-                log.error('Invalid input')
-                logger.print_on_console('Invalid input')
-
+                err_msg=INVALID_INPUT
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
 
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,output_res,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output_res,err_msg
 
     def modify_value(self,variable,value):
-        log.info(KEYWORD_EXECUTION_STARTED)
+
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        error_msg=None
-        output_res=MD5_TEMP_RES
+        err_msg=None
+        output_res=OUTPUT_CONSTANT
         try:
-            log.debug('reding the inputs')
+            log.debug('Reading the inputs in modify_value')
             if not(variable is None or value is None or variable is '' or value is ''):
                 #Check if the given variable to be modified is dynamic or not
                 log.debug('Check if the given variable to be modified is dynamic or not')
@@ -91,27 +91,28 @@ class DynamicVariables:
                         log.debug('Variable modified: Old value '+str(variable)+'='+str(oldvalue)+'New value '+str(variable)+'='+str(value))
                         logger.print_on_console('Variable modified: Old value '+str(variable)+'='+str(oldvalue)+'New value '+str(variable)+'='+str(value))
                     else:
-                        log.error('Variable does not exists')
-                        logger.print_on_console('Variable does not exists')
+                        err_msg=ERROR_CODE_DICT['ERR_DYNVAR']
+                        log.error(err_msg)
+                        logger.print_on_console(err_msg)
             else:
-                log.error('Invalid input')
-                logger.print_on_console('Invalid input')
-
+               err_msg=INVALID_INPUT
+               log.error(err_msg)
+               logger.print_on_console(err_msg)
 
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,output_res,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output_res,err_msg
 
     def copy_value(self,variable,value):
-        log.info(KEYWORD_EXECUTION_STARTED)
+
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        error_msg=None
-        output_res=MD5_TEMP_RES
+        err_msg=None
+        output_res=OUTPUT_CONSTANT
         try:
-            log.debug('reding the inputs')
+            log.debug('Reading the inputs in copy_value')
             if not(variable is None or value is None or variable is '' or value is ''):
                 #Check if the given variable to be modified is dynamic or not
                 log.debug('Check if the given variable to be modified is dynamic or not')
@@ -136,25 +137,27 @@ class DynamicVariables:
                             logger.print_on_console('Invalid Input: 2nd input should be dynamic variable')
 
                     else:
-                        log.error('Variable already exists')
-                        logger.print_on_console('Variable already exists')
+                        err_msg=ERROR_CODE_DICT['ERR_DYNVAR']
+                        log.error(err_msg)
+                        logger.print_on_console(err_msg)
                 else:
-                    log.error('Invalid input')
-                    logger.print_on_console('Invalid input')
+                    err_msg=INVALID_INPUT
+                    log.error(err_msg)
+                    logger.print_on_console(err_msg)
 
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,output_res,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output_res,err_msg
 
 
     def delete_dyn_value(self,variable):
-        log.info(KEYWORD_EXECUTION_STARTED)
+
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        error_msg=None
-        output_res=MD5_TEMP_RES
+        err_msg=None
+        output_res=OUTPUT_CONSTANT
         try:
             log.debug('reding the inputs')
             if not(variable is None or variable is ''):
@@ -171,18 +174,19 @@ class DynamicVariables:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        log.error('Variable does not exists')
-                        logger.print_on_console('Variable does not exists')
+                        err_msg=ERROR_CODE_DICT['ERR_DYNVAR']
+                        log.error(err_msg)
+                        logger.print_on_console(err_msg)
                 else:
-                    log.error('Invalid input')
-                    logger.print_on_console('Invalid input')
-                    error_msg='Invalid input'
+                    err_msg=INVALID_INPUT
+                    log.error(err_msg)
+                    logger.print_on_console(err_msg)
 
         except Exception as e:
              log.error(e)
              logger.print_on_console(e)
-             error_msg=e
-        return status,methodoutput,output_res,error_msg
+             err_msg=INPUT_ERROR
+        return status,methodoutput,output_res,err_msg
 
 
 

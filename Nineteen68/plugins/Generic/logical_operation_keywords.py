@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 
 from sympy.logic.inference import satisfiable
-import Exceptions
+
 import logger
 from constants import *
 from loggermessages import *
@@ -21,11 +21,10 @@ log = logging.getLogger('logical_operation_keywords.py')
 class logical_eval():
 
     def eval_expression(self,expression,*args):
-        log.info(KEYWORD_EXECUTION_STARTED)
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        error_msg=None
-        output_res=MD5_TEMP_RES
+        err_msg=None
+        output_res=OUTPUT_CONSTANT
         log.debug('reading the inputs')
         if len(expression==2):
             expression=expression[0]+expression[1]+expression[2]
@@ -45,12 +44,10 @@ class logical_eval():
                     log.info('Expression evaluation failed')
             except Exception as e:
                 log.error(e)
-                
                 logger.print_on_console(e)
-                error_msg=e
+                err_msg=INPUT_ERROR
         else:
             log.error('invalid expression')
-
-        return status,methodoutput,output_res,error_msg
+        return status,methodoutput,output_res,err_msg
 
 

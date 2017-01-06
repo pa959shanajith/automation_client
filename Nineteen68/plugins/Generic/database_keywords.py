@@ -12,7 +12,7 @@
 ##prerequistes - Respective database drivers should be avialable in client machine
 
 import pyodbc
-import Exceptions
+
 import csv
 import file_operations
 import excel_operations

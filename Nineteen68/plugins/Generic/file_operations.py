@@ -17,7 +17,7 @@ from constants import *
 import folder_operations
 from file_comparison_operations import TextFile,PdfFile,XML
 import excel_operations
-import Exceptions
+
 from constants import *
 from loggermessages import *
 import logging
@@ -32,7 +32,6 @@ class FileOperations:
     def __init__(self):
         self.txt=TextFile()
         self.pdf=PdfFile()
-##        self.excel=ExcelFile()
         self.xml=XML()
         self.folder=folder_operations.FolderOperations()
         self.xls_obj=excel_operations.ExcelXLS()
@@ -80,11 +79,11 @@ class FileOperations:
 
         """
         try:
-            log.info(KEYWORD_EXECUTION_STARTED)
+
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
-            error_msg=None
-            output_res=MD5_TEMP_RES
+            err_msg=None
+            output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             inputpath=inputpath.strip()
             log.debug(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
@@ -104,8 +103,8 @@ class FileOperations:
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,output_res,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output_res,err_msg
 
 
     def verify_file_exists(self,inputpath,file_name):
@@ -117,11 +116,11 @@ class FileOperations:
 
         """
         try:
-            log.info(KEYWORD_EXECUTION_STARTED)
+
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
-            error_msg=None
-            output_res=MD5_TEMP_RES
+            err_msg=None
+            output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             inputpath=inputpath.strip()
             log.debug(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
@@ -129,7 +128,7 @@ class FileOperations:
             if not (input is None and input is ''):
                 if file_name is not '':inputpath=inputpath+'/'+file_name
                 if os.path.isfile(inputpath):
-                    log.debug('file exists')
+                    log.debug(generic_constants.FILE_EXISTS)
                     logger.print_on_console(generic_constants.FILE_EXISTS)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
@@ -142,8 +141,8 @@ class FileOperations:
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,output_res,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output_res,err_msg
 
     def rename_file(self,inputpath,file_name,rename_file):
         """
@@ -154,11 +153,11 @@ class FileOperations:
 
         """
         try:
-            log.info(KEYWORD_EXECUTION_STARTED)
+
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
-            error_msg=None
-            output_res=MD5_TEMP_RES
+            err_msg=None
+            output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             inputpath=inputpath.strip()
             log.debug(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
@@ -180,8 +179,8 @@ class FileOperations:
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,output_res,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output_res,err_msg
 
     def delete_file(self,inputpath,file_name):
         """
@@ -192,11 +191,11 @@ class FileOperations:
 
         """
         try:
-            log.info(KEYWORD_EXECUTION_STARTED)
+
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
-            error_msg=None
-            output_res=MD5_TEMP_RES
+            err_msg=None
+            output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             log.debug(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             logger.print_on_console(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
@@ -215,8 +214,8 @@ class FileOperations:
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,output_res,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output_res,err_msg
 
 
     def verify_content(self,input_path,content,*args):
@@ -228,11 +227,11 @@ class FileOperations:
 
         """
         try:
-            log.info(KEYWORD_EXECUTION_STARTED)
+
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
-            error_msg=None
-            output_res=MD5_TEMP_RES
+            err_msg=None
+            output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             params=self.__split(input_path,content,*args)
             if self.verify_file_exists(params[0],'') == True:
@@ -248,8 +247,8 @@ class FileOperations:
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,output_res,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output_res,err_msg
 
 
     def __get_ext(self,input_path):
@@ -272,7 +271,7 @@ class FileOperations:
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
+            err_msg=INPUT_ERROR
         return '',status
 
     def compare_content(self,input_path1,input_path2,*args):
@@ -284,11 +283,11 @@ class FileOperations:
 
         """
         try:
-            log.info(KEYWORD_EXECUTION_STARTED)
+
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
-            error_msg=None
-            output_res=MD5_TEMP_RES
+            err_msg=None
+            output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             params=self.__split(input_path1,input_path2,*args)
             path2=params[1]
@@ -309,8 +308,8 @@ class FileOperations:
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,output_res,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output_res,err_msg
 
     def clear_content(self,input_path,*args):
         """
@@ -321,11 +320,11 @@ class FileOperations:
 
         """
         try:
-            log.info(KEYWORD_EXECUTION_STARTED)
+
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
-            error_msg=None
-            output_res=MD5_TEMP_RES
+            err_msg=None
+            output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             params=self.__split(input_path,*args)
             log.debug('verifying whether the files exist')
@@ -340,8 +339,8 @@ class FileOperations:
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,output_res,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output_res,err_msg
 
     def get_content(self,input_path,*args):
         """
@@ -352,11 +351,11 @@ class FileOperations:
 
         """
         try:
-            log.info(KEYWORD_EXECUTION_STARTED)
+
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             content=None
-            error_msg=None
+            err_msg=None
 
             log.debug('reading the inputs')
             params=self.__split(input_path,*args)
@@ -371,14 +370,14 @@ class FileOperations:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                 else:
-                    error_msg='Excel files are not supported'
+                    err_msg='Excel files are not supported'
                     log.error('Excel files are not supported')
                     logger.print_on_console('Excel files are not supported')
         except Exception as e:
              log.error(e)
              logger.print_on_console(e)
-             error_msg=e
-        return status,methodoutput,content,error_msg
+             err_msg=INPUT_ERROR
+        return status,methodoutput,content,err_msg
 
     def replace_content(self,input_path,existing_content,replace_content,*args):
         """
@@ -389,11 +388,11 @@ class FileOperations:
 
         """
         try:
-            log.info(KEYWORD_EXECUTION_STARTED)
+
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
-            error_msg=None
-            output_res=MD5_TEMP_RES
+            err_msg=None
+            output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             params=self.__split(input_path,existing_content,replace_content,*args)
             log.debug('verifying whether the files exist')
@@ -408,8 +407,8 @@ class FileOperations:
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,output_res,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output_res,err_msg
 
     def write_to_file(self,input_path,content,*args):
         """
@@ -420,11 +419,11 @@ class FileOperations:
 
         """
         try:
-            log.info(KEYWORD_EXECUTION_STARTED)
+
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
-            error_msg=None
-            output_res=MD5_TEMP_RES
+            err_msg=None
+            output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             params=self.__split(input_path,content,*args)
             log.debug('verifying whether the file exists')
@@ -439,8 +438,8 @@ class FileOperations:
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,output_res,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output_res,err_msg
 
     def get_line_number(self,input_path,content,*args):
         """
@@ -452,12 +451,12 @@ class FileOperations:
 
         """
         try:
-            log.info(KEYWORD_EXECUTION_STARTED)
+
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             linenumbers=None
-            error_msg=None
-            output_res=MD5_TEMP_RES
+            err_msg=None
+            output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             params=self.__split(input_path,content,*args)
             if self.verify_file_exists(params[0],'')[1]:
@@ -471,8 +470,8 @@ class FileOperations:
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,linenumbers,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,linenumbers,err_msg
 
     def save_file(self,folder_path,file_path):
         """
@@ -483,11 +482,11 @@ class FileOperations:
 
         """
         try:
-            log.info(KEYWORD_EXECUTION_STARTED)
+
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
-            error_msg=None
-            output_res=MD5_TEMP_RES
+            err_msg=None
+            output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             folder_path=str(folder_path)
             file_path=str(file_path)
@@ -520,13 +519,13 @@ class FileOperations:
             else:
                 log.error('Invalid input')
                 logger.print_on_console('Invalid input')
-                error_msg='Invalid input'
+                err_msg='Invalid input'
 
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,output_res,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output_res,err_msg
 
     def __split(self,*args):
         """

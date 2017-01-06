@@ -15,7 +15,7 @@ from Crypto.Cipher import AES
 import hashlib
 import logger
 import generic_constants
-import Exceptions
+
 import logging
 from loggermessages import *
 from constants import *

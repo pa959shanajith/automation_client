@@ -12,7 +12,7 @@ from pyrobot import Robot
 from generic_constants import *
 from constants import *
 import logger
-import Exceptions
+
 import time
 from constants import *
 from loggermessages import *
@@ -23,11 +23,11 @@ log = logging.getLogger('sendfunction_keys.py')
 class SendFunctionKeys:
 
     def sendfunction_keys(self,input,*args):
-        log.info(KEYWORD_EXECUTION_STARTED)
+        
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        error_msg=None
-        output_res=MD5_TEMP_RES
+        err_msg=None
+        output_res=OUTPUT_CONSTANT
         try:
             log.debug('reading the inputs')
             input=str(input)
@@ -50,13 +50,13 @@ class SendFunctionKeys:
             else:
                 log.debug('Invalid input')
                 logger.print_on_console('Invalid input')
-                error_msg='Invalid input'
+                err_msg='Invalid input'
 
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
-        return status,methodoutput,output_res,error_msg
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output_res,err_msg
 
     def execute_key(self,key,count):
         for x in range(count):
@@ -80,7 +80,7 @@ class SendFunctionKeys:
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            error_msg=e
+            err_msg=INPUT_ERROR
 
 
     def press_key(self,key):

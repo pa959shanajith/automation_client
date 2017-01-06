@@ -59,6 +59,10 @@ INVALID_CHARS='\/:*?"<>|'
 
 DYNAMIC_STATIC=['dynamic','static']
 
+DISPLAY_VARIABLE_VALUE='displayVariableValue'
+
+SENDFUNCTIONKEYS='sendFunctionKeys'
+
 
 
 
