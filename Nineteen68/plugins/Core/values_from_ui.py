@@ -22,4 +22,6 @@ execution_mode = 'serial'
 browsers = [1]
 
 
+condition_check=False
+
 
