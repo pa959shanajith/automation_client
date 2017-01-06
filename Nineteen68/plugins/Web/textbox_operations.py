@@ -51,13 +51,10 @@ class TextboxKeywords:
     def __invalid_element_state(self,e):
         err_msg=ERROR_CODE_DICT['ERR_INVALID_ELEMENT_STATE_EXCEPTION']
         log.error(e)
-
         logger.print_on_console(err_msg)
         return err_msg
 
     def __web_driver_exception(self,e):
-##        log.error(e)
-
         logger.print_on_console(e)
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         return err_msg

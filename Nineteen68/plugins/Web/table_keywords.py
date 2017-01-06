@@ -11,7 +11,7 @@
 
 
 from selenium import webdriver
-import Exceptions
+
 import webconstants
 from constants import *
 import logger
@@ -28,7 +28,7 @@ class TableOperationKeywords():
 
 #   returns the row count of table if the table found with the given xpath
         def getRowCount(self,element,*args):
-            log.info(KEYWORD_EXECUTION_STARTED)
+            
             logger.print_on_console('Executing keyword : ',getRowCount)
             driver=browser_Keywords.driver_obj
             logger.debug('got the driver instance from browser keyword')
@@ -36,7 +36,7 @@ class TableOperationKeywords():
             methodoutput=TEST_RESULT_FALSE
             row_count=None
             visibleFlag=True
-            error_msg=None
+            err_msg=None
             if visibleFlag==True:
                 try:
                     log.debug('checking for element')
@@ -49,27 +49,27 @@ class TableOperationKeywords():
                             methodoutput=TEST_RESULT_TRUE
                             logger.print_on_console('Got the result : ',row_count)
                     else:
-                        error_msg='Element not found'
+                        err_msg='Element not found'
                         log.error('Element not found')
                         logger.print_on_console('Element not found')
                 except Exception as e:
                      log.error(e)
                      
                      logger.print_on_console(e)
-                     error_msg=e
+                     err_msg=E
             else:
                 log.error('hidden object')
                 logger.print_on_console('hidden object')
-            return status,methodoutput,row_count,error_msg
+            return status,methodoutput,row_count,err_msg
 
 #   returns the no of coloumns of the table if the table found with the given xpath
         def getColoumnCount(self,webElement,*args):
-            log.info(KEYWORD_EXECUTION_STARTED)
+            
             logger.print_on_console('Executing keyword : ',getColoumnCount)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             coloumn_count=None
-            error_msg=None
+            err_msg=None
             driver=browser_Keywords.driver_obj
             logger.debug('got the driver instance from browser keyword')
             visibleFlag=True
@@ -89,19 +89,19 @@ class TableOperationKeywords():
                     log.error(e)
                     
                     logger.print_on_console(e)
-                    error_msg=e
+                    err_msg=E
             else:
                 logger.print_on_console('hidden object')
-            return status,methodoutput,coloumn_count,error_msg
+            return status,methodoutput,coloumn_count,err_msg
 
 #   returns the cell value of cell with ',' seperated values, if the table found with the given xpath
         def getCellValue(self,element,input_val,output):
-            log.info(KEYWORD_EXECUTION_STARTED)
+            
             logger.print_on_console('Executing keyword : ',getCellValue)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             cellVal=None
-            error_msg=None
+            err_msg=None
             driver=browser_Keywords.driver_obj
             logger.debug('got the driver instance from browser keyword')
             visibleFlag=True
@@ -128,21 +128,21 @@ class TableOperationKeywords():
                 log.error(e)
                 
                 logger.print_on_console(e)
-                error_msg=e
-            return status,methodoutput,cellVal,error_msg
+                err_msg=E
+            return status,methodoutput,cellVal,err_msg
 
 #   verifies the cell value with the given text input, if the table found with the given xpath
         def verifyCellValue(self,element,input_val,output_val):
-            log.info(KEYWORD_EXECUTION_STARTED)
+            
             logger.print_on_console('Executing keyword : ',verifyCellValue)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             cellVal=None
-            error_msg=None
+            err_msg=None
             driver=browser_Keywords.driver_obj
             logger.debug('got the driver instance from browser keyword')
             visibleFlag=True
-            output_res=MD5_TEMP_RES
+            output_res=OUTPUT_CONSTANT
             try:
                 if visibleFlag==True:
                     log.debug('reading the inputs')
@@ -170,18 +170,18 @@ class TableOperationKeywords():
                 log.error(e)
                 
                 logger.print_on_console(e)
-                error_msg=e
-            return status,methodoutput,output_res,error_msg
+                err_msg=E
+            return status,methodoutput,output_res,err_msg
 
 #   returns the  tooltip text  of given cell, if the table found with the given xpath
         def getCellToolTip(self,element,input_val,output):
-            log.info(KEYWORD_EXECUTION_STARTED)
+            
             logger.print_on_console('Executing keyword : ',getCellToolTip)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             tooltip=None
             driver=browser_Keywords.driver_obj
-            error_msg=None
+            err_msg=None
             logger.debug('got the driver instance from browser keyword')
             visibleFlag=True
             if visibleFlag==True:
@@ -208,19 +208,19 @@ class TableOperationKeywords():
                     log.error(e)
                     
                     logger.print_on_console(e)
-                    error_msg=e
+                    err_msg=E
             else:
                 logger.print_on_console('hidden object')
-            return status,methodoutput,tooltip,error_msg
+            return status,methodoutput,tooltip,err_msg
 
 #   lclicks on the given cell, if the table found with the given xpath
         def cellClick(self,element,input_arr,*args):
-            log.info(KEYWORD_EXECUTION_STARTED)
+            
             logger.print_on_console('Executing keyword :',cellClick)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
-            error_msg=None
-            output_val=MD5_TEMP_RES
+            err_msg=None
+            output_val=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             row_number=int(input_arr[0])-1
             col_number=int(input_arr[1])-1
@@ -277,7 +277,7 @@ class TableOperationKeywords():
                             log.error(e)
                             
                             logger.print_on_console(e)
-                            error_msg=e
+                            err_msg=E
                     elif len(input_arr)>2:
                         log.info('click on an element inside a cell')
                         logger.print_on_console('click on an element inside a cell')
@@ -417,27 +417,27 @@ class TableOperationKeywords():
                                          log.error(e)
                                          
                                          logger.print_on_console(e)
-                                         error_msg=e
+                                         err_msg=E
 
                 except Exception as e:
                    log.error(e)
                    
                    logger.print_on_console(e)
-                   error_msg=e
+                   err_msg=E
             else:
                 logger.print_on_console('hidden object')
-            return status,methodoutput,output_val,error_msg
+            return status,methodoutput,output_val,err_msg
 
 
 
 
         def getRowNumByText(self,element,text,*args):
-            log.info(KEYWORD_EXECUTION_STARTED)
+            
             logger.print_on_console('Executing keyword : ',getRowNumByText)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             row_number=None
-            error_msg=None
+            err_msg=None
             log.debug('reading the inputs')
             text=text[0].strip()
             driver=browser_Keywords.driver_obj
@@ -455,13 +455,13 @@ class TableOperationKeywords():
                     log.error(e)
                     
                     logger.print_on_console(e)
-                    error_msg=e
+                    err_msg=E
             else:
                 logger.print_on_console('hidden object')
-            return status,methodoutput,row_number,error_msg
+            return status,methodoutput,row_number,err_msg
 
         def getColNumByText(self,element,text,*args):
-            log.info(KEYWORD_EXECUTION_STARTED)
+            
             logger.print_on_console('Executing keyword : ',getColNumByText)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
@@ -483,10 +483,10 @@ class TableOperationKeywords():
                     log.error(e)
                     
                     logger.print_on_console(e)
-                    error_msg=e
+                    err_msg=E
             else:
                 logger.print_on_console('hidden object')
-            return status,methodoutput,col_number,error_msg
+            return status,methodoutput,col_number,err_msg
 
 
         def getChildNodes(self,element):
@@ -539,11 +539,11 @@ class TableOperationKeywords():
 
 
         def getInnerTable(self,element,input_val,*args):
-            log.info(KEYWORD_EXECUTION_STARTED)
+            
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             web_element=None
-            error_msg=None
+            err_msg=None
 
             if((element is not None) and (input_val is not None)):
                 try:
@@ -563,7 +563,7 @@ class TableOperationKeywords():
                             methodoutput=TEST_RESULT_TRUE
                         else:
                             web_element = None
-                            error_msg = 'Table element not found'
+                            err_msg = 'Table element not found'
                     elif(len(input_val) == 1):
                         log.info('Input value is 1')
                         row_no = input_val[0]
@@ -577,7 +577,7 @@ class TableOperationKeywords():
                             methodoutput=TEST_RESULT_TRUE
                         else:
                             web_element = None
-                            error_msg = 'Table element not found'
+                            err_msg = 'Table element not found'
 ##                    elif(len(input_val == 0)):
 ##                        script = """var ele = arguments[0]; var temp = fun(ele); console.log(temp); return temp;  function fun(tableEle) {     eleCollection = tableEle.getElementsByTagName('table');     if (eleCollection.length > 0) {         console.log(eleCollection.length);         return eleCollection[0];     }     return "null";     console.log("No Inner Table") };"""
 ##                        web_element = browser_Keywords.driver_obj.execute_script(script)
@@ -585,8 +585,8 @@ class TableOperationKeywords():
                     log.error(e)
                     
                     logger.print_on_console(e)
-                    error_msg=e
-            return status,methodoutput,web_element,error_msg
+                    err_msg=E
+            return status,methodoutput,web_element,err_msg
 
 
 ##if __name__ == '__main__':

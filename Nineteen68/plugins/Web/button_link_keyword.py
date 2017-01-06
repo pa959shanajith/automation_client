@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import Exceptions
+
 import logger
 import webconstants
 import time

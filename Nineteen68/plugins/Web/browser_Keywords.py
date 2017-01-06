@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 from selenium import webdriver
-import Exceptions
+
 import logger
 import webconstants
 driver_obj = None

@@ -9,8 +9,6 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-##import selenium
-import Exceptions
 from selenium.webdriver.support.ui import Select
 ##import browser_Keywords
 import webconstants

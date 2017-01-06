@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 
 import logger
-import Exceptions
+
 import browser_Keywords
 from webconstants import *
 from constants import *

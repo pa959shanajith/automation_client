@@ -79,6 +79,7 @@ class Dispatcher:
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE)
 
         def print_error(err_msg):
+            err_msg=ERROR_CODE_DICT['ERR_CUSTOM_MISMATCH']
             logger.print_on_console(err_msg)
             log.error(err_msg)
 
@@ -116,19 +117,14 @@ class Dispatcher:
                                     for x in range(0,3):
                                         input.pop()
                                 else:
-                                    err_msg=ERROR_CODE_DICT['ERR_CUSTOM_MISMATCH']
-                                    print_error(err_msg)
+                                    print_error('ERR_CUSTOM_MISMATCH')
                             else:
-                                err_msg=ERROR_CODE_DICT['ERR_PRECONDITION_NOTMET']
-                                print_error(err_msg)
-                                err_msg=ERROR_CODE_DICT['ERR_CUSTOM_NOTFOUND']
-                                print_error(err_msg)
+                                print_error('ERR_PRECONDITION_NOTMET')
+                                print_error('ERR_CUSTOM_NOTFOUND')
 
                         else:
-                            err_msg=ERROR_CODE_DICT['ERR_REF_ELE_NULL']
-                            print_error(err_msg)
-                            err_msg=ERROR_CODE_DICT['ERR_CUSTOM_NOTFOUND']
-                            print_error(err_msg)
+                            print_error('ERR_REF_ELE_NULL')
+                            print_error('ERR_CUSTOM_NOTFOUND')
 
                 else:
                     webelement = self.getwebelement(driver,objectname)

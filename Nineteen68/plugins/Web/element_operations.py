@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import logger
-import Exceptions
+
 from utils_web import Utils
 from button_link_keyword import ButtonLinkKeyword
 from webconstants import *
