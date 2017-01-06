@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 
 from sympy.logic.inference import satisfiable
-import Exceptions
+
 import logger
 import handler
 from constants import *

@@ -11,9 +11,9 @@
 
 import handler
 import logger
-import Exceptions
+
 from  constants import *
-from loggermessages import *
+
 import logging
 
 
@@ -75,7 +75,7 @@ class  JumpBy():
              log.error(e)
              
              logger.print_on_console(e)
-             error_msg=e
+             
 
         #Reporting part
         self.step_description='JumpBy executed and the result is '+self.status

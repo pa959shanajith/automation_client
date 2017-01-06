@@ -201,6 +201,7 @@ ERROR_CODE_DICT ={
                     'ERR_GETPARAM_UNIQUECOLUMN': 'Excel sheet should contain Unique Column names',
                     'ERR_XML_INVALID': 'Invalid XML format.',
                     'ERR_DYNVAR': 'Variable does not Exist.',
+                    'ERR_DYNVAR_ALREADY_EXISTS': 'Variable already exists',
                     'ERR_XML_TAGNAMES': """XML file doesn't contain tag names.""",
                     'ERR_DATE_MISMATCH': 'Inputs donot match.',
                     'MSG_EXTERNAL_DATALIST_STATICVARIABLE': 'Invalid Input:No externalData List exists for static variable.',

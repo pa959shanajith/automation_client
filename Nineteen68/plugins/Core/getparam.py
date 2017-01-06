@@ -28,8 +28,6 @@ from xlrd import open_workbook
 
 import logger
 
-import Exceptions
-
 import handler
 
 from teststepproperty import TestStepProperty
