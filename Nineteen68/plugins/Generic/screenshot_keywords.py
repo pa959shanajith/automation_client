@@ -42,7 +42,7 @@ class Screenshot():
             img.save(filePath+'.png', "png")
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
-            log.debug('screenshot captured and saved in : %s',filePath+'.png')
+            log.debug('screenshot captured and saved in : ',filePath+'.png')
         except Exception as e:
             log.error(e)
 

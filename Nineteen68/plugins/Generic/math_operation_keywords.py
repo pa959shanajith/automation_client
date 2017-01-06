@@ -126,7 +126,7 @@ class NumericStringParser(object):
             logger.print_on_console('Evaluating the expression')
             output=self.evaluateStack( self.exprStack[:] )
             log.debug('Got the result : %s', output)
-            logger.print_on_console('Got the result : %s', output)
+            logger.print_on_console('Got the result : ', output)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:

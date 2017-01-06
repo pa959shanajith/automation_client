@@ -24,7 +24,7 @@ class BatchOperationKeyword():
 
     def executeFile(self, filePath):
         log.info(KEYWORD_EXECUTION_STARTED)
-        logger.print_on_console('Executing keyword : %s',executeFile)
+        logger.print_on_console('Executing keyword : ',executeFile)
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         error_msg=None

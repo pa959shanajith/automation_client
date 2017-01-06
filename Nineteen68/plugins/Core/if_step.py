@@ -9,7 +9,6 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import logger
 from sympy.logic.inference import satisfiable
 import Exceptions
 import logger

@@ -29,7 +29,7 @@ class TableOperationKeywords():
 #   returns the row count of table if the table found with the given xpath
         def getRowCount(self,element,*args):
             log.info(KEYWORD_EXECUTION_STARTED)
-            logger.print_on_console('Executing keyword : %s',getRowCount)
+            logger.print_on_console('Executing keyword : ',getRowCount)
             driver=browser_Keywords.driver_obj
             logger.debug('got the driver instance from browser keyword')
             status=TEST_RESULT_FAIL
@@ -47,7 +47,7 @@ class TableOperationKeywords():
                         if(row_count>=0):
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
-                            logger.print_on_console('Got the result : %s',row_count)
+                            logger.print_on_console('Got the result : ',row_count)
                     else:
                         error_msg='Element not found'
                         log.error('Element not found')
@@ -65,7 +65,7 @@ class TableOperationKeywords():
 #   returns the no of coloumns of the table if the table found with the given xpath
         def getColoumnCount(self,webElement,*args):
             log.info(KEYWORD_EXECUTION_STARTED)
-            logger.print_on_console('Executing keyword : %s',getColoumnCount)
+            logger.print_on_console('Executing keyword : ',getColoumnCount)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             coloumn_count=None
@@ -97,7 +97,7 @@ class TableOperationKeywords():
 #   returns the cell value of cell with ',' seperated values, if the table found with the given xpath
         def getCellValue(self,element,input_val,output):
             log.info(KEYWORD_EXECUTION_STARTED)
-            logger.print_on_console('Executing keyword : %s',getCellValue)
+            logger.print_on_console('Executing keyword : ',getCellValue)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             cellVal=None
@@ -119,7 +119,7 @@ class TableOperationKeywords():
                         cellVal=self.getChildNodes(remoteWebElement)
                         cellVal=cellVal.strip()
                         log.info('Got the result : %s',cellVal)
-                        logger.print_on_console('Got the result : %s',cellVal)
+                        logger.print_on_console('Got the result : ',cellVal)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                 else:
@@ -134,7 +134,7 @@ class TableOperationKeywords():
 #   verifies the cell value with the given text input, if the table found with the given xpath
         def verifyCellValue(self,element,input_val,output_val):
             log.info(KEYWORD_EXECUTION_STARTED)
-            logger.print_on_console('Executing keyword : %s',verifyCellValue)
+            logger.print_on_console('Executing keyword : ',verifyCellValue)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             cellVal=None
@@ -161,7 +161,7 @@ class TableOperationKeywords():
                         expected_value=input_val[2].strip()
                         if(cellVal == expected_value):
                             log.info('Got the result : %s', 'PASS')
-                            logger.print_on_console('Got the result : %s','PASS')
+                            logger.print_on_console('Got the result : ','PASS')
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                 else:
@@ -176,7 +176,7 @@ class TableOperationKeywords():
 #   returns the  tooltip text  of given cell, if the table found with the given xpath
         def getCellToolTip(self,element,input_val,output):
             log.info(KEYWORD_EXECUTION_STARTED)
-            logger.print_on_console('Executing keyword : %s',getCellToolTip)
+            logger.print_on_console('Executing keyword : ',getCellToolTip)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             tooltip=None
@@ -202,7 +202,7 @@ class TableOperationKeywords():
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                             log.info('Got the result : %s',cellVal)
-                            logger.print_on_console('Got the result : %s',cellVal)
+                            logger.print_on_console('Got the result : ',cellVal)
 
                 except Exception as e:
                     log.error(e)
@@ -216,7 +216,7 @@ class TableOperationKeywords():
 #   lclicks on the given cell, if the table found with the given xpath
         def cellClick(self,element,input_arr,*args):
             log.info(KEYWORD_EXECUTION_STARTED)
-            logger.print_on_console('Executing keyword : %s',cellClick)
+            logger.print_on_console('Executing keyword :',cellClick)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             error_msg=None
@@ -433,7 +433,7 @@ class TableOperationKeywords():
 
         def getRowNumByText(self,element,text,*args):
             log.info(KEYWORD_EXECUTION_STARTED)
-            logger.print_on_console('Executing keyword : %s',getRowNumByText)
+            logger.print_on_console('Executing keyword : ',getRowNumByText)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             row_number=None
@@ -450,7 +450,7 @@ class TableOperationKeywords():
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                     log.info('Got the result : %s',cellVal)
-                    logger.print_on_console('Got the result : %s',cellVal)
+                    logger.print_on_console('Got the result : ',cellVal)
                 except Exception as e:
                     log.error(e)
                     
@@ -462,7 +462,7 @@ class TableOperationKeywords():
 
         def getColNumByText(self,element,text,*args):
             log.info(KEYWORD_EXECUTION_STARTED)
-            logger.print_on_console('Executing keyword : %s',getColNumByText)
+            logger.print_on_console('Executing keyword : ',getColNumByText)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             col_number=None
@@ -478,7 +478,7 @@ class TableOperationKeywords():
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                     log.info('Got the result : %s',cellVal)
-                    logger.print_on_console('Got the result : %s',cellVal)
+                    logger.print_on_console('Got the result : ',cellVal)
                 except Exception as e:
                     log.error(e)
                     
