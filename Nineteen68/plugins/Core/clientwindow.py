@@ -328,12 +328,9 @@ class ClientWindow(wx.Frame):
         print '---------controller.Continue-------'
     #----------------------------------------------------------------------
     def OnTerminate(self, event):
-        print 'EVENT RECEIVED'
         print '---------Termination Started-------'
         self.cancelbutton.Enable()
         controller.terminate_flag=True
-
-        print '---------controller.terminate_flag-------'
 
     #----------------------------------------------------------------------
     def OnClear(self,event):

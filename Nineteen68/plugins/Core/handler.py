@@ -460,5 +460,7 @@ class Handler():
         for k, v in d.items():
             print(k,':', v)
 
-    def clearList(self):
+    def clearList(self,con):
         del tspList[:]
+        if con.oebs_dispatcher_obj != None:
+            con.oebs_dispatcher_obj.clear_oebs_window_name()

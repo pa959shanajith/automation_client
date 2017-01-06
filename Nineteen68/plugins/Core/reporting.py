@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        reporting
+# Name:        reporting.py
 # Purpose:
 #
 # Author:      sushma.p
@@ -11,6 +11,10 @@
 from constants import *
 import json
 import reporting_pojo
+import logger
+import logging
+
+log = logging.getLogger("reporting.py")
 
 
 class Reporting:
@@ -35,6 +39,7 @@ class Reporting:
         self.start_time=''
         self.end_time=''
         self.ellapsed_time=''
+        self.name=''
 
     def build_overallstatus(self,start_time,end_time,ellapsed_time):
         """
@@ -135,7 +140,7 @@ class Reporting:
         obj[ELLAPSED_TIME]=report_obj.ellapsedtime
         self.report_string.append(obj)
 
-    def generate_report_step(self,tsp,status,step_description,ellapsedtime,keyword_flag):
+    def generate_report_step(self,tsp,status,step_description,ellapsedtime,keyword_flag,*args):
         """
         def : generate_report_step
         purpose : calls the method 'generate_keyword_step' to add each step to the report
@@ -143,6 +148,7 @@ class Reporting:
 
 
         """
+        comments=''
         parent_id=0
         name=tsp.name
         if keyword_flag and self.nested_flag:
@@ -151,8 +157,11 @@ class Reporting:
             parent_id=tsp.parent_id
             step_description=tsp.step_description
             name=self.name
+        if len(args)>0:
+            if args[0] != None:
+                comments=args[0]
 
-        reporting_pojo_obj=reporting_pojo.ReportingStep(self.id_counter,name,parent_id,status,STEP+str(tsp.stepnum),'',step_description,str(ellapsedtime),tsp.testscript_name)
+        reporting_pojo_obj=reporting_pojo.ReportingStep(self.id_counter,name,parent_id,status,STEP+str(tsp.stepnum),comments,step_description,str(ellapsedtime),tsp.testscript_name)
 
         self.generate_keyword_step(reporting_pojo_obj)
         self.id_counter+=1
@@ -172,4 +181,12 @@ class Reporting:
         print json.dumps(self.report_json)
         print '--------------------------------------------------------------------'
 
+
+
+    def save_report_json(self,filename):
+        log.debug('Saving report json to a file')
+        with open(filename, 'w') as outfile:
+                log.info('Writing report data to the file'+filename)
+                json.dump(self.report_json, outfile, indent=4, sort_keys=False)
+        outfile.close()
 
