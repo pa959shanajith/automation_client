@@ -15,44 +15,85 @@ import logger
 import Exceptions
 import launch_keywords
 from ldtp.client_exception import LdtpExecutionError
+import logging
+from loggermessages import *
+import logger
+log = logging.getLogger('editable_text.py')
 
 class Text_Box:
     def set_text(self , element , parent , input_val ,*args):
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
+        log.debug('Got window name after launching application')
+        log.debug(launch_keywords.window_name)
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             if launch_keywords.window_name!=None:
+                log.info('Recieved element from the desktop dispatcher')
                 dektop_element = element.split(';')
                 input_val = input_val[0]
+                log.info('Input value obtained')
+                log.info(input_val)
                 check = self.verify_parent(dektop_element[0],parent)
+                log.debug('Parent of element while scraping')
+                log.debug(parent)
+                log.debug('Parent check status')
+                log.debug(check)
                 if (check == True):
+                    log.info('Parent matched')
                     states = ldtp.getallstates(launch_keywords.window_name,dektop_element[0])
+                    log.debug('state of element')
+                    log.debug(states)
                     if(desktop_constants.ENABLED_CHECK in states):
+                        log.info('Element state is enabled')
                         ldtp.grabfocus(launch_keywords.window_name,dektop_element[0])
                         ldtp.activatetext(launch_keywords.window_name,dektop_element[0])
                         ldtp.settextvalue(launch_keywords.window_name,dektop_element[0], input_val)
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
+                        log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
-                        logger.print_on_console('Element state does not allow to perform the operation')
+                        log.log('Element state does not allow to perform the operation')
+                        err_msg = 'Element state does not allow to perform the operation'
                 else:
-                    logger.print_on_console('element not present on the page where operation is trying to be performed')
+                    log.log('element not present on the page where operation is trying to be performed')
+                    err_msg = 'element not present on the page where operation is trying to be performed'
         except LdtpExecutionError as exception:
-            Exceptions.error(exception)
-        return status,result
+            log.error(exception)
+            logger.print_on_console(exception)
+        log.info(RETURN_RESULT)
+        return status,result,verb,err_msg
 
 
     def set_secure_text(self, element , parent , input_val , *args):
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
+        log.debug('Got window name after launching application')
+        log.debug(launch_keywords.window_name)
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             if launch_keywords.window_name!=None:
+                log.info('Recieved element from the desktop dispatcher')
                 dektop_element = element.split(';')
                 input_val = input_val[0]
+                log.info('Input value obtained')
+                log.info(input_val)
                 check = self.verify_parent(dektop_element[0],parent)
+                log.debug('Parent of element while scraping')
+                log.debug(parent)
+                log.debug('Parent check status')
+                log.debug(check)
                 if (check == True):
+                    log.info('Parent matched')
                     states = ldtp.getallstates(launch_keywords.window_name,dektop_element[0])
+                    log.debug('states of element')
+                    log.debug(states)
                     if(desktop_constants.ENABLED_CHECK in states):
+                        log.info('Element state is enabled')
                         ldtp.grabfocus(launch_keywords.window_name,dektop_element[0])
                         ldtp.activatetext(launch_keywords.window_name,dektop_element[0])
                         encryption_obj = AESCipher()
@@ -60,92 +101,157 @@ class Text_Box:
                         ldtp.settextvalue(launch_keywords.window_name,dektop_element[0],input_val_temp)
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
+                        log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
-                        logger.print_on_console('Element state does not allow to perform the operation')
+                        log.info('Element state does not allow to perform the operation')
+                        err_msg = 'Element state does not allow to perform the operation'
                 else:
-                    logger.print_on_console('element not present on the page where operation is trying to be performed')
+                    log.info('element not present on the page where operation is trying to be performed')
+                    err_msg = 'element not present on the page where operation is trying to be performed'
         except LdtpExecutionError as exception:
-            Exceptions.error(exception)
-        return status,result
+            log.error(exception)
+            logger.print_on_console(exception)
+        log.info(RETURN_RESULT)
+        return status,result,verb,err_msg
 
     def get_text(self, element , parent  , *args):
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
+        log.debug('Got window name after launching application')
+        log.debug(launch_keywords.window_name)
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         output=None
+        err_msg=None
         try:
             if launch_keywords.window_name!=None:
+                log.info('Recieved element from the desktop dispatcher')
                 dektop_element = element.split(';')
                 check = self.verify_parent(dektop_element[0],parent)
+                log.debug('Parent of element while scraping')
+                log.debug(parent)
+                log.debug('Parent check status')
+                log.debug(check)
                 if (check == True):
+                    log.info('Parent matched')
                     states = ldtp.getallstates(launch_keywords.window_name,dektop_element[0])
+                    log.debug('states of element')
+                    log.debug(states)
                     if(desktop_constants.ENABLED_CHECK in states):
+                        log.info('Element state is enabled')
                         ldtp.grabfocus(launch_keywords.window_name,dektop_element[0])
                         ldtp.activatetext(launch_keywords.window_name,dektop_element[0])
                         output = ldtp.gettextvalue(launch_keywords.window_name,dektop_element[0])
+                        logger.print_on_console('Text obtained : ' , output)
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
+                        log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
-                        logger.print_on_console('Element state does not allow to perform the operation')
+                        log.info('Element state does not allow to perform the operation')
+                        err_msg = 'Element state does not allow to perform the operation'
                 else:
-                    logger.print_on_console('element not present on the page where operation is trying to be performed')
+                    log.info('element not present on the page where operation is trying to be performed')
+                    err_msg = 'element not present on the page where operation is trying to be performed'
         except LdtpExecutionError as exception:
-            Exceptions.error(exception)
-        return status,result,output
+            log.error(exception)
+            logger.print_on_console(exception)
+        log.info(RETURN_RESULT)
+        return status,result,output,err_msg
 
     def clear_text(self, element , parent, *args):
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
+        log.debug('Got window name after launching application')
+        log.debug(launch_keywords.window_name)
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             if launch_keywords.window_name!=None:
+                log.info('Recieved element from the desktop dispatcher')
                 dektop_element = element.split(';')
                 check = self.verify_parent(dektop_element[0],parent)
+                log.debug('Parent of element while scraping')
+                log.debug(parent)
+                log.debug('Parent check status')
+                log.debug(check)
                 if (check == True):
+                    log.info('Parent matched')
                     states = ldtp.getallstates(launch_keywords.window_name,dektop_element[0])
+                    log.debug('states of element')
+                    log.debug(states)
                     if(desktop_constants.ENABLED_CHECK in states):
+                        log.info('Element state is enabled')
                         index = 0
                         ldtp.grabfocus(launch_keywords.window_name,dektop_element[0])
                         ldtp.activatetext(launch_keywords.window_name,dektop_element[0])
                         ldtp.deletetext(launch_keywords.window_name,dektop_element[0],index)
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
+                        log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
-                        logger.print_on_console('Element state does not allow to perform the operation')
+                        log.info('Element state does not allow to perform the operation')
+                        err_msg = 'Element state does not allow to perform the operation'
                 else:
-                    logger.print_on_console('element not present on the page where operation is trying to be performed')
+                    log.info('element not present on the page where operation is trying to be performed')
+                    err_msg = 'element not present on the page where operation is trying to be performed'
         except LdtpExecutionError as exception:
-            Exceptions.error(exception)
-        return status,result
+            log.error(exception)
+            logger.print_on_console(exception)
+        log.info(RETURN_RESULT)
+        return status,result,verb,err_msg
 
     def verify_text(self, element , parent , input_val, *args):
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
+        log.debug('Got window name after launching application')
+        log.debug(launch_keywords.window_name)
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             if launch_keywords.window_name!=None:
+                log.info('Recieved element from the desktop dispatcher')
                 dektop_element = element.split(';')
                 input_val = input_val[0]
+                log.info('Input Value obtained')
+                log.info(input_val)
                 check = self.verify_parent(dektop_element[0],parent)
+                log.debug('Parent of element while scraping')
+                log.debug(parent)
+                log.debug('Parent check status')
+                log.debug(check)
                 if (check == True):
+                    log.info('Parent matched')
                     states = ldtp.getallstates(launch_keywords.window_name,dektop_element[0])
+                    log.debug('states of element')
+                    log.debug(states)
                     if(desktop_constants.ENABLED_CHECK in states):
+                        log.info('Element state is enabled')
                         ldtp.grabfocus(launch_keywords.window_name,dektop_element[0])
                         ldtp.activatetext(launch_keywords.window_name,dektop_element[0])
                         output = ldtp.gettextvalue(launch_keywords.window_name,dektop_element[0])
+                        log.debug('output from inbuilt call')
+                        log.debug(output)
                         if (output == input_val):
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
-                        logger.print_on_console('Element state does not allow to perform the operation')
+                        log.info('Element state does not allow to perform the operation')
+                        err_msg = 'Element state does not allow to perform the operation'
                 else:
-                    logger.print_on_console('element not present on the page where operation is trying to be performed')
+                    log.info('element not present on the page where operation is trying to be performed')
+                    err_msg='element not present on the page where operation is trying to be performed'
         except LdtpExecutionError as exception:
-            Exceptions.error(exception)
-        return status,result,output
+            log.error(exception)
+            logger.print_on_console(exception)
+        log.info(RETURN_RESULT)
+        return status,result,verb,err_msg
 
 
 
     def verify_parent(self,element,parent):
         try:
-            desktop_constants.ELEMENT_FOUND=False
             real_parent=ldtp.getobjectproperty(launch_keywords.window_name,element,'parent')
             parent=parent.strip()
             if(parent == 'pagetitle'):
@@ -157,11 +263,11 @@ class Text_Box:
             real_parent = real_parent.replace(' ','')
             parent = parent.replace(' ','')
             if(real_parent == parent):
-                desktop_constants.ELEMENT_FOUND=True
+                return True
             else:
-                logger.print_on_console('verify parent is false')
+                logger.log('verify parent is false')
+                return False
         except Exception as e:
             Exceptions.error(e)
-        return desktop_constants.ELEMENT_FOUND
 
 
