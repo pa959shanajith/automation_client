@@ -44,7 +44,7 @@ class RadioCheckboxOperations:
                 if 'enabled' in objstates:
                     if 'checked' in objstates:
                         log.debug('%s',MSG_OBJECTSELECTED)
-                        oebs_key_objects.custom_msg.append("ERR_OBJECTSELECTED")
+                        oebs_key_objects.custom_msg.append(MSG_OBJECTSELECTED)
                     else:
                         oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                         time.sleep(2)
@@ -52,7 +52,7 @@ class RadioCheckboxOperations:
                         keywordresult=MSG_PASS
                 else:
                    log.debug('MSG:%s',MSG_DISABLED_OBJECT)
-                   oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                   oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
@@ -87,7 +87,7 @@ class RadioCheckboxOperations:
                 if 'enabled' in objstates:
                     if 'checked' in objstates:
                         log.debug('%s',MSG_OBJECTSELECTED)
-                        oebs_key_objects.custom_msg.append("ERR_OBJECTSELECTED")
+                        oebs_key_objects.custom_msg.append(MSG_OBJECTSELECTED)
                     else:
                         oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                         time.sleep(2)
@@ -101,7 +101,7 @@ class RadioCheckboxOperations:
                             oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
                 else:
                     log.debug('%s',MSG_DISABLED_OBJECT)
-                    oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                    oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
@@ -152,13 +152,13 @@ class RadioCheckboxOperations:
                         if 'checked' in objstates:
                             oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                             log.debug('%s',MSG_OBJECTUNSELECTED)
-                            oebs_key_objects.custom_msg.append("ERR_OBJECTUNSELECTED")
+                            oebs_key_objects.custom_msg.append(MSG_OBJECTUNSELECTED)
                         else:
                             log.debug('%s',MSG_OBJECT_READONLY)
                             oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
                 else:
                     log.debug('Object is disabled',MSG_DISABLED_OBJECT)
-                    oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                    oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)

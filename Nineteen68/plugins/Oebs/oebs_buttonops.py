@@ -52,7 +52,7 @@ class ButtonOperations:
                     oebs_key_objects.custom_msg.append(MSG_NAME_NOT_DEFINED)
             else:
                 log.debug('%s',MSG_INVALID_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_INVALID_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
@@ -101,10 +101,10 @@ class ButtonOperations:
                         oebs_key_objects.custom_msg.append(MSG_NAME_NOT_DEFINED)
                 else:
                     log.debug('MSG:%s',MSG_INVALID_INPUT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
             else:
                 log.debug('MSG:%s',MSG_INVALID_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_INVALID_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
        	    log.debug('%s',e)
@@ -141,7 +141,7 @@ class ButtonOperations:
                     keywordresult=MSG_PASS
                 else:
                     log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                    oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                    oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
@@ -180,7 +180,7 @@ class ButtonOperations:
                     keywordresult=MSG_PASS
                 else:
                     log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                    oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                    oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
@@ -262,7 +262,7 @@ class ButtonOperations:
                             oebs_key_objects.custom_msg.append(str('Link names mismatched. Expected:' + linktext + " Obtained:"+verificationtext))
                 else:
                     log.debug('%s',MSG_INVALID_INPUT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
             elif(curaccinfo.role == 'push button'):
                 linktext = curaccinfo.name
                 if len(oebs_key_objects.keyword_input) == 1:

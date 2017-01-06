@@ -53,12 +53,12 @@ class InternalFrameOperations:
                         keywordresult=MSG_PASS
                     else:
                         log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                        oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                        oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
 
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
         except Exception as e:
             oebs_serverUtilities.cleardata()
@@ -92,10 +92,10 @@ class InternalFrameOperations:
                         keywordresult=MSG_PASS
                     else:
                         log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                        oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                        oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
         except Exception as e:
             oebs_serverUtilities.cleardata()
@@ -132,7 +132,7 @@ class InternalFrameOperations:
                             keywordresult=MSG_PASS
                         else:
                             log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                            oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                            oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
                 else:
                     for i in range(actioncount):
@@ -146,11 +146,11 @@ class InternalFrameOperations:
                             keywordresult=MSG_PASS
                         else:
                             log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                            oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                            oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
         except Exception as e:
             oebs_serverUtilities.cleardata()

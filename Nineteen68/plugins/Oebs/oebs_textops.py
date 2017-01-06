@@ -59,10 +59,10 @@ class TextOperations:
                     oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
                 else:
                     log.debug('MSG:%s',MSG_DISABLED_OBJECT)
-                    oebs_key_objects.custom_msg.append("ERR_OBJECT_DISABLED")
+                    oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('%s',MSG_INVALID_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_INVALID_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
@@ -110,13 +110,13 @@ class TextOperations:
                                         keywordresponse=MSG_TRUE
                                 else:
                                     log.debug('MSG:%s',MSG_INVALID_INPUT)
-                                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                             else:
-                                log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
-                                oebs_key_objects.custom_msg.append("ERR_INVALID_NO_INPUT")
+                                log.debug('MSG:%s',MSG_INVALID_INPUT)
+                                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                         else:
                             log.debug('MSG:%s',MSG_INVALID_OBJECT)
-                            oebs_key_objects.custom_msg.append("ERR_INVALID_OBJECT")
+                            oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
                     else:
                         log.debug('MSG:%s',MSG_OBJECT_READONLY)
                         oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
@@ -186,17 +186,19 @@ class TextOperations:
                                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                         else:
                             log.debug('MSG:%s',MSG_INVALID_INPUT)
-                            oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                            oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                     else:
                         log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
-                        oebs_key_objects.custom_msg.append("ERR_INVALID_NO_INPUT")
+                        oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
             else:
                 log.debug('MSG:%s',MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
-            log.debug('%s',e)
+            log.error('%s',e)
             log.debug('Status %s',keywordresult)
+            oebs_key_objects.custom_msg=[]
+            oebs_key_objects.custom_msg.append(str(e))
         log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
@@ -235,13 +237,13 @@ class TextOperations:
                             oebs_key_objects.custom_msg.append(str('Text verification failed \'' + fetchedText + '\' not equal to \''+textVerify+"\'."))
                     else:
                         log.debug('MSG:%s',MSG_INVALID_INPUT)
-                        oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                        oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                 else:
                     log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_NO_INPUT")
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
             else:
                 log.debug('MSG:%s',MSG_INVALID_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_INVALID_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
@@ -352,7 +354,7 @@ class TextOperations:
                         oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
             else:
                 log.debug('MSG:%s',MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_OBJECT_DISABLED")
+                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)

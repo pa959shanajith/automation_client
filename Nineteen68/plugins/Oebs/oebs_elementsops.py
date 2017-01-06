@@ -55,7 +55,7 @@ class ElementOperations:
                     oebs_key_objects.custom_msg.append(str(MSG_CLICK_SUCCESSFUL))
                 else:
                     log.debug('MSG:%s',MSG_DISABLED_OBJECT)
-                    oebs_key_objects.custom_msg.append("ERR_OBJECT_DISABLED")
+                    oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
@@ -87,7 +87,7 @@ class ElementOperations:
                 verifyresponse = MSG_FALSE
                 keywordresult=MSG_FAIL
                 log.debug('%s',MSG_HIDDEN_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_HIDDEN_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_HIDDEN_OBJECT)
             else:
                 if (charinfo.name != None and charinfo.name !=''):
                     fetchedText = charinfo.name
@@ -135,7 +135,7 @@ class ElementOperations:
                 verifyresponse = MSG_FALSE
                 keywordresult=MSG_FAIL
                 log.debug('%s',MSG_HIDDEN_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_HIDDEN_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_HIDDEN_OBJECT)
             else:
                 if len(oebs_key_objects.keyword_input) == 1:
                         textVerify=oebs_key_objects.keyword_input[0]
@@ -166,10 +166,10 @@ class ElementOperations:
                                 oebs_key_objects.custom_msg.append(MSG_TEXT_NOT_DEFINED)
                         else:
                             log.debug('MSG:%s',MSG_INVALID_INPUT)
-                            oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                            oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                 else:
                     log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
@@ -208,11 +208,11 @@ class ElementOperations:
                 else:
                     verifyresponse = MSG_FALSE
                     keywordresult=MSG_FAIL
-                    oebs_key_objects.custom_msg.append("ERR_TIME_OUT_EXCEPTION")
+                    oebs_key_objects.custom_msg.append(MSG_TIME_OUT_EXCEPTION)
                     log.debug('%s',keywordresult)
             else:
-                oebs_key_objects.custom_msg.append("ERR_ELEMENT_NOT_EXISTS")
-                log.debug('%s',"ERR_ELEMENT_NOT_EXISTS")
+                oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_EXISTS)
+                log.debug('%s',MSG_ELEMENT_NOT_EXISTS)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)

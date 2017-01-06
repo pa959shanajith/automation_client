@@ -155,7 +155,7 @@ class TableOperations:
                         keywordresponse=cellcontextinfo.name
                 else:
                     log.debug('%s',MSG_INVALID_NOOF_INPUT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
@@ -183,7 +183,7 @@ class TableOperations:
                     keywordresponse=innertablechildcontext.name
                 else:
                     log.debug('%s',MSG_INVALID_NOOF_INPUT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
 
             elif(childcontext.role== 'table'):
                 if(oebs_key_objects.keyword_input[0] =='1'):
@@ -212,7 +212,7 @@ class TableOperations:
                                 keywordresponse=innertablechildcontext.name
                             else:
                                 log.debug('%s',MSG_INVALID_NOOF_INPUT)
-                                oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                         break
         except Exception as e:
             self.utilities_obj.cleardata()
@@ -520,7 +520,7 @@ class TableOperations:
                     result=info.name
                 else:
                     log.debug('%s',MSG_INVALID_OBJECT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                 break
             elif(childinfo.role =='table'):
                 parentacc = acc.getAccessibleContextInfo()
@@ -580,7 +580,7 @@ class TableOperations:
                     result=info.name
                 else:
                     log.debug('%s',MSG_INVALID_OBJECT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                 break
             elif(childinfo.role =='table'):
                 parentacc = acc.getAccessibleContextInfo()

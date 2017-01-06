@@ -50,7 +50,7 @@ class UtilOperations:
                     log.debug('%s %s',MSG_RESULT_IS,keywordresult)
                 else:
                     log.debug('%s %s',MSG_RESULT_IS,keywordresult)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_OBJECT")
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
@@ -88,7 +88,7 @@ class UtilOperations:
                 log.debug('%s',keywordresult)
             else:
                 log.debug('%s %s',DEF_DRAG)
-                oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
                 verifyresponse = MSG_FALSE
                 keywordresult = MSG_FAIL
                 log.debug('%s',keywordresult)
@@ -134,7 +134,7 @@ class UtilOperations:
                 log.debug('%s',keywordresult)
             else:
                 log.debug('%s %s',DEF_DROP)
-                oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
                 verifyresponse = MSG_FALSE
                 keywordresult = MSG_FAIL
                 log.debug('%s',keywordresult)
@@ -167,7 +167,7 @@ class UtilOperations:
                 log.debug('%s',keywordresult)
             else:
                 log.debug('%s %s',DEF_VERIFYENABLED)
-                oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
                 verifyresponse = MSG_FALSE
                 keywordresult = MSG_FAIL
                 log.debug('%s',keywordresult)
@@ -198,7 +198,7 @@ class UtilOperations:
                 verifyresponse = MSG_FALSE
                 keywordresult = MSG_FAIL
                 log.debug('%s',keywordresult)
-                oebs_key_objects.custom_msg.append("ERR_OBJECT_ENABLED")
+                oebs_key_objects.custom_msg.append(MSG_OBJECT_ENABLED)
             else:
                 verifyresponse = MSG_TRUE
                 keywordresult= MSG_PASS
@@ -236,7 +236,7 @@ class UtilOperations:
                 else:
                     verifyresponse = MSG_FALSE
                     keywordresult=MSG_FAIL
-                    oebs_key_objects.custom_msg.append("ERR_HIDDEN_OBJECT")
+                    oebs_key_objects.custom_msg.append(MSG_HIDDEN_OBJECT)
                     log.debug('%s',keywordresult)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
@@ -273,7 +273,7 @@ class UtilOperations:
                     verifyresponse = MSG_FALSE
                     keywordresult=MSG_FAIL
                     log.debug('%s',keywordresult)
-                    oebs_key_objects.custom_msg.append("ERR_OBJECT_VISIBLE")
+                    oebs_key_objects.custom_msg.append(MSG_OBJECT_VISIBLE)
                 else:
                     verifyresponse = MSG_TRUE
                     keywordresult=MSG_PASS
@@ -380,7 +380,7 @@ class UtilOperations:
                     log.debug('%s',DEF_VERIFYREADONLY,keywordresult)
             else:
                 log.debug('Object Disabled',DEF_VERIFYREADONLY,MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',DEF_VERIFYREADONLY,e)
@@ -437,7 +437,7 @@ class UtilOperations:
                    # oebs_key_objects.custom_msg.append(str('Verification failed \'' + tooltiptext + '\' not equal to \''+text+"\'."))
             else:
                 log.debug('%s',DEF_VERIFYTOOLTIPTEXT,MSG_INVALID_INPUT)
-                oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',DEF_VERIFYTOOLTIPTEXT,e)
@@ -465,7 +465,7 @@ class UtilOperations:
                 keywordresult = MSG_PASS
             else:
                 log.debug('%s',DEF_VERIFYEXISTS,MSG_INVALID_INPUT)
-                oebs_key_objects.custom_msg.append("ERR_HIDDEN_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_HIDDEN_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',DEF_VERIFYEXISTS,e)
@@ -502,8 +502,8 @@ class UtilOperations:
             verifyresponse = MSG_TRUE
             keywordresult = MSG_PASS
             self.utilities_obj.cleardata()
-            log.debug('%s',DEF_VERIFYDOESNOTEXISTS,e)
-            log.debug('Status %s',DEF_VERIFYDOESNOTEXISTS,keywordresult)
+            log.error('%s',e)
+            log.debug('Status %s',keywordresult)
         log.debug('Status %s',DEF_VERIFYDOESNOTEXISTS,keywordresult)
         log.debug('Verify Response %s',DEF_VERIFYDOESNOTEXISTS,str(verifyresponse))
         # response is sent to the client
@@ -538,7 +538,7 @@ class UtilOperations:
                 	keywordresult=MSG_PASS
                 else:
                     log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                    oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                    oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
@@ -617,13 +617,13 @@ class UtilOperations:
                             keywordresult=MSG_PASS
                         else:
                             log.debug('MSG:%s',MSG_INVALID_INPUT)
-                            oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                            oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                     else:
                         log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
-                        oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                        oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                 else:
                     log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_NO_INPUT")
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)

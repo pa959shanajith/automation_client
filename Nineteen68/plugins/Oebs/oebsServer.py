@@ -324,7 +324,7 @@ class OebsKeywords:
         elif (str(accessContext) == 'fail'):
             self.utilops_obj.verifydoesnotexists(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
-        return self.utilities_obj.clientresponse()
+        return self.utilities_obj.clientresponse('verifydoesnotexists')
 
     def sendfunctionkeys(self,applicationname,objectname,keyword,inputs,outputs):
         # accessContext object gets value on call of swooptoelement definition

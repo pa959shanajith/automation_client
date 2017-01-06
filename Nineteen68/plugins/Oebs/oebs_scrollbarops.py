@@ -51,11 +51,11 @@ class ScrollbarOperations:
 
                     else:
                         log.debug('Invalid Input',MSG_INVALID_INPUT)
-                        oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                        oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
 
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
         except Exception as e:
             self.utilities_obj.cleardata()
@@ -97,11 +97,11 @@ class ScrollbarOperations:
 
                     else:
                         log.debug('Invalid Input',MSG_INVALID_INPUT)
-                        oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                        oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
 
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
         except Exception as e:
             self.utilities_obj.cleardata()
@@ -142,11 +142,11 @@ class ScrollbarOperations:
 
                     else:
                         log.debug('Invalid Input',MSG_INVALID_INPUT)
-                        oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                        oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
 
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
         except Exception as e:
             self.utilities_obj.cleardata()
@@ -187,11 +187,11 @@ class ScrollbarOperations:
 
                 else:
                     log.debug('Invalid Input',MSG_INVALID_INPUT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
 
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
         except Exception as e:
             self.utilities_obj.cleardata()

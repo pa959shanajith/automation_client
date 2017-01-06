@@ -403,7 +403,7 @@ class Utilities:
             self.looptolist(childacc)
         return accessContext
 
-    def clientresponse(self):
+    def clientresponse(self,*args):
         clientresp=()
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
@@ -422,14 +422,19 @@ class Utilities:
             del oebs_key_objects.custom_msg[:]
             oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_FOUND)
             logger.print_on_console(MSG_ELEMENT_NOT_FOUND)
+            if len(args)>0:
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
 
         if oebs_key_objects.custom_msg != [] and status==TEST_RESULT_FAIL:
             err_msg=oebs_key_objects.custom_msg[0]
+            logger.print_on_console(err_msg)
 
         if methodoutput==output:
             output=OUTPUT_CONSTANT
 
         clientresp=(status,methodoutput,output,err_msg)
+
 
         global accessContext
         if type(accessContext) != str:

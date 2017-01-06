@@ -57,7 +57,7 @@ class DropdownListboxOperations:
                 keywordresult = MSG_PASS
             else:
                 log.debug('%s',MSG_INVALID_INPUT)
-                oebs_key_objects.custom_msg.append("ERR_INVALID_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
             outputsize = len(selectedvalue)
             for i in range(outputsize):
                 if outputsize == 1:
@@ -117,7 +117,7 @@ class DropdownListboxOperations:
                     verifyresponse=MSG_TRUE
             else:
                 log.debug('%s',MSG_INVALID_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_INVALID_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
             if keywordresult == MSG_FAIL:
                 oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
         except Exception as e:
@@ -179,7 +179,7 @@ class DropdownListboxOperations:
                     oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
             else:
                 log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
-                oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
@@ -219,7 +219,7 @@ class DropdownListboxOperations:
                         verifyresponse =MSG_TRUE
             else:
                 log.debug('%s',MSG_INVALID_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_INVALID_OBJECT")
+                oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
             if keywordresult == MSG_FAIL:
                 oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
         except Exception as e:
@@ -280,7 +280,7 @@ class DropdownListboxOperations:
                 if keywordresult == MSG_FAIL:
                     oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
             else:
-                oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
@@ -423,7 +423,7 @@ class DropdownListboxOperations:
                     keywordresult=MSG_PASS
                 else:
                     log.debug('%s',DEF_GETMULTIPLEVALUESBYINDEXES,MSG_INVALID_INPUT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
             else:
                 log.debug('Not a List',DEF_GETMULTIPLEVALUESBYINDEXES)
                 oebs_key_objects.custom_msg.append('Not a List.')
@@ -587,13 +587,13 @@ class DropdownListboxOperations:
                                     oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                     else:
                         log.debug('%s',MSG_INVALID_NOOF_INPUT)
-                        oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                        oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                 else:
                     log.debug('%s',MSG_INVALID_INPUT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
             else:
                 log.debug('%s',MSG_INVALID_NOOF_INPUT)
-                oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
@@ -619,7 +619,7 @@ class DropdownListboxOperations:
             if(oebs_key_objects.keyword_input[0] != ''):
                 if(int(oebs_key_objects.keyword_input[0]) > listcontxtInfo.childrenCount or int(oebs_key_objects.keyword_input[0]) < 0):
                     log.debug('%s',MSG_INVALID_INPUT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                 else:
                     childinfo=accinfo.getAccessibleChildFromContext(int(oebs_key_objects.keyword_input[0]))
                     childcontxt=childinfo.getAccessibleContextInfo()
@@ -627,7 +627,7 @@ class DropdownListboxOperations:
                     keywordresponse=childcontxt.name
             else:
                 log.debug('%s',MSG_INVALID_INPUT)
-                oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
@@ -721,7 +721,7 @@ class DropdownListboxOperations:
                         break
             else:
                 log.debug('%s',MSG_INVALID_INPUT)
-                oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
@@ -777,7 +777,7 @@ class DropdownListboxOperations:
                                         break
                                     else:
                                         log.debug('Value Does not exist',DEF_SELECTVALUEBYTEXT)
-                                        oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                                        oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                             else:
                                 elementPos=0
                                 for index in range(children):
@@ -896,16 +896,16 @@ class DropdownListboxOperations:
                                         log.debug('%s',MSG_INVALID_NOOF_INPUT)
                                 else:
                                     log.debug('Value Does not exist',DEF_SELECTVALUEBYTEXT)
-                                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                             else:
                                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                 else:
                     log.debug('%s',MSG_INVALID_INPUT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
             else:
                 log.debug('%s',MSG_INVALID_NOOF_INPUT)
-                oebs_key_objects.custom_msg.append("ERR_INVALID_NO_INPUT")
+                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
@@ -951,7 +951,7 @@ class DropdownListboxOperations:
                     verifyresponse = MSG_TRUE
             else:
                 log.debug('%s',MSG_INVALID_NOOF_INPUT)
-                oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
