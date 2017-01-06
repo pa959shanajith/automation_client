@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        file_comparison_operations.py
+# Name:        module1
 # Purpose:
 #
 # Author:      sushma.p
@@ -11,9 +11,6 @@
 
 import logger
 import generic_constants
-import constants
-
-log = logging.getLogger('file_comparison_operations.py')
 
 class PdfFile:
 
@@ -31,8 +28,8 @@ class PdfFile:
             if content in pdf_content.replace('\n',''):
                 status=True
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
+            Exceptions.error(e)
+
         return status
 
     def compare_content(self,input_path1,input_path2):
@@ -48,8 +45,7 @@ class PdfFile:
             import filecmp
             status=filecmp.cmp(input_path1,input_path2)
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
+            Exceptions.error(e)
         return status
 
 
@@ -94,8 +90,7 @@ class PdfFile:
                 logger.print_on_console(generic_constants.INVALID_INPUT)
 
         except ValueError as e:
-            log.error(generic_constants.INVALID_INPUT)
-            logger.print_on_console(generic_constants.INVALID_INPUT)
+            Exception.message(generic_constants.INVALID_INPUT)
         return status,content
 
 
@@ -118,8 +113,7 @@ class TextFile:
                         logger.print_on_console('found at line:',(num))
                         status=True
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
+            Exceptions.error(e)
         return status
 
 
@@ -140,8 +134,7 @@ class TextFile:
             if content1==content2:
                 status=True
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
+            Exceptions.error(e)
         return status
 
 
@@ -161,8 +154,7 @@ class TextFile:
                 myFile.close()
                 status=True
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
+            Exceptions.error(e)
         return status
 
 
@@ -182,8 +174,7 @@ class TextFile:
                 logger.print_on_console(str)
                 content=str
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
+            Exceptions.error(e)
         return status,content
 
     def get_linenumber(self,input_path,content):
@@ -205,8 +196,7 @@ class TextFile:
                         status=True
             logger.print_on_console(line_numbers)
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
+            Exceptions.error(e)
         return status,line_numbers
 
 
@@ -229,9 +219,8 @@ class TextFile:
                     file.write(filecontent)
                     file.close()
                     status= True
-        except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
+        except:
+            Exception.message('Error occurred')
         return status
 
 
@@ -254,9 +243,7 @@ class TextFile:
                 file.close()
                 status= True
         except (OSError, IOError) as e:
-            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
-            log.error(err_msg)
-            logger.print_on_console(err_msg)
+            Exception.message('Cannot open file')
         return status
 
 
@@ -286,8 +273,7 @@ class XML:
                 file.close()
                 status=True
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
+            Exceptions.error(e)
         return status
 
 
