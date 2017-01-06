@@ -448,7 +448,7 @@ class Singleton_DriverUtil():
 
         elif(browser_num == '5'):
             driver = webdriver.PhantomJS(executable_path=webconstants.PHANTOM_DRIVER_PATH)
-            logger.print_on_console('Opera browser started')
+            logger.print_on_console('Phantom browser started')
 
         elif(browser_num == '6'):
             driver = webdriver.Safari()
