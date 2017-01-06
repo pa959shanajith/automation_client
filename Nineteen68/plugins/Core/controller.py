@@ -570,6 +570,14 @@ class Controller():
                     else:
                         logger.print_on_console ('Scenario ' , (i + 1) ,' has been disabled for execution!!!')
                         log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
+                    #logic for condition check
+                    report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+                    overall_status=report_json[0]['overallstatus']
+                    if(condition_check==True):
+                        if(overall_status=='Pass'):
+                            continue
+                        else:
+                            break
                 log.info('---------------------------------------------------------------------')
                 logger.print_on_console('---------------------------------------------------------------------')
                 log.info('***SUITE ', j ,' EXECUTION COMPLETED***')
@@ -650,6 +658,14 @@ class Controller():
                         else:
                             logger.print_on_console( 'Scenario ' , (i + 1) ,' has been disabled for execution!!!')
                             log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
+                         #logic for condition check
+                        report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+                        overall_status=report_json[0]['overallstatus']
+                        if(condition_check==True):
+                            if(overall_status=='Pass'):
+                                continue
+                            else:
+                                break
 
                     log.info('-----------------------------------------------')
                     logger.print_on_console('-----------------------------------------------')
