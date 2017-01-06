@@ -18,6 +18,8 @@ import oebs_mouseops
 from oebs_utilops import UtilOperations
 from oebs_keyboardops import KeywordOperations
 
+log = logging.getLogger('oebs_dropdownlistboxops.py')
+
 class DropdownListboxOperations:
 
     def __init__(self):
@@ -35,7 +37,7 @@ class DropdownListboxOperations:
         selectedvalue = []
         try:
             charinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_DROPDOWNLISTBOX,DEF_GETSELECTED)
+            log.debug('Received Object Context',DEF_GETSELECTED)
             #check for dropdown
             if charinfo.role == 'combo box':
                 listcontext=self.utilities_obj.looptolist(acc)
@@ -54,7 +56,7 @@ class DropdownListboxOperations:
                 selectedvalue = self.getselectedlist(acc)
                 keywordresult = MSG_PASS
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_GETSELECTED,MSG_INVALID_INPUT,MSG_INVALID_OBJECT)
+                log.debug('%s',MSG_INVALID_INPUT)
                 oebs_key_objects.custom_msg.append("ERR_INVALID_OBJECT")
             outputsize = len(selectedvalue)
             for i in range(outputsize):
@@ -76,9 +78,9 @@ class DropdownListboxOperations:
                     oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_GETSELECTED,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_GETSELECTED,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_GETSELECTED,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -95,7 +97,7 @@ class DropdownListboxOperations:
         verifyresponse = MSG_FALSE
         try:
             charinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_DROPDOWNLISTBOX,DEF_VERIFYSELECTEDVALUE)
+            log.debug('Received Object Context',DEF_VERIFYSELECTEDVALUE)
             #check for dropdown
             if charinfo.role == 'combo box':
                 childAcc = self.utilities_obj.looptolist(acc)
@@ -114,15 +116,15 @@ class DropdownListboxOperations:
                     keywordresult=MSG_PASS
                     verifyresponse=MSG_TRUE
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYSELECTEDVALUE,MSG_INVALID_OBJECT)
+                log.debug('%s',MSG_INVALID_OBJECT)
                 oebs_key_objects.custom_msg.append("ERR_INVALID_OBJECT")
             if keywordresult == MSG_FAIL:
                 oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYSELECTEDVALUE,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYSELECTEDVALUE,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYSELECTEDVALUE,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -140,17 +142,17 @@ class DropdownListboxOperations:
         try:
             verifyresponse = MSG_FALSE
             charinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_DROPDOWNLISTBOX,DEF_GETCOUNT)
+            log.debug('Received Object Context',DEF_GETCOUNT)
             countvalue = charinfo.childrenCount
-            logging.debug('FILE: %s , DEF: %s MSG: children count: %s',OEBS_DROPDOWNLISTBOX,DEF_GETCOUNT,countvalue)
+            log.debug('children count: %s',countvalue)
             oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
             keywordresult=MSG_PASS
             keywordresponse=str(countvalue)
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_GETCOUNT,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_GETCOUNT,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_GETCOUNT,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -167,22 +169,22 @@ class DropdownListboxOperations:
             if len(oebs_key_objects.keyword_input) == 1:
                 inputVal=oebs_key_objects.keyword_input[0]
                 charinfo = acc.getAccessibleContextInfo()
-                logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_DROPDOWNLISTBOX,DEF_VERIFYCOUNT)
+                log.debug('Received Object Context',DEF_VERIFYCOUNT)
                 countvalue = charinfo.childrenCount
                 if countvalue == int(inputVal):
                     keywordresult=MSG_PASS
                     verifyresponse = MSG_TRUE
                 else:
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYCOUNT,MSG_INVALID_INPUT)
+                    log.debug('%s',MSG_INVALID_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
             else:
-                logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYCOUNT,MSG_INVALID_NOOF_INPUT)
+                log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
                 oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYCOUNT,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYCOUNT,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYCOUNT,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -200,7 +202,7 @@ class DropdownListboxOperations:
         inputValues = oebs_key_objects.keyword_input
         try:
             charinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_DROPDOWNLISTBOX,DEF_VERIFYALLVALUES)
+            log.debug('Received Object Context',DEF_VERIFYALLVALUES)
             #check for dropdown
             if charinfo.role == 'combo box':
                 #calling getvaluesdropdown def to get all values in dropdown
@@ -216,15 +218,15 @@ class DropdownListboxOperations:
                         keywordresult=MSG_PASS
                         verifyresponse =MSG_TRUE
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYALLVALUES,MSG_INVALID_OBJECT)
+                log.debug('%s',MSG_INVALID_OBJECT)
                 oebs_key_objects.custom_msg.append("ERR_INVALID_OBJECT")
             if keywordresult == MSG_FAIL:
                 oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYALLVALUES,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYALLVALUES,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYALLVALUES,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -240,7 +242,7 @@ class DropdownListboxOperations:
         flag = 0
         outputvalues = []
         try:
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_DROPDOWNLISTBOX,DEF_VERIFYVALUESEXISTS)
+            log.debug('Received Object Context',DEF_VERIFYVALUESEXISTS)
             charinfo = acc.getAccessibleContextInfo()
             inputValues = oebs_key_objects.keyword_input
             if(len(inputValues) > 0 and inputValues[0] != ''):
@@ -274,16 +276,16 @@ class DropdownListboxOperations:
                             keywordresult=MSG_FAIL
                             verifyresponse = MSG_FALSE
                 else:
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_BUTTONOPS,DEF_VERIFYVALUESEXISTS,MSG_INVALID_INPUT)
+                    log.debug('%s',MSG_INVALID_INPUT)
                 if keywordresult == MSG_FAIL:
                     oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
             else:
                 oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYVALUESEXISTS,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYVALUESEXISTS,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYVALUESEXISTS,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -359,7 +361,7 @@ class DropdownListboxOperations:
         verifyresponse = MSG_FALSE
         try:
             accinfo=acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_DROPDOWNLISTBOX,DEF_VERIFYSELECTEDVALUES)
+            log.debug('Received Object Context',DEF_VERIFYSELECTEDVALUES)
             if (accinfo.role == 'list') :
                 count=0
                 for num in range(0,accinfo.childrenCount):
@@ -380,9 +382,9 @@ class DropdownListboxOperations:
                     oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYSELECTEDVALUES,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYSELECTEDVALUES,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_VERIFYSELECTEDVALUES,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -400,7 +402,7 @@ class DropdownListboxOperations:
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_DROPDOWNLISTBOX,DEF_GETMULTIPLEVALUESBYINDEXES)
+            log.debug('Received Object Context',DEF_GETMULTIPLEVALUESBYINDEXES)
             if 'multiselectable' in curaccinfo.states:
                 valueslength = len(oebs_key_objects.keyword_input)
                 if valueslength >=  1:
@@ -420,16 +422,16 @@ class DropdownListboxOperations:
                         output_list.append(elementcontext.name)
                     keywordresult=MSG_PASS
                 else:
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_GETMULTIPLEVALUESBYINDEXES,MSG_INVALID_INPUT)
+                    log.debug('%s',DEF_GETMULTIPLEVALUESBYINDEXES,MSG_INVALID_INPUT)
                     oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: Not a List',OEBS_DROPDOWNLISTBOX,DEF_GETMULTIPLEVALUESBYINDEXES)
+                log.debug('Not a List',DEF_GETMULTIPLEVALUESBYINDEXES)
                 oebs_key_objects.custom_msg.append('Not a List.')
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_GETMULTIPLEVALUESBYINDEXES,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_GETMULTIPLEVALUESBYINDEXES,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_GETMULTIPLEVALUESBYINDEXES,keywordresult)
+            log.debug('%s',DEF_GETMULTIPLEVALUESBYINDEXES,e)
+            log.debug('Status %s',DEF_GETMULTIPLEVALUESBYINDEXES,keywordresult)
+        log.debug('Status %s',DEF_GETMULTIPLEVALUESBYINDEXES,keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -445,7 +447,7 @@ class DropdownListboxOperations:
         try:
             #gets the entire context information
             currinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX)
+            log.debug('Received Object Context')
             children=''
             if(currinfo.role =='list'):
                 children = currinfo.childrenCount
@@ -456,7 +458,7 @@ class DropdownListboxOperations:
             if (len(oebs_key_objects.keyword_input) == 1) and (oebs_key_objects.keyword_input[0] != None):
                 if (oebs_key_objects.keyword_input[0] != ''):
                     childindex = int(oebs_key_objects.keyword_input[0])
-                    logging.debug('FILE: %s , DEF: %s MSG: Specified text %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX,childindex)
+                    log.debug('Specified text %s',childindex)
                     if (int(childindex) < int(children)) and (int(childindex) >= 0):
                         if currinfo.role =='combo box':
                             x_coor = int(currinfo.x + (0.5 * currinfo.width))
@@ -470,7 +472,7 @@ class DropdownListboxOperations:
                                     acc.addAccessibleSelectionFromContext(int(childindex))
                                     keywordresult = MSG_PASS
                                     verifyresponse = MSG_TRUE
-                                    logging.debug('FILE: %s , DEF: %s MSG: Value is selected',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX)
+                                    log.debug('Value is selected')
                                 else:
                                     currentselection=0
                                     for selected in range(children):
@@ -491,7 +493,7 @@ class DropdownListboxOperations:
                                             if 'selected' in childcontext.states:
                                                 keywordresult = MSG_PASS
                                                 verifyresponse = MSG_TRUE
-                                            logging.debug('FILE: %s , DEF: %s MSG: Value is selected',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX)
+                                            log.debug('Value is selected')
                                         elif currentselection<childindex:
                                             moveloc=childindex-currentselection
                                             for index in range(int(moveloc)):
@@ -504,12 +506,12 @@ class DropdownListboxOperations:
                                             if 'selected' in childcontext.states:
                                                 keywordresult = MSG_PASS
                                                 verifyresponse = MSG_TRUE
-                                            logging.debug('FILE: %s , DEF: %s MSG: Value is selected',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX)
+                                            log.debug('Value is selected')
                                     else:
                                         keywordresult = MSG_PASS
                                         verifyresponse = MSG_TRUE
-                                        logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX,MSG_INVALID_NOOF_INPUT)
-                                    logging.debug('FILE: %s , DEF: %s MSG: Value is selected',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX)
+                                        log.debug('%s',MSG_INVALID_NOOF_INPUT)
+                                    log.debug('Value is selected')
                                 #combo box is revert back with below code
                                 self.keyboardops_obj.KeyboardOperation('keypress','ENTER')
                                 time.sleep(0.4)
@@ -524,14 +526,14 @@ class DropdownListboxOperations:
                                     keywordresult = MSG_FAIL
                                     verifyresponse = MSG_FALSE
                             else:
-                                logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX,MSG_ELEMENT_NOT_VISIBLE)
+                                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                         else:
                             if currinfo.accessibleAction == 1:
                                 acc.addAccessibleSelectionFromContext(int(childindex))
                                 keywordresult = MSG_PASS
                                 verifyresponse = MSG_TRUE
-                                logging.debug('FILE: %s , DEF: %s MSG: Value is selected',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX)
+                                log.debug('Value is selected')
                             else:
                                 labelcontext=''
                                 currentselection=0
@@ -562,7 +564,7 @@ class DropdownListboxOperations:
                                             if 'selected' in childcontext.states:
                                                 keywordresult = MSG_PASS
                                                 verifyresponse = MSG_TRUE
-                                            logging.debug('FILE: %s , DEF: %s MSG: Value is selected',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX)
+                                            log.debug('Value is selected')
                                         elif currentselection<childindex:
                                             moveloc=childindex-currentselection
                                             for index in range(int(moveloc)):
@@ -575,28 +577,28 @@ class DropdownListboxOperations:
                                             if 'selected' in childcontext.states:
                                                 keywordresult = MSG_PASS
                                                 verifyresponse = MSG_TRUE
-                                            logging.debug('FILE: %s , DEF: %s MSG: Value is selected',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX)
+                                            log.debug('Value is selected')
                                     else:
                                         keywordresult = MSG_PASS
                                         verifyresponse = MSG_TRUE
-                                        logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX,MSG_INVALID_NOOF_INPUT)
+                                        log.debug('%s',MSG_INVALID_NOOF_INPUT)
                                 else:
-                                    logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX,MSG_ELEMENT_NOT_VISIBLE)
+                                    log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                                     oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                     else:
-                        logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX,MSG_INVALID_NOOF_INPUT)
+                        log.debug('%s',MSG_INVALID_NOOF_INPUT)
                         oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
                 else:
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX,MSG_INVALID_INPUT)
+                    log.debug('%s',MSG_INVALID_INPUT)
                     oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX,MSG_INVALID_NOOF_INPUT)
+                log.debug('%s',MSG_INVALID_NOOF_INPUT)
                 oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYINDEX,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -616,7 +618,7 @@ class DropdownListboxOperations:
             #if (int(oebs_key_objects.keyword_input[0]) < listcontxtInfo.childrenCount and oebs_key_objects.keyword_input[0] >= 0):
             if(oebs_key_objects.keyword_input[0] != ''):
                 if(int(oebs_key_objects.keyword_input[0]) > listcontxtInfo.childrenCount or int(oebs_key_objects.keyword_input[0]) < 0):
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_GETVALUEBYINDEX,MSG_INVALID_INPUT)
+                    log.debug('%s',MSG_INVALID_INPUT)
                     oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
                 else:
                     childinfo=accinfo.getAccessibleChildFromContext(int(oebs_key_objects.keyword_input[0]))
@@ -624,13 +626,13 @@ class DropdownListboxOperations:
                     keywordresult=MSG_PASS
                     keywordresponse=childcontxt.name
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_GETVALUEBYINDEX,MSG_INVALID_INPUT)
+                log.debug('%s',MSG_INVALID_INPUT)
                 oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_GETVALUEBYINDEX,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_GETVALUEBYINDEX,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_GETVALUEBYINDEX,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -642,7 +644,7 @@ class DropdownListboxOperations:
         verifyresponse = MSG_FALSE
         keywordresult=MSG_FAIL
         try:
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_DROPDOWNLISTBOX,DEF_SELECTALLVALUES)
+            log.debug('Received Object Context')
             curaccinfo=acc.getAccessibleContextInfo()
             if(curaccinfo.role == 'list' and 'multiselectable' in curaccinfo.states):
                 getAcceess=acc.selectAllAccessibleSelectionFromContext()
@@ -652,9 +654,9 @@ class DropdownListboxOperations:
                 oebs_key_objects.custom_msg.append(MSG_SINGLESELECTION_LIST)
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTALLVALUES,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTALLVALUES,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTALLVALUES,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -680,9 +682,9 @@ class DropdownListboxOperations:
                 oebs_key_objects.custom_msg.append(MSG_SINGLESELECTION_LIST)
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_DESELECTALL,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_DESELECTALL,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_DESELECTALL,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -696,7 +698,7 @@ class DropdownListboxOperations:
         try:
             #gets the entire context information
             contextinfo=acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_DROPDOWNLISTBOX,DEF_SELECTMULTIPLEVALUESBYINDEXES)
+            log.debug('Received Object Context',DEF_SELECTMULTIPLEVALUESBYINDEXES)
             childrennames=[]
 
             # code to deselect all selected values, fix for defect:1132
@@ -713,18 +715,18 @@ class DropdownListboxOperations:
                         verifyresponse=MSG_TRUE
                         keywordresult=MSG_PASS
                     else:
-                        logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTMULTIPLEVALUESBYINDEXES,MSG_INVALID_INPUT)
+                        log.debug('%s',MSG_INVALID_INPUT)
                         verifyresponse = MSG_FALSE
                         keywordresult=MSG_FAIL
                         break
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTMULTIPLEVALUESBYINDEXES,MSG_INVALID_INPUT)
+                log.debug('%s',MSG_INVALID_INPUT)
                 oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTMULTIPLEVALUESBYINDEXES,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTMULTIPLEVALUESBYINDEXES,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTMULTIPLEVALUESBYINDEXES,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -740,7 +742,7 @@ class DropdownListboxOperations:
         try:
             #gets the entire context information
             currinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYTEXT)
+            log.debug('Received Object Context',DEF_SELECTVALUEBYTEXT)
             children = ''
             listObj=''
             if(currinfo.role =='list'):
@@ -753,7 +755,7 @@ class DropdownListboxOperations:
             if len(oebs_key_objects.keyword_input) == 1:
                 if (oebs_key_objects.keyword_input[0] != None and oebs_key_objects.keyword_input[0] != ''):
                     childname = oebs_key_objects.keyword_input[0]
-                    logging.debug('FILE: %s , DEF: %s MSG: Specified text %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYTEXT,childname)
+                    log.debug('Specified text %s',childname)
                     if currinfo.role == 'combo box':
                         x_coor = int(currinfo.x + (0.5 * currinfo.width))
                         y_coor = int(currinfo.y + (0.5 * currinfo.height))
@@ -771,10 +773,10 @@ class DropdownListboxOperations:
                                         acc.addAccessibleSelectionFromContext(index)
                                         keywordresult = MSG_PASS
                                         verifyresponse = MSG_TRUE
-                                        logging.debug('FILE: %s , DEF: %s MSG: Value selected is %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYTEXT,fetchedname)
+                                        log.debug('Value selected is %s',fetchedname)
                                         break
                                     else:
-                                        logging.debug('FILE: %s , DEF: %s MSG: Value Does not exist',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYTEXT)
+                                        log.debug('Value Does not exist',DEF_SELECTVALUEBYTEXT)
                                         oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
                             else:
                                 elementPos=0
@@ -803,9 +805,9 @@ class DropdownListboxOperations:
                                     if 'selected' in childcontext.states:
                                         keywordresult = MSG_PASS
                                         verifyresponse = MSG_TRUE
-                                    logging.debug('FILE: %s , DEF: %s MSG: Value is selected',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYTEXT)
+                                    log.debug('Value is selected',DEF_SELECTVALUEBYTEXT)
                                 else:
-                                    logging.debug('FILE: %s , DEF: %s MSG: Value Does not exist',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYTEXT)
+                                    log.debug('Value Does not exist',DEF_SELECTVALUEBYTEXT)
                             #combo box is revert back with below code
                             self.keyboardops_obj.KeyboardOperation('keypress','ENTER')
                             time.sleep(0.4)
@@ -820,14 +822,14 @@ class DropdownListboxOperations:
                                 keywordresult = MSG_FAIL
                                 verifyresponse = MSG_FALSE
                         else:
-                                logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_SETTEXT,MSG_ELEMENT_NOT_VISIBLE)
+                                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                     else:
                         if currinfo.accessibleAction == 1:
                             acc.addAccessibleSelectionFromContext(int(childindex))
                             keywordresult = MSG_PASS
                             verifyresponse = MSG_TRUE
-                            logging.debug('FILE: %s , DEF: %s MSG: Value is selected',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYTEXT)
+                            log.debug('Value is selected',DEF_SELECTVALUEBYTEXT)
                         else:
                             labelContext=''
                             elementPos=0
@@ -874,7 +876,7 @@ class DropdownListboxOperations:
                                             if 'selected' in childcontext.states:
                                                 keywordresult = MSG_PASS
                                                 verifyresponse = MSG_TRUE
-                                            logging.debug('FILE: %s , DEF: %s MSG: Value is selected',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYTEXT)
+                                            log.debug('Value is selected',DEF_SELECTVALUEBYTEXT)
                                         elif currentselection<elementPos:
                                             moveloc=elementPos-currentselection
                                             for index in range(int(moveloc)):
@@ -887,28 +889,28 @@ class DropdownListboxOperations:
                                             if 'selected' in childcontext.states:
                                                 keywordresult = MSG_PASS
                                                 verifyresponse = MSG_TRUE
-                                            logging.debug('FILE: %s , DEF: %s MSG: Value is selected',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYTEXT)
+                                            log.debug('Value is selected',DEF_SELECTVALUEBYTEXT)
                                     else:
                                         keywordresult = MSG_PASS
                                         verifyresponse = MSG_TRUE
-                                        logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYTEXT,MSG_INVALID_NOOF_INPUT)
+                                        log.debug('%s',MSG_INVALID_NOOF_INPUT)
                                 else:
-                                    logging.debug('FILE: %s , DEF: %s MSG: Value Does not exist',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYTEXT)
+                                    log.debug('Value Does not exist',DEF_SELECTVALUEBYTEXT)
                                     oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
                             else:
-                                logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_SETTEXT,MSG_ELEMENT_NOT_VISIBLE)
+                                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                 else:
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYTEXT,MSG_INVALID_INPUT)
+                    log.debug('%s',MSG_INVALID_INPUT)
                     oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYTEXT,MSG_INVALID_NOOF_INPUT)
+                log.debug('%s',MSG_INVALID_NOOF_INPUT)
                 oebs_key_objects.custom_msg.append("ERR_INVALID_NO_INPUT")
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYTEXT,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYTEXT,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTVALUEBYTEXT,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -924,7 +926,7 @@ class DropdownListboxOperations:
         try:
             #gets the entire context information
             currinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_DROPDOWNLISTBOX,DEF_SELECTMULTIPLEVALUEBYTEXT)
+            log.debug('Received Object Context',DEF_SELECTMULTIPLEVALUEBYTEXT)
             children = currinfo.childrenCount
 
             # code to deselect all selected values, fix for defect:1132
@@ -948,13 +950,13 @@ class DropdownListboxOperations:
                     keywordresult = MSG_PASS
                     verifyresponse = MSG_TRUE
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTMULTIPLEVALUEBYTEXT,MSG_INVALID_NOOF_INPUT)
+                log.debug('%s',MSG_INVALID_NOOF_INPUT)
                 oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTMULTIPLEVALUEBYTEXT,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTMULTIPLEVALUEBYTEXT,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_DROPDOWNLISTBOX,DEF_SELECTMULTIPLEVALUEBYTEXT,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))

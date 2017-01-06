@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module2
+# Name:        utils.py
 # Purpose:
 #
 # Author:      sushma.p
@@ -18,12 +18,11 @@ import oebs_api
 from oebs_msg import *
 import logger
 import logging
-import Exceptions
 import json
 
 
 
-
+log = logging.getLogger('utils.py')
 
 class Utils:
     """win32 utilities
@@ -133,31 +132,31 @@ class Utils:
         return None
 
     def windowsrun(self):
-        logging.debug('FILE: %s , DEF: %s',FILE_OEBSSERVER,DEF_WINDOWSRUN)
+        log.debug('FILE: %s , DEF: %s',)
         return (oebs_api.bridgeDll.Windows_run())
 
     #Confirm open window is a java window
     def isjavawindow(self,windowname):
-        logging.debug('FILE: %s , DEF: %s , MSG: Window Name Received: %s',FILE_OEBSSERVER,DEF_ISJAVAWINDOW, windowname)
+        log.debug('MSG: Window Name Received: %s', windowname)
         isjavares = False
-        logging.debug('FILE: %s , DEF: %s , MSG: Window BRIDGE DLL Status: %s',FILE_OEBSSERVER,DEF_ISJAVAWINDOW,oebs_api.bridgeDll )
+        log.debug('MSG: Window BRIDGE DLL Status: %s',oebs_api.bridgeDll )
         if (oebs_api.bridgeDll != None):
             self.windowsrun()
             hwnd = self.GetHwndFromWindowName(windowname)
-            logging.debug('FILE: %s , DEF: %s , MSG: API Call for Java window check',FILE_OEBSSERVER,DEF_ISJAVAWINDOW)
+            log.debug('MSG: API Call for Java window check',DEF_ISJAVAWINDOW)
             isjavares = oebs_api.isJavaWindow(hwnd)
             return (isjavares, hwnd)
         else:
-            logging.debug('FILE: %s , DEF: %s ,MSG: %s.',FILE_OEBSSERVER,DEF_ISJAVAWINDOW,MSG_ACCESS_BRIDGE_INIT_ERROR)
+            log.debug(',MSG: %s.',MSG_ACCESS_BRIDGE_INIT_ERROR)
             return (isjavares, MSG_ACCESS_BRIDGE_INIT_ERROR)
 
     #Function to get HWND using window name
     def GetHwndFromWindowName(self,windowname):
         try:
             hwnd = win32gui.FindWindow(None, windowname)
-            logging.debug('FILE: %s , DEF: %s MSG: Window Handle Fetched',FILE_OEBSSERVER,DEF_GETHWNDFROMWINDOWNAME)
+            log.debug('Window Handle Fetched',)
         except:
-            logging.debug('FILE: %s , DEF: %s , MSG: Window Handle Fetch Fail',FILE_OEBSSERVER,DEF_GETHWNDFROMWINDOWNAME)
+            log.debug('MSG: Window Handle Fetch Fail',)
             hwnd = None
         return hwnd
 

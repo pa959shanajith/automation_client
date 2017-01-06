@@ -128,13 +128,11 @@ DEF_GETMULTIPLEVALUESBYINDEXES='getmultiplevaluesbyindexes'
 DEF_GETVALUEBYINDEX='getvaluebyindex'
 DEF_VERIFYSELECTEDVALUES='verifyselectedvalues'
 DEF_SELECTVALUEBYINDEX='selectvaluebyindex'
-DEF_GETVALUEBYINDEX='getvaluebyindex'
 DEF_SELECTALLVALUES='selectallvalues'
 DEF_DESELECTALL='deselectall'
 DEF_SELECTMULTIPLEVALUESBYINDEXES='selectmultiplevaluesbyindexes'
 DEF_SELECTVALUEBYTEXT='selectvaluebytext'
 DEF_SELECTMULTIPLEVALUEBYTEXT='selectmultiplevaluebytext'
-DEF_GETVALUEBYINDEX='getvaluebyindex'
 DEF_GETSELECTED='getselected'
 DEF_VERIFYSELECTEDVALUE='verifyselectedvalue'
 DEF_GETCOUNT='getcount'
@@ -167,5 +165,7 @@ TEST_RESULT_FALSE = 'False'
 TEST_RESULT_TRUE = 'True'
 
 ELEMENT_FOUND=True
+
+OUTPUT_CONSTANT ="""9cc33d6fe25973868b30f4439f09901a"""
 
 

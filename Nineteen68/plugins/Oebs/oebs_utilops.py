@@ -20,6 +20,8 @@ import oebs_constants
 global activeframes
 activeframes=[]
 
+log = logging.getLogger('oebs_utilops.py')
+
 class UtilOperations:
 
     def __init__(self):
@@ -35,28 +37,28 @@ class UtilOperations:
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_UTILOPS,DEF_SETFOCUS)
+            log.debug('Received Object Context',DEF_SETFOCUS)
             x_coor = int(curaccinfo.x + (0.5 * curaccinfo.width))
             y_coor = int(curaccinfo.y + (0.5 * curaccinfo.height))
-            logging.debug('FILE: %s , DEF: %s MSG: Formula Created',OEBS_UTILOPS,DEF_SETFOCUS)
+            log.debug('Formula Created',DEF_SETFOCUS)
             #Visibility check for scrollbar
             if(self.getObjectVisibility(acc,x_coor,y_coor)):
                 if ('showing' or 'focusable') in curaccinfo.states:
                     oebs_mouseops.MouseOperation('move',x_coor,y_coor)
                     keywordresponse = MSG_TRUE
                     keywordresult=MSG_PASS
-                    logging.debug('FILE: %s , DEF: %s MSG: %s %s',OEBS_UTILOPS,DEF_SETFOCUS,MSG_RESULT_IS,keywordresult)
+                    log.debug('%s %s',MSG_RESULT_IS,keywordresult)
                 else:
-                    logging.debug('FILE: %s , DEF: %s MSG: %s %s',OEBS_UTILOPS,DEF_SETFOCUS,MSG_RESULT_IS,keywordresult)
+                    log.debug('%s %s',MSG_RESULT_IS,keywordresult)
                     oebs_key_objects.custom_msg.append("ERR_INVALID_OBJECT")
             else:
-                logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_UTILOPS,DEF_SETFOCUS,MSG_ELEMENT_NOT_VISIBLE)
+                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_SETFOCUS,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_SETFOCUS,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_SETFOCUS,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -83,21 +85,21 @@ class UtilOperations:
                 oebs_mouseops.MouseOperation('hold',x_cor,y_cor)
                 verifyresponse = MSG_TRUE
                 keywordresult = MSG_PASS
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_DRAG,keywordresult)
+                log.debug('%s',keywordresult)
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: %s %s',OEBS_UTILOPS,DEF_DRAG)
+                log.debug('%s %s',DEF_DRAG)
                 oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
                 verifyresponse = MSG_FALSE
                 keywordresult = MSG_FAIL
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_DRAG,keywordresult)
+                log.debug('%s',keywordresult)
 
 
 
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_BUTTONOPS,DEF_CLICK,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_BUTTONOPS,DEF_CLICK,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_BUTTONOPS,DEF_CLICK,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status: %s',keywordresult)
+        log.debug('Status: %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -129,19 +131,19 @@ class UtilOperations:
 
                 verifyresponse = MSG_TRUE
                 keywordresult = MSG_PASS
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_DROP,keywordresult)
+                log.debug('%s',keywordresult)
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: %s %s',OEBS_UTILOPS,DEF_DROP)
+                log.debug('%s %s',DEF_DROP)
                 oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
                 verifyresponse = MSG_FALSE
                 keywordresult = MSG_FAIL
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_DROP,keywordresult)
+                log.debug('%s',keywordresult)
 
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_BUTTONOPS,DEF_CLICK,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_BUTTONOPS,DEF_CLICK,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_BUTTONOPS,DEF_CLICK,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status: %s',keywordresult)
+        log.debug('Status: %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -157,24 +159,24 @@ class UtilOperations:
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_UTILOPS,DEF_VERIFYENABLED)
+            log.debug('Received Object Context',DEF_VERIFYENABLED)
             objstates = curaccinfo.states
             if 'enabled' in objstates:
                 verifyresponse = MSG_TRUE
                 keywordresult = MSG_PASS
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYENABLED,keywordresult)
+                log.debug('%s',keywordresult)
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: %s %s',OEBS_UTILOPS,DEF_VERIFYENABLED)
+                log.debug('%s %s',DEF_VERIFYENABLED)
                 oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
                 verifyresponse = MSG_FALSE
                 keywordresult = MSG_FAIL
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYENABLED,keywordresult)
+                log.debug('%s',keywordresult)
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYENABLED,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_VERIFYENABLED,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_VERIFYENABLED,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Verify Response %s',OEBS_UTILOPS,DEF_VERIFYENABLED,str(verifyresponse))
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
+        log.debug('Verify Response %s',str(verifyresponse))
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -190,23 +192,23 @@ class UtilOperations:
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_UTILOPS,DEF_VERIFYDISABLED)
+            log.debug('Received Object Context',DEF_VERIFYDISABLED)
             objstates = curaccinfo.states
             if 'enabled' in objstates:
                 verifyresponse = MSG_FALSE
                 keywordresult = MSG_FAIL
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYDISABLED,keywordresult)
+                log.debug('%s',keywordresult)
                 oebs_key_objects.custom_msg.append("ERR_OBJECT_ENABLED")
             else:
                 verifyresponse = MSG_TRUE
                 keywordresult= MSG_PASS
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYDISABLED,keywordresult)
+                log.debug('%s',keywordresult)
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYDISABLED,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_VERIFYDISABLED,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_VERIFYDISABLED,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Verify Response %s',OEBS_UTILOPS,DEF_VERIFYDISABLED,str(verifyresponse))
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
+        log.debug('Verify Response %s',str(verifyresponse))
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -221,7 +223,7 @@ class UtilOperations:
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_UTILOPS,DEF_VERIFYVISIBLE)
+            log.debug('Received Object Context',DEF_VERIFYVISIBLE)
             objstates = curaccinfo.states
             x_coor = int(curaccinfo.x + (0.5 * curaccinfo.width))
             y_coor = int(curaccinfo.y + (0.5 * curaccinfo.height))
@@ -230,21 +232,21 @@ class UtilOperations:
                 if 'visible' in objstates:
                     verifyresponse = MSG_TRUE
                     keywordresult=MSG_PASS
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYVISIBLE,keywordresult)
+                    log.debug('%s',keywordresult)
                 else:
                     verifyresponse = MSG_FALSE
                     keywordresult=MSG_FAIL
                     oebs_key_objects.custom_msg.append("ERR_HIDDEN_OBJECT")
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYVISIBLE,keywordresult)
+                    log.debug('%s',keywordresult)
             else:
-                logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_UTILOPS,DEF_VERIFYVISIBLE,MSG_ELEMENT_NOT_VISIBLE)
+                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYVISIBLE,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_VERIFYVISIBLE,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_VERIFYVISIBLE,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Verify Response %s',OEBS_UTILOPS,DEF_VERIFYVISIBLE,str(verifyresponse))
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
+        log.debug('Verify Response %s',str(verifyresponse))
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -259,7 +261,7 @@ class UtilOperations:
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_UTILOPS,DEF_VERIFYHIDDEN)
+            log.debug('Received Object Context',DEF_VERIFYHIDDEN)
             objstates = curaccinfo.states
             x_coor = int(curaccinfo.x + (0.5 * curaccinfo.width))
             y_coor = int(curaccinfo.y + (0.5 * curaccinfo.height))
@@ -270,24 +272,24 @@ class UtilOperations:
                 if 'visible' and 'showing' in objstates:
                     verifyresponse = MSG_FALSE
                     keywordresult=MSG_FAIL
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYHIDDEN,keywordresult)
+                    log.debug('%s',keywordresult)
                     oebs_key_objects.custom_msg.append("ERR_OBJECT_VISIBLE")
                 else:
                     verifyresponse = MSG_TRUE
                     keywordresult=MSG_PASS
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYHIDDEN,keywordresult)
+                    log.debug('%s',keywordresult)
             else:
-                logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_UTILOPS,DEF_VERIFYHIDDEN,MSG_ELEMENT_NOT_VISIBLE)
+                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                 verifyresponse = MSG_TRUE
                 keywordresult=MSG_PASS
 
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYHIDDEN,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_VERIFYHIDDEN,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_VERIFYHIDDEN,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Verify Response %s',OEBS_UTILOPS,DEF_VERIFYHIDDEN,str(verifyresponse))
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
+        log.debug('Verify Response %s',str(verifyresponse))
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -303,7 +305,7 @@ class UtilOperations:
         try:
             #gets the entire context information
             currinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_UTILOPS,DEF_VERIFYREADONLY)
+            log.debug('Received Object Context',DEF_VERIFYREADONLY)
             objstates = currinfo.states
             children=''
             if(currinfo.role =='list'):
@@ -364,27 +366,27 @@ class UtilOperations:
                                 verifyresponse = MSG_TRUE
                             oebs_key_objects.custom_msg.append(MSG_OBJECT_SELECTABLE)
                     else:
-                        logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_UTILOPS,DEF_VERIFYREADONLY,MSG_ELEMENT_NOT_VISIBLE)
+                        log.debug('MSG:%s',DEF_VERIFYREADONLY,MSG_ELEMENT_NOT_VISIBLE)
                         oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                 else:
                     oebs_key_objects.custom_msg.append(MSG_OBJECT_SELECTABLE)
             elif 'enabled' in objstates:
                 if 'editable' in objstates:
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYREADONLY,keywordresult)
+                    log.debug('%s',DEF_VERIFYREADONLY,keywordresult)
                     oebs_key_objects.custom_msg.append(MSG_OBJECT_EDITABLE)
                 else:
                     verifyresponse = MSG_TRUE
                     keywordresult=MSG_PASS
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYREADONLY,keywordresult)
+                    log.debug('%s',DEF_VERIFYREADONLY,keywordresult)
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: Object Disabled',OEBS_UTILOPS,DEF_VERIFYREADONLY,MSG_DISABLED_OBJECT)
+                log.debug('Object Disabled',DEF_VERIFYREADONLY,MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYREADONLY,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_VERIFYREADONLY,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_VERIFYREADONLY,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Verify Response %s',OEBS_UTILOPS,DEF_VERIFYREADONLY,str(verifyresponse))
+            log.debug('%s',DEF_VERIFYREADONLY,e)
+            log.debug('Status %s',DEF_VERIFYREADONLY,keywordresult)
+        log.debug('Status %s',DEF_VERIFYREADONLY,keywordresult)
+        log.debug('Verify Response %s',DEF_VERIFYREADONLY,str(verifyresponse))
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -399,15 +401,15 @@ class UtilOperations:
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_UTILOPS,DEF_GETTOOLTIPTEXT)
+            log.debug('Received Object Context',DEF_GETTOOLTIPTEXT)
             keywordresponse = curaccinfo.description
             keywordresult = MSG_PASS
             oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_GETTOOLTIPTEXT,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_GETTOOLTIPTEXT,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_GETTOOLTIPTEXT,keywordresult)
+            log.debug('%s',DEF_GETTOOLTIPTEXT,e)
+            log.debug('Status %s',DEF_GETTOOLTIPTEXT,keywordresult)
+        log.debug('Status %s',DEF_GETTOOLTIPTEXT,keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -422,7 +424,7 @@ class UtilOperations:
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_UTILOPS,DEF_VERIFYTOOLTIPTEXT)
+            log.debug('Received Object Context',DEF_VERIFYTOOLTIPTEXT)
             if len(oebs_key_objects.keyword_input) == 1:
                 text=oebs_key_objects.keyword_input[0]
                # oebs_key_objects.custom_msg.append(str('User Input: ' + text))
@@ -431,17 +433,17 @@ class UtilOperations:
                     verifyresponse = MSG_TRUE
                     keywordresult = MSG_PASS
                 else:
-                    logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_UTILOPS,DEF_VERIFYTOOLTIPTEXT,MSG_INVALID_INPUT)
+                    log.debug('MSG:%s',DEF_VERIFYTOOLTIPTEXT,MSG_INVALID_INPUT)
                    # oebs_key_objects.custom_msg.append(str('Verification failed \'' + tooltiptext + '\' not equal to \''+text+"\'."))
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYTOOLTIPTEXT,MSG_INVALID_INPUT)
+                log.debug('%s',DEF_VERIFYTOOLTIPTEXT,MSG_INVALID_INPUT)
                 oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYTOOLTIPTEXT,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_VERIFYTOOLTIPTEXT,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_VERIFYTOOLTIPTEXT,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Verify Response %s',OEBS_UTILOPS,DEF_VERIFYTOOLTIPTEXT,str(verifyresponse))
+            log.debug('%s',DEF_VERIFYTOOLTIPTEXT,e)
+            log.debug('Status %s',DEF_VERIFYTOOLTIPTEXT,keywordresult)
+        log.debug('Status %s',DEF_VERIFYTOOLTIPTEXT,keywordresult)
+        log.debug('Verify Response %s',DEF_VERIFYTOOLTIPTEXT,str(verifyresponse))
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -457,19 +459,19 @@ class UtilOperations:
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_UTILOPS,DEF_VERIFYEXISTS)
+            log.debug('Received Object Context',DEF_VERIFYEXISTS)
             if('showing' in curaccinfo.states and 'visible' in curaccinfo.states):
                 verifyresponse = MSG_TRUE
                 keywordresult = MSG_PASS
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYEXISTS,MSG_INVALID_INPUT)
+                log.debug('%s',DEF_VERIFYEXISTS,MSG_INVALID_INPUT)
                 oebs_key_objects.custom_msg.append("ERR_HIDDEN_OBJECT")
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYEXISTS,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_VERIFYEXISTS,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_VERIFYEXISTS,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Verify Response %s',OEBS_UTILOPS,DEF_VERIFYEXISTS,str(verifyresponse))
+            log.debug('%s',DEF_VERIFYEXISTS,e)
+            log.debug('Status %s',DEF_VERIFYEXISTS,keywordresult)
+        log.debug('Status %s',DEF_VERIFYEXISTS,keywordresult)
+        log.debug('Verify Response %s',DEF_VERIFYEXISTS,str(verifyresponse))
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -486,9 +488,9 @@ class UtilOperations:
             #gets the entire context information
             if(str(acc)!='fail'):
                 curaccinfo = acc.getAccessibleContextInfo()
-                logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_UTILOPS,DEF_VERIFYDOESNOTEXISTS)
+                log.debug('Received Object Context',DEF_VERIFYDOESNOTEXISTS)
                 if(acc):
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYDOESNOTEXISTS,MSG_ELEMENT_EXIST)
+                    log.debug('%s',DEF_VERIFYDOESNOTEXISTS,MSG_ELEMENT_EXIST)
                     oebs_key_objects.custom_msg.append(MSG_ELEMENT_EXIST)
                 else:
                     verifyresponse = MSG_TRUE
@@ -500,10 +502,10 @@ class UtilOperations:
             verifyresponse = MSG_TRUE
             keywordresult = MSG_PASS
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_VERIFYDOESNOTEXISTS,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_VERIFYDOESNOTEXISTS,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_VERIFYDOESNOTEXISTS,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Verify Response %s',OEBS_UTILOPS,DEF_VERIFYDOESNOTEXISTS,str(verifyresponse))
+            log.debug('%s',DEF_VERIFYDOESNOTEXISTS,e)
+            log.debug('Status %s',DEF_VERIFYDOESNOTEXISTS,keywordresult)
+        log.debug('Status %s',DEF_VERIFYDOESNOTEXISTS,keywordresult)
+        log.debug('Verify Response %s',DEF_VERIFYDOESNOTEXISTS,str(verifyresponse))
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -519,7 +521,7 @@ class UtilOperations:
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_UTILOPS,DEF_RIGHTCLICK)
+            log.debug('Received Object Context',DEF_RIGHTCLICK)
             objstates = charinfo.states
             #x_coor = int(charinfo.x + (0.5 * charinfo.width))
             #y_coor = int(charinfo.y + (0.5 * charinfo.height))
@@ -529,22 +531,22 @@ class UtilOperations:
             if(self.getObjectVisibility(acc,x_coor,y_coor)):
             #check for object enabled
                 if 'enabled' in objstates:
-                	logging.debug('FILE: %s , DEF: %s MSG: RightClick Happens on :%s , %s',OEBS_UTILOPS,DEF_RIGHTCLICK,x_coor,y_coor)
+                	log.debug('RightClick Happens on :%s , %s',x_coor,y_coor)
                 	oebs_mouseops.MouseOperation('rightclick',x_coor,y_coor)
-                	logging.debug('FILE: %s , DEF: %s MSG: RightClick Successful',OEBS_UTILOPS,DEF_RIGHTCLICK)
+                	log.debug('RightClick Successful',DEF_RIGHTCLICK)
                 	verifyresponse = MSG_TRUE
                 	keywordresult=MSG_PASS
                 else:
-                    logging.debug('FILE: %s , DEF: %s MSG: Object Disabled',OEBS_UTILOPS,DEF_RIGHTCLICK,MSG_DISABLED_OBJECT)
+                    log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                     oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
             else:
-                logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_UTILOPS,DEF_RIGHTCLICK,MSG_ELEMENT_NOT_VISIBLE)
+                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_RIGHTCLICK,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_UTILOPS,DEF_RIGHTCLICK,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_UTILOPS,DEF_RIGHTCLICK,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status: %s',keywordresult)
+        log.debug('Status: %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -561,13 +563,13 @@ class UtilOperations:
         verifyresponse = MSG_FALSE
         try:
             framecontext=acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_UTILOPS,DEF_SWITCHTOFRAME)
+            log.debug('Received Object Context',DEF_SWITCHTOFRAME)
             failflag = -1
             if len(oebs_key_objects.keyword_input) == 1:
                 #checks if the text is empty
                 if (oebs_key_objects.keyword_input[0] != ''):
                     framename = oebs_key_objects.keyword_input[0]
-                    logging.debug('FILE: %s , DEF: %s MSG: %s is the frame name.',OEBS_UTILOPS,DEF_SWITCHTOFRAME,framename)
+                    log.debug('%s is the frame name.',framename)
                     menuobj=self.utilities_obj.menugenerator(acc)
                     self.getactiveframes(acc)
                     activeframelist=[]
@@ -602,10 +604,10 @@ class UtilOperations:
                                     if failflag != 0:
                                         failflag = -1
                         if failflag == 1 :
-                            logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_UTILOPS,DEF_SWITCHTOFRAME,MSG_INVALID_INPUT)
+                            log.debug('MSG:%s',MSG_INVALID_INPUT)
                             oebs_key_objects.custom_msg.append("Switch to Frame Failed.")
                         elif failflag == -1 :
-                            logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_UTILOPS,DEF_SWITCHTOFRAME,MSG_INVALID_INPUT)
+                            log.debug('MSG:%s',MSG_INVALID_INPUT)
                             oebs_key_objects.custom_msg.append("Switch to Frame Failed.")
                             oebs_mouseops.MouseOperation('click',x_coormenu,y_coormenu)
                         elif failflag == 0:
@@ -614,20 +616,20 @@ class UtilOperations:
                             #sets the keywordresult to pass
                             keywordresult=MSG_PASS
                         else:
-                            logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_UTILOPS,DEF_SWITCHTOFRAME,MSG_INVALID_INPUT)
+                            log.debug('MSG:%s',MSG_INVALID_INPUT)
                             oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
                     else:
-                        logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_UTILOPS,DEF_SWITCHTOFRAME,MSG_INVALID_NOOF_INPUT)
+                        log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
                         oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
                 else:
-                    logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_UTILOPS,DEF_SWITCHTOFRAME,MSG_INVALID_NOOF_INPUT)
+                    log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
                     oebs_key_objects.custom_msg.append("ERR_INVALID_NO_INPUT")
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_SWITCHTOFRAME,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_SWITCHTOFRAME,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_SWITCHTOFRAME,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Verify Response %s',OEBS_UTILOPS,DEF_SWITCHTOFRAME,str(verifyresponse))
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
+        log.debug('Verify Response %s',str(verifyresponse))
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -699,7 +701,7 @@ class UtilOperations:
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_UTILOPS,DEF_SENDFUNCTIONKEYS)
+            log.debug('Received Object Context',DEF_SENDFUNCTIONKEYS)
             string = oebs_key_objects.keyword_input[0]
             for i in range(len(string)):
                 if string[i].isalpha():
@@ -727,10 +729,10 @@ class UtilOperations:
                         verifyresponse = MSG_TRUE
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_UTILOPS,DEF_SENDFUNCTIONKEYS,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_SENDFUNCTIONKEYS,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_UTILOPS,DEF_SENDFUNCTIONKEYS,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Verify Response %s',OEBS_UTILOPS,DEF_SENDFUNCTIONKEYS,str(verifyresponse))
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
+        log.debug('Verify Response %s',str(verifyresponse))
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))

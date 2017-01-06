@@ -22,6 +22,7 @@ from oebs_keyboardops import KeywordOperations
 import oebs_utilops
 import time
 
+log = logging.getLogger('oebs_internalframeops.py')
 
 class InternalFrameOperations:
     def closeframe(self,acc):
@@ -32,7 +33,7 @@ class InternalFrameOperations:
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_INTERNALFRAMEOPS,DEF_CLOSEFRAME)
+            log.debug('Received Object Context',DEF_CLOSEFRAME)
             objstates = charinfo.states
             if 'enabled' in objstates:
                 accessibleactionsinfo = acc.getAccessibleActions()
@@ -51,19 +52,19 @@ class InternalFrameOperations:
                         verifyresponse = MSG_TRUE
                         keywordresult=MSG_PASS
                     else:
-                        logging.debug('FILE: %s , DEF: %s MSG: Object Disabled',OEBS_INTERNALFRAMEOPS,DEF_CLOSEFRAME,MSG_DISABLED_OBJECT)
+                        log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                         oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
 
 
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: Object Disabled',OEBS_INTERNALFRAMEOPS,DEF_CLOSEFRAME,MSG_DISABLED_OBJECT)
+                log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
 
         except Exception as e:
             oebs_serverUtilities.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_INTERNALFRAMEOPS,DEF_CLOSEFRAME,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_INTERNALFRAMEOPS,DEF_CLOSEFRAME,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_INTERNALFRAMEOPS,DEF_CLOSEFRAME,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status: %s',keywordresult)
+        log.debug('Status: %s',keywordresult)
         # response is sent to the client
         oebs_serverUtilities.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -77,7 +78,7 @@ class InternalFrameOperations:
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_INTERNALFRAMEOPS,DEF_TOGGLEMAXIMIZE)
+            log.debug('Received Object Context',DEF_TOGGLEMAXIMIZE)
             objstates = charinfo.states
             if 'enabled' in objstates:
                 accessibleactionsinfo = acc.getAccessibleActions()
@@ -90,17 +91,17 @@ class InternalFrameOperations:
                         verifyresponse = MSG_TRUE
                         keywordresult=MSG_PASS
                     else:
-                        logging.debug('FILE: %s , DEF: %s MSG: Object Disabled',OEBS_INTERNALFRAMEOPS,DEF_TOGGLEMAXIMIZE,MSG_DISABLED_OBJECT)
+                        log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                         oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: Object Disabled',OEBS_INTERNALFRAMEOPS,DEF_TOGGLEMAXIMIZE,MSG_DISABLED_OBJECT)
+                log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
 
         except Exception as e:
             oebs_serverUtilities.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_INTERNALFRAMEOPS,DEF_TOGGLEMAXIMIZE,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_INTERNALFRAMEOPS,DEF_TOGGLEMAXIMIZE,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_INTERNALFRAMEOPS,DEF_TOGGLEMAXIMIZE,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status: %s',keywordresult)
+        log.debug('Status: %s',keywordresult)
         # response is sent to the client
         oebs_serverUtilities.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -115,7 +116,7 @@ class InternalFrameOperations:
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_INTERNALFRAMEOPS,DEF_TOGGLEMINIMIZE)
+            log.debug('Received Object Context',DEF_TOGGLEMINIMIZE)
             objstates = charinfo.states
             keywordop_obj=KeywordOperations()
             if 'enabled' in objstates:
@@ -130,7 +131,7 @@ class InternalFrameOperations:
                             verifyresponse = MSG_TRUE
                             keywordresult=MSG_PASS
                         else:
-                            logging.debug('FILE: %s , DEF: %s MSG: Object Disabled',OEBS_INTERNALFRAMEOPS,DEF_TOGGLEMINIMIZE,MSG_DISABLED_OBJECT)
+                            log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                             oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
 
                 else:
@@ -144,18 +145,18 @@ class InternalFrameOperations:
                             verifyresponse = MSG_TRUE
                             keywordresult=MSG_PASS
                         else:
-                            logging.debug('FILE: %s , DEF: %s MSG: Object Disabled',OEBS_INTERNALFRAMEOPS,DEF_TOGGLEMINIMIZE,MSG_DISABLED_OBJECT)
+                            log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                             oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
 
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: Object Disabled',OEBS_INTERNALFRAMEOPS,DEF_TOGGLEMINIMIZE,MSG_DISABLED_OBJECT)
+                log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
 
         except Exception as e:
             oebs_serverUtilities.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_INTERNALFRAMEOPS,DEF_TOGGLEMINIMIZE,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_INTERNALFRAMEOPS,DEF_TOGGLEMINIMIZE,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_INTERNALFRAMEOPS,DEF_TOGGLEMINIMIZE,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status: %s',keywordresult)
+        log.debug('Status: %s',keywordresult)
         # response is sent to the client
         oebs_serverUtilities.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))

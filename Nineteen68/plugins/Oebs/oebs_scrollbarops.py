@@ -8,9 +8,6 @@
 # Copyright:   (c) sushma.p 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-
-
-
 from oebs_msg import *
 import oebs_key_objects
 import oebs_serverUtilities
@@ -18,6 +15,7 @@ import logging
 import oebs_mouseops
 import time
 
+log = logging.getLogger('oebs_scrollbarops.py')
 
 class ScrollbarOperations:
 
@@ -32,7 +30,7 @@ class ScrollbarOperations:
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_SCROLLBAR,DEF_RIGHT)
+            log.debug('Received Object Context',DEF_RIGHT)
             objstates = charinfo.states
             x1_cor = charinfo.x
             y1_cor = charinfo.y
@@ -52,18 +50,18 @@ class ScrollbarOperations:
                                 keywordresult=MSG_PASS
 
                     else:
-                        logging.debug('FILE: %s , DEF: %s MSG: Invalid Input',OEBS_SCROLLBAR,DEF_DOWN,MSG_INVALID_INPUT)
+                        log.debug('Invalid Input',MSG_INVALID_INPUT)
                         oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
 
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: Object Disabled',OEBS_SCROLLBAR,DEF_DOWN,MSG_DISABLED_OBJECT)
+                log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
 
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_SCROLLBAR,DEF_RIGHT,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_SCROLLBAR,DEF_RIGHT,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_SCROLLBAR,DEF_RIGHT,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status: %s',keywordresult)
+        log.debug('Status: %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -78,7 +76,7 @@ class ScrollbarOperations:
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_SCROLLBAR,DEF_LEFT)
+            log.debug('Received Object Context',DEF_LEFT)
             objstates = charinfo.states
             x1_cor = charinfo.x
             y1_cor = charinfo.y
@@ -98,18 +96,18 @@ class ScrollbarOperations:
                                 keywordresult=MSG_PASS
 
                     else:
-                        logging.debug('FILE: %s , DEF: %s MSG: Invalid Input',OEBS_SCROLLBAR,DEF_DOWN,MSG_INVALID_INPUT)
+                        log.debug('Invalid Input',MSG_INVALID_INPUT)
                         oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
 
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: Object Disabled',OEBS_SCROLLBAR,DEF_DOWN,MSG_DISABLED_OBJECT)
+                log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
 
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_SCROLLBAR,DEF_LEFT,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_SCROLLBAR,DEF_LEFT,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_SCROLLBAR,DEF_LEFT,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status: %s',keywordresult)
+        log.debug('Status: %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -123,7 +121,7 @@ class ScrollbarOperations:
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_SCROLLBAR,DEF_UP)
+            log.debug('Received Object Context',DEF_UP)
             objstates = charinfo.states
             x1_cor = charinfo.x
             y1_cor = charinfo.y
@@ -143,18 +141,18 @@ class ScrollbarOperations:
                                 keywordresult=MSG_PASS
 
                     else:
-                        logging.debug('FILE: %s , DEF: %s MSG: Invalid Input',OEBS_SCROLLBAR,DEF_DOWN,MSG_INVALID_INPUT)
+                        log.debug('Invalid Input',MSG_INVALID_INPUT)
                         oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
 
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: Object Disabled',OEBS_SCROLLBAR,DEF_DOWN,MSG_DISABLED_OBJECT)
+                log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
 
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_SCROLLBAR,DEF_UP,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_SCROLLBAR,DEF_UP,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_SCROLLBAR,DEF_UP,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status: %s',keywordresult)
+        log.debug('Status: %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -168,7 +166,7 @@ class ScrollbarOperations:
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_SCROLLBAR,DEF_DOWN)
+            log.debug('Received Object Context',DEF_DOWN)
             objstates = charinfo.states
             x1_cor = charinfo.x
             y1_cor = charinfo.y
@@ -188,18 +186,18 @@ class ScrollbarOperations:
                             keywordresult=MSG_PASS
 
                 else:
-                    logging.debug('FILE: %s , DEF: %s MSG: Invalid Input',OEBS_SCROLLBAR,DEF_DOWN,MSG_INVALID_INPUT)
+                    log.debug('Invalid Input',MSG_INVALID_INPUT)
                     oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
 
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: Object Disabled',OEBS_SCROLLBAR,DEF_DOWN,MSG_DISABLED_OBJECT)
+                log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
 
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_SCROLLBAR,DEF_DOWN,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_SCROLLBAR,DEF_DOWN,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status: %s',OEBS_SCROLLBAR,DEF_DOWN,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status: %s',keywordresult)
+        log.debug('Status: %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))

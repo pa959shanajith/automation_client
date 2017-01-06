@@ -31,6 +31,8 @@ activeframename=''
 deletedobjectlist=[]
 import logger
 
+log = logging.getLogger('oebs_serverUtilities.py')
+
 class Utilities:
 
     #Method to swoop till the element at the given Object location
@@ -405,6 +407,7 @@ class Utilities:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=None
+        err_msg=None
         if(oebs_key_objects.keyword_output[0] != ''):
             if oebs_key_objects.keyword_output[0]== MSG_PASS:
                 status=TEST_RESULT_PASS
@@ -419,9 +422,13 @@ class Utilities:
             oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_FOUND)
             logger.print_on_console(MSG_ELEMENT_NOT_FOUND)
 
-        clientresp=(status,methodoutput,output)
+        if oebs_key_objects.custom_msg != []:
+            err_msg=oebs_key_objects.custom_msg[0]
+
         if methodoutput==output:
-            clientresp=(status,methodoutput)
+            methodoutput=OUTPUT_CONSTANT
+
+        clientresp=(status,methodoutput,output,err_msg)
 
         global accessContext
         if type(accessContext) != str:
