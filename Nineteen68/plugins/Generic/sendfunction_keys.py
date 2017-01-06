@@ -14,37 +14,54 @@ from constants import *
 import logger
 import Exceptions
 import time
+from constants import *
+from loggermessages import *
+import logging
+
+
+log = logging.getLogger('sendfunction_keys.py')
 class SendFunctionKeys:
 
     def sendfunction_keys(self,input,*args):
+        log.info(KEYWORD_EXECUTION_STARTED)
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        error_msg=None
+        output_res=MD5_TEMP_RES
         try:
+            log.debug('reading the inputs')
             input=str(input)
             if not(input is None or input is ''):
                 count=self.get_args(args)
                 if count == 'type':
+                    log.debug('sending the keys in input')
                     self.type(input)
                 else:
                     if '+' in input:
                         keys_list=input.split('+')
+                        log.debug('sending multiple  keys')
                         self.press_multiple_keys(keys_list,count)
 
                     else:
+                        log.debug('sending the keys in input')
                         self.execute_key(input,count)
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
             else:
+                log.debug('Invalid input')
                 logger.print_on_console('Invalid input')
+                error_msg='Invalid input'
 
         except Exception as e:
-            logger.print_on_console('Invalid input')
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+            logger.print_on_console(e)
+            error_msg=e
+        return status,methodoutput,output_res,error_msg
 
     def execute_key(self,key,count):
         for x in range(count):
             robot=Robot()
+            log.debug('press and release the key', key)
             robot.press_and_release(key)
 
     def press_multiple_keys(self,keys_list,count):
@@ -61,15 +78,19 @@ class SendFunctionKeys:
             robot=Robot()
             robot.type_string(str(input),1)
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            logger.print_on_console(e)
+            error_msg=e
 
 
     def press_key(self,key):
         robot=Robot()
+        log.debug('press  the key', key)
         robot.key_press(key)
 
     def release_key(self,key):
         robot=Robot()
+        log.debug('releasing  the key', key)
         robot.key_release(key)
 
     def get_args(self,args):
