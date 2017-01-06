@@ -31,7 +31,7 @@ class Screenshot():
         output=MD5_TEMP_RES
         error_msg=None
         try:
-            log.debug('reading the inputs')
+            log.debug('Reading the inputs')
             if not os.path.exists(fileDir):
                 os.makedirs(fileDir)
             filename=self.generateUniqueFileName()
