@@ -334,7 +334,7 @@ class UtilOperations:
 
                     if(self.getObjectVisibility(acc,x_coor,y_coor)):
                         oebs_mouseops.MouseOperation('click',x_coor,y_coor)
-                        oebs_keyboardops.KeyboardOperation('keypress','A_DOWN')
+                        self.keyboardops.keyboard_operation('keypress','A_DOWN')
                         time.sleep(0.1)
                         requiredcontext=self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                         listObj = self.utilities_obj.looptolist(requiredcontext)
@@ -343,7 +343,7 @@ class UtilOperations:
                         if 'selected' in childcontext.states:
                             keywordresult = MSG_PASS
                             verifyresponse = MSG_TRUE
-                        oebs_keyboardops.KeyboardOperation('keypress','ENTER')
+                        self.keyboardops.keyboard_operation('keypress','ENTER')
                         time.sleep(0.4)
                         for selected in range(children):
                             labelobj=acc.getAccessibleChildFromContext(selected)
@@ -355,7 +355,7 @@ class UtilOperations:
                             keywordresult = MSG_PASS
                             verifyresponse = MSG_TRUE
                         else:
-                            oebs_keyboardops.KeyboardOperation('keypress','A_UP')
+                            self.keyboardops.keyboard_operation('keypress','A_UP')
                             time.sleep(0.1)
                             requiredcontext=self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                             listObj = self.utilities_obj.looptolist(requiredcontext)
@@ -706,31 +706,33 @@ class UtilOperations:
             for i in range(len(string)):
                 if string[i].isalpha():
                     if string[i].isupper():
-                        oebs_keyboardops.KeyboardOperation('keypress','CAPSLOCK')
-                        oebs_keyboardops.KeyboardOperation('keypress',string[i])
-                        oebs_keyboardops.KeyboardOperation('keypress','CAPSLOCK')
+                        self.keyboardops.keyboard_operation('keypress','CAPSLOCK')
+                        self.keyboardops.keyboard_operation('keypress',string[i])
+                        self.keyboardops.keyboard_operation('keypress','CAPSLOCK')
+
                         keywordresult = MSG_PASS
                         verifyresponse = MSG_TRUE
                     else:
                         val = string[i].upper()
-                        oebs_keyboardops.KeyboardOperation('keypress',val)
+                        self.keyboardops.keyboard_operation('keypress',val)
                         keywordresult = MSG_PASS
                         verifyresponse = MSG_TRUE
                 elif string[i].isdigit():
-                    oebs_keyboardops.KeyboardOperation('keypress',string[i])
+                    self.keyboardops.keyboard_operation('keypress',string[i])
                     keywordresult = MSG_PASS
                     verifyresponse = MSG_TRUE
                 else:
                     if string[i] in oebs_constants.SENDFUNCTION_KEYS_DICT:
-                        oebs_keyboardops.KeyboardOperation('keydown','SHIFT')
-                        oebs_keyboardops.KeyboardOperation('keypress',oebs_constants.SENDFUNCTION_KEYS_DICT[string[i]])
-                        oebs_keyboardops.KeyboardOperation('keyup','SHIFT')
+                        self.keyboardops.keyboard_operation('keydown','SHIFT')
+                        self.keyboardops.keyboard_operation('keypress',oebs_constants.SENDFUNCTION_KEYS_DICT[string[i]])
+                        self.keyboardops.keyboard_operation('keyup','SHIFT')
                         keywordresult = MSG_PASS
                         verifyresponse = MSG_TRUE
         except Exception as e:
             self.utilities_obj.cleardata()
-            log.debug('%s',e)
+            log.error('%s',e)
             log.debug('Status %s',keywordresult)
+            oebs_key_objects.custom_msg.append(str(e))
         log.debug('Status %s',keywordresult)
         log.debug('Verify Response %s',str(verifyresponse))
         # response is sent to the client

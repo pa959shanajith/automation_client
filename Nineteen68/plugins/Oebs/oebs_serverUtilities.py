@@ -30,6 +30,7 @@ objectDictWithNameDesc={}
 activeframename=''
 deletedobjectlist=[]
 import logger
+import logging
 
 log = logging.getLogger('oebs_serverUtilities.py')
 
@@ -422,11 +423,11 @@ class Utilities:
             oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_FOUND)
             logger.print_on_console(MSG_ELEMENT_NOT_FOUND)
 
-        if oebs_key_objects.custom_msg != []:
+        if oebs_key_objects.custom_msg != [] and status==TEST_RESULT_FAIL:
             err_msg=oebs_key_objects.custom_msg[0]
 
         if methodoutput==output:
-            methodoutput=OUTPUT_CONSTANT
+            output=OUTPUT_CONSTANT
 
         clientresp=(status,methodoutput,output,err_msg)
 

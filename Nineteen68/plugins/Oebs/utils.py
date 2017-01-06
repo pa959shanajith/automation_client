@@ -37,6 +37,7 @@ class Utils:
     def save_json(self,scrape_data):
         with open('domelements.json', 'w') as outfile:
                 logger.print_on_console('Writing scrape data to domelements.json file')
+                log.info('Writing scrape data to domelements.json file')
                 json.dump(scrape_data, outfile, indent=4, sort_keys=False)
         outfile.close()
 
@@ -93,36 +94,44 @@ class Utils:
 
     def find_oebswindow_and_attach(self,windowname,*args):
         logger.print_on_console('windowname is '+windowname)
+        log.info('windowname is '+windowname)
         status=False
-        import oebs_dispatcher
-        import time
-        load_timeout=1
-        if len(args)>0:
-            load_timeout=args[0]
+        err_msg=None
+        try:
+            import oebs_dispatcher
+            import time
+            load_timeout=1
+            if len(args)>0:
+                load_timeout=args[0]
 
-        if not(windowname is None and windowname is ''):
-            start_time = time.time()
-            while (time.time() - start_time) < load_timeout:
-                handle=self.find_window(windowname)
-                if handle is not None:
-                    self.aut_handle=handle
-                    logger.print_on_console('Application handle found')
-                    break;
-        if self.aut_handle is not None:
-            oebs_dispatcher.windowname=windowname
-##            self.set_to_foreground(windowname)
-            status=True
-        return status
+            if not(windowname is None and windowname is ''):
+                start_time = time.time()
+                while (time.time() - start_time) < load_timeout:
+                    handle=self.find_window(windowname)
+                    if handle is not None:
+                        self.aut_handle=handle
+                        logger.print_on_console('Application handle found')
+                        break;
+            if self.aut_handle is not None:
+                oebs_dispatcher.windowname=windowname
+    ##            self.set_to_foreground(windowname)
+                status=True
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg=str(e)
+        return status,err_msg
 
     def find_window_and_attach(self,url,objectname,keyword,windowname,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         windowname=windowname[0]
-        res=self.find_oebswindow_and_attach(windowname)
+        output=OUTPUT_CONSTANT
+        res,err_msg=self.find_oebswindow_and_attach(windowname)
         if status:
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
 
     def find_window(self,windowname):
@@ -154,9 +163,9 @@ class Utils:
     def GetHwndFromWindowName(self,windowname):
         try:
             hwnd = win32gui.FindWindow(None, windowname)
-            log.debug('Window Handle Fetched',)
+            log.debug('Window Handle Fetched')
         except:
-            log.debug('MSG: Window Handle Fetch Fail',)
+            log.debug('MSG: Window Handle Fetch Fail')
             hwnd = None
         return hwnd
 

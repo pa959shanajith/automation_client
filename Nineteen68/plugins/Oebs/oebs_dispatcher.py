@@ -58,7 +58,7 @@ class OebsDispatcher:
         log.info('Clearing the window name')
         windowname=None
 
-    def print_error(err_msg):
+    def print_error(self,err_msg):
         err_msg1=constants.ERROR_CODE_DICT[err_msg]
         logger.print_on_console(err_msg1)
         log.error(err_msg1)
@@ -86,14 +86,14 @@ class OebsDispatcher:
                             input.pop()
                         objectname=custom_oebs_element
                     else:
-                        print_error('ERR_CUSTOM_MISMATCH')
+                        self.print_error('ERR_CUSTOM_MISMATCH')
 
                 else:
-                    print_error('ERR_PRECONDITION_NOTMET')
-                    print_error('ERR_CUSTOM_NOTFOUND')
+                    self.print_error('ERR_PRECONDITION_NOTMET')
+                    self.print_error('ERR_CUSTOM_NOTFOUND')
             else:
-                 print_error('ERR_REF_ELE_NULL')
-                 print_error('ERR_CUSTOM_NOTFOUND')
+                 self.print_error('ERR_REF_ELE_NULL')
+                 self.print_error('ERR_CUSTOM_NOTFOUND')
         message=[tsp.url,objectname,tsp.name,input,tsp.outputval]
         return message
 

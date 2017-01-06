@@ -79,7 +79,7 @@ class KeywordOperations:
         windll.user32.keybd_event(self.virtualkeycodes.get(key), 0,0,0)
         windll.user32.keybd_event(self.virtualkeycodes.get(key),0,self.KEYEVENTF_KEYUP,0)
 
-    def KeyboardOperation(self,action,key):
+    def keyboard_operation(self,action,key):
         if(action == 'keydown'):
             self.sendkeydown(key)
             return True
