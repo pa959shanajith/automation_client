@@ -447,6 +447,10 @@ class Singleton_DriverUtil():
             logger.print_on_console('Opera browser started')
 
         elif(browser_num == '5'):
+            driver = webdriver.PhantomJS(executable_path=webconstants.PHANTOM_DRIVER_PATH)
+            logger.print_on_console('Opera browser started')
+
+        elif(browser_num == '6'):
             driver = webdriver.Safari()
             logger.print_on_console('Safari browser started')
             log.info('Safari browser started')
@@ -455,7 +459,7 @@ class Singleton_DriverUtil():
 
     def __web_driver_exception(self,e):
         log.error(e)
-        
+
         logger.print_on_console(e)
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         return err_msg

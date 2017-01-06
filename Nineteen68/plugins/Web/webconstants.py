@@ -32,6 +32,8 @@ IE_DRIVER_PATH_64 = os.getcwd()+'\IEDriverServer64.exe'
 
 IE_DRIVER_PATH_32 = os.getcwd()+'\IEDriverServer.exe'
 
+PHANTOM_DRIVER_PATH = os.getcwd()+'\phantomjs.exe'
+
 SET_TEXT_SCRIPT="""arguments[0].value=arguments[1]"""
 
 CLICK_RADIO_CHECKBOX="""arguments[0].click()"""
