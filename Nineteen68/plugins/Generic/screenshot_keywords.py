@@ -36,16 +36,16 @@ class Screenshot():
                 os.makedirs(fileDir)
             filename=self.generateUniqueFileName()
             filePath=str(fileDir)+filename
-            logger.debug('capturing the screenshot')
+            log.debug('capturing the screenshot')
             logger.print_on_console('capturing the screenshot')
             img=ImageGrab.grab()
             img.save(filePath+'.png', "png")
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
-            logger.debug('screenshot captured and saved in : %s',filePath+'.png')
+            log.debug('screenshot captured and saved in : %s',filePath+'.png')
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             error_msg=e
         return status,methodoutput,output,error_msg

@@ -325,7 +325,9 @@ INVALID_INPUT = 'Invalid input, Please provide the valid input'
 
 WEB_ELEMENT_FOUND_INSIDE_IFRAME='Web Element is found inside iframe/frame '
 
-OUTPUT_CONSTANT="""9cc33d6fe25973868b30f4439f09901a"""
+OUTPUT_CONSTANT ="""9cc33d6fe25973868b30f4439f09901a"""
+
+MD5_TEMP_RES  ="""9cc33d6fe25973868b30f4439f09901a"""
 
 MSG_CUSTOM_FOUND='Custom Object is Found'
 
