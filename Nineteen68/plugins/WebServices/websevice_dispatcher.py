@@ -8,7 +8,7 @@
 # Copyright:   (c) wasimakram.sutar 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-import Exceptions
+
 import webservices
 import logger
 import ws_constants

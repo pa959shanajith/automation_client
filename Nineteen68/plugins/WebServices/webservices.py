@@ -11,7 +11,6 @@
 
 """logger - File which prints the code loggers """
 import logger
-import Exceptions
 
 """request - requests is an elegant and simple HTTP library for Python to perform webservice operations"""
 import requests

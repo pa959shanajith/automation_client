@@ -23,7 +23,7 @@ def _fixBridgeFunc(restype,name,*argtypes,**kwargs):
     try:
         func=getattr(bridgeDll,name)
     except AttributeError:
-        logging.warning("%s not found in Java Access Bridge dll"%name)
+        log.warning("%s not found in Java Access Bridge dll"%name)
         return
     func.restype=restype
     func.argtypes=argtypes
@@ -289,7 +289,7 @@ class JABContext(object):
             try:
                 bridgeDll.releaseJavaObject(self.vmID,self.accContext)
             except:
-                logging.debugWarning("Error releasing java object",exc_info=True)
+                log.debugWarning("Error releasing java object",exc_info=True)
 
 
     def __eq__(self,jabContext):
@@ -339,14 +339,14 @@ class JABContext(object):
 
     def getAccessibleTextLineBounds(self,index):
         index=max(index,0)
-        logging.debug("lineBounds: index %s"%index)
+        log.debug("lineBounds: index %s"%index)
         #Java returns end as the last character, not end as past the last character
         startIndex=c_int()
         endIndex=c_int()
         bridgeDll.getAccessibleTextLineBounds(self.vmID,self.accContext,index,byref(startIndex),byref(endIndex))
         start=startIndex.value
         end=endIndex.value
-        logging.debug("line bounds: start %s, end %s"%(start,end))
+        log.debug("line bounds: start %s, end %s"%(start,end))
         if end<start or start<0:
             # Invalid or empty line.
             return (0,-1)
@@ -357,7 +357,7 @@ class JABContext(object):
             bridgeDll.getAccessibleTextLineBounds(self.vmID,self.accContext,end,byref(startIndex),byref(endIndex))
             tempStart=max(startIndex.value,0)
             tempEnd=max(endIndex.value,0)
-            logging.debug("line bounds: tempStart %s, tempEnd %s"%(tempStart,tempEnd))
+            log.debug("line bounds: tempStart %s, tempEnd %s"%(tempStart,tempEnd))
             if tempStart>(index+1):
                 # This line starts after the requested index, so set end to point at the line before.
                 end=tempStart-1
@@ -369,13 +369,13 @@ class JABContext(object):
             bridgeDll.getAccessibleTextLineBounds(self.vmID,self.accContext,start,byref(startIndex),byref(endIndex))
             tempStart=max(startIndex.value,0)
             tempEnd=max(endIndex.value,0)
-            logging.debug("line bounds: tempStart %s, tempEnd %s"%(tempStart,tempEnd))
+            log.debug("line bounds: tempStart %s, tempEnd %s"%(tempStart,tempEnd))
             if tempEnd<(index-1):
                 # This line ends before the requested index, so set start to point at the line after.
                 start=tempEnd+1
             else:
                 ok=True
-        logging.debug("line bounds: returning %s, %s"%(start,end))
+        log.debug("line bounds: returning %s, %s"%(start,end))
         return (start,end)
 
 
