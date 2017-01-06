@@ -67,7 +67,7 @@ class TestThread(threading.Thread):
 
             time.sleep(2)
             con = Controller()
-            print 'Controller object created'
+##            print 'Controller object created'
 
             status = con.invoke_controller('debug','',self.browser)
             if status==TERMINATE:
@@ -543,10 +543,11 @@ class Controller():
                 flag=True
                 #Iterate through the suite
                 log.info('---------------------------------------------------------------------')
-                logger.print_on_console('---------------------------------------------------------------------')
-                log.info('***SUITE ', j ,' EXECUTION STARTED***')
+                print( '=======================================================================================================')
+                log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
                 logger.print_on_console('***SUITE ', j ,' EXECUTION STARTED***')
-                logger.print_on_console('---------------------------------------------------------------------')
+                log.info('-----------------------------------------------')
+                print( '=======================================================================================================')
                 for i in range( len(suite)):
                     do_not_execute = False
                     #create a object of controller for each scenario
@@ -561,7 +562,9 @@ class Controller():
 
 
                     if (not do_not_execute) :
+                        print( '=======================================================================================================')
                         logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
+                        print( '=======================================================================================================')
                         log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
                         for d in suite[i]:
                             flag=obj.parse_json(d)
@@ -578,14 +581,18 @@ class Controller():
 
                         else:
                             print 'Invalid script'
+                        print( '=======================================================================================================')
                         logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
+                        print( '=======================================================================================================')
                         log.info('Saving the Report json of Scenario '+str((i  + 1 )))
                         logger.print_on_console( '***Saving the Report json of Scenario ',(i  + 1 ),'***')
                         log.info( '***Scenario' + str((i  + 1 )) +' execution completed***')
                         obj.clearList(con)
                     else:
-                        logger.print_on_console ('Scenario ' , (i + 1) ,' has been disabled for execution!!!')
+                        print( '=======================================================================================================')
+                        logger.print_on_console( 'Scenario ' , (i + 1) ,' has been disabled for execution!!!')
                         log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
+                        print( '=======================================================================================================')
                     #logic for condition check
                     report_json=con.reporting_obj.report_json[OVERALLSTATUS]
                     overall_status=report_json[0]['overallstatus']
@@ -595,10 +602,11 @@ class Controller():
                         else:
                             break
                 log.info('---------------------------------------------------------------------')
-                logger.print_on_console('---------------------------------------------------------------------')
-                log.info('***SUITE ', j ,' EXECUTION COMPLETED***')
+                print( '=======================================================================================================')
+                log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
                 logger.print_on_console('***SUITE ', j ,' EXECUTION COMPLETED***')
-                logger.print_on_console('---------------------------------------------------------------------')
+                log.info('-----------------------------------------------')
+                print( '=======================================================================================================')
                 j=j+1
 
         elif execution_mode.lower() == SERIAL:
@@ -630,11 +638,11 @@ class Controller():
                 j=1
                 for suite in suites_list:
                     log.info('-----------------------------------------------')
-                    logger.print_on_console('-----------------------------------------------')
+                    print( '=======================================================================================================')
                     log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
                     logger.print_on_console('***SUITE ', j ,' EXECUTION STARTED***')
                     log.info('-----------------------------------------------')
-                    logger.print_on_console('-----------------------------------------------')
+                    print( '=======================================================================================================')
                     for i in range( len(suite)):
                         do_not_execute = False
                         #create a object of controller for each scenario
@@ -688,11 +696,11 @@ class Controller():
                                 break
 
                     log.info('-----------------------------------------------')
-                    logger.print_on_console('-----------------------------------------------')
+                    print( '=======================================================================================================')
                     log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
                     logger.print_on_console('***SUITE ', j ,' EXECUTION COMPLETED***')
                     log.info('-----------------------------------------------')
-                    logger.print_on_console('-----------------------------------------------')
+                    print( '=======================================================================================================')
                     j=j+1
         return status
 
@@ -717,13 +725,13 @@ class Controller():
                 task_counter = task_counter + 1
                 if size == task_counter:
                     if  TERMINATE:
-                        print 'Update the result json as terminate'
+                        logger.print_on_console( 'Update the result json as terminate')
                     else:
-                        print 'Update the result json as complete'
+                        logger.print_on_console( 'Update the result json as complete')
                 executor.shutdown()
                 break
 
-        print 'Parralel execution completed'
+        logger.print_on_console ('Parralel execution completed')
 
     def execute(self):
         kill_process()

@@ -46,7 +46,7 @@ class Parallel(threading.Thread):
 ##                t.gettsplist()
 
 
-            print 'Breakpoint value : ',value
+
             status = con.invoke_parralel_exe('debug',value)
             if status==TERMINATE:
                 print '---------Termination Completed-------'
@@ -104,7 +104,6 @@ class TestThread(threading.Thread):
                 time.sleep(2)
                 controller.kill_process()
                 con = controller.Controller()
-                print 'Controller object created'
                 value= self.wxObject.breakpoint.GetValue()
 
 
@@ -112,17 +111,17 @@ class TestThread(threading.Thread):
 ##                t.gettsplist()
 
 
-                print 'Breakpoint value : ',value
+
                 status = con.invoke_controller('debug',value)
                 if status==TERMINATE:
-                    print '---------Termination Completed-------'
+                    logger.print_on_console(  '---------Termination Completed-------')
 ##                    self.terminatebutton.Enable()
                 else:
-                    logger.print_on_console('-----------------------------------------------')
+                    print( '=======================================================================================================')
                     log.info('-----------------------------------------------')
                     logger.print_on_console('***SUITE EXECUTION COMPLETED***')
                     log.info('***SUITE EXECUTION COMPLETED***')
-                    logger.print_on_console('-----------------------------------------------')
+                    print( '=======================================================================================================')
                     log.info('-----------------------------------------------')
 ##                con.execute()
                 controller.kill_process()
@@ -244,7 +243,7 @@ class ClientWindow(wx.Frame):
       id = event.GetId()
 
       if id == 100:
-        print '--Logger level : INFO selected--'
+        logger.print_on_console( '--Logger level : INFO selected--')
 
 
 
@@ -267,7 +266,7 @@ class ClientWindow(wx.Frame):
         # tell the handler to use this format
         console.setFormatter(formatter)
       elif id == 101:
-        print '--Logger level : DEBUG selected--'
+        logger.print_on_console( '--Logger level : DEBUG selected--')
 
         for handler in logging.root.handlers[:]:
             logging.root.removeHandler(handler)
@@ -286,7 +285,7 @@ class ClientWindow(wx.Frame):
         # tell the handler to use this format
         console.setFormatter(formatter)
       elif id ==102:
-        print '--Logger level : ERROR selected--'
+        logger.print_on_console( '--Logger level : ERROR selected--')
 
         for handler in logging.root.handlers[:]:
             logging.root.removeHandler(handler)
@@ -328,7 +327,7 @@ class ClientWindow(wx.Frame):
         print '---------controller.Continue-------'
     #----------------------------------------------------------------------
     def OnTerminate(self, event):
-        print '---------Termination Started-------'
+        logger.print_on_console( '---------Termination Started-------')
         self.cancelbutton.Enable()
         controller.terminate_flag=True
 
@@ -338,13 +337,18 @@ class ClientWindow(wx.Frame):
     #-----------------------------------------------------------------------
     def OnExecute(self,event):
         if execution_mode.lower() == 'serial':
-            print 'Serial execution'
+            print( '=======================================================================================================')
+            logger.print_on_console('Execution mode : SERIAL')
+            print( '=======================================================================================================')
             TestThread(self)
         elif execution_mode.lower() == 'parallel':
-            print 'Parallel execution'
+            logger.print_on_console('Execution mode : PARALLEL')
+            print( '=======================================================================================================')
+            print( '=========================================Nineteen68 Client Window======================================')
+            print( '=======================================================================================================')
             Parallel(self)
         else:
-            print 'Please provide valid execution mode'
+            logger.print_on_console('Please provide valid execution mode')
 
     def OnDebug(self,event):
         self.mythread = TestThread(self)
@@ -356,6 +360,9 @@ class ClientWindow(wx.Frame):
 def main():
     app = wx.App()
     ClientWindow()
+    print( '*******************************************************************************************************')
+    print( '=========================================Nineteen68 Client Window======================================')
+    print( '*******************************************************************************************************')
     app.MainLoop()
 
 if __name__ == "__main__":
