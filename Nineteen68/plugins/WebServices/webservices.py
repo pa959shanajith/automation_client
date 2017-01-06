@@ -174,7 +174,7 @@ class WSkeywords:
         output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if not (method is None or method is ''):
+            if not (header is None or header is ''):
                 log.debug('Setting the input header template to Header ')
                 self.setHeader(header)
                 log.info('Input header template has been set ')
