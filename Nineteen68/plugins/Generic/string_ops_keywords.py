@@ -13,10 +13,8 @@ import random
 import logger
 import generic_constants
 import Exceptions
-
 import logging
 from constants import *
-
 log = logging.getLogger('string_ops_keywords.py')
 
 class StringOperation:
@@ -45,7 +43,6 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            
             logger.print_on_console(e)
         return status,result,output,err_msg
 
@@ -74,7 +71,6 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            
             logger.print_on_console(e)
         return status,result,output,err_msg
 
@@ -103,7 +99,6 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            
             logger.print_on_console(e)
         return status,result,output,err_msg
 
@@ -134,7 +129,6 @@ class StringOperation:
                     logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            
             logger.print_on_console(e)
         return status,result,output,err_msg
 
@@ -170,7 +164,6 @@ class StringOperation:
                     logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            
             logger.print_on_console(e)
         return status,result,output,err_msg
 
@@ -210,7 +203,6 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            
             logger.print_on_console(e)
         return status,result,output,err_msg
 
@@ -239,7 +231,6 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            
             logger.print_on_console(e)
         return status,result,output,err_msg
 
@@ -273,9 +264,8 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            
             logger.print_on_console(e)
-        return status,result
+        return status,result,output,err_msg
 
     def replace(self, actual_string, to_be_replaced , value ):
         """
@@ -315,7 +305,7 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
         return status,result,output,err_msg
 
@@ -334,40 +324,6 @@ class StringOperation:
             if not (input is None and input is ''):
                 if not (character is None):
                     output = input.split(character)
-                    llogger.print_on_console('Result : ',output)
-                    log.info('Result : ')
-                    log.info(output)
-                    status=TEST_RESULT_PASS
-                    result=TEST_RESULT_TRUE
-                else:
-                    log.error(INVALID_INPUT)
-                    err_msg=INVALID_INPUT
-                    logger.print_on_console(INVALID_INPUT)
-            else:
-                log.error(INVALID_INPUT)
-                err_msg=INVALID_INPUT
-                logger.print_on_console(INVALID_INPUT)
-        except Exception as e:
-            log.error(e)
-            
-            logger.print_on_console(e)
-        return status,result,output,err_msg
-
-    def concatenate(self,input1,input2):
-        """
-        def : concatenate
-        purpose : to concatenate two string
-        param  : string , string
-        return : string
-        """
-        status=TEST_RESULT_FAIL
-        result=TEST_RESULT_FALSE
-        err_msg=None
-        output=OUTPUT_CONSTANT
-        try:
-            if not (input1 is None and input1 is ''):
-                if not (input2 is None and input2 is ''):
-                    output = input1 + input2
                     logger.print_on_console('Result : ',output)
                     log.info('Result : ')
                     log.info(output)
@@ -383,7 +339,36 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            
+            logger.print_on_console(e)
+        return status,result,output,err_msg
+
+    def concatenate(self,*args):
+        """
+        def : concatenate
+        purpose : to concatenate string
+        param  : *args
+        return : string
+        """
+        status=TEST_RESULT_FAIL
+        result=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        try:
+            input_vals = args
+            len_input_val = len(input_vals)
+            if len_input_val >= 2:
+                output = ''.join(input_vals)
+                logger.print_on_console('Result : ',output)
+                log.info('Output is')
+                log.info(output)
+                status=TEST_RESULT_PASS
+                result=TEST_RESULT_TRUE
+            else:
+                log.error(INVALID_INPUT)
+                err_msg=INVALID_INPUT
+                logger.print_on_console(INVALID_INPUT)
+        except Exception as e:
+            log.error(e)
             logger.print_on_console(e)
         return status,result,output,err_msg
 
@@ -432,7 +417,7 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
         return status,result,output,err_msg
 
@@ -481,14 +466,14 @@ class StringOperation:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
         return status,result,output,err_msg
 
 ##obj =StringOperation()
 ##obj.toLowerCase('RAkESH')
 ##obj.toUpperCase('raKesh')
-##obj.concatenate("I am "," Rakesh")
+##obj.concatenate("I am ","Rakesh","SV")
 ##obj.trim(' Rake  ')
 ##obj.getStringLength('RAKESH')
 ##obj.replace("Rakesh","esh"," ")
