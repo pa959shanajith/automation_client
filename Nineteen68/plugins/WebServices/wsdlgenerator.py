@@ -21,7 +21,7 @@ sys.path.append(path)
 import zeep
 import zeep.xsd.indicators
 import logging
-from loggermessages import *
+
 import logger
 log = logging.getLogger('wsdlgenerator.py')
 

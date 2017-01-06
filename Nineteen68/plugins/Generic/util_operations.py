@@ -16,7 +16,7 @@ from generic_constants import *
 
 import file_operations
 from constants import *
-from loggermessages import *
+
 import logging
 
 log = logging.getLogger('util_operations.py')

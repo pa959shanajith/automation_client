@@ -16,7 +16,7 @@ from utilweb_operations import UtilWebKeywords
 import logger
 import radio_checkbox_operations
 import logging
-from loggermessages import *
+
 from constants import *
 log = logging.getLogger('dropdown_listbox.py')
 class DropdownKeywords():

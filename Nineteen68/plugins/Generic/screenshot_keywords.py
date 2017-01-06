@@ -18,7 +18,7 @@ import logger
 import generic_constants
 import os
 from constants import *
-from loggermessages import *
+
 import logging
 
 

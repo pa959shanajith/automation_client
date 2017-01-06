@@ -19,7 +19,7 @@ from file_comparison_operations import TextFile,PdfFile,XML
 import excel_operations
 
 from constants import *
-from loggermessages import *
+
 import logging
 
 

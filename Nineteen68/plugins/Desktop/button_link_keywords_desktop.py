@@ -16,7 +16,7 @@ import launch_keywords
 from launch_keywords import Launch_Keywords
 from ldtp.client_exception import LdtpExecutionError
 import logging
-from loggermessages import *
+
 import logger
 log = logging.getLogger('button_link_keywords_desktop.py')
 

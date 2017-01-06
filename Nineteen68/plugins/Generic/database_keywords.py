@@ -21,7 +21,7 @@ import os
 import logger
 from encryption_utility import AESCipher
 import logging
-from loggermessages import *
+
 from constants import *
 log = logging.getLogger('database_keywords.py')
 

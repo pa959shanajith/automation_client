@@ -29,7 +29,7 @@ import ast
 
 from lxml import etree
 
-from loggermessages import *
+
 import logging
 from constants import *
 

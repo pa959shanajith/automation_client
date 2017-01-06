@@ -14,7 +14,7 @@ import xml.etree.ElementTree as ET
 import logger
 from generic_constants import *
 
-from loggermessages import *
+
 import logging
 from constants import *
 from lxml import etree

@@ -14,7 +14,7 @@ import logger
 import generic_constants
 from datetime import timedelta
 import logging
-from loggermessages import *
+
 from constants import *
 log = logging.getLogger('date_ops_keywords.py')
 

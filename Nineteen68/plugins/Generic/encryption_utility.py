@@ -17,7 +17,7 @@ import logger
 import generic_constants
 
 import logging
-from loggermessages import *
+
 from constants import *
 log = logging.getLogger('encryption_utility.py')
 
