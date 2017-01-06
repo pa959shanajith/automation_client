@@ -66,7 +66,6 @@ class DropdownKeywords():
                         log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 except Exception as e:
                     log.error(e)
-
                     logger.print_on_console(e)
                 log.info(RETURN_RESULT)
             else:
@@ -245,7 +244,7 @@ class DropdownKeywords():
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 except Exception as e:
                     log.error(e)
-                    
+
                     logger.print_on_console(e)
             else:
                 logger.print_on_console('Element is not displayed')

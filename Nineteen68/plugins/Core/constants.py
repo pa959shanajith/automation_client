@@ -339,5 +339,7 @@ INPUT_IS='Input is: '
 
 MAX_SIZE_EXCEEDED='Maximum size of Web element map is 4 '
 
+INPUT_ERROR='Input error'
+
 
 
