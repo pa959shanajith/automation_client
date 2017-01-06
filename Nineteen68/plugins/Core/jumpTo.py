@@ -11,8 +11,12 @@
 
 import handler
 import logger
-import Exceptions
 import constants
+from  constants import *
+import logging
+
+
+log = logging.getLogger('jumpTo.py')
 
 # Handles JumpTo keyword
 class  JumpTo():
@@ -27,26 +31,43 @@ class  JumpTo():
         self.executed=executed
         self.apptype=apptype
         self.additionalinfo=additionalinfo
+        self.parent_id=0
+        self.step_description=''
+        self.status=False
 
-    def print_step(self,input):
-        logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name)
+    def print_step(self):
+        logger.print_on_console(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name)
 
     # returns jumpTo index of step to executed by taking the script name as parameter
-    def invoke_jumpto(self):
+    def invoke_jumpto(self,reporting_obj):
+        log.info('JumpTo Execution Started')
+        return_value=self.index+1
         try:
+            log.debug('Get the tsp list')
             tspList=handler.tspList
             flag=False
             i=-1
+            log.debug('Searching for Test script name in tsp list')
             for tsp in tspList:
                 i+=1
                 inputVal=input[0]
                 if inputVal==tsp.testscript_name:
                     flag=True
-                    logger.log('Target index ' +str(i))
-                    return i
+                    log.debug('Found  target index in tsp list')
+                    logger.print_on_console('Target index ' +str(i))
+                    return_value=i
+                    self.status=True
             if(flag==False):
-                logger.log('Test script name not found')
+                logger.print_on_console('Test script name not found')
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            
+            logger.print_on_console(e)
+
+
+        #Reporting part
+        self.step_description='JumpTo executed and the result is '+self.status
+        self.parent_id=reporting_obj.get_pid()
+        #Reporting part ends
         return self.index+1
 

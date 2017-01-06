@@ -23,6 +23,8 @@ import time
 
 shell = win32com.client.Dispatch("WScript.Shell")
 
+log = logging.getLogger('oebs_textops.py')
+
 class TextOperations:
 
     def __init__(self):
@@ -40,32 +42,32 @@ class TextOperations:
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_TEXTOPS,DEF_GETTEXT)
+            log.debug('Received Object Context',DEF_GETTEXT)
             #checks element is accessible
             if charinfo.accessibleText == 1:
                 if 'enabled' in charinfo.states:
-                    logging.debug('FILE: %s , DEF: %s MSG: Text Box is accessible',OEBS_TEXTOPS,DEF_GETTEXT)
+                    log.debug('Text Box is accessible',DEF_GETTEXT)
                     #gets the text information
                     charinfo = acc.getAccessibleTextInfo(0,1)
                     #fetches text from 0th to nth location
                     text = acc.getAccessibleTextRange(0,charinfo.charCount - 1)
-                    logging.debug('FILE: %s , DEF: %s MSG: Text Box text is %s',OEBS_TEXTOPS,DEF_GETTEXT,text)
+                    log.debug('Text Box text is %s',text)
                     #sets the result to pass
                     keywordresult=MSG_PASS
-                    logging.debug('FILE: %s , DEF: %s MSG: Result:%s',OEBS_TEXTOPS,DEF_GETTEXT,text)
+                    log.debug('Result:%s',text)
                     keywordresponse = text
                     oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
                 else:
-                    logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_GETTEXT,MSG_DISABLED_OBJECT)
-                    oebs_key_objects.custom_msg.append("ERR_OBJECT_DISABLED")
+                    log.debug('MSG:%s',MSG_DISABLED_OBJECT)
+                    oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
-                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TEXTOPS,DEF_GETTEXT,MSG_INVALID_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_INVALID_OBJECT")
+                log.debug('%s',MSG_INVALID_OBJECT)
+                oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TEXTOPS,DEF_GETTEXT,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TEXTOPS,DEF_GETTEXT,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TEXTOPS,DEF_GETTEXT,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -83,20 +85,20 @@ class TextOperations:
             #gets the entire context information
             time.sleep(3)
             curaccinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_TEXTOPS,DEF_SETTEXT)
+            log.debug('Received Object Context',DEF_SETTEXT)
             if 'enabled' in curaccinfo.states:
                 #checks whether action can be performed on the object
                 if curaccinfo.accessibleAction == 1:
                     #checks whether text object editable
                     if 'editable' in curaccinfo.states:
-                        logging.debug('FILE: %s , DEF: %s MSG: Text Box is accessible',OEBS_TEXTOPS,DEF_SETTEXT)
+                        log.debug('Text Box is accessible',DEF_SETTEXT)
                         #checks element is accessible
                         if curaccinfo.accessibleText == 1:
                             if len(oebs_key_objects.keyword_input) == 1:
                                 #checks if the text is empty
                                 if (oebs_key_objects.keyword_input[0] != ''):
                                     text=oebs_key_objects.keyword_input[0]
-                                    logging.debug('FILE: %s , DEF: %s MSG: Text to be set is %s',OEBS_TEXTOPS,DEF_SETTEXT,text)
+                                    log.debug('Text to be set is %s',text)
                                     #if text != None:
                                     #gets the full length of the text
                                     character=acc.getAccessibleTextInfo(0,1)
@@ -107,30 +109,30 @@ class TextOperations:
                                         keywordresult=MSG_PASS
                                         keywordresponse=MSG_TRUE
                                 else:
-                                    logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_SETTEXT,MSG_INVALID_INPUT)
-                                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                                    log.debug('MSG:%s',MSG_INVALID_INPUT)
+                                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                             else:
-                                logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_SETTEXT,MSG_INVALID_NOOF_INPUT)
-                                oebs_key_objects.custom_msg.append("ERR_INVALID_NO_INPUT")
+                                log.debug('MSG:%s',MSG_INVALID_INPUT)
+                                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                         else:
-                            logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_SETTEXT,MSG_INVALID_OBJECT)
-                            oebs_key_objects.custom_msg.append("ERR_INVALID_OBJECT")
+                            log.debug('MSG:%s',MSG_INVALID_OBJECT)
+                            oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
                     else:
-                        logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_SETTEXT,MSG_OBJECT_READONLY)
+                        log.debug('MSG:%s',MSG_OBJECT_READONLY)
                         oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
                 else:
                     #gets the entire context information
                     curaccinfo = acc.getAccessibleContextInfo()
-                    logging.debug('FILE: %s , DEF: %s MSG: Text Box is accessible',OEBS_TEXTOPS,DEF_SETTEXT)
+                    log.debug('Text Box is accessible',DEF_SETTEXT)
                     x_coor = int(curaccinfo.x + (0.5 * curaccinfo.width))
                     y_coor = int(curaccinfo.y + (0.5 * curaccinfo.height))
-                    logging.debug('FILE: %s , DEF: %s MSG: Text Box is accessible',OEBS_TEXTOPS,DEF_SETTEXT)
+                    log.debug('Text Box is accessible',DEF_SETTEXT)
                     if len(oebs_key_objects.keyword_input) == 1:
                         #if text != None:
                         if (oebs_key_objects.keyword_input[0] != ''):
                             text=oebs_key_objects.keyword_input[0]
                             index = len(text)
-                            logging.debug('FILE: %s , DEF: %s MSG: Text to be set is %s',OEBS_TEXTOPS,DEF_SETTEXT,text)
+                            log.debug('Text to be set is %s',text)
                             #Visibility check for scrollbar
                             if(self.utilops_obj.getObjectVisibility(acc,x_coor,y_coor)):
                                 oebs_mouseops.MouseOperation('click',x_coor,y_coor)
@@ -173,29 +175,31 @@ class TextOperations:
                                             keywordresult=MSG_PASS
                                             keywordresponse=MSG_TRUE
                                     else:
-                                        logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_SETTEXT,MSG_ELEMENT_NON_EDITABLE)
+                                        log.debug('MSG:%s',MSG_ELEMENT_NON_EDITABLE)
                                         oebs_key_objects.custom_msg.append(MSG_ELEMENT_NON_EDITABLE)
 
                                 else:
-                                    logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_SETTEXT,MSG_OBJECT_READONLY)
+                                    log.debug('MSG:%s',MSG_OBJECT_READONLY)
                                     oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
                             else:
-                                logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_SETTEXT,MSG_ELEMENT_NOT_VISIBLE)
+                                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                         else:
-                            logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_SETTEXT,MSG_INVALID_INPUT)
-                            oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                            log.debug('MSG:%s',MSG_INVALID_INPUT)
+                            oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                     else:
-                        logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_SETTEXT,MSG_INVALID_NOOF_INPUT)
-                        oebs_key_objects.custom_msg.append("ERR_INVALID_NO_INPUT")
+                        log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
+                        oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
             else:
-                logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_SETTEXT,MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_DISABLED_OBJECT")
+                log.debug('MSG:%s',MSG_DISABLED_OBJECT)
+                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TEXTOPS,DEF_SETTEXT,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TEXTOPS,DEF_SETTEXT,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TEXTOPS,DEF_SETTEXT,keywordresult)
+            log.error('%s',e)
+            log.debug('Status %s',keywordresult)
+            oebs_key_objects.custom_msg=[]
+            oebs_key_objects.custom_msg.append(str(e))
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -211,7 +215,7 @@ class TextOperations:
             verifyresponse = MSG_FALSE
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_TEXTOPS,DEF_VERIFYTEXT)
+            log.debug('Received Object Context',DEF_VERIFYTEXT)
             #checks element is accessible
             if curaccinfo.accessibleText == 1:
                 if len(oebs_key_objects.keyword_input) == 1:
@@ -223,29 +227,29 @@ class TextOperations:
                         fetchedText = acc.getAccessibleTextRange(0,character.charCount - 1)
                         #checks the user provided text with the text in the object
                         if fetchedText == textVerify:
-                            logging.debug('FILE: %s , DEF: %s MSG: Text verified',OEBS_TEXTOPS,DEF_VERIFYTEXT)
+                            log.debug('Text verified',DEF_VERIFYTEXT)
                             #sets the verifyresponse to TRUE
                             verifyresponse = MSG_TRUE
                              #sets the keywordresult to pass
                             keywordresult=MSG_PASS
                         else:
-                            logging.debug('FILE: %s , DEF: %s MSG: Text verification failed',OEBS_TEXTOPS,DEF_VERIFYTEXT)
+                            log.debug('Text verification failed',DEF_VERIFYTEXT)
                             oebs_key_objects.custom_msg.append(str('Text verification failed \'' + fetchedText + '\' not equal to \''+textVerify+"\'."))
                     else:
-                        logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_VERIFYTEXT,MSG_INVALID_INPUT)
-                        oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                        log.debug('MSG:%s',MSG_INVALID_INPUT)
+                        oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                 else:
-                    logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_VERIFYTEXT,MSG_INVALID_NOOF_INPUT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_NO_INPUT")
+                    log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
             else:
-                logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_VERIFYTEXT,MSG_INVALID_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_INVALID_OBJECT")
+                log.debug('MSG:%s',MSG_INVALID_OBJECT)
+                oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TEXTOPS,DEF_VERIFYTEXT,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TEXTOPS,DEF_VERIFYTEXT,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TEXTOPS,DEF_VERIFYTEXT,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Verify Response %s',OEBS_TEXTOPS,DEF_VERIFYTEXT,str(verifyresponse))
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
+        log.debug('Verify Response %s',str(verifyresponse))
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -264,7 +268,7 @@ class TextOperations:
             time.sleep(3)
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_TEXTOPS,DEF_CLEARTEXT)
+            log.debug('Received Object Context',DEF_CLEARTEXT)
             if 'enabled' in curaccinfo.states:
                 #checks whether an action can be performed on the object
                 if curaccinfo.accessibleAction == 1:
@@ -272,7 +276,7 @@ class TextOperations:
                         # formula for changing co-ordinates to center of the element
                         x_coor = int(curaccinfo.x + (0.5 * curaccinfo.width))
                         y_coor = int(curaccinfo.y + (0.5 * curaccinfo.height))
-                        logging.debug('FILE: %s , DEF: %s MSG: Formula Created',OEBS_TEXTOPS,DEF_CLEARTEXT)
+                        log.debug('Formula Created',DEF_CLEARTEXT)
                         #checks element is accessible
                         if curaccinfo.accessibleText == 1:
                             #sets the text to empty
@@ -283,18 +287,18 @@ class TextOperations:
                                 #sets the result to pass
                                 keywordresult=MSG_PASS
                                 verifyresponse=MSG_TRUE
-                                logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_CLEARTEXT,MSG_TEXTBOX_CLEARED)
+                                log.debug('MSG:%s',MSG_TEXTBOX_CLEARED)
                         else:
-                            logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_CLEARTEXT,MSG_INVALID_OBJECT)
+                            log.debug('MSG:%s',MSG_INVALID_OBJECT)
                             oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
                     else:
-                        logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_CLEARTEXT,MSG_OBJECT_READONLY)
+                        log.debug('MSG:%s',MSG_OBJECT_READONLY)
                         oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
                 else:
                     if 'editable' in curaccinfo.states:
                         x_coor = int(curaccinfo.x + (0.5 * curaccinfo.width))
                         y_coor = int(curaccinfo.y + (0.5 * curaccinfo.height))
-                        logging.debug('FILE: %s , DEF: %s MSG: Formula Created',OEBS_TEXTOPS,DEF_CLEARTEXT)
+                        log.debug('Formula Created',DEF_CLEARTEXT)
                         text=''
                         if text != None:
                             #Visibility check for scrollbar
@@ -332,30 +336,30 @@ class TextOperations:
                                             #clears the text until all characters are deleted
                                             for num in range(character.charCount):
                                                 shell.SendKeys("{DELETE}")
-                                            logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_CLEARTEXT,MSG_TEXTBOX_CLEARED)
+                                            log.debug('MSG:%s',MSG_TEXTBOX_CLEARED)
                                             #sets the result to pass
                                             keywordresult=MSG_PASS
                                             verifyresponse=MSG_TRUE
                                         else:
-                                            logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_CLEARTEXT,MSG_ELEMENT_NOT_VISIBLE)
+                                            log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                                             oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_FOCUSABLE)
                                 else:
-                                    logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_CLEARTEXT,MSG_ELEMENT_NON_EDITABLE)
+                                    log.debug('MSG:%s',MSG_ELEMENT_NON_EDITABLE)
                                     oebs_key_objects.custom_msg.append(MSG_ELEMENT_NON_EDITABLE)
                             else:
-                                logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_CLEARTEXT,MSG_ELEMENT_NOT_VISIBLE)
+                                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                     else:
-                        logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_CLEARTEXT,MSG_OBJECT_READONLY)
+                        log.debug('MSG:%s',MSG_OBJECT_READONLY)
                         oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
             else:
-                logging.debug('FILE: %s , DEF: %s MSG:%s',OEBS_TEXTOPS,DEF_CLEARTEXT,MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append("ERR_OBJECT_DISABLED")
+                log.debug('MSG:%s',MSG_DISABLED_OBJECT)
+                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TEXTOPS,DEF_CLEARTEXT,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TEXTOPS,DEF_CLEARTEXT,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TEXTOPS,DEF_CLEARTEXT,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))

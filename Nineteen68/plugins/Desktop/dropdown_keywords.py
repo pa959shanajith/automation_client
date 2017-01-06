@@ -42,9 +42,9 @@ class Dropdown_Keywords():
                                             result=desktop_constants.TEST_RESULT_TRUE
                                             return status,result
                                         else:
-                                            logger.log('unable to slect the dropdown item')
+                                            logger.print_on_console('unable to slect the dropdown item')
                                 else:
-                                    logger.log('element not found')
+                                    logger.print_on_console('element not found')
                             except Exception as e:
                                 if isinstance(e,LdtpExecutionError):
                                     self.clickOnCombo(object_xpath)
@@ -68,9 +68,9 @@ class Dropdown_Keywords():
                                         result=desktop_constants.TEST_RESULT_TRUE
                                         return status,result
                                     else:
-                                        logger.log('unable to select list item')
+                                        logger.print_on_console('unable to select list item')
                         else:
-                            logger.log('element not found')
+                            logger.print_on_console('element not found')
                     except Exception as e:
                         Exceptions.error(e)
                 else:
@@ -101,9 +101,9 @@ class Dropdown_Keywords():
                                             result=desktop_constants.TEST_RESULT_TRUE
                                             return status,result
                                         else:
-                                            logger.log('unable to slect the dropdown item')
+                                            logger.print_on_console('unable to slect the dropdown item')
                                 else:
-                                    logger.log('element not found')
+                                    logger.print_on_console('element not found')
                             except Exception as e:
                                 if isinstance(e,LdtpExecutionError):
                                     self.clickOnCombo(object_xpath)
@@ -120,9 +120,9 @@ class Dropdown_Keywords():
                                     result=desktop_constants.TEST_RESULT_TRUE
                                     return status,result
                                 else:
-                                    logger.log('unable to select list item')
+                                    logger.print_on_console('unable to select list item')
                         else:
-                            logger.log('element not found')
+                            logger.print_on_console('element not found')
                     except Exception as e:
                         Exceptions.error(e)
             except Exception as e:
@@ -150,9 +150,9 @@ class Dropdown_Keywords():
                                                 result=select
                                                 return status,method_output,result
                                             else:
-                                                logger.log('unable to get  the selected item')
+                                                logger.print_on_console('unable to get  the selected item')
                                     else:
-                                        logger.log('element not found')
+                                        logger.print_on_console('element not found')
                                 except Exception as e:
                                     if isinstance(e,LdtpExecutionError):
                                         self.clickOnCombo(object_xpath)
@@ -192,9 +192,9 @@ class Dropdown_Keywords():
                                                 result=selected_text
                                                 return status,method_output,result
                                             else:
-                                                logger.log('unable to get the selected list item')
+                                                logger.print_on_console('unable to get the selected list item')
                                 else:
-                                    logger.log('element not found')
+                                    logger.print_on_console('element not found')
                             except Exception as e:
                                 Exceptions.error(e)
                 except Exception as e:
@@ -222,9 +222,9 @@ class Dropdown_Keywords():
                                             result=desktop_constants.TEST_RESULT_TRUE
                                             return status,result
                                         else:
-                                            logger.log('unable to verify  the selected item')
+                                            logger.print_on_console('unable to verify  the selected item')
                                 else:
-                                    logger.log('element not found')
+                                    logger.print_on_console('element not found')
                             except Exception as e:
                                 if isinstance(e,LdtpExecutionError):
                                     self.clickOnCombo(object_xpath)
@@ -269,9 +269,9 @@ class Dropdown_Keywords():
                                                     result=desktop_constants.TEST_RESULT_FALSE
                                                     break
                                         else:
-                                            logger.log('unable to verify the selected list item')
+                                            logger.print_on_console('unable to verify the selected list item')
                             else:
-                                logger.log('element not found')
+                                logger.print_on_console('element not found')
                         except Exception as e:
                             Exceptions.error(e)
             except Exception as e:
@@ -299,9 +299,9 @@ class Dropdown_Keywords():
                                             result=len(select)
                                             return status,method_output,result
                                         else:
-                                            logger.log('unable to verify  the selected item')
+                                            logger.print_on_console('unable to verify  the selected item')
                                 else:
-                                    logger.log('element not found')
+                                    logger.print_on_console('element not found')
                             except Exception as e:
                                 if isinstance(e,LdtpExecutionError):
                                     self.clickOnCombo(object_xpath)
@@ -324,9 +324,9 @@ class Dropdown_Keywords():
                                         result=actual_count
                                         return status,method_output,result
                                     else:
-                                        logger.log('unable to select list item')
+                                        logger.print_on_console('unable to select list item')
                             else:
-                                logger.log('element not found')
+                                logger.print_on_console('element not found')
                         except Exception as e:
                             Exceptions.error(e)
             except Exception as e:
@@ -354,9 +354,9 @@ class Dropdown_Keywords():
                                                 result=desktop_constants.TEST_RESULT_TRUE
                                                 return status,result
                                         else:
-                                            logger.log('unable to verify  the selected item')
+                                            logger.print_on_console('unable to verify  the selected item')
                                 else:
-                                    logger.log('element not found')
+                                    logger.print_on_console('element not found')
                             except Exception as e:
                                 if isinstance(e,LdtpExecutionError):
                                     self.clickOnCombo(object_xpath)
@@ -378,7 +378,7 @@ class Dropdown_Keywords():
                                         result=desktop_constants.TEST_RESULT_TRUE
                                         return status,result
                             else:
-                                logger.log('element not found')
+                                logger.print_on_console('element not found')
                         except Exception as e:
                             Exceptions.error(e)
             except Exception as e:
@@ -412,9 +412,9 @@ class Dropdown_Keywords():
                                                     result=desktop_constants.TEST_RESULT_FALSE
                                                     break
                                         else:
-                                            logger.log('unable to verify  the  combo items')
+                                            logger.print_on_console('unable to verify  the  combo items')
                                 else:
-                                    logger.log('element not found')
+                                    logger.print_on_console('element not found')
                             except Exception as e:
                                 if isinstance(e,LdtpExecutionError):
                                     self.clickOnCombo(object_xpath)
@@ -456,9 +456,9 @@ class Dropdown_Keywords():
                                                     result=desktop_constants.TEST_RESULT_FALSE
                                                     break
                                         else:
-                                            logger.log('unable to verify the list item')
+                                            logger.print_on_console('unable to verify the list item')
                             else:
-                                logger.log('element not found')
+                                logger.print_on_console('element not found')
                         except Exception as e:
                             Exceptions.error(e)
             except Exception as e:
@@ -491,9 +491,9 @@ class Dropdown_Keywords():
                                                     result=desktop_constants.TEST_RESULT_FALSE
                                                     break
                                     else:
-                                        logger.log('unable to verify  the  combo items')
+                                        logger.print_on_console('unable to verify  the  combo items')
                                 else:
-                                    logger.log('element not found')
+                                    logger.print_on_console('element not found')
                             except Exception as e:
                                 if isinstance(e,LdtpExecutionError):
                                     self.clickOnCombo(object_xpath)
@@ -535,9 +535,9 @@ class Dropdown_Keywords():
                                                         result=desktop_constants.TEST_RESULT_FALSE
                                                         break
                                         else:
-                                            logger.log('unable to verify the list item')
+                                            logger.print_on_console('unable to verify the list item')
                             else:
-                                logger.log('element not found')
+                                logger.print_on_console('element not found')
                         except Exception as e:
                             Exceptions.error(e)
             except Exception as e:
@@ -567,9 +567,9 @@ class Dropdown_Keywords():
                                         status=desktop_constants.TEST_RESULT_PASS
                                         method_output=desktop_constants.TEST_RESULT_TRUE
                                     else:
-                                        logger.log('invalid input')
+                                        logger.print_on_console('invalid input')
                                 else:
-                                    logger.log('element not found')
+                                    logger.print_on_console('element not found')
                             except Exception as e:
                                 raise e
                                 if isinstance(e,LdtpExecutionError):
@@ -613,7 +613,7 @@ class Dropdown_Keywords():
                                         method_output=desktop_constants.TEST_RESULT_TRUE
                                         result=selected_text
                             else:
-                                logger.log('element not found')
+                                logger.print_on_console('element not found')
                         except Exception as e:
                             Exceptions.error(e)
             except Exception as e:
@@ -666,7 +666,7 @@ class Dropdown_Keywords():
                                     method_output=desktop_constants.TEST_RESULT_PASS
                                     result=selected_text
                         else:
-                            logger.log('element not found')
+                            logger.print_on_console('element not found')
             except Exception as e:
                 Exceptions.error(e)
             return status,method_output,result
@@ -707,7 +707,7 @@ class Dropdown_Keywords():
                                                 break
 
                         else:
-                            logger.log('element not found')
+                            logger.print_on_console('element not found')
             except Exception as e:
                 Exceptions.error(e)
             return status,result
@@ -748,7 +748,7 @@ class Dropdown_Keywords():
                                                 break
 
                         else:
-                            logger.log('element not found')
+                            logger.print_on_console('element not found')
             except Exception as e:
                 Exceptions.error(e)
             return status,result
@@ -789,7 +789,7 @@ class Dropdown_Keywords():
                                                     break
 
                         else:
-                            logger.log('element not found')
+                            logger.print_on_console('element not found')
             except Exception as e:
                 Exceptions.error(e)
             return status,result
@@ -826,7 +826,7 @@ class Dropdown_Keywords():
                                         result=desktop_constants.TEST_RESULT_FALSE
                                         break
                         else:
-                            logger.log('element not found')
+                            logger.print_on_console('element not found')
             except Exception as e:
                 Exceptions.error(e)
             return status,result
@@ -836,6 +836,6 @@ class Dropdown_Keywords():
                 a = ldtp.getobjectsize(launch_keywords.window_name,objectName);
                 ldtp.generatemouseevent(a[0] + (a[2]) / 2, a[1]+ (a[3] / 2), "b1c")
             except Exception as e:
-                logger.log('')
+                logger.print_on_console('')
 
 

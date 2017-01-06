@@ -32,6 +32,8 @@ IE_DRIVER_PATH_64 = os.getcwd()+'\IEDriverServer64.exe'
 
 IE_DRIVER_PATH_32 = os.getcwd()+'\IEDriverServer.exe'
 
+PHANTOM_DRIVER_PATH = os.getcwd()+'\phantomjs.exe'
+
 SET_TEXT_SCRIPT="""arguments[0].value=arguments[1]"""
 
 CLICK_RADIO_CHECKBOX="""arguments[0].click()"""
@@ -126,9 +128,22 @@ STATUS_CODE_DICT={520: 'Unknown Error',
             510: 'Not Extended',
             511: 'Network Authentication Required'}
 
+GET_OBJECT_COUNT='getObjectCount'
+
+WAIT_FOR_ELEMENT_VISIBLE='waitForElementVisible'
+
+GET_INNER_TABLE='getInnerTable'
+
+OPEN_BROWSER='openBrowser'
+
+OPEN_NEW_BROWSER='openNewBrowser'
+
+CLOSE_BROWSER='closeBrowser'
 
 
 NON_WEBELEMENT_KEYWORDS=['openBrowser','openNewBrowser','navigateToURL','getPageTitle','verifyPageTitle','getCurrentURL','verifyCurrentURL','closeBrowser',
 'switchToWindow','closeSubWindows','verifyTextExists','waitforelementvisible','refresh','maximizeBrowser','getCurrentURL','acceptPopUp','dismissPopUp',
 'getPopUpText','verifyPopUpText','clearCache','navigateWithAuthenticate']
+
+FOUND='found'
 

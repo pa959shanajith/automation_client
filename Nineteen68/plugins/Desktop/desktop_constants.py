@@ -79,3 +79,5 @@ CLASS='class'
 CHILD='children'
 
 LABEL='label'
+
+ELEMENT_FOUND=True

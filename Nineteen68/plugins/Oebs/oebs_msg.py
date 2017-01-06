@@ -38,11 +38,19 @@ MSG_NAME_NOT_DEFINED = 'Name not Defined.'
 MSG_CLICK_SUCCESSFUL = 'Clicked Successfully.'
 MSG_ELEMENT_NOT_FOUND = 'Element Not Found'
 MSG_ELEMENT_EXIST = 'Element Exists.'
+MSG_ELEMENT_NOT_EXISTS='Element doesn not Exists'
 MSG_SINGLESELECTION_LIST = 'This operation not supported on SingleSelection list'
 MSG_OBJECT_EDITABLE = 'Object is editable.'
 MSG_OBJECT_SELECTABLE = 'Object is selectable.'
 MSG_OBJECT_READONLY = 'Object is readonly.'
 MSG_ELEMENT_NOT_VISIBLE = 'Element is not visible.'
+MSG_OBJECT_VISIBLE='Element is visible'
+MSG_ELEMENT_NON_EDITABLE='Element is not editable'
+MSG_OBJECT_ENABLED='Element is Enabled'
+MSG_TIME_OUT_EXCEPTION='Timeout exception'
+
+
+
 
 
 
@@ -128,13 +136,11 @@ DEF_GETMULTIPLEVALUESBYINDEXES='getmultiplevaluesbyindexes'
 DEF_GETVALUEBYINDEX='getvaluebyindex'
 DEF_VERIFYSELECTEDVALUES='verifyselectedvalues'
 DEF_SELECTVALUEBYINDEX='selectvaluebyindex'
-DEF_GETVALUEBYINDEX='getvaluebyindex'
 DEF_SELECTALLVALUES='selectallvalues'
 DEF_DESELECTALL='deselectall'
 DEF_SELECTMULTIPLEVALUESBYINDEXES='selectmultiplevaluesbyindexes'
 DEF_SELECTVALUEBYTEXT='selectvaluebytext'
 DEF_SELECTMULTIPLEVALUEBYTEXT='selectmultiplevaluebytext'
-DEF_GETVALUEBYINDEX='getvaluebyindex'
 DEF_GETSELECTED='getselected'
 DEF_VERIFYSELECTEDVALUE='verifyselectedvalue'
 DEF_GETCOUNT='getcount'
@@ -165,3 +171,9 @@ TEST_RESULT_PASS = 'Pass'
 TEST_RESULT_FAIL = 'Fail'
 TEST_RESULT_FALSE = 'False'
 TEST_RESULT_TRUE = 'True'
+
+ELEMENT_FOUND=True
+
+OUTPUT_CONSTANT ="""9cc33d6fe25973868b30f4439f09901a"""
+
+

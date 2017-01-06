@@ -30,6 +30,9 @@ objectDictWithNameDesc={}
 activeframename=''
 deletedobjectlist=[]
 import logger
+import logging
+
+log = logging.getLogger('oebs_serverUtilities.py')
 
 class Utilities:
 
@@ -329,8 +332,10 @@ class Utilities:
         oebs_key_objects.keyword_output = outputs.split(';')
 
         if flag == 'true' :
+             ELEMENT_FOUND=True
              return accessContext
         else :
+            ELEMENT_FOUND=False
             return 'fail'
 
     def getsize(self,xpath,windowname):
@@ -398,11 +403,12 @@ class Utilities:
             self.looptolist(childacc)
         return accessContext
 
-    def clientresponse(self):
+    def clientresponse(self,*args):
         clientresp=()
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=None
+        err_msg=None
         if(oebs_key_objects.keyword_output[0] != ''):
             if oebs_key_objects.keyword_output[0]== MSG_PASS:
                 status=TEST_RESULT_PASS
@@ -413,13 +419,22 @@ class Utilities:
 
         else:
 ##            oebs_key_objects.custom_msg.append[:]
-            oebs_key_objects.custom_msg=[]
+            del oebs_key_objects.custom_msg[:]
             oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_FOUND)
-            logger.log(MSG_ELEMENT_NOT_FOUND)
+            logger.print_on_console(MSG_ELEMENT_NOT_FOUND)
+            if len(args)>0:
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
 
-        clientresp=(status,methodoutput,output)
+        if oebs_key_objects.custom_msg != [] and status==TEST_RESULT_FAIL:
+            err_msg=oebs_key_objects.custom_msg[0]
+            logger.print_on_console(err_msg)
+
         if methodoutput==output:
-            clientresp=(status,methodoutput)
+            output=OUTPUT_CONSTANT
+
+        clientresp=(status,methodoutput,output,err_msg)
+
 
         global accessContext
         if type(accessContext) != str:

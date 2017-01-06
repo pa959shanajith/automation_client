@@ -30,3 +30,5 @@ OEBS_SCRAPE_KEYWORDS=['clickandadd','fullscrape']
 INVALID_KEYWORD='Invalid keyword'
 
 CUSTOM='@Custom'
+
+INVALID_INPUT = 'Invalid input, Please provide the valid input'

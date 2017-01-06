@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        scrape_dispatcher.py
 # Purpose:
 #
 # Author:      sushma.p
@@ -12,8 +12,11 @@ import utils
 import oebs_fullscrape
 import oebsclickandadd
 import logger
-import Exceptions
+import logging
 import oebs_constants
+
+log = logging.getLogger('scrape_dispatcher.py')
+
 class ScrapeDispatcher:
 
     def __init__(self):
@@ -22,7 +25,7 @@ class ScrapeDispatcher:
         self.clickandadd_obj=oebsclickandadd.ClickAndAdd()
 
     def scrape_dispatcher(self,keyword,*message):
-             logger.log('Keyword is '+keyword)
+             logger.print_on_console('Keyword is '+keyword)
 
 
              if keyword in oebs_constants.OEBS_SCRAPE_KEYWORDS:
@@ -40,6 +43,7 @@ class ScrapeDispatcher:
                 if keyword in dict.keys():
                     return dict[keyword](*message)
                 else:
-                    logger.log(generic_constants.INVALID_INPUT)
+                    logger.print_on_console(oebs_constants.INVALID_INPUT)
              except Exception as e:
-                Exceptions.error(e)
+                log.error(e)
+                logger.print_on_console(e)

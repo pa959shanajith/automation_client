@@ -14,31 +14,41 @@ from PIL import ImageGrab
 import  datetime
 import time
 import logger
-import Exceptions
+
 import generic_constants
 import os
 from constants import *
 
+import logging
+
+
+log = logging.getLogger('screenshot_keywords.py')
 class Screenshot():
-    status=False
-    def captureScreenshot(self,fileDir):
+    def captureScreenshot(self,fileDir,*args):
+        
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
         try:
+            log.debug('Reading the inputs')
             if not os.path.exists(fileDir):
                 os.makedirs(fileDir)
             filename=self.generateUniqueFileName()
             filePath=str(fileDir)+filename
-            logger.log('capturing the screenshot')
+            log.debug('capturing the screenshot')
+            logger.print_on_console('capturing the screenshot')
             img=ImageGrab.grab()
             img.save(filePath+'.png', "png")
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
+            log.debug('screenshot captured and saved in : ',filePath+'.png')
         except Exception as e:
-            raise e
-            logger.log('unable to capture the screenshot')
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+
+            logger.print_on_console(e)
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output,err_msg
 
     def generateUniqueFileName(self):
         filename=datetime.datetime.now().strftime("%Y-%m-%d-%H_%M_%S_"+str(time.strftime("%Y%m%d%H%M%S")))

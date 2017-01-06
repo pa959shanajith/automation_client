@@ -56,12 +56,12 @@ class Launch_Keywords():
                 title_matched_windows=self.getProcessWindows(windowName)
                 if len(title_matched_windows)>=1:
                     self.multiInstance=title_matched_windows[0]
-                    logger.log('please close the existing application instnace with the given window name and try again')
-                    logger.log('Terminate the execution')
+                    logger.print_on_console('please close the existing application instnace with the given window name and try again')
+                    logger.print_on_console('Terminate the execution')
                 elif len(title_matched_windows)==0:
                     value=win32api.ShellExecute(0,'open',filePath,None,directory,1)
                     if int(value)>32:
-                        logger.log('The specified application is launched')
+                        logger.print_on_console('The specified application is launched')
                         result=	self.find_window_and_attach(windowName,timeout)
                         if result!=None:
                             status=desktop_constants.TEST_RESULT_PASS
@@ -69,11 +69,11 @@ class Launch_Keywords():
                     else :
                         error_code=int(win32api.GetLastError())
                         if error_code in desktop_constants.DESKTOP_ERROR_CODES.keys():
-                            logger.log(desktop_constants.DESKTOP_ERROR_CODES.get(error_code))
+                            logger.print_on_console(desktop_constants.DESKTOP_ERROR_CODES.get(error_code))
                         else:
-                            logger.log('unable to launch the application')
+                            logger.print_on_console('unable to launch the application')
             else:
-                logger.log('The file does not exists')
+                logger.print_on_console('The file does not exists')
 
         except Exception as e:
             Exceptions.error(e)
@@ -245,7 +245,7 @@ class Launch_Keywords():
 
             if desktop_constants.VISIBLE_CHECK in states:
                 size=ldtp.getobjectsize(self.windowname,object)
-                logger.log( 'object size '+str(size))
+                logger.print_on_console( 'object size '+str(size))
                 rgn1=win32gui.CreateRectRgnIndirect((size[0] + 1, size[1] + 1,
         							size[0] + size[2] - 1, size[1] + size[3] - 1))
                 rgn2=win32gui.CreateRectRgnIndirect((size[0] + 4, size[1] + 4,
@@ -265,7 +265,7 @@ class Launch_Keywords():
         return status
 
     def find_window_and_attach(self,windowname,launch_time_out):
-        logger.log('windowname is '+windowname)
+        logger.print_on_console('windowname is '+windowname)
         status=False
         if not(windowname is None and windowname is ''):
             start_time = time.time()
@@ -281,7 +281,7 @@ class Launch_Keywords():
 
                         self.set_to_foreground()
                         time.sleep(0.5)
-                        logger.log('Application handle found')
+                        logger.print_on_console('Application handle found')
 ##                        tempTitle = windowTitle.replaceAll("[^a-zA-Z0-9]", "*")
                         # need  to create a ldtp object here
                         global window_name

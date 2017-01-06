@@ -53,6 +53,7 @@ e = []
 a = None
 ##objects = []
 
+log = logging.getLogger('oebsclickandadd.py')
 
 class ClickAndAdd:
 
@@ -63,32 +64,31 @@ class ClickAndAdd:
     def clickandadd(self,windowname,operation):
         operation=operation.upper()
         self.utils_obj.windowsrun()
-        logging.debug('FILE: %s , DEF: %s , MSG:\nWindows Run Executed.',FILE_OEBSSERVER,DEF_CLICKANDADD)
+        log.debug('MSG:\nWindows Run Executed.',)
         isjavares, hwnd = self.utils_obj.isjavawindow(windowname)
-        logging.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',FILE_OEBSCLICKANADD,DEF_CLICKANDADD,str(isjavares))
+        log.debug('Java window status obtained is :%s',str(isjavares))
         if (isjavares):
             map = {}
             if(operation == 'STARTCLICKANDADD'):
                 map = self.createObjectMap(windowname)
             result = self.perform_clickandadd(oebs_api.JABContext(hwnd),map,windowname,operation)
-            logging.debug('FILE: %s , DEF: %s , MSG:\n',FILE_OEBSSERVER,DEF_CLICKANDADD)
             return result
         else:
-            logging.debug('FILE: %s , DEF: %s , MSG: %s',FILE_OEBSSERVER,DEF_CLICKANDADD,MSG_NOT_JAVA_WINDOW_INFO)
+            log.debug('MSG: %s',MSG_NOT_JAVA_WINDOW_INFO)
             return 'fail'
 
     def createObjectMap(self,windowname):
         tempne = []
         self.utils_obj.windowsrun()
-        logging.debug('FILE: %s , DEF: %s , MSG:\nWindows Run Executed.',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST)
+        log.debug('MSG:\nWindows Run Executed.',DEF_GETENTIREOBJECTLIST)
         isjavares, hwnd = self.utils_obj.isjavawindow(windowname)
-        logging.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST,str(isjavares))
+        log.debug('Java window status obtained is :%s',str(isjavares))
         if (isjavares):
             map = self.createMap(oebs_api.JABContext(hwnd), tempne,'',0,windowname)
-            logging.debug('FILE: %s , DEF: %s , MSG:\n',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST)
+##            log.debug('MSG:\n',DEF_GETENTIREOBJECTLIST)
             return map
         else:
-            logging.debug('FILE: %s , DEF: %s , MSG: %s',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST,MSG_NOT_JAVA_WINDOW_INFO)
+            log.debug('MSG: %s',MSG_NOT_JAVA_WINDOW_INFO)
             return 'fail'
 
     def createMap(self,acc, tempne,xpath,j,window):

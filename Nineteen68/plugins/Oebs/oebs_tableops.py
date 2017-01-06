@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        oebs_table.py
+# Name:        oebs_tableops.py
 # Purpose:     keywords in this script are used to perform table operation.
 #
 # Author:      sushma.p
@@ -15,6 +15,8 @@ import oebs_serverUtilities
 from oebs_msg import *
 import oebs_mouseops
 
+log = logging.getLogger('oebs_tableops.py')
+
 class TableOperations:
 
     def __init__(self):
@@ -29,7 +31,7 @@ class TableOperations:
         keywordresponse=''
         rowcount = ''
         try:
-                logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_TABLEOPS,DEF_GETROWCOUNT)
+                log.debug('Received Object Context',DEF_GETROWCOUNT)
                 #gets the accessible table information
                 curaccinfo=acc.getAccessibleContextInfo()
                 childrencount=curaccinfo.childrenCount
@@ -63,9 +65,9 @@ class TableOperations:
                 oebs_key_objects.custom_msg("MSG_RESULT_IS")
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TABLEOPS,DEF_GETROWCOUNT,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TABLEOPS,DEF_GETROWCOUNT,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TABLEOPS,DEF_GETROWCOUNT,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -81,7 +83,7 @@ class TableOperations:
         keywordresponse=''
         columncount = ''
         try:
-                logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_TABLEOPS,DEF_GETCOLUMNCOUNT)
+                log.debug('Received Object Context',DEF_GETCOLUMNCOUNT)
                 #gets the accessible table information
                 curaccinfo=acc.getAccessibleContextInfo()
                 childrencount=curaccinfo.childrenCount
@@ -115,9 +117,9 @@ class TableOperations:
                 oebs_key_objects.custom_msg("MSG_RESULT_IS")
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TABLEOPS,DEF_GETCOLUMNCOUNT,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TABLEOPS,DEF_GETCOLUMNCOUNT,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TABLEOPS,DEF_GETCOLUMNCOUNT,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -129,7 +131,7 @@ class TableOperations:
             #this is the response obtained from the keyword
         keywordresponse=''
         try:
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_TABLEOPS,DEF_GETCELLVALUEJAVA)
+            log.debug('Received Object Context',DEF_GETCELLVALUEJAVA)
             if(oebs_key_objects.keyword_input[0] =='1'):
                 parentcontext=self.getparent(acc)
                 keywordresponse=self.getheader(parentcontext)
@@ -152,17 +154,17 @@ class TableOperations:
                     if(cellcontextinfo.role == 'label'):
                         keywordresponse=cellcontextinfo.name
                 else:
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TABLEOPS,DEF_GETCELLVALUEJAVA,MSG_INVALID_NOOF_INPUT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                    log.debug('%s',MSG_INVALID_NOOF_INPUT)
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TABLEOPS,DEF_GETCELLVALUEJAVA,e)
+            log.debug('%s',e)
         return keywordresponse
 
     def getcellvalueOebs(self,acc):
         keywordresponse=''
         try:
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_TABLEOPS,DEF_GETCELLVALUEOEBS)
+            log.debug('Received Object Context',DEF_GETCELLVALUEOEBS)
             parentinfo=acc.getAccessibleParentFromContext()
             parentcontext=parentinfo.getAccessibleContextInfo()
             childinfo=acc.getAccessibleChildFromContext(0)
@@ -180,8 +182,8 @@ class TableOperations:
                     innertablechildcontext=innertablechild.getAccessibleContextInfo()
                     keywordresponse=innertablechildcontext.name
                 else:
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TABLEOPS,DEF_GETCELLVALUEOEBS,MSG_INVALID_NOOF_INPUT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                    log.debug('%s',MSG_INVALID_NOOF_INPUT)
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
 
             elif(childcontext.role== 'table'):
                 if(oebs_key_objects.keyword_input[0] =='1'):
@@ -209,12 +211,12 @@ class TableOperations:
                                 innertablechildcontext=innertablechild.getAccessibleContextInfo()
                                 keywordresponse=innertablechildcontext.name
                             else:
-                                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TABLEOPS,DEF_GETCELLVALUEOEBS,MSG_INVALID_NOOF_INPUT)
-                                oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                                log.debug('%s',MSG_INVALID_NOOF_INPUT)
+                                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                         break
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TABLEOPS,DEF_GETCELLVALUEOEBS,e)
+            log.debug('%s',e)
         return keywordresponse
 
 
@@ -225,7 +227,7 @@ class TableOperations:
         #this is the response obtained from the keyword
         keywordresponse=''
         try:
-                logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_TABLEOPS,DEF_GETCELLVALUE)
+                log.debug('Received Object Context',DEF_GETCELLVALUE)
                 #gets the accessible table information
                 curaccinfo=acc.getAccessibleContextInfo()
                 childrencount=curaccinfo.childrenCount
@@ -268,9 +270,9 @@ class TableOperations:
                 oebs_key_objects.custom_msg("MSG_RESULT_IS")
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TABLEOPS,DEF_GETCELLVALUE,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TABLEOPS,DEF_GETCELLVALUE,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TABLEOPS,DEF_GETCELLVALUE,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -285,7 +287,7 @@ class TableOperations:
         keywordresponse=''
         verifyresponse=MSG_FALSE
         try:
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_TABLEOPS,DEF_VERIFYCELLVALUE)
+            log.debug('Received Object Context',DEF_VERIFYCELLVALUE)
             #getting cell value using getCellValue method
             inputcellvalue = oebs_key_objects.keyword_input[2]
             self.getcellvalue(acc)
@@ -296,9 +298,9 @@ class TableOperations:
             oebs_key_objects.custom_msg("MSG_STATUS")
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TABLEOPS,DEF_VERIFYCELLVALUE,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TABLEOPS,DEF_VERIFYCELLVALUE,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TABLEOPS,DEF_VERIFYCELLVALUE,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -314,7 +316,7 @@ class TableOperations:
         keywordresponse=MSG_TRUE
         verifyresponse=MSG_FALSE
         try:
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_TABLEOPS,DEF_CELLCLICK)
+            log.debug('Received Object Context',DEF_CELLCLICK)
             #getting cell value using getCellValue method
             #inputcellvalue = oebs_key_objects.keyword_input[2]
             curaccinfo=acc.getAccessibleContextInfo()
@@ -345,9 +347,9 @@ class TableOperations:
                             break
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TABLEOPS,DEF_CELLCLICK,e)
-            logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TABLEOPS,DEF_CELLCLICK,keywordresult)
-        logging.debug('FILE: %s , DEF: %s MSG: Status %s',OEBS_TABLEOPS,DEF_CELLCLICK,keywordresult)
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
@@ -373,7 +375,7 @@ class TableOperations:
         keywordresponse = MSG_FALSE
         keywordresult=MSG_FAIL
         try:
-            logging.debug('FILE: %s , DEF: %s MSG: Received Object Context',OEBS_TABLEOPS,DEF_CELLCLICK)
+            log.debug('Received Object Context',DEF_CELLCLICK)
             parentinfo=acc.getAccessibleParentFromContext()
             parentcontext=parentinfo.getAccessibleContextInfo()
             childinfo=acc.getAccessibleChildFromContext(0)
@@ -425,7 +427,7 @@ class TableOperations:
                      oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                      keywordresponse=MSG_TRUE
                 else:
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TABLEOPS,DEF_CELLCLICK,MSG_INVALID_NOOF_INPUT)
+                    log.debug('%s',MSG_INVALID_NOOF_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_NOOF_INPUT)
 
             elif(childcontext.role== 'table'):
@@ -486,16 +488,16 @@ class TableOperations:
                                 parent_width = childcontext.width
                                 if((x_coor > parent_x and x_coor<(parent_x + parent_width)) and (y_coor>parent_y and y_coor<(parent_y+parent_height))):
                                     oebs_mouseops.MouseOperation('click',x_coor,y_coor)
-                                    logging.debug('FILE: %s , DEF: %s MSG: Click Successful',OEBS_BUTTONOPS,DEF_CLICK)
+                                    log.debug('Click Successful',DEF_CLICK)
                                     keywordresponse = MSG_TRUE
                                     keywordresult=MSG_PASS
                             else:
-                                logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TABLEOPS,DEF_CELLCLICK,MSG_INVALID_NOOF_INPUT)
+                                log.debug('%s',MSG_INVALID_NOOF_INPUT)
                                 oebs_key_objects.custom_msg.append(MSG_INVALID_NOOF_INPUT)
                         break
         except Exception as e:
             self.utilities_obj.cleardata()
-            logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TABLEOPS,DEF_CELLCLICK,e)
+            log.debug('%s',e)
         return keywordresponse
 
     #Method to click table header
@@ -517,8 +519,8 @@ class TableOperations:
                     info=panelchildinfo.getAccessibleContextInfo()
                     result=info.name
                 else:
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TABLEOPS,DEF_CELLCLICK,MSG_INVALID_OBJECT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                    log.debug('%s',MSG_INVALID_OBJECT)
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                 break
             elif(childinfo.role =='table'):
                 parentacc = acc.getAccessibleContextInfo()
@@ -577,8 +579,8 @@ class TableOperations:
                     info=panelchildinfo.getAccessibleContextInfo()
                     result=info.name
                 else:
-                    logging.debug('FILE: %s , DEF: %s MSG: %s',OEBS_TABLEOPS,DEF_GETCELLVALUE,MSG_INVALID_OBJECT)
-                    oebs_key_objects.custom_msg.append("ERR_INVALID_INPUT")
+                    log.debug('%s',MSG_INVALID_OBJECT)
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                 break
             elif(childinfo.role =='table'):
                 parentacc = acc.getAccessibleContextInfo()

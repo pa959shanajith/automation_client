@@ -12,12 +12,18 @@
 
 
 import handler
+import controller
+import logger
 class Test():
     def gettsplist(self):
         obj=handler.Handler()
-        dataList=[]
+        suite_list = []
+        suite = []
+        dataList1=[]
+        dataList2 = []
+        dataList3 = []
 
-        data =[{
+        data1 =[{
         	"template": "",
         	"testscript_name": "Script1",
         	"testcase": [
@@ -25,9 +31,8 @@ class Test():
     "outputVal": "",
     "keywordVal": "openBrowser",
     "objectName": " ",
-    "_id_": "1",
     "inputVal": [
-      "2"
+      ""
     ],
     "appType": "Web",
     "stepNo": 1,
@@ -38,9 +43,8 @@ class Test():
     "outputVal": "",
     "keywordVal": "navigateToURL",
     "objectName": " ",
-    "_id_": "2",
     "inputVal": [
-      "http://software-ingenuity.com/formdemo.html"
+      "https://cvg53.ngahrhosting.com/Main/careerportal/JobAgent.cfm"
     ],
     "appType": "Web",
     "stepNo": 2,
@@ -48,123 +52,85 @@ class Test():
     "custname": "@Browser"
   },
   {
-    "outputVal": "{chk_status}",
-    "keywordVal": "mouseClick",
-    "objectName": "/html/body/form/div[1]/table;null;/html/body/form/div[1]/table;null;null;null",
-    "_id_": "3",
+    "outputVal": "",
+    "keywordVal": "getCount",
+    "objectName": "/html/body/table[2]/tbody/tr/td/table/tbody/tr/td/table[5]/tbody/tr/td/table/tbody/tr[3]/td/table/tbody/tr[5]/td[2]/select;null;/html/body/table[2]/tbody/tr/td/table/tbody/tr/td/table[5]/tbody/tr/td/table/tbody/tr[3]/td/table/tbody/tr[5]/td[2]/select;null;null;null",
     "inputVal": [
-      "4;2"
+      ""
     ],
     "appType": "Web",
     "stepNo": 3,
-    "url": "http://software-ingenuity.com/formdemo.html",
-    "custname": "table_1"
+    "url": "https://cvg53.ngahrhosting.com/Main/careerportal/JobAgent.cfm",
+    "custname": "Accounting/Finance_elmnt"
   },
-##  {
-##    "outputVal": "{rd_st1}",
-##    "keywordVal": "getStatus",
-##    "objectName": "/html/body/form/div[1]/table;null;/html/body/form/div[1]/table;null;null;null",
-##    "_id_": "4",
-##    "inputVal": [
-##      "5;2;radio"
-##    ],
-##    "appType": "Web",
-##    "stepNo": 4,
-##    "url": "http://software-ingenuity.com/formdemo.html",
-##    "custname": "table_1"
-##  },
-##  {
-##    "outputVal": "{rd_st2}",
-##    "keywordVal": "getStatus",
-##    "objectName": "/html/body/form/div[1]/table;null;/html/body/form/div[1]/table;null;null;null",
-##    "_id_": "5",
-##    "inputVal": [
-##      "5;2;radio;2"
-##    ],
-##    "appType": "Web",
-##    "stepNo": 5,
-##    "url": "http://software-ingenuity.com/formdemo.html",
-##    "custname": "table_1"
-##  },
-##  {
-##    "outputVal": "",
-##    "keywordVal": "displayVariableValue",
-##    "objectName": " ",
-##    "_id_": "6",
-##    "inputVal": [
-##      "{chk_status};{rd_st1};{rd_st2}"
-##    ],
-##    "appType": "Generic",
-##    "stepNo": 6,
-##    "url": " ",
-##    "custname": "@Generic"
-##  },
-##  {
-##    "outputVal": "",
-##    "keywordVal": "verifyExists",
-##    "objectName": "/html/body/form/div[2]/table;null;/html/body/form/div[2]/table;null;null;null",
-##    "_id_": "7",
-##    "inputVal": [
-##      ""
-##    ],
-##    "appType": "Web",
-##    "stepNo": 7,
-##    "url": "http://software-ingenuity.com/formdemo.html",
-##    "custname": "table_2"
-##  },
-##  {
-##    "outputVal": "",
-##    "keywordVal": "selectValueByIndex",
-##    "objectName": "/html/body/form/div[2]/table;null;/html/body/form/div[2]/table;null;null;null",
-##    "_id_": "8",
-##    "inputVal": [
-##      "1;2;dropdown;1;1"
-##    ],
-##    "appType": "Web",
-##    "stepNo": 8,
-##    "url": "http://software-ingenuity.com/formdemo.html",
-##    "custname": "table_2"
-##  },
-##  {
-##    "outputVal": "{selected}",
-##    "keywordVal": "getSelected",
-##    "objectName": "/html/body/form/div[2]/table;null;/html/body/form/div[2]/table;null;null;null",
-##    "_id_": "9",
-##    "inputVal": [
-##      "1;2;dropdown;1;1"
-##    ],
-##    "appType": "Web",
-##    "stepNo": 9,
-##    "url": "http://software-ingenuity.com/formdemo.html",
-##    "custname": "table_2"
-##  },
-##  {
-##    "outputVal": "",
-##    "keywordVal": "selectValueByText",
-##    "objectName": "/html/body/form/div[2]/table;null;/html/body/form/div[2]/table;null;null;null",
-##    "_id_": "10",
-##    "inputVal": [
-##      "1;2;dropdown;1;BMW"
-##    ],
-##    "appType": "Web",
-##    "stepNo": 10,
-##    "url": "http://software-ingenuity.com/formdemo.html",
-##    "custname": "table_2"
-##  },
+  {
+    "outputVal": "",
+    "keywordVal": "verifyCount",
+    "objectName": "/html/body/table[2]/tbody/tr/td/table/tbody/tr/td/table[5]/tbody/tr/td/table/tbody/tr[3]/td/table/tbody/tr[5]/td[2]/select;null;/html/body/table[2]/tbody/tr/td/table/tbody/tr/td/table[5]/tbody/tr/td/table/tbody/tr[3]/td/table/tbody/tr[5]/td[2]/select;null;null;null",
+    "inputVal": [
+      "47"
+    ],
+    "appType": "Web",
+    "stepNo": 4,
+    "url": "https://cvg53.ngahrhosting.com/Main/careerportal/JobAgent.cfm",
+    "custname": "Accounting/Finance_elmnt"
+  },
+  {
+    "outputVal": "",
+    "keywordVal": "selectAllValues",
+    "objectName": "/html/body/table[2]/tbody/tr/td/table/tbody/tr/td/table[5]/tbody/tr/td/table/tbody/tr[3]/td/table/tbody/tr[5]/td[2]/select;null;/html/body/table[2]/tbody/tr/td/table/tbody/tr/td/table[5]/tbody/tr/td/table/tbody/tr[3]/td/table/tbody/tr[5]/td[2]/select;null;null;null",
+    "inputVal": [
+      ""
+    ],
+    "appType": "Web",
+    "stepNo": 5,
+    "url": "https://cvg53.ngahrhosting.com/Main/careerportal/JobAgent.cfm",
+    "custname": "Accounting/Finance_elmnt"
+  },
   {
     "comments": ""
   }
 ]
         }]
-        dataList.append(data)
-        flag=True
-        for d in dataList:
-            flag=obj.parse_json(d)
-            if flag == False:
-                break
-        print '\n'
-        tsplist = obj.read_step()
-        return tsplist,flag
+        dataList1.append(data1)
+
+
+        suite.append(dataList1)
+
+        suite_list.append(suite)
+
+
+
+        flag = True
+        return suite_list,flag
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##                print tsplist
+
+##        print '===================Scenario execution completed=========================='
+
 
 
 

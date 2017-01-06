@@ -11,8 +11,6 @@
 
 import logger
 import generic_constants
-import Exceptions
-
 
 class PdfFile:
 
@@ -81,15 +79,15 @@ class PdfFile:
                     if not end is '':
                         endIndex=content.find(end)
                     content=content[startIndex:endIndex]
-                    logger.log('Content between Start and End string is ')
+                    logger.print_on_console('Content between Start and End string is ')
                 elif len(args)==1:
                     with open(args[0],'w') as file:
                         file.write(content)
                         file.close()
-                logger.log(content)
+                logger.print_on_console(content)
                 status=True
              else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
 
         except ValueError as e:
             Exception.message(generic_constants.INVALID_INPUT)
@@ -112,7 +110,7 @@ class TextFile:
             with open(input_path) as myFile:
                 for num, line in enumerate(myFile, 1):
                     if content in line:
-                        logger.log('found at line:',(num))
+                        logger.print_on_console('found at line:',(num))
                         status=True
         except Exception as e:
             Exceptions.error(e)
@@ -131,8 +129,8 @@ class TextFile:
         try:
             content1=self.get_content(input_path1)
             content2=self.get_content(input_path2)
-            logger.log('File1 content is '+content1)
-            logger.log('File2 content is '+content2)
+            logger.print_on_console('File1 content is '+content1)
+            logger.print_on_console('File2 content is '+content2)
             if content1==content2:
                 status=True
         except Exception as e:
@@ -173,7 +171,7 @@ class TextFile:
         try:
             with open(input_path) as myFile:
                 str=myFile.read()
-                logger.log(str)
+                logger.print_on_console(str)
                 content=str
         except Exception as e:
             Exceptions.error(e)
@@ -196,7 +194,7 @@ class TextFile:
                         print 'found at line:', num
                         line_numbers.append(num)
                         status=True
-            logger.log(line_numbers)
+            logger.print_on_console(line_numbers)
         except Exception as e:
             Exceptions.error(e)
         return status,line_numbers
@@ -236,7 +234,7 @@ class TextFile:
 
         """
         status=False
-        logger.log('Writing to text file')
+        logger.print_on_console('Writing to text file')
         try:
             if len(args)>0:
                 content+=' '.join(args)
@@ -260,7 +258,7 @@ class XML:
 
         """
         status=False
-        logger.log('Writing to XML file')
+        logger.print_on_console('Writing to XML file')
         import xml.dom.minidom as minidom
         from xml.etree import ElementTree as ET
         from xml.etree import ElementTree
@@ -269,7 +267,7 @@ class XML:
             rough_string = ElementTree.tostring(tree)
             reparsed = minidom.parseString(rough_string)
             val=reparsed.toprettyxml(indent="\t")
-            logger.log(val)
+            logger.print_on_console(val)
             with open(input_path, 'a') as file:
                 file.write(val)
                 file.close()

@@ -22,7 +22,10 @@ import sys
 from xlrd import open_workbook
 from openpyxl import load_workbook
 from constants import *
-import Exceptions
+import logging
+
+from constants import *
+log = logging.getLogger('excel_operations.py')
 
 
 class ExcelFile:
@@ -52,6 +55,16 @@ class ExcelFile:
 
         }
 
+    def open_and_save_file(self,input_path):
+        #win32 part opening and closing of file to claculate and save values of the formula
+        #This is to support the feature of   simulataneous writing and reading to a file
+        from win32com.client.gencache import EnsureDispatch
+        excel = EnsureDispatch("Excel.Application")
+        excel.DisplayAlerts = False
+        print input_path
+        excel_file = excel.Workbooks.Open(input_path)
+        excel_file.Close(True)
+
 
 
     def __get_ext(self,input_path):
@@ -66,12 +79,14 @@ class ExcelFile:
             filename,file_ext=os.path.splitext(input_path)
             if file_ext in generic_constants.FILE_TYPES:
                 status=True
-                logger.log('File type is'+file_ext)
+                log.info('File type is :')
+                log.info(file_ext)
                 return file_ext,status
             else:
-                logger.log(generic_constants.INVALID_FILE_FORMAT)
+                logger.print_on_console(generic_constants.INVALID_FILE_FORMAT)
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            logger.print_on_console(e)
         return '',False
 
     def set_excel_path(self,input_path,sheetname):
@@ -84,13 +99,17 @@ class ExcelFile:
         """
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        logger.log(generic_constants.INPUT_IS+input_path+' '+sheetname)
+        verb = OUTPUT_CONSTANT
+        err_msg = None
+        logger.print_on_console(generic_constants.INPUT_IS+input_path+' '+sheetname)
         if not(self.excel_path is None and self.sheetname):
             self.excel_path=input_path
             self.sheetname=sheetname
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput
+        else:
+            err_msg=INPUT_ERROR
+        return status,methodoutput,verb,err_msg
 
 
     def delete_row(self,row):
@@ -102,6 +121,8 @@ class ExcelFile:
         return : Returns Bool
 
         """
+        verb = OUTPUT_CONSTANT
+        err_msg = None
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         try:
@@ -111,9 +132,16 @@ class ExcelFile:
                 if res:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                else:
+                    err_msg=INPUT_ERROR
+            else:
+                err_msg=INPUT_ERROR
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg=INPUT_ERROR
+
+        return status,methodoutput,verb,err_msg
 
 
     def read_cell(self,row,col,*args):
@@ -128,19 +156,26 @@ class ExcelFile:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=None
+        err_msg = None
         try:
             file_ext,res=self.__get_ext(self.excel_path)
             if res:
-                logger.log('Row is '+str(row)+' and col is '+str(col))
+                logger.print_on_console('Row is '+str(row)+' and col is '+str(col))
                 res,value=self.dict['read_cell_'+file_ext](int(row),int(col),self.excel_path,self.sheetname,*args)
-                logger.log('cell value is '+str(value))
+                logger.print_on_console('cell value is '+str(value))
                 if res:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                     output=value
+                else:
+                    err_msg=INPUT_ERROR
+            else:
+                err_msg=INPUT_ERROR
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput,output
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output,err_msg
 
 
     def write_cell(self,row,col,value,*args):
@@ -154,18 +189,26 @@ class ExcelFile:
         """
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg = None
         try:
             file_ext,res=self.__get_ext(self.excel_path)
             if res:
-                logger.log('Row is '+str(row)+' col is '+str(col)+' and Value: '+str(value))
+                logger.print_on_console('Row is '+str(row)+' col is '+str(col)+' and Value: '+str(value))
                 res=self.dict['write_cell_'+file_ext](int(row),int(col),value,self.excel_path,self.sheetname,*args)
                 if res:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                else:
+                    err_msg=INPUT_ERROR
+            else:
+                err_msg=INPUT_ERROR
 
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg=INPUT_ERROR
+        return status,methodoutput,verb,err_msg
 
 
     def clear_cell(self,row,col):
@@ -179,17 +222,25 @@ class ExcelFile:
         """
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg = None
         try:
             file_ext,res=self.__get_ext(self.excel_path)
             if res:
-                logger.log('Row is'+str(row)+'and col is'+str(col))
+                logger.print_on_console('Row is'+str(row)+'and col is'+str(col))
                 res=self.dict['clear_cell_'+file_ext](int(row),int(col),self.excel_path,self.sheetname)
                 if res:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                else:
+                    err_msg=INPUT_ERROR
+            else:
+                err_msg=INPUT_ERROR
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg=INPUT_ERROR
+        return status,methodoutput,verb,err_msg
 
 
     def get_rowcount(self,*args):
@@ -204,17 +255,24 @@ class ExcelFile:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         row_count=None
+        err_msg = None
         try:
             file_ext,res=self.__get_ext(self.excel_path)
             if res:
                 res,row_count=self.dict['get_rowcount_'+file_ext](self.excel_path,self.sheetname,*args)
-                logger.log('Row count is:'+str(row_count))
+                logger.print_on_console('Row count is:'+str(row_count))
                 if res:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                else:
+                    err_msg=INPUT_ERROR
+            else:
+                err_msg=INPUT_ERROR
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput,row_count
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg=INPUT_ERROR
+        return status,methodoutput,row_count,err_msg
 
 
 
@@ -230,17 +288,24 @@ class ExcelFile:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         col_count=None
+        err_msg = None
         try:
             file_ext,res=self.__get_ext(self.excel_path)
             if res:
                 res,col_count=self.dict['get_colcount_'+file_ext](self.excel_path,self.sheetname,*args)
-                logger.log('Column count is:'+str(col_count))
+                logger.print_on_console('Column count is:'+str(col_count))
                 if res:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                else:
+                    err_msg=INPUT_ERROR
+            else:
+                err_msg=INPUT_ERROR
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput,col_count
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg=INPUT_ERROR
+        return status,methodoutput,col_count,err_msg
 
     def clear_excel_path(self,*args):
         """
@@ -305,6 +370,8 @@ class ExcelXLS:
         from xlwt import easyxf,XFStyle
         workbook = copy(book)
         sheets=book.sheet_names()
+        status=False
+        self.excel_obj=ExcelFile()
         try:
             sheetnum=sheets.index(sheetname)
             s = workbook.get_sheet(sheetnum)
@@ -328,17 +395,21 @@ class ExcelXLS:
                         s.write(int(row),int(col),value)
 
                 workbook.save(input_path)
-                return True
+                status= True
             else:
-                logger.log('Cell Type not supported')
+                logger.print_on_console('Cell Type not supported')
+                log.info('Cell Type not supported')
             workbook.save(input_path)
-            return True
+
         except IOError:
-            logger.log('Permisson denied to perform write operation')
+            logger.print_on_console('Permisson denied to perform write operation')
+            log.info('Permisson denied to perform write operation')
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            logger.print_on_console(e)
             workbook.save(input_path)
-        return False
+        self.excel_obj.open_and_save_file(input_path)
+        return status
 
     def get_linenumber_xls(self,input_path,sheetname,content):
         """
@@ -351,7 +422,7 @@ class ExcelXLS:
         status=False
         line_number=None
         try:
-            logger.log(generic_constants.INPUT_IS+input_path+' '+sheetname)
+            logger.print_on_console(generic_constants.INPUT_IS+input_path+' '+sheetname)
             book = open_workbook(input_path)
             sheet = book.sheet_by_name(sheetname)
             for col in range(sheet.ncols):
@@ -359,7 +430,8 @@ class ExcelXLS:
                 line_number=indices
                 status=True
         except Exception as e:
-           Exceptions.error(e)
+           log.error(e)
+           logger.print_on_console(e)
         return status,line_number
 
     def replace_content_xls(self,input_path,sheetname,existingcontent,replacecontent,*args):
@@ -371,7 +443,7 @@ class ExcelXLS:
         return : bool
 
         """
-        logger.log(generic_constants.INPUT_IS+input_path+' '+sheetname)
+        logger.print_on_console(generic_constants.INPUT_IS+input_path+' '+sheetname)
         status=False
         try:
             from xlutils.copy import copy
@@ -388,7 +460,8 @@ class ExcelXLS:
             workbook.save(input_path)
             status=True
         except Exception as e:
-           Exceptions.error(e)
+           log.error(e)
+           logger.print_on_console(e)
         return status
 
     def delete_row_xls(self,row,excel_path,sheetname):
@@ -401,7 +474,7 @@ class ExcelXLS:
         """
         status=False
         self.excel_obj=ExcelFile()
-        logger.log(generic_constants.INPUT_IS+excel_path+' '+sheetname)
+        logger.print_on_console(generic_constants.INPUT_IS+excel_path+' '+sheetname)
         try:
             from win32com.client.gencache import EnsureDispatch
             excel = EnsureDispatch("Excel.Application")
@@ -414,9 +487,11 @@ class ExcelXLS:
                 excel_file.Close(True)
                 status=True
             else:
-                logger.log('Excel is Read only')
+                logger.print_on_console('Excel is Read only')
+                log.info('Excel is Read only')
         except Exception as e:
-           Exceptions.error(e)
+           log.error(e)
+           logger.print_on_console(e)
         return status
 
     def compare_content_xls(self,input_path1,sheetname1,input_path2,sheetname2,*args):
@@ -432,13 +507,14 @@ class ExcelXLS:
             import pandas as pd
             file1=pd.ExcelFile(input_path1)
             data1=file1.parse(sheetname1)
-##            logger.log('File content1'+str(data1))
+##            logger.print_on_console('File content1'+str(data1))
             file2=pd.ExcelFile(input_path2)
             data2=file2.parse(sheetname2)
-##            logger.log('File content2'+str(data2))
+##            logger.print_on_console('File content2'+str(data2))
             status= (str(data1)==str(data2))
         except Exception as e:
-           Exceptions.error(e)
+           log.error(e)
+           logger.print_on_console(e)
         return status
 
     def verify_content_xls(self,input_path,sheetname,content,*args):
@@ -465,7 +541,7 @@ class ExcelXLS:
 
         """
         status=False
-        logger.log(generic_constants.INPUT_IS+inputpath+' '+sheetname)
+        logger.print_on_console(generic_constants.INPUT_IS+inputpath+' '+sheetname)
         try:
             from win32com.client.gencache import EnsureDispatch
             excel = EnsureDispatch("Excel.Application")
@@ -476,7 +552,8 @@ class ExcelXLS:
             excel_file.Close(True)
             status=True
         except Exception as e:
-            Exceptions,error(e)
+            log.error(e)
+            logger.print_on_console(e)
         return status
 
     def read_cell_xls(self,row,col,excel_path,sheetname,*args):
@@ -490,7 +567,7 @@ class ExcelXLS:
         status=False
         value=None
         try:
-            logger.log(generic_constants.INPUT_IS+excel_path+' '+sheetname)
+            logger.print_on_console(generic_constants.INPUT_IS+excel_path+' '+sheetname)
             book = open_workbook(excel_path)
             sheet = book.sheet_by_name(sheetname)
             if row<=sheet.nrows and col<=sheet.ncols:
@@ -500,11 +577,12 @@ class ExcelXLS:
                     value=datetime.datetime(*xlrd.xldate_as_tuple(cell.value, book.datemode))
                     value=value.date()
                 status=True
-                logger.log(value)
+                logger.print_on_console(value)
             else:
-                logger.log(generic_constants.INDEX_EXCEEDS)
+                logger.print_on_console(generic_constants.INDEX_EXCEEDS)
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            logger.print_on_console(e)
         return status,value
 
 
@@ -518,7 +596,7 @@ class ExcelXLS:
 
         """
         status=False
-        logger.log(generic_constants.INPUT_IS+excel_path+' '+sheetname)
+        logger.print_on_console(generic_constants.INPUT_IS+excel_path+' '+sheetname)
         from xlutils.copy import copy
         book = open_workbook(excel_path)
         workbook = copy(book)
@@ -531,7 +609,7 @@ class ExcelXLS:
                 workbook.save(excel_path)
                 status=True
             else:
-                logger.log('Row/Col should be greater than 0')
+                logger.print_on_console('Row/Col should be greater than 0')
         except ValueError:
             Exception.message('Value Error occured')
         workbook.save(excel_path)
@@ -568,13 +646,14 @@ class ExcelXLS:
         status=False
         row_count=None
         try:
-            logger.log(generic_constants.INPUT_IS+excel_path+' '+sheetname)
+            logger.print_on_console(generic_constants.INPUT_IS+excel_path+' '+sheetname)
             book = open_workbook(excel_path)
             sheet=book.sheet_by_name(sheetname)
             row_count=sheet.nrows
             status=True
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            logger.print_on_console(e)
         return status,row_count
 
     def get_colcount_xls(self,excel_path,sheetname,*args):
@@ -587,14 +666,15 @@ class ExcelXLS:
         """
         status=False
         col_count=None
-        logger.log(generic_constants.INPUT_IS+excel_path+' '+sheetname)
+        logger.print_on_console(generic_constants.INPUT_IS+excel_path+' '+sheetname)
         try:
             book = open_workbook(excel_path)
             sheet=book.sheet_by_name(sheetname)
             col_count=sheet.ncols
             status=True
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            logger.print_on_console(e)
         return status,col_count
 
     def write_to_file_xls(self,input_path,sheetname,content,*args):
@@ -607,7 +687,7 @@ class ExcelXLS:
         """
         self.excel_obj=ExcelFile()
         status=False
-        logger.log(generic_constants.INPUT_IS+input_path+' '+sheetname)
+        logger.print_on_console(generic_constants.INPUT_IS+input_path+' '+sheetname)
         try:
             #loads the xls workbook
             workbook_info=self.__load_workbook_xls(input_path,sheetname)
@@ -628,7 +708,8 @@ class ExcelXLS:
             #writes to the cell in given row,col
             status=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content)
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            logger.print_on_console(e)
         return status
 
 
@@ -686,6 +767,7 @@ class ExcelXLSX:
 
         return book,sheet,last_row,last_col,sheet.max_row
 
+
     def __write_to_cell_xlsx(self,input_path,book,sheetname,row,col,value,*args):
         """
         def : __write_to_cell_xlsx(private method)
@@ -695,6 +777,7 @@ class ExcelXLSX:
 
         """
         status=False
+        self.excel_obj=ExcelFile()
         try:
            sheet=book.get_sheet_by_name(sheetname)
            cell=sheet.cell(row=row,column=col)
@@ -712,14 +795,16 @@ class ExcelXLSX:
                 cell.value=value
                 status=True
             else:
-                logger.log('Cell Type not supported')
+                logger.print_on_console('Cell Type not supported')
            else:
                 cell.value=value
                 status=True
         except Exception as e:
-            logger.log('Invalid input')
-            Exceptions.error(e)
+            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+            log.error(e)
+            logger.print_on_console(e)
         book.save(input_path)
+        self.excel_obj.open_and_save_file(input_path)
         return status
 
     def __get_formatted_date(self,val,fmt):
@@ -738,7 +823,7 @@ class ExcelXLSX:
         """
         status=False
         line_number=None
-        logger.log(generic_constants.INPUT_IS+input_path+' '+sheetname)
+        logger.print_on_console(generic_constants.INPUT_IS+input_path+' '+sheetname)
         try:
             book = load_workbook(input_path,data_only=True)
             sheet = book.get_sheet_by_name(sheetname)
@@ -752,7 +837,8 @@ class ExcelXLSX:
             line_number=value
             status=True
         except Exception as e:
-           Exceptions.error(e)
+           log.error(e)
+           logger.print_on_console(e)
         return status,line_number
 
     def replace_content_xlsx(self,input_path,sheetname,existingcontent,replacecontent,*args):
@@ -764,7 +850,7 @@ class ExcelXLSX:
         return : bool
 
         """
-        logger.log(generic_constants.INPUT_IS+input_path+' '+sheetname)
+        logger.print_on_console(generic_constants.INPUT_IS+input_path+' '+sheetname)
         status=False
         try:
             book = load_workbook(input_path,data_only=True)
@@ -776,7 +862,8 @@ class ExcelXLSX:
             book.save(input_path)
             status=True
         except Exception as e:
-           Exceptions.error(e)
+           log.error(e)
+           logger.print_on_console(e)
         return status
 
 
@@ -805,7 +892,7 @@ class ExcelXLSX:
         return : bool
 
         """
-        logger.log(generic_constants.INPUT_IS+input_path1+' '+input_path2)
+        logger.print_on_console(generic_constants.INPUT_IS+input_path1+' '+input_path2)
         obj=ExcelXLS()
         #same functionality as compare_content_xlsx
         status=obj.compare_content_xls(input_path1,sheetname1,input_path2,sheetname2)
@@ -842,7 +929,7 @@ class ExcelXLSX:
 
         """
         status=False
-        logger.log(generic_constants.INPUT_IS+inputpath+' '+sheetname)
+        logger.print_on_console(generic_constants.INPUT_IS+inputpath+' '+sheetname)
         try:
             book=load_workbook(inputpath)
             sheet=book.get_sheet_by_name(sheetname)
@@ -851,7 +938,8 @@ class ExcelXLSX:
             book.save(inputpath)
             status=True
         except Exception as e:
-            Exceptions,error(e)
+            log.error(e)
+            logger.print_on_console(e)
         return status
 
 
@@ -867,7 +955,7 @@ class ExcelXLSX:
         status=False
         value=None
         try:
-            logger.log(generic_constants.INPUT_IS+excel_path+' '+sheetname)
+            logger.print_on_console(generic_constants.INPUT_IS+excel_path+' '+sheetname)
             wb=openpyxl.load_workbook(excel_path,read_only=True,data_only=True)
             sheet=wb.get_sheet_by_name(sheetname)
             value=None
@@ -878,9 +966,10 @@ class ExcelXLSX:
                     value= self.__get_formatted_date(value,cell.number_format)
                 status=True
             else:
-                logger.log(generic_constants.INDEX_EXCEEDS)
+                logger.print_on_console(generic_constants.INDEX_EXCEEDS)
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            logger.print_on_console(e)
         return status,value
 
     def clear_cell_xlsx(self,row,col,excel_path,sheetname):
@@ -892,7 +981,7 @@ class ExcelXLSX:
 
         """
         status=False
-        logger.log(generic_constants.INPUT_IS+excel_path+' '+sheetname)
+        logger.print_on_console(generic_constants.INPUT_IS+excel_path+' '+sheetname)
         workbook=openpyxl.load_workbook(excel_path)
         try:
             sheet=workbook.get_sheet_by_name(sheetname)
@@ -926,9 +1015,11 @@ class ExcelXLSX:
             if not(workbook_info[0].read_only):
                 status=self.__write_to_cell_xlsx(excel_path,workbook_info[0],sheetname,int(row),int(col),value,*args)
             else:
-                logger.log('Excel is readonly')
+                logger.print_on_console('Excel is readonly')
+                log.info('Excel is readonly')
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            logger.print_on_console(e)
         return status
 
 
@@ -944,13 +1035,14 @@ class ExcelXLSX:
         status=False
         row_count=None
         try:
-            logger.log(generic_constants.INPUT_IS+excel_path+' '+sheetname)
+            logger.print_on_console(generic_constants.INPUT_IS+excel_path+' '+sheetname)
             book=openpyxl.load_workbook(excel_path)
             sheet=book.get_sheet_by_name(sheetname)
             row_count=sheet.max_row
             status=True
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            logger.print_on_console(e)
         return status,row_count
 
 
@@ -966,13 +1058,14 @@ class ExcelXLSX:
         status=False
         col_count=None
         try:
-            logger.log(generic_constants.INPUT_IS+excel_path+' '+sheetname)
+            logger.print_on_console(generic_constants.INPUT_IS+excel_path+' '+sheetname)
             book=openpyxl.load_workbook(excel_path)
             sheet=book.get_sheet_by_name(sheetname)
             col_count=sheet.max_column
             status=True
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            logger.print_on_console(e)
         return status,col_count
 
     def write_to_file_xlsx(self,input_path,sheetname,content,*args):
@@ -985,7 +1078,7 @@ class ExcelXLSX:
         """
 
         status=False
-        logger.log(generic_constants.INPUT_IS+input_path+' '+sheetname)
+        logger.print_on_console(generic_constants.INPUT_IS+input_path+' '+sheetname)
         try:
             #loads the xls workbook
             workbook_info=self.__load_workbook_xlsx(input_path,sheetname)
@@ -998,7 +1091,8 @@ class ExcelXLSX:
             #writes to the cell in given row,col
             status=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,content)
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            logger.print_on_console(e)
         return status
 
 

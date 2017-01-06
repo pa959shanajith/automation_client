@@ -9,215 +9,348 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import Exceptions
+
 import logger
 import webconstants
 import time
 from selenium import webdriver
 from pyrobot import Robot,Keys
 import browser_Keywords
+import logging
+from constants import *
 
 
 driver = browser_Keywords.driver_obj
 ##driver = None
+log = logging.getLogger('button_link_keyword.py')
 class ButtonLinkKeyword():
 ##    def __init__(self):
 ##        driver = webdriver.Ie(executable_path = 'D:\Drivers\iedriverserver64')
 
-
     def click(self,webelement,*args):
+        log.debug('Got the driver object from browser keyword class')
+        log.debug(driver)
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         #click keyword implementation
         try:
             if webelement != None:
-                logger.log('Check for the element enable')
+                log.info('Recieved web element from the web dispatcher')
+                log.debug(webelement)
+                log.debug('Check for the element enable')
                 if webelement.is_enabled():
+                    log.debug(WEB_ELEMENT_ENABLED)
                     if isinstance(driver,webdriver.Ie):
-                        logger.log('Internet Explorer Instance')
+                        log.info('Opened browser : Internet Explorer Instance')
                         try:
+                            log.debug('Going to perform click operation')
                             clickinfo = driver.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
                             time.sleep(5)
-                            logger.log('ButtonLinkKeyword info',clickinfo)
+                            log.info('Click operation performed using javascript click')
+                            log.debug('click operation info: ')
+                            log.debug(clickinfo)
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
                         except Exception as e:
-                            logger.log('Javascript error occured, Trying to click using Action class')
+                            log.error('Javascript error occured, Trying to click using Action class')
                             webdriver.ActionChains(driver).move_to_element(webelement).click(webelement).perform()
-                            logger.log('ButtonLinkKeyword info: Clicked using Actions class')
+                            log.info('click operation  info: Clicked using Actions class')
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
                     else:
                         try:
+                            log.debug('Going to perform click operation')
                             webelement.click()
+                            log.info('Click operation performed using selenium click')
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
                         except Exception as e:
+                            log.error('selenium click  error occured, Trying to click using Javascript')
                             clickinfo = driver.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
-                            logger.log('ButtonLinkKeyword info',clickinfo)
+                            log.info('Click operation performed using javascript click')
+                            log.debug('click operation info: ')
+                            log.debug(clickinfo)
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
-                    logger.log('Element is disabled, hence cannot perform Click operation')
+                    log.info(WEB_ELEMENT_DISABLED)
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+            
+            logger.print_on_console(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        log.info(RETURN_RESULT)
+        return status,methodoutput,output,err_msg
 
-    def verify_button_name(self,webelement,inputs,output,*args):
+    def verify_button_name(self,webelement,inputs,*args):
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         #verify_button_name keyword implementation
         try:
             if webelement != None:
+                log.info('Recieved web element from the web dispatcher')
+                log.debug(webelement)
                 #fetch the text (button name) using selenium webelement.text
+                log.debug('Going to fetch the button name')
                 buttonname = webelement.text
+                log.info('Button name fetched from the AUT using selenium')
+                logger.print_on_console('Button name : ' , buttonname)
+
                 if buttonname == None or len(buttonname) == 0:
-                    logger.log('Getting value attribute')
+                    log.debug('Button name not recieved using selenium text method, Getting value attribute')
                     #if text is empty search for the value attribute
                     buttonname = webelement.get_attribute(webconstants.VALUE)
+                    log.info('Button name fetched from the AUT using value attribute')
+                    log.info(buttonname)
+                    logger.print_on_console('Button name : ' , buttonname)
                 if buttonname == None or len(buttonname) == 0:
-                    logger.log('Getting name attribute')
+                    log.debug('Button name not recieved using selenium text method/ value attribute, Getting name attribute')
                     #if value is empty search for the name attribute
                     buttonname = webelement.get_attribute(webconstants.NAME)
+                    log.info('Button name fetched from the AUT using name attribute')
+                    log.info(buttonname)
+                    logger.print_on_console('Button name : ' , buttonname)
+
                 #Remove the leading and trailing spaces
                 input = inputs[0]
                 input = input.strip()
+                logger.print_on_console('Input text : ' , input)
                 #Check for the input
                 if input != None and len(input) != 0:
-                    logger.log('Input is valid, Continue..')
+                    log.info('Input is valid, Continue..')
                     if buttonname == input:
-                        logger.log('Button name matched with the input, set the status to Pass')
+                        log.info('Button name matched with the input, set the status to Pass')
+                        logger.print_on_console('Button name  matched')
+                        log.info(STATUS_METHODOUTPUT_UPDATE)
                         status = webconstants.TEST_RESULT_PASS
                         methodoutput = webconstants.TEST_RESULT_TRUE
                     else:
-                        logger.log('Button name does not matched with the input, set the status to Fail')
-                        status = webconstants.TEST_RESULT_FAIL
-                        methodoutput = webconstants.TEST_RESULT_FAIL
-                else:
-                    logger.log('Invalid input')
-            else:
-                logger.log('Please pass the valid web element')
-            logger.log('Keyword result: ' + status)
-        except Exception as e:
-            Exceptions.error(e)
-        #return status and methodoutput
-        logger.log('return status and methodoutput')
-        return status,methodoutput
+                        log.info('Button name does not matched with the input, set the status to Fail')
+                        logger.print_on_console('Button name mismatched')
+                        logger.print_on_console(EXPECTED,input)
+                        log.info(EXPECTED)
+                        log.info(input)
+                        logger.print_on_console(ACTUAL,buttonname)
+                        log.info(ACTUAL)
+                        log.info(buttonname)
 
-    def get_link_text(self,webelement,input,output,*args):
+                else:
+                    log.error(INVALID_INPUT)
+                    err_msg=INVALID_INPUT
+                    logger.print_on_console(INVALID_INPUT)
+
+        except Exception as e:
+            log.error(e)
+            
+            logger.print_on_console(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        #return status and methodoutput
+        log.info(RETURN_RESULT)
+        return status,methodoutput,output,err_msg
+
+    def get_link_text(self,webelement,input,*args):
         #get_link_text keyword implementation
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         linktext = ''
+        err_msg = None
         try:
             if webelement != None:
-                logger.log('Getting href attribute')
+                log.info('Recieved web element from the web dispatcher')
+                log.debug(webelement)
+                log.debug('Getting href attribute')
                 text = webelement.get_attribute(webconstants.HREF)
                 if text != None:
+                    log.info('Web element is a valid link and it has href attribute')
                     linktext = webelement.text
-                    logger.log('Link text: ' +linktext)
-
                     if linktext == None:
                         linktext = ''
+                    log.info('Link text: ' +linktext)
+                    log.info(STATUS_METHODOUTPUT_UPDATE)
                     status = webconstants.TEST_RESULT_PASS
                     methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
-                    logger.log('Object is not a link')
-            else:
-                logger.log('Element not found')
-            print 'Keyword result: ',status
+                    log.error('Web element is not a link')
+                    logger.print_on_console('Web element is not a link')
+##            else:
+##                logger.print_on_console('Element not found')
+##            print 'Keyword result: ',status
 
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput,linktext
+            log.error(e)
+            
+            logger.print_on_console(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        #return status and methodoutput
+        log.info(RETURN_RESULT)
+        return status,methodoutput,linktext,err_msg
 
-    def verify_link_text(self,webelement,inputs,output,*args):
+    def verify_link_text(self,webelement,inputs,*args):
         #verify_link_text keyword implementation
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement != None:
                 text = webelement.text
                 input = inputs[0]
                 input = input.strip()
                 if input != None and len(input) != 0:
-                    logger.log('Input is valid, Continue..')
-                    logger.log('Getting href attribute')
+                    log.debug('Input is valid, Continue..')
+                    log.debug('Getting href attribute')
                     text = webelement.get_attribute(webconstants.HREF)
                     if text != None:
+                        log.info('Web element is a valid link and it has href attribute')
                         linktext = webelement.text
-                        logger.log('Link text: ' +linktext)
+                        log.info('Link text: ' +linktext)
                         if linktext == input:
+                            logger.print_on_console('Link Text matched')
+                            log.info('Link Text matched')
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
                         else:
-                            logger.log('Link text does not matched with the input, set the status to Fail')
-                            status = webconstants.TEST_RESULT_FAIL
-                            methodoutput = webconstants.TEST_RESULT_FAIL
-                    else:
-                        logger.log('Please provide the input')
-            else:
-                logger.log('Element not found')
-            print 'Keyword result: ',status
+                            logger.print_on_console('Link Text mismatched')
+                            log.info('Link Text mismatched')
+                            logger.print_on_console(EXPECTED,input)
+                            log.info(EXPECTED)
+                            log.info(input)
+                            logger.print_on_console(ACTUAL,text)
+                            log.info(ACTUAL)
+                            log.info(text)
+
+
+                else:
+                    log.error(INVALID_INPUT)
+                    err_msg=INVALID_INPUT
+                    logger.print_on_console(INVALID_INPUT)
+
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+            
+            logger.print_on_console(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+
+        #return status and methodoutput
+        log.info(RETURN_RESULT)
+        return status,methodoutput,output,
 
     #Below keyword specifically written for to support mnt CBU
-    def press(self,webelement,input,output,*args):
+    def press(self,webelement,input,*args):
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
        #press keyword implementation
         try:
             if webelement != None:
-                logger.log('Check for the element enable')
+                log.info('Recieved web element from the web dispatcher')
+                log.debug(webelement)
+                log.debug('Check for the element enable')
                 if webelement.is_enabled():
+                    log.debug(WEB_ELEMENT_ENABLED)
+                    log.debug('Going to perform click operation')
                     webelement.click()
+                    log.info('press operation performed using selenium click')
+                    log.info(STATUS_METHODOUTPUT_UPDATE)
                     status = webconstants.TEST_RESULT_PASS
                     methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
-                    logger.log('Element is disabled, hence cannot perform press operation')
+                    log.info(WEB_ELEMENT_DISABLED)
+                    err_msg = WEB_ELEMENT_DISABLED
+                    logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+            
+            logger.print_on_console(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        #return status and methodoutput
+        log.info(RETURN_RESULT)
+        return status,methodoutput,output,err_msg
 
-    def double_click(self,webelement,input,output,*args):
+    def double_click(self,webelement,input,*args):
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
        #double_click keyword implementation
         try:
             if webelement != None:
-                logger.log('Check for the element enable')
+                log.info('Recieved web element from the web dispatcher')
+                log.debug(webelement)
+                log.debug('Check for the element enable')
                 if webelement.is_enabled():
                     webdriver.ActionChains(driver).move_to_element(webelement).double_click(webelement).perform()
+                    log.info('double click operation performed using Action class')
+                    log.info(STATUS_METHODOUTPUT_UPDATE)
                     status = webconstants.TEST_RESULT_PASS
                     methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
-                    logger.log('Element is disabled, hence cannot perform double click operation')
+                    log.info(WEB_ELEMENT_DISABLED)
+                    err_msg = WEB_ELEMENT_DISABLED
+                    logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+            
+            logger.print_on_console(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        #return status and methodoutput
+        log.info(RETURN_RESULT)
+        return status,methodoutput,output,err_msg
 
-    def right_click(self,webelement,input,output,*args):
+    def right_click(self,webelement,input,*args):
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
        #right_click keyword implementation
         try:
             if webelement != None:
-                logger.log('Check for the element enable')
+                log.info('Recieved web element from the web dispatcher')
+                log.debug(webelement)
+                log.debug('Check for the element enable')
                 if webelement.is_enabled():
                     webdriver.ActionChains(driver).move_to_element(webelement).context_click(webelement).perform()
+                    log.info('right click operation performed using Action class')
+                    log.info(STATUS_METHODOUTPUT_UPDATE)
                     status = webconstants.TEST_RESULT_PASS
                     methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
-                    logger.log('Element is disabled, hence cannot perform right_click operation')
+                    log.info(WEB_ELEMENT_DISABLED)
+                    err_msg = WEB_ELEMENT_DISABLED
+                    logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+            
+            logger.print_on_console(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        #return status and methodoutput
+        log.info(RETURN_RESULT)
+        return status,methodoutput,output,err_msg
 
-    def upload_file(self,webelement,inputs,output,*args):
+    def upload_file(self,webelement,inputs,*args):
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         #upload_file keyword implementation
         try:
             driver = browser_Keywords.driver_obj
@@ -225,29 +358,42 @@ class ButtonLinkKeyword():
             filename = inputs[1]
             inputfile = filepath + '\\' + filename
             if webelement != None:
-                logger.log('Check for the element enable')
+                log.info('Recieved web element from the web dispatcher')
+                log.debug(webelement)
+                log.debug('Check for the element enable')
                 if webelement.is_enabled():
                     if isinstance(driver,webdriver.Firefox):
-                        logger.log('Mozilla Firefox Instance')
+                        log.debug('Mozilla Firefox Instance')
                         clickinfo = driver.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
-                        logger.log('upload_file click info'+clickinfo)
+                        log.info('upload_file click info')
+                        log.info(clickinfo)
                         filestatus = self.__upload_operation(inputfile)
+                        log.info(STATUS_METHODOUTPUT_UPDATE)
                         status = webconstants.TEST_RESULT_PASS
                         methodoutput = webconstants.TEST_RESULT_TRUE
                     else:
                         if  self.__click_for_file_upload(driver,webelement):
                             filestatus =self.__upload_operation(inputfile)
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
-                    logger.log('Element is disabled, hence cannot perform upload_file operation')
+                    log.info(WEB_ELEMENT_DISABLED)
+                    err_msg = WEB_ELEMENT_DISABLED
+                    logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
-            Exceptions.error(e)
-        return status,methodoutput
+            log.error(e)
+            
+            logger.print_on_console(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        #return status and methodoutput
+        log.info(RETURN_RESULT)
+        return status,methodoutput,output,err_msg
 
     def __upload_operation(self,inputfile):
         status = False
         try:
+            log.debug('using Robot class to perform keyboard operation')
             robot = Robot()
             time.sleep(1)
             self.__set_clipboard_data(inputfile)
@@ -264,32 +410,47 @@ class ButtonLinkKeyword():
             robot.sleep(0.5)
             robot.key_release(Keys.enter)
             robot.sleep(1)
+            log.debug('copied clipboard data pasted to the input using robot')
             status = True
         except Exception as e:
-            Exceptions.error(e)
+            logger.print_on_console(EXCEPTION_OCCURED,e)
+            log.error(EXCEPTION_OCCURED)
+            log.error(e)
         return status
 
     def __set_clipboard_data(self,inputfile):
         status = False
         try:
             robot = Robot()
+            log.debug('Copying input file path to the clipboard')
             robot.add_to_clipboard(str(inputfile))
+            log.debug(' input file path Copied to  clipboard')
             status = True
         except Exception as e:
-            Exceptions.error(e)
+            logger.print_on_console(EXCEPTION_OCCURED,e)
+            log.error(EXCEPTION_OCCURED)
+            log.error(e)
         return status
     def __click_for_file_upload(self,driver,webelement):
         status = False
         try:
             if isinstance(driver,webdriver.Ie):
+                log.debug('Going to perform click operation')
                 clickinfo = driver.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
-                logger.log('Upload File click info: ' + clickinfo)
+                log.info('Click operation performed using javascript click')
+                log.debug('click operation info: ')
+                log.debug(clickinfo)
+                log.info(STATUS_METHODOUTPUT_UPDATE)
                 status = True
             else:
+                log.debug('Going to perform click operation')
                 webelement.click()
+                log.info('Click operation performed using selenium click')
                 status = True
         except Exception as e:
-            Exceptions.error(e)
+            logger.print_on_console(EXCEPTION_OCCURED,e)
+            log.error(EXCEPTION_OCCURED)
+            log.error(e)
         return status
 
 
@@ -310,7 +471,7 @@ class ButtonLinkKeyword():
 ##
 ####    element = driver.find_element_by_name('btnI')
 ##    obj = ButtonLinkKeyword()
-##    logger.log('ButtonLinkKeyword object created')
+##    logger.print_on_console('ButtonLinkKeyword object created')
 ##
 ##    obj.click(element)
 ##    print ' ***click exected ***\n\n'

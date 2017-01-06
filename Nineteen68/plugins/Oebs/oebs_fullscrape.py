@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        oebs_fullscrape
+# Name:        oebs_fullscrape.py
 # Purpose:
 #
 # Author:      sushma.p
@@ -13,7 +13,6 @@
 ##import oebsServer
 import utils
 import logging
-import logger
 import oebs_api
 from oebs_msg import *
 import ast
@@ -25,23 +24,25 @@ k = 0
 cordinates = []
 states = []
 
+log = logging.getLogger('oebs_fullscrape.py')
+
 class FullScrape:
 
     def getentireobjectlist(self,windowname):
         utils_obj=utils.Utils()
         tempne = []
         utils_obj.windowsrun()
-        logging.debug('FILE: %s , DEF: %s , MSG:\nWindows Run Executed.',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST)
+        log.debug('MSG:\nWindows Run Executed.',DEF_GETENTIREOBJECTLIST)
         isjavares, hwnd = utils_obj.isjavawindow(windowname)
-        logging.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST,str(isjavares))
+        log.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',str(isjavares))
         if (isjavares):
             self.acccontext(oebs_api.JABContext(hwnd), tempne,'',0,windowname)
-            logging.debug('FILE: %s , DEF: %s , MSG:\nThe Scraped Data is:\n %s',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST,tempne)
+            log.debug('MSG:\nThe Scraped Data is:\n %s',tempne)
             vie = {'view': tempne}
             utils_obj.save_json(vie)
             return json.dumps(vie)
         else:
-            logging.debug('FILE: %s , DEF: %s , MSG: %s',FILE_OEBSSERVER,DEF_GETENTIREOBJECTLIST,MSG_NOT_JAVA_WINDOW_INFO)
+            log.debug('MSG: %s',MSG_NOT_JAVA_WINDOW_INFO)
             return 'fail'
 
     #Method accontext called by getentireobjectlist

@@ -15,7 +15,7 @@ import file_operations
 import folder_operations
 import logger
 import generic_constants
-import Exceptions
+
 import excel_operations
 import database_keywords
 import math_operation_keywords
@@ -48,7 +48,8 @@ class GenericKeywordDispatcher:
 
     def dispatcher(self,tsp,*message):
          keyword=tsp.name
-         logger.log('Keyword is '+keyword)
+         logger.print_on_console('Keyword is '+keyword)
+         result=(constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE)
          try:
             dict={'toLowerCase': self.generic_string.toLowerCase,
                   'toUpperCase' : self.generic_string.toUpperCase,
@@ -113,6 +114,7 @@ class GenericKeywordDispatcher:
                   'getBlockCount' : self.xml_oper.get_block_count,
                   'getTagValue' : self.xml_oper.get_tag_value,
                   'GetBlockValue' : self.xml_oper.get_block_value,
+                  'VerifyObjects': self.xml_oper.verifyObjects,
                   'typeCast':self.util_operation_obj.type_cast,
                   'verifyFileImages':self.util_operation_obj.verify_file_images,
                   'stop':self.util_operation_obj.stop,
@@ -126,15 +128,16 @@ class GenericKeywordDispatcher:
 
                 }
             if keyword in dict.keys():
-                if keyword in ['displayVariableValue','sendFunctionKeys']:
+                if keyword in [generic_constants.DISPLAY_VARIABLE_VALUE,generic_constants.SENDFUNCTIONKEYS]:
                     actual_input=tsp.inputval[0].split(';')
                     message=list(message)
-                    if keyword != 'sendFunctionKeys':
+                    if keyword != generic_constants.SENDFUNCTIONKEYS:
                         message.append(';')
                     message.extend(actual_input)
-                return dict[keyword](*message)
+                result= dict[keyword](*message)
             else:
-                logger.log(generic_constants.INVALID_KEYWORD)
+                logger.print_on_console(generic_constants.INVALID_KEYWORD)
          except Exception as e:
-            Exceptions.error(e)
-         return constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE
+            log.error(e)
+            logger.print_on_console(e)
+         return result

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        oebs_dispatcher.py
 # Purpose:
 #
 # Author:      sushma.p
@@ -14,11 +14,13 @@ import oebs_fullscrape
 import oebsclickandadd
 import utils
 import logger
-import Exceptions
+import logging
 import oebs_constants
 windowname=None
 import constants
+import oebs_msg
 
+log = logging.getLogger('oebs_dispatcher.py')
 
 class OebsDispatcher:
 
@@ -26,6 +28,7 @@ class OebsDispatcher:
     utils_obj=utils.Utils()
     scrape_obj=oebs_fullscrape.FullScrape()
     clickandadd_obj=oebsclickandadd.ClickAndAdd()
+
 
     custom_dict={
                     'getstatus': ['radio button','check box'],
@@ -45,42 +48,57 @@ class OebsDispatcher:
                     'radio': 'radio button',
                     'checkbox':'check box',
                     'dropdown':'combo box',
-                    'Listbox':'list',
+                    'listbox':'list',
                     'textbox':'text',
                     'button':'push button'
                     }
     custom_dict_element={'element':['clickelement','setfocus','doubleclick','rightclick','getelementtext','verifyelementtext','verifyexists', 'verifydoesnotexists', 'verifyreadonly','verifyhidden','verifyvisible','sendfunctionkeys','waitforelementvisible']}
 
+    def clear_oebs_window_name(self):
+        log.info('Clearing the window name')
+        windowname=None
+
+    def print_error(self,err_msg):
+        err_msg1=constants.ERROR_CODE_DICT[err_msg]
+        logger.print_on_console(err_msg1)
+        log.error(err_msg1)
+
+
     def assign_url_objectname(self,tsp,input):
         keyword=tsp.name.lower()
         objectname=tsp.objectname
         if objectname==oebs_constants.CUSTOM and tsp.custom_flag:
+            log.info('Encountered Custom object')
             parent_xpath=tsp.parent_xpath
+            log.info('parent_xpath is ')
+            log.info(parent_xpath)
             if len(input)>=3:
                 ele_type=input[0].lower()
                 if ele_type in self.get_ele_type:
                     ele_type=self.get_ele_type[ele_type]
                 if (keyword in self.custom_dict and ele_type in self.custom_dict[keyword]) or keyword in self.custom_dict_element.values()[0]:
                     custom_oebs_element=self.oebs_keywords.getobjectforcustom(windowname,parent_xpath,ele_type,input[2])
-                    print 'custom_oebs_element', custom_oebs_element
+                    log.info('custom_oebs_element')
+                    log.info(custom_oebs_element)
                     if custom_oebs_element != '':
                         input.reverse()
                         for x in range(0,3):
                             input.pop()
                         objectname=custom_oebs_element
                     else:
-                        logger.log('Custom object not found')
+                        self.print_error('ERR_CUSTOM_MISMATCH')
 
                 else:
-                    logger.log('Keyword and Type Mismatch')
+                    self.print_error('ERR_PRECONDITION_NOTMET')
+                    self.print_error('ERR_CUSTOM_NOTFOUND')
             else:
-                logger.log('Insufficient Input to find custom object')
-                logger.log('Custom object not found')
+                 self.print_error('ERR_REF_ELE_NULL')
+                 self.print_error('ERR_CUSTOM_NOTFOUND')
         message=[tsp.url,objectname,tsp.name,input,tsp.outputval]
         return message
 
     def dispatcher(self,tsp,input,*message):
-         logger.log('Keyword is '+tsp.name)
+         logger.print_on_console('Keyword is '+tsp.name)
          keyword=tsp.name
          result=(constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE)
          if windowname is not None:
@@ -166,10 +184,13 @@ class OebsDispatcher:
             keyword=keyword.lower()
             if keyword in dict.keys():
                 result=dict[keyword](*message)
+                if not(oebs_msg.ELEMENT_FOUND):
+                    result=constants.TERMINATE
             else:
-                logger.log(generic_constants.INVALID_INPUT)
+                logger.print_on_console(generic_constants.INVALID_INPUT)
          except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            logger.print_on_console(e)
          return result
 
 

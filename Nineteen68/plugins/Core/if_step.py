@@ -9,13 +9,12 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import logger
 from sympy.logic.inference import satisfiable
-import Exceptions
+
 import logger
 import handler
 from constants import *
-import controller
+import reporting
 
 
 class If():
@@ -32,13 +31,15 @@ class If():
         self.status=False
         self.apptype=apptype
         self.additionalinfo = additionalinfo
+        self.parent_id=0
+        self.step_description=''
 
     def print_step(self):
-        logger.log(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
+        logger.print_on_console(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
 
 
 
-    def invoke_condtional_keyword(self,input):
+    def invoke_condtional_keyword(self,input,reporting_obj):
 
         """
         def : invoke_condtional_keyword
@@ -54,6 +55,7 @@ class If():
         start_step=self.info_dict[0]
         #NO need to keep track of next targets when endIf is encountered
         if self.name.lower() != ENDIF:
+            self.step_description='Encountered :'+self.name
             next_target=self.info_dict[1]
             if len(self.info_dict)>2:
                 last_target=self.info_dict[2]
@@ -64,26 +66,41 @@ class If():
         #block to execute if,elseIf part
         if self.name.lower() in [IF,ELSE_IF]:
 
+
+
             #Check is made when elseIf is encountered to ensure it is to be executed or not
             if self.name.lower() == ELSE_IF:
                 step=handler.tspList[start_step.keys()[0]]
+                #This check is to make sure that if the previous if/elseIf is already exeucted then do not execute next elseIf/else blocks
+                #Hence ,it should  send the index after 'endIf' step
                 if step.status==True:
+                    self.parent_id=reporting_obj.get_pid()
                     return last_target.keys()[0]
 
-            logger.log('Encountered :'+self.name+'\n')
+            logger.print_on_console('Encountered :'+self.name+'\n')
             logical_eval_obj=Logical_eval()
             input_expression=input[0]
-            logger.log('Input_expression is '+input_expression)
+            logger.print_on_console('Input_expression is '+input_expression)
             res=logical_eval_obj.eval_expression(input_expression)
-            logger.log(self.name+': Condition is '+str(res)+'\n')
+            logger.print_on_console(self.name+': Condition is '+str(res)+'\n')
+            self.step_description='Encountered :'+self.name+ ' Condition is '+str(res)
 
 
             if res==True:
+                #Reporting part
+                self.parent_id=reporting_obj.get_pid()
+                reporting_obj.add_pid(self.name)
+                #Reporting part ends
+
                 self.status=True
-                logger.log('***Started executing:'+self.name+'***\n')
+                logger.print_on_console('***Started executing:'+self.name+'***\n')
                 return self.index+1
             elif res==INVALID:
-                logger.log('Invalid conditional expression\n')
+                if self.name==IF:
+                    self.parent_id=reporting_obj.get_pid()
+                    reporting_obj.add_pid(self.name)
+
+                logger.print_on_console('Invalid conditional expression\n')
                 return last_target.keys()[0]
             else:
                 return next_target.keys()[0]
@@ -92,17 +109,33 @@ class If():
 
         #block to execute else part
         elif self.name.lower() in [ELSE]:
+            self.step_description='Encountered :'+self.name
             step=handler.tspList[start_step.keys()[0]]
+            #This check is to make sure that if the previous if/elseIf is False ,only then enter the else block
+            #else ,it should  send the index after 'endIf' step
             if step.status==False:
-                logger.log('***Started executing:'+self.name+'***\n')
+
+                #Reporting part
+                self.parent_id=reporting_obj.get_pid()
+                reporting_obj.add_pid(self.name)
+                #Reporting part ends
+
+                logger.print_on_console('***Started executing:'+self.name+'***\n')
                 return self.index+1
             else:
                 return last_target.keys()[0]
 
         #block to execute endIf
         else:
-            logger.log('Encountered :'+self.name+'\n')
-            logger.log('***If execution completed ***\n')
+            #Reporting part
+            self.parent_id=reporting_obj.get_pid()
+            reporting_obj.pop_pid()
+            reporting_obj.remove_nested_flag()
+            self.step_description='Encountered :'+self.name
+            #Reporting part ends
+
+            logger.print_on_console('Encountered :'+self.name+'\n')
+            logger.print_on_console('***If execution completed ***\n')
             return next_index
 
 

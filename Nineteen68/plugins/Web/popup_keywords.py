@@ -9,107 +9,130 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import Exceptions
+
 import logger
 import time
 import webconstants
 from selenium import webdriver
 
 import browser_Keywords
+import logging
 
+
+log = logging.getLogger('popup_keywords.py')
 class PopupKeywords():
-    def accept_popup(self,webelement,input,output,*args):
+    def accept_popup(self,webelement,*args):
         driver = browser_Keywords.driver_obj
+        log.debug('Got the driver object from browser keyword class')
+        log.debug(driver)
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             #code to accept the pop up
+            log.debug('Switching to Alert')
             driver.switch_to.alert.accept()
+            logger.print_on_console('Switched to Alert and accepted the alert')
+            log.info('Switched to Alert and accepted')
+            log.info(STATUS_METHODOUTPUT_UPDATE)
             status = webconstants.TEST_RESULT_PASS
             methodoutput = webconstants.TEST_RESULT_TRUE
         except Exception as e:
-            Exceptions.error(e)
+            logger.print_on_console(EXCEPTION_OCCURED,e)
+            log.error(EXCEPTION_OCCURED)
+            log.error(e)
+        log.info(RETURN_RESULT)
         return status,methodoutput
 
-    def dismiss_popup(self,webelement,input,output,*args):
+    def dismiss_popup(self,webelement,*args):
         driver = browser_Keywords.driver_obj
+        log.debug('Got the driver object from browser keyword class')
+        log.debug(driver)
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             #code to dismiss the pop up
+            log.debug('Switching to Alert')
             driver.switch_to.alert.dismiss()
+            logger.print_on_console('Switched to Alert and dismissed(closed) the alert')
+            log.info('Switched to Alert and dismissed(closed) the alert')
+            log.info(STATUS_METHODOUTPUT_UPDATE)
             status = webconstants.TEST_RESULT_PASS
             methodoutput = webconstants.TEST_RESULT_TRUE
         except Exception as e:
-            Exceptions.error(e)
+            logger.print_on_console(EXCEPTION_OCCURED,e)
+            log.error(EXCEPTION_OCCURED)
+            log.error(e)
+        log.info(RETURN_RESULT)
         return status,methodoutput
 
-    def get_popup_text(self,webelement,input,output,*args):
+    def get_popup_text(self,webelement,*args):
         driver = browser_Keywords.driver_obj
+        log.debug('Got the driver object from browser keyword class')
+        log.debug(driver)
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             #code to get the pop up text
+            log.debug('Switching to Alert')
             text = driver.switch_to.alert.text
-            logger.log('Alert text : ' + text)
+            logger.print_on_console('Switched to Alert and retrieved the text')
+            log.info('Switched to Alert and retrieved the text')
+            logger.print_on_console('Alert text= ', text)
+            log.info('Alert text= '+ str( text))
+            log.info(STATUS_METHODOUTPUT_UPDATE)
             status = webconstants.TEST_RESULT_PASS
             methodoutput = webconstants.TEST_RESULT_TRUE
         except Exception as e:
-            Exceptions.error(e)
+            logger.print_on_console(EXCEPTION_OCCURED,e)
+            log.error(EXCEPTION_OCCURED)
+            log.error(e)
+        log.info(RETURN_RESULT)
         return status,methodoutput,text
 
-    def verify_popup_text(self,webelement,inputs,output,*args):
+    def verify_popup_text(self,webelement,inputs,*args):
         driver = browser_Keywords.driver_obj
+        log.debug('Got the driver object from browser keyword class')
+        log.debug(driver)
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             #code to verify the pop up text
+            log.debug('Switching to Alert')
             text = driver.switch_to.alert.text
-            logger.log('Alert text : ' + text)
+            logger.print_on_console('Switched to Alert and retrieved the text')
+            log.info('Switched to Alert and retrieved the text')
+            logger.print_on_console('Alert text : ' , text)
+            log.info('Alert text= '+ str( text))
             input = inputs[0]
             input = input.strip()
+            logger.print_on_console('Input text : ' , input)
+            log.info('Input text= '+ str( input))
             if text == input:
-                logger.log('Text matched')
+                logger.print_on_console('Alert Text matched')
+                log.info('Alert Text matched')
+                log.info(STATUS_METHODOUTPUT_UPDATE)
                 status = webconstants.TEST_RESULT_PASS
                 methodoutput = webconstants.TEST_RESULT_TRUE
+            else:
+                logger.print_on_console('Alert Text mismatched')
+                log.info('Alert Text mismatched')
+                logger.print_on_console('Expected: ',text)
+                log.info('Expected:')
+                log.info(text)
+                logger.print_on_console('Actual: ',input)
+                log.info('Actual:')
+                log.info(input)
         except Exception as e:
-            Exceptions.error(e)
+            logger.print_on_console(EXCEPTION_OCCURED,e)
+            log.error(EXCEPTION_OCCURED)
+            log.error(e)
+        log.info(RETURN_RESULT)
         return status,methodoutput
 
-
-
-if __name__ == '__main__':
-##    driver = webdriver.Chrome(executable_path = 'D:\Drivers\chromedriver')
-    driver = webdriver.Ie(executable_path = 'D:\Drivers\iedriverserver64')
-##    driver.get('https://converge/ManageUsers.aspx')
-##    driver.get('https://www.google.co.in/?gfe_rd=cr&ei=y3ghWLqjAs-L8QfMjYGwDA&gws_rd=ssl')
-    driver.get('https://www.irctc.co.in/eticketing/loginHome.jsf')
-
-    obj = PopupKeywords()
-
-
-    print 'Click on login button manually'
-    time.sleep(5)
-    obj.accept_popup()
-    print '***accept_popup executed *****'
-
-    print 'Click on login button manually'
-    time.sleep(5)
-    obj.dismiss_popup()
-    print '***dismiss_popup executed *****'
-
-    print 'Click on login button manually'
-    time.sleep(5)
-    status,methodoutput,text = obj.get_popup_text()
-    print 'Status :',status
-    print 'methodoutput :',methodoutput
-    print 'text :',text
-    print '***get_popup_text executed *****'
-
-    status,methodoutput = obj.verify_popup_text('Enter User ID')
-    print 'Status :',status
-    print 'methodoutput :',methodoutput
-    print '***get_popup_text executed *****'
 
 
 
