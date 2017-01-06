@@ -76,7 +76,7 @@ class Dispatcher:
         custom_dict_element={'element':['clickElement','doubleClick','rightClick','getElementText','verifyElementText','drag', 'drop','getToolTipText','verifyToolTipText','verifyExists', 'verifyDoesNotExists', 'verifyHidden','verifyVisible', 'switchToTab','switchToWindow','setFocus','sendFunctionKeys',
                                         'tab','waitForElementVisible','mouseHover','saveFile']}
 
-        result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE)
+        result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,None,None)
 
         def print_error(err_msg):
             err_msg=ERROR_CODE_DICT['ERR_CUSTOM_MISMATCH']
@@ -112,7 +112,7 @@ class Dispatcher:
                             elif len(input)>=3:
                                 if (keyword in custom_dict and input[0].lower() in custom_dict[keyword]) or keyword in custom_dict_element.values()[0]:
                                     webelement=self.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url)
-                                    log.debug(ERROR_CODE_DICT['MSG_CUSTOM_FOUND'])
+                                    log.debug(MSG_CUSTOM_FOUND)
                                     input.reverse()
                                     for x in range(0,3):
                                         input.pop()
@@ -277,6 +277,8 @@ class Dispatcher:
                 logger.print_on_console(METHOD_INVALID)
                 log.error(METHOD_INVALID)
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             log.error(e)
             logger.print_on_console(e)
         return result
