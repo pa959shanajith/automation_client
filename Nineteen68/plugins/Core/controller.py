@@ -88,7 +88,6 @@ class Controller():
     webservice_dispatcher_obj = None
     outlook_dispatcher_obj = None
     desktop_dispatcher_obj = None
-    reporting_obj=reporting.Reporting()
     verify_exists=False
 
     def __init__(self):
@@ -107,6 +106,7 @@ class Controller():
         self.scenario_start_time=''
         self.scenario_end_time=''
         self.scenario_ellapsed_time=''
+        self.reporting_obj=reporting.Reporting()
 
     def __load_generic(self):
         try:
@@ -186,13 +186,22 @@ class Controller():
 
         if not(status):
             logger.print_on_console('Dangling: '+tsp.name +' in '+tsp.testscript_name+'\n')
+            log.error('Dangling: '+tsp.name +' in '+tsp.testscript_name)
         return status
 
     def __print_details(self,tsp,input,inpval):
-        logger.print_on_console('Keyword : '+tsp.name)
-        logger.print_on_console('Input :'+input)
-        logger.print_on_console('Output :'+tsp.outputval)
-        logger.print_on_console('Apptype : '+str(tsp.apptype))
+        keyowrd='Keyword : '+tsp.name
+        input_val='Input :'+str(input)
+        output='Output :'+tsp.outputval
+        apptype='Apptype : '+str(tsp.apptype)
+        logger.print_on_console(keyowrd)
+        log.info(keyowrd)
+        logger.print_on_console(input_val)
+        log.info(input_val)
+        logger.print_on_console(output)
+        log.info(output)
+        logger.print_on_console(apptype)
+        log.info(apptype)
         for i in range(len(inpval)):
             logger.print_on_console('Input: ',i + 1 , '= ',inpval[i])
 
@@ -249,7 +258,7 @@ class Controller():
                     start_time = datetime.now()
                     start_time_string=start_time.strftime(TIME_FORMAT)
                     logger.print_on_console('Step Execution start time is : '+start_time_string)
-                    index = self.keywordinvocation(index,inpval,self.reporting_obj,*args)
+                    index,result = self.keywordinvocation(index,inpval,self.reporting_obj,*args)
                 else:
                     keyword_flag=False
                     if tsp != None and isinstance(tsp,if_step.If):
@@ -278,14 +287,14 @@ class Controller():
             end_time = datetime.now()
             end_time_string=end_time.strftime(TIME_FORMAT)
             logger.print_on_console('Step Execution end time is : '+end_time_string)
-            logger.print_on_console( "----Keyword :",tsp.name,' execution Completed----')
+            logger.print_on_console( "----Keyword :",tsp.name,' execution Completed----\n')
             ellapsed_time=end_time-start_time
             logger.print_on_console('Step Elapsed time is : ',str(ellapsed_time)+'\n')
             #Changing the overallstatus of the scenario if it's Fail or Terminate
             if self.status==TEST_RESULT_FAIL or self.status==TERMINATE:
                 self.reporting_obj.overallstatus=self.status
 
-        self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED ',ellapsed_time,keyword_flag)
+        self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
 
         return index
 
@@ -316,20 +325,24 @@ class Controller():
 
     def store_result(self,result,tsp):
         output=tsp.outputval.split(SEMICOLON)
-        logger.print_on_console('Result obtained is ',result[-1])
+        keyword_response=result[-2]
+        if result[-2] == OUTPUT_CONSTANT:
+            keyword_response=result[-3]
+
+        logger.print_on_console('Result obtained is ',keyword_response)
+        log.info('Result obtained is: ')
+        log.info(keyword_response)
 
         if len(output)>0 and output[0] != '':
-            if len(result)>2:
-                self.dynamic_var_handler_obj.store_dynamic_value(output[0],result[2])
-            else:
-                self.dynamic_var_handler_obj.store_dynamic_value(output[0],result[1])
+            self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response)
+
         if len(output)>1:
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1])
 
     def keywordinvocation(self,index,inpval,*args):
         import time
         time.sleep(1)
-        result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE)
+        result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
         #Check for 'terminate_flag' before execution
         if not(terminate_flag):
             #Check for 'pause_flag' before execution
@@ -384,7 +397,10 @@ class Controller():
                 #OEBS apptype module call
                 result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
 
-            logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',result,'\n')
+            temp_result=list(result)
+            if temp_result[2]==OUTPUT_CONSTANT:
+                temp_result[2]=None
+            logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',temp_result,'\n')
             log.info('Result in methodinvocation : '+ str(teststepproperty.name)+' : ')
             log.info(result)
             log.info(KEYWORD_EXECUTION_COMPLETED+ '\n' )
@@ -402,7 +418,7 @@ class Controller():
             #Checking for stop keyword
             if teststepproperty.name==STOP:
                 index=len(handler.tspList)
-            return index
+            return index,result
         else:
             return TERMINATE
 
@@ -558,15 +574,15 @@ class Controller():
                                     tsplist[k].inputval = unicode(args[0])
 
                         if flag:
-
                             status = con.executor(tsplist,'debug')
-
 
                         else:
                             print 'Invalid script'
                         logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
+                        log.info('Saving the Report json of Scenario '+str((i  + 1 )))
+                        logger.print_on_console( '***Saving the Report json of Scenario ',(i  + 1 ),'***')
                         log.info( '***Scenario' + str((i  + 1 )) +' execution completed***')
-                        obj.clearList()
+                        obj.clearList(con)
                     else:
                         logger.print_on_console ('Scenario ' , (i + 1) ,' has been disabled for execution!!!')
                         log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
@@ -654,7 +670,11 @@ class Controller():
                                 log.error('Invalid script')
                             logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
                             log.info( '***Scenario ' + str((i  + 1 )) +' execution completed***')
-                            obj.clearList()
+                            log.info('Saving the Report json of Scenario '+str((i  + 1 )))
+                            logger.print_on_console( '***Saving the Report json of Scenario ',(i  + 1 ),'***')
+                            filename='Scenario'+str(i  + 1)+'.json'
+                            con.reporting_obj.save_report_json(filename)
+                            obj.clearList(con)
                         else:
                             logger.print_on_console( 'Scenario ' , (i + 1) ,' has been disabled for execution!!!')
                             log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
@@ -675,6 +695,8 @@ class Controller():
                     logger.print_on_console('-----------------------------------------------')
                     j=j+1
         return status
+
+
 
     def invoke_parralel_exe(self,action,input_breakpoint):
         #create a ThreadPoolExecutor to perform parallel execution
