@@ -755,6 +755,7 @@ def kill_process():
         os.system("TASKKILL /F /IM IEDriverServer.exe")
         os.system("TASKKILL /F /IM IEDriverServer64.exe")
         os.system("TASKKILL /F /IM CobraWinLDTP.exe")
+        os.system("TASKKILL /F /IM phantomjs.exe")
         logger.print_on_console( 'Stale processes killed')
     except Exception as e:
         log.error(e)
