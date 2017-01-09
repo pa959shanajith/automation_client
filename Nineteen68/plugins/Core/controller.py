@@ -587,6 +587,8 @@ class Controller():
                         log.info('Saving the Report json of Scenario '+str((i  + 1 )))
                         logger.print_on_console( '***Saving the Report json of Scenario ',(i  + 1 ),'***')
                         log.info( '***Scenario' + str((i  + 1 )) +' execution completed***')
+                        filename='Scenario'+str(i  + 1)+'.json'
+                        con.reporting_obj.save_report_json(filename)
                         obj.clearList(con)
                     else:
                         print( '=======================================================================================================')
