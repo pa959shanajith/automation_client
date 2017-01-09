@@ -29,6 +29,9 @@ class OebsDispatcher:
     scrape_obj=oebs_fullscrape.FullScrape()
     clickandadd_obj=oebsclickandadd.ClickAndAdd()
 
+    def __init__():
+        self.exception_flag=''
+
 
     custom_dict={
                     'getstatus': ['radio button','check box'],
@@ -184,7 +187,7 @@ class OebsDispatcher:
             keyword=keyword.lower()
             if keyword in dict.keys():
                 result=dict[keyword](*message)
-                if not(oebs_msg.ELEMENT_FOUND):
+                if not(oebs_msg.ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE
             else:
                 logger.print_on_console(generic_constants.INVALID_INPUT)

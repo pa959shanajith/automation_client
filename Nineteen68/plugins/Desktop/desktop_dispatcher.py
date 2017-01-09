@@ -32,6 +32,9 @@ class DesktopDispatcher:
     radio_checkbox_keywords_obj = radio_checkbox_keywords_desktop.Radio_Checkbox_keywords()
     outook_obj=outlook.OutlookKeywords()
 
+    def __init__():
+        self.exception_flag=''
+
 
 
     def dispatcher(self,teststepproperty,input):
@@ -118,7 +121,7 @@ class DesktopDispatcher:
                     self.launch_keywords_obj.verifyWindowTitle()
                     result= dict[keyword](objectname,url,input,output)
 
-                if not(desktop_constants.ELEMENT_FOUND):
+                if not(desktop_constants.ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE
             else:
                 logger.print_on_console(desktop_constants.INVALID_KEYWORD)
