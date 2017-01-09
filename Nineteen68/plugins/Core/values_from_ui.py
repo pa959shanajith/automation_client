@@ -23,5 +23,6 @@ browsers = [1]
 
 
 condition_check=False
+exception_flag=True
 
 
