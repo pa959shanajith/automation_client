@@ -42,6 +42,7 @@ terminate_flag=False
 pause_flag=False
 break_point=-1
 
+
 thread_tracker = []
 log = logging.getLogger("controller.py")
 
@@ -126,6 +127,7 @@ class Controller():
         try:
             import oebs_dispatcher
             self.oebs_dispatcher_obj = oebs_dispatcher.OebsDispatcher()
+            self.oebs_dispatcher_obj.exception_flag=exception_flag
         except Exception as e:
             logger.print_on_console('')
 
@@ -140,6 +142,7 @@ class Controller():
         try:
             import web_dispatcher
             self.web_dispatcher_obj = web_dispatcher.Dispatcher()
+            self.web_dispatcher_obj.exception_flag=exception_flag
         except Exception as e:
              logger.print_on_console('')
 
@@ -147,6 +150,7 @@ class Controller():
         try:
             import desktop_dispatcher
             self.desktop_dispatcher_obj = desktop_dispatcher.DesktopDispatcher()
+            self.desktop_dispatcher_obj.exception_flag=exception_flag
         except Exception as e:
             logger.print_on_console('')
 
