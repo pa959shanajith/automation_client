@@ -186,7 +186,7 @@ class Reporting:
     def save_report_json(self,filename):
         log.debug('Saving report json to a file')
         with open(filename, 'w') as outfile:
-                log.info('Writing report data to the file'+filename)
+                log.info('Writing report data to the file '+filename)
                 json.dump(self.report_json, outfile, indent=4, sort_keys=False)
         outfile.close()
 

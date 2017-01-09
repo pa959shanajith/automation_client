@@ -42,6 +42,7 @@ terminate_flag=False
 pause_flag=False
 break_point=-1
 
+
 thread_tracker = []
 log = logging.getLogger("controller.py")
 
@@ -126,6 +127,7 @@ class Controller():
         try:
             import oebs_dispatcher
             self.oebs_dispatcher_obj = oebs_dispatcher.OebsDispatcher()
+            self.oebs_dispatcher_obj.exception_flag=exception_flag
         except Exception as e:
             logger.print_on_console('')
 
@@ -140,6 +142,7 @@ class Controller():
         try:
             import web_dispatcher
             self.web_dispatcher_obj = web_dispatcher.Dispatcher()
+            self.web_dispatcher_obj.exception_flag=exception_flag
         except Exception as e:
              logger.print_on_console('')
 
@@ -147,6 +150,7 @@ class Controller():
         try:
             import desktop_dispatcher
             self.desktop_dispatcher_obj = desktop_dispatcher.DesktopDispatcher()
+            self.desktop_dispatcher_obj.exception_flag=exception_flag
         except Exception as e:
             logger.print_on_console('')
 
@@ -587,6 +591,8 @@ class Controller():
                         log.info('Saving the Report json of Scenario '+str((i  + 1 )))
                         logger.print_on_console( '***Saving the Report json of Scenario ',(i  + 1 ),'***')
                         log.info( '***Scenario' + str((i  + 1 )) +' execution completed***')
+                        filename='Scenario'+str(i  + 1)+'.json'
+                        con.reporting_obj.save_report_json(filename)
                         obj.clearList(con)
                     else:
                         print( '=======================================================================================================')
@@ -749,6 +755,7 @@ def kill_process():
         os.system("TASKKILL /F /IM IEDriverServer.exe")
         os.system("TASKKILL /F /IM IEDriverServer64.exe")
         os.system("TASKKILL /F /IM CobraWinLDTP.exe")
+        os.system("TASKKILL /F /IM phantomjs.exe")
         logger.print_on_console( 'Stale processes killed')
     except Exception as e:
         log.error(e)
