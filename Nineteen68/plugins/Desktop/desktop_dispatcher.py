@@ -32,7 +32,7 @@ class DesktopDispatcher:
     radio_checkbox_keywords_obj = radio_checkbox_keywords_desktop.Radio_Checkbox_keywords()
     outook_obj=outlook.OutlookKeywords()
 
-    def __init__():
+    def __init__(self):
         self.exception_flag=''
 
 
