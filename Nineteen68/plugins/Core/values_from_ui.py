@@ -23,6 +23,7 @@ browsers = [1]
 
 
 condition_check=False
-exception_flag=True
+#decides whether to terminate the execution in case of element not found in Web, OEBS, Desktop
+exception_flag=False
 
 
