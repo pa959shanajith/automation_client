@@ -548,7 +548,11 @@ class ExcelXLS:
             excel.DisplayAlerts = False
             excel_file = excel.Workbooks.Open(inputpath)
             sheet = excel.Sheets(sheetname)
-            sheet.Delete()
+            if excel_file.Sheets.Count>1:
+                sheet.Delete()
+            else:
+                log.error('Cannot clear the content if single sheet is present in Excel')
+                logger.print_on_console('Cannot clear the content if single sheet is present in Excel')
             excel_file.Close(True)
             status=True
         except Exception as e:
