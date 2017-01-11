@@ -28,6 +28,7 @@ class logical_eval():
         log.debug('reading the inputs')
         if len(expression==2):
             expression=expression[0]+expression[1]+expression[2]
+            logger.print_on_console('input expression is'+expression)
             expression=expression.replace('AND','and').replace('OR','or').replace('NOT','not')
             try:
                 logger.print_on_console('Evaluationg the expression')
@@ -40,6 +41,7 @@ class logical_eval():
                             log.debug('Got the result : %s', status)
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
+                            logger.print_on_console('result obtained'+status)
                 else:
                     log.info('Expression evaluation failed')
             except Exception as e:
