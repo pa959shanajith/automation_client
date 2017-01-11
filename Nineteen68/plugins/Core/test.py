@@ -32,7 +32,7 @@ class Test():
     "keywordVal": "if",
     "objectName": " ",
     "inputVal": [
-      "1;==;1"
+      "1:1"
     ],
     "appType": "Generic",
     "stepNo": 1,
