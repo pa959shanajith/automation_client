@@ -42,7 +42,7 @@ class Dropdown_Keywords():
                                         if select==1:
                                             status=desktop_constants.TEST_RESULT_PASS
                                             result=desktop_constants.TEST_RESULT_TRUE
-                                            return status,result
+
                                         else:
                                             logger.print_on_console('unable to slect the dropdown item')
                                 else:
@@ -68,7 +68,7 @@ class Dropdown_Keywords():
                                     if select==1:
                                         status=desktop_constants.TEST_RESULT_PASS
                                         result=desktop_constants.TEST_RESULT_TRUE
-                                        return status,result
+
                                     else:
                                         logger.print_on_console('unable to select list item')
                                         err_msg = 'unable to select list item'
@@ -106,7 +106,7 @@ class Dropdown_Keywords():
                                         if select==1:
                                             status=desktop_constants.TEST_RESULT_PASS
                                             result=desktop_constants.TEST_RESULT_TRUE
-                                            return status,result
+
                                         else:
                                             logger.print_on_console('unable to slect the dropdown item')
                                 else:
@@ -126,7 +126,7 @@ class Dropdown_Keywords():
                                 if select==1:
                                     status=desktop_constants.TEST_RESULT_PASS
                                     result=desktop_constants.TEST_RESULT_TRUE
-                                    return status,result
+
                                 else:
                                     logger.print_on_console('unable to select list item')
                                     err_msg = 'unable to select list item'
@@ -158,7 +158,7 @@ class Dropdown_Keywords():
                                                 status=desktop_constants.TEST_RESULT_PASS
                                                 method_output=desktop_constants.TEST_RESULT_TRUE
                                                 result=select
-                                                return status,method_output,result
+
                                             else:
                                                 logger.print_on_console('unable to get  the selected item')
                                     else:
@@ -200,7 +200,7 @@ class Dropdown_Keywords():
                                                 status=desktop_constants.TEST_RESULT_PASS
                                                 method_output=desktop_constants.TEST_RESULT_TRUE
                                                 result=selected_text
-                                                return status,method_output,result
+
                                             else:
                                                 logger.print_on_console('unable to get the selected list item')
                                 else:
@@ -234,7 +234,7 @@ class Dropdown_Keywords():
                                         if select==1:
                                             status=desktop_constants.TEST_RESULT_PASS
                                             result=desktop_constants.TEST_RESULT_TRUE
-                                            return status,result
+
                                         else:
                                             logger.print_on_console('unable to verify  the selected item')
                                 else:
@@ -313,7 +313,7 @@ class Dropdown_Keywords():
                                             status=desktop_constants.TEST_RESULT_PASS
                                             method_output=desktop_constants.TEST_RESULT_TRUE
                                             result=len(select)
-                                            return status,method_output,result
+
                                         else:
                                             logger.print_on_console('unable to verify  the selected item')
                                 else:
@@ -338,7 +338,7 @@ class Dropdown_Keywords():
                                         status=desktop_constants.TEST_RESULT_PASS
                                         method_output=desktop_constants.TEST_RESULT_TRUE
                                         result=actual_count
-                                        return status,method_output,result
+
                                     else:
                                         logger.print_on_console('unable to select list item')
                             else:
@@ -371,7 +371,7 @@ class Dropdown_Keywords():
                                             if int(count_given)==len(select):
                                                 status=desktop_constants.TEST_RESULT_PASS
                                                 result=desktop_constants.TEST_RESULT_TRUE
-                                                return status,result
+
                                         else:
                                             logger.print_on_console('unable to verify  the selected item')
                                 else:
@@ -395,7 +395,7 @@ class Dropdown_Keywords():
                                     if actual_count>0 and  int(count_given)==actual_count:
                                         status=desktop_constants.TEST_RESULT_PASS
                                         result=desktop_constants.TEST_RESULT_TRUE
-                                        return status,result
+
                             else:
                                 logger.print_on_console('element not found')
                                 err_msg = 'element not found'

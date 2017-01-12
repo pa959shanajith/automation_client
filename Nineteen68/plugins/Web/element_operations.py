@@ -58,7 +58,7 @@ class ElementKeywords:
                methodoutput=TEST_RESULT_TRUE
             except Exception as e:
                 log.error(e)
-                
+
                 logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         log.info(RETURN_RESULT)
@@ -96,7 +96,7 @@ class ElementKeywords:
                     logger.print_on_console(INVALID_INPUT)
             except Exception as e:
                 log.error(e)
-                
+
                 logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
@@ -125,7 +125,7 @@ class ElementKeywords:
                     logger.print_on_console(ERR_DISABLED_OBJECT)
             except Exception as e:
                 log.error(e)
-                
+
                 logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
@@ -168,7 +168,7 @@ class ElementKeywords:
                     logger.print_on_console(ERR_DISABLED_OBJECT)
             except Exception as e:
                 log.error(e)
-                
+
                 logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
@@ -212,7 +212,7 @@ class ElementKeywords:
                     logger.print_on_console(ERR_DISABLED_OBJECT)
             except Exception as e:
                 log.error(e)
-                
+
                 logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
@@ -237,7 +237,7 @@ class ElementKeywords:
                    methodoutput=TEST_RESULT_TRUE
             except Exception as e:
                 log.error(e)
-                
+
                 logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
@@ -251,6 +251,7 @@ class ElementKeywords:
         err_msg=None
         output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        tool_tip = None
         if webelement is not None:
             try:
                 input=input[0]
@@ -277,7 +278,7 @@ class ElementKeywords:
                     logger.print_on_console(INVALID_INPUT)
             except Exception as e:
                 log.error(e)
-                
+
                 logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
@@ -308,12 +309,12 @@ class ElementKeywords:
         except TimeoutException as e:
             logger.print_on_console('Delay timeout exceeded')
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg='Delay timeout exceeded'
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         return status,methodoutput,output,err_msg

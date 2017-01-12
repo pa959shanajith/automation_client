@@ -1,0 +1,13 @@
+{
+    "rows": [], 
+    "overallstatus": [
+        {
+            "browserVersion": "-", 
+            "EllapsedTime": "0:00:00.034000", 
+            "browserType": "-", 
+            "StartTime": "2017-01-11 18:35:27.638000", 
+            "EndTime": "2017-01-11 18:35:27.672000", 
+            "overallstatus": "Pass"
+        }
+    ]
+}
