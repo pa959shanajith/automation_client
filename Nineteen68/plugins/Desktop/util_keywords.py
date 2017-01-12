@@ -35,7 +35,6 @@ class Util_Keywords():
                         if desktop_constants.ENABLED_CHECK in states:
                             status=desktop_constants.TEST_RESULT_PASS
                             result=desktop_constants.TEST_RESULT_TRUE
-                            return status,result
                     else:
                         logger.print_on_console('element not found')
                         err_msg = 'element not found'
@@ -58,7 +57,6 @@ class Util_Keywords():
                         if not desktop_constants.ENABLED_CHECK in states:
                             status=desktop_constants.TEST_RESULT_PASS
                             result=desktop_constants.TEST_RESULT_TRUE
-                            return status,result
                     else:
                         logger.print_on_console('element not found')
             except Exception as e:
@@ -80,7 +78,6 @@ class Util_Keywords():
                             if  desktop_constants.VISIBLE_CHECK in states:
                                 status=desktop_constants.TEST_RESULT_PASS
                                 result=desktop_constants.TEST_RESULT_TRUE
-                                return status,result
                         else:
                             logger.print_on_console('element not found')
                 except Exception as e:
@@ -102,7 +99,6 @@ class Util_Keywords():
                             if  desktop_constants.VISIBLE_CHECK in states:
                                 status=desktop_constants.TEST_RESULT_PASS
                                 result=desktop_constants.TEST_RESULT_TRUE
-                                return status,result
                         else:
                             logger.print_on_console('element not found')
                 except Exception as e:
@@ -124,7 +120,6 @@ class Util_Keywords():
                             if  not desktop_constants.VISIBLE_CHECK in states:
                                 status=desktop_constants.TEST_RESULT_PASS
                                 result=desktop_constants.TEST_RESULT_TRUE
-                                return status,result
                         else:
                             logger.print_on_console('element not found')
                 except Exception as e:
@@ -148,7 +143,6 @@ class Util_Keywords():
                                 if int(classID)!=1:
                                     status=desktop_constants.TEST_RESULT_PASS
                                     result=desktop_constants.TEST_RESULT_TRUE
-                                    return status,result
                         else:
                             logger.print_on_console('element not found')
                 except Exception as e:
@@ -176,7 +170,6 @@ class Util_Keywords():
                             if flagEnable==1:
                                 status=desktop_constants.TEST_RESULT_PASS
                                 result=desktop_constants.TEST_RESULT_TRUE
-                                return status,result
                         else:
                             logger.print_on_console('element not found')
                 except Exception as e:
