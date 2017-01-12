@@ -49,6 +49,13 @@ class BrowserKeywords():
     def __init__(self):
         self.browser_num=''
 
+    def __web_driver_exception(self,e):
+        log.error(e)
+
+        logger.print_on_console(e)
+        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        return err_msg
+
     def openBrowser(self,webelement,browser_num,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -457,12 +464,7 @@ class Singleton_DriverUtil():
 ##        print __driver
         return driver
 
-    def __web_driver_exception(self,e):
-        log.error(e)
 
-        logger.print_on_console(e)
-        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-        return err_msg
 
 
 
