@@ -11,6 +11,7 @@ import threading
 from values_from_ui import *
 
 
+
 log = logging.getLogger('clientwindow.py')
 
 class Parallel(threading.Thread):
@@ -21,8 +22,21 @@ class Parallel(threading.Thread):
         """Init Worker Thread Class."""
         threading.Thread.__init__(self)
         self.wxObject = wxObject
-
+        self.paused = False
+        # Explicitly using Lock over RLock since the use of self.paused
+        # break reentrancy anyway, and I believe using Lock could allow
+        # one thread to pause the worker, while another resumes; haven't
+        # checked if Condition imposes additional limitations that would
+        # prevent that. In Python 2, use of Lock instead of RLock also
+        # boosts performance.
+        self.pause_cond = threading.Condition(threading.Lock())
+        self.con=''
         self.start()    # start the thread
+
+     #should just resume the thread
+    def resume(self):
+        self.con.resume_execution()
+
 
     #----------------------------------------------------------------------
     def run(self):
@@ -34,33 +48,26 @@ class Parallel(threading.Thread):
             self.wxObject.debugbutton.Disable()
             self.wxObject.cancelbutton.Disable()
             self.wxObject.terminatebutton.Enable()
+            self.wxObject.pausebutton.Show()
 
+            import time
             time.sleep(2)
 ##            controller.kill_process()
-            con = controller.Controller()
-            logging.debug( 'Controller object created')
+            self.con = controller.Controller()
+            self.con.conthread=self
             value= self.wxObject.breakpoint.GetValue()
 
-
-##                t = test.Test()
-##                t.gettsplist()
-
-
-
-            status = con.invoke_parralel_exe('debug',value)
+            status = self.con.invoke_parralel_exe(EXECUTE,value,self)
             if status==TERMINATE:
                 print '---------Termination Completed-------'
-##                    self.terminatebutton.Enable()
+
             else:
                 logger.print_on_console('***SUITE EXECUTION COMPLETED***')
-##                con.execute()
-##            controller.kill_process()
+
             self.wxObject.debugbutton.Enable()
             self.wxObject.executebutton.Enable()
             self.wxObject.cancelbutton.Enable()
-##                self.wxObject.pausebutton.Disable()
-##                self.wxObject.continuebutton.Disable()
-            self.wxObject.terminatebutton.Disable()
+##
         except Exception as m:
             print m
 
@@ -72,7 +79,7 @@ class TestThread(threading.Thread):
     """Test Worker Thread Class."""
 
     #----------------------------------------------------------------------
-    def __init__(self,wxObject):
+    def __init__(self,wxObject,action):
         """Init Worker Thread Class."""
         threading.Thread.__init__(self)
         self.wxObject = wxObject
@@ -85,60 +92,66 @@ class TestThread(threading.Thread):
         # prevent that. In Python 2, use of Lock instead of RLock also
         # boosts performance.
         self.pause_cond = threading.Condition(threading.Lock())
+        self.con=''
+        self.action=action
         self.start()    # start the thread
+
+
+    #should just resume the thread
+    def resume(self):
+        self.con.resume_execution()
+
+
 
     #----------------------------------------------------------------------
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         try:
-            with self.pause_cond as a:
-                while self.paused:
-                    a.wait()
-##                self.wxObject.pausebutton.Enable()
-                self.wxObject.executebutton.Disable()
-                self.wxObject.debugbutton.Disable()
-                self.wxObject.cancelbutton.Disable()
-                self.wxObject.terminatebutton.Enable()
-
-                time.sleep(2)
-                controller.kill_process()
-                con = controller.Controller()
-                value= self.wxObject.breakpoint.GetValue()
+            self.wxObject.executebutton.Disable()
+            self.wxObject.debugbutton.Disable()
+            self.wxObject.cancelbutton.Disable()
+            self.wxObject.terminatebutton.Enable()
+            if self.action==EXECUTE:
+                self.wxObject.pausebutton.Show()
+            else:
+                self.wxObject.continue_debugbutton.Show()
 
 
-##                t = test.Test()
-##                t.gettsplist()
+            time.sleep(2)
+            controller.kill_process()
+            self.con = controller.Controller()
+            value= self.wxObject.breakpoint.GetValue()
 
 
+            status = self.con.invoke_controller(self.action,value,self)
+            if status==TERMINATE:
+                logger.print_on_console(  '---------Termination Completed-------')
+##                self.terminatebutton.Enable()
+            else:
+                print( '=======================================================================================================')
+                log.info('-----------------------------------------------')
+                logger.print_on_console('***SUITE EXECUTION COMPLETED***')
+                log.info('***SUITE EXECUTION COMPLETED***')
+                print( '=======================================================================================================')
+                log.info('-----------------------------------------------')
 
-                status = con.invoke_controller('debug',value)
-                if status==TERMINATE:
-                    logger.print_on_console(  '---------Termination Completed-------')
-##                    self.terminatebutton.Enable()
-                else:
-                    print( '=======================================================================================================')
-                    log.info('-----------------------------------------------')
-                    logger.print_on_console('***SUITE EXECUTION COMPLETED***')
-                    log.info('***SUITE EXECUTION COMPLETED***')
-                    print( '=======================================================================================================')
-                    log.info('-----------------------------------------------')
-##                con.execute()
-                controller.kill_process()
-                self.wxObject.debugbutton.Enable()
-                self.wxObject.executebutton.Enable()
-                self.wxObject.cancelbutton.Enable()
-##                self.wxObject.pausebutton.Disable()
-##                self.wxObject.continuebutton.Disable()
-                self.wxObject.terminatebutton.Disable()
+            controller.kill_process()
+            self.wxObject.debugbutton.Enable()
+            self.wxObject.executebutton.Enable()
+            self.wxObject.cancelbutton.Enable()
+            self.wxObject.terminatebutton.Disable()
         except Exception as m:
             print m
+
+
+
 class RedirectText(object):
     def __init__(self,aWxTextCtrl):
         self.out=aWxTextCtrl
 
     def write(self,string):
-        wx.CallAfter(self.out.WriteText, string)
+        wx.CallAfter(self.out.AppendText, string)
 
 class ClientWindow(wx.Frame):
     #----------------------------------------------------------------------
@@ -147,7 +160,8 @@ class ClientWindow(wx.Frame):
                    pos=(300, 150),  size=(800, 730)  )
         self.SetBackgroundColour(   (245,222,179))
         self.mainclass = self
-        self.mythread = None
+        self.mythread = ''
+        self.action=''
         curdir = os.getcwd()
         ID_FILE_NEW = 1
         self.iconpath = curdir + "\\slk.ico"
@@ -201,10 +215,26 @@ class ClientWindow(wx.Frame):
         self.debugbutton = wx.Button(self.panel, label="Debug" ,pos=(10, 548), size=(100, 28))
         self.debugbutton.Bind(wx.EVT_BUTTON, self.OnDebug)
         self.debugbutton.SetToolTip(wx.ToolTip("To Debug the script"))
+
+        self.continue_debugbutton = wx.Button(self.panel, label="Resume Debug" ,pos=(120, 548), size=(100, 28))
+        self.continue_debugbutton.Bind(wx.EVT_BUTTON, self.OnContinueDebug)   # need to implement OnExit(). Leave notrace
+        self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution "))
+        self.continue_debugbutton.Hide()
+
         self.terminatebutton = wx.Button(self.panel, label="Terminate" ,pos=(470, 548), size=(100, 28))
         self.terminatebutton.Bind(wx.EVT_BUTTON, self.OnTerminate)
         self.terminatebutton.SetToolTip(wx.ToolTip("Terminate button logic imp in progress"))
         self.terminatebutton.Disable()
+
+        self.pausebutton = wx.Button(self.panel, label="Pause" ,pos=(230, 548), size=(100, 28))
+        self.pausebutton.Bind(wx.EVT_BUTTON, self.OnPause)   # need to implement OnExit(). Leave notrace
+        self.pausebutton.SetToolTip(wx.ToolTip("To pause the execution "))
+        self.pausebutton.Hide()
+
+        self.continuebutton = wx.Button(self.panel, label="Continue" ,pos=(230, 548), size=(100, 28))
+        self.continuebutton.Bind(wx.EVT_BUTTON, self.OnContinue)   # need to implement OnExit(). Leave notrace
+        self.continuebutton.SetToolTip(wx.ToolTip("To continue the execution "))
+        self.continuebutton.Hide()
 
 
 
@@ -226,6 +256,9 @@ class ClientWindow(wx.Frame):
         self.clearbutton = wx.Button(self.panel, label="Clear" ,pos=(120, 588), size=(100, 28))
         self.clearbutton.Bind(wx.EVT_BUTTON, self.OnClear)   # need to implement OnExit(). Leave notrace
         self.clearbutton.SetToolTip(wx.ToolTip("To clear the console area"))
+
+
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
 
         box.AddStretchSpacer()
 
@@ -305,53 +338,74 @@ class ClientWindow(wx.Frame):
         console.setFormatter(formatter)
 
 
+    def OnClose(self, event):
 
+        print 'KILLING THE THREAD'
+        controller.terminate_flag=True
+
+        self.Destroy()  # you may also do:  event.Skip()
+                        # since the default event handler does call Destroy(), too
 
 
     def OnExit(self, event):
         self.Close()
 
+
         #----------------------------------------------------------------------
     def OnPause(self, event):
-
         print '--------- Paused-------'
+        controller.pause_flag=True
+        self.pausebutton.Hide()
+        self.continuebutton.Show()
 
-        self.mythread.pause()
 
-        print '---------controller.pause-------'
+    def OnContinueDebug(self, event):
+        print '--------- Resume-------'
+        controller.pause_flag=False
+        self.mythread.resume()
+        self.continuebutton.Hide()
+
+
 
     #----------------------------------------------------------------------
     def OnContinue(self, event):
-        print '--------- Continue-------'
+        print '--------- Resume-------'
+        controller.pause_flag=False
         self.mythread.resume()
-        print '---------controller.Continue-------'
+        self.continuebutton.Hide()
+        self.pausebutton.Show()
     #----------------------------------------------------------------------
     def OnTerminate(self, event):
-        logger.print_on_console( '---------Termination Started-------')
-        self.cancelbutton.Enable()
+        print '---------Termination Started-------'
         controller.terminate_flag=True
+
+
 
     #----------------------------------------------------------------------
     def OnClear(self,event):
         self.log.Clear()
+
+
     #-----------------------------------------------------------------------
     def OnExecute(self,event):
+        global action
+        self.action=EXECUTE
         if execution_mode.lower() == 'serial':
             print( '=======================================================================================================')
             logger.print_on_console('Execution mode : SERIAL')
             print( '=======================================================================================================')
-            TestThread(self)
+            self.mythread=TestThread(self,self.action)
         elif execution_mode.lower() == 'parallel':
             logger.print_on_console('Execution mode : PARALLEL')
             print( '=======================================================================================================')
-            print( '=========================================Nineteen68 Client Window======================================')
-            print( '=======================================================================================================')
-            Parallel(self)
+            self.mythread=Parallel(self)
         else:
             logger.print_on_console('Please provide valid execution mode')
 
     def OnDebug(self,event):
-        self.mythread = TestThread(self)
+        global action
+        self.action=DEBUG
+        self.mythread = TestThread(self,self.action)
 
 
 

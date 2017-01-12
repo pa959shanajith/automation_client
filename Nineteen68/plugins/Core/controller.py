@@ -16,6 +16,7 @@ import jumpTo
 import jumpBy
 from teststepproperty import TestStepProperty
 from generickeywordresult import GenericKeywordResult
+import test_debug
 import test
 import handler
 import os,sys
@@ -30,6 +31,7 @@ from concurrent.futures import ThreadPoolExecutor
 import threading
 from datetime import datetime
 import logging
+import time
 
 
 
@@ -51,12 +53,13 @@ class TestThread(threading.Thread):
     """Test Worker Thread Class."""
 
     #----------------------------------------------------------------------
-    def __init__(self,browser):
+    def __init__(self,browser,mythread):
         """Init Worker Thread Class."""
         logger.print_on_console( 'Browser number: ',browser)
         log.debug('Browser number:  %d',browser)
         threading.Thread.__init__(self)
         self.browser = browser
+        self.thread=mythread
         self.start()    # start the thread
 
     #----------------------------------------------------------------------
@@ -69,10 +72,10 @@ class TestThread(threading.Thread):
             time.sleep(2)
             con = Controller()
 ##            print 'Controller object created'
-
-            status = con.invoke_controller('debug','',self.browser)
+            con.conthread=self.thread
+            status = con.invoke_controller(EXECUTE,'',con.conthread,self.browser)
             if status==TERMINATE:
-                print '---------Termination Completed-------'
+                logger.print_on_console( '---------Termination Completed-------')
             else:
                 logger.print_on_console('***SUITE EXECUTION COMPLETED***')
 
@@ -92,13 +95,13 @@ class Controller():
     verify_exists=False
 
     def __init__(self):
-        self.get_all_the_imports()
+        self.get_all_the_imports(CORE)
         self.__load_generic()
-        self.__load_web()
-        self.__load_webservice()
-        self.__load_oebs()
-        self.__load_outlook()
-        self.__load_desktop()
+##        self.__load_web()
+##        self.__load_webservice()
+##        self.__load_oebs()
+##        self.__load_outlook()
+##        self.__load_desktop()
         self.previous_step=''
         self.verify_dict={'web':VERIFY_EXISTS,
         'desktopjava':VERIFY_VISIBLE}
@@ -108,51 +111,56 @@ class Controller():
         self.scenario_end_time=''
         self.scenario_ellapsed_time=''
         self.reporting_obj=reporting.Reporting()
+        self.conthread=None
+        self.action=None
+        self.jumpto_counter=-1
+        self.jumpto_previousindex=-1
 
     def __load_generic(self):
         try:
-            import generic_dispatcher
-            self.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
+            if self.generic_dispatcher_obj==None:
+                self.get_all_the_imports('Generic')
+                import generic_dispatcher
+                self.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
         except Exception as e:
-            logger.print_on_console('')
+            logger.print_on_console('Error loading Generic plugin')
 
     def __load_webservice(self):
         try:
+            self.get_all_the_imports('WebServices')
             import websevice_dispatcher
             self.webservice_dispatcher_obj = websevice_dispatcher.Dispatcher()
         except Exception as e:
-            logger.print_on_console('')
+            logger.print_on_console('Error loading Web services plugin')
 
     def __load_oebs(self):
         try:
+            self.get_all_the_imports('Oebs')
             import oebs_dispatcher
             self.oebs_dispatcher_obj = oebs_dispatcher.OebsDispatcher()
             self.oebs_dispatcher_obj.exception_flag=exception_flag
         except Exception as e:
-            logger.print_on_console('')
+            logger.print_on_console('Error loading OEBS plugin')
 
-    def __load_outlook(self):
-        try:
-            import outlookdispatcher
-            self.outlook_dispatcher_obj = outlookdispatcher.Dispatcher()
-        except Exception as e:
-             logger.print_on_console('')
+
 
     def __load_web(self):
         try:
+            self.get_all_the_imports('Web')
             import web_dispatcher
             self.web_dispatcher_obj = web_dispatcher.Dispatcher()
             self.web_dispatcher_obj.exception_flag=exception_flag
         except Exception as e:
-             logger.print_on_console('')
+             logger.print_on_console('Error loading Web plugin')
 
     def __load_desktop(self):
         try:
+            self.get_all_the_imports('Desktop')
             import desktop_dispatcher
             self.desktop_dispatcher_obj = desktop_dispatcher.DesktopDispatcher()
             self.desktop_dispatcher_obj.exception_flag=exception_flag
         except Exception as e:
-            logger.print_on_console('')
+            logger.print_on_console('Error loading Desktop plugin')
 
     def dangling_status(self,index):
         step=handler.tspList[index]
@@ -209,20 +217,58 @@ class Controller():
         for i in range(len(inpval)):
             logger.print_on_console('Input: ',i + 1 , '= ',inpval[i])
 
+    def clear_data(self):
+        global terminate_flag,pause_flag
+        terminate_flag=pause_flag=False
+
+
+    def resume_execution(self):
+        logger.print_on_console('=======Resuming=======')
+        log.info('=======Resuming=======')
+        self.conthread.paused = False
+        pause_flag=False
+        # Notify so thread will wake after lock released
+        try:
+            self.conthread.pause_cond.notify()
+        # Now release the lock
+            self.conthread.pause_cond.release()
+        except Exception as e:
+            log.error('Debug is not paused to Resume')
+            logger.print_on_console('Debug is not paused to Resume')
+
+
+    def pause_execution(self):
+        logger.print_on_console('=======Pausing=======')
+        log.info('=======Pausing=======')
+        self.conthread.paused=True
+        self.conthread.pause_cond.acquire()
+        with self.conthread.pause_cond:
+            while self.conthread.paused:
+                self.conthread.pause_cond.wait()
+        log.debug('Wait is sover')
 
 
     def methodinvocation(self,index,*args):
 
+        global pause_flag
+
+
+
         if break_point != -1 and break_point == index:
-            index = BREAK_POINT
-            return index
+
+            if self.action==DEBUG:
+                pause_flag=True
+
+
         tsp = handler.tspList[index]
         keyword_flag=True
         #Check for 'terminate_flag' before execution
         if not(terminate_flag):
             #Check for 'pause_flag' before executionee
+
             if pause_flag:
-                pause_execution.execute(PAUSE)
+                self.pause_execution()
+
             if(self.check_dangling(tsp,index)):
 
                 input = tsp.inputval[0]
@@ -248,7 +294,6 @@ class Controller():
                 rawinput = tsp.inputval
                 if len(args) > 0:
                     rawinput = args[0]
-
 
                 inpval=self.split_input(rawinput,tsp.name)
                 if tsp.name.lower() not in [FOR,ENDFOR] :
@@ -298,7 +343,8 @@ class Controller():
             if self.status==TEST_RESULT_FAIL or self.status==TERMINATE:
                 self.reporting_obj.overallstatus=self.status
 
-        self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
+        if self.action==EXECUTE:
+            self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
 
         return index
 
@@ -351,7 +397,8 @@ class Controller():
         if not(terminate_flag):
             #Check for 'pause_flag' before execution
             if pause_flag:
-                pause_execution.execute(PAUSE)
+
+                self.pause_execution()
 
             teststepproperty = handler.tspList[index]
 
@@ -383,27 +430,40 @@ class Controller():
             #Check the apptype and pass to perticular module
             if teststepproperty.apptype.lower() == APPTYPE_GENERIC:
                 #Generic apptype module call
+                if self.generic_dispatcher_obj == None:
+                    self.__load_generic()
                 result = self.invokegenerickeyword(teststepproperty,self.generic_dispatcher_obj,inpval)
 
             elif teststepproperty.apptype.lower() == APPTYPE_WEB:
                 #Web apptype module call
+                if self.web_dispatcher_obj == None:
+                    self.__load_web()
                 result = self.invokewebkeyword(teststepproperty,self.web_dispatcher_obj,inpval,args[0])
 
             elif teststepproperty.apptype.lower() == APPTYPE_WEBSERVICE:
                 #Webservice apptype module call
+                if self.webservice_dispatcher_obj == None:
+                    self.__load_webservice()
                 result = self.invokewebservicekeyword(teststepproperty,self.webservice_dispatcher_obj,inpval)
 
             elif teststepproperty.apptype.lower() == APPTYPE_DESKTOP:
                 #Desktop apptype module call
+                if self.desktop_dispatcher_obj == None:
+                    self.__load_desktop()
                 result = self.invokeDesktopkeyword(teststepproperty,self.desktop_dispatcher_obj,inpval)
 
             elif teststepproperty.apptype.lower() == APPTYPE_DESKTOP_JAVA:
                 #OEBS apptype module call
+                if self.oebs_dispatcher_obj == None:
+                    self.__load_oebs()
                 result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
 
             temp_result=list(result)
-            if temp_result[2]==OUTPUT_CONSTANT:
+            if  len(temp_result)>2 and temp_result[2]==OUTPUT_CONSTANT:
                 temp_result[2]=None
+
+            if pause_flag:
+                self.pause_execution()
             logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',temp_result,'\n')
             log.info('Result in methodinvocation : '+ str(teststepproperty.name)+' : ')
             log.info(result)
@@ -436,7 +496,7 @@ class Controller():
         self.scenario_start_time=datetime.now()
         start_time_string=self.scenario_start_time.strftime(TIME_FORMAT)
         logger.print_on_console('Scenario Execution start time is : '+start_time_string)
-
+        global pause_flag
 
         while (i < len(tsplist)):
             tsp = tsplist[i]
@@ -444,21 +504,24 @@ class Controller():
             if not(terminate_flag):
                 #Check for 'pause_flag' before execution
                 if pause_flag:
-                    pause_execution.execute(PAUSE)
+                    self.pause_execution()
+
                 try:
                     i = self.methodinvocation(i)
                     if i== TERMINATE:
                         logger.print_on_console('Terminating the execution')
                         status=i
                         break
-                    elif i==BREAK_POINT:
-                        logger.print_on_console('Debug Stopped')
-                        status=i
-                        break
+##                    elif i==BREAK_POINT:
+##                        logger.print_on_console('Debug Stopped')
+##                        status=i
+##                        break
 
                 except Exception as e:
                     log.error(e)
                     logger.print_on_console(e)
+
+
                     status=False
                     i=i+1
             else:
@@ -505,221 +568,175 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
         return res
 
-    def get_all_the_imports(self):
+    def get_all_the_imports(self,plugin_path):
         maindir = os.getcwd()
         os.chdir('..')
         curdir = os.getcwd()
-        path= curdir + '//Nineteen68//plugins'
+        path= curdir + '//Nineteen68//plugins//'+plugin_path
+        sys.path.append(path)
         for root, dirs, files in os.walk(path):
             for d in dirs:
                 p = path + '\\' + d
                 sys.path.append(p)
         os.chdir(maindir)
 
+    def invoke_debug(self,input_breakpoint,mythread,browser):
+        global break_point
+        obj = handler.Handler()
+        self.action=DEBUG
+        handler.tspList=[]
+        t = test_debug.Test()
+        scenario,flag = t.gettsplist()
+        if flag:
+            try:
+                input_breakpoint=int(input_breakpoint)
+                if input_breakpoint >0:
+                    break_point=input_breakpoint-1
+                    logger.print_on_console('***Break_point is ***',break_point)
+            except Exception as e:
+                logger.print_on_console(e)
+                logger.print_on_console('Invalid breakpoint number')
+        print( '=======================================================================================================')
+        log.info('***DEBUG STARTED***')
+        logger.print_on_console('***DEBUG STARTED***')
+        for d in scenario:
+            flag=obj.parse_json(d)
+            if flag == False:
+                break
+            print '\n'
+            tsplist = obj.read_step()
+            for k in range(len(tsplist)):
+                if tsplist[k].name.lower() == 'openbrowser':
+                    tsplist[k].inputval = browser
 
-    def invoke_controller(self,action,input_breakpoint,*args):
-        status = False
-        global terminate_flag,break_point,pause_flag
-        if execution_mode.lower() == PARALLEL:
+        if flag:
+            self.conthread=mythread
+            status = self.executor(tsplist,DEBUG)
 
-            handler.tspList=[]
-            terminate_flag=False
-            pause_flag=False
-            obj = handler.Handler()
-            t = test.Test()
-            suites_list,flag = t.gettsplist()
-            if flag:
-                try:
-                    input_breakpoint=int(input_breakpoint)
-                    if input_breakpoint >0:
-                        break_point=input_breakpoint-1
-                except ValueError,NameError:
-                    logger.print_on_console('Invalid breakpoint number')
-
-
-            #in future this value will come from the UI
-            scenarios = scenario_num
-            print 'No  of Suites : ',len(suites_list)
-            j=1
-            for suite in suites_list:
-                #EXECUTION GOES HERE
-                status = False
-                flag=True
-                #Iterate through the suite
-                log.info('---------------------------------------------------------------------')
-                print( '=======================================================================================================')
-                log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
-                logger.print_on_console('***SUITE ', j ,' EXECUTION STARTED***')
-                log.info('-----------------------------------------------')
-                print( '=======================================================================================================')
-                for i in range( len(suite)):
-                    do_not_execute = False
-                    #create a object of controller for each scenario
-                    con =Controller()
-                    #Check for the disabled scenario
-
-                    for k in scenarios:
-                        if k == (i + 1):
-                            do_not_execute = True
-                            break
+        else:
+            print 'Invalid script'
+        print( '=======================================================================================================')
+        log.info('***DEBUG COMPLETED***')
+        logger.print_on_console('***DEBUG COMEPLETED***')
 
 
+    def invoke_execution(self,input_breakpoint,mythread,browser):
 
-                    if (not do_not_execute) :
-                        print( '=======================================================================================================')
-                        logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
-                        print( '=======================================================================================================')
-                        log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
-                        for d in suite[i]:
-                            flag=obj.parse_json(d)
-                            if flag == False:
-                                break
-                            print '\n'
-                            tsplist = obj.read_step()
-                            for k in range(len(tsplist)):
-                                if tsplist[k].name.lower() == 'openbrowser':
-                                    tsplist[k].inputval = unicode(args[0])
-
-                        if flag:
-                            status = con.executor(tsplist,'debug')
-
-                        else:
-                            print 'Invalid script'
-                        print( '=======================================================================================================')
-                        logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
-                        print( '=======================================================================================================')
-                        log.info('Saving the Report json of Scenario '+str((i  + 1 )))
-                        logger.print_on_console( '***Saving the Report json of Scenario ',(i  + 1 ),'***')
-                        log.info( '***Scenario' + str((i  + 1 )) +' execution completed***')
-                        filename='Scenario'+str(i  + 1)+'.json'
-                        con.reporting_obj.save_report_json(filename)
-                        obj.clearList(con)
-                    else:
-                        print( '=======================================================================================================')
-                        logger.print_on_console( 'Scenario ' , (i + 1) ,' has been disabled for execution!!!')
-                        log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
-                        print( '=======================================================================================================')
-                    #logic for condition check
-                    report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-                    overall_status=report_json[0]['overallstatus']
-                    if(condition_check==True):
-                        if(overall_status=='Pass'):
-                            continue
-                        else:
-                            break
-                log.info('---------------------------------------------------------------------')
-                print( '=======================================================================================================')
-                log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
-                logger.print_on_console('***SUITE ', j ,' EXECUTION COMPLETED***')
-                log.info('-----------------------------------------------')
-                print( '=======================================================================================================')
-                j=j+1
-
-        elif execution_mode.lower() == SERIAL:
-            handler.tspList=[]
-            terminate_flag=False
-            pause_flag=False
-            obj = handler.Handler()
-            t = test.Test()
-            suites_list,flag = t.gettsplist()
-            if flag:
-                try:
-                    input_breakpoint=int(input_breakpoint)
-                    if input_breakpoint >0:
-                        break_point=input_breakpoint-1
-                except ValueError,NameError:
-                    logger.print_on_console('Invalid breakpoint number')
+        obj = handler.Handler()
+        t = test.Test()
+        suites_list,flag = t.gettsplist()
+        self.action=EXECUTE
 
 
-            #in future this value will come from the UI
-            scenarios = scenario_num
-            logger.print_on_console( 'Length of Suite : ',len(suites_list))
-
+        #in future this value will come from the UI
+        scenarios = scenario_num
+        print 'No  of Suites : ',len(suites_list)
+        j=1
+        for suite in suites_list:
             #EXECUTION GOES HERE
             status = False
             flag=True
+            handler.tspList=[]
             #Iterate through the suite
+            if terminate_flag:
+                status=TERMINATE
+            log.info('---------------------------------------------------------------------')
+            print( '=======================================================================================================')
+            log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
+            logger.print_on_console('***SUITE ', j ,' EXECUTION STARTED***')
+            log.info('-----------------------------------------------')
+            print( '=======================================================================================================')
+            for i in range( len(suite)):
+                do_not_execute = False
+                #create a object of controller for each scenario
+                con =Controller()
+                #Check for the disabled scenario
 
-            for browser in range( len(browsers)):
-                j=1
-                for suite in suites_list:
-                    log.info('-----------------------------------------------')
+                for k in scenarios:
+                    if k == (i + 1):
+                        do_not_execute = True
+                        break
+
+
+
+                if (not do_not_execute) :
                     print( '=======================================================================================================')
-                    log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
-                    logger.print_on_console('***SUITE ', j ,' EXECUTION STARTED***')
-                    log.info('-----------------------------------------------')
+                    logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
                     print( '=======================================================================================================')
-                    for i in range( len(suite)):
-                        do_not_execute = False
-                        #create a object of controller for each scenario
-                        con =Controller()
-                        #Check for the disabled scenario
+                    log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
+                    for d in suite[i]:
+                        flag=obj.parse_json(d)
+                        if flag == False:
+                            break
+                        print '\n'
+                        tsplist = obj.read_step()
+                        for k in range(len(tsplist)):
+                            if tsplist[k].name.lower() == 'openbrowser':
+                                tsplist[k].inputval = browser
 
-                        for k in scenarios:
-                            if k == (i + 1):
-                                do_not_execute = True
-                                break
+                    if flag:
+                        con.conthread=mythread
+                        status = con.executor(tsplist,EXECUTE)
 
-
-
-                        if (not do_not_execute) :
-                            logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
-                            log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
-                            for d in suite[i]:
-                                flag=obj.parse_json(d)
-                                if flag == False:
-                                    break
-                                print '\n'
-                                tsplist = obj.read_step()
-                                for k in range(len(tsplist)):
-                                    if tsplist[k].name.lower() == 'openbrowser':
-                                        tsplist[k].inputval = unicode(browsers[browser])
-
-                            if flag:
-
-                                status = con.executor(tsplist,'debug')
-
-
-                            else:
-                                log.error('Invalid script')
-                            logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
-                            log.info( '***Scenario ' + str((i  + 1 )) +' execution completed***')
-                            log.info('Saving the Report json of Scenario '+str((i  + 1 )))
-                            logger.print_on_console( '***Saving the Report json of Scenario ',(i  + 1 ),'***')
-                            filename='Scenario'+str(i  + 1)+'.json'
-                            con.reporting_obj.save_report_json(filename)
-                            obj.clearList(con)
-                        else:
-                            logger.print_on_console( 'Scenario ' , (i + 1) ,' has been disabled for execution!!!')
-                            log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
-                         #logic for condition check
-                        report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-                        overall_status=report_json[0]['overallstatus']
-                        if(condition_check==True):
-                            if(overall_status=='Pass'):
-                                continue
-                            else:
-                                break
-
-                    log.info('-----------------------------------------------')
+                    else:
+                        print 'Invalid script'
                     print( '=======================================================================================================')
-                    log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
-                    logger.print_on_console('***SUITE ', j ,' EXECUTION COMPLETED***')
-                    log.info('-----------------------------------------------')
+                    logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
                     print( '=======================================================================================================')
-                    j=j+1
+                    log.info('Saving the Report json of Scenario '+str((i  + 1 )))
+                    logger.print_on_console( '***Saving the Report json of Scenario ',(i  + 1 ),'***')
+                    log.info( '***Scenario' + str((i  + 1 )) +' execution completed***')
+                    filename='Scenario'+str(i  + 1)+'.json'
+                    con.reporting_obj.save_report_json(filename)
+                    obj.clearList(con)
+                else:
+                    print( '=======================================================================================================')
+                    logger.print_on_console( 'Scenario ' , (i + 1) ,' has been disabled for execution!!!')
+                    log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
+                    print( '=======================================================================================================')
+                #logic for condition check
+                report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+                overall_status=report_json[0]['overallstatus']
+                if(condition_check==True):
+                    if(overall_status=='Pass'):
+                        continue
+                    else:
+                        break
+            log.info('---------------------------------------------------------------------')
+            print( '=======================================================================================================')
+            log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
+            logger.print_on_console('***SUITE ', j ,' EXECUTION COMPLETED***')
+            log.info('-----------------------------------------------')
+            print( '=======================================================================================================')
+            j=j+1
         return status
 
+    def invoke_controller(self,action,input_breakpoint,mythread,*args):
+        status = False
+        global terminate_flag,break_point,pause_flag
+        self.conthread=mythread
+        self.clear_data()
+        if action.lower()==EXECUTE:
+            #Parallel Execution
+            if execution_mode.lower() == PARALLEL:
+                status=self.invoke_execution(input_breakpoint,mythread,unicode(args[0]))
+            elif execution_mode.lower() == SERIAL:
+                 for browser in range( len(browsers)):
+                    status=self.invoke_execution(input_breakpoint,mythread,unicode(browsers[browser]))
+                    if status==TERMINATE:
+                        break
+        elif action.lower()==DEBUG:
+            self.invoke_debug(input_breakpoint,mythread,unicode(browsers[0]))
 
-
-    def invoke_parralel_exe(self,action,input_breakpoint):
+    def invoke_parralel_exe(self,action,input_breakpoint,mythread):
         #create a ThreadPoolExecutor to perform parallel execution
         executor = ThreadPoolExecutor(max_workers=len(browsers))
-
+        print
         #create Future object of  size number of browsers selected
         for browser in range(len(browsers)):
             #create a future object and start execution
-            future = executor.submit(TestThread(browsers[browser]))
+            future = executor.submit(TestThread(browsers[browser],mythread))
+
             #Store the future object to track in future
             thread_tracker.append(future)
             time.sleep(2)
@@ -737,25 +754,22 @@ class Controller():
                 executor.shutdown()
                 break
 
-        logger.print_on_console ('Parralel execution completed')
+        logger.print_on_console ('Parallel execution completed')
 
-    def execute(self):
-        kill_process()
-        obj = Controller()
-        t = test.Test()
-        list,flag = t.gettsplist()
-        if flag:
-            logger.print_on_console('*** SUITE EXECUTION STARTED***')
-            obj.executor(list,'debug')
-            logger.print_on_console('***SUITE EXECUTION COMPLETED***')
 
 def kill_process():
     try:
-        os.system("TASKKILL /F /IM chromedriver.exe")
-        os.system("TASKKILL /F /IM IEDriverServer.exe")
-        os.system("TASKKILL /F /IM IEDriverServer64.exe")
-        os.system("TASKKILL /F /IM CobraWinLDTP.exe")
-        os.system("TASKKILL /F /IM phantomjs.exe")
+##        os.system("TASKKILL /F /IM chromedriver.exe")
+##        os.system("TASKKILL /F /IM IEDriverServer.exe")
+##        os.system("TASKKILL /F /IM IEDriverServer64.exe")
+##        os.system("TASKKILL /F /IM CobraWinLDTP.exe")
+##        os.system("TASKKILL /F /IM phantomjs.exe")
+        import win32com.client
+        my_processes = ['chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe']
+        wmi=win32com.client.GetObject('winmgmts:')
+        for p in wmi.InstancesOf('win32_process'):
+            if p.Name in my_processes:
+                os.system("TASKKILL /F /IM " + p.Name)
         logger.print_on_console( 'Stale processes killed')
     except Exception as e:
         log.error(e)
@@ -764,15 +778,23 @@ def kill_process():
 #main method
 if __name__ == '__main__':
     kill_process()
-    obj = Controller()
+    obj = handler.Handler()
+    obj1=Controller()
+    obj1.get_all_the_imports(CORE)
     print 'Controller object created'
-    t = test.Test()
-    list,flag = t.gettsplist()
+    t = test_debug.Test()
+    list_data,flag = t.gettsplist()
+    for d in list_data:
+            flag=obj.parse_json(d)
+            if flag == False:
+                break
+            print '\n'
+            tsplist = obj.read_step()
+            for k in range(len(tsplist)):
+                if tsplist[k].name.lower() == 'openbrowser':
+                    tsplist[k].inputval = browser
     if flag:
-        logger.print_on_console('***SUITE EXECUTION STARTED***')
-        obj.executor(list,'debug')
-        logger.print_on_console('***SUITE EXECUTION COMPLETED***')
-        obj.reporting_obj.print_report_json()
+            status = obj1.executor(tsplist,DEBUG)
 
     else:
         print 'Invalid script'
