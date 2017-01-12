@@ -26,83 +26,66 @@ class Test():
         data1 =[{
         	"template": "",
         	"testscript_name": "Script1",
-        	"testcase": [
+        	"testcase":[
   {
     "outputVal": "",
-    "keywordVal": "if",
+    "keywordVal": "openBrowser",
     "objectName": " ",
-    "inputVal": [
-      "1:1"
-    ],
-    "appType": "Generic",
-    "stepNo": 1,
-    "url": " ",
-    "custname": "@Generic"
-  },
-  {
-    "outputVal": "",
-    "keywordVal": "endIf",
-    "objectName": " ",
+    "_id_": "1",
     "inputVal": [
       ""
     ],
-    "appType": "Generic",
+    "appType": "Web",
     "stepNo": 1,
     "url": " ",
-    "custname": "@Generic"
+    "custname": "@Browser"
   },
-##  {
-##    "outputVal": "",
-##    "keywordVal": "navigateToURL",
-##    "objectName": " ",
-##    "inputVal": [
-##      "https://cvg53.ngahrhosting.com/Main/careerportal/JobAgent.cfm"
-##    ],
-##    "appType": "Web",
-##    "stepNo": 2,
-##    "url": " ",
-##    "custname": "@Browser"
-##  },
-##  {
-##    "outputVal": "",
-##    "keywordVal": "getCount",
-##    "objectName": "/html/body/table[2]/tbody/tr/td/table/tbody/tr/td/table[5]/tbody/tr/td/table/tbody/tr[3]/td/table/tbody/tr[5]/td[2]/select;null;/html/body/table[2]/tbody/tr/td/table/tbody/tr/td/table[5]/tbody/tr/td/table/tbody/tr[3]/td/table/tbody/tr[5]/td[2]/select;null;null;null",
-##    "inputVal": [
-##      ""
-##    ],
-##    "appType": "Web",
-##    "stepNo": 3,
-##    "url": "https://cvg53.ngahrhosting.com/Main/careerportal/JobAgent.cfm",
-##    "custname": "Accounting/Finance_elmnt"
-##  },
-##  {
-##    "outputVal": "",
-##    "keywordVal": "verifyCount",
-##    "objectName": "/html/body/table[2]/tbody/tr/td/table/tbody/tr/td/table[5]/tbody/tr/td/table/tbody/tr[3]/td/table/tbody/tr[5]/td[2]/select;null;/html/body/table[2]/tbody/tr/td/table/tbody/tr/td/table[5]/tbody/tr/td/table/tbody/tr[3]/td/table/tbody/tr[5]/td[2]/select;null;null;null",
-##    "inputVal": [
-##      "47"
-##    ],
-##    "appType": "Web",
-##    "stepNo": 4,
-##    "url": "https://cvg53.ngahrhosting.com/Main/careerportal/JobAgent.cfm",
-##    "custname": "Accounting/Finance_elmnt"
-##  },
-##  {
-##    "outputVal": "",
-##    "keywordVal": "selectAllValues",
-##    "objectName": "/html/body/table[2]/tbody/tr/td/table/tbody/tr/td/table[5]/tbody/tr/td/table/tbody/tr[3]/td/table/tbody/tr[5]/td[2]/select;null;/html/body/table[2]/tbody/tr/td/table/tbody/tr/td/table[5]/tbody/tr/td/table/tbody/tr[3]/td/table/tbody/tr[5]/td[2]/select;null;null;null",
-##    "inputVal": [
-##      ""
-##    ],
-##    "appType": "Web",
-##    "stepNo": 5,
-##    "url": "https://cvg53.ngahrhosting.com/Main/careerportal/JobAgent.cfm",
-##    "custname": "Accounting/Finance_elmnt"
-##  },
+  {
+    "outputVal": "",
+    "keywordVal": "navigateToURL",
+    "objectName": " ",
+    "_id_": "2",
+    "inputVal": [
+      "http://www.way2automation.com/angularjs-protractor/calc/"
+    ],
+    "appType": "Web",
+    "stepNo": 2,
+    "url": " ",
+    "custname": "@Browser"
+  },
+
+  {
+    "outputVal": "{title}",
+    "keywordVal": "getPageTitle",
+    "objectName": " ",
+    "_id_": "5",
+    "inputVal": [
+      ""
+    ],
+    "appType": "Web",
+    "stepNo": 5,
+    "url": " ",
+    "custname": "@Browser"
+  },
+  {
+    "outputVal": "",
+    "keywordVal": "verifyPageTitle",
+    "objectName": " ",
+    "_id_": "6",
+    "inputVal": [
+        "{title}"
+    ],
+    "appType": "Web",
+    "stepNo": 6,
+    "url": " ",
+    "custname": "@Browser"
+  },
+
   {
     "comments": ""
   }
 ]
+
         }]
         dataList1.append(data1)
 
