@@ -29,7 +29,7 @@ class OebsDispatcher:
     scrape_obj=oebs_fullscrape.FullScrape()
     clickandadd_obj=oebsclickandadd.ClickAndAdd()
 
-    def __init__():
+    def __init__(self):
         self.exception_flag=''
 
 
