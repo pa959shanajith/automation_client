@@ -27,6 +27,7 @@ import struct
 from ctypes import wintypes
 import ldtp
 from ldtp.client_exception import LdtpExecutionError
+from constants import *
 
 window_name=None
 window_handle=None
@@ -43,6 +44,8 @@ class Launch_Keywords():
 
     def launch_application(self,input_val,*args):
         status=desktop_constants.TEST_RESULT_FAIL
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
         # check file exists
             if len(input_val)==2:
@@ -77,28 +80,36 @@ class Launch_Keywords():
 
         except Exception as e:
             Exceptions.error(e)
-        return status,self.windowname
+            err_msg = desktop_constants.ERROR_MSG
+        return status,self.windowname,verb,err_msg
 
     def getPageTitle(self,*args):
         status=desktop_constants.TEST_RESULT_FAIL
+        result=desktop_constants.TEST_RESULT_FALSE
+        err_msg=None
         try:
             if self.windowname!='':
                 status=desktop_constants.TEST_RESULT_PASS
+                result = desktop_constants.TEST_RESULT_TRUE
                 return status,self.windowname
         except Exception as e:
             Exceptions.error(e)
-        return status,self.windowname
+        return status,result,self.windowname,err_msg
 
     def closeApplication(self,*args):
         status=desktop_constants.TEST_RESULT_FAIL
+        result=desktop_constants.TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             if window_handle!=None:
                 win32gui.PostMessage(window_handle,win32con.WM_CLOSE,0,0)
                 status=desktop_constants.TEST_RESULT_PASS
+                result = desktop_constants.TEST_RESULT_TRUE
                 return status
         except Exception as e:
             Exceptions.error(e)
-        return status
+        return status,result,verb,err_msg
 
     def captureScreenshot(self,hwnd):
         time.sleep(0.120)

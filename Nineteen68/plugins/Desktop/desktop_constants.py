@@ -81,3 +81,5 @@ CHILD='children'
 LABEL='label'
 
 ELEMENT_FOUND=True
+
+ERROR_MSG = 'Error occured'

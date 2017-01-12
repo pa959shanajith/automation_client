@@ -16,7 +16,7 @@ import Exceptions
 import launch_keywords
 from ldtp.client_exception import LdtpExecutionError
 import logging
-
+from constants import *
 import logger
 log = logging.getLogger('editable_text.py')
 

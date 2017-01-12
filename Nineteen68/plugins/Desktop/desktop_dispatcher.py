@@ -20,7 +20,7 @@ import logger
 import desktop_constants
 import radio_checkbox_keywords_desktop
 import outlook
-import constants
+from constants import *
 
 class DesktopDispatcher:
     button_link_keywords_obj = button_link_keywords_desktop.ButtonLinkKeyword()
