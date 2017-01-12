@@ -13,11 +13,14 @@ from editable_text import Text_Box
 from launch_keywords import ldtp
 import launch_keywords
 from ldtp.client_exception import LdtpExecutionError
+from constants import *
 
 class Radio_Checkbox_keywords():
     def select_radiobutton(self, element , parent  , *args):
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             if launch_keywords.window_name!=None:
                 dektop_element = element.split(';')
@@ -35,11 +38,14 @@ class Radio_Checkbox_keywords():
                     logger.print_on_console('element not present on the page where operation is trying to be performed')
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
-        return status,result
+            err_msg = desktop_constants.ERROR_MSG
+        return status,result,verb,err_msg
 
     def select_checkbox(self, element , parent  , *args):
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             if launch_keywords.window_name!=None:
                 print element
@@ -60,11 +66,14 @@ class Radio_Checkbox_keywords():
                     logger.print_on_console('element not present on the page where operation is trying to be performed')
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
-        return status,result
+            err_msg = desktop_constants.ERROR_MSG
+        return status,result,verb,err_msg
 
     def unselect_checkbox(self, element , parent  , *args):
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             if launch_keywords.window_name!=None:
                 dektop_element = element.split(';')
@@ -83,12 +92,14 @@ class Radio_Checkbox_keywords():
                     logger.print_on_console('element not present on the page where operation is trying to be performed')
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
-        return status,result
+            err_msg = desktop_constants.ERROR_MSG
+        return status,result,verb,err_msg
 
     def get_status(self, element , parent  , *args):
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         flag=None
+        err_msg=None
         try:
             if launch_keywords.window_name!=None:
                 dektop_element = element.split(';')
@@ -122,4 +133,5 @@ class Radio_Checkbox_keywords():
 
         except LdtpExecutionError as exception:
             Exceptions.error(exception)
-        return status,result,flag
+            err_msg = desktop_constants.ERROR_MSG
+        return status,result,flag,err_msg

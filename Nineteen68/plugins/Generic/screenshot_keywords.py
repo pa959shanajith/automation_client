@@ -25,7 +25,7 @@ import logging
 log = logging.getLogger('screenshot_keywords.py')
 class Screenshot():
     def captureScreenshot(self,fileDir,*args):
-        
+
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -34,7 +34,10 @@ class Screenshot():
             log.debug('Reading the inputs')
             if not os.path.exists(fileDir):
                 os.makedirs(fileDir)
-            filename=self.generateUniqueFileName()
+            if len(args)>0:
+                filename=args[0]
+            else:
+                filename=self.generateUniqueFileName()
             filePath=str(fileDir)+filename
             log.debug('capturing the screenshot')
             logger.print_on_console('capturing the screenshot')

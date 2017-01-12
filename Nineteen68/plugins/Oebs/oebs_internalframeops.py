@@ -25,6 +25,11 @@ import time
 log = logging.getLogger('oebs_internalframeops.py')
 
 class InternalFrameOperations:
+
+    def __init__(self):
+        self.utilities_obj=oebs_serverUtilities.Utilities()
+
+
     def closeframe(self,acc):
         del oebs_key_objects.custom_msg[:]
      	#sets the keywordResult to FAIL
@@ -61,12 +66,12 @@ class InternalFrameOperations:
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
         except Exception as e:
-            oebs_serverUtilities.cleardata()
+            self.utilities_obj.cleardata()
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)
         # response is sent to the client
-        oebs_serverUtilities.cleardata()
+        self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
 
@@ -98,12 +103,12 @@ class InternalFrameOperations:
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
         except Exception as e:
-            oebs_serverUtilities.cleardata()
+            self.utilities_obj.cleardata()
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)
         # response is sent to the client
-        oebs_serverUtilities.cleardata()
+        self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
 
@@ -153,11 +158,11 @@ class InternalFrameOperations:
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
         except Exception as e:
-            oebs_serverUtilities.cleardata()
+            self.utilities_obj.cleardata()
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)
         # response is sent to the client
-        oebs_serverUtilities.cleardata()
+        self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))

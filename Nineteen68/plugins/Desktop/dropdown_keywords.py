@@ -17,7 +17,7 @@ import desktop_constants
 import editable_text
 import time
 from ldtp.client_exception import LdtpExecutionError
-
+from constants import *
 editable_text=editable_text.Text_Box()
 class Dropdown_Keywords():
 
@@ -27,6 +27,8 @@ class Dropdown_Keywords():
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
             item_index=int(input_val[0])
+            verb = OUTPUT_CONSTANT
+            err_msg=None
             try:
 
                 if object_xpath[0:3]=='cbo':
@@ -40,7 +42,7 @@ class Dropdown_Keywords():
                                         if select==1:
                                             status=desktop_constants.TEST_RESULT_PASS
                                             result=desktop_constants.TEST_RESULT_TRUE
-                                            return status,result
+
                                         else:
                                             logger.print_on_console('unable to slect the dropdown item')
                                 else:
@@ -66,19 +68,22 @@ class Dropdown_Keywords():
                                     if select==1:
                                         status=desktop_constants.TEST_RESULT_PASS
                                         result=desktop_constants.TEST_RESULT_TRUE
-                                        return status,result
+
                                     else:
                                         logger.print_on_console('unable to select list item')
+                                        err_msg = 'unable to select list item'
                         else:
                             logger.print_on_console('element not found')
+                            err_msg = 'element not found'
                     except Exception as e:
                         Exceptions.error(e)
+                        err_msg = desktop_constants.ERROR_MSG
                 else:
                     print 'not a list'
 
             except Exception as e:
                 Exceptions.error(e)
-            return status,result
+            return status,result,verb,err_msg
 
         def selectValueByText(self,element,parent,input_val, *args):
             status=desktop_constants.TEST_RESULT_FAIL
@@ -86,6 +91,8 @@ class Dropdown_Keywords():
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
             item_text=input_val[0].strip()
+            verb = OUTPUT_CONSTANT
+            err_msg=None
             try:
                 if launch_keywords.window_name!=None:
                     if object_xpath[0:3]=='cbo':
@@ -99,11 +106,12 @@ class Dropdown_Keywords():
                                         if select==1:
                                             status=desktop_constants.TEST_RESULT_PASS
                                             result=desktop_constants.TEST_RESULT_TRUE
-                                            return status,result
+
                                         else:
                                             logger.print_on_console('unable to slect the dropdown item')
                                 else:
                                     logger.print_on_console('element not found')
+                                    err_msg = 'element not found'
                             except Exception as e:
                                 if isinstance(e,LdtpExecutionError):
                                     self.clickOnCombo(object_xpath)
@@ -118,21 +126,23 @@ class Dropdown_Keywords():
                                 if select==1:
                                     status=desktop_constants.TEST_RESULT_PASS
                                     result=desktop_constants.TEST_RESULT_TRUE
-                                    return status,result
+
                                 else:
                                     logger.print_on_console('unable to select list item')
+                                    err_msg = 'unable to select list item'
                         else:
                             logger.print_on_console('element not found')
                     except Exception as e:
                         Exceptions.error(e)
             except Exception as e:
                 Exceptions.error(e)
-            return status,result
+            return status,result,verb,err_msg
 
         def getSelected(self,element,parent,input_val, *args):
                 status=desktop_constants.TEST_RESULT_FAIL
                 method_output=desktop_constants.TEST_RESULT_FALSE
                 result=None
+                err_msg=None
                 object_xpath=element.split(';')[0]
                 object_index=element.split(';')[1]
                 try:
@@ -148,7 +158,7 @@ class Dropdown_Keywords():
                                                 status=desktop_constants.TEST_RESULT_PASS
                                                 method_output=desktop_constants.TEST_RESULT_TRUE
                                                 result=select
-                                                return status,method_output,result
+
                                             else:
                                                 logger.print_on_console('unable to get  the selected item')
                                     else:
@@ -190,16 +200,18 @@ class Dropdown_Keywords():
                                                 status=desktop_constants.TEST_RESULT_PASS
                                                 method_output=desktop_constants.TEST_RESULT_TRUE
                                                 result=selected_text
-                                                return status,method_output,result
+
                                             else:
                                                 logger.print_on_console('unable to get the selected list item')
                                 else:
                                     logger.print_on_console('element not found')
+                                    err_msg = 'element not found'
                             except Exception as e:
                                 Exceptions.error(e)
                 except Exception as e:
                     Exceptions.error(e)
-                return status,method_output,result
+                    err_msg = desktop_constants.ERROR_MSG
+                return status,method_output,result,err_msg
 
         def verifySelected(self,element,parent,input_val, *args):
             status=desktop_constants.TEST_RESULT_FAIL
@@ -207,6 +219,8 @@ class Dropdown_Keywords():
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
             item_text=input_val[0].strip()
+            verb = OUTPUT_CONSTANT
+            err_msg=None
             try:
                 if launch_keywords.window_name!=None:
                     if object_xpath[0:3]=='cbo':
@@ -220,7 +234,7 @@ class Dropdown_Keywords():
                                         if select==1:
                                             status=desktop_constants.TEST_RESULT_PASS
                                             result=desktop_constants.TEST_RESULT_TRUE
-                                            return status,result
+
                                         else:
                                             logger.print_on_console('unable to verify  the selected item')
                                 else:
@@ -276,7 +290,8 @@ class Dropdown_Keywords():
                             Exceptions.error(e)
             except Exception as e:
                 Exceptions.error(e)
-            return status,result
+                err_msg = desktop_constants.ERROR_MSG
+            return status,result,verb,err_msg
 
         def getCount(self,element,parent, *args):
             status=desktop_constants.TEST_RESULT_FAIL
@@ -284,6 +299,7 @@ class Dropdown_Keywords():
             result=None
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
+            err_msg=None
             try:
                 if launch_keywords.window_name!=None:
                     if object_xpath[0:3]=='cbo':
@@ -297,7 +313,7 @@ class Dropdown_Keywords():
                                             status=desktop_constants.TEST_RESULT_PASS
                                             method_output=desktop_constants.TEST_RESULT_TRUE
                                             result=len(select)
-                                            return status,method_output,result
+
                                         else:
                                             logger.print_on_console('unable to verify  the selected item')
                                 else:
@@ -322,16 +338,17 @@ class Dropdown_Keywords():
                                         status=desktop_constants.TEST_RESULT_PASS
                                         method_output=desktop_constants.TEST_RESULT_TRUE
                                         result=actual_count
-                                        return status,method_output,result
+
                                     else:
                                         logger.print_on_console('unable to select list item')
                             else:
                                 logger.print_on_console('element not found')
                         except Exception as e:
                             Exceptions.error(e)
+                            err_msg = desktop_constants.ERROR_MSG
             except Exception as e:
                 Exceptions.error(e)
-            return status,method_output,result
+            return status,method_output,result,err_msg
 
         def verifyCount(self,element,parent,input_val, *args):
             status=desktop_constants.TEST_RESULT_FAIL
@@ -339,6 +356,8 @@ class Dropdown_Keywords():
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
             count_given=input_val[0]
+            err_msg=None
+            verb = OUTPUT_CONSTANT
             try:
                 if launch_keywords.window_name!=None:
                     if object_xpath[0:3]=='cbo':
@@ -352,7 +371,7 @@ class Dropdown_Keywords():
                                             if int(count_given)==len(select):
                                                 status=desktop_constants.TEST_RESULT_PASS
                                                 result=desktop_constants.TEST_RESULT_TRUE
-                                                return status,result
+
                                         else:
                                             logger.print_on_console('unable to verify  the selected item')
                                 else:
@@ -376,14 +395,16 @@ class Dropdown_Keywords():
                                     if actual_count>0 and  int(count_given)==actual_count:
                                         status=desktop_constants.TEST_RESULT_PASS
                                         result=desktop_constants.TEST_RESULT_TRUE
-                                        return status,result
+
                             else:
                                 logger.print_on_console('element not found')
+                                err_msg = 'element not found'
                         except Exception as e:
                             Exceptions.error(e)
+                            err_msg = desktop_constants.ERROR_MSG
             except Exception as e:
                 Exceptions.error(e)
-            return status,result
+            return status,result,verb,err_msg
 
         def verifyValuesExists(self,element,parent,input_val, *args):
             status=desktop_constants.TEST_RESULT_FAIL
@@ -391,6 +412,8 @@ class Dropdown_Keywords():
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
             item_text=input_val
+            err_msg=None
+            verb = OUTPUT_CONSTANT
 
             try:
                 if launch_keywords.window_name!=None:
@@ -461,9 +484,10 @@ class Dropdown_Keywords():
                                 logger.print_on_console('element not found')
                         except Exception as e:
                             Exceptions.error(e)
+                            err_msg = desktop_constants.ERROR_MSG
             except Exception as e:
                 Exceptions.error(e)
-            return status,result
+            return status,result,verb,err_msg
 
 
         def verifyAllValues(self,element,parent,input_val, *args):
@@ -472,6 +496,8 @@ class Dropdown_Keywords():
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
             item_text=input_val
+            err_msg=None
+            verb = OUTPUT_CONSTANT
             try:
                 if launch_keywords.window_name!=None:
                     if object_xpath[0:3]=='cbo':
@@ -540,9 +566,10 @@ class Dropdown_Keywords():
                                 logger.print_on_console('element not found')
                         except Exception as e:
                             Exceptions.error(e)
+                            err_msg = desktop_constants.ERROR_MSG
             except Exception as e:
                 Exceptions.error(e)
-            return status,result
+            return status,result,verb,err_msg
 
 
         def getValueByIndex(self,element,parent,input_val, *args):
@@ -552,6 +579,7 @@ class Dropdown_Keywords():
             object_index=element.split(';')[1]
             index=input_val[0]
             result=None
+            err_msg=None
             try:
                 if launch_keywords.window_name!=None:
                     if object_xpath[0:3]=='cbo':
@@ -618,7 +646,8 @@ class Dropdown_Keywords():
                             Exceptions.error(e)
             except Exception as e:
                 Exceptions.error(e)
-            return status,method_output,result
+                err_msg = desktop_constants.ERROR_MSG
+            return status,method_output,result,err_msg
 
         def getMultpleValuesByIndexs(self,element,parent,input_val, *args):
             status=desktop_constants.TEST_RESULT_FAIL
@@ -626,6 +655,7 @@ class Dropdown_Keywords():
             method_output=desktop_constants.TEST_RESULT_FALSE
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
+            err_msg=None
             try:
                     if ldtp.getobjectproperty(launch_keywords.window_name, object_xpath,desktop_constants.CLASS)==desktop_constants.LIST_BOX:
                         if object_xpath!=None  and editable_text.verify_parent(object_xpath,parent):
@@ -669,13 +699,16 @@ class Dropdown_Keywords():
                             logger.print_on_console('element not found')
             except Exception as e:
                 Exceptions.error(e)
-            return status,method_output,result
+                err_msg = desktop_constants.ERROR_MSG
+            return status,method_output,result,err_msg
 
         def selectAllValues(self,element,parent,*args):
             status=desktop_constants.TEST_RESULT_FAIL
             result=desktop_constants.TEST_RESULT_FALSE
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
+            err_msg=None
+            verb = OUTPUT_CONSTANT
             try:
 
                     if ldtp.getobjectproperty(launch_keywords.window_name, object_xpath,desktop_constants.CLASS)==desktop_constants.LIST_BOX:
@@ -710,13 +743,16 @@ class Dropdown_Keywords():
                             logger.print_on_console('element not found')
             except Exception as e:
                 Exceptions.error(e)
-            return status,result
+                err_msg = desktop_constants.ERROR_MSG
+            return status,result,verb,err_msg
 
         def deSelectAll(self,element,parent,*args):
             status=desktop_constants.TEST_RESULT_FAIL
             result=desktop_constants.TEST_RESULT_FALSE
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
+            err_msg=None
+            verb = OUTPUT_CONSTANT
 
             try:
                     if ldtp.getobjectproperty(launch_keywords.window_name, object_xpath,desktop_constants.CLASS)==desktop_constants.LIST_BOX:
@@ -751,13 +787,16 @@ class Dropdown_Keywords():
                             logger.print_on_console('element not found')
             except Exception as e:
                 Exceptions.error(e)
-            return status,result
+                err_msg = desktop_constants.ERROR_MSG
+            return status,result,verb,err_msg
 
         def selectMultpleValuesByIndexs(self,element,parent,input_val, *args):
             status=desktop_constants.TEST_RESULT_FAIL
             result=desktop_constants.TEST_RESULT_FALSE
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
+            err_msg=None
+            verb = OUTPUT_CONSTANT
             try:
                     if ldtp.getobjectproperty(launch_keywords.window_name, object_xpath,desktop_constants.CLASS)==desktop_constants.LIST_BOX:
                         if object_xpath!=None and editable_text.verify_parent(object_xpath,parent) :
@@ -792,13 +831,16 @@ class Dropdown_Keywords():
                             logger.print_on_console('element not found')
             except Exception as e:
                 Exceptions.error(e)
-            return status,result
+                err_msg = desktop_constants.ERROR_MSG
+            return status,result,verb,err_msg
 
         def selectMultpleValuesByText(self,element,parent,input_val, *args):
             status=desktop_constants.TEST_RESULT_FAIL
             result=desktop_constants.TEST_RESULT_FALSE
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
+            err_msg=None
+            verb = OUTPUT_CONSTANT
             try:
                     if ldtp.getobjectproperty(launch_keywords.window_name, object_xpath,desktop_constants.CLASS)==desktop_constants.LIST_BOX:
                         if object_xpath!=None  and editable_text.verify_parent(object_xpath,parent):
@@ -829,7 +871,8 @@ class Dropdown_Keywords():
                             logger.print_on_console('element not found')
             except Exception as e:
                 Exceptions.error(e)
-            return status,result
+                err_msg = desktop_constants.ERROR_MSG
+            return status,result,verb,err_msg
 
         def clickOnCombo(self,objectName):
             try:

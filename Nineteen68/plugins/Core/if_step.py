@@ -67,7 +67,7 @@ class If():
         if self.name.lower() in [IF,ELSE_IF]:
 
 
-
+            input_expression=None
             #Check is made when elseIf is encountered to ensure it is to be executed or not
             if self.name.lower() == ELSE_IF:
                 step=handler.tspList[start_step.keys()[0]]
@@ -79,8 +79,11 @@ class If():
 
             logger.print_on_console('Encountered :'+self.name+'\n')
             logical_eval_obj=Logical_eval()
-            input_expression=input[0]
-            logger.print_on_console('Input_expression is '+input_expression)
+            if len(input)>=2:
+                input_expression=input[0]+input[1]+input[2]
+            else:
+                logger.print_on_console('Invalid input')
+            logger.print_on_console('Input_expression is ',input_expression)
             res=logical_eval_obj.eval_expression(input_expression)
             logger.print_on_console(self.name+': Condition is '+str(res)+'\n')
             self.step_description='Encountered :'+self.name+ ' Condition is '+str(res)

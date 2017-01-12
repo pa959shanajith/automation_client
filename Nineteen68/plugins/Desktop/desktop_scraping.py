@@ -22,6 +22,7 @@ import win32process
 from threading import Thread
 from ldtp import *
 from ldtp.client_exception import LdtpExecutionError
+from constants import *
 
 ctrldownflag = False
 stopumpingmsgs = False

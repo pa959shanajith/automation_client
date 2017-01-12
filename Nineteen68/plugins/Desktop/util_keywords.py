@@ -16,6 +16,7 @@ import Exceptions
 import desktop_constants
 import editable_text
 from launch_keywords import Launch_Keywords
+from constants import *
 
 editable_text=editable_text.Text_Box()
 class Util_Keywords():
@@ -25,6 +26,8 @@ class Util_Keywords():
             result=desktop_constants.TEST_RESULT_FALSE
             object_xpath=element.split(';')
             object_xpath=object_xpath[0].strip()
+            verb = OUTPUT_CONSTANT
+            err_msg=None
             try:
                 if launch_keywords.window_name!=None:
                     if object_xpath!=None and editable_text.verify_parent(object_xpath,parent):
@@ -32,18 +35,21 @@ class Util_Keywords():
                         if desktop_constants.ENABLED_CHECK in states:
                             status=desktop_constants.TEST_RESULT_PASS
                             result=desktop_constants.TEST_RESULT_TRUE
-                            return status,result
                     else:
                         logger.print_on_console('element not found')
+                        err_msg = 'element not found'
             except Exception as e:
                 Exceptions.error(e)
-            return status,result
+                err_msg = desktop_constants.ERROR_MSG
+            return status,result,verb,err_msg
 
         def verifyDisabled(self,element,parent,*args):
             status=desktop_constants.TEST_RESULT_FAIL
             result=desktop_constants.TEST_RESULT_FALSE
             object_xpath=element.split(';')
             object_xpath=object_xpath[0].strip()
+            verb = OUTPUT_CONSTANT
+            err_msg=None
             try:
                 if launch_keywords.window_name!=None:
                     if object_xpath!=None and  editable_text.verify_parent(object_xpath,parent):
@@ -51,18 +57,20 @@ class Util_Keywords():
                         if not desktop_constants.ENABLED_CHECK in states:
                             status=desktop_constants.TEST_RESULT_PASS
                             result=desktop_constants.TEST_RESULT_TRUE
-                            return status,result
                     else:
                         logger.print_on_console('element not found')
             except Exception as e:
                 Exceptions.error(e)
-            return status,result
+                err_msg = desktop_constants.ERROR_MSG
+            return status,result,verb,err_msg
 
         def verifyVisible(self,element,parent,*args):
                 status=desktop_constants.TEST_RESULT_FAIL
                 result=desktop_constants.TEST_RESULT_FALSE
                 object_xpath=element.split(';')
                 object_xpath=object_xpath[0].strip()
+                verb = OUTPUT_CONSTANT
+                err_msg=None
                 try:
                     if launch_keywords.window_name!=None:
                         if object_xpath!=None and  editable_text.verify_parent(object_xpath,parent):
@@ -70,18 +78,20 @@ class Util_Keywords():
                             if  desktop_constants.VISIBLE_CHECK in states:
                                 status=desktop_constants.TEST_RESULT_PASS
                                 result=desktop_constants.TEST_RESULT_TRUE
-                                return status,result
                         else:
                             logger.print_on_console('element not found')
                 except Exception as e:
                     Exceptions.error(e)
-                return status,result
+                    err_msg = desktop_constants.ERROR_MSG
+                return status,result,verb,err_msg
 
         def verifyExists(self,element,parent,*args):
                 status=desktop_constants.TEST_RESULT_FAIL
                 result=desktop_constants.TEST_RESULT_FALSE
                 object_xpath=element.split(';')
                 object_xpath=object_xpath[0].strip()
+                verb = OUTPUT_CONSTANT
+                err_msg=None
                 try:
                     if launch_keywords.window_name!=None:
                         if object_xpath!=None and  editable_text.verify_parent(object_xpath,parent):
@@ -89,18 +99,20 @@ class Util_Keywords():
                             if  desktop_constants.VISIBLE_CHECK in states:
                                 status=desktop_constants.TEST_RESULT_PASS
                                 result=desktop_constants.TEST_RESULT_TRUE
-                                return status,result
                         else:
                             logger.print_on_console('element not found')
                 except Exception as e:
                     Exceptions.error(e)
-                return status,result
+                    err_msg = desktop_constants.ERROR_MSG
+                return status,result,verb,err_msg
 
         def verifyHidden(self,element,parent,*args):
                 status=desktop_constants.TEST_RESULT_FAIL
                 result=desktop_constants.TEST_RESULT_FALSE
                 object_xpath=element.split(';')
                 object_xpath=object_xpath[0].strip()
+                verb = OUTPUT_CONSTANT
+                err_msg=None
                 try:
                     if launch_keywords.window_name!=None:
                         if object_xpath!=None and  editable_text.verify_parent(object_xpath,parent):
@@ -108,18 +120,20 @@ class Util_Keywords():
                             if  not desktop_constants.VISIBLE_CHECK in states:
                                 status=desktop_constants.TEST_RESULT_PASS
                                 result=desktop_constants.TEST_RESULT_TRUE
-                                return status,result
                         else:
                             logger.print_on_console('element not found')
                 except Exception as e:
                     Exceptions.error(e)
-                return status,result
+                    err_msg = desktop_constants.ERROR_MSG
+                return status,result,verb,err_msg
 
         def verifyReadOnly(self,element,parent,*args):
                 status=desktop_constants.TEST_RESULT_FAIL
                 result=desktop_constants.TEST_RESULT_FALSE
                 object_xpath=element.split(';')
                 object_xpath=object_xpath[0].strip()
+                verb = OUTPUT_CONSTANT
+                err_msg=None
                 try:
                     if launch_keywords.window_name!=None:
                         if object_xpath!=None and  editable_text.verify_parent(object_xpath,parent):
@@ -129,19 +143,20 @@ class Util_Keywords():
                                 if int(classID)!=1:
                                     status=desktop_constants.TEST_RESULT_PASS
                                     result=desktop_constants.TEST_RESULT_TRUE
-                                    return status,result
                         else:
                             logger.print_on_console('element not found')
                 except Exception as e:
                     Exceptions.error(e)
-                return status,result
+                    err_msg = desktop_constants.ERROR_MSG
+                return status,result,verb,err_msg
 
         def setFocus(self,element,parent,*args):
                 status=desktop_constants.TEST_RESULT_FAIL
                 result=desktop_constants.TEST_RESULT_FALSE
                 object_xpath=element.split(';')
                 object_xpath=object_xpath[0].strip()
-
+                verb = OUTPUT_CONSTANT
+                err_msg=None
                 try:
                     if launch_keywords.window_name!=None:
                         if object_xpath!=None and  editable_text.verify_parent(object_xpath,parent):
@@ -155,10 +170,10 @@ class Util_Keywords():
                             if flagEnable==1:
                                 status=desktop_constants.TEST_RESULT_PASS
                                 result=desktop_constants.TEST_RESULT_TRUE
-                                return status,result
                         else:
                             logger.print_on_console('element not found')
                 except Exception as e:
                     Exceptions.error(e)
-                return status,result
+                    err_msg = desktop_constants.ERROR_MSG
+                return status,result,verb,err_msg
 
