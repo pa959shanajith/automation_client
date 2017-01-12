@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        desktop_dispatcher.py
 # Purpose:
 #
 # Author:      rakesh.v
@@ -21,6 +21,9 @@ import desktop_constants
 import radio_checkbox_keywords_desktop
 import outlook
 from constants import *
+import logging
+
+log = logging.getLogger('desktop_dispatcher.py')
 
 class DesktopDispatcher:
     button_link_keywords_obj = button_link_keywords_desktop.ButtonLinkKeyword()
@@ -126,8 +129,7 @@ class DesktopDispatcher:
             else:
                 logger.print_on_console(desktop_constants.INVALID_KEYWORD)
         except Exception as e:
-            print 'Exception at dispatcher'
-            Exceptions.error(e)
+            logger.print_on_console('Exception at dispatcher')
 
         return result
 
