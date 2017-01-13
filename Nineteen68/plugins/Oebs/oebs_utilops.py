@@ -714,7 +714,7 @@ class UtilOperations:
                         verifyresponse = MSG_TRUE
                     else:
                         val = string[i].upper()
-                        self.keyboardops.keyboard_operation('keypress',val)
+                        self.keyboardops.keyboard_operation('keypress','TAB')
                         keywordresult = MSG_PASS
                         verifyresponse = MSG_TRUE
                 elif string[i].isdigit():
