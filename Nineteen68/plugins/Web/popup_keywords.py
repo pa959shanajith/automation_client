@@ -17,7 +17,7 @@ from selenium import webdriver
 
 import browser_Keywords
 import logging
-
+from constants import *
 
 log = logging.getLogger('popup_keywords.py')
 class PopupKeywords():
