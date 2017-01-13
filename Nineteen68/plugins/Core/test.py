@@ -26,68 +26,188 @@ class Test():
         data1 =[{
         	"template": "",
         	"testscript_name": "Script1",
-        	"testcase":[
+        	"testcase": [
   {
     "outputVal": "",
-    "keywordVal": "openBrowser",
+    "keywordVal": "createDynVariable",
     "objectName": " ",
-    "_id_": "1",
     "inputVal": [
-      ""
+      "abc"
     ],
-    "appType": "Web",
+    "appType": "Generic",
     "stepNo": 1,
     "url": " ",
-    "custname": "@Browser"
+    "custname": "@Generic"
   },
   {
     "outputVal": "",
-    "keywordVal": "navigateToURL",
+    "keywordVal": "if",
     "objectName": " ",
-    "_id_": "2",
     "inputVal": [
-      "http://www.way2automation.com/angularjs-protractor/calc/"
+      "(abc;==;abc)"
     ],
-    "appType": "Web",
+    "appType": "Generic",
     "stepNo": 2,
     "url": " ",
-    "custname": "@Browser"
+    "custname": "@Generic"
   },
-
   {
-    "outputVal": "{title}",
-    "keywordVal": "getPageTitle",
+    "outputVal": "",
+    "keywordVal": "concatenate",
     "objectName": " ",
-    "_id_": "5",
+    "inputVal": [
+      "slk;software"
+    ],
+    "appType": "Generic",
+    "stepNo": 3,
+    "url": " ",
+    "custname": "@Generic"
+  },
+  {
+    "outputVal": "",
+    "keywordVal": "endIf",
+    "objectName": " ",
     "inputVal": [
       ""
     ],
-    "appType": "Web",
-    "stepNo": 5,
+    "appType": "Generic",
+    "stepNo": 4,
     "url": " ",
-    "custname": "@Browser"
+    "custname": "@Generic"
   },
   {
     "outputVal": "",
-    "keywordVal": "verifyPageTitle",
+    "keywordVal": "jumpTo",
     "objectName": " ",
-    "_id_": "6",
     "inputVal": [
-        "{title}"
+      "s2"
     ],
-    "appType": "Web",
-    "stepNo": 6,
+    "appType": "Generic",
+    "stepNo": 5,
     "url": " ",
-    "custname": "@Browser"
+    "custname": "@Generic"
   },
-
+  {
+    "outputVal": "",
+    "keywordVal": "createDynVariable",
+    "objectName": "",
+    "inputVal": [
+      "{msg};jump to executed "
+    ],
+    "appType": "Generic",
+    "stepNo": 6,
+    "url": "",
+    "custname": "@Generic"
+  },
+  {
+    "outputVal": "",
+    "keywordVal": "displayVariableValue",
+    "objectName": "",
+    "inputVal": [
+      "{msg}"
+    ],
+    "appType": "Generic",
+    "stepNo": 7,
+    "url": "",
+    "custname": "@Generic"
+  },
+  {
+    "outputVal": "",
+    "keywordVal": "stop",
+    "objectName": "",
+    "inputVal": [
+      ""
+    ],
+    "appType": "Generic",
+    "stepNo": 8,
+    "url": "",
+    "custname": "@Generic"
+  },
+  {
+    "outputVal": "",
+    "keywordVal": "evaluate",
+    "objectName": " ",
+    "inputVal": [
+      "1 + 3"
+    ],
+    "appType": "Generic",
+    "stepNo": 9,
+    "url": " ",
+    "custname": "@Generic"
+  },
   {
     "comments": ""
   }
 ]
-
         }]
+
+
+
+        data2 =[{
+        	"template": "",
+        	"testscript_name": "s2",
+        	"testcase": [
+  {
+    "outputVal": "",
+    "keywordVal": "if",
+    "objectName": "",
+    "_id_": "1",
+    "inputVal": [
+      "(1==1)"
+    ],
+    "appType": "Generic",
+    "stepNo": 1,
+    "url": "",
+    "custname": "@Generic"
+  },
+  {
+    "outputVal": "{a}",
+    "keywordVal": "concatenate",
+    "objectName": " ",
+    "_id_": "2",
+    "inputVal": [
+      "abc;d"
+    ],
+    "appType": "Generic",
+    "stepNo": 2,
+    "url": " ",
+    "custname": "@Generic"
+  },
+  {
+    "outputVal": "",
+    "keywordVal": "displayVariableValue",
+    "objectName": " ",
+    "_id_": "3",
+    "inputVal": [
+      "{a}"
+    ],
+    "appType": "Generic",
+    "stepNo": 3,
+    "url": " ",
+    "custname": "@Generic"
+  },
+  {
+    "outputVal": "",
+    "keywordVal": "endIf",
+    "objectName": " ",
+    "_id_": "4",
+    "inputVal": [
+      ""
+    ],
+    "appType": "Generic",
+    "stepNo": 4,
+    "url": " ",
+    "custname": "@Generic"
+  },
+  {
+    "comments": ""
+  }
+]
+        }]
+
+
         dataList1.append(data1)
+        dataList1.append(data2)
 
 
         suite.append(dataList1)

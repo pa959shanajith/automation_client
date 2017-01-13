@@ -113,7 +113,7 @@ class Controller():
         self.reporting_obj=reporting.Reporting()
         self.conthread=None
         self.action=None
-        self.jumpto_counter=-1
+        self.counter=-1
         self.jumpto_previousindex=-1
 
     def __load_generic(self):
@@ -319,7 +319,8 @@ class Controller():
                     elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
                         index = tsp.invoke_jumpby(inpval,self.reporting_obj)
                     elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
-                        index = tsp.invoke_jumpto(inpval,self.reporting_obj)
+                        self.jumpto_previousindex=index+1
+                        index,self.counter = tsp.invoke_jumpto(inpval,self.reporting_obj,self.counter)
 
 
 
@@ -345,6 +346,9 @@ class Controller():
 
         if self.action==EXECUTE:
             self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
+
+        if self.counter>-1 and self.counter-index==0:
+            return JUMP_TO
 
         return index
 
@@ -516,12 +520,14 @@ class Controller():
 ##                        logger.print_on_console('Debug Stopped')
 ##                        status=i
 ##                        break
+                    elif i==JUMP_TO:
+                        i=self.jumpto_previousindex
+                        self.jumpto_previousindex-1
+                        self.counter=-1
 
                 except Exception as e:
                     log.error(e)
                     logger.print_on_console(e)
-
-
                     status=False
                     i=i+1
             else:
