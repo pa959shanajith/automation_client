@@ -99,9 +99,7 @@ class KeywordOperations:
         windll.user32.keybd_event(key,0,self.KEYEVENTF_KEYUP,0)
 
     def keyboard_operation_sendfunctionkeys(self,action,key):
-        print 'WHAT IS TH EKWY ',key
         key=self.find_key(key)
-        print 'AFTERR WHAT IS TH EKWY ',key
         if key != None:
             if(action == 'keydown'):
                 self.__sendkeydown(key)
