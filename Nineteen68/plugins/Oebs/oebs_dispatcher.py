@@ -63,7 +63,8 @@ class OebsDispatcher:
 
     def print_error(self,err_msg):
         err_msg1=constants.ERROR_CODE_DICT[err_msg]
-        logger.print_on_console(err_msg1)
+        if err_msg!='ERR_CUSTOM_NOTFOUND':
+            logger.print_on_console(err_msg1)
         log.error(err_msg1)
 
 
@@ -90,11 +91,11 @@ class OebsDispatcher:
                         input.reverse()
                         objectname=custom_oebs_element
                     else:
-                        self.print_error('ERR_CUSTOM_MISMATCH')
-
+                        self.print_error('ERR_CUSTOM_NOTFOUND')
                 else:
+                    self.print_error('ERR_CUSTOM_MISMATCH')
                     self.print_error('ERR_PRECONDITION_NOTMET')
-                    self.print_error('ERR_CUSTOM_NOTFOUND')
+
             else:
                  self.print_error('ERR_REF_ELE_NULL')
                  self.print_error('ERR_CUSTOM_NOTFOUND')

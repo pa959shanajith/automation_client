@@ -65,7 +65,6 @@ class UtilOperations:
         oebs_key_objects.keyword_output.append(str(keywordresponse))
 
     def drag(self,acc):
-        print
         del oebs_key_objects.custom_msg[:]
          #sets the keywordresult to FAIL
         keywordresult=MSG_FAIL
@@ -106,7 +105,6 @@ class UtilOperations:
         oebs_key_objects.keyword_output.append(str(verifyresponse))
 
     def drop(self,acc):
-        print
         del oebs_key_objects.custom_msg[:]
          #sets the keywordresult to FAIL
         keywordresult=MSG_FAIL
@@ -266,9 +264,7 @@ class UtilOperations:
             x_coor = int(curaccinfo.x + (0.5 * curaccinfo.width))
             y_coor = int(curaccinfo.y + (0.5 * curaccinfo.height))
             #Visibility check for scrollbar
-            print 'Visibility',self.getObjectVisibility(acc,x_coor,y_coor)
             if(self.getObjectVisibility(acc,x_coor,y_coor)):
-                print objstates
                 if 'visible' and 'showing' in objstates:
                     verifyresponse = MSG_FALSE
                     keywordresult=MSG_FAIL
