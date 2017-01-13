@@ -118,6 +118,7 @@ class Dispatcher:
                                     input.reverse()
                                     for x in range(0,3):
                                         input.pop()
+                                    input.reverse()
                                 else:
                                     print_error('ERR_CUSTOM_MISMATCH')
                             else:

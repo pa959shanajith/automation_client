@@ -428,7 +428,7 @@ class Utilities:
 
         if oebs_key_objects.custom_msg != [] and status==TEST_RESULT_FAIL:
             err_msg=oebs_key_objects.custom_msg[0]
-            logger.print_on_console(err_msg)
+##            logger.print_on_console(err_msg)
 
         if methodoutput==output:
             output=OUTPUT_CONSTANT

@@ -748,7 +748,7 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.utilities_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
         if (oebs_key_objects.keyword_output[1]):
             accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
             if str(accessContext) != 'fail':

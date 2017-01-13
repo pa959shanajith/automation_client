@@ -12,7 +12,7 @@ from launch_keywords import ldtp
 import desktop_constants
 from encryption_utility import AESCipher
 import logger
-import Exceptions
+
 import launch_keywords
 from ldtp.client_exception import LdtpExecutionError
 import logging

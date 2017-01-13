@@ -36,13 +36,13 @@ class TextboxKeywords:
         log.debug(user_input)
         return user_input
 
-    def __read_only(self,e):
+    def __read_only(self):
         err_msg=ERROR_CODE_DICT['ERR_ELEMENT_IS_READONLY']
         logger.print_on_console(err_msg)
         log.error(err_msg)
         return err_msg
 
-    def __element_disabled(self,e):
+    def __element_disabled(self):
         err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
         logger.print_on_console(err_msg)
         log.error(err_msg)
@@ -102,9 +102,9 @@ class TextboxKeywords:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:
-                            err_msg=self.__read_only(e)
+                            err_msg=self.__read_only()
                 else:
-                    err_msg=self.__element_disabled(e)
+                    err_msg=self.__element_disabled()
             except InvalidElementStateException as e:
                 err_msg=self.__invalid_element_state(e)
 
@@ -144,14 +144,18 @@ class TextboxKeywords:
                                 browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
                             else:
                                 webelement.clear()
-                                log.debug('Sending the value via part 2')
-                                webelement.send_keys(input)
+                                if isinstance(browser_Keywords.driver_obj,browser_Keywords.webdriver.Ie):
+                                    log.debug('Sending the value via part 1')
+                                    browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
+                                else:
+                                    log.debug('Sending the value via part 2')
+                                    webelement.send_keys(input)
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:
-                            err_msg=self.__read_only(e)
+                            err_msg=self.__read_only()
                 else:
-                    err_msg=self.__element_disabled(e)
+                    err_msg=self.__element_disabled()
             except InvalidElementStateException as e:
                 err_msg=self.__invalid_element_state(e)
             except Exception as e:
@@ -189,7 +193,7 @@ class TextboxKeywords:
                    status=TEST_RESULT_PASS
                    methodoutput=TEST_RESULT_TRUE
                 else:
-                    err_msg=self.__element_disabled(e)
+                    err_msg=self.__element_disabled()
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
 
@@ -245,9 +249,9 @@ class TextboxKeywords:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg=self.__read_only(e)
+                        err_msg=self.__read_only()
                 else:
-                    err_msg=self.__element_disabled(e)
+                    err_msg=self.__element_disabled()
             except InvalidElementStateException as e:
                 err_msg=self.__invalid_element_state(e)
             except Exception as e:
@@ -340,9 +344,9 @@ class TextboxKeywords:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:
-                            err_msg=self.__read_only(e)
+                            err_msg=self.__read_only()
                 else:
-                    err_msg=self.__element_disabled(e)
+                    err_msg=self.__element_disabled()
             except InvalidElementStateException as e:
                 err_msg=self.__invalid_element_state(e)
             except Exception as e:

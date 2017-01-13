@@ -15,7 +15,7 @@ import win32process
 import win32con
 import win32api
 import logger
-import Exceptions
+
 import os
 import desktop_constants
 import ctypes

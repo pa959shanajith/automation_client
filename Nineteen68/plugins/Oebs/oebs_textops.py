@@ -162,7 +162,7 @@ class TextOperations:
                                         #gets the full length of the text
                                         character=acc.getAccessibleTextInfo(0,1)
 
-                                        self.keywordops_obj.KeyboardOperation('keypress','HOME')
+                                        self.keywordops_obj.keyboard_operation('keypress','HOME')
                                         #clears the text untill all characters are deleted
                                         for num in range(character.charCount):
                                             shell.SendKeys("{DELETE}")
@@ -332,7 +332,7 @@ class TextOperations:
                                         if 'focused' in curaccinfo.states:
                                             #gets the full length of the text
                                             character=acc.getAccessibleTextInfo(0,1)
-                                            self.keywordops_obj.KeyboardOperation('keypress','HOME')
+                                            self.keywordops_obj.keyboard_operation('keypress','HOME')
                                             #clears the text until all characters are deleted
                                             for num in range(character.charCount):
                                                 shell.SendKeys("{DELETE}")

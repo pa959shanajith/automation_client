@@ -73,15 +73,16 @@ class  JumpBy():
 
         except Exception as e:
              log.error(e)
-             
+
              logger.print_on_console(e)
-             
+
 
         #Reporting part
-        self.step_description='JumpBy executed and the result is '+self.status
-        logger.print_on_console('JumpBy executed and the result is '+self.status)
+        self.step_description='JumpBy executed and the result is '+str(self.status)
+        logger.print_on_console('JumpBy executed and the result is '+str(self.status))
         log.info('JumpBy executed and the result is '+self.status)
         self.parent_id=reporting_obj.get_pid()
+        reporting_obj.name=self.name
         #Reporting part ends
         return jumpByStepNum
 

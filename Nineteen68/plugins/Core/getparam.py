@@ -178,7 +178,7 @@ class GetParam():
             return status
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
 
     def readcsvfile(self,fileinfo):
@@ -253,7 +253,7 @@ class GetParam():
             return myDict
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
 
 
@@ -307,7 +307,7 @@ class GetParam():
                 return sdata
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
 
 
@@ -345,7 +345,7 @@ class GetParam():
             return data
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
 
 
@@ -392,7 +392,7 @@ class GetParam():
                 return getparamres
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
 
     def invokegetparam(self,input):
@@ -442,11 +442,14 @@ class GetParam():
                                     variable = PIPE + columnname + PIPE
                                     p = p + len(variable)
                                     inputresult = data[columnname][row]
+                                    if isinstance(inputresult,float):
+                                        if inputresult % 1 == 0.0:
+                                            inputresult = int(inputresult)
                                     resultinput = resultinput.replace(variable,str(inputresult))
                                     inputlistwithval.insert(i,resultinput)
             except Exception as e:
                 log.error(e)
-                
+
                 logger.print_on_console(e)
             return inputlistwithval
 
@@ -705,7 +708,7 @@ class GetParam():
             #Reporting part ends
 
             log.error(e)
-            
+
             logger.print_on_console(e)
         return return_value
 

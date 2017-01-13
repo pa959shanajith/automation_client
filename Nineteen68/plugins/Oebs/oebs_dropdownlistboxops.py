@@ -485,7 +485,7 @@ class DropdownListboxOperations:
                                         if currentselection>childindex:
                                             moveloc=currentselection-childindex
                                             for index in range(int(moveloc)):
-                                                self.keyboardops_obj.KeyboardOperation('keypress','A_UP')
+                                                self.keyboardops_obj.keyboard_operation('keypress','A_UP')
                                             requiredcontext=self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(childindex))
@@ -497,7 +497,7 @@ class DropdownListboxOperations:
                                         elif currentselection<childindex:
                                             moveloc=childindex-currentselection
                                             for index in range(int(moveloc)):
-                                                self.keyboardops_obj.KeyboardOperation('keypress','A_DOWN')
+                                                self.keyboardops_obj.keyboard_operation('keypress','A_DOWN')
                                                 time.sleep(0.1)
                                             requiredcontext=self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
@@ -513,7 +513,7 @@ class DropdownListboxOperations:
                                         log.debug('%s',MSG_INVALID_NOOF_INPUT)
                                     log.debug('Value is selected')
                                 #combo box is revert back with below code
-                                self.keyboardops_obj.KeyboardOperation('keypress','ENTER')
+                                self.keyboardops_obj.keyboard_operation('keypress','ENTER')
                                 time.sleep(0.4)
                                 labelobj1=acc.getAccessibleChildFromContext(childindex)
                                 labelcontext1=labelobj1.getAccessibleContextInfo()
@@ -555,7 +555,7 @@ class DropdownListboxOperations:
                                         if currentselection>childindex:
                                             moveloc=currentselection-childindex
                                             for index in range(int(moveloc)):
-                                                self.keyboardops_obj.KeyboardOperations('keypress','A_UP')
+                                                self.keyboardops_obj.keyboard_operations('keypress','A_UP')
                                                 time.sleep(0.1)
                                             requiredcontext=self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
@@ -568,7 +568,7 @@ class DropdownListboxOperations:
                                         elif currentselection<childindex:
                                             moveloc=childindex-currentselection
                                             for index in range(int(moveloc)):
-                                                self.keyboardops_obj.KeyboardOperation('keypress','A_DOWN')
+                                                self.keyboardops_obj.keyboard_operation('keypress','A_DOWN')
                                                 time.sleep(0.1)
                                             requiredcontext=self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
@@ -794,9 +794,9 @@ class DropdownListboxOperations:
                                 if elementPos != -1:
                                     keywordresult = MSG_PASS
                                     verifyresponse = MSG_TRUE
-                                    self.keyboardops_obj.KeyboardOperation('keypress','HOME')
+                                    self.keyboardops_obj.keyboard_operation('keypress','HOME')
                                     for num in range(elementPos):
-                                        self.keyboardops_obj.KeyboardOperation('keypress','A_DOWN')
+                                        self.keyboardops_obj.keyboard_operation('keypress','A_DOWN')
                                         time.sleep(0.1)
                                     requiredcontext=self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                                     listObj = self.utilities_obj.looptolist(requiredcontext)
@@ -809,7 +809,7 @@ class DropdownListboxOperations:
                                 else:
                                     log.debug('Value Does not exist',DEF_SELECTVALUEBYTEXT)
                             #combo box is revert back with below code
-                            self.keyboardops_obj.KeyboardOperation('keypress','ENTER')
+                            self.keyboardops_obj.keyboard_operation('keypress','ENTER')
                             time.sleep(0.4)
                             labelobj1=acc.getAccessibleChildFromContext(elementPos)
                             labelcontext1=labelobj1.getAccessibleContextInfo()
@@ -867,7 +867,7 @@ class DropdownListboxOperations:
                                         if currentselection>elementPos:
                                             moveloc=currentselection-elementPos
                                             for index in range(int(moveloc)):
-                                                self.keyboardops_obj.KeyboardOperation('keypress','A_UP')
+                                                self.keyboardops_obj.keyboard_operation('keypress','A_UP')
                                                 time.sleep(0.1)
                                             requiredcontext=self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
@@ -880,7 +880,7 @@ class DropdownListboxOperations:
                                         elif currentselection<elementPos:
                                             moveloc=elementPos-currentselection
                                             for index in range(int(moveloc)):
-                                                self.keyboardops_obj.KeyboardOperation('keypress','A_DOWN')
+                                                self.keyboardops_obj.keyboard_operation('keypress','A_DOWN')
                                                 time.sleep(0.1)
                                             requiredcontext=self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                                             listObj = self.utilities_obj.looptolist(requiredcontext)

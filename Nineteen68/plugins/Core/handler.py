@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        handler
+# Name:        handler.py
 # Purpose:
 #
 # Author:      sushma.p
@@ -19,6 +19,7 @@ import getparam
 from collections import OrderedDict
 import constants
 import logger
+import logging
 
 
 
@@ -77,6 +78,8 @@ start_end_dict={constants.ENDFOR:[constants.FOR],
 ws_template=''
 
 ##dynamic_variable_map=OrderedDict()
+log = logging.getLogger('handler.py')
+
 
 class Handler():
 
@@ -299,7 +302,9 @@ class Handler():
             outputval=step['outputVal'].strip()
             outputArray=outputval.split(';')
             if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
-                logger.print_on_console(str(x)+' '+keyword)
+                logger.print_on_console('keyword: '+keyword)
+                log.info('keyword: '+keyword)
+                log.debug(str(x)+'keyword: '+keyword)
                 keyword=keyword.lower()
                 global tspIndex
                 tspIndex+=1

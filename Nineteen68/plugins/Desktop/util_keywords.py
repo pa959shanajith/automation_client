@@ -12,7 +12,7 @@
 from launch_keywords import ldtp
 import launch_keywords
 import logger
-import Exceptions
+
 import desktop_constants
 import editable_text
 from launch_keywords import Launch_Keywords

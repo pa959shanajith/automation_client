@@ -19,7 +19,6 @@ import logging
 import oebs_mouseops
 import oebs_keyboardops
 from oebs_keyboardops import KeywordOperations
-import oebs_utilops
 import time
 
 log = logging.getLogger('oebs_internalframeops.py')
@@ -125,14 +124,16 @@ class InternalFrameOperations:
             objstates = charinfo.states
             keywordop_obj=KeywordOperations()
             if 'enabled' in objstates:
+                from oebs_utilops import UtilOperations
+                obj=UtilOperations()
                 accessibleactionsinfo = acc.getAccessibleActions()
                 actioncount = accessibleactionsinfo.actionsCount
                 if('iconified' in objstates):
                     for i in range(actioncount):
                         actiontext = accessibleactionsinfo.actionInfo[i].name
                         if(str(actiontext) == 'Toggle Minimized'):
-                            oebs_utilops.rightclick(acc)
-                            keywordop_obj.KeyboardOperation('keypress','R')
+                            obj.rightclick(acc)
+                            keywordop_obj.keyboard_operation('keypress','R')
                             verifyresponse = MSG_TRUE
                             keywordresult=MSG_PASS
                         else:
@@ -143,10 +144,10 @@ class InternalFrameOperations:
                     for i in range(actioncount):
                         actiontext = accessibleactionsinfo.actionInfo[i].name
                         if(str(actiontext) == 'Toggle Minimized'):
-                            oebs_utilops.rightclick(acc)
+                            obj.rightclick(acc)
                             for i in range(0,4):
-                                keywordop_obj.KeyboardOperation('keypress','A_DOWN')
-                            keywordop_obj.KeyboardOperation('keypress','ENTER')
+                                keywordop_obj.keyboard_operation('keypress','A_DOWN')
+                            keywordop_obj.keyboard_operation('keypress','ENTER')
                             verifyresponse = MSG_TRUE
                             keywordresult=MSG_PASS
                         else:

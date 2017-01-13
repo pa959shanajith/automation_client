@@ -39,7 +39,7 @@ class  JumpTo():
         logger.print_on_console(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name)
 
     # returns jumpTo index of step to executed by taking the script name as parameter
-    def invoke_jumpto(self,reporting_obj):
+    def invoke_jumpto(self,input,reporting_obj,counter):
         log.info('JumpTo Execution Started')
         return_value=self.index+1
         try:
@@ -57,17 +57,41 @@ class  JumpTo():
                     logger.print_on_console('Target index ' +str(i))
                     return_value=i
                     self.status=True
+                    no_Of_Test_steps=self.getNoOfStepsInTestScript(i,tsp.testscript_name,handler.tspList)
+                    break
             if(flag==False):
                 logger.print_on_console('Test script name not found')
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
 
 
         #Reporting part
-        self.step_description='JumpTo executed and the result is '+self.status
+        self.step_description='JumpTo executed and the result is '+ str(self.status)
         self.parent_id=reporting_obj.get_pid()
+        reporting_obj.name=self.name
         #Reporting part ends
-        return self.index+1
+        return return_value,no_Of_Test_steps
 
+
+    # returns no of steps inside the test script
+    def getNoOfStepsInTestScript(self,current_index,actual_testscript_name,tspList):
+        return_value=None
+        try:
+            j=current_index
+            for abc in range(j,len(tspList)):
+##            while True:
+                if tspList[abc].testscript_name==actual_testscript_name:
+                    j=j+1
+                    continue
+##                elif j==len(tspList):
+##                    break
+                else:
+                    break
+
+            return_value=j
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+        return return_value
