@@ -46,7 +46,7 @@ class DateOperation:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
         return status,result,output,err_msg
 
@@ -80,7 +80,7 @@ class DateOperation:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
         return status,result,output,err_msg
 
@@ -113,7 +113,7 @@ class DateOperation:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
         return status,result,output,err_msg
 
@@ -166,7 +166,7 @@ class DateOperation:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
         return status,result,output,err_msg
 
@@ -210,7 +210,7 @@ class DateOperation:
 
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
         return status,result,output,err_msg
 
@@ -255,11 +255,11 @@ class DateOperation:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
         return status,result,output,err_msg
 
-    def dateCompare(self, input_from , input_to , input_format=None):
+    def dateCompare(self, input_from , input_to=None , input_format=None):
         """
         def : dateCompare
         purpose : compare if two dates are equal or not
@@ -272,10 +272,17 @@ class DateOperation:
         verb = OUTPUT_CONSTANT
         try:
             if not (input_from is None and input_from is ''):
-                 if not (input_to is None and input_to is ''):
+                try:
+                    if '==' in input_from:
+                        input_to=input_from.split('==')[1]
+                        input_from = input_from.split('==')[0]
+                except Exception as e:
+                    log.error(e)
+                if not (input_to is None and input_to is ''):
                     if  (input_format is None):
                         date1 = datetime.datetime.strptime(input_from, generic_constants.DATE_FORMAT )
                         date2 = datetime.datetime.strptime(input_to, generic_constants.DATE_FORMAT )
+                        print date1 , date2
                         if date1 == date2:
                             log.info('date1 == date2')
                             log.info(date1 == date2)
@@ -300,7 +307,7 @@ class DateOperation:
                         else:
                             logger.print_on_console('Format not supported')
                             err_msg = 'Format not supported'
-                 else:
+                else:
                     logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                     err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             else:
@@ -308,7 +315,6 @@ class DateOperation:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
-            
             logger.print_on_console(e)
         return status,result,verb,err_msg
 
@@ -332,7 +338,6 @@ class DateOperation:
                 return -1
         except Exception as e:
             log.error(e)
-            
             logger.print_on_console(e)
 
 
