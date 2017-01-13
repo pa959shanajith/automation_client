@@ -87,6 +87,7 @@ class OebsDispatcher:
                         input.reverse()
                         for x in range(0,3):
                             input.pop()
+                        input.reverse()
                         objectname=custom_oebs_element
                     else:
                         self.print_error('ERR_CUSTOM_MISMATCH')
