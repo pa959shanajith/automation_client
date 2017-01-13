@@ -62,8 +62,8 @@ class OutlookKeywords:
                                         folder=inbox_folder
                                         self.targetFolder=folder
                                     else:
-                                        folder=folder.Folders.Item(folders[index-1])
-                                        self.targetFolder=self.findFolder(foldername,folder)
+                                        folder=folder.Folders.Item(folders[index])
+                                        self.targetFolder=self.findFolder(foldername,self.targetFolder)
                                     index+=1
                                 if(self.targetFolder==None):
                                     logger.print_on_console('Unable to find the target folder')
