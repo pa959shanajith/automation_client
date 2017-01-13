@@ -13,7 +13,7 @@ from  win32com.client import Dispatch
 import logger
 import outlook_constants
 from   pywintypes import  com_error
-import Exceptions
+
 import desktop_constants
 
 ## This class will have the methods to automate Outlook Application
