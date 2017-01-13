@@ -301,12 +301,15 @@ class Controller():
                     self.__print_details(tsp,input,inpval)
 
                 #Calculating Start time
+                logger.print_on_console('Step number is : ',tsp.stepnum)
+                log.info('Step number is : '+str(tsp.stepnum))
 
                 if tsp != None and isinstance(tsp,TestStepProperty) :
-                    logger.print_on_console( "----Keyword :",tsp.name,' execution Started----\n')
+                    logger.print_on_console( "----Keyword :",tsp.name,' execution Started----')
                     start_time = datetime.now()
                     start_time_string=start_time.strftime(TIME_FORMAT)
                     logger.print_on_console('Step Execution start time is : '+start_time_string)
+                    log.info('Step Execution start time is : '+start_time_string)
                     index,result = self.keywordinvocation(index,inpval,self.reporting_obj,*args)
                 else:
                     keyword_flag=False
@@ -337,7 +340,7 @@ class Controller():
             end_time = datetime.now()
             end_time_string=end_time.strftime(TIME_FORMAT)
             logger.print_on_console('Step Execution end time is : '+end_time_string)
-            logger.print_on_console( "----Keyword :",tsp.name,' execution Completed----\n')
+            logger.print_on_console( "----Keyword :",tsp.name,' execution Completed----')
             ellapsed_time=end_time-start_time
             logger.print_on_console('Step Elapsed time is : ',str(ellapsed_time)+'\n')
             #Changing the overallstatus of the scenario if it's Fail or Terminate
@@ -468,7 +471,7 @@ class Controller():
 
             if pause_flag:
                 self.pause_execution()
-            logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',temp_result,'\n')
+            logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',temp_result)
             log.info('Result in methodinvocation : '+ str(teststepproperty.name)+' : ')
             log.info(result)
             log.info(KEYWORD_EXECUTION_COMPLETED+ '\n' )
@@ -481,7 +484,7 @@ class Controller():
                 index=result
                 self.status=result
 
-            print '\n'
+##            print '\n'
 
             #Checking for stop keyword
             if teststepproperty.name==STOP:
@@ -499,7 +502,7 @@ class Controller():
 
         self.scenario_start_time=datetime.now()
         start_time_string=self.scenario_start_time.strftime(TIME_FORMAT)
-        logger.print_on_console('Scenario Execution start time is : '+start_time_string)
+        logger.print_on_console('Scenario Execution start time is : '+start_time_string,'\n')
         global pause_flag
 
         while (i < len(tsplist)):
@@ -522,7 +525,7 @@ class Controller():
 ##                        break
                     elif i==JUMP_TO:
                         i=self.jumpto_previousindex
-                        self.jumpto_previousindex-1
+                        self.jumpto_previousindex=-1
                         self.counter=-1
 
                 except Exception as e:
