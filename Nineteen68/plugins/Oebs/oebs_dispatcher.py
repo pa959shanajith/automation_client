@@ -95,7 +95,6 @@ class OebsDispatcher:
                 else:
                     self.print_error('ERR_CUSTOM_MISMATCH')
 
-
             else:
                  self.print_error('ERR_CUSTOM_NOTFOUND')
                  self.print_error('ERR_PRECONDITION_NOTMET')
