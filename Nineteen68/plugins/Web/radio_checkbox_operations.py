@@ -27,7 +27,7 @@ class RadioCheckboxKeywords():
         self.status={'radio':'Selected',
                     'checkbox':'Checked'}
 
-    def __element_disabled(self,e):
+    def __element_disabled(self):
         err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
         logger.print_on_console(err_msg)
         log.error(err_msg)
@@ -35,7 +35,6 @@ class RadioCheckboxKeywords():
 
     def __web_driver_exception(self,e):
         log.error(e)
-        
         logger.print_on_console(e)
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         return err_msg
@@ -62,7 +61,7 @@ class RadioCheckboxKeywords():
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    err_msg=self.__element_disabled(e)
+                    err_msg=self.__element_disabled()
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
 
@@ -95,7 +94,7 @@ class RadioCheckboxKeywords():
                         logger.print_on_console(err_msg)
                         log.error(err_msg)
                 else:
-                    err_msg=self.__element_disabled(e)
+                    err_msg=self.__element_disabled()
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
@@ -127,7 +126,7 @@ class RadioCheckboxKeywords():
                         logger.print_on_console(err_msg)
                         log.error(err_msg)
                 else:
-                    err_msg=self.__element_disabled(e)
+                    err_msg=self.__element_disabled()
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
