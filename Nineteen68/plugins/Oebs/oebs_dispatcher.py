@@ -94,11 +94,11 @@ class OebsDispatcher:
                         self.print_error('ERR_CUSTOM_NOTFOUND')
                 else:
                     self.print_error('ERR_CUSTOM_MISMATCH')
-                    self.print_error('ERR_PRECONDITION_NOTMET')
+
 
             else:
-                 self.print_error('ERR_REF_ELE_NULL')
                  self.print_error('ERR_CUSTOM_NOTFOUND')
+                 self.print_error('ERR_PRECONDITION_NOTMET')
         message=[tsp.url,objectname,tsp.name,input,tsp.outputval]
         return message
 

@@ -18,6 +18,7 @@ from oebs_keyboardops import KeywordOperations
 import time
 import oebs_constants
 global activeframes
+import logger
 activeframes=[]
 
 log = logging.getLogger('oebs_utilops.py')
@@ -687,6 +688,21 @@ class UtilOperations:
                 self.viewportacc(parentacc)
         return accontext
 
+    def internal_setfocus(self,acc):
+        try:
+            curaccinfo = acc.getAccessibleContextInfo()
+            log.debug('Received Object Context','internal_setfocus')
+            x_coor = int(curaccinfo.x + (0.5 * curaccinfo.width))
+            y_coor = int(curaccinfo.y + (0.5 * curaccinfo.height))
+            log.debug('Formula Created','internal_setfocus')
+            #Visibility check for scrollbar
+            if(self.getObjectVisibility(acc,x_coor,y_coor)):
+                if ('showing' or 'focusable') in curaccinfo.states:
+                    oebs_mouseops.MouseOperation('move',x_coor,y_coor)
+                else:
+                    log.error('Not focusable')
+        except Exception as e:
+            log.error(e)
 
     #Method for send function keys
     def sendfunctionkeys(self,acc):
@@ -698,32 +714,53 @@ class UtilOperations:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_SENDFUNCTIONKEYS)
-            string = oebs_key_objects.keyword_input[0]
-            for i in range(len(string)):
-                if string[i].isalpha():
-                    if string[i].isupper():
-                        self.keyboardops.keyboard_operation('keypress','CAPSLOCK')
-                        self.keyboardops.keyboard_operation('keypress',string[i])
-                        self.keyboardops.keyboard_operation('keypress','CAPSLOCK')
+            self.internal_setfocus(acc)
+            string = str(oebs_key_objects.keyword_input[0])
+            count=1
+            if len(oebs_key_objects.keyword_input)>1:
+                count=oebs_key_objects.keyword_input[1]
+                try:
+                    count=int(float(count))
+                except Exception as e:
+                    log.error(e)
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_FORMAT_INPUT)
+            if string!=None and string.strip() != '':
+                for i in range(count):
+                    import time
+                    time.sleep(0.5)
+                    res=self.keyboardops.keyboard_operation_sendfunctionkeys('keypress',string)
+                    if res:
+                        keywordresult = MSG_PASS
+                        verifyresponse = MSG_TRUE
+            else:
+                logger.print_on_console(MSG_INVALID_INPUT)
+                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
 
-                        keywordresult = MSG_PASS
-                        verifyresponse = MSG_TRUE
-                    else:
-                        val = string[i].upper()
-                        self.keyboardops.keyboard_operation('keypress','TAB')
-                        keywordresult = MSG_PASS
-                        verifyresponse = MSG_TRUE
-                elif string[i].isdigit():
-                    self.keyboardops.keyboard_operation('keypress',string[i])
-                    keywordresult = MSG_PASS
-                    verifyresponse = MSG_TRUE
-                else:
-                    if string[i] in oebs_constants.SENDFUNCTION_KEYS_DICT:
-                        self.keyboardops.keyboard_operation('keydown','SHIFT')
-                        self.keyboardops.keyboard_operation('keypress',oebs_constants.SENDFUNCTION_KEYS_DICT[string[i]])
-                        self.keyboardops.keyboard_operation('keyup','SHIFT')
-                        keywordresult = MSG_PASS
-                        verifyresponse = MSG_TRUE
+##            for i in range(len(string)):
+##                if string[i].isalpha():
+##                    if string[i].isupper():
+##                        self.keyboardops.keyboard_operation('keypress','CAPSLOCK')
+##                        self.keyboardops.keyboard_operation('keypress',string[i])
+##                        self.keyboardops.keyboard_operation('keypress','CAPSLOCK')
+##
+##                        keywordresult = MSG_PASS
+##                        verifyresponse = MSG_TRUE
+##                    else:
+##                        val = string[i].upper()
+##                        self.keyboardops.keyboard_operation('keypress',val)
+##                        keywordresult = MSG_PASS
+##                        verifyresponse = MSG_TRUE
+##                elif string[i].isdigit():
+##                    self.keyboardops.keyboard_operation('keypress',string[i])
+##                    keywordresult = MSG_PASS
+##                    verifyresponse = MSG_TRUE
+##                else:
+##                    if string[i] in oebs_constants.SENDFUNCTION_KEYS_DICT:
+##                        self.keyboardops.keyboard_operation('keydown','SHIFT')
+##                        self.keyboardops.keyboard_operation('keypress',oebs_constants.SENDFUNCTION_KEYS_DICT[string[i]])
+##                        self.keyboardops.keyboard_operation('keyup','SHIFT')
+##                        keywordresult = MSG_PASS
+##                        verifyresponse = MSG_TRUE
         except Exception as e:
             self.utilities_obj.cleardata()
             log.error('%s',e)
