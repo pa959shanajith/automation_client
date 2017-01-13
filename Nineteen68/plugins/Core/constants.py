@@ -210,7 +210,7 @@ ERROR_CODE_DICT ={
                     'ERR_OBJECT_IS_NOT_LINK':'Given object is not a link.',
                     'ERR_ELEMENT_NOT_SELECTED':'Object not selected.',
                     'ERR_TEXTBOX_SIZE_UNDEFINED':'Textbox size is not defined.',
-                    'MSG_ELEMENT_EXISTS':'Element does not exists.',
+                    'MSG_ELEMENT_EXISTS':'Element exists.',
                     'ERR_ELEMENT_NOT_EXISTS':'Element does not exists.',
                     'ERR_GET_COLUMN_COUNT_EXCEPTION':'Exception occured in getColumnCount.',
                     'ERR_ROW_COLUMN':'Row number and Column nunber shoud be greater than 0.',
