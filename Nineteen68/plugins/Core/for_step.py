@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        for_step.py
 # Purpose:
 #
 # Author:      rakesh.v
@@ -11,6 +11,10 @@
 import logger
 import constants
 iteration_count=0
+
+import logging
+
+log = logging.getLogger('for_step.py')
 
 class For():
 
@@ -33,7 +37,7 @@ class For():
 
 
     def print_step(self):
-        logger.print_on_console(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
+        log.info(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
 
     def add_report_step(self,reporting_obj,step_description):
         #Reporting part

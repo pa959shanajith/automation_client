@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        if_step.py
 # Purpose:
 #
 # Author:      sushma.p
@@ -15,7 +15,10 @@ import logger
 import handler
 from constants import *
 import reporting
+import logging
 
+
+log = logging.getLogger('if_step.py')
 
 class If():
     """Object instantiation of 'for' object"""
@@ -35,7 +38,7 @@ class If():
         self.step_description=''
 
     def print_step(self):
-        logger.print_on_console(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
+        log.info(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
 
 
 
