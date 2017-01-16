@@ -63,6 +63,18 @@ DISPLAY_VARIABLE_VALUE='displayVariableValue'
 
 SENDFUNCTIONKEYS='sendFunctionKeys'
 
+DATE_COMPARE='dateCompare'
+
+EXPORT_DATA='exportData'
+
+GET_DATA='getData'
+
+SECURE_EXPORT_DATA='secureExportData'
+
+SECURE_GET_DATA='secureGetData'
+
+DATA_BASE_KEYWORDS=[EXPORT_DATA,GET_DATA,SECURE_EXPORT_DATA,SECURE_GET_DATA]
+
 
 
 
