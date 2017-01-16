@@ -1,0 +1,31 @@
+{
+    "rows": [
+        {
+            "Comments": "", 
+            "StepDescription": "Testscriptname: s2", 
+            "id": 1, 
+            "Keyword": "Testscriptname", 
+            "parentId": 0
+        }, 
+        {
+            "status": "", 
+            "Keyword": "", 
+            "Step ": "Step 1", 
+            "EllapsedTime": "3.00", 
+            "Comments": "", 
+            "StepDescription": "Encountered :for", 
+            "parentId": 0, 
+            "id": 1
+        }
+    ], 
+    "overallstatus": [
+        {
+            "browserVersion": "-", 
+            "EllapsedTime": "0:00:03.635000", 
+            "browserType": "-", 
+            "StartTime": "2017-01-16 12:48:51.802000", 
+            "EndTime": "2017-01-16 12:48:55.437000", 
+            "overallstatus": "Pass"
+        }
+    ]
+}

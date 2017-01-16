@@ -10,6 +10,7 @@
 #-------------------------------------------------------------------------------
 import logger
 import logging
+import constants
 
 log = logging.getLogger('teststepproperty.py')
 class TestStepProperty():
@@ -28,6 +29,8 @@ class TestStepProperty():
         self.additionalinfo = additionalinfo
         self.parent_xpath=''
         self.custom_flag=False
+        self.execute_flag=True
+        self.keyword_status=constants.TEST_RESULT_FAIL
 
     def print_step(self):
         log.info(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+self.apptype)

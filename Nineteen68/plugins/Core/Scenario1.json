@@ -2,11 +2,11 @@
     "rows": [], 
     "overallstatus": [
         {
-            "browserVersion": "-", 
-            "EllapsedTime": "0:00:00.034000", 
-            "browserType": "-", 
-            "StartTime": "2017-01-11 18:35:27.638000", 
-            "EndTime": "2017-01-11 18:35:27.672000", 
+            "browserVersion": "55.0.2883.87", 
+            "EllapsedTime": "0:00:46.453000", 
+            "browserType": "chrome", 
+            "StartTime": "2017-01-16 17:30:33.096000", 
+            "EndTime": "2017-01-16 17:31:19.549000", 
             "overallstatus": "Pass"
         }
     ]
