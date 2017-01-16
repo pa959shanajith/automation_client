@@ -348,5 +348,7 @@ DEBUG='debug'
 
 CORE='Core'
 
+INVALID_KEYWORD='Keyword not available'
+
 
 

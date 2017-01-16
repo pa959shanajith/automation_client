@@ -446,6 +446,7 @@ class Singleton_DriverUtil():
             caps['ignoreZoomSetting'] = True
             caps['NATIVE_EVENTS'] = True
             driver = webdriver.Ie(capabilities=caps,executable_path=webconstants.IE_DRIVER_PATH_64)
+            driver.maximize_window()
             logger.print_on_console('IE browser started')
             log.info('IE browser started')
 

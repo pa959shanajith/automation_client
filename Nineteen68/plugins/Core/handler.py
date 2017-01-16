@@ -93,6 +93,13 @@ class Handler():
         """
         global ws_template
         logger.print_on_console('Parsing')
+        log.info('Parsing')
+        log.info('-------------------------')
+        log.info('TSP list')
+        log.info('-------------------------')
+        logger.print_on_console('-------------------------')
+        logger.print_on_console('TSP list')
+        logger.print_on_console('-------------------------')
         json_string = json.dumps(test_data)
         new_obj = json.loads(json_string)
         if len(new_obj)==1:
@@ -443,10 +450,10 @@ class Handler():
         return :
 
         """
-
-        logger.print_on_console('-------------------------')
-        logger.print_on_console('TSP list\n')
-        logger.print_on_console('-------------------------')
+        log.info('Printing each step in TSP')
+        log.info('-------------------------')
+        log.info('TSP list')
+        log.info('-------------------------')
         for x in tspList:
             x.print_step()
 ##            logger.print_on_console('\n')
