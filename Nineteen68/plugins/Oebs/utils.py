@@ -19,6 +19,9 @@ from oebs_msg import *
 import logger
 import logging
 import json
+import ctypes
+from ctypes import wintypes
+
 
 
 
@@ -122,13 +125,164 @@ class Utils:
             err_msg=str(e)
         return status,err_msg
 
+
+    def getWindowText(self,hwnd):
+        text=None
+        GetWindowText = ctypes.windll.user32.GetWindowTextW
+        GetWindowTextLength = ctypes.windll.user32.GetWindowTextLengthW
+        IsWindowVisible = ctypes.windll.user32.IsWindowVisible
+        if IsWindowVisible(hwnd):
+                length = GetWindowTextLength(hwnd)
+                buff = ctypes.create_unicode_buffer(length + 1)
+                GetWindowText(hwnd, buff, length + 1)
+                text=buff.value
+        return text
+
+    def find_javawindow_and_attach(self,windowname,launch_time_out):
+        err_msg=None
+        try:
+            import time
+            logger.print_on_console('windowname is '+windowname)
+            status=False
+            if not(windowname is None and windowname is ''):
+                import oebs_dispatcher
+                start_time = time.time()
+                while True:
+                        if int(time.time() - start_time) == launch_time_out:
+                                break
+                        title_matched_windows=self.getProcessWindows(windowname)
+                        if len(title_matched_windows)>1:
+                            break
+                        elif len(title_matched_windows)==1:
+                            self.windowHandle=title_matched_windows[0]
+                            self.windowname=self.getWindowText(self.windowHandle)
+                            oebs_dispatcher.windowname=self.windowname
+
+                            self.set_to_foreground(self.windowname)
+                            time.sleep(0.5)
+                            logger.print_on_console('Application handle found')
+                            break
+                        if(self.windowname!=''):
+                            break
+        except Exception as e:
+            err_msg=str(e)
+            log.error(err_msg)
+        return self.windowname,err_msg
+
+    def close_application(self,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            if self.aut_handle!=None:
+                win32gui.PostMessage(self.aut_handle,win32con.WM_CLOSE,0,0)
+                status=TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg=str(e)
+        return status,result,output,err_msg
+
+
+
+    def getProcessWindows(self,windowName):
+        EnumWindows = ctypes.windll.user32.EnumWindows
+        EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
+        GetWindowText = ctypes.windll.user32.GetWindowTextW
+        GetWindowTextLength = ctypes.windll.user32.GetWindowTextLengthW
+        IsWindowVisible = ctypes.windll.user32.IsWindowVisible
+
+        handles = []
+        def foreach_window(hwnd, lParam):
+            if IsWindowVisible(hwnd):
+                length = GetWindowTextLength(hwnd)
+                buff = ctypes.create_unicode_buffer(length + 1)
+                GetWindowText(hwnd, buff, length + 1)
+    ##                titles.append(buff.value)
+                if self.patternMatching(windowName,buff.value):
+                    handles.append(hwnd)
+            return True
+        win32gui.EnumWindows(foreach_window, None)
+        return handles
+
+    def patternMatching(self,toMatch,matchIn):
+        regex=None
+        pattern=None
+
+        toMatch=toMatch.strip().replace('*','.*')
+        matchIn=matchIn.strip()
+        if toMatch.endswith('*'):
+            regex=toMatch+"([^a-zA-Z0-9-#.()%@!:;\"'?><,$+=()|{}&\\s]|$).*"
+        elif toMatch.startswith('.'):
+            regex=".*([^a-zA-Z0-9-#.()%@!:;\"'?><,$+=()|{}&\\s]|^)" + toMatch
+        elif '*' in toMatch and toMatch.index('*')>0 and toMatch.index('*')<len(toMatch):
+            toMatch = toMatch.replaceAll("[^a-zA-Z0-9*.]", ".*")
+            regex=toMatch.replace(".*",".*([a-zA-Z0-9-#.()%@!:;\"'?><,$+=()|{}&\\s]|^)")
+        else :
+            return toMatch==matchIn
+        status= re.match(regex,matchIn)
+        try:
+            if status.group()!=None:
+                return True
+        except Exception as e:
+                return False
+        return False
+
+    def launch_application(self,url,objectname,keyword,input_val,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg=None
+        try:
+        # check file exists
+            import os
+            if len(input_val)==2:
+                filePath,window_name=str(input_val[0]),str(input_val[1])
+                timeout=5
+            elif len(input_val)==3:
+                filePath,windowName,timeout=str(input_val[0]),str(input_val[1]),str(input_val[2])
+            if(os.path.isfile(filePath)):
+                directory = os.path.dirname(filePath)
+                #check for any existing instance of app by window name
+                title_matched_windows=self.getProcessWindows(window_name)
+                if len(title_matched_windows)>=1:
+##                    self.multiInstance=title_matched_windows[0]
+                    logger.print_on_console('please close the existing application instnace with the given window name and try again')
+                    logger.print_on_console('Terminate the execution')
+                elif len(title_matched_windows)==0:
+                    value=win32api.ShellExecute(0,'open',filePath,None,directory,1)
+                    if int(value)>32:
+                        logger.print_on_console('The specified application is launched')
+                        result,err_msg=	self.find_javawindow_and_attach(window_name,timeout)
+                        if result!=None:
+                             status=TEST_RESULT_PASS
+                             methodoutput=TEST_RESULT_TRUE
+                    else :
+                        error_code=int(win32api.GetLastError())
+                        if error_code in APPLICATION_ERROR_CODES.keys():
+                            err_msg=APPLICATION_ERROR_CODES.get(error_code)
+                            logger.print_on_console(err_msg)
+                        else:
+                            logger.print_on_console('unable to launch the application')
+            else:
+                logger.print_on_console('The file does not exists')
+
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg=str(e)
+        return status,methodoutput,output,err_msg
+
+
     def find_window_and_attach(self,url,objectname,keyword,windowname,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         windowname=windowname[0]
         output=OUTPUT_CONSTANT
         res,err_msg=self.find_oebswindow_and_attach(windowname)
-        if status:
+        if res:
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output,err_msg
