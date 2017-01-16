@@ -215,7 +215,8 @@ class TextboxKeywords:
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
                else:
-                logger.print_on_console('Text mismatched')
+                err_msg='Text mismatched'
+                logger.print_on_console(err_msg)
                 logger.print_on_console(EXPECTED,input)
                 log.info(EXPECTED)
                 log.info(input)
@@ -270,6 +271,8 @@ class TextboxKeywords:
                 if length is not None:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                else:
+                    err_msg='Textbox length is '+str(length)
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         logger.print_on_console('Textbox length is '+str(length))
@@ -290,20 +293,24 @@ class TextboxKeywords:
                 log.info(INPUT_IS)
                 log.info(input)
 
-                if not (length is None or length is ''):
+                if length != None and length != '':
                     if '.' in input:
                         input=input[0:input.find('.')]
                     if length==input:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        logger.print_on_console('Textbox length mismatched')
+                        err_msg='Textbox length mismatched'
+                        logger.print_on_console(err_msg)
                         logger.print_on_console(EXPECTED,input)
                         log.info(EXPECTED)
                         log.info(input)
                         logger.print_on_console(ACTUAL,length)
                         log.info(ACTUAL)
                         log.info(length)
+                else:
+                    err_msg='Textbox length is None or empty'
+
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg

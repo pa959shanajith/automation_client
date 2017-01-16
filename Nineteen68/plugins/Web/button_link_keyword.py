@@ -84,7 +84,7 @@ class ButtonLinkKeyword():
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         log.info(RETURN_RESULT)
@@ -136,8 +136,9 @@ class ButtonLinkKeyword():
                         status = webconstants.TEST_RESULT_PASS
                         methodoutput = webconstants.TEST_RESULT_TRUE
                     else:
+                        err_msg='Button name mismatched'
                         log.info('Button name does not matched with the input, set the status to Fail')
-                        logger.print_on_console('Button name mismatched')
+                        logger.print_on_console(err_msg)
                         logger.print_on_console(EXPECTED,input)
                         log.info(EXPECTED)
                         log.info(input)
@@ -152,7 +153,7 @@ class ButtonLinkKeyword():
 
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
@@ -190,7 +191,7 @@ class ButtonLinkKeyword():
 
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
@@ -218,14 +219,16 @@ class ButtonLinkKeyword():
                         linktext = webelement.text
                         log.info('Link text: ' +linktext)
                         if linktext == input:
-                            logger.print_on_console('Link Text matched')
-                            log.info('Link Text matched')
+                            err_msg='Link Text mismatched'
+                            logger.print_on_console(err_msg)
+                            log.info(err_msg)
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
                         else:
-                            logger.print_on_console('Link Text mismatched')
-                            log.info('Link Text mismatched')
+                            err_msg='Link Text mismatched'
+                            logger.print_on_console(err_msg)
+                            log.info(err_msg)
                             logger.print_on_console(EXPECTED,input)
                             log.info(EXPECTED)
                             log.info(input)
@@ -241,7 +244,7 @@ class ButtonLinkKeyword():
 
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
 
@@ -276,7 +279,7 @@ class ButtonLinkKeyword():
                     logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
@@ -307,7 +310,7 @@ class ButtonLinkKeyword():
                     logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
@@ -338,7 +341,7 @@ class ButtonLinkKeyword():
                     logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
@@ -383,7 +386,7 @@ class ButtonLinkKeyword():
                     logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
