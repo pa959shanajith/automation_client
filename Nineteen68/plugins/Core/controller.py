@@ -553,8 +553,6 @@ class Controller():
                         self.counter=-1
 
                 except Exception as e:
-                    import traceback
-                    traceback.print_exc()
                     log.error(e)
                     logger.print_on_console(e)
                     status=False
@@ -607,7 +605,7 @@ class Controller():
         maindir = os.getcwd()
         os.chdir('..')
         curdir = os.getcwd()
-        path= 'D://git//Sprint6' + '//Nineteen68//plugins//'+plugin_path
+        path= curdir + '//Nineteen68//plugins//'+plugin_path
         sys.path.append(path)
         for root, dirs, files in os.walk(path):
             for d in dirs:
