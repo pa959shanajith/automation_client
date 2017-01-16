@@ -353,14 +353,16 @@ class ClientWindow(wx.Frame):
 
         #----------------------------------------------------------------------
     def OnPause(self, event):
-        print '--------- Paused-------'
+        logger.print_on_console('Event Triggered to Pause')
+        log.info('Event Triggered to Pause')
         controller.pause_flag=True
         self.pausebutton.Hide()
         self.continuebutton.Show()
 
 
     def OnContinueDebug(self, event):
-        print '--------- Resume-------'
+        logger.print_on_console('Event Triggered to Resume Debug')
+        log.info('Event Triggered to Resume Debug')
         controller.pause_flag=False
         self.mythread.resume()
         self.continuebutton.Hide()
@@ -369,7 +371,8 @@ class ClientWindow(wx.Frame):
 
     #----------------------------------------------------------------------
     def OnContinue(self, event):
-        print '--------- Resume-------'
+        logger.print_on_console('Event Triggered to Resume')
+        log.info('Event Triggered to Resume')
         controller.pause_flag=False
         self.mythread.resume()
         self.continuebutton.Hide()

@@ -206,16 +206,13 @@ class Controller():
         input_val='Input :'+str(input)
         output='Output :'+tsp.outputval
         apptype='Apptype : '+str(tsp.apptype)
-        logger.print_on_console(keyowrd)
         log.info(keyowrd)
-        logger.print_on_console(input_val)
         log.info(input_val)
-        logger.print_on_console(output)
         log.info(output)
-        logger.print_on_console(apptype)
         log.info(apptype)
         for i in range(len(inpval)):
-            logger.print_on_console('Input: ',i + 1 , '= ',inpval[i])
+            log.info('Input: '+str(i + 1)+ '= '+repr(inpval[i]))
+            ##logger.print_on_console('Input: '+str(i + 1)+ '= ',inpval[i])
 
     def clear_data(self):
         global terminate_flag,pause_flag
@@ -636,7 +633,6 @@ class Controller():
         suites_list,flag = t.gettsplist()
         self.action=EXECUTE
 
-
         #in future this value will come from the UI
         scenarios = scenario_num
         print 'No  of Suites : ',len(suites_list)
@@ -645,7 +641,7 @@ class Controller():
             #EXECUTION GOES HERE
             status = False
             flag=True
-            handler.tspList=[]
+
             #Iterate through the suite
             if terminate_flag:
                 status=TERMINATE
@@ -659,6 +655,7 @@ class Controller():
                 do_not_execute = False
                 #create a object of controller for each scenario
                 con =Controller()
+                handler.tspList=[]
                 #Check for the disabled scenario
 
                 for k in scenarios:
@@ -787,6 +784,7 @@ def kill_process():
 #main method
 if __name__ == '__main__':
     kill_process()
+    #To debug from main method
     obj = handler.Handler()
     obj1=Controller()
     obj1.get_all_the_imports(CORE)
@@ -807,7 +805,13 @@ if __name__ == '__main__':
 
     else:
         print 'Invalid script'
-    kill_process()
+
+    #To execute from main method
+##    obj=Controller()
+##    obj.invoke_execution(0,None,'1')
+##    kill_process()
+
+
 
 
 

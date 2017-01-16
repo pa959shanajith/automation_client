@@ -449,7 +449,7 @@ class Handler():
         logger.print_on_console('-------------------------')
         for x in tspList:
             x.print_step()
-            logger.print_on_console('\n')
+##            logger.print_on_console('\n')
         return tspList
 
     def print_dict(self,d):
@@ -466,6 +466,26 @@ class Handler():
             print(k,':', v)
 
     def clearList(self,con):
+        """
+        def : clearList
+        purpose : Reset all global variables after the execution of each Scenario
+        param : dict
+        return :
+
+        """
         del tspList[:]
+        global tspIndex,tspIndex2,copy_for_keywords,for_keywords,copy_condition_keywords,condition_keywords,copy_getparam_keywords,getparam_keywords,for_info,if_info,get_param_info
+        tspIndex=-1
+        tspIndex2=-1
+        copy_for_keywords=OrderedDict()
+        for_keywords=OrderedDict()
+        copy_condition_keywords=OrderedDict()
+        condition_keywords=OrderedDict()
+        copy_getparam_keywords=OrderedDict()
+        getparam_keywords=OrderedDict()
+        for_info=OrderedDict()
+        if_info=OrderedDict()
+        get_param_info=OrderedDict()
+        ws_template=''
         if con.oebs_dispatcher_obj != None:
             con.oebs_dispatcher_obj.clear_oebs_window_name()
