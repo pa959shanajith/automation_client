@@ -143,8 +143,6 @@ class GenericKeywordDispatcher:
             else:
                 logger.print_on_console(generic_constants.INVALID_KEYWORD)
          except Exception as e:
-            import traceback
-            traceback.print_exc()
             log.error(e)
             logger.print_on_console(e)
          return result

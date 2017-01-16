@@ -79,8 +79,10 @@ class If():
 
             logger.print_on_console('Encountered :'+self.name+'\n')
             logical_eval_obj=Logical_eval()
+            input_expression=''
             if len(input)>=2:
-                input_expression=input[0]+input[1]+input[2]
+                for exp in input:
+                    input_expression=input_expression+exp
             else:
                 logger.print_on_console('Invalid input')
             logger.print_on_console('Input_expression is ',input_expression)
