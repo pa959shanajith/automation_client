@@ -1,2 +1,5 @@
-#ignore *.pyc files
+#ignore *.pyc files,*.exe, *.log,*.json files 
 *.pyc
+*.exe
+*.log
+*.json
