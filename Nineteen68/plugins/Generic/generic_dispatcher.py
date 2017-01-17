@@ -15,7 +15,6 @@ import file_operations
 import folder_operations
 import logger
 import generic_constants
-
 import excel_operations
 import database_keywords
 import math_operation_keywords
@@ -28,6 +27,8 @@ import xml_operations
 import util_operations
 import dynamic_variable
 import constants
+import logging
+log = logging.getLogger("generic_dispatcher.py")
 
 class GenericKeywordDispatcher:
     generic_date = date_ops_keywords.DateOperation()
@@ -134,6 +135,10 @@ class GenericKeywordDispatcher:
                     if keyword != generic_constants.SENDFUNCTIONKEYS:
                         message.append(';')
                     message.extend(actual_input)
+                elif keyword in generic_constants.DATA_BASE_KEYWORDS:
+                    message=list(message)
+                    output=[tsp.outputval]
+                    message.extend(output)
                 result= dict[keyword](*message)
             else:
                 logger.print_on_console(generic_constants.INVALID_KEYWORD)

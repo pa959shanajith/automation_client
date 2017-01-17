@@ -111,6 +111,8 @@ class OebsDispatcher:
 
          try:
             dict={'findwindowandattach':self.utils_obj.find_window_and_attach,
+                  'launchapplication':self.utils_obj.launch_application,
+                  'closeapplication':self.utils_obj.close_application,
                   'getobjectforcustom' : self.oebs_keywords.getobjectforcustom,
                   'drop'    : self.oebs_keywords.drop,
                   'drag'     : self.oebs_keywords.drag,
@@ -191,7 +193,7 @@ class OebsDispatcher:
                 if not(oebs_msg.ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE
             else:
-                logger.print_on_console(generic_constants.INVALID_INPUT)
+                logger.print_on_console(MSG_KEYWORD_NA)
          except Exception as e:
             log.error(e)
             logger.print_on_console(e)

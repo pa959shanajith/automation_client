@@ -59,7 +59,7 @@ class GetParam():
         self.step_description=''
 
     def print_step(self):
-        logger.print_on_console('Step: '+str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
+##        logger.print_on_console('Step: '+str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
         log.info('Step: '+str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
 
 
@@ -90,6 +90,7 @@ class GetParam():
                     log.debug('Retrieved file name and sheetname ')
                     if os.access(filepath, os.R_OK):
                         log.info('File is accesible')
+                        print '\n'
                         logger.print_on_console('File is accesible')
                         wb = open_workbook(filepath)
                         log.info('Work Book object is created')

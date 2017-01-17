@@ -95,12 +95,16 @@ class DatabaseOperation():
         value = None
         err_msg=None
         try:
+##            if len(args)>0 :
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
             out_tuple = args
-            str(out_tuple)
+            out_tuple=''.join(out_tuple)
+            import re
             data = re.findall(r'\[([^]]*)\]',out_tuple)
             row = data[0]
             col = data[1]
+            row = int(row)
+            col = int(col)
             cursor = cnxn.cursor()
             cursor.execute(query)
             rows = cursor.fetchall()
@@ -111,9 +115,12 @@ class DatabaseOperation():
 ##                logger.print_on_console(row)
             status=generic_constants.TEST_RESULT_PASS
             result=generic_constants.TEST_RESULT_TRUE
+##            else:
+##                log.info('Output column missing required value')
+##                logger.print_on_console('Output column missing required value')
+
         except Exception as e:
             log.error(e)
-
             logger.print_on_console(e)
             err_msg = e
         finally:
@@ -240,18 +247,20 @@ class DatabaseOperation():
             ##logic for output col reading
             out_tuple = args
             fields = out_tuple[0]
-            inp_file = fields[0]
-            verify = os.path.isfile(inp_file)
+            inp_sheet = None
+            if ';' in fields:
+                inp_sheet=fields.split(';')[1]
+                fields=fields.split(';')[0]
+            verify = os.path.isfile(fields)
             if (verify == True):
-                ext = self.get_ext(inp_file)
+                ext = self.get_ext(fields)
                 if (ext == '.xls'):
-                    inp_sheet = fields[1]
-                    if(inp_sheet == ''):
+                    if(inp_sheet is None or inp_sheet == ''):
                         inp_sheet = 'Sheet1'
                     log.debug('Input Sheet is :')
                     log.debug(inp_sheet)
                     obj=excel_operations.ExcelFile()
-                    obj.set_excel_path(inp_file,inp_sheet)
+                    obj.set_excel_path(fields,inp_sheet)
                     i=1
                     j=1
                     for x in columns:
@@ -284,7 +293,6 @@ class DatabaseOperation():
                 logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
             log.error(e)
-
             logger.print_on_console(e)
             err_msg = e
         finally:

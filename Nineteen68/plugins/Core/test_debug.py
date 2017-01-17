@@ -25,187 +25,269 @@ class Test():
         	"testscript_name": "Script1",
            "testcase": [
   {
-    "outputVal": "",
-    "keywordVal": "setEndPointURL",
+    "outputVal": "##",
+    "keywordVal": "FindWindowAndAttach",
     "objectName": "",
     "_id_": "1",
     "inputVal": [
-      "http://10.41.133.135:8500/Service1.svc"
+      "Oracle Applications - EBSDB"
     ],
-    "appType": "Webservice",
+    "appType": "DesktopJava",
     "stepNo": 1,
     "url": "",
-    "custname": "WebService List"
+    "custname": "@Oebs"
   },
   {
     "outputVal": "",
-    "keywordVal": "setMethods",
+    "keywordVal": "launchApplication",
     "objectName": "",
+    "_id_": "1",
+    "inputVal": [
+      "D:\\Java Access Bridge\\SwingSet2.jar;SwingSet2"
+    ],
+    "appType": "DesktopJava",
+    "stepNo": 1,
+    "url": "",
+    "custname": "@Oebs"
+  },
+    {
+    "outputVal": "",
+    "keywordVal": "pause",
+    "objectName": "frame[Oracle Applications - EBSDB]/panel[1]/panel[1]/panel[0]/menu bar[1]/menu[File ALT F];File ALT F;0;16;;frame[Oracle Applications - EBSDB]/panel[1]/panel[1]/panel[0]/menu bar[1];7;1;menu bar;menu;",
     "_id_": "2",
     "inputVal": [
-      "POST"
-    ],
-    "appType": "Webservice",
-    "stepNo": 2,
-    "url": "",
-    "custname": "WebService List"
-  },
-  {
-    "outputVal": "",
-    "keywordVal": "setHeader",
-    "objectName": "",
-    "_id_": "3",
-    "inputVal": [
-      "POST /Service1.svc HTTP/1.1##Host: 10.41.133.135:8500##Content-Type: text/xml; charset=utf-8##Content-Length: length##SOAPAction: \"http://tempuri.org/IService1/Authenticate\"\n"
-    ],
-    "appType": "Webservice",
-    "stepNo": 3,
-    "url": "",
-    "custname": "WebService List"
-  },
-  {
-    "outputVal": "##",
-    "keywordVal": "setHeader",
-    "objectName": "",
-    "_id_": "4",
-    "inputVal": [
-      "Content-Type: text/xml; charset=utf-8"
-    ],
-    "appType": "Webservice",
-    "stepNo": 4,
-    "url": "",
-    "custname": "WebService List"
-  },
-  {
-    "outputVal": "##",
-    "keywordVal": "setHeader",
-    "objectName": "",
-    "_id_": "5",
-    "inputVal": [
-      "POST /Service1.svc HTTP/1.1"
-    ],
-    "appType": "Webservice",
-    "stepNo": 5,
-    "url": "",
-    "custname": "WebService List"
-  },
-  {
-    "outputVal": "##",
-    "keywordVal": "setHeader",
-    "objectName": "",
-    "_id_": "6",
-    "inputVal": [
-      "SOAPAction: \"http://tempuri.org/IService1/Authenticate\""
-    ],
-    "appType": "Webservice",
-    "stepNo": 6,
-    "url": "",
-    "custname": "WebService List"
-  },
-  {
-    "outputVal": "##",
-    "keywordVal": "setHeader",
-    "objectName": "",
-    "_id_": "7",
-    "inputVal": [
-      "Content-Length: length"
-    ],
-    "appType": "Webservice",
-    "stepNo": 7,
-    "url": "",
-    "custname": "WebService List"
-  },
-  {
-    "outputVal": "##",
-    "keywordVal": "setHeader",
-    "objectName": "",
-    "_id_": "8",
-    "inputVal": [
-      "Host: 10.41.133.135:8500"
-    ],
-    "appType": "Webservice",
-    "stepNo": 8,
-    "url": "",
-    "custname": "WebService List"
-  },
-  {
-    "outputVal": "",
-    "keywordVal": "setTagValue",
-    "objectName": "/s11:Envelope/s11:Body/ns1:Authenticate/ns1:username",
-    "_id_": "9",
-    "inputVal": [
-      "admin"
-    ],
-    "appType": "Webservice",
-    "stepNo": 9,
-    "url": "",
-    "custname": "ns1:username"
-  },
-  {
-    "outputVal": "",
-    "keywordVal": "setTagValue",
-    "objectName": "/s11:Envelope/s11:Body/ns1:Authenticate/ns1:password",
-    "_id_": "10",
-    "inputVal": [
-      "admin"
-    ],
-    "appType": "Webservice",
-    "stepNo": 10,
-    "url": "",
-    "custname": "ns1:password"
-  },
-  {
-    "outputVal": "",
-    "keywordVal": "executeRequest",
-    "objectName": "",
-    "_id_": "11",
-    "inputVal": [
       ""
-    ],
-    "appType": "Webservice",
-    "stepNo": 11,
-    "url": "",
-    "custname": "WebService List"
-  },
-  {
-    "outputVal": "{body}",
-    "keywordVal": "getBody",
-    "objectName": "",
-    "_id_": "12",
-    "inputVal": [
-      ""
-    ],
-    "appType": "Webservice",
-    "stepNo": 12,
-    "url": "",
-    "custname": "WebService List"
-  },
-  {
-    "outputVal": "{header}",
-    "keywordVal": "getHeader",
-    "objectName": "",
-    "_id_": "13",
-    "inputVal": [
-      ""
-    ],
-    "appType": "Webservice",
-    "stepNo": 13,
-    "url": "",
-    "custname": "WebService List"
-  },
-  {
-    "outputVal": "",
-    "keywordVal": "displayVariableValue",
-    "objectName": " ",
-    "_id_": "14",
-    "inputVal": [
-      "{body};{header}"
     ],
     "appType": "Generic",
-    "stepNo": 14,
-    "url": " ",
-    "custname": "@Generic"
+    "stepNo": 2,
+    "url": "Oracle Applications - EBSDB",
+    "custname": "File ALT F"
   },
+  {
+    "outputVal": "##",
+    "keywordVal": "closeApplication",
+    "objectName": "frame[Oracle Applications - EBSDB]/panel[1]/panel[1]/panel[0]/menu bar[1]/menu[File ALT F];File ALT F;0;16;;frame[Oracle Applications - EBSDB]/panel[1]/panel[1]/panel[0]/menu bar[1];7;1;menu bar;menu;",
+    "_id_": "2",
+    "inputVal": [
+      "Oracle Applications - EBSDB"
+    ],
+    "appType": "DesktopJava",
+    "stepNo": 2,
+    "url": "Oracle Applications - EBSDB",
+    "custname": "File ALT F"
+  },
+##  {
+##    "outputVal": "",
+##    "keywordVal": "verifyVisible",
+##    "objectName": "frame[Oracle Applications - EBSDB]/panel[1]/panel[1]/panel[0]/menu bar[1]/menu[File ALT F];File ALT F;0;16;;frame[Oracle Applications - EBSDB]/panel[1]/panel[1]/panel[0]/menu bar[1];7;1;menu bar;menu;",
+##    "_id_": "2",
+##    "inputVal": [
+##      ""
+##    ],
+##    "appType": "DesktopJava",
+##    "stepNo": 2,
+##    "url": "Oracle Applications - EBSDB",
+##    "custname": "File ALT F"
+##  },
+##  {
+##    "outputVal": "",
+##    "keywordVal": "clickElement",
+##    "objectName": "@Custom",
+##    "_id_": "3",
+##    "inputVal": [
+##      "textbox;;1"
+##    ],
+##    "appType": "DesktopJava",
+##    "stepNo": 3,
+##    "url": "Oracle Applications - EBSDB",
+##    "custname": "@Custom"
+##  },
+##  {
+##    "outputVal": "##",
+##    "keywordVal": "rightClick",
+##    "objectName": "@Custom",
+##    "_id_": "4",
+##    "inputVal": [
+##      "textbox;;1"
+##    ],
+##    "appType": "DesktopJava",
+##    "stepNo": 4,
+##    "url": "Oracle Applications - EBSDB",
+##    "custname": "@Custom"
+##  },
+##  {
+##    "outputVal": "",
+##    "keywordVal": "setText",
+##    "objectName": "@Custom",
+##    "_id_": "5",
+##    "inputVal": [
+##      "textbox;;1;peter"
+##    ],
+##    "appType": "DesktopJava",
+##    "stepNo": 5,
+##    "url": "Oracle Applications - EBSDB",
+##    "custname": "@Custom"
+##  },
+##    {
+##    "outputVal": "",
+##    "keywordVal": "sendFunctionKeys",
+##    "objectName": "@Custom",
+##    "_id_": "8",
+##    "inputVal": [
+##      "textbox;;1;backspace;5"
+##    ],
+##    "appType": "DesktopJava",
+##    "stepNo": 8,
+##    "url": "Oracle Applications - EBSDB",
+##    "custname": "@Custom"
+##  },
+##  {
+##    "outputVal": "",
+##    "keywordVal": "sendFunctionKeys",
+##    "objectName": "@Custom",
+##    "_id_": "5",
+##    "inputVal": [
+##      "textbox;;1;tab"
+##    ],
+##    "appType": "DesktopJava",
+##    "stepNo": 5,
+##    "url": "Oracle Applications - EBSDB",
+##    "custname": "@Custom"
+##  },
+##  {
+##    "outputVal": "{t1}",
+##    "keywordVal": "getElementText",
+##    "objectName": "@Custom",
+##    "_id_": "6",
+##    "inputVal": [
+##      "textbox;;1"
+##    ],
+##    "appType": "DesktopJava",
+##    "stepNo": 6,
+##    "url": "Oracle Applications - EBSDB",
+##    "custname": "@Custom"
+##  },
+
+
+#------------------------------
+##  {
+##    "outputVal": "{text}",
+##    "keywordVal": "getText",
+##    "objectName": "@Custom",
+##    "_id_": "7",
+##    "inputVal": [
+##      "textbox;;1"
+##    ],
+##    "appType": "DesktopJava",
+##    "stepNo": 7,
+##    "url": "Oracle Applications - EBSDB",
+##    "custname": "@Custom"
+##  },
+
+##  {
+##    "outputVal": "",
+##    "keywordVal": "setFocus",
+##    "objectName": "@Custom",
+##    "_id_": "9",
+##    "inputVal": [
+##      "textbox;;1"
+##    ],
+##    "appType": "DesktopJava",
+##    "stepNo": 9,
+##    "url": "Oracle Applications - EBSDB",
+##    "custname": "@Custom"
+##  },
+##  {
+##    "outputVal": "",
+##    "keywordVal": "setText",
+##    "objectName": "@Custom",
+##    "_id_": "10",
+##    "inputVal": [
+##      "textbox;;3"
+##    ],
+##    "appType": "DesktopJava",
+##    "stepNo": 10,
+##    "url": "Oracle Applications - EBSDB",
+##    "custname": "@Custom"
+##  },
+##  {
+##    "outputVal": "",
+##    "keywordVal": "verifyExists",
+##    "objectName": "@Custom",
+##    "_id_": "11",
+##    "inputVal": [
+##      "textbox;;1"
+##    ],
+##    "appType": "DesktopJava",
+##    "stepNo": 11,
+##    "url": "Oracle Applications - EBSDB",
+##    "custname": "@Custom"
+##  },
+##  {
+##    "outputVal": "",
+##    "keywordVal": "verifyHidden",
+##    "objectName": "@Custom",
+##    "_id_": "12",
+##    "inputVal": [
+##      "textbox;;1"
+##    ],
+##    "appType": "DesktopJava",
+##    "stepNo": 12,
+##    "url": "Oracle Applications - EBSDB",
+##    "custname": "@Custom"
+##  },
+##  {
+##    "outputVal": "",
+##    "keywordVal": "verifyReadOnly",
+##    "objectName": "@Custom",
+##    "_id_": "13",
+##    "inputVal": [
+##      "textbox;;1"
+##    ],
+##    "appType": "DesktopJava",
+##    "stepNo": 13,
+##    "url": "Oracle Applications - EBSDB",
+##    "custname": "@Custom"
+##  },
+##  {
+##    "outputVal": "",
+##    "keywordVal": "verifyElementText",
+##    "objectName": "@Custom",
+##    "_id_": "14",
+##    "inputVal": [
+##      "textbox;;1;{t1}"
+##    ],
+##    "appType": "DesktopJava",
+##    "stepNo": 14,
+##    "url": "Oracle Applications - EBSDB",
+##    "custname": "@Custom"
+##  },
+##  {
+##    "outputVal": "",
+##    "keywordVal": "verifyVisible",
+##    "objectName": "@Custom",
+##    "_id_": "15",
+##    "inputVal": [
+##      "textbox;;1"
+##    ],
+##    "appType": "DesktopJava",
+##    "stepNo": 15,
+##    "url": "Oracle Applications - EBSDB",
+##    "custname": "@Custom"
+##  },
+##  {
+##    "outputVal": "",
+##    "keywordVal": "waitForElementVisible",
+##    "objectName": "@Custom",
+##    "_id_": "16",
+##    "inputVal": [
+##      "textbox;;1"
+##    ],
+##    "appType": "DesktopJava",
+##    "stepNo": 16,
+##    "url": "Oracle Applications - EBSDB",
+##    "custname": "@Custom"
+##  },
   {
     "comments": ""
   }

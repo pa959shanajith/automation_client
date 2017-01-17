@@ -93,6 +93,13 @@ class Handler():
         """
         global ws_template
         logger.print_on_console('Parsing')
+        log.info('Parsing')
+        log.info('-------------------------')
+        log.info('TSP list')
+        log.info('-------------------------')
+        logger.print_on_console('-------------------------')
+        logger.print_on_console('TSP list')
+        logger.print_on_console('-------------------------')
         json_string = json.dumps(test_data)
         new_obj = json.loads(json_string)
         if len(new_obj)==1:
@@ -443,13 +450,13 @@ class Handler():
         return :
 
         """
-
-        logger.print_on_console('-------------------------')
-        logger.print_on_console('TSP list\n')
-        logger.print_on_console('-------------------------')
+        log.info('Printing each step in TSP')
+        log.info('-------------------------')
+        log.info('TSP list')
+        log.info('-------------------------')
         for x in tspList:
             x.print_step()
-            logger.print_on_console('\n')
+##            logger.print_on_console('\n')
         return tspList
 
     def print_dict(self,d):
@@ -466,6 +473,26 @@ class Handler():
             print(k,':', v)
 
     def clearList(self,con):
+        """
+        def : clearList
+        purpose : Reset all global variables after the execution of each Scenario
+        param : dict
+        return :
+
+        """
         del tspList[:]
+        global tspIndex,tspIndex2,copy_for_keywords,for_keywords,copy_condition_keywords,condition_keywords,copy_getparam_keywords,getparam_keywords,for_info,if_info,get_param_info
+        tspIndex=-1
+        tspIndex2=-1
+        copy_for_keywords=OrderedDict()
+        for_keywords=OrderedDict()
+        copy_condition_keywords=OrderedDict()
+        condition_keywords=OrderedDict()
+        copy_getparam_keywords=OrderedDict()
+        getparam_keywords=OrderedDict()
+        for_info=OrderedDict()
+        if_info=OrderedDict()
+        get_param_info=OrderedDict()
+        ws_template=''
         if con.oebs_dispatcher_obj != None:
             con.oebs_dispatcher_obj.clear_oebs_window_name()

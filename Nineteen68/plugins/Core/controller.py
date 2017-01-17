@@ -92,7 +92,7 @@ class Controller():
     webservice_dispatcher_obj = None
     outlook_dispatcher_obj = None
     desktop_dispatcher_obj = None
-    verify_exists=False
+
 
     def __init__(self):
         self.get_all_the_imports(CORE)
@@ -115,6 +115,8 @@ class Controller():
         self.action=None
         self.counter=-1
         self.jumpto_previousindex=-1
+        self.verify_exists=False
+
 
     def __load_generic(self):
         try:
@@ -206,16 +208,13 @@ class Controller():
         input_val='Input :'+str(input)
         output='Output :'+tsp.outputval
         apptype='Apptype : '+str(tsp.apptype)
-        logger.print_on_console(keyowrd)
         log.info(keyowrd)
-        logger.print_on_console(input_val)
         log.info(input_val)
-        logger.print_on_console(output)
         log.info(output)
-        logger.print_on_console(apptype)
         log.info(apptype)
         for i in range(len(inpval)):
-            logger.print_on_console('Input: ',i + 1 , '= ',inpval[i])
+            log.info('Input: '+str(i + 1)+ '= '+repr(inpval[i]))
+            ##logger.print_on_console('Input: '+str(i + 1)+ '= ',inpval[i])
 
     def clear_data(self):
         global terminate_flag,pause_flag
@@ -429,41 +428,63 @@ class Controller():
             elif teststepproperty.name==VERIFY_EXISTS and self.verify_exists:
                 self.verify_exists=False
 
+            #Checking of  Drag and Drop keyowrds Issue #115 in Git
+            if teststepproperty.name==DROP:
+                log.debug('Drop keyword encountered')
+                teststepproperty_prev = handler.tspList[index-1]
+                if teststepproperty_prev.name!=DRAG:
+                    teststepproperty.execute_flag=False
+                    result=list(result)
+                    result[3]='Drag Keyword is missing'
+
+
+            elif teststepproperty.name==DRAG:
+                log.debug('Drag keyword encountered')
+                if(index+1)<len(handler.tspList):
+                    teststepproperty_next = handler.tspList[index+1]
+                    if teststepproperty_next.name!=DROP:
+                        teststepproperty.execute_flag=False
+                        result=list(result)
+                        result[3]='Drop Keyword is missing'
+
+
+
 
 
             #get the output varible from the teststep property
             outputstring = teststepproperty.outputval
 
-            #Check the apptype and pass to perticular module
-            if teststepproperty.apptype.lower() == APPTYPE_GENERIC:
-                #Generic apptype module call
-                if self.generic_dispatcher_obj == None:
-                    self.__load_generic()
-                result = self.invokegenerickeyword(teststepproperty,self.generic_dispatcher_obj,inpval)
+            if teststepproperty.execute_flag:
+                #Check the apptype and pass to perticular module
+                if teststepproperty.apptype.lower() == APPTYPE_GENERIC:
+                    #Generic apptype module call
+                    if self.generic_dispatcher_obj == None:
+                        self.__load_generic()
+                    result = self.invokegenerickeyword(teststepproperty,self.generic_dispatcher_obj,inpval)
 
-            elif teststepproperty.apptype.lower() == APPTYPE_WEB:
-                #Web apptype module call
-                if self.web_dispatcher_obj == None:
-                    self.__load_web()
-                result = self.invokewebkeyword(teststepproperty,self.web_dispatcher_obj,inpval,args[0])
+                elif teststepproperty.apptype.lower() == APPTYPE_WEB:
+                    #Web apptype module call
+                    if self.web_dispatcher_obj == None:
+                        self.__load_web()
+                    result = self.invokewebkeyword(teststepproperty,self.web_dispatcher_obj,inpval,args[0])
 
-            elif teststepproperty.apptype.lower() == APPTYPE_WEBSERVICE:
-                #Webservice apptype module call
-                if self.webservice_dispatcher_obj == None:
-                    self.__load_webservice()
-                result = self.invokewebservicekeyword(teststepproperty,self.webservice_dispatcher_obj,inpval)
+                elif teststepproperty.apptype.lower() == APPTYPE_WEBSERVICE:
+                    #Webservice apptype module call
+                    if self.webservice_dispatcher_obj == None:
+                        self.__load_webservice()
+                    result = self.invokewebservicekeyword(teststepproperty,self.webservice_dispatcher_obj,inpval)
 
-            elif teststepproperty.apptype.lower() == APPTYPE_DESKTOP:
-                #Desktop apptype module call
-                if self.desktop_dispatcher_obj == None:
-                    self.__load_desktop()
-                result = self.invokeDesktopkeyword(teststepproperty,self.desktop_dispatcher_obj,inpval)
+                elif teststepproperty.apptype.lower() == APPTYPE_DESKTOP:
+                    #Desktop apptype module call
+                    if self.desktop_dispatcher_obj == None:
+                        self.__load_desktop()
+                    result = self.invokeDesktopkeyword(teststepproperty,self.desktop_dispatcher_obj,inpval)
 
-            elif teststepproperty.apptype.lower() == APPTYPE_DESKTOP_JAVA:
-                #OEBS apptype module call
-                if self.oebs_dispatcher_obj == None:
-                    self.__load_oebs()
-                result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
+                elif teststepproperty.apptype.lower() == APPTYPE_DESKTOP_JAVA:
+                    #OEBS apptype module call
+                    if self.oebs_dispatcher_obj == None:
+                        self.__load_oebs()
+                    result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
 
             temp_result=list(result)
             if  len(temp_result)>2 and temp_result[2]==OUTPUT_CONSTANT:
@@ -479,10 +500,13 @@ class Controller():
             if result!=TERMINATE:
                 self.store_result(result,teststepproperty)
                 self.status=result[0]
+
                 index+=1
             else:
                 index=result
                 self.status=result
+            self.keyword_status=self.status
+
 
 ##            print '\n'
 
@@ -636,7 +660,6 @@ class Controller():
         suites_list,flag = t.gettsplist()
         self.action=EXECUTE
 
-
         #in future this value will come from the UI
         scenarios = scenario_num
         print 'No  of Suites : ',len(suites_list)
@@ -645,7 +668,7 @@ class Controller():
             #EXECUTION GOES HERE
             status = False
             flag=True
-            handler.tspList=[]
+
             #Iterate through the suite
             if terminate_flag:
                 status=TERMINATE
@@ -659,6 +682,7 @@ class Controller():
                 do_not_execute = False
                 #create a object of controller for each scenario
                 con =Controller()
+                handler.tspList=[]
                 #Check for the disabled scenario
 
                 for k in scenarios:
@@ -684,6 +708,7 @@ class Controller():
                                 tsplist[k].inputval = browser
 
                     if flag:
+                        con.action=EXECUTE
                         con.conthread=mythread
                         status = con.executor(tsplist,EXECUTE)
 
@@ -787,27 +812,34 @@ def kill_process():
 #main method
 if __name__ == '__main__':
     kill_process()
-    obj = handler.Handler()
-    obj1=Controller()
-    obj1.get_all_the_imports(CORE)
-    print 'Controller object created'
-    t = test_debug.Test()
-    list_data,flag = t.gettsplist()
-    for d in list_data:
-            flag=obj.parse_json(d)
-            if flag == False:
-                break
-            print '\n'
-            tsplist = obj.read_step()
-            for k in range(len(tsplist)):
-                if tsplist[k].name.lower() == 'openbrowser':
-                    tsplist[k].inputval = browser
-    if flag:
-            status = obj1.executor(tsplist,DEBUG)
+    #To debug from main method
+##    obj = handler.Handler()
+##    obj1=Controller()
+##    obj1.get_all_the_imports(CORE)
+##    print 'Controller object created'
+##    t = test_debug.Test()
+##    list_data,flag = t.gettsplist()
+##    for d in list_data:
+##            flag=obj.parse_json(d)
+##            if flag == False:
+##                break
+##            print '\n'
+##            tsplist = obj.read_step()
+##            for k in range(len(tsplist)):
+##                if tsplist[k].name.lower() == 'openbrowser':
+##                    tsplist[k].inputval = browser
+##    if flag:
+##            status = obj1.executor(tsplist,DEBUG)
+##
+##    else:
+##        print 'Invalid script'
 
-    else:
-        print 'Invalid script'
+    #To execute from main method
+    obj=Controller()
+    obj.invoke_execution(0,None,'3')
     kill_process()
+
+
 
 
 

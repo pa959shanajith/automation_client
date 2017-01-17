@@ -263,6 +263,7 @@ class Dispatcher:
                     input=identifiers[0]
 
                 if result != TERMINATE:
+
                     result= dict[keyword](webelement,input)
                     if keyword == GET_INNER_TABLE and (output != '' and output.startswith('{') and output.endswith('}')):
                         self.webelement_map[output]=result[2]
@@ -277,11 +278,9 @@ class Dispatcher:
 
 
             else:
-                logger.print_on_console(METHOD_INVALID)
-                log.error(METHOD_INVALID)
+                logger.print_on_console(INVALID_KEYWORD)
+                log.error(INVALID_KEYWORD)
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             log.error(e)
             logger.print_on_console(e)
         return result
@@ -292,14 +291,17 @@ class Dispatcher:
         value=None
         if browser_Keywords.driver_obj != None:
             log.info('checking for the url error')
-            response=requests.get(browser_Keywords.driver_obj.current_url)
-            status_code=response.status_code
-            log.info(status_code)
-            if status_code in STATUS_CODE_DICT:
-                value=STATUS_CODE_DICT[status_code]
-                logger.print_on_console('Error code ',status_code,' : ',value)
-                log.error('Error code ',status_code,' : ',value)
-                status=True
+            try:
+                response=requests.get(browser_Keywords.driver_obj.current_url)
+                status_code=response.status_code
+                log.info(status_code)
+                if status_code in STATUS_CODE_DICT:
+                    value=STATUS_CODE_DICT[status_code]
+                    logger.print_on_console('Error code ',status_code,' : ',value)
+                    log.error('Error code ',status_code,' : ',value)
+                    status=True
+            except Exception as e:
+                log.error(e)
         return status,value
 
 

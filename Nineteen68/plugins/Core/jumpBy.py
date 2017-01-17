@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        jumpBy.py
 # Purpose:
 #
 # Author:      prudhvi.gujjuboyina
@@ -36,7 +36,7 @@ class  JumpBy():
         self.status=False
 
     def print_step(self):
-        logger.print_on_console(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name)
+        log.info(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name)
 
 
     def invoke_jumpby(self,input,reporting_obj):

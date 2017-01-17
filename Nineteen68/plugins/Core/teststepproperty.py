@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        teststepproperty.py
 # Purpose:
 #
 # Author:      sushma.p
@@ -9,6 +9,10 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import logger
+import logging
+import constants
+
+log = logging.getLogger('teststepproperty.py')
 class TestStepProperty():
 
     def __init__(self,name,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo):
@@ -25,9 +29,11 @@ class TestStepProperty():
         self.additionalinfo = additionalinfo
         self.parent_xpath=''
         self.custom_flag=False
+        self.execute_flag=True
+        self.keyword_status=constants.TEST_RESULT_FAIL
 
     def print_step(self):
-        logger.print_on_console(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+self.apptype)
+        log.info(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+self.apptype)
 
 
 

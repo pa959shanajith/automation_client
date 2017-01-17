@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        jumpTo.py
 # Purpose:
 #
 # Author:      prudhvi.gujjuboyina
@@ -36,7 +36,7 @@ class  JumpTo():
         self.status=False
 
     def print_step(self):
-        logger.print_on_console(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name)
+        log.info(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name)
 
     # returns jumpTo index of step to executed by taking the script name as parameter
     def invoke_jumpto(self,input,reporting_obj,counter):

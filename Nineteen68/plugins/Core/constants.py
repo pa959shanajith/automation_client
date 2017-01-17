@@ -348,5 +348,11 @@ DEBUG='debug'
 
 CORE='Core'
 
+INVALID_KEYWORD='Keyword not available'
+
+DRAG='drag'
+
+DROP='drop'
+
 
 

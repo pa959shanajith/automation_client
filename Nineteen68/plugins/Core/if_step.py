@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        if_step.py
 # Purpose:
 #
 # Author:      sushma.p
@@ -15,7 +15,10 @@ import logger
 import handler
 from constants import *
 import reporting
+import logging
 
+
+log = logging.getLogger('if_step.py')
 
 class If():
     """Object instantiation of 'for' object"""
@@ -35,7 +38,7 @@ class If():
         self.step_description=''
 
     def print_step(self):
-        logger.print_on_console(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
+        log.info(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
 
 
 
@@ -79,8 +82,10 @@ class If():
 
             logger.print_on_console('Encountered :'+self.name+'\n')
             logical_eval_obj=Logical_eval()
+            input_expression=''
             if len(input)>=2:
-                input_expression=input[0]+input[1]+input[2]
+                for exp in input:
+                    input_expression=input_expression+exp
             else:
                 logger.print_on_console('Invalid input')
             logger.print_on_console('Input_expression is ',input_expression)

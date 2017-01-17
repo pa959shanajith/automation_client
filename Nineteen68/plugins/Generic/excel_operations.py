@@ -194,7 +194,7 @@ class ExcelFile:
         try:
             file_ext,res=self.__get_ext(self.excel_path)
             if res:
-                logger.print_on_console('Row is '+str(row)+' col is '+str(col)+' and Value: '+str(value))
+                log.info('Row is '+str(row)+' col is '+str(col)+' and Value: '+str(value))
                 res=self.dict['write_cell_'+file_ext](int(row),int(col),value,self.excel_path,self.sheetname,*args)
                 if res:
                     status=TEST_RESULT_PASS
@@ -394,11 +394,16 @@ class ExcelXLS:
                         value=str(value)
                         s.write(int(row),int(col),value)
 
-                workbook.save(input_path)
-                status= True
+                    workbook.save(input_path)
+                    status= True
+                else:
+                    logger.print_on_console('Cell Type not supported')
+                    log.info('Cell Type not supported')
             else:
-                logger.print_on_console('Cell Type not supported')
-                log.info('Cell Type not supported')
+                value=str(value)
+                s.write(int(row),int(col),value)
+
+
             workbook.save(input_path)
 
         except IOError:
