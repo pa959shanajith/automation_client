@@ -282,7 +282,6 @@ class DateOperation:
                     if  (input_format is None):
                         date1 = datetime.datetime.strptime(input_from, generic_constants.DATE_FORMAT )
                         date2 = datetime.datetime.strptime(input_to, generic_constants.DATE_FORMAT )
-                        print date1 , date2
                         if date1 == date2:
                             log.info('date1 == date2')
                             log.info(date1 == date2)
