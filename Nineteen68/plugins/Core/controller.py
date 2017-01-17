@@ -708,6 +708,7 @@ class Controller():
                                 tsplist[k].inputval = browser
 
                     if flag:
+                        con.action=EXECUTE
                         con.conthread=mythread
                         status = con.executor(tsplist,EXECUTE)
 
