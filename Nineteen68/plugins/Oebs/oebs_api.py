@@ -650,6 +650,6 @@ def terminate():
     if legacyAccessBridge:
         del cdll.windowsAccessBridge
     else:
-        delattr(cdll,'windowsAccessBridge-32')
+        delattr(cdll,'windowsAccessBridge-64')
     windll.kernel32.FreeLibrary(h)
     isRunning=False

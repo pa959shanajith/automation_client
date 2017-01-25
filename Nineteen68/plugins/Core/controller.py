@@ -329,8 +329,10 @@ class Controller():
             else:
 
                 index= TERMINATE
+                self.status=index
         else:
             index= TERMINATE
+            self.status=index
 
 
 
@@ -343,7 +345,7 @@ class Controller():
             ellapsed_time=end_time-start_time
             logger.print_on_console('Step Elapsed time is : ',str(ellapsed_time)+'\n')
             #Changing the overallstatus of the scenario if it's Fail or Terminate
-            if self.status==TEST_RESULT_FAIL or self.status==TERMINATE:
+            if self.status != TEST_RESULT_PASS:
                 self.reporting_obj.overallstatus=self.status
 
         if self.action==EXECUTE:
@@ -515,7 +517,7 @@ class Controller():
                 index=len(handler.tspList)
             return index,result
         else:
-            return TERMINATE
+            return index,TERMINATE
 
 
     def executor(self,tsplist,action):
@@ -540,13 +542,11 @@ class Controller():
                 try:
                     i = self.methodinvocation(i)
                     if i== TERMINATE:
+                        #Changing the overallstatus of the report_obj to Terminate - (Sushma)
+                        self.reporting_obj.overallstatus=TERMINATE
                         logger.print_on_console('Terminating the execution')
                         status=i
                         break
-##                    elif i==BREAK_POINT:
-##                        logger.print_on_console('Debug Stopped')
-##                        status=i
-##                        break
                     elif i==JUMP_TO:
                         i=self.jumpto_previousindex
                         self.jumpto_previousindex=-1
@@ -559,6 +559,8 @@ class Controller():
                     i=i+1
             else:
                 logger.print_on_console('Terminating the execution')
+                #Changing the overallstatus of the report_obj to Terminate - (Sushma)
+                self.reporting_obj.overallstatus=TERMINATE
                 status=TERMINATE
                 break
 
@@ -567,11 +569,11 @@ class Controller():
         logger.print_on_console('Scenario Execution end time is : '+end_time_string)
 
         self.scenario_ellapsed_time=self.scenario_end_time-self.scenario_start_time
+        if terminate_flag:
+            #Indication of user_termination to report_obj to add a proper description in report - (Sushma)
+            self.reporting_obj.user_termination=True
         self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
         logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
-
-
-
 
         return status
 

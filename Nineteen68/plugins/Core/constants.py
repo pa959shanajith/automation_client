@@ -354,5 +354,8 @@ DRAG='drag'
 
 DROP='drop'
 
+USER_TERMINATION='Terminated by the user'
+
+PROGRAM_TERMINATION='Terminated'
 
 
