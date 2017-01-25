@@ -324,8 +324,6 @@ class Controller():
                         self.jumpto_previousindex=index+1
                         index,self.counter = tsp.invoke_jumpto(inpval,self.reporting_obj,self.counter)
 
-
-
             else:
 
                 index= TERMINATE
@@ -488,9 +486,13 @@ class Controller():
                         self.__load_oebs()
                     result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
 
-            temp_result=list(result)
-            if  len(temp_result)>2 and temp_result[2]==OUTPUT_CONSTANT:
-                temp_result[2]=None
+			#Fixed issue num #389 (Taiga) 
+            temp_result=result
+            if result!=TERMINATE:
+                temp_result=list(result)
+                if  len(temp_result)>2 and temp_result[2]==OUTPUT_CONSTANT:
+                    temp_result[2]=None
+
 
             if pause_flag:
                 self.pause_execution()
