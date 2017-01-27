@@ -87,11 +87,13 @@ class TestThread(threading.Thread):
 class Controller():
 
     generic_dispatcher_obj = None
+    mobile_web_dispatcher_obj = None
     web_dispatcher_obj = None
     oebs_dispatcher_obj = None
     webservice_dispatcher_obj = None
     outlook_dispatcher_obj = None
     desktop_dispatcher_obj = None
+    mobile_app_dispatcher_obj = None
 
 
     def __init__(self):
@@ -126,6 +128,25 @@ class Controller():
                 self.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
         except Exception as e:
             logger.print_on_console('Error loading Generic plugin')
+
+    def __load_mobile_web(self):
+        try:
+            if self.mobile_web_dispatcher_obj==None:
+                self.get_all_the_imports('Mobility')
+                import mobile_dispatcher
+                self.mobile_web_dispatcher_obj = mobile_dispatcher.Dispatcher()
+        except Exception as e:
+            logger.print_on_console('Error loading MobileWeb plugin')
+
+    def __load_mobile_app(self):
+        try:
+            if self.mobile_app_dispatcher_obj==None:
+                self.get_all_the_imports('Mobility')
+                import mobile_app_dispatcher
+                self.mobile_app_dispatcher_obj = mobile_app_dispatcher.MobileDispatcher()
+
+        except Exception as e:
+            logger.print_on_console('Error loading MobileApp plugin')
 
     def __load_webservice(self):
         try:
@@ -468,6 +489,18 @@ class Controller():
                         self.__load_web()
                     result = self.invokewebkeyword(teststepproperty,self.web_dispatcher_obj,inpval,args[0])
 
+                elif teststepproperty.apptype.lower() == APPTYPE_MOBILE:
+                    #MobileWeb apptype module call
+                    if self.mobile_web_dispatcher_obj == None:
+                        self.__load_mobile_web()
+                    result = self.invokemobilekeyword(teststepproperty,self.mobile_web_dispatcher_obj,inpval,args[0])
+
+                elif teststepproperty.apptype.lower() == APPTYPE_MOBILE_APP:
+                    #MobileApp apptype module call
+                    if self.mobile_app_dispatcher_obj==None:
+                        self.__load_mobile_app()
+                    result = self.invokemobileappkeyword(teststepproperty,self.mobile_app_dispatcher_obj,inpval,args[0])
+
                 elif teststepproperty.apptype.lower() == APPTYPE_WEBSERVICE:
                     #Webservice apptype module call
                     if self.webservice_dispatcher_obj == None:
@@ -486,7 +519,7 @@ class Controller():
                         self.__load_oebs()
                     result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
 
-			#Fixed issue num #389 (Taiga) 
+			#Fixed issue num #389 (Taiga)
             temp_result=result
             if result!=TERMINATE:
                 temp_result=list(result)
@@ -599,6 +632,19 @@ class Controller():
         keyword = teststepproperty.name
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
         return res
+
+    def invokemobilekeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
+
+        keyword = teststepproperty.name
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
+        return res
+
+    def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
+
+        keyword = teststepproperty.name
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
+        return res
+
 
     def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval):
         keyword = teststepproperty.name
