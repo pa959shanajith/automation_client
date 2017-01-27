@@ -57,6 +57,11 @@ APPTYPE_DESKTOP = 'desktop'
 
 APPTYPE_DESKTOP_JAVA = 'desktopjava'
 
+
+APPTYPE_MOBILE='mobileweb'
+
+APPTYPE_MOBILE_APP = 'mobileapp'
+
 IGNORE_THIS_STEP = '<<Ignore.This.Step>>'
 
 SEMICOLON = ';'
@@ -107,8 +112,8 @@ ERROR_CODE_DICT ={
                     'MSG_ELEMENT_NOT_FOUND':'Element not found.',
                     'MSG_OBJECT_ENABLED':'The Element is enabled.',
                     'ERR_OBJECT_DISABLED':'The object is disabled.',
-                    'MSB_OBJECT_DISPLAYED':'The object is displayed.',
-                    'MSB_OBJECT_NOT_DISPLAYED':'The object is not displayed.',
+                    'MSG_OBJECT_DISPLAYED':'The object is displayed.',
+                    'MSG_OBJECT_NOT_DISPLAYED':'The object is not displayed.',
                     'ERR_UNABLE_TO_SELECT':'Unable to select.',
                     'ERR_CURRENT_STATE':'The current operation cannot be performed because of the object state.',
                     'ERR_OBJECT_NOT_FOUND':'Object Not Found.',
@@ -354,5 +359,8 @@ DRAG='drag'
 
 DROP='drop'
 
+USER_TERMINATION='Terminated by the user'
+
+PROGRAM_TERMINATION='Terminated'
 
 

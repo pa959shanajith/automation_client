@@ -87,11 +87,13 @@ class TestThread(threading.Thread):
 class Controller():
 
     generic_dispatcher_obj = None
+    mobile_web_dispatcher_obj = None
     web_dispatcher_obj = None
     oebs_dispatcher_obj = None
     webservice_dispatcher_obj = None
     outlook_dispatcher_obj = None
     desktop_dispatcher_obj = None
+    mobile_app_dispatcher_obj = None
 
 
     def __init__(self):
@@ -126,6 +128,25 @@ class Controller():
                 self.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
         except Exception as e:
             logger.print_on_console('Error loading Generic plugin')
+
+    def __load_mobile_web(self):
+        try:
+            if self.mobile_web_dispatcher_obj==None:
+                self.get_all_the_imports('Mobility')
+                import mobile_dispatcher
+                self.mobile_web_dispatcher_obj = mobile_dispatcher.Dispatcher()
+        except Exception as e:
+            logger.print_on_console('Error loading MobileWeb plugin')
+
+    def __load_mobile_app(self):
+        try:
+            if self.mobile_app_dispatcher_obj==None:
+                self.get_all_the_imports('Mobility')
+                import mobile_app_dispatcher
+                self.mobile_app_dispatcher_obj = mobile_app_dispatcher.MobileDispatcher()
+
+        except Exception as e:
+            logger.print_on_console('Error loading MobileApp plugin')
 
     def __load_webservice(self):
         try:
@@ -324,13 +345,13 @@ class Controller():
                         self.jumpto_previousindex=index+1
                         index,self.counter = tsp.invoke_jumpto(inpval,self.reporting_obj,self.counter)
 
-
-
             else:
 
                 index= TERMINATE
+                self.status=index
         else:
             index= TERMINATE
+            self.status=index
 
 
 
@@ -343,7 +364,7 @@ class Controller():
             ellapsed_time=end_time-start_time
             logger.print_on_console('Step Elapsed time is : ',str(ellapsed_time)+'\n')
             #Changing the overallstatus of the scenario if it's Fail or Terminate
-            if self.status==TEST_RESULT_FAIL or self.status==TERMINATE:
+            if self.status != TEST_RESULT_PASS:
                 self.reporting_obj.overallstatus=self.status
 
         if self.action==EXECUTE:
@@ -468,6 +489,18 @@ class Controller():
                         self.__load_web()
                     result = self.invokewebkeyword(teststepproperty,self.web_dispatcher_obj,inpval,args[0])
 
+                elif teststepproperty.apptype.lower() == APPTYPE_MOBILE:
+                    #MobileWeb apptype module call
+                    if self.mobile_web_dispatcher_obj == None:
+                        self.__load_mobile_web()
+                    result = self.invokemobilekeyword(teststepproperty,self.mobile_web_dispatcher_obj,inpval,args[0])
+
+                elif teststepproperty.apptype.lower() == APPTYPE_MOBILE_APP:
+                    #MobileApp apptype module call
+                    if self.mobile_app_dispatcher_obj==None:
+                        self.__load_mobile_app()
+                    result = self.invokemobileappkeyword(teststepproperty,self.mobile_app_dispatcher_obj,inpval,args[0])
+
                 elif teststepproperty.apptype.lower() == APPTYPE_WEBSERVICE:
                     #Webservice apptype module call
                     if self.webservice_dispatcher_obj == None:
@@ -486,9 +519,13 @@ class Controller():
                         self.__load_oebs()
                     result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
 
-            temp_result=list(result)
-            if  len(temp_result)>2 and temp_result[2]==OUTPUT_CONSTANT:
-                temp_result[2]=None
+			#Fixed issue num #389 (Taiga)
+            temp_result=result
+            if result!=TERMINATE:
+                temp_result=list(result)
+                if  len(temp_result)>2 and temp_result[2]==OUTPUT_CONSTANT:
+                    temp_result[2]=None
+
 
             if pause_flag:
                 self.pause_execution()
@@ -515,7 +552,7 @@ class Controller():
                 index=len(handler.tspList)
             return index,result
         else:
-            return TERMINATE
+            return index,TERMINATE
 
 
     def executor(self,tsplist,action):
@@ -540,13 +577,11 @@ class Controller():
                 try:
                     i = self.methodinvocation(i)
                     if i== TERMINATE:
+                        #Changing the overallstatus of the report_obj to Terminate - (Sushma)
+                        self.reporting_obj.overallstatus=TERMINATE
                         logger.print_on_console('Terminating the execution')
                         status=i
                         break
-##                    elif i==BREAK_POINT:
-##                        logger.print_on_console('Debug Stopped')
-##                        status=i
-##                        break
                     elif i==JUMP_TO:
                         i=self.jumpto_previousindex
                         self.jumpto_previousindex=-1
@@ -559,6 +594,8 @@ class Controller():
                     i=i+1
             else:
                 logger.print_on_console('Terminating the execution')
+                #Changing the overallstatus of the report_obj to Terminate - (Sushma)
+                self.reporting_obj.overallstatus=TERMINATE
                 status=TERMINATE
                 break
 
@@ -567,11 +604,11 @@ class Controller():
         logger.print_on_console('Scenario Execution end time is : '+end_time_string)
 
         self.scenario_ellapsed_time=self.scenario_end_time-self.scenario_start_time
+        if terminate_flag:
+            #Indication of user_termination to report_obj to add a proper description in report - (Sushma)
+            self.reporting_obj.user_termination=True
         self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
         logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
-
-
-
 
         return status
 
@@ -595,6 +632,19 @@ class Controller():
         keyword = teststepproperty.name
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
         return res
+
+    def invokemobilekeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
+
+        keyword = teststepproperty.name
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
+        return res
+
+    def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
+
+        keyword = teststepproperty.name
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
+        return res
+
 
     def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval):
         keyword = teststepproperty.name

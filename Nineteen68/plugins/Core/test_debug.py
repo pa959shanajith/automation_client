@@ -24,58 +24,45 @@ class Test():
         	"template": "",
         	"testscript_name": "Script1",
            "testcase": [
-  {
-    "outputVal": "##",
-    "keywordVal": "FindWindowAndAttach",
-    "objectName": "",
-    "_id_": "1",
-    "inputVal": [
-      "Oracle Applications - EBSDB"
-    ],
-    "appType": "DesktopJava",
-    "stepNo": 1,
-    "url": "",
-    "custname": "@Oebs"
-  },
-  {
-    "outputVal": "",
-    "keywordVal": "launchApplication",
-    "objectName": "",
-    "_id_": "1",
-    "inputVal": [
-      "D:\\Java Access Bridge\\SwingSet2.jar;SwingSet2"
-    ],
-    "appType": "DesktopJava",
-    "stepNo": 1,
-    "url": "",
-    "custname": "@Oebs"
-  },
     {
-    "outputVal": "",
-    "keywordVal": "pause",
-    "objectName": "frame[Oracle Applications - EBSDB]/panel[1]/panel[1]/panel[0]/menu bar[1]/menu[File ALT F];File ALT F;0;16;;frame[Oracle Applications - EBSDB]/panel[1]/panel[1]/panel[0]/menu bar[1];7;1;menu bar;menu;",
-    "_id_": "2",
+    "stepNo": 1,
+    "appType": "mobileapp",
+    "objectName": " ",
     "inputVal": [
-      ""
+      "D:\\apks\\selendroid-test-app-0.17.0.apk;6.0;AND6:5554"
     ],
-    "appType": "Generic",
-    "stepNo": 2,
-    "url": "Oracle Applications - EBSDB",
-    "custname": "File ALT F"
+    "_id_": "1",
+    "keywordVal": "installApplication",
+    "custname": "@Browser",
+    "outputVal": "",
+    "url": " "
   },
   {
-    "outputVal": "##",
-    "keywordVal": "closeApplication",
-    "objectName": "frame[Oracle Applications - EBSDB]/panel[1]/panel[1]/panel[0]/menu bar[1]/menu[File ALT F];File ALT F;0;16;;frame[Oracle Applications - EBSDB]/panel[1]/panel[1]/panel[0]/menu bar[1];7;1;menu bar;menu;",
-    "_id_": "2",
-    "inputVal": [
-      "Oracle Applications - EBSDB"
-    ],
-    "appType": "DesktopJava",
     "stepNo": 2,
-    "url": "Oracle Applications - EBSDB",
-    "custname": "File ALT F"
+    "appType": "mobileapp",
+    "objectName": "null;//hierarchy[1]/android.widget.FrameLayout[1]/android.widget.LinearLayout[1]/android.widget.FrameLayout[2]/android.widget.LinearLayout[1]/android.widget.EditText[1]",
+    "inputVal": [
+      "hi"
+    ],
+    "_id_": "2",
+    "keywordVal": "setText",
+    "custname": "@Browser",
+    "outputVal": "",
+    "url": " "
   },
+##  {
+##    "stepNo": 3,
+##    "appType": "mobileapp",
+##    "objectName": "//*[@id=\"searchBtn\"];searchBtn;/html/body/div[4]/div/form/div/div/div/input[10];searchBtn;input[13];chkavailabilityBtn",
+##    "inputVal": [
+##      "Check Availability"
+##    ],
+##    "_id_": "3",
+##    "keywordVal": "verifyButtonName",
+##    "custname": "CheckAvailabilityButton",
+##    "outputVal": "{verifyButtonName};##",
+##    "url": "http://m.ksrtc.in/oprs-mobile/"
+##  },
 ##  {
 ##    "outputVal": "",
 ##    "keywordVal": "verifyVisible",

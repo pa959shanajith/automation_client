@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        web_dispatcher.py
+# Name:        mobile_dispatcher.py
 # Purpose:
 #
 # Author:      sushma.p
@@ -9,20 +9,19 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import button_link_keyword
-import popup_keywords
-import browser_Keywords
-import radio_checkbox_operations
-import table_keywords
-import utilweb_operations
-import element_operations
-import textbox_operations
-import dropdown_listbox
-import utilweb_operations
-import static_text_keywords
+import mobile_button_link_keyword
+import mobile_popup_keywords
+import mobile_browser_keywords
+import mobile_radio_checkbox_operations
+import mobile_table_keywords
+import mobile_utilweb_operations
+import mobile_element_operations
+import mobile_textbox_operations
+import mobile_dropdown_listbox
+import mobile_static_text_keywords
 import logger
-from webconstants import *
-import custom_keyword
+from mobileconstants import *
+import mobile_custom_keyword
 from collections import OrderedDict
 from constants import *
 import requests
@@ -30,21 +29,21 @@ import re
 
 import logging
 
-log = logging.getLogger('web_dispatcher.py')
+log = logging.getLogger('mobile_dispatcher.py')
 
 class Dispatcher:
 
-    button_link_object = button_link_keyword.ButtonLinkKeyword()
-    popup_object = popup_keywords.PopupKeywords()
-    browser_object = browser_Keywords.BrowserKeywords()
-    radio_checkbox_object = radio_checkbox_operations.RadioCheckboxKeywords()
-    table_object = table_keywords.TableOperationKeywords()
-    element_object = element_operations.ElementKeywords()
-    textbox_object = textbox_operations.TextboxKeywords()
-    dropdown_list_object = dropdown_listbox.DropdownKeywords()
-    util_object = utilweb_operations.UtilWebKeywords()
-    statict_text_object = static_text_keywords.StaticTextKeywords()
-    custom_object=custom_keyword.CustomKeyword()
+    button_link_object = mobile_button_link_keyword.ButtonLinkKeyword()
+    popup_object = mobile_popup_keywords.PopupKeywords()
+    browser_object = mobile_browser_keywords.BrowserKeywords()
+    radio_checkbox_object = mobile_radio_checkbox_operations.RadioCheckboxKeywords()
+    table_object = mobile_table_keywords.TableOperationKeywords()
+    element_object = mobile_element_operations.ElementKeywords()
+    textbox_object = mobile_textbox_operations.TextboxKeywords()
+    dropdown_list_object = mobile_dropdown_listbox.DropdownKeywords()
+    util_object = mobile_utilweb_operations.UtilWebKeywords()
+    statict_text_object = mobile_static_text_keywords.StaticTextKeywords()
+    custom_object=mobile_custom_keyword.CustomKeyword()
     webelement_map=OrderedDict()
 
     def __init__(self):
@@ -56,7 +55,7 @@ class Dispatcher:
         objectname = objectname.strip()
         url=teststepproperty.url.strip()
         keyword = teststepproperty.name
-        driver = browser_Keywords.driver_obj
+        driver = mobile_browser_keywords.driver_obj
         webelement = None
         element = None
 
@@ -96,7 +95,7 @@ class Dispatcher:
                 if url !=  '' and self.custom_object.is_int(url):
                     log.debug('Encountered iframe/frame url')
                     self.custom_object.switch_to_iframe(url,driver.current_window_handle)
-                    driver = browser_Keywords.driver_obj
+                    driver = mobile_browser_keywords.driver_obj
                 if objectname==CUSTOM:
                     log.info('Encountered custom object')
                     log.info('Custom flag is ')
@@ -141,9 +140,9 @@ class Dispatcher:
 
         def find_browser_info(reporting_obj):
             #Find the browser type and browser name if driver_obj is not None
-            if browser_Keywords.driver_obj is not None:
+            if mobile_browser_keywords.driver_obj is not None:
                 log.info('Finding the browser information')
-                browser_info=browser_Keywords.driver_obj.capabilities
+                browser_info=mobile_browser_keywords.driver_obj.capabilities
                 reporting_obj.browser_version=browser_info.get('version')
                 reporting_obj.browser_type=browser_info.get('browserName')
                 log.info(reporting_obj.browser_version)
@@ -290,10 +289,10 @@ class Dispatcher:
     def check_url_error_code(self):
         status=False
         value=None
-        if browser_Keywords.driver_obj != None:
+        if mobile_browser_keywords.driver_obj != None:
             log.info('checking for the url error')
             try:
-                urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', browser_Keywords.driver_obj.current_url)
+                urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', mobile_browser_keywords.driver_obj.current_url)
                 response=requests.get(urls[0])
                 status_code=response.status_code
                 log.info(status_code)

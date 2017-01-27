@@ -40,6 +40,7 @@ class Reporting:
         self.end_time=''
         self.ellapsed_time=''
         self.name=''
+        self.user_termination=False
 
     def build_overallstatus(self,start_time,end_time,ellapsed_time):
         """
@@ -48,6 +49,8 @@ class Reporting:
         param : start_time,end_time,ellapsed_time
 
         """
+        if self.overallstatus==TERMINATE:
+            self.add_termination_step()
         self.start_time=str(start_time)
         self.end_time=str(end_time)
         self.ellapsed_time=str(ellapsed_time)
@@ -110,8 +113,27 @@ class Reporting:
         obj[ID]=report_obj._id
         obj[KEYWORD]=TEST_SCRIPT_NAME
         obj[PARENT_ID]=report_obj.parent_id
-        obj[COMMENTS]=report_obj.comments
+        obj[COMMENTS]=''
         obj[STEP_DESCRIPTION]=TEST_SCRIPT_NAME+': '+report_obj.testscript_name
+        self.report_string.append(obj)
+        self.id_counter+=1
+
+    def add_termination_step(self):
+        """
+        def : add_testscriptname
+        purpose : adds the Termination_step to the report
+
+        """
+        obj={}
+        obj[ID]=self.id_counter
+        obj[KEYWORD]=''
+        obj[PARENT_ID]=''
+        obj[COMMENTS]=''
+        description=PROGRAM_TERMINATION
+        obj[STEP]=description
+        if self.user_termination:
+            description=USER_TERMINATION
+        obj[STEP_DESCRIPTION]=description
         self.report_string.append(obj)
         self.id_counter+=1
 
@@ -128,7 +150,6 @@ class Reporting:
         if report_obj.testscript_name != self.testscript_name:
             self.testscript_name=report_obj.testscript_name
             self.add_testscriptname(report_obj)
-
         obj={}
         obj[ID]=report_obj._id
         obj[KEYWORD]=report_obj.name
