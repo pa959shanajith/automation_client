@@ -138,6 +138,7 @@ class OutlookKeywords:
                                     msg.Display(False)
                                     status=desktop_constants.TEST_RESULT_PASS
                                     method_output=desktop_constants.TEST_RESULT_TRUE
+                                    break
                                 else:
                                     continue
                             else:

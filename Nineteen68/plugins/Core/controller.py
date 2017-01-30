@@ -320,6 +320,8 @@ class Controller():
                     #Print the details of keyword
                     self.__print_details(tsp,input,inpval)
 
+                result_touple=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
+
                 #Calculating Start time
                 logger.print_on_console('Step number is : ',tsp.stepnum)
                 log.info('Step number is : '+str(tsp.stepnum))
@@ -368,7 +370,7 @@ class Controller():
                 self.reporting_obj.overallstatus=self.status
 
         if self.action==EXECUTE:
-            self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
+            self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result_touple[3])
 
         if self.counter>-1 and self.counter-index==0:
             return JUMP_TO
@@ -588,6 +590,8 @@ class Controller():
                         self.counter=-1
 
                 except Exception as e:
+                    import traceback
+                    traceback.print_exc()
                     log.error(e)
                     logger.print_on_console(e)
                     status=False
