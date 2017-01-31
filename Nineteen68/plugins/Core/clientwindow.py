@@ -31,7 +31,33 @@ class MainNamespace(BaseNamespace):
 
             time.sleep(5)
             print 'Importing done'
-        elif str(args[0]) == 'HIGHLIGHT':
+        elif str(args[0]) == 'OPEN BROWSER IE':
+            print args[0]
+
+            global wxObject
+            print wxObject
+            global browsername
+            browsername = 'CH'
+            print 'Browser name : ',browsername
+##            wxObject.test()
+            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+
+            time.sleep(5)
+            print 'Importing done'
+        elif str(args[0]) == 'OPEN BROWSER FX':
+            print args[0]
+
+            global wxObject
+            print wxObject
+            global browsername
+            browsername = 'CH'
+            print 'Browser name : ',browsername
+##            wxObject.test()
+            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+
+            time.sleep(5)
+            print 'Importing done'
+        elif 'HIGHLIGHT' in str(args[0]):
             print args[0]
             global browsername
             browsername = 'CH'
@@ -41,7 +67,6 @@ class MainNamespace(BaseNamespace):
 ##            wxObject.test()
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
             time.sleep(20)
-            data = """HIGHLIGHT,//*[@id=\"loginbutton\"];loginbutton;/html/body/div[2]/div/div[11]/form/div[1]/div[4]/input[1];submit[0];input[8];grid_4 pull_4 omega,https://www.irctc.co.in/eticketing/loginHome.jsf"""
             import highlight
             light =highlight.Highlight()
             res = light.highlight(data,None,None)
