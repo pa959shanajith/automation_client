@@ -37,7 +37,7 @@ class MainNamespace(BaseNamespace):
             global wxObject
             print wxObject
             global browsername
-            browsername = 'CH'
+            browsername = 'IE'
             print 'Browser name : ',browsername
 ##            wxObject.test()
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
