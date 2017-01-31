@@ -42,6 +42,8 @@ class  JumpTo():
     def invoke_jumpto(self,input,reporting_obj,counter):
         log.info('JumpTo Execution Started')
         return_value=self.index+1
+        error_msg=None
+        output=OUTPUT_CONSTANT
         try:
             log.debug('Get the tsp list')
             tspList=handler.tspList

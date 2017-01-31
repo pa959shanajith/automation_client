@@ -99,6 +99,7 @@ class Controller():
     def __init__(self):
         self.get_all_the_imports(CORE)
         self.__load_generic()
+        self.cur_dir= os.getcwd()
 ##        self.__load_web()
 ##        self.__load_webservice()
 ##        self.__load_oebs()
@@ -272,15 +273,13 @@ class Controller():
 
         global pause_flag
 
+		#COmapring breakpoint with the step number of tsp instead of index - (Sushma)
+        tsp = handler.tspList[index]
 
-
-        if break_point != -1 and break_point == index:
-
+        if break_point != -1 and break_point== tsp.stepnum:
             if self.action==DEBUG:
                 pause_flag=True
 
-
-        tsp = handler.tspList[index]
         keyword_flag=True
         #Check for 'terminate_flag' before execution
         if not(terminate_flag):
@@ -367,7 +366,7 @@ class Controller():
             if self.status != TEST_RESULT_PASS:
                 self.reporting_obj.overallstatus=self.status
 
-        if self.action==EXECUTE:
+       	if self.action==EXECUTE:
             self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
 
         if self.counter>-1 and self.counter-index==0:
@@ -428,6 +427,7 @@ class Controller():
                 self.pause_execution()
 
             teststepproperty = handler.tspList[index]
+            keyword=teststepproperty.name
 
             #Custom object implementation for Web
             if teststepproperty.objectname==CUSTOM:
@@ -446,7 +446,7 @@ class Controller():
                     teststepproperty.custom_flag=True
                     teststepproperty.parent_xpath=self.previous_step.objectname
                     teststepproperty.url=self.previous_step.url
-            elif teststepproperty.name==VERIFY_EXISTS and self.verify_exists:
+            elif keyword==VERIFY_EXISTS and self.verify_exists:
                 self.verify_exists=False
 
             #Checking of  Drag and Drop keyowrds Issue #115 in Git
@@ -459,7 +459,7 @@ class Controller():
                     result[3]='Drag Keyword is missing'
 
 
-            elif teststepproperty.name==DRAG:
+            elif keyword==DRAG:
                 log.debug('Drag keyword encountered')
                 if(index+1)<len(handler.tspList):
                     teststepproperty_next = handler.tspList[index+1]
@@ -532,17 +532,19 @@ class Controller():
             logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',temp_result)
             log.info('Result in methodinvocation : '+ str(teststepproperty.name)+' : ')
             log.info(result)
-            log.info(KEYWORD_EXECUTION_COMPLETED+ '\n' )
+
 
             if result!=TERMINATE:
                 self.store_result(result,teststepproperty)
                 self.status=result[0]
-
                 index+=1
             else:
                 index=result
                 self.status=result
             self.keyword_status=self.status
+            #FIxing issue #382
+            logger.print_on_console(keyword+' executed and the status is '+self.status+'\n')
+            log.info(keyword+' executed and the status is '+self.status+'\n')
 
 
 ##            print '\n'
@@ -675,8 +677,9 @@ class Controller():
             try:
                 input_breakpoint=int(input_breakpoint)
                 if input_breakpoint >0:
-                    break_point=input_breakpoint-1
-                    logger.print_on_console('***Break_point is ***',break_point)
+##                    break_point=input_breakpoint-1
+                    break_point=input_breakpoint
+                    logger.print_on_console('***Break_point is ***',input_breakpoint)
             except Exception as e:
                 logger.print_on_console(e)
                 logger.print_on_console('Invalid breakpoint number')
@@ -771,6 +774,7 @@ class Controller():
                     log.info('Saving the Report json of Scenario '+str((i  + 1 )))
                     logger.print_on_console( '***Saving the Report json of Scenario ',(i  + 1 ),'***')
                     log.info( '***Scenario' + str((i  + 1 )) +' execution completed***')
+                    os.chdir(self.cur_dir)
                     filename='Scenario'+str(i  + 1)+'.json'
                     con.reporting_obj.save_report_json(filename)
                     obj.clearList(con)
@@ -864,31 +868,31 @@ def kill_process():
 if __name__ == '__main__':
     kill_process()
     #To debug from main method
-##    obj = handler.Handler()
-##    obj1=Controller()
-##    obj1.get_all_the_imports(CORE)
-##    print 'Controller object created'
-##    t = test_debug.Test()
-##    list_data,flag = t.gettsplist()
-##    for d in list_data:
-##            flag=obj.parse_json(d)
-##            if flag == False:
-##                break
-##            print '\n'
-##            tsplist = obj.read_step()
-##            for k in range(len(tsplist)):
-##                if tsplist[k].name.lower() == 'openbrowser':
-##                    tsplist[k].inputval = browser
-##    if flag:
-##            status = obj1.executor(tsplist,DEBUG)
-##
-##    else:
-##        print 'Invalid script'
+    obj = handler.Handler()
+    obj1=Controller()
+    obj1.get_all_the_imports(CORE)
+    print 'Controller object created'
+    t = test_debug.Test()
+    list_data,flag = t.gettsplist()
+    for d in list_data:
+            flag=obj.parse_json(d)
+            if flag == False:
+                break
+            print '\n'
+            tsplist = obj.read_step()
+            for k in range(len(tsplist)):
+                if tsplist[k].name.lower() == 'openbrowser':
+                    tsplist[k].inputval = browser
+    if flag:
+            status = obj1.executor(tsplist,DEBUG)
 
-    #To execute from main method
-    obj=Controller()
-    obj.invoke_execution(0,None,'3')
-    kill_process()
+    else:
+        print 'Invalid script'
+
+##    #To execute from main method
+##    obj=Controller()
+##    obj.invoke_execution(0,None,'3')
+##    kill_process()
 
 
 

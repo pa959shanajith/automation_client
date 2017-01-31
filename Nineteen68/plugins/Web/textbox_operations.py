@@ -344,12 +344,13 @@ class TextboxKeywords:
                                 webelement.clear()
                             encryption_obj = AESCipher()
                             input_val = encryption_obj.decrypt(input)
-                            user_input=self.validate_input(webelement,input_val)
-                            if user_input is not None:
-                                input_val=user_input
-                            browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
+                            if input_val is not None:
+                                user_input=self.validate_input(webelement,input_val)
+                                if user_input is not None:
+                                    input_val=user_input
+                                browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
                         else:
                             err_msg=self.__read_only()
                 else:

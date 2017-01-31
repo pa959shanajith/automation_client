@@ -14,7 +14,6 @@ import logging
 log = logging.getLogger('install_and_launch.py')
 import logger
 from constants import *
-import mobile_app_constants
 driver = None
 
 class LaunchAndInstall():
@@ -62,9 +61,11 @@ class LaunchAndInstall():
 ##            path='C:\\Nineteen68\\plugins\\Mobility\\node_modules\\appium\\build\\lib\main.js'
             log.info('Server file path')
             log.info(path)
+            nodePath = maindir+'//node.exe'
+            log.info(nodePath)
 ##            print ' logic to start server'
 ##            file_path = 'D:\\mobile_python\\node_modules\\appium\\build\\lib\\main.js'
-            proc = subprocess.Popen(["node", path], shell=True,stdin=None, stdout=None, stderr=None, close_fds=True)
+            proc = subprocess.Popen([nodePath, path], shell=True,stdin=None, stdout=None, stderr=None, close_fds=True)
             import time
             time.sleep(15)
             logger.print_on_console('Server started')

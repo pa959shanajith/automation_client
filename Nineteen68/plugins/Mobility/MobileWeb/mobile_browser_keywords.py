@@ -439,7 +439,9 @@ class Singleton_DriverUtil():
         os.chdir('..')
         curdir= os.getcwd()
         file_path= curdir + '//Nineteen68//plugins//Mobility//node_modules//appium//build//lib//main.js'
-        proc = subprocess.Popen(["node", file_path], shell=True,stdin=None, stdout=None, stderr=None, close_fds=True)
+        nodePath = maindir+'//node.exe'
+        log.info(nodePath)
+        proc = subprocess.Popen([nodePath, file_path], shell=True,stdin=None, stdout=None, stderr=None, close_fds=True)
         import time
         time.sleep(15)
         os.chdir(maindir)
