@@ -29,9 +29,9 @@ class Clickandadd():
             browser = browserops.browser
             logger.log('FILE: clickandadd.py , DEF: startclickandadd() , MSG: Obtained browser handle and driver from browserops.py class .....')
             toolwindow = win32gui.GetForegroundWindow()
-            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
+##            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
             actwindow = win32gui.GetForegroundWindow()
-            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
+##            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
             logger.log('FILE: clickandadd.py , DEF: startclickandadd()  , MSG: Minimizing the foreground window i.e tool and assuming AUT on top .....')
             javascript_hasfocus = """return(document.hasFocus());"""
             time.sleep(6)
