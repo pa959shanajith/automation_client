@@ -234,11 +234,17 @@ class Clickandadd():
 
     def save_json_data(self):
 ##        data = {'view' : vie}
+        data = []
+        driver = browserops.driver
+        data.append(vie)
+        screen = driver.get_screenshot_as_base64()
+        screenshot = {'mirror':screen}
+        data.append(screenshot)
         with open('domelements.json', 'w') as outfile:
                 logger.log('FILE: clickandadd.py , DEF: stopclickandadd() , MSG: Opening domelements.json file to write vie object')
-                json.dump(vie, outfile, indent=4, sort_keys=False)
+                json.dump(data, outfile, indent=4, sort_keys=False)
                 logger.log('FILE: clickandadd.py , DEF: stopclickandadd() , MSG: vie is dumped into  domelements.json file ')
         outfile.close()
-        return vie
+        return data
 
 
