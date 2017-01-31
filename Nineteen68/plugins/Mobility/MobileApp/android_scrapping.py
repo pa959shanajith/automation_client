@@ -15,7 +15,8 @@ import xml.parsers.expat
 import ConfigParser
 import uuid,json
 import os
-from appium import webdriver
+from mobile_app_constants import *
+
 ##log = logging.getLogger('android_scrapping.py')
 
 
@@ -44,12 +45,14 @@ class InstallAndLaunch:
             os.chdir('..')
             curdir = os.getcwd()
             print curdir
-##            path= curdir + '//Nineteen68//plugins//Mobility//node_modules//appium//build//lib//main.js'
-            path= curdir + '//node_modules//appium//build//lib//main.js'
+            path= curdir + '//Nineteen68//plugins//Mobility//node_modules//appium//build//lib//main.js'
+            nodePath = maindir+'//node.exe'
+            print nodePath
+##            path= curdir + '//node_modules//appium//build//lib//main.js'
             print 'Server file path',path
 ##            print ' logic to start server'
 ##            file_path = 'D:\\mobile_python\\node_modules\\appium\\build\\lib\\main.js'
-            proc = subprocess.Popen(["node", path], shell=True,stdin=None, stdout=None, stderr=None, close_fds=True)
+            proc = subprocess.Popen([nodePath, path], shell=True,stdin=None, stdout=None, stderr=None, close_fds=True)
             import time
             time.sleep(15)
             print('Server started')
@@ -66,8 +69,8 @@ class InstallAndLaunch:
                 for line in processes:
                     p =  line.laddr
                     if p[1] == 4723:
-                        log.info( 'Pid Found' )
-                        log.info(line.pid)
+                        print 'Pid Found'
+                        print line.pid
                         os.system("TASKKILL /F /PID " + str(line.pid))
                         print('Server stopped')
             except Exception as e:
@@ -77,6 +80,7 @@ class InstallAndLaunch:
 
      def installApplication(self,apk_path,platform_version,device_name,*args):
         driver=None
+        from appium import webdriver
         try:
             desired_caps = {}
             desired_caps['platformName'] = 'Android'
@@ -88,7 +92,7 @@ class InstallAndLaunch:
             desired_caps['app'] = apk_path
             desired_caps['sessionOverride'] = True
             desired_caps['fullReset'] = False
-            desired_caps['logLevel'] = 'debug'
+            desired_caps['logLevel'] = 'info'
             driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
 
         except Exception as e:
@@ -230,10 +234,14 @@ if __name__ == '__main__':
   apk_path=platform=device_name=None
   obj=InstallAndLaunch()
 
-  if len(list_args)== 3:
-    apk_path=list_args[0]
-    platform=list_args[1]
-    device_name=list_args[2]
+  apk_path=raw_input('Enter apk path')
+  platform=raw_input('Enter platform')
+  device_name=raw_input('Enter device_name')
+
+##  if len(list_args)== 3:
+##    apk_path=list_args[0]
+##    platform=list_args[1]
+##    device_name=list_args[2]
   print apk_path,platform,device_name
 ##  apk_path='D:\\apks\\selendroid-test-app-0.17.0.apk'
 ##  platform='6.0'
@@ -251,15 +259,20 @@ if __name__ == '__main__':
   file_path_xml=os.getcwd()+'//Elements.xml'
   page_source=page_source.encode('utf-8').strip()
 ##  print page_source
-  with open(file_path_xml,'w') as new_file:
-    new_file.write(page_source)
-    new_file.close()
+  try:
+      with open(file_path_xml,'w') as new_file:
+        new_file.write(page_source)
+        new_file.close()
 
-  parser.parse(file_path_xml)
-  obj=BuildJson()
-  obj.xmltojson(driver)
+      parser.parse(file_path_xml)
+      obj2=BuildJson()
+      obj2.xmltojson(driver)
 
-  with open(file_path_xml,'w') as new_file:
-    new_file.write('')
-    new_file.close()
+      with open(file_path_xml,'w') as new_file:
+        new_file.write('')
+        new_file.close()
+  except Exception as e:
+    print e
+
+  obj.stop_server()
 
