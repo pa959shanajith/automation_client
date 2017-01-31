@@ -357,33 +357,39 @@ class ButtonLinkKeyword():
         #upload_file keyword implementation
         try:
             driver = browser_Keywords.driver_obj
-            filepath = inputs[0]
-            filename = inputs[1]
-            inputfile = filepath + '\\' + filename
-            if webelement != None:
-                log.info('Recieved web element from the web dispatcher')
-                log.debug(webelement)
-                log.debug('Check for the element enable')
-                if webelement.is_enabled():
-                    if isinstance(driver,webdriver.Firefox):
-                        log.debug('Mozilla Firefox Instance')
-                        clickinfo = driver.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
-                        log.info('upload_file click info')
-                        log.info(clickinfo)
-                        filestatus = self.__upload_operation(inputfile)
-                        log.info(STATUS_METHODOUTPUT_UPDATE)
-                        status = webconstants.TEST_RESULT_PASS
-                        methodoutput = webconstants.TEST_RESULT_TRUE
-                    else:
-                        if  self.__click_for_file_upload(driver,webelement):
-                            filestatus =self.__upload_operation(inputfile)
+            if len(inputs) > 1:
+                filepath = inputs[0]
+                filename = inputs[1]
+                inputfile = filepath + '\\' + filename
+                if webelement != None:
+                    log.info('Recieved web element from the web dispatcher')
+                    log.debug(webelement)
+                    log.debug('Check for the element enable')
+                    if webelement.is_enabled():
+                        if isinstance(driver,webdriver.Firefox):
+                            log.debug('Mozilla Firefox Instance')
+                            clickinfo = driver.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
+                            log.info('upload_file click info')
+                            log.info(clickinfo)
+                            filestatus = self.__upload_operation(inputfile)
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
+                        else:
+                            if  self.__click_for_file_upload(driver,webelement):
+                                filestatus =self.__upload_operation(inputfile)
+                                log.info(STATUS_METHODOUTPUT_UPDATE)
+                                status = webconstants.TEST_RESULT_PASS
+                                methodoutput = webconstants.TEST_RESULT_TRUE
+                    else:
+                        log.info(WEB_ELEMENT_DISABLED)
+                        err_msg = WEB_ELEMENT_DISABLED
+                        logger.print_on_console(WEB_ELEMENT_DISABLED)
                 else:
-                    log.info(WEB_ELEMENT_DISABLED)
-                    err_msg = WEB_ELEMENT_DISABLED
-                    logger.print_on_console(WEB_ELEMENT_DISABLED)
+                    log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+
         except Exception as e:
             log.error(e)
 

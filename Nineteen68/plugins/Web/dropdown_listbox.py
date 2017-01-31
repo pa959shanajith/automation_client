@@ -42,24 +42,33 @@ class DropdownKeywords():
             if webelement.tag_name=='table':
                     webelement=self.radioKeywordsObj.getActualElement(webelement,input)
             if ((webelement.is_enabled()) and webelement.is_displayed()):
-                log.debug(ERROR_CODE_DICT['MSB_OBJECT_ENABLED'])
-                log.debug(ERROR_CODE_DICT['MSB_OBJECT_DISPLAYED'])
+                log.debug(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
+                log.debug(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
                     if (input is not None) :
-                        input_val = int(input[0])
-                        log.info('Input value obtained')
-                        log.info(input_val)
-                        select = Select(webelement)
-                        iList = select.options
-                        iListSize = len(iList)
-                        input_val=input_val-1
-                        if(input_val < iListSize):
-                            for i in range(0,iListSize):
-                                if(input_val == i):
-                                    select.select_by_index(input_val)
-                                    status=webconstants.TEST_RESULT_PASS
-                                    result=webconstants.TEST_RESULT_TRUE
-                                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                        if len(input[0].strip()) != 0:
+                            input_val = int(input[0])
+                            log.info('Input value obtained')
+                            log.info(input_val)
+                            select = Select(webelement)
+                            iList = select.options
+                            iListSize = len(iList)
+                            input_val=input_val-1
+                            if(input_val < iListSize):
+                                for i in range(0,iListSize):
+                                    if(input_val == i):
+                                        select.select_by_index(input_val)
+                                        status=webconstants.TEST_RESULT_PASS
+                                        result=webconstants.TEST_RESULT_TRUE
+                                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                            else:
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                        else:
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     else:
                         log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 except Exception as e:
@@ -68,7 +77,7 @@ class DropdownKeywords():
                 log.info(RETURN_RESULT)
             else:
                 log.info('Element is not enabled or dispalyed')
-                err_msg = ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED']
+                err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
         return status,result,verb,err_msg
 
     def getCount(self,webelement,*args):
@@ -87,7 +96,7 @@ class DropdownKeywords():
         if webelement is not None:
             log.info('Recieved web element from the web dispatcher')
             if webelement.is_displayed():
-                log.debug(ERROR_CODE_DICT['MSB_OBJECT_DISPLAYED'])
+                log.debug(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
                     select = Select(webelement)
                     iList = select.options
@@ -105,8 +114,8 @@ class DropdownKeywords():
                     logger.print_on_console(e)
                 log.info(RETURN_RESULT)
             else:
-                log.info(ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED'])
-                err_msg = ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED']
+                log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
         return status,result,str(iListSize),err_msg
 
     def selectValueByText(self,webelement,input,*args):
@@ -137,24 +146,42 @@ class DropdownKeywords():
                             inp_val = input[4]
                             log.info('Input value obtained')
                             log.info(inp_val)
-                        select = Select(webelement)
-                        select.select_by_visible_text(inp_val)
-                        status=webconstants.TEST_RESULT_PASS
-                        result=webconstants.TEST_RESULT_TRUE
-                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                        if len(inp_val.strip()) != 0:
+                            select = Select(webelement)
+                            iList = select.options
+                            flag = False
+                            for i in range (0,len(iList)):
+                                if iList[i].text == inp_val:
+                                    flag = True
+                            if(flag):
+                                select.select_by_visible_text(inp_val)
+                                status=webconstants.TEST_RESULT_PASS
+                                result=webconstants.TEST_RESULT_TRUE
+                                log.info(STATUS_METHODOUTPUT_UPDATE)
+                            else:
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                        else:
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     else:
                         logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 except Exception as e:
                     log.error(e)
+                    from selenium.common.exceptions import NoSuchElementException
+                    if type(e) == NoSuchElementException:
+                       err_msg = str(e)
 
                     logger.print_on_console(e)
             else:
                 err_msg = 'Element is not displayed or enabled '
                 logger.print_on_console('Element is not displayed or enabled ')
                 log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                log.info(ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED'])
+                log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
         return status,result,verb,err_msg
 
     def verifySelectedValue(self,webelement,input,*args):
@@ -173,7 +200,7 @@ class DropdownKeywords():
         if webelement is not None:
             log.info('Recieved web element from the web dispatcher')
             if webelement.is_displayed():
-                log.info(ERROR_CODE_DICT['MSB_OBJECT_DISPLAYED'])
+                log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
                     if ((input is not None) and (len(input) == 1)) :
 ##                        if not(visibilityFlag and isvisble):
@@ -184,6 +211,10 @@ class DropdownKeywords():
                             status=webconstants.TEST_RESULT_PASS
                             result=webconstants.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
+                        else:
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INPUT_MISS_MATCH'])
+                            log.info(ERROR_CODE_DICT['ERR_INPUT_MISS_MATCH'])
+                            err_msg = ERROR_CODE_DICT['ERR_INPUT_MISS_MATCH']
                     else:
                         logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -194,8 +225,8 @@ class DropdownKeywords():
                     logger.print_on_console(e)
             else:
                 logger.print_on_console('Element is not displayed')
-                log.info(ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED'])
-                err_msg = ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED']
+                log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
         return status,result,verb,err_msg
 
     def verifyCount(self,webelement,input,*args):
@@ -214,7 +245,7 @@ class DropdownKeywords():
         if webelement is not None:
             log.info('Recieved web element from the web dispatcher')
             if webelement.is_displayed():
-                log.info(ERROR_CODE_DICT['MSB_OBJECT_DISPLAYED'])
+                log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
                     if ((input is not None) and (len(input) == 1)) :
                         log.info('Input is not none')
@@ -230,6 +261,8 @@ class DropdownKeywords():
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
                             logger.print_on_console('Count mismatched')
+                            log.info('Count mismatched')
+                            err_msg = 'Count mismatched'
                             logger.print_on_console(EXPECTED,input_val)
                             log.info(EXPECTED)
                             log.info(input)
@@ -246,8 +279,8 @@ class DropdownKeywords():
                     logger.print_on_console(e)
             else:
                 logger.print_on_console('Element is not displayed')
-                log.info(ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED'])
-                err_msg = ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED']
+                log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
         return status,result,verb,err_msg
 
     def verifyAllValues(self,webelement,input,*args):
@@ -270,7 +303,7 @@ class DropdownKeywords():
                 if webelement is not None:
                     log.info('Recieved web element from the web dispatcher')
                     if webelement.is_displayed():
-                        log.info(ERROR_CODE_DICT['MSB_OBJECT_DISPLAYED'])
+                        log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                         select = Select(webelement)
                         option_len = select.options
                         opt_len = len(option_len)
@@ -296,10 +329,14 @@ class DropdownKeywords():
                             status=webconstants.TEST_RESULT_PASS
                             result=webconstants.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
+                        else:
+                            logger.print_on_console('ERR_VALUES_DOESNOT_MATCH')
+                            log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                            err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                     else:
                         logger.print_on_console('Element is not displayed')
-                        log.info(ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED'])
-                        err_msg = ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED']
+                        log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                        err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
             else:
                 logger.print_on_console('Provided input not present in element')
 
@@ -324,32 +361,81 @@ class DropdownKeywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if input is not None:
-                log.info('Input is not none')
-                if webelement is not None:
-                    log.info('Recieved web element from the web dispatcher')
-                    if ((webelement.is_enabled()) and webelement.is_displayed()):
-                        log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
-                        log.info(ERROR_CODE_DICT['MSB_OBJECT_DISPLAYED'])
-                        count= len(input)
-                        log.info('count is')
-                        log.info(count)
-                        select = Select(webelement)
-                        iList = select.options
-                        iListSize = len(iList)
-                        log.info('iListSize is')
-                        log.info(iListSize)
-                        for x in range(0,count):
-                            input_val_temp = input[x]
-                            input_val = int(input_val_temp)
-                            select.select_by_index(input_val)
-                        status=webconstants.TEST_RESULT_PASS
-                        result=webconstants.TEST_RESULT_TRUE
-                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                if len(input) == 1:
+                    if len(input[0].strip()) != 0:
+                        log.info('Input is not none')
+                        if webelement is not None:
+                            log.info('Recieved web element from the web dispatcher')
+                            if ((webelement.is_enabled()) and webelement.is_displayed()):
+                                log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
+                                log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
+                                count= len(input)
+                                log.info('count is')
+                                log.info(count)
+                                select = Select(webelement)
+                                iList = select.options
+                                iListSize = len(iList)
+                                log.info('iListSize is')
+                                log.info(iListSize)
+                                flag = False
+                                for x in range(0,count):
+                                    if int(input[x]) <= iListSize:
+                                        input_val_temp = input[x]
+                                        input_val = int(input_val_temp)
+                                        select.select_by_index(input_val)
+                                    else:
+                                        flag = True
+                                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                        break;
+                                if (not flag):
+                                    status=webconstants.TEST_RESULT_PASS
+                                    result=webconstants.TEST_RESULT_TRUE
+                                    log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
-                        err_msg = 'Element is not displayed or enabled '
-                        logger.print_on_console('Element is not displayed or enabled ')
-                        log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                        log.info(ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED'])
+                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                else:
+                    log.info('Input is not none')
+                    if webelement is not None:
+                            log.info('Recieved web element from the web dispatcher')
+                            if ((webelement.is_enabled()) and webelement.is_displayed()):
+                                log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
+                                log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
+                                count= len(input)
+                                log.info('count is')
+                                log.info(count)
+                                select = Select(webelement)
+                                iList = select.options
+                                iListSize = len(iList)
+                                log.info('iListSize is')
+                                log.info(iListSize)
+
+                                flag = False
+                                for x in range(0,count):
+                                    if int(input[x]) <= iListSize:
+                                        input_val_temp = input[x]
+                                        input_val = int(input_val_temp)
+                                        select.select_by_index(input_val)
+                                    else:
+                                        flag = True
+                                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                        break;
+                                if (not flag):
+                                    status=webconstants.TEST_RESULT_PASS
+                                    result=webconstants.TEST_RESULT_TRUE
+                                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                            else:
+                                err_msg = 'Element is not displayed or enabled '
+                                logger.print_on_console('Element is not displayed or enabled ')
+                                log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                                log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+
+
             else:
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -379,7 +465,7 @@ class DropdownKeywords():
                 if webelement.tag_name=='table':
                     webelement=self.radioKeywordsObj.getActualElement(webelement,input)
                 if webelement.is_displayed():
-                    log.info(ERROR_CODE_DICT['MSB_OBJECT_DISPLAYED'])
+                    log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                     select = Select(webelement)
                     index = select.all_selected_options
                     log.info('Index value')
@@ -405,8 +491,8 @@ class DropdownKeywords():
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                 else:
                     logger.print_on_console('Element is not displayed')
-                    log.info(ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED'])
-                    err_msg = ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED']
+                    log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                    err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
         except Exception as e:
             log.error(e)
 
@@ -425,23 +511,68 @@ class DropdownKeywords():
             log.info('Recieved web element from the web dispatcher')
             if ((webelement.is_enabled()) and webelement.is_displayed()):
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
-                log.info(ERROR_CODE_DICT['MSB_OBJECT_DISPLAYED'])
+                log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
                     count = len(input)
                     log.info('count value is')
                     log.info(count)
-                    select = Select(webelement)
-                    iList = select.options
-                    iListSize = len(iList)
-                    for x in range(0,count):
-                        input_val = input[x]
-                        log.info('Input value obtained')
-                        log.info(input_val)
-                        select.select_by_visible_text(input_val)
+                    if len(input) == 1:
+                        if len(input[0].strip()) != 0:
+                            select = Select(webelement)
+                            iList = select.options
+                            iListSize = len(iList)
 
-                    status=webconstants.TEST_RESULT_PASS
-                    result=webconstants.TEST_RESULT_TRUE
-                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                            counter = 0
+                            for x in range(0,count):
+                                flag = False
+                                for i in range(0,len(iList)):
+                                     if iList[i].text == input[x] :
+                                        flag = True
+                                if(flag):
+                                    input_val = input[x]
+                                    log.info('Input value obtained')
+                                    log.info(input_val)
+                                    select.select_by_visible_text(input_val)
+                                    counter = counter + 1
+
+                            if counter == count :
+                                status=webconstants.TEST_RESULT_PASS
+                                result=webconstants.TEST_RESULT_TRUE
+                                log.info(STATUS_METHODOUTPUT_UPDATE)
+                            else:
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                        else:
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                    else:
+                        select = Select(webelement)
+                        iList = select.options
+                        iListSize = len(iList)
+                        counter = 0
+                        for x in range(0,count):
+                            flag = False
+                            for i in range(0,len(iList)):
+                                 if iList[i].text == input[x] :
+                                    flag = True
+                            if(flag):
+                                input_val = input[x]
+                                log.info('Input value obtained')
+                                log.info(input_val)
+                                select.select_by_visible_text(input_val)
+                                counter = counter + 1
+
+                        if counter == count :
+                            status=webconstants.TEST_RESULT_PASS
+                            result=webconstants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                        else:
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                            log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                            err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+
                 except Exception as e:
                     log.error(e)
 
@@ -450,7 +581,7 @@ class DropdownKeywords():
                 err_msg = 'Element is not displayed or enabled '
                 logger.print_on_console('Element is not displayed or enabled ')
                 log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                log.info(ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED'])
+                log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
         return status,result,verb,err_msg
 
     def getMultipleValuesByIndexes(self,webelement,input,*args):
@@ -462,35 +593,90 @@ class DropdownKeywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if input is not None:
-                log.info('Input is not none')
-                if webelement is not None:
-                    log.info('Recieved web element from the web dispatcher')
-                    log.debug(webelement)
-                    if webelement.is_displayed():
-                        log.info(ERROR_CODE_DICT['MSB_OBJECT_DISPLAYED'])
-                        count = len(input)
-                        log.info('count is')
-                        log.info(count)
-                        select = Select(webelement)
-                        iList = select.options
-                        iListSize = len(iList)
-                        temp = []
-                        for x in range(0,count):
-                            input_val_temp = input[x]
-                            input_val = int(input_val_temp)
-                            out=select.options[input_val].text
-                            value = str(out)
-                            temp.append(value)
-                        output = ';'.join(temp)
-                        logger.print_on_console(output)
-                        output=temp
-                        status=webconstants.TEST_RESULT_PASS
-                        result=webconstants.TEST_RESULT_TRUE
-                        log.info(STATUS_METHODOUTPUT_UPDATE)
-                    else:
-                        logger.print_on_console('Element is not displayed')
-                        log.info(ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED'])
-                        err_msg = ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED']
+                 if len(input) == 1:
+                        if len(input[0].strip()) != 0:
+                            log.info('Input is not none')
+                            if webelement is not None:
+                                log.info('Recieved web element from the web dispatcher')
+                                log.debug(webelement)
+                                if webelement.is_displayed():
+                                    log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
+                                    count = len(input)
+                                    log.info('count is')
+                                    log.info(count)
+                                    select = Select(webelement)
+                                    iList = select.options
+                                    iListSize = len(iList)
+                                    temp = []
+                                    flag = False
+                                    for x in range(0,count):
+                                        if int(input[x]) <= iListSize:
+                                            input_val_temp = input[x]
+                                            input_val = int(input_val_temp)
+                                            out=select.options[input_val].text
+                                            value = str(out)
+                                            temp.append(value)
+                                        else:
+                                            flag = True
+                                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                            log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                            break;
+                                    if(not flag):
+                                        output = ';'.join(temp)
+                                        logger.print_on_console(output)
+                                        output=temp
+                                        status=webconstants.TEST_RESULT_PASS
+                                        result=webconstants.TEST_RESULT_TRUE
+                                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                                else:
+                                    logger.print_on_console('Element is not displayed')
+                                    log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                                    err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
+                        else:
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                 else:
+                    log.info('Input is not none')
+                    if webelement is not None:
+                        log.info('Recieved web element from the web dispatcher')
+                        log.debug(webelement)
+                        if webelement.is_displayed():
+                            log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
+                            count = len(input)
+                            log.info('count is')
+                            log.info(count)
+                            select = Select(webelement)
+                            iList = select.options
+                            iListSize = len(iList)
+                            temp = []
+                            flag = False
+                            for x in range(0,count):
+                                if int(input[x]) <= iListSize:
+                                    input_val_temp = input[x]
+                                    input_val = int(input_val_temp)
+                                    out=select.options[input_val].text
+                                    value = str(out)
+                                    temp.append(value)
+                                else:
+                                    flag = True
+                                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                    log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                    break;
+                            if(not flag):
+                                output = ';'.join(temp)
+                                logger.print_on_console(output)
+                                output=temp
+                                status=webconstants.TEST_RESULT_PASS
+                                result=webconstants.TEST_RESULT_TRUE
+                                log.info(STATUS_METHODOUTPUT_UPDATE)
+                        else:
+                            logger.print_on_console('Element is not displayed')
+                            log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                            err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
+
             else:
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -513,7 +699,7 @@ class DropdownKeywords():
             log.debug(webelement)
             if ((webelement.is_enabled()) and webelement.is_displayed()):
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
-                log.info(ERROR_CODE_DICT['MSB_OBJECT_DISPLAYED'])
+                log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
                     select = Select(webelement)
                     iList = select.options
@@ -541,7 +727,7 @@ class DropdownKeywords():
                 err_msg = 'Element is not displayed or enabled '
                 logger.print_on_console('Element is not displayed or enabled ')
                 log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                log.info(ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED'])
+                log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
         return status,result,verb,err_msg
 
     def getValueByIndex(self,webelement,input,*args):
@@ -555,21 +741,30 @@ class DropdownKeywords():
             log.info('Recieved web element from the web dispatcher')
             log.debug(webelement)
             if webelement.is_displayed():
-                log.info(ERROR_CODE_DICT['MSB_OBJECT_DISPLAYED'])
+                log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
                     if input is not None:
 ##                        if not(visibilityFlag and isvisble):
-                        input_val = int(input[0])
-                        select = Select(webelement)
-                        iList = select.options
-                        iListSize = len(iList)
-                        if(input_val < iListSize):
-                            for i in range(0,iListSize):
-                                if(input_val == i):
-                                    output=select.options[input_val].text
-                                    status=webconstants.TEST_RESULT_PASS
-                                    result=webconstants.TEST_RESULT_TRUE
-                                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                        if len(input[0].strip()) != 0:
+                            input_val = int(input[0])
+                            select = Select(webelement)
+                            iList = select.options
+                            iListSize = len(iList)
+                            if(input_val < iListSize):
+                                for i in range(0,iListSize):
+                                    if(input_val == i):
+                                        output=select.options[input_val].text
+                                        status=webconstants.TEST_RESULT_PASS
+                                        result=webconstants.TEST_RESULT_TRUE
+                                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                            else:
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                        else:
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     else:
                         logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -580,8 +775,8 @@ class DropdownKeywords():
                     logger.print_on_console(e)
             else:
                 logger.print_on_console('Element is not displayed')
-                log.info(ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED'])
-                err_msg = ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED']
+                log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
         return status,result,output,err_msg
 
     def verifyValuesExists(self,webelement,input,*args):
@@ -598,7 +793,7 @@ class DropdownKeywords():
                     log.info('Recieved web element from the web dispatcher')
                     log.debug(webelement)
                     if webelement.is_displayed():
-                        log.info(ERROR_CODE_DICT['MSB_OBJECT_DISPLAYED'])
+                        log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                         select = Select(webelement)
                         option_len = select.options
                         opt_len = len(option_len)
@@ -628,8 +823,8 @@ class DropdownKeywords():
                             logger.print_on_console('Inputs does not match')
                     else:
                         logger.print_on_console('Element is not displayed')
-                        log.info(ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED'])
-                        err_msg = ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED']
+                        log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                        err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
             else:
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -652,7 +847,7 @@ class DropdownKeywords():
             log.debug(webelement)
             if ((webelement.is_enabled()) and webelement.is_displayed()):
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
-                log.info(ERROR_CODE_DICT['MSB_OBJECT_DISPLAYED'])
+                log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
                     select = Select(webelement)
                     select.deselect_all()
@@ -671,5 +866,5 @@ class DropdownKeywords():
                 err_msg = 'Element is not displayed or enabled '
                 logger.print_on_console('Element is not displayed or enabled ')
                 log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                log.info(ERROR_CODE_DICT['MSB_OBJECT_NOT_DISPLAYED'])
+                log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
         return status,result,verb,err_msg
