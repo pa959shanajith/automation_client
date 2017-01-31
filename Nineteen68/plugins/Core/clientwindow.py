@@ -9,10 +9,87 @@ import logging.config
 import logger
 import threading
 from values_from_ui import *
-
-
-
 log = logging.getLogger('clientwindow.py')
+from socketIO_client import SocketIO,BaseNamespace
+i = 0
+wxObject = None
+browsername = None
+class MainNamespace(BaseNamespace):
+    def on_message(self, *args):
+##        print args
+##        print(args)
+        if str(args[0]) == 'OPEN BROWSER CH':
+            print args[0]
+
+            global wxObject
+            print wxObject
+            global browsername
+            browsername = 'CH'
+            print 'Browser name : ',browsername
+##            wxObject.test()
+            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+
+            time.sleep(5)
+            print 'Importing done'
+        elif str(args[0]) == 'HIGHLIGHT':
+            print args[0]
+            global browsername
+            browsername = 'CH'
+            print 'Browser name : ',browsername
+            global wxObject
+            print wxObject
+##            wxObject.test()
+            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+            time.sleep(20)
+            data = """HIGHLIGHT,//*[@id=\"loginbutton\"];loginbutton;/html/body/div[2]/div/div[11]/form/div[1]/div[4]/input[1];submit[0];input[8];grid_4 pull_4 omega,https://www.irctc.co.in/eticketing/loginHome.jsf"""
+            import highlight
+            light =highlight.Highlight()
+            res = light.highlight(data,None,None)
+            print 'Highlight result: ',res
+        elif(str(args[0]) == 'connected'):
+            print('Connection to the Node Server established')
+
+
+    def on_emit(self, *args):
+        print 'aaa', args[0]
+        if str(args[0]) == 'connected':
+            print 'Connected'
+
+
+
+
+
+
+
+
+socketIO = None
+
+class SocketThread(threading.Thread):
+    """Test Worker Thread Class."""
+
+    #----------------------------------------------------------------------
+    def __init__(self,wxObject):
+        """Init Worker Thread Class."""
+        threading.Thread.__init__(self)
+        self.wxobject = wxObject
+        self.start()
+
+
+
+
+    #----------------------------------------------------------------------
+    def run(self):
+        """Run Worker Thread."""
+        # This is the code executing in the new thread.
+        global socketIO
+        socketIO = SocketIO('10.41.31.29',3000,MainNamespace)
+
+        ##socketIO = SocketIO('localhost',8124)
+##        socketIO.send('I am ready to process the request')
+        socketIO.emit('news')
+        socketIO.wait()
+
+
 
 class Parallel(threading.Thread):
     """Test Worker Thread Class."""
@@ -159,9 +236,12 @@ class ClientWindow(wx.Frame):
         wx.Frame.__init__(self, parent=None,id=-1, title="SLK Nineteen68 - Client Window",
                    pos=(300, 150),  size=(800, 730)  )
         self.SetBackgroundColour(   (245,222,179))
+        self.id =id
         self.mainclass = self
         self.mythread = ''
         self.action=''
+        global wxObject
+        wxObject = self
         curdir = os.getcwd()
         ID_FILE_NEW = 1
         self.iconpath = curdir + "\\slk.ico"
@@ -190,7 +270,7 @@ class ClientWindow(wx.Frame):
         box = wx.BoxSizer(wx.VERTICAL)
         self.menubar = wx.MenuBar()
         self.fileMenu = wx.Menu()
-
+        self.Bind( wx.EVT_CHOICE, self.test)
         self.configMenu = wx.Menu()
         self.infoItem = wx.MenuItem(self.configMenu, 100,text = "Info",kind = wx.ITEM_NORMAL)
         self.configMenu.AppendItem(self.infoItem)
@@ -207,6 +287,9 @@ class ClientWindow(wx.Frame):
         self.SetMenuBar(self.menubar)
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
+        self.connectbutton = wx.Button(self.panel, label="Connect To Node" ,pos=(10, 10), size=(100, 28))
+        self.connectbutton.Bind(wx.EVT_BUTTON, self.OnNodeConnect)
+        self.connectbutton.SetToolTip(wx.ToolTip("Connect to node Server"))
         self.log = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_MULTILINE|wx.TE_READONLY)
         font1 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL,  False, u'Consolas')
         self.log.SetForegroundColour((0,50,250))
@@ -348,6 +431,13 @@ class ClientWindow(wx.Frame):
 
 
     def OnExit(self, event):
+        global socketIO
+        print 'SocketIO : ',socketIO
+        if socketIO != None:
+            log.info('Closing the socket')
+            socketIO.disconnect()
+            log.info(socketIO)
+            self.new.Close()
         self.Close()
 
 
@@ -386,7 +476,8 @@ class ClientWindow(wx.Frame):
 
     #----------------------------------------------------------------------
     def OnClear(self,event):
-        self.log.Clear()
+        self.test()
+##        self.log.Clear()
 
 
     #-----------------------------------------------------------------------
@@ -409,6 +500,21 @@ class ClientWindow(wx.Frame):
         global action
         self.action=DEBUG
         self.mythread = TestThread(self,self.action)
+
+    def OnNodeConnect(self,event):
+        self.mythread = SocketThread(self)
+        self.connectbutton.Disable()
+
+    def test(self,event):
+        print 'Self',self
+        global browsername
+        print 'Browser name : ',browsername
+        con = controller.Controller()
+        con.get_all_the_imports('WebScrape')
+        import Nineteen68_WebScrape
+        global socketIO
+        self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO)
+        self.new.Show()
 
 
 

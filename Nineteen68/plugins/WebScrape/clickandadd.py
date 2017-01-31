@@ -20,6 +20,7 @@ import Exceptions
 
 currenthandle = ''
 status = domconstants.STATUS_FAIL
+vie = {}
 class Clickandadd():
     def startclickandadd(self):
         try:
@@ -28,9 +29,9 @@ class Clickandadd():
             browser = browserops.browser
             logger.log('FILE: clickandadd.py , DEF: startclickandadd() , MSG: Obtained browser handle and driver from browserops.py class .....')
             toolwindow = win32gui.GetForegroundWindow()
-            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
+##            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
             actwindow = win32gui.GetForegroundWindow()
-            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
+##            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
             logger.log('FILE: clickandadd.py , DEF: startclickandadd()  , MSG: Minimizing the foreground window i.e tool and assuming AUT on top .....')
             javascript_hasfocus = """return(document.hasFocus());"""
             time.sleep(6)
@@ -212,6 +213,7 @@ class Clickandadd():
             callback_stopclicknadd2('', tempne_stopclicknadd)
             logger.log('FILE: clickandadd.py , DEF: stopclickandadd() , MSG: stopclickandadd operation on frame/iframe pages is completed')
             driver.switch_to.window(currenthandle)
+            global vie
             vie = {'view': tempne_stopclicknadd}
             logger.log('FILE: clickandadd.py , DEF: stopclickandadd() , MSG: Creating a json object with key vie with value as return data')
             with open('domelements.json', 'w') as outfile:
@@ -229,5 +231,20 @@ class Clickandadd():
             status = domconstants.STATUS_FAIL
             Exceptions.error(e)
         return status
+
+    def save_json_data(self):
+##        data = {'view' : vie}
+        data = []
+        driver = browserops.driver
+        data.append(vie)
+        screen = driver.get_screenshot_as_base64()
+        screenshot = {'mirror':screen}
+        data.append(screenshot)
+        with open('domelements.json', 'w') as outfile:
+                logger.log('FILE: clickandadd.py , DEF: stopclickandadd() , MSG: Opening domelements.json file to write vie object')
+                json.dump(data, outfile, indent=4, sort_keys=False)
+                logger.log('FILE: clickandadd.py , DEF: stopclickandadd() , MSG: vie is dumped into  domelements.json file ')
+        outfile.close()
+        return data
 
 

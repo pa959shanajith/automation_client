@@ -656,6 +656,7 @@ class Controller():
         os.chdir('..')
         curdir = os.getcwd()
         path= curdir + '//Nineteen68//plugins//'+plugin_path
+##        path = 'D:\Git\Nineteen68_Websrape_Integration\Nineteen68\plugins\\' + plugin_path
         sys.path.append(path)
         for root, dirs, files in os.walk(path):
             for d in dirs:
