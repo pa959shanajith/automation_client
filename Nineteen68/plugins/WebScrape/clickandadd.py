@@ -20,6 +20,7 @@ import Exceptions
 
 currenthandle = ''
 status = domconstants.STATUS_FAIL
+vie = {}
 class Clickandadd():
     def startclickandadd(self):
         try:
@@ -212,6 +213,7 @@ class Clickandadd():
             callback_stopclicknadd2('', tempne_stopclicknadd)
             logger.log('FILE: clickandadd.py , DEF: stopclickandadd() , MSG: stopclickandadd operation on frame/iframe pages is completed')
             driver.switch_to.window(currenthandle)
+            global vie
             vie = {'view': tempne_stopclicknadd}
             logger.log('FILE: clickandadd.py , DEF: stopclickandadd() , MSG: Creating a json object with key vie with value as return data')
             with open('domelements.json', 'w') as outfile:
@@ -229,5 +231,14 @@ class Clickandadd():
             status = domconstants.STATUS_FAIL
             Exceptions.error(e)
         return status
+
+    def save_json_data(self):
+##        data = {'view' : vie}
+        with open('domelements.json', 'w') as outfile:
+                logger.log('FILE: clickandadd.py , DEF: stopclickandadd() , MSG: Opening domelements.json file to write vie object')
+                json.dump(vie, outfile, indent=4, sort_keys=False)
+                logger.log('FILE: clickandadd.py , DEF: stopclickandadd() , MSG: vie is dumped into  domelements.json file ')
+        outfile.close()
+        return vie
 
 

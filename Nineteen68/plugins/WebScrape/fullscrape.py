@@ -20,22 +20,23 @@ import Exceptions
 
 currenthandle = ''
 status = domconstants.STATUS_FAIL
+vie = {}
 class Fullscrape():
     def fullscrape(self):
         try:
             logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: Inside fullscrape method .....')
-            vie = {}
+##            vie = {}
             driver = browserops.driver
             hwndg = browserops.hwndg
             logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: Obtained browser handle and driver from browserops.py class .....')
             toolwindow = win32gui.GetForegroundWindow()
-            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
+##            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
             logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: Minimizing the foreground window i.e tool and assuming AUT on top .....')
             time.sleep(2)
             actwindow = win32gui.GetForegroundWindow()
-            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
+##            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
             javascript_hasfocus = """return(document.hasFocus());"""
-            time.sleep(6)
+##            time.sleep(6)
             for eachdriverhand in driver.window_handles:
                 logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: Iterating through the number of windows open by the driver')
                 driver.switch_to.window(eachdriverhand)
@@ -130,7 +131,8 @@ class Fullscrape():
             tempne = json.dumps(tempne)
             tempne = json.loads(tempne)
             logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: json opertions dumps and loads are performed on the return data')
-            win32gui.ShowWindow(hwndg, win32con.SW_MINIMIZE)
+##            win32gui.ShowWindow(hwndg, win32con.SW_MINIMIZE)
+            global vie
             vie = {"view": tempne}
             logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: Creating a json object with key vie with value as return data')
             with open('domelements.json', 'w') as outfile:
@@ -145,10 +147,19 @@ class Fullscrape():
             else:
                 status = domconstants.STATUS_SUCCESS
             logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: Maximizing the tool once full scrape is done ')
-            win32gui.ShowWindow(toolwindow, win32con.SW_MAXIMIZE)
+##            win32gui.ShowWindow(toolwindow, win32con.SW_MAXIMIZE)
         except Exception as e:
             status = domconstants.STATUS_FAIL
             Exceptions.error(e)
         return status
 
+    def save_json_data(self):
+        global vie
+##        data = {'view' : vie}
+        with open('domelements.json', 'w') as outfile:
+                logger.log('FILE: fullscrape.py , DEF: stopclickandadd() , MSG: Opening domelements.json file to write vie object')
+                json.dump(vie, outfile, indent=4, sort_keys=False)
+                logger.log('FILE: fullscrape.py , DEF: stopclickandadd() , MSG: vie is dumped into  domelements.json file ')
+        outfile.close()
+        return vie
 
