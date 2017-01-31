@@ -25,5 +25,9 @@ def print_on_console(message,*args):
     print sttime + ':  CONSOLE: ' +filename+':'+str(caller.lineno) +' ' +str( message),''.join(str(i) if (type(i)==unicode or type(i)==str) else  repr(i) for i in args)
 
 
+def log(message):
+    print message
+
+
 
 
