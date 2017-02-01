@@ -50,35 +50,47 @@ class MainNamespace(BaseNamespace):
             global wxObject
             print wxObject
             global browsername
-            browsername = 'CH'
+            browsername = 'FX'
             print 'Browser name : ',browsername
 ##            wxObject.test()
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
             time.sleep(5)
             print 'Importing done'
-        elif 'HIGHLIGHT' in str(args[0]):
-            print args[0]
-            global browsername
-            browsername = 'CH'
-            print 'Browser name : ',browsername
-            global wxObject
-            print wxObject
-##            wxObject.test()
-            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
-            time.sleep(20)
-            import highlight
-            light =highlight.Highlight()
-            res = light.highlight(data,None,None)
-            print 'Highlight result: ',res
+
         elif(str(args[0]) == 'connected'):
             print('Connection to the Node Server established')
+
+##        elif (str(args[0]) == 'killbrowser'):
+##            global wxObject
+##            print wxObject
+##            global browsername
+##            browsername = 'CH'
+##            print 'Browser name : ',browsername
+####            wxObject.test()
+##            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+##            time.sleep(5)
+##            con = controller.Controller()
+##            con.get_all_the_imports('WebScrape')
+##            import browserops
+##            driver = browserops.driver
+##            driver.close()
+##            wxObject.new.Close()
+##            print 'Kill the drivers'
+
 
 
     def on_emit(self, *args):
         print 'aaa', args[0]
         if str(args[0]) == 'connected':
             print 'Connected'
+
+    def on_focus(self, *args):
+        print 'in focus------------aaa', args[0]
+        import highlight
+        light =highlight.Highlight()
+        res = light.highlight(args[0],None,None)
+        print 'Highlight result: ',res
 
 
 
@@ -112,6 +124,7 @@ class SocketThread(threading.Thread):
         ##socketIO = SocketIO('localhost',8124)
 ##        socketIO.send('I am ready to process the request')
         socketIO.emit('news')
+        socketIO.emit('focus')
         socketIO.wait()
 
 
@@ -295,7 +308,10 @@ class ClientWindow(wx.Frame):
         box = wx.BoxSizer(wx.VERTICAL)
         self.menubar = wx.MenuBar()
         self.fileMenu = wx.Menu()
+        #own event
         self.Bind( wx.EVT_CHOICE, self.test)
+        #own event
+##        self.Bind(wx.EVT_CLOSE, self.closeScrapeWindow)
         self.configMenu = wx.Menu()
         self.infoItem = wx.MenuItem(self.configMenu, 100,text = "Info",kind = wx.ITEM_NORMAL)
         self.configMenu.AppendItem(self.infoItem)
@@ -454,6 +470,14 @@ class ClientWindow(wx.Frame):
         self.Destroy()  # you may also do:  event.Skip()
                         # since the default event handler does call Destroy(), too
 
+##    def closeScrapeWindow(self):
+##        global socketIO
+##        print 'SocketIO : ',socketIO
+##        if socketIO != None:
+##            log.info('Closing the socket')
+##            socketIO.disconnect()
+##            log.info(socketIO)
+##            self.new.Close()
 
     def OnExit(self, event):
         global socketIO
@@ -501,8 +525,8 @@ class ClientWindow(wx.Frame):
 
     #----------------------------------------------------------------------
     def OnClear(self,event):
-        self.test()
-##        self.log.Clear()
+##        self.test()
+        self.log.Clear()
 
 
     #-----------------------------------------------------------------------

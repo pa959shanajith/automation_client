@@ -35,9 +35,9 @@ class Highlight():
             highele = data.split(',')
             # find out if the highele[1] has id or name attrib
 
-            identifiers = highele[1].split(';')
-            url = highele[2]
-            action=highele[0]
+            identifiers = highele[0].split(';')
+            url = highele[1]
+            action=''
             def highlight1(element):
                 logger.log('FILE: highlight.py , DEF: highlight() , MSG: Inside highlight1 method .....')
                 if element is not None:
