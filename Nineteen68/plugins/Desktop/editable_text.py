@@ -98,10 +98,11 @@ class Text_Box:
                         ldtp.activatetext(launch_keywords.window_name,dektop_element[0])
                         encryption_obj = AESCipher()
                         input_val_temp = encryption_obj.decrypt(launch_keywords.window_name)
-                        ldtp.settextvalue(launch_keywords.window_name,dektop_element[0],input_val_temp)
-                        status = desktop_constants.TEST_RESULT_PASS
-                        result = desktop_constants.TEST_RESULT_TRUE
-                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                        if input_val_temp is not None:
+                            ldtp.settextvalue(launch_keywords.window_name,dektop_element[0],input_val_temp)
+                            status = desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
                         log.info('Element state does not allow to perform the operation')
                         err_msg = 'Element state does not allow to perform the operation'
