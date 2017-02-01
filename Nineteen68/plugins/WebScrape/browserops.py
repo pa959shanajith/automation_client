@@ -143,7 +143,7 @@ class BrowserOperations():
             global browser
             browser = 2
             util = utils_sc.Utils()
-            logger.log('FILE: browserops.py , DEF: openFirefoxBrowser() , MSG: Opening Chrome browser.....')
+            logger.log('FILE: browserops.py , DEF: openFirefoxBrowser() , MSG: Opening Firefox browser.....')
             global driver
             driver = webdriver.Firefox()
             driver.maximize_window()
@@ -153,7 +153,7 @@ class BrowserOperations():
             logger.log('FILE: browserops.py , DEF: openFirefoxBrowser() , MSG:  Pid is obtained')
             hwndg = util.bring_Window_Front(p)
             logger.log('FILE: browserops.py , DEF: openFirefoxBrowser() , MSG:  Using Pid handle is obtained')
-            logger.log('FILE: browserops.py , DEF: openFirefoxBrowser() , MSG:  Chrome browser opened successfully')
+            logger.log('FILE: browserops.py , DEF: openFirefoxBrowser() , MSG:  Firefox browser opened successfully')
             status = domconstants.STATUS_SUCCESS
         except Exception as e:
             status = domconstants.STATUS_FAIL
