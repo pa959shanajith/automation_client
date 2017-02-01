@@ -50,7 +50,7 @@ class MainNamespace(BaseNamespace):
             global wxObject
             print wxObject
             global browsername
-            browsername = 'CH'
+            browsername = 'FX'
             print 'Browser name : ',browsername
 ##            wxObject.test()
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
@@ -87,8 +87,6 @@ class MainNamespace(BaseNamespace):
 
     def on_focus(self, *args):
         print 'in focus------------aaa', args[0]
-        print 'Type of data : ',type(args[0])
-        print 'Got it'
         import highlight
         light =highlight.Highlight()
         res = light.highlight(args[0],None,None)
