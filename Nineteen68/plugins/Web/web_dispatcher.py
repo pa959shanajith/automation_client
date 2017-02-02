@@ -59,6 +59,8 @@ class Dispatcher:
         driver = browser_Keywords.driver_obj
         webelement = None
         element = None
+        err_msg=None
+
 
         log.info('In Web dispatcher')
         custom_dict={
@@ -79,7 +81,7 @@ class Dispatcher:
         custom_dict_element={'element':['clickElement','doubleClick','rightClick','getElementText','verifyElementText','drag', 'drop','getToolTipText','verifyToolTipText','verifyExists', 'verifyDoesNotExists', 'verifyHidden','verifyVisible', 'switchToTab','switchToWindow','setFocus','sendFunctionKeys',
                                         'tab','waitForElementVisible','mouseHover','saveFile']}
 
-        result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,None,None)
+        result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
 
         def print_error(err_msg):
             err_msg=ERROR_CODE_DICT['ERR_CUSTOM_MISMATCH']
@@ -252,9 +254,10 @@ class Dispatcher:
                 }
 
             if keyword in dict.keys():
-
+                flag=False
                 #Finding the webelement for NON_WEBELEMENT_KEYWORDS
                 if keyword not in NON_WEBELEMENT_KEYWORDS:
+                    flag=True
                     webelement=send_webelement_to_keyword(driver,objectname,url)
                     if webelement == None and self.exception_flag:
                         result=TERMINATE
@@ -266,6 +269,9 @@ class Dispatcher:
                 if result != TERMINATE:
 
                     result= dict[keyword](webelement,input)
+                    if flag and webelement==None:
+                        result=list(result)
+                        result[3]=WEB_ELEMENT_NOT_FOUND
                     if keyword == GET_INNER_TABLE and (output != '' and output.startswith('{') and output.endswith('}')):
                         self.webelement_map[output]=result[2]
 
@@ -279,11 +285,17 @@ class Dispatcher:
 
 
             else:
-                logger.print_on_console(INVALID_KEYWORD)
-                log.error(INVALID_KEYWORD)
+                err_msg=INVALID_KEYWORD
+                result[3]=err_msg
+        except TypeError as e:
+            err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
+            result[3]=err_msg
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
+            logger.print_on_console('Exception at dispatcher')
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         return result
 
 
@@ -348,8 +360,6 @@ class Dispatcher:
                             log.debug('Webelement found by absolute Xpath')
                         except Exception as webEx:
                             err_msg=WEB_ELEMENT_NOT_FOUND
-                            logger.print_on_console(err_msg)
-                            log.error(err_msg)
 
             elif objectname.startswith('{') and objectname.endswith('}') and self.webelement_map.has_key(objectname):
                 if len(self.webelement_map)<=4:
@@ -361,7 +371,11 @@ class Dispatcher:
                     err_msg=WEB_ELEMENT_NOT_FOUND
                     logger.print_on_console(err_msg)
                     log.error(err_msg)
-
+            #Fixing issue #381
+            if webElement==None:
+                err_msg=WEB_ELEMENT_NOT_FOUND
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
 
         return webElement
 

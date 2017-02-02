@@ -18,7 +18,7 @@ import folder_operations
 from file_comparison_operations import TextFile,PdfFile,XML
 import excel_operations
 
-from constants import *
+
 
 import logging
 
@@ -95,15 +95,15 @@ class FileOperations:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    log.error(generic_constants.FILE_EXISTS)
-                    logger.print_on_console(generic_constants.FILE_EXISTS)
+                    err_msg=generic_constants.FILE_EXISTS
             else:
-                log.error(generic_constants.INVALID_INPUT)
-                logger.print_on_console(generic_constants.INVALID_INPUT)
+                err_msg=generic_constants.INVALID_INPUT
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
-            err_msg=INPUT_ERROR
+            err_msg=generic_constants.ERR_MSG1+'Creating'+generic_constants.ERR_MSG2
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
 
 
@@ -123,25 +123,31 @@ class FileOperations:
             output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             inputpath=inputpath.strip()
-            log.debug(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
-            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
-            if not (input is None and input is ''):
-                if file_name is not '':inputpath=inputpath+'/'+file_name
+            info_msg=generic_constants.INPUT_IS+inputpath
+            log.info(info_msg)
+            logger.print_on_console(info_msg)
+            if inputpath!= None and inputpath!='':
+                if file_name!= None and file_name!='':
+                    logger.print_on_console(' and File name is:'+file_name)
+                    log.info(' and File name is:'+file_name)
+                    inputpath=inputpath+'\\'+file_name
                 if os.path.isfile(inputpath):
                     log.debug(generic_constants.FILE_EXISTS)
                     logger.print_on_console(generic_constants.FILE_EXISTS)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    log.debug(generic_constants.FILE_NOT_EXISTS)
-                    logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
+                    err_msg=ERROR_CODE_DICT['ERR_NO_SUCH_FILE_EXCEPTION']
             else:
-                log.debug(generic_constants.INVALID_INPUT)
-                logger.print_on_console(generic_constants.INVALID_INPUT)
+                err_msg=generic_constants.INVALID_INPUT
+        except (IOError,WindowsError):
+            err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
+            err_msg=generic_constants.ERR_MSG1+'Verifying'+generic_constants.ERR_MSG2
             log.error(e)
-            logger.print_on_console(e)
-            err_msg=INPUT_ERROR
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
 
     def rename_file(self,inputpath,file_name,rename_file):
@@ -171,15 +177,17 @@ class FileOperations:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    log.debug(generic_constants.FILE_NOT_EXISTS)
-                    logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
+                    err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_FOUND_EXCEPTION']
             else:
-                log.debug(generic_constants.INVALID_INPUT)
-                logger.print_on_console(generic_constants.INVALID_INPUT)
+                err_msg=generic_constants.INVALID_INPUT
+        except (IOError,WindowsError):
+            err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
+            err_msg=generic_constants.ERR_MSG1+'Renaming'+generic_constants.ERR_MSG2
             log.error(e)
-            logger.print_on_console(e)
-            err_msg=INPUT_ERROR
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
 
     def delete_file(self,inputpath,file_name):
@@ -206,15 +214,17 @@ class FileOperations:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    log.debug(generic_constants.FILE_NOT_EXISTS)
-                    logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
+                    err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_FOUND_EXCEPTION']
             else:
-                log.debug(generic_constants.INVALID_INPUT)
-                logger.print_on_console(generic_constants.INVALID_INPUT)
+                err_msg=generic_constants.INVALID_INPUT
+        except (IOError,WindowsError):
+            err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
+            err_msg=generic_constants.ERR_MSG1+'Deleting'+generic_constants.ERR_MSG2
             log.error(e)
-            logger.print_on_console(e)
-            err_msg=INPUT_ERROR
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
 
 
@@ -234,20 +244,24 @@ class FileOperations:
             output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             params=self.__split(input_path,content,*args)
-            if self.verify_file_exists(params[0],'') == True:
+            result=self.verify_file_exists(params[0],'')
+            if result[1] == TEST_RESULT_TRUE:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
                     log.debug('verifying the contents')
-                    res= self.dict[file_ext+'_verify_content'](*params)
+                    res,err_msg= self.dict[file_ext+'_verify_content'](*params)
                     if res:
-                        log.debug('content present the given file')
+                        log.debug('content present in the given file')
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
-
+            else:
+                err_msg=result[3]
         except Exception as e:
+            err_msg=generic_constants.ERR_MSG1+'Verifying content of'+generic_constants.ERR_MSG2
             log.error(e)
-            logger.print_on_console(e)
-            err_msg=INPUT_ERROR
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
 
 
@@ -294,24 +308,36 @@ class FileOperations:
             if len(params)>2:
                 path2=params[2]
             log.debug('verifying whether the files exists')
-            if self.verify_file_exists(params[0],'')[1] and self.verify_file_exists(path2,'')[1] :
+            result1=self.verify_file_exists(params[0],'')
+            result2=self.verify_file_exists(path2,'')
+            if result1[1] == TEST_RESULT_TRUE and result2[1]==TEST_RESULT_TRUE :
                 file_ext1,status1=self.__get_ext(params[0])
                 file_ext2,status2=self.__get_ext(path2)
                 log.debug('comparing the contents')
                 if status1 == True and status2==True and file_ext1==file_ext2:
-                    res=self.dict[file_ext1+'_compare_content'](*params)
+                    res,err_msg=self.dict[file_ext1+'_compare_content'](*params)
                     if res:
-                        log.debug('files contenta are same')
+                        log.info('files contents are same')
+                        logger.print_on_console('files contents are same')
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
-
+                else:
+                    err_msg=ERROR_CODE_DICT['ERR_FILE_EXT_MISMATCH']
+            else:
+                err_msg=result1[3]
+                if err_msg==None:
+                    err_msg=result2[3]
+        except TypeError as e:
+            err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
         except Exception as e:
+            err_msg=generic_constants.ERR_MSG1+'Comapring content of'+generic_constants.ERR_MSG2
             log.error(e)
-            logger.print_on_console(e)
-            err_msg=INPUT_ERROR
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
 
-    def clear_content(self,input_path,*args):
+    def clear_content(self,input_path,file_name,*args):
         """
         def : clear_content
         purpose : calls the respective method to clear the content of given file based on file type
@@ -326,20 +352,27 @@ class FileOperations:
             err_msg=None
             output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
-            params=self.__split(input_path,*args)
+            params=self.__split(input_path,file_name,*args)
             log.debug('verifying whether the files exist')
-            if self.verify_file_exists(params[0],'')[1]:
-                file_ext,res=self.__get_ext(params[0])
+            result=self.verify_file_exists(params[0],params[1])
+            if result[1]==TEST_RESULT_TRUE:
+                file_ext,res=self.__get_ext(params[1])
                 if res == True:
                     log.debug('clearing the content of file')
-                    res=self.dict[file_ext+'_clear_content'](*params)
+                    res,err_msg=self.dict[file_ext+'_clear_content'](*params)
                     if res:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
+            else:
+                err_msg=result[3]
+        except TypeError as e:
+            err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
         except Exception as e:
+            err_msg=generic_constants.ERR_MSG1+'Clearing'+generic_constants.ERR_MSG2
             log.error(e)
-            logger.print_on_console(e)
-            err_msg=INPUT_ERROR
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
 
     def get_content(self,input_path,*args):
@@ -360,23 +393,28 @@ class FileOperations:
             log.debug('reading the inputs')
             params=self.__split(input_path,*args)
             log.debug('verifying whether the files exists')
-            if self.verify_file_exists(params[0],'')[1]:
+            result=self.verify_file_exists(params[0],'')
+            if result[1]==TEST_RESULT_TRUE:
                 file_ext,res=self.__get_ext(params[0])
                 if file_ext not in ['.xls','.xlsx']:
                     if res == True:
                         log.debug('clearing the content of file')
-                        res,content=self.dict[file_ext+'_get_content'](*params)
+                        res,content,err_msg=self.dict[file_ext+'_get_content'](*params)
                         if res:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                 else:
-                    err_msg='Excel files are not supported'
-                    log.error('Excel files are not supported')
-                    logger.print_on_console('Excel files are not supported')
+                    err_msg=generic_constants.NOT_SUPPORTED
+            else:
+                err_msg=result[3]
+        except TypeError as e:
+            err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
         except Exception as e:
              log.error(e)
-             logger.print_on_console(e)
-             err_msg=INPUT_ERROR
+             err_msg=generic_constants.ERR_MSG1+'Fetching content of'+generic_constants.ERR_MSG2
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         return status,methodoutput,content,err_msg
 
     def replace_content(self,input_path,existing_content,replace_content,*args):
@@ -396,18 +434,25 @@ class FileOperations:
             log.debug('reading the inputs')
             params=self.__split(input_path,existing_content,replace_content,*args)
             log.debug('verifying whether the files exist')
-            if self.verify_file_exists(params[0],'')[1]:
+            result=self.verify_file_exists(params[0],'')
+            if result[1]:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
                     log.debug('replacing the content of file')
-                    res=self.dict[file_ext+'_replace_content'](*params)
+                    res,err_msg=self.dict[file_ext+'_replace_content'](*params)
                     if res:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
+            else:
+                err_msg=result[3]
+        except TypeError as e:
+            err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
         except Exception as e:
+            err_msg=err_msg=generic_constants.ERR_MSG1+'Replacing content of'+generic_constants.ERR_MSG2
             log.error(e)
-            logger.print_on_console(e)
-            err_msg=INPUT_ERROR
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
 
     def write_to_file(self,input_path,content,*args):
@@ -427,18 +472,25 @@ class FileOperations:
             log.debug('reading the inputs')
             params=self.__split(input_path,content,*args)
             log.debug('verifying whether the file exists')
-            if self.verify_file_exists(params[0],'')[1]:
+            result=self.verify_file_exists(params[0],'')
+            if result[1]==TEST_RESULT_TRUE:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
                     log.debug('writing to the file')
-                    res = self.dict[file_ext+'_write_to_file'](*params)
+                    res,err_msg = self.dict[file_ext+'_write_to_file'](*params)
                     if res:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
+            else:
+                err_msg=result[3]
+        except TypeError as e:
+            err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
         except Exception as e:
+            err_msg=generic_constants.ERR_MSG1+'Writing to'+generic_constants.ERR_MSG2
             log.error(e)
-            logger.print_on_console(e)
-            err_msg=INPUT_ERROR
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
 
     def get_line_number(self,input_path,content,*args):
@@ -459,18 +511,25 @@ class FileOperations:
             output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             params=self.__split(input_path,content,*args)
-            if self.verify_file_exists(params[0],'')[1]:
+            result=self.verify_file_exists(params[0],'')
+            if result[1]==TEST_RESULT_TRUE:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
-                    res,linenumbers= self.dict[file_ext+'_get_line_number'](*params)
+                    res,linenumbers,err_msg= self.dict[file_ext+'_get_line_number'](*params)
                     logger.print_on_console(linenumbers)
                     if linenumbers is not None:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
+            else:
+                err_msg=result[3]
+        except TypeError as e:
+            err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
         except Exception as e:
+            err_msg=err_msg=generic_constants.ERR_MSG1+'getting line number of'+generic_constants.ERR_MSG2
             log.error(e)
-            logger.print_on_console(e)
-            err_msg=INPUT_ERROR
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         return status,methodoutput,linenumbers,err_msg
 
     def save_file(self,folder_path,file_path):
@@ -514,17 +573,18 @@ class FileOperations:
                 obj.press_multiple_keys(['ctrl','y'],1)
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
-                log.debug('File has been saved')
+                log.info('File has been saved')
 
             else:
-                log.error('Invalid input')
-                logger.print_on_console('Invalid input')
-                err_msg='Invalid input'
-
+                err_msg=generic_constants.INVALID_INPUT
+        except (IOError,WindowsError):
+            err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
-            err_msg=INPUT_ERROR
+            err_msg=generic_constants.ERR_MSG1+'Saving'+generic_constants.ERR_MSG2
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
 
     def __split(self,*args):

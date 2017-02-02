@@ -24,21 +24,22 @@ class ElementKeywords:
 
     def __getelement_text(self,webelement):
         text=''
-        text=webelement.text
+       # Fixed issue #311
+        text=str(webelement.text)
         if text is None or text is '':
-            text=webelement.get_attribute('value')
+            text=str(webelement.get_attribute('value'))
         if text is None or text is '':
-            text=webelement.get_attribute('name')
+            text=str(webelement.get_attribute('name'))
         if text is None or text is '':
             text=self.__get_tooltip(webelement)
         if text is None or text is '':
-            text=webelement.get_attribute('placeholder')
+            text=str(webelement.get_attribute('placeholder'))
         if text is None or text is '':
-            text=webelement.get_attribute('href')
+            text=str(webelement.get_attribute('href'))
         return text
 
     def __get_tooltip(self,webelement):
-        return webelement.get_attribute('title')
+        return str(webelement.get_attribute('title'))
 
 
     def get_element_text(self,webelement,*args):

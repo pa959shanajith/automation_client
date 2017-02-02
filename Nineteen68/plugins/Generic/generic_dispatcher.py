@@ -50,7 +50,8 @@ class GenericKeywordDispatcher:
     def dispatcher(self,tsp,*message):
          keyword=tsp.name
          logger.print_on_console('Keyword is '+keyword)
-         result=(constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE)
+         err_msg=None
+         result=[constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
          try:
             dict={'toLowerCase': self.generic_string.toLowerCase,
                   'toUpperCase' : self.generic_string.toUpperCase,
@@ -141,8 +142,15 @@ class GenericKeywordDispatcher:
                     message.extend(output)
                 result= dict[keyword](*message)
             else:
-                logger.print_on_console(generic_constants.INVALID_KEYWORD)
+                err_msg=generic_constants.INVALID_KEYWORD
+                result[3]=err_msg
+         except TypeError as e:
+            err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
+            result[3]=err_msg
          except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
+            logger.print_on_console('Exception at dispatcher')
+         if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
          return result

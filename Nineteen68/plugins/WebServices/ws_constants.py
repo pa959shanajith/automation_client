@@ -37,6 +37,12 @@ CONTENT_TYPE_JSON = 'application/json'
 
 CONTENT_TYPE_SOAP_XML = 'application/soap+xml'
 
+ERR_MSG1='Error occurred in '
+
+ERR_SET_WHOLE_BODY='Invalid input : Whole Body is invalid or missing.'
+
+ERR_SET_TAG_VALUE='Request body is empty'
+
 ##TYPE_XML="""Content-Type:text/xml;"""
 ##
 ##TYPE_JSON="""Content-Type:application/json;"""

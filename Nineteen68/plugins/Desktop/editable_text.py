@@ -98,10 +98,11 @@ class Text_Box:
                         ldtp.activatetext(launch_keywords.window_name,dektop_element[0])
                         encryption_obj = AESCipher()
                         input_val_temp = encryption_obj.decrypt(launch_keywords.window_name)
-                        ldtp.settextvalue(launch_keywords.window_name,dektop_element[0],input_val_temp)
-                        status = desktop_constants.TEST_RESULT_PASS
-                        result = desktop_constants.TEST_RESULT_TRUE
-                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                        if input_val_temp is not None:
+                            ldtp.settextvalue(launch_keywords.window_name,dektop_element[0],input_val_temp)
+                            status = desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
                         log.info('Element state does not allow to perform the operation')
                         err_msg = 'Element state does not allow to perform the operation'
@@ -251,6 +252,7 @@ class Text_Box:
 
 
     def verify_parent(self,element,parent):
+        status=False
         try:
             real_parent=ldtp.getobjectproperty(launch_keywords.window_name,element,'parent')
             parent=parent.strip()
@@ -263,11 +265,15 @@ class Text_Box:
             real_parent = real_parent.replace(' ','')
             parent = parent.replace(' ','')
             if(real_parent == parent):
-                return True
+                status= True
             else:
                 logger.log('verify parent is false')
-                return False
+                status= False
+
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
+            logger.print_on_console(e)
+        desktop_constants.ELEMENT_FOUND=status
+        return status
 
 

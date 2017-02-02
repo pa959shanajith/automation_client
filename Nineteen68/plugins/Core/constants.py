@@ -144,12 +144,13 @@ ERROR_CODE_DICT ={
                     'ERR_PLUGINS_PATH': 'please check your plugins path.',
                     'ERR_BROWSER_INPUT': 'Invalid Browser Input.',
                     'ERR_CHROME_INSTANCE': 'Unable to terminate the chrome driver instance.',
-                    'ERR_NO_SUCH_FILE_EXCEPTION':"""File doesn't exist.""",
+                    'ERR_NO_SUCH_FILE_EXCEPTION':"File doesn't exist.",
                     'TERMINATE':'Terminated Successfully.',
                     'ERR_NULL_POINTER_EXCEPTION' : 'Input Error:Please provide valid input.',
                     'ERR_SQL_EXCEPTION': 'Unable to establish connection to DB, please check your Input Query.',
                     'ERR_FILE_NOT_FOUND_EXCEPTION': 'File not found in the specified path.',
-                    'ERR_FILE_NOT_ACESSIBLE': 'File not found/ file is open',
+                    'ERR_FILE_NOT_ACESSIBLE': 'Permisson denied, File is already open',
+                    'ERR_FOLDER_NOT_ACESSIBLE': 'Permisson denied, Folder not accessible',
                     'ERR_ILLEGAL_ARGUMENT_EXCEPTION': 'Input Error: Please provide valid input.',
                     'ERR_NO_IMAGE_SOURCE': 'Image source not available.',
                     'MSG_IMAGE_COMPARE_PASS':'Image comparision is Pass',
@@ -229,6 +230,7 @@ ERROR_CODE_DICT ={
                     'ERR_WEB_ELEMENT_IS_NULL':'The WebElement Value is null.',
                     'ERR_NO_ACCESS_TO_FOLDER':'Invalid input: No access to folder or folder doesnot exists.',
                     'ERR_CONNECTION_FAILED':'Unable to establish connection to DB',
+                    'ERR_VALUES_DOESNOT_MATCH':'Values does not match',
                     #controller messages
                     'ERR_ENDIF_TERMINATE_EXECUTION': ' Execution Terminated : End if/Endfor is missing',
                     'ERR_INVALID_TESTCASE':'Execution Terminated : Jump to test case name not present',
@@ -237,6 +239,7 @@ ERROR_CODE_DICT ={
                     'ERR_TERMINATE_EXECUTION':'-------Terminating the execution-------',
                     'ERR_OOPS_NODATA_GETPARAM':'Oops!! There is no data in external file to Perform Data Parameterization',
                     'ERR_INVALIDFILE_GETPARAM':'Invalid file\n',
+                    'ERR_FILE_EXT_MISMATCH':'File not found/File types are not same',
                     'ERR_CUSTOM_VERIFYEXISTS':'Previous step VerifyExists is missing',
                     'ERR_CUSTOM_NOTFOUND':'Custom Object not Found',
                     'ERR_CUSTOM_MISMATCH':'Input type and keyword mismatch',
@@ -353,7 +356,7 @@ DEBUG='debug'
 
 CORE='Core'
 
-INVALID_KEYWORD='Keyword not available'
+INVALID_KEYWORD='Invalid Keyword'
 
 DRAG='drag'
 

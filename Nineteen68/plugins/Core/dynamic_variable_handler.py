@@ -13,7 +13,7 @@ import logger
 
 from collections import OrderedDict
 from constants import *
-
+import re
 dynamic_variable_map=OrderedDict()
 
 class DynamicVariables:
@@ -30,8 +30,12 @@ class DynamicVariables:
                 if self.check_for_dynamicvariables(value)==TEST_RESULT_TRUE:
                     actual_value=self.get_dynamic_value(value)
 
-            elif  self.check_for_dynamicvariables(input_var)==TEST_RESULT_TRUE:
-                actual_value=self.get_dynamic_value(input_var)
+            elif self.check_for_dynamicvariables(input_var)==TEST_RESULT_TRUE:
+                var_list=re.findall("\{(.*?)\}",input_var)
+                for data in var_list:
+                    data='{'+data+'}'
+                    temp_value=self.get_dynamic_value(data)
+                    actual_value=actual_value.replace(data,str(temp_value))
         return actual_value
 
     #To Store the output from keyword as an array if it is multiple values
@@ -57,6 +61,11 @@ class DynamicVariables:
         if outputval != None and outputval != '':
             if outputval.startswith('{') and outputval.endswith('}'):
                 status = TEST_RESULT_TRUE
+            elif '{' in outputval and '}' in outputval:
+                var_list=re.findall("\{(.*?)\}",outputval)
+                if len(var_list)>0:
+                    status = TEST_RESULT_TRUE
+
         return status
 
     #To get the value of given dynamic variable
@@ -73,7 +82,6 @@ class DynamicVariables:
         status = TEST_RESULT_FALSE
         nested_variable=None
         if (inputvar.startswith('{') and inputvar.endswith('}')) or (inputvar.count('{') > 0 and inputvar.count('}') > 0):
-            import re
             pattern = '\\[(.*?)\\]'
             regularexp = re.compile(pattern)
             nested_variable = regularexp.findall(inputvar)
