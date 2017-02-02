@@ -20,7 +20,7 @@ import logger
 import desktop_constants
 import radio_checkbox_keywords_desktop
 import outlook
-from constants import *
+import constants
 import logging
 
 log = logging.getLogger('desktop_dispatcher.py')
@@ -46,7 +46,8 @@ class DesktopDispatcher:
         objectname = objectname.strip()
         keyword = teststepproperty.name
         url = teststepproperty.url
-        result=(desktop_constants.TEST_RESULT_FAIL,desktop_constants.TEST_RESULT_FALSE)
+        err_msg=None
+        result=[desktop_constants.TEST_RESULT_FAIL,desktop_constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
 ##        if objectname != '@Browser' or objectname != '@BrowserPopUp' or objectname != '@Custom':
 
 
@@ -127,9 +128,17 @@ class DesktopDispatcher:
                 if not(desktop_constants.ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE
             else:
-                logger.print_on_console(desktop_constants.INVALID_KEYWORD)
+                err_msg=desktop_constants.INVALID_KEYWORD
+                result[3]=err_msg
+        except TypeError as e:
+            err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
+            result[3]=err_msg
         except Exception as e:
+            log.error(e)
             logger.print_on_console('Exception at dispatcher')
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
 
         return result
 

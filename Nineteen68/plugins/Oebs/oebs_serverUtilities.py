@@ -188,6 +188,8 @@ class Utilities:
 
     def object_generator(self,applicationname,locator,keyword,inputs,outputs):
         global accessContext
+        global ELEMENT_FOUND
+        ELEMENT_FOUND=False
         #OBJECTLOCATION for the object is sent from the user
         del oebs_key_objects.keyword_input[:]
         oebs_key_objects.xpath = locator

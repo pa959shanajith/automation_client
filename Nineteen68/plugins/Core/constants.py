@@ -356,7 +356,7 @@ DEBUG='debug'
 
 CORE='Core'
 
-INVALID_KEYWORD='Keyword not available'
+INVALID_KEYWORD='Invalid Keyword'
 
 DRAG='drag'
 

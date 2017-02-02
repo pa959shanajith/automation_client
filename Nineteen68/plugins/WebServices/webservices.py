@@ -572,7 +572,7 @@ class WSkeywords:
             logger.print_on_console('Element not found')
         return result
 
-     def setAttributeValue(self,attribute_name,attribute_value,element_path):
+     def setTagAttribute(self,attribute_name,attribute_value,element_path):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         err_msg=None

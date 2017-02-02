@@ -59,6 +59,8 @@ class Dispatcher:
         driver = browser_Keywords.driver_obj
         webelement = None
         element = None
+        err_msg=None
+
 
         log.info('In Web dispatcher')
         custom_dict={
@@ -79,7 +81,7 @@ class Dispatcher:
         custom_dict_element={'element':['clickElement','doubleClick','rightClick','getElementText','verifyElementText','drag', 'drop','getToolTipText','verifyToolTipText','verifyExists', 'verifyDoesNotExists', 'verifyHidden','verifyVisible', 'switchToTab','switchToWindow','setFocus','sendFunctionKeys',
                                         'tab','waitForElementVisible','mouseHover','saveFile']}
 
-        result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,None,None)
+        result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
 
         def print_error(err_msg):
             err_msg=ERROR_CODE_DICT['ERR_CUSTOM_MISMATCH']
@@ -267,7 +269,7 @@ class Dispatcher:
                 if result != TERMINATE:
 
                     result= dict[keyword](webelement,input)
-                    if flag:
+                    if flag and webelement==None:
                         result=list(result)
                         result[3]=WEB_ELEMENT_NOT_FOUND
                     if keyword == GET_INNER_TABLE and (output != '' and output.startswith('{') and output.endswith('}')):
@@ -283,11 +285,17 @@ class Dispatcher:
 
 
             else:
-                logger.print_on_console(INVALID_KEYWORD)
-                log.error(INVALID_KEYWORD)
+                err_msg=INVALID_KEYWORD
+                result[3]=err_msg
+        except TypeError as e:
+            err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
+            result[3]=err_msg
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
+            logger.print_on_console('Exception at dispatcher')
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         return result
 
 

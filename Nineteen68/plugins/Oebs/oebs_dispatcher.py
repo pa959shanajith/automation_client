@@ -104,7 +104,8 @@ class OebsDispatcher:
     def dispatcher(self,tsp,input,*message):
          logger.print_on_console('Keyword is '+tsp.name)
          keyword=tsp.name
-         result=(constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE)
+         err_msg=None
+         result=[constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
          if windowname is not None:
             self.utils_obj.set_to_foreground(windowname)
          message=self.assign_url_objectname(tsp,input)
@@ -184,7 +185,7 @@ class OebsDispatcher:
                   'gettextboxlength':self.oebs_keywords.gettextboxlength,
                   'settext':self.oebs_keywords.settext,
                   'gettext':self.oebs_keywords.gettext,
-                  'closeapplictaion':''
+                  'closeapplictaion':self.utils_obj.close_application
 
                 }
             keyword=keyword.lower()
@@ -193,10 +194,17 @@ class OebsDispatcher:
                 if not(oebs_msg.ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE
             else:
-                logger.print_on_console(MSG_KEYWORD_NA)
+                err_msg=constants.INVALID_KEYWORD
+                result[3]=err_msg
+         except TypeError as e:
+            err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
+            result[3]=err_msg
          except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
+            logger.print_on_console('Exception at dispatcher')
+         if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
          return result
 
 

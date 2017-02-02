@@ -23,6 +23,6 @@ ELEMENT_IS_DISPALYED = 'Element is displayed'
 
 CLASS_NAME = 'android.widget.TextView'
 
-INVALID_INPUT = 'Input is either empty or invalid'
+INVALID_KEYWORD = 'Invalid keyword'
 
 ELEMENT_FOUND=True

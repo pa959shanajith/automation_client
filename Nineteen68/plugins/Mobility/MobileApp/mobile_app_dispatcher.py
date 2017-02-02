@@ -20,7 +20,7 @@ import device_keywords
 import logging
 import logger
 from mobile_app_constants import *
-from constants import *
+import constants
 
 log = logging.getLogger('mobile_app_dispatcher.py')
 class MobileDispatcher:
@@ -38,11 +38,14 @@ class MobileDispatcher:
 
 
     def dispatcher(self,teststepproperty,input,reporting_obj):
+        global ELEMENT_FOUND
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE)
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
         keyword = teststepproperty.name
+        err_msg=None
+        result=[constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
 
         try:
             dict={'setText':self.textbox_keywords_object.set_text,
@@ -79,7 +82,7 @@ class MobileDispatcher:
                     'invokeDevice' : self.device_keywords_object.invoke_device
 
                 }
-
+            ELEMENT_FOUND=True
             if keyword in dict.keys():
                 driver = install_and_launch.driver
                 webelement=self.getMobileElement(driver,objectname)
@@ -87,17 +90,20 @@ class MobileDispatcher:
                 if not(ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE
             else:
-                logger.print_on_console(INVALID_INPUT)
+                err_msg=INVALID_KEYWORD
+                result[3]=err_msg
+        except TypeError as e:
+            err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
+            result[3]=err_msg
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             log.error(e)
-            logger.print_on_console(e)
+            logger.print_on_console('Exception at dispatcher')
         return result
 
     def getMobileElement(self,driver,objectname):
         objectname = str(objectname)
         mobileElement = None
+        global ELEMENT_FOUND
         if objectname.strip() != '':
 
             identifiers = objectname.split(';')
@@ -116,4 +122,6 @@ class MobileDispatcher:
                     err_msg=str(Ex)
                     logger.print_on_console(err_msg)
                     log.error(err_msg)
+        if mobileElement==None:
+            ELEMENT_FOUND=False
         return mobileElement

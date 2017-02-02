@@ -142,14 +142,15 @@ class GenericKeywordDispatcher:
                     message.extend(output)
                 result= dict[keyword](*message)
             else:
-                result[3]=generic_constants.INVALID_KEYWORD
-                logger.print_on_console(generic_constants.INVALID_KEYWORD)
+                err_msg=generic_constants.INVALID_KEYWORD
+                result[3]=err_msg
          except TypeError as e:
-            log.error(e)
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
-            logger.print_on_console(err_msg)
             result[3]=err_msg
          except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
+            logger.print_on_console('Exception at dispatcher')
+         if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
          return result
