@@ -20,7 +20,7 @@ import logging
 from constants import *
 
 
-driver = browser_Keywords.driver_obj
+##driver = browser_Keywords.driver_obj
 ##driver = None
 log = logging.getLogger('button_link_keyword.py')
 class ButtonLinkKeyword():
@@ -29,7 +29,7 @@ class ButtonLinkKeyword():
 
     def click(self,webelement,*args):
         log.debug('Got the driver object from browser keyword class')
-        log.debug(driver)
+        log.debug(browser_Keywords.driver_obj)
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
         err_msg=None
@@ -43,11 +43,11 @@ class ButtonLinkKeyword():
                 log.debug('Check for the element enable')
                 if webelement.is_enabled():
                     log.debug(WEB_ELEMENT_ENABLED)
-                    if isinstance(driver,webdriver.Ie):
+                    if isinstance(browser_Keywords.driver_obj,webdriver.Ie):
                         log.info('Opened browser : Internet Explorer Instance')
                         try:
                             log.debug('Going to perform click operation')
-                            clickinfo = driver.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
+                            clickinfo = browser_Keywords.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
                             time.sleep(5)
                             log.info('Click operation performed using javascript click')
                             log.debug('click operation info: ')
@@ -57,7 +57,7 @@ class ButtonLinkKeyword():
                             methodoutput = webconstants.TEST_RESULT_TRUE
                         except Exception as e:
                             log.error('Javascript error occured, Trying to click using Action class')
-                            webdriver.ActionChains(driver).move_to_element(webelement).click(webelement).perform()
+                            webdriver.ActionChains(browser_Keywords.driver_obj).move_to_element(webelement).click(webelement).perform()
                             log.info('click operation  info: Clicked using Actions class')
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
@@ -72,7 +72,7 @@ class ButtonLinkKeyword():
                             methodoutput = webconstants.TEST_RESULT_TRUE
                         except Exception as e:
                             log.error('selenium click  error occured, Trying to click using Javascript')
-                            clickinfo = driver.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
+                            clickinfo = browser_Keywords.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
                             log.info('Click operation performed using javascript click')
                             log.debug('click operation info: ')
                             log.debug(clickinfo)
@@ -299,7 +299,7 @@ class ButtonLinkKeyword():
                 log.debug(webelement)
                 log.debug('Check for the element enable')
                 if webelement.is_enabled():
-                    webdriver.ActionChains(driver).move_to_element(webelement).double_click(webelement).perform()
+                    webdriver.ActionChains(browser_Keywords.driver_obj).move_to_element(webelement).double_click(webelement).perform()
                     log.info('double click operation performed using Action class')
                     log.info(STATUS_METHODOUTPUT_UPDATE)
                     status = webconstants.TEST_RESULT_PASS
@@ -310,8 +310,9 @@ class ButtonLinkKeyword():
                     logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
             log.error(e)
-
             logger.print_on_console(e)
+            import traceback
+            traceback.print_exc()
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
         log.info(RETURN_RESULT)
@@ -330,7 +331,7 @@ class ButtonLinkKeyword():
                 log.debug(webelement)
                 log.debug('Check for the element enable')
                 if webelement.is_enabled():
-                    webdriver.ActionChains(driver).move_to_element(webelement).context_click(webelement).perform()
+                    webdriver.ActionChains(browser_Keywords.driver_obj).move_to_element(webelement).context_click(webelement).perform()
                     log.info('right click operation performed using Action class')
                     log.info(STATUS_METHODOUTPUT_UPDATE)
                     status = webconstants.TEST_RESULT_PASS
@@ -356,40 +357,34 @@ class ButtonLinkKeyword():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         #upload_file keyword implementation
         try:
-            driver = browser_Keywords.driver_obj
-            if len(inputs) > 1:
-                filepath = inputs[0]
-                filename = inputs[1]
-                inputfile = filepath + '\\' + filename
-                if webelement != None:
-                    log.info('Recieved web element from the web dispatcher')
-                    log.debug(webelement)
-                    log.debug('Check for the element enable')
-                    if webelement.is_enabled():
-                        if isinstance(driver,webdriver.Firefox):
-                            log.debug('Mozilla Firefox Instance')
-                            clickinfo = driver.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
-                            log.info('upload_file click info')
-                            log.info(clickinfo)
-                            filestatus = self.__upload_operation(inputfile)
+##            driver = browser_Keywords.driver_obj
+            filepath = inputs[0]
+            filename = inputs[1]
+            inputfile = filepath + '\\' + filename
+            if webelement != None:
+                log.info('Recieved web element from the web dispatcher')
+                log.debug(webelement)
+                log.debug('Check for the element enable')
+                if webelement.is_enabled():
+                    if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
+                        log.debug('Mozilla Firefox Instance')
+                        clickinfo = browser_Keywords.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
+                        log.info('upload_file click info')
+                        log.info(clickinfo)
+                        filestatus = self.__upload_operation(inputfile)
+                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                        status = webconstants.TEST_RESULT_PASS
+                        methodoutput = webconstants.TEST_RESULT_TRUE
+                    else:
+                        if  self.__click_for_file_upload(browser_Keywords.driver_obj,webelement):
+                            filestatus =self.__upload_operation(inputfile)
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
-                        else:
-                            if  self.__click_for_file_upload(driver,webelement):
-                                filestatus =self.__upload_operation(inputfile)
-                                log.info(STATUS_METHODOUTPUT_UPDATE)
-                                status = webconstants.TEST_RESULT_PASS
-                                methodoutput = webconstants.TEST_RESULT_TRUE
-                    else:
-                        log.info(WEB_ELEMENT_DISABLED)
-                        err_msg = WEB_ELEMENT_DISABLED
-                        logger.print_on_console(WEB_ELEMENT_DISABLED)
                 else:
-                    log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-
+                    log.info(WEB_ELEMENT_DISABLED)
+                    err_msg = WEB_ELEMENT_DISABLED
+                    logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
             log.error(e)
 
@@ -443,9 +438,9 @@ class ButtonLinkKeyword():
     def __click_for_file_upload(self,driver,webelement):
         status = False
         try:
-            if isinstance(driver,webdriver.Ie):
+            if isinstance(browser_Keywords.driver_obj,webdriver.Ie):
                 log.debug('Going to perform click operation')
-                clickinfo = driver.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
+                clickinfo = browser_Keywords.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
                 log.info('Click operation performed using javascript click')
                 log.debug('click operation info: ')
                 log.debug(clickinfo)
