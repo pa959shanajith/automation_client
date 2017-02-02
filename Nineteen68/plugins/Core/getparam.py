@@ -432,7 +432,15 @@ class GetParam():
                     variable = ''
                     temp = ''
                     columnname = ''
-                    arr = inputvalstring.split(';')
+                    arr=[]
+                    keywordList=[IF,FOR,JUMP_BY,JUMP_TO]
+                    if teststepproperty.name in keywordList :
+                        import re
+                        static_var_list=re.findall("\|(.*?)\|", inputvalstring)
+                        for var in static_var_list:
+                            arr.append('|'+var+'|')
+                    else:
+                        arr = inputvalstring.split(';')
                     for item in arr:
                         if self.checkforstaticvariable(item.strip()):
                             p = 0
