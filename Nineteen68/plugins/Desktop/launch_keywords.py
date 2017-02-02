@@ -44,8 +44,10 @@ class Launch_Keywords():
 
     def launch_application(self,input_val,*args):
         status=desktop_constants.TEST_RESULT_FAIL
+        result=desktop_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
         err_msg=None
+        term = None
         try:
         # check file exists
             if len(input_val)==2:
@@ -61,27 +63,36 @@ class Launch_Keywords():
                     self.multiInstance=title_matched_windows[0]
                     logger.print_on_console('please close the existing application instnace with the given window name and try again')
                     logger.print_on_console('Terminate the execution')
+                    term = TERMINATE
                 elif len(title_matched_windows)==0:
                     value=win32api.ShellExecute(0,'open',filePath,None,directory,1)
                     if int(value)>32:
                         logger.print_on_console('The specified application is launched')
-                        result=	self.find_window_and_attach(windowName,timeout)
-                        if result!=None:
+                        res=self.find_window_and_attach(windowName,int(timeout))
+                        if res!=None and res!='':
                             status=desktop_constants.TEST_RESULT_PASS
-                            return status,self.windowname
+                            result = desktop_constants.TEST_RESULT_TRUE
+##                            return status,self.windowname
+                        else:
+                            term = TERMINATE
                     else :
                         error_code=int(win32api.GetLastError())
                         if error_code in desktop_constants.DESKTOP_ERROR_CODES.keys():
                             logger.print_on_console(desktop_constants.DESKTOP_ERROR_CODES.get(error_code))
+                            term =TERMINATE
                         else:
                             logger.print_on_console('unable to launch the application')
+                            term =TERMINATE
             else:
                 logger.print_on_console('The file does not exists')
 
         except Exception as e:
-            Exceptions.error(e)
+##            Exceptions.error(e)
             err_msg = desktop_constants.ERROR_MSG
-        return status,self.windowname,verb,err_msg
+            term =TERMINATE
+        if term!=None:
+            return term
+        return status,result,self.windowname,err_msg
 
     def getPageTitle(self,*args):
         status=desktop_constants.TEST_RESULT_FAIL
@@ -93,7 +104,8 @@ class Launch_Keywords():
                 result = desktop_constants.TEST_RESULT_TRUE
                 return status,self.windowname
         except Exception as e:
-            Exceptions.error(e)
+##            Exceptions.error(e)
+            err_msg = desktop_constants.ERROR_MSG
         return status,result,self.windowname,err_msg
 
     def closeApplication(self,*args):
@@ -108,7 +120,8 @@ class Launch_Keywords():
                 result = desktop_constants.TEST_RESULT_TRUE
                 return status
         except Exception as e:
-            Exceptions.error(e)
+##            Exceptions.error(e)
+            err_msg = desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
     def captureScreenshot(self,hwnd):
@@ -220,7 +233,7 @@ class Launch_Keywords():
                     self.bring_to_top(aut_handle,1)
                     return True
         except Exception as e:
-            Exceptions.error(e)
+            err_msg = desktop_constants.ERROR_MSG
 
         return False
 
@@ -230,7 +243,8 @@ class Launch_Keywords():
             win32gui.ShowWindow(aut_handle,value)
             #win32gui.SetForegroundWindow(aut_handle)
        except Exception as e:
-            Exceptions.error(e)
+##            Exceptions.error(e)
+            err_msg = desktop_constants.ERROR_MSG
 
     def higlight(self,objectname,parent,*args):
         status=False
@@ -272,7 +286,8 @@ class Launch_Keywords():
                 status=desktop_constants.TEST_RESULT_PASS
         except Exception as e:
             status=False
-            Exceptions.error(e)
+##            Exceptions.error(e)
+            err_msg = desktop_constants.ERROR_MSG
         return status
 
     def find_window_and_attach(self,windowname,launch_time_out):
@@ -281,27 +296,27 @@ class Launch_Keywords():
         if not(windowname is None and windowname is ''):
             start_time = time.time()
             while True:
-                    if int(time.time() - start_time) == launch_time_out:
-                            break
-                    title_matched_windows=self.getProcessWindows(windowname)
-                    if len(title_matched_windows)>1:
-                        break
-                    elif len(title_matched_windows)==1:
-                        self.windowHandle=title_matched_windows[0]
-                        self.windowname=self.getWindowText(self.windowHandle)
+                if int(time.time()-start_time) >= launch_time_out:
+                    break
+                title_matched_windows=self.getProcessWindows(windowname)
+                if len(title_matched_windows)>1:
+                    break
+                elif len(title_matched_windows)==1:
+                    self.windowHandle=title_matched_windows[0]
+                    self.windowname=self.getWindowText(self.windowHandle)
 
-                        self.set_to_foreground()
-                        time.sleep(0.5)
-                        logger.print_on_console('Application handle found')
+                    self.set_to_foreground()
+                    time.sleep(0.5)
+                    logger.print_on_console('Application handle found')
 ##                        tempTitle = windowTitle.replaceAll("[^a-zA-Z0-9]", "*")
-                        # need  to create a ldtp object here
-                        global window_name
-                        window_name=self.windowname
-                        global window_handle
-                        window_handle=title_matched_windows[0]
-                        break
-                    if(self.windowname!=''):
-                        break
+                    # need  to create a ldtp object here
+                    global window_name
+                    window_name=self.windowname
+                    global window_handle
+                    window_handle=title_matched_windows[0]
+                    break
+                if(self.windowname!=''):
+                    break
         return self.windowname
 
 
@@ -324,8 +339,8 @@ class Launch_Keywords():
                 self.windowname=newWindowName
                 window_name=newWindowName
         except Exception as e:
-            Exceptions.error(e)
-
+##            Exceptions.error(e)
+            err_msg = desktop_constants.ERROR_MSG
 
     def find_window(self,windowname):
         aut_handle = win32gui.FindWindow(None,windowname)
