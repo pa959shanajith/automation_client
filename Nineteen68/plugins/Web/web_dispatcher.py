@@ -252,9 +252,10 @@ class Dispatcher:
                 }
 
             if keyword in dict.keys():
-
+                flag=False
                 #Finding the webelement for NON_WEBELEMENT_KEYWORDS
                 if keyword not in NON_WEBELEMENT_KEYWORDS:
+                    flag=True
                     webelement=send_webelement_to_keyword(driver,objectname,url)
                     if webelement == None and self.exception_flag:
                         result=TERMINATE
@@ -266,6 +267,9 @@ class Dispatcher:
                 if result != TERMINATE:
 
                     result= dict[keyword](webelement,input)
+                    if flag:
+                        result=list(result)
+                        result[3]=WEB_ELEMENT_NOT_FOUND
                     if keyword == GET_INNER_TABLE and (output != '' and output.startswith('{') and output.endswith('}')):
                         self.webelement_map[output]=result[2]
 
