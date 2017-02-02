@@ -101,6 +101,7 @@ class ScrapeWindow(wx.Frame):
           d=   clickandaddoj.save_json_data()
         else:
             d = fullscrapeobj.save_json_data()
+        self.savescrapebutton.Disable()
         self.socketIO.send(d)
 
 ##        self.Close()
