@@ -272,7 +272,7 @@ class Controller():
     def methodinvocation(self,index,*args):
 
         global pause_flag
-
+        result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
 		#COmapring breakpoint with the step number of tsp instead of index - (Sushma)
         tsp = handler.tspList[index]
 
@@ -359,7 +359,7 @@ class Controller():
             end_time = datetime.now()
             end_time_string=end_time.strftime(TIME_FORMAT)
             logger.print_on_console('Step Execution end time is : '+end_time_string)
-            logger.print_on_console( "----Keyword :",tsp.name,' execution Completed----')
+##            logger.print_on_console( "----Keyword :",tsp.name,' execution Completed----')
             ellapsed_time=end_time-start_time
             logger.print_on_console('Step Elapsed time is : ',str(ellapsed_time)+'\n')
             #Changing the overallstatus of the scenario if it's Fail or Terminate
@@ -533,18 +533,19 @@ class Controller():
             log.info('Result in methodinvocation : '+ str(teststepproperty.name)+' : ')
             log.info(result)
 
-
+            self.keyword_status=TEST_RESULT_FAIL
             if result!=TERMINATE:
                 self.store_result(result,teststepproperty)
                 self.status=result[0]
                 index+=1
+                self.keyword_status=self.status
             else:
                 index=result
                 self.status=result
-            self.keyword_status=self.status
-            #FIxing issue #382
-            logger.print_on_console(keyword+' executed and the status is '+self.status+'\n')
-            log.info(keyword+' executed and the status is '+self.status+'\n')
+
+            #Fixing issue #382
+            logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n')
+            log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
 
 
 ##            print '\n'
