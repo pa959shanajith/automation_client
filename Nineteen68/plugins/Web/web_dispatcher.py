@@ -348,8 +348,6 @@ class Dispatcher:
                             log.debug('Webelement found by absolute Xpath')
                         except Exception as webEx:
                             err_msg=WEB_ELEMENT_NOT_FOUND
-                            logger.print_on_console(err_msg)
-                            log.error(err_msg)
 
             elif objectname.startswith('{') and objectname.endswith('}') and self.webelement_map.has_key(objectname):
                 if len(self.webelement_map)<=4:
@@ -361,7 +359,11 @@ class Dispatcher:
                     err_msg=WEB_ELEMENT_NOT_FOUND
                     logger.print_on_console(err_msg)
                     log.error(err_msg)
-
+            #Fixing issue #381
+            if webElement==None:
+                err_msg=WEB_ELEMENT_NOT_FOUND
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
 
         return webElement
 
