@@ -16,7 +16,7 @@ import handler
 from constants import *
 import reporting
 import logging
-
+import dynamic_variable_handler
 
 log = logging.getLogger('if_step.py')
 
@@ -88,6 +88,15 @@ class If():
                     input_expression=input_expression+exp
             else:
                 logger.print_on_console('Invalid input')
+
+            if '{' in input_expression and '}' in input_expression :
+                import re
+                dyn_var_list=re.findall("\{(.*?)\}", input_expression)
+                if len(dyn_var_list)>0:
+                    import string
+                    for var in dyn_var_list:
+                        value=dynamic_variable_handler.dynamic_variable_map['{'+var+'}']
+                        input_expression=string.replace(input_expression,'{'+var+'}',value)
             logger.print_on_console('Input_expression is ',input_expression)
             res=logical_eval_obj.eval_expression(input_expression)
             logger.print_on_console(self.name+': Condition is '+str(res)+'\n')
