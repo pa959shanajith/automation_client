@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        file_comparison_operations.py
 # Purpose:
 #
 # Author:      sushma.p
@@ -11,10 +11,14 @@
 
 import logger
 import generic_constants
+import logging
+import constants
+
+log = logging.getLogger('file_comparison_operations.py')
 
 class PdfFile:
 
-    def verify_content(self,input_path,pagenumber,content):
+    def verify_content(self,input_path,pagenumber):
         """
         def : verify_content
         purpose : verifies whether the content is given pagenumber of pdf file
@@ -23,14 +27,22 @@ class PdfFile:
 
         """
         status=False
+        err_msg=None
         try:
+            log.debug('Verifying content of pdf file')
             pdf_content=self.get_content(input_path,pagenumber,content,'_internal_verify_content')
+            log.debug('pdf_content is '+str(pdf_content))
             if content in pdf_content.replace('\n',''):
                 status=True
+            else:
+                err_msg=generic_constants.CONTENT_NOT_PRESENT
+        except IOError:
+            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
-            Exceptions.error(e)
-
-        return status
+            err_msg=generic_constants.ERR_MSG1+'verifying PDF content'+generic_constants.ERR_MSG2
+            log.error(e)
+        log.info('Status is '+str(status))
+        return status,err_msg
 
     def compare_content(self,input_path1,input_path2):
         """
@@ -41,12 +53,20 @@ class PdfFile:
 
         """
         status=False
+        err_msg=None
+        log.debug('Comparing content of pdf files: '+str(input_path1)+','+str(input_path2))
         try:
             import filecmp
             status=filecmp.cmp(input_path1,input_path2)
+            if not(status):
+                err_msg=generic_constants.CONTENT_NOT_SAME
+        except IOError:
+            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
-            Exceptions.error(e)
-        return status
+            err_msg=generic_constants.ERR_MSG1+'Comparing PDF content'+generic_constants.ERR_MSG2
+            log.error(e)
+        log.info('Status is '+str(status))
+        return status,err_msg
 
 
     def get_content(self,input_path,pagenumber,*args):
@@ -59,8 +79,10 @@ class PdfFile:
         """
         status=False
         content=None
+        err_msg=None
         from PyPDF2 import PdfFileReader, PdfFileWriter
         try:
+             log.debug('Get the content of pdf file: '+str(input_path)+','+str(pagenumber))
              reader=PdfFileReader(open(input_path,'rb'))
              pagenumber=int(pagenumber)-1
              if pagenumber<reader.getNumPages():
@@ -74,24 +96,34 @@ class PdfFile:
                     end=args[1].strip()
                     startIndex=0
                     endIndex=len(content)
+                    log.info('Start string: '+str(start)+' End string: '+str(end))
                     if not start is '':
                         startIndex=content.find(start)+len(start)
                     if not end is '':
                         endIndex=content.find(end)
                     content=content[startIndex:endIndex]
+                    log.info('Content between Start and End string is ')
                     logger.print_on_console('Content between Start and End string is ')
                 elif len(args)==1:
                     with open(args[0],'w') as file:
                         file.write(content)
                         file.close()
-                logger.print_on_console(content)
+                log.info(content)
                 status=True
              else:
-                logger.print_on_console(generic_constants.INVALID_INPUT)
+                err_msg=generic_constants.INVALID_INPUT
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
 
         except ValueError as e:
-            Exception.message(generic_constants.INVALID_INPUT)
-        return status,content
+            err_msg=generic_constants.INVALID_INPUT
+        except IOError:
+            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
+        except Exception as e:
+            err_msg=generic_constants.ERR_MSG1+'Fetching PDF content'+generic_constants.ERR_MSG2
+            log.error(e)
+        log.info('Status is '+str(status))
+        return status,content,err_msg
 
 
 
@@ -106,15 +138,24 @@ class TextFile:
 
         """
         status=False
+        err_msg=None
         try:
+            log.debug('Verifying content of Text file ')
             with open(input_path) as myFile:
                 for num, line in enumerate(myFile, 1):
                     if content in line:
+                        log.info('found at line:'+str(num))
                         logger.print_on_console('found at line:',(num))
                         status=True
+            if not(status):
+                err_msg=generic_constants.CONTENT_NOT_PRESENT
+        except IOError:
+            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
-            Exceptions.error(e)
-        return status
+            err_msg=generic_constants.ERR_MSG1+'Verifying Text content'+generic_constants.ERR_MSG2
+            log.error(e)
+        log.info('Status is '+str(status))
+        return status,err_msg
 
 
     def compare_content(self,input_path1,input_path2):
@@ -126,20 +167,28 @@ class TextFile:
 
         """
         status=False
+        err_msg=None
+        log.debug('Comparing content of pdf files: '+str(input_path1)+','+str(input_path2))
         try:
             content1=self.get_content(input_path1)
             content2=self.get_content(input_path2)
-            logger.print_on_console('File1 content is '+content1)
-            logger.print_on_console('File2 content is '+content2)
+            log.debug('File1 content is '+content1)
+            log.debug('File2 content is '+content2)
             if content1==content2:
                 status=True
+            else:
+                err_msg=generic_constants.CONTENT_NOT_SAME
+        except IOError:
+            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
-            Exceptions.error(e)
-        return status
+            err_msg=generic_constants.ERR_MSG1+'Comparing Text content'+generic_constants.ERR_MSG2
+            log.error(e)
+        log.info('Status is '+str(status))
+        return status,err_msg
 
 
 
-    def clear_content(self,input_path):
+    def clear_content(self,input_path,file_name):
         """
         def : clear_content
         purpose : clears the content of given text file
@@ -148,14 +197,21 @@ class TextFile:
 
         """
         status=False
+        err_msg=None
+        log.debug('Clearing content of Text file '+str(input_path)+' '+str(file_name))
+        input_path=input_path+'/'+file_name
         try:
             with open(input_path,'w') as myFile:
                 myFile.write('')
                 myFile.close()
                 status=True
+        except IOError:
+            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
-            Exceptions.error(e)
-        return status
+            err_msg=generic_constants.ERR_MSG1+'Clearing Text content'+generic_constants.ERR_MSG2
+            log.error(e)
+        log.info('Status is '+str(status))
+        return status,err_msg
 
 
     def get_content(self,input_path):
@@ -168,14 +224,21 @@ class TextFile:
         """
         status=False
         content=None
+        err_msg=None
+        log.debug('Get the content of Text file '+str(input_path))
         try:
             with open(input_path) as myFile:
-                str=myFile.read()
-                logger.print_on_console(str)
-                content=str
+                content=myFile.read()
+                logger.print_on_console('Content is:'+content)
+                log.info('Content is '+str(content))
+                status=True
+        except IOError:
+            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
-            Exceptions.error(e)
-        return status,content
+            err_msg=generic_constants.ERR_MSG1+'Fetching Text content'+generic_constants.ERR_MSG2
+            log.error(e)
+        log.info('Status is '+str(status))
+        return status,content,err_msg
 
     def get_linenumber(self,input_path,content):
         """
@@ -187,17 +250,24 @@ class TextFile:
         """
         status=False
         line_numbers=[]
+        err_msg=None
+        log.debug('Get the line number of Text file '+str(input_path)+' containing the ontent '+str(content))
         try:
             with open(input_path) as myFile:
                 for num, line in enumerate(myFile, 1):
                     if content in line:
-                        print 'found at line:', num
+                        log.debug('found at line: '+str(num))
                         line_numbers.append(num)
                         status=True
+            log.info(line_numbers)
             logger.print_on_console(line_numbers)
+        except IOError:
+            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
-            Exceptions.error(e)
-        return status,line_numbers
+            err_msg=generic_constants.ERR_MSG1+'Fetching line number of text '+generic_constants.ERR_MSG2
+            log.error(e)
+        log.info('Status is '+str(status))
+        return status,line_numbers,err_msg
 
 
 
@@ -211,17 +281,24 @@ class TextFile:
         """
         filecontent=''
         status=False
+        err_msg=None
         try:
+            log.debug('Replace_content of Text file ')
             with open(input_path,'r') as myFile:
                 filecontent=myFile.read()
                 filecontent=filecontent.replace(existing_content,replace_content)
+                log.debug('Replaced content successfully')
             with open(input_path, 'w') as file:
                     file.write(filecontent)
                     file.close()
                     status= True
-        except:
-            Exception.message('Error occurred')
-        return status
+        except IOError:
+            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
+        except Exception as e:
+            err_msg=generic_constants.ERR_MSG1+'Replacing of text '+generic_constants.ERR_MSG2
+            log.error(e)
+        log.info('Status is '+str(status))
+        return status,err_msg
 
 
 
@@ -234,17 +311,24 @@ class TextFile:
 
         """
         status=False
-        logger.print_on_console('Writing to text file')
+        err_msg=None
+        logger.print_on_console('Writing '+str(content)+' to text file '+str(input_path))
+        log.info('Writing '+str(content)+' to text file '+str(input_path))
         try:
             if len(args)>0:
                 content+=' '.join(args)
             with open(input_path, 'a') as file:
                 file.write(content)
                 file.close()
+                log.debug('Content is written successfully')
                 status= True
-        except (OSError, IOError) as e:
-            Exception.message('Cannot open file')
-        return status
+        except IOError,OSError:
+            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
+        except Exception as e:
+            err_msg=generic_constants.ERR_MSG1+'Writing to text '+generic_constants.ERR_MSG2
+            log.error(e)
+        log.info('Status is '+str(status))
+        return status,err_msg
 
 
 class XML:
@@ -258,7 +342,9 @@ class XML:
 
         """
         status=False
-        logger.print_on_console('Writing to XML file')
+        err_msg=None
+        logger.print_on_console('Writing '+str(content)+' to XML file '+str(input_path))
+        log.info('Writing '+str(content)+' to XML file '+str(input_path))
         import xml.dom.minidom as minidom
         from xml.etree import ElementTree as ET
         from xml.etree import ElementTree
@@ -271,13 +357,18 @@ class XML:
             with open(input_path, 'a') as file:
                 file.write(val)
                 file.close()
+                log.debug('Content is written successfully')
                 status=True
+        except IOError:
+            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
-            Exceptions.error(e)
-        return status
+            err_msg=generic_constants.ERR_MSG1+'Writing to XML '+generic_constants.ERR_MSG2
+            log.error(e)
+        log.info('Status is '+str(status))
+        return status,err_msg
 
 
-    def clear_content(self,input_path):
+    def clear_content(self,input_path,file_name):
         """
         def : clear_content
         purpose : clears the content of given xml file
@@ -285,8 +376,20 @@ class XML:
         return : bool
 
         """
-        with open(input_path,'w') as myFile:
-            myFile.write('')
-            myFile.close()
-            return True
+        status=False
+        err_msg=None
+        log.debug('Clearing content of XML file '+str(input_path)+' '+str(file_name))
+        input_path=input_path+'/'+file_name
+        try:
+            with open(input_path,'w') as myFile:
+                myFile.write('')
+                myFile.close()
+                status=True
+        except IOError:
+            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
+        except Exception as e:
+            err_msg=generic_constants.ERR_MSG1+'Clearing XML '+generic_constants.ERR_MSG2
+            log.error(e)
+        log.info('Status is '+str(status))
+        return status,err_msg
 

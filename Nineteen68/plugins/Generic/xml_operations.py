@@ -31,6 +31,7 @@ class XMLOperations():
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
         block_count = 0
+        err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             root = ET.fromstring(str(input_string))
@@ -46,15 +47,16 @@ class XMLOperations():
                 status = TEST_RESULT_PASS
                 methodoutput = TEST_RESULT_TRUE
         except Exception as e:
+            log.error(e)
             if isinstance(e,ET.ParseError):
-                logger.print_on_console('Invalid tag/missing tag/blockcount in XML input')
-                log.error('Invalid tag/missing tag/blockcount in XML input')
+                err_msg=ERR_XML
             else:
-                logger.print_on_console(EXCEPTION_OCCURED,e)
-                log.error(EXCEPTION_OCCURED)
-                log.error(e)
+                err_msg=EXCEPTION_OCCURED
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
-        return status,methodoutput,block_count
+        return status,methodoutput,block_count,err_msg
 
     def get_tag_value(self,input_string,block_number,input_tag,child_tag):
         """
@@ -68,6 +70,7 @@ class XMLOperations():
         methodoutput = TEST_RESULT_FALSE
         block_count = 0
         invalidinput = False
+        err_msg=None
         tagvalue = ''
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
@@ -86,7 +89,7 @@ class XMLOperations():
                     if child.tag == str(child_tag):
                         log.info('Child mathed with the input child tag')
                         tagvalue =  child.text
-                        logger.print_on_console('Tag : ',input_tag, '       Tag Value : ',tagvalue)
+                        logger.print_on_console('Tag : ',input_tag, 'Tag Value : ',tagvalue)
                         log.info('Got the child text value and stored in tagvalue')
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                         status = TEST_RESULT_PASS
@@ -94,21 +97,22 @@ class XMLOperations():
                     else:
                         invalidinput = True
                 if status == TEST_RESULT_FAIL:
+                    err
                     log.info(INVALID_INPUT + 'Please check the input tag')
                     logger.print_on_console(INVALID_INPUT , 'Please check the input tag')
         except Exception as e:
+            log.error(e)
             if isinstance(e,ValueError):
-                log.error("Block number should be a number")
-                logger.print_on_console("Block number should be a number")
+                err_msg=ERR_XML_BLOCK
             elif isinstance(e,ET.ParseError):
-                logger.print_on_console('Invalid tag/missing tag/blockcount in XML input')
-                log.error('Invalid tag/missing tag/blockcount in XML input')
+                err_msg=ERR_XML
             else:
-                log.error(EXCEPTION_OCCURED)
-                log.error(e)
-                logger.print_on_console(EXCEPTION_OCCURED,e)
+                err_msg=EXCEPTION_OCCURED
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
-        return status,methodoutput,tagvalue
+        return status,methodoutput,tagvalue,err_msg
 
     def get_block_value(self,input_string,block_number,input_tag):
         """
@@ -122,6 +126,7 @@ class XMLOperations():
         methodoutput = TEST_RESULT_FALSE
         block_count = 0
         blockvalue = []
+        err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             root = ET.fromstring(str(input_string))
@@ -144,18 +149,18 @@ class XMLOperations():
                 if status == TEST_RESULT_FAIL:
                     log.info(INVALID_INPUT + ' Please check the input tag' )
         except Exception as e:
+            log.error(e)
             if isinstance(e,ValueError):
-                log.error("Block number should be a number")
-                logger.print_on_console("Block number should be a number")
+                err_msg=ERR_XML_BLOCK
             elif isinstance(e,ET.ParseError):
-                logger.print_on_console('Invalid tag/missing tag/blockcount in XML input')
-                log.error('Invalid tag/missing tag/blockcount in XML input')
+                err_msg=ERR_XML
             else:
-                log.error(EXCEPTION_OCCURED)
-                log.error(e)
-                logger.print_on_console(EXCEPTION_OCCURED,e)
+                err_msg=EXCEPTION_OCCURED
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
-        return status,methodoutput,blockvalue
+        return status,methodoutput,blockvalue,err_msg
 
     def verifyObjects(self,object_string1,object_string2):
         """
@@ -167,6 +172,8 @@ class XMLOperations():
         """
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg=None
         try:
             #Make sure params are strings
             log.debug('Conver xml param to string')
@@ -206,15 +213,15 @@ class XMLOperations():
                 status = TEST_RESULT_PASS
                 methodoutput = TEST_RESULT_TRUE
             else:
-                logger.print_on_console('xml chunks are not equal')
-                log.info('xml chunks are not equal')
-
+                err_msg='xml chunks are not equal'
         except Exception as e:
-            log.error(EXCEPTION_OCCURED)
+            err_msg=EXCEPTION_OCCURED
             log.error(e)
-            logger.print_on_console(EXCEPTION_OCCURED,e)
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
 
 ##if __name__ == '__main__':
