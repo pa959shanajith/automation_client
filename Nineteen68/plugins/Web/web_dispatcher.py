@@ -71,6 +71,8 @@ class Dispatcher:
 
                     'selectValueByIndex':['dropdown','listbox'],
                     'selectValueByText': ['dropdown','listbox'],
+                    'getAllValues':['dropdown','listbox'],
+                    'verifyAllValues': ['dropdown','listbox'],
 
                     'setText': ['textbox','textarea','password','number','email','url'],
                     'sendValue':['textbox','textarea','password','number','email','url'],
