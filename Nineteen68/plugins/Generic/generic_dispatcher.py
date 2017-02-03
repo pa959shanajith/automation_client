@@ -47,6 +47,15 @@ class GenericKeywordDispatcher:
     util_operation_obj=util_operations.UtilOperations()
     dyn_var_obj=dynamic_variable.DynamicVariables()
 
+	#Call to fetch data in database keywords
+    def fetch_data(self,input):
+        output=None
+        try:
+            output=self.generic_database.fetchData(input)
+        except Exception as e:
+            log.error(e)
+        return output
+
     def dispatcher(self,tsp,*message):
          keyword=tsp.name
          logger.print_on_console('Keyword is '+keyword)
