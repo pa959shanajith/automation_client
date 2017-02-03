@@ -11,7 +11,7 @@ import threading
 from values_from_ui import *
 log = logging.getLogger('clientwindow.py')
 from socketIO_client import SocketIO,BaseNamespace
-i = 0
+i = 0 
 wxObject = None
 browsername = None
 class MainNamespace(BaseNamespace):
@@ -486,7 +486,7 @@ class ClientWindow(wx.Frame):
             log.info('Closing the socket')
             socketIO.disconnect()
             log.info(socketIO)
-            self.new.Close()
+##            self.new.Close()
         self.Close()
 
 
@@ -569,7 +569,7 @@ class ClientWindow(wx.Frame):
         import Nineteen68_WebScrape
         global socketIO
         self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO)
-        self.new.Show()
+##        self.new.Show()
 
 
 
