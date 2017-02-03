@@ -512,6 +512,9 @@ class ClientWindow(wx.Frame):
     def OnContinue(self, event):
         logger.print_on_console('Event Triggered to Resume')
         log.info('Event Triggered to Resume')
+        self.resume()
+
+    def resume(self):
         controller.pause_flag=False
         self.mythread.resume()
         self.continuebutton.Hide()
@@ -520,7 +523,10 @@ class ClientWindow(wx.Frame):
     def OnTerminate(self, event):
         print '---------Termination Started-------'
         controller.terminate_flag=True
-
+        #Handling the case where user clicks terminate when the execution is paused
+        #Resume the execution
+        if controller.pause_flag:
+            self.resume()
 
 
     #----------------------------------------------------------------------

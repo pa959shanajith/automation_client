@@ -38,7 +38,7 @@ class Dropdown_Keywords():
                                 if object_xpath!=None and editable_text.verify_parent(object_xpath,parent):
                                     states=ldtp.getallstates(launch_keywords.window_name,object_xpath)
                                     if desktop_constants.ENABLED_CHECK in states:
-                                        select=ldtp.selectindex(launch_keywords.window_name,object_xpath, item_index-1)
+                                        select=ldtp.selectdropdownitem(launch_keywords.window_name,object_xpath, item_index)
                                         if select==1:
                                             status=desktop_constants.TEST_RESULT_PASS
                                             result=desktop_constants.TEST_RESULT_TRUE
