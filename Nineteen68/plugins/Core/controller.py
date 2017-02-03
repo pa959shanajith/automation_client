@@ -394,7 +394,8 @@ class Controller():
                 input_list.append(string)
 
         for x in input_list:
-            x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword)
+        #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
+            x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
             inpval.append(x)
 
         return inpval
@@ -404,16 +405,21 @@ class Controller():
         keyword_response=result[-2]
         if result[-2] == OUTPUT_CONSTANT:
             keyword_response=result[-3]
+        display_keyword_response=keyword_response
+		#To Handle dynamic variables of DB keywords
+        if tsp.name.lower() in DATABASE_KEYWORDS:
+            if keyword_response != []:
+                display_keyword_response='DB data fetched'
 
-        logger.print_on_console('Result obtained is ',keyword_response)
+        logger.print_on_console('Result obtained is ',display_keyword_response)
         log.info('Result obtained is: ')
-        log.info(keyword_response)
+        log.info(display_keyword_response)
 
         if len(output)>0 and output[0] != '':
-            self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response)
+            self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response,tsp.name)
 
         if len(output)>1:
-            self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1])
+            self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
     def keywordinvocation(self,index,inpval,*args):
         import time
@@ -446,7 +452,8 @@ class Controller():
                     teststepproperty.custom_flag=True
                     teststepproperty.parent_xpath=self.previous_step.objectname
                     teststepproperty.url=self.previous_step.url
-            elif keyword==VERIFY_EXISTS and self.verify_exists:
+            #Fixed OEBS custom reference defect #398
+            elif keyword in [VERIFY_EXISTS,VERIFY_VISIBLE] and self.verify_exists:
                 self.verify_exists=False
 
             #Checking of  Drag and Drop keyowrds Issue #115 in Git
@@ -884,32 +891,32 @@ def kill_process():
 #main method
 if __name__ == '__main__':
     kill_process()
-##    #To debug from main method
-##    obj = handler.Handler()
-##    obj1=Controller()
-##    obj1.get_all_the_imports(CORE)
-##    print 'Controller object created'
-##    t = test_debug.Test()
-##    list_data,flag = t.gettsplist()
-##    for d in list_data:
-##            flag=obj.parse_json(d)
-##            if flag == False:
-##                break
-##            print '\n'
-##            tsplist = obj.read_step()
-##            for k in range(len(tsplist)):
-##                if tsplist[k].name.lower() == 'openbrowser':
-##                    tsplist[k].inputval = browsers
-##    if flag:
-##            status = obj1.executor(tsplist,DEBUG)
-##
-##    else:
-##        print 'Invalid script'
+    #To debug from main method
+    obj = handler.Handler()
+    obj1=Controller()
+    obj1.get_all_the_imports(CORE)
+    print 'Controller object created'
+    t = test_debug.Test()
+    list_data,flag = t.gettsplist()
+    for d in list_data:
+            flag=obj.parse_json(d)
+            if flag == False:
+                break
+            print '\n'
+            tsplist = obj.read_step()
+            for k in range(len(tsplist)):
+                if tsplist[k].name.lower() == 'openbrowser':
+                    tsplist[k].inputval = browsers
+    if flag:
+            status = obj1.executor(tsplist,DEBUG)
 
-    #To execute from main method
-    obj=Controller()
-    obj.invoke_execution(0,None,'3')
-    kill_process()
+    else:
+        print 'Invalid script'
+
+##    #To execute from main method
+##    obj=Controller()
+##    obj.invoke_execution(0,None,'3')
+##    kill_process()
 
 
 

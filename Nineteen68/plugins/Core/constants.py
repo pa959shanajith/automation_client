@@ -366,4 +366,10 @@ USER_TERMINATION='Terminated by the user'
 
 PROGRAM_TERMINATION='Terminated'
 
+DATABASE_KEYWORDS=['getdata','securegetdata']
+
+DB_VAR='ret_riever'
+
+
+
 

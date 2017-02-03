@@ -106,8 +106,9 @@ class Handler():
             json_data=new_obj[0]
         ws_template=json_data['template']
         testcase=json_data['testcase']
-
-        comments=testcase[len(testcase)-1]['comments']
+		#Checking if the testcase has key 'comments'
+        if testcase[len(testcase)-1].has_key('comments'):
+            comments=testcase[len(testcase)-1]['comments']
         testscript_name=json_data['testscript_name']
         flag=self.create_list(testcase,testscript_name)
         return flag
@@ -427,8 +428,10 @@ class Handler():
         return :
 
         """
-        #popping the comments key in testcase json before parsing
-        testcase.pop()
+        #popping the comments key in testcase json before parsing if it has
+        if testcase[len(testcase)-1].has_key('comments'):
+            testcase.pop()
+
         flag=self.parse_condition(testcase)
         for x in testcase:
             step=self.extract_field(x,tspIndex2,testscript_name)
@@ -480,19 +483,21 @@ class Handler():
         return :
 
         """
+        import dynamic_variable_handler
         del tspList[:]
         global tspIndex,tspIndex2,copy_for_keywords,for_keywords,copy_condition_keywords,condition_keywords,copy_getparam_keywords,getparam_keywords,for_info,if_info,get_param_info
         tspIndex=-1
         tspIndex2=-1
-        copy_for_keywords=OrderedDict()
-        for_keywords=OrderedDict()
-        copy_condition_keywords=OrderedDict()
-        condition_keywords=OrderedDict()
-        copy_getparam_keywords=OrderedDict()
-        getparam_keywords=OrderedDict()
-        for_info=OrderedDict()
-        if_info=OrderedDict()
-        get_param_info=OrderedDict()
+        copy_for_keywords.clear()
+        for_keywords.clear()
+        copy_condition_keywords.clear()
+        condition_keywords.clear()
+        copy_getparam_keywords.clear()
+        getparam_keywords.clear()
+        for_info.clear()
+        if_info.clear()
+        get_param_info.clear()
         ws_template=''
+        dynamic_variable_handler.dynamic_variable_map.clear()
         if con.oebs_dispatcher_obj != None:
             con.oebs_dispatcher_obj.clear_oebs_window_name()

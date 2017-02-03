@@ -18,17 +18,32 @@ dynamic_variable_map=OrderedDict()
 
 class DynamicVariables:
 
+	#TO ftech the value form Data base
+    def getDBdata(self,inp_value,con_obj):
+        res=False
+        dyn_value=None
+        variable=re.findall("\{(.*?)\[",inp_value)
+        if len(variable)>0 and variable[0] != '':
+            dbvalue=dynamic_variable_map[DB_VAR]
+            if dbvalue!=None and dbvalue[-1]=='{'+variable[0]+'}':
+                dbvalue[-1]=inp_value
+                dyn_value=con_obj.generic_dispatcher_obj.fetch_data(dbvalue)
+                res=True
+        return res,dyn_value
+
     #To replace the dynamic vraiable by it's actual value
-    def replace_dynamic_variable(self,input_var,keyword):
+    def replace_dynamic_variable(self,input_var,keyword,con_obj):
         actual_value=input_var
         if not(keyword in DYNAMIC_KEYWORDS):
-
             status,nested_var=self.check_dynamic_inside_dynamic(input_var)
             if status==TEST_RESULT_TRUE:
                 value=self.get_nestedDyn_value(nested_var,input_var)
                 actual_value=value
                 if self.check_for_dynamicvariables(value)==TEST_RESULT_TRUE:
                     actual_value=self.get_dynamic_value(value)
+                    if actual_value==None:
+                        db_result=self.getDBdata(value,con_obj)
+                        actual_value=db_result[1]
 
             elif self.check_for_dynamicvariables(input_var)==TEST_RESULT_TRUE:
                 var_list=re.findall("\{(.*?)\}",input_var)
@@ -46,11 +61,15 @@ class DynamicVariables:
 
 
      #To Store the output from keyword as an array if it is single value
-    def store_dynamic_value(self,output_var,output_value):
+    def store_dynamic_value(self,output_var,output_value,keyword):
 
         if self.check_for_dynamicvariables(output_var)==TEST_RESULT_TRUE:
             if isinstance(output_value,list):
-                self.store_as_array(output_var,output_value)
+                if not(keyword.lower() in DATABASE_KEYWORDS):
+                    self.store_as_array(output_var,output_value)
+                else:
+                    output_value.append(output_var)
+                    dynamic_variable_map[DB_VAR]=output_value
             else:
                 dynamic_variable_map[output_var]=output_value
 
