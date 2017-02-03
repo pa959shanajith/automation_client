@@ -57,7 +57,7 @@ class DatabaseOperation():
             log.error(e)
 
             logger.print_on_console(e)
-            err_msg = e
+            err_msg = str(e)
         finally:
             cursor.close()
             cnxn.close()
@@ -77,9 +77,9 @@ class DatabaseOperation():
             print status,result
         except Exceptions as e:
             log.error(e)
+            err_msg = str(e)
+            logger.print_on_console(err_msg)
 
-            logger.print_on_console(e)
-            err_msg = e
         return status,result,verb,err_msg
 
 
@@ -94,39 +94,80 @@ class DatabaseOperation():
         result=generic_constants.TEST_RESULT_FALSE
         value = None
         err_msg=None
+        details = []
+        cnxn=None
         try:
 ##            if len(args)>0 :
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
-            out_tuple = args
-            out_tuple=''.join(out_tuple)
-            import re
-            data = re.findall(r'\[([^]]*)\]',out_tuple)
-            row = data[0]
-            col = data[1]
-            row = int(row)
-            col = int(col)
-            cursor = cnxn.cursor()
-            cursor.execute(query)
-            rows = cursor.fetchall()
-            value = rows[row][col]
-            log.info('Value obtained :')
-            log.info(value)
+##            out_tuple = args
+##            out_tuple=''.join(out_tuple)
+##            import re
+##            data = re.findall(r'\[([^]]*)\]',out_tuple)
+##            row = data[0]
+##            col = data[1]
+##            row = int(row)
+##            col = int(col)
+##            cursor = cnxn.cursor()
+##            cursor.execute(query)
+##            rows = cursor.fetchall()
+##            value = rows[row][col]
+##            log.info('Value obtained :')
+##            log.info(value)
 ##            for row in rows:
 ##                logger.print_on_console(row)
-            status=generic_constants.TEST_RESULT_PASS
-            result=generic_constants.TEST_RESULT_TRUE
+            if cnxn is not None:
+                details.append(ip)
+                details.append(port)
+                details.append(userName)
+                details.append(password)
+                details.append(dbName)
+                details.append(query)
+                details.append(dbtype)
+                status=generic_constants.TEST_RESULT_PASS
+                result=generic_constants.TEST_RESULT_TRUE
 ##            else:
 ##                log.info('Output column missing required value')
 ##                logger.print_on_console('Output column missing required value')
 
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
-            err_msg = e
+            err_msg = 'Database Login failed'
+            logger.print_on_console(err_msg)
         finally:
-            cursor.close()
-            cnxn.close()
-            return status,result,value,err_msg
+##            cursor.close()
+            if cnxn!=None:
+                cnxn.close()
+        return status,result,details,err_msg
+
+    def fetchData(self,input_val,*args):
+        value = None
+        if(len(input_val)== 8):
+            try:
+                cnxn = self.connection(input_val[6], input_val[0] , input_val[1] , input_val[4], input_val[2] , input_val[3])
+                import re
+                data = re.findall(r'\[([^]]*)\]',input_val[7])
+                row = data[0]
+                col = data[1]
+                row = int(row)
+                col = int(col)
+                cursor = cnxn.cursor()
+                cursor.execute(input_val[5])
+                rows = cursor.fetchall()
+                value = rows[row][col]
+                log.info('Value obtained :')
+                log.info(value)
+            except Exception as e:
+                log.error(e)
+                err_msg = str(e)
+                logger.print_on_console(err_msg)
+                import traceback
+                traceback.print_exc()
+            finally:
+                cursor.close()
+                cnxn.close()
+            return value
+
+
 
     def secureGetData(self, ip , port , userName , password, dbName, query, dbtype,*args):
         """
@@ -142,9 +183,8 @@ class DatabaseOperation():
             status,result,value,err_msg=self.getData(ip,port,userName,decrypted_password,dbName,query,dbtype,temp)
         except Exceptions as e:
             log.error(e)
-
-            logger.print_on_console(e)
-            err_msg = e
+            err_msg = str(e)
+            logger.print_on_console(err_msg)
         return status,result,value,err_msg
 
     def verifyData(self, ip , port , userName , password, dbName, query, dbtype,inp_file,inp_sheet):
@@ -201,9 +241,8 @@ class DatabaseOperation():
                 logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
             log.error(e)
-
-            logger.print_on_console(e)
-            err_msg = e
+            err_msg = str(e)
+            logger.print_on_console(err_msg)
         finally:
             os.remove(file_path)
             cursor.close()
@@ -223,8 +262,8 @@ class DatabaseOperation():
             status,result,verb,err_msg=self.verifyData(ip,port,userName,decrypted_password,dbName, query, dbtype,inp_file,inp_sheet)
         except Exceptions as e:
             log.error(e)
-            logger.print_on_console(e)
-            err_msg = e
+            err_msg = str(e)
+            logger.print_on_console(err_msg)
         return status,result,verb,err_msg
 
     def exportData(self, ip , port , userName , password, dbName, query, dbtype, *args):
@@ -293,8 +332,8 @@ class DatabaseOperation():
                 logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
-            err_msg = e
+            err_msg = str(e)
+            logger.print_on_console(err_msg)
         finally:
             cursor.close()
             cnxn.close()
@@ -314,9 +353,8 @@ class DatabaseOperation():
             status,result,verb,err_msg=self.exportData(ip,port,userName,decrypted_password,dbName, query, dbtype, out_col)
         except Exceptions as e:
             log.error(e)
-
-            logger.print_on_console(e)
-            err_msg = e
+            err_msg = str(e)
+            logger.print_on_console(err_msg)
         return status,result,verb,err_msg
 
     def connection(self,dbtype, ip , port , dbName, userName , password):
@@ -327,15 +365,16 @@ class DatabaseOperation():
         return : connection object
         """
         dbNumber = {4:'{SQL Server}',5:'{Microdsoft ODBC for Oracle}',2:'{IBM DB2 ODBC DRIVER}'}
+        err_msg=None
         try:
             dbtype= int(dbtype)
             self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
             return self.cnxn
         except Exception as e:
             log.error(e)
+            err_msg = e.msg
+        return err_msg
 
-            logger.print_on_console(e)
-            err_msg = e
 
     def get_ext(self,input_path):
         """
@@ -353,8 +392,10 @@ class DatabaseOperation():
                 logger.print_on_console(generic_constants.INVALID_FILE_FORMAT)
             return file_ext
         except Exception as e:
-            Exceptions.error(e)
-            return '',status
+            log.error(e)
+            err_msg = str(e)
+            logger.print_on_console(err_msg)
+        return '',status
 
     def create_file(self):
         """
@@ -363,6 +404,7 @@ class DatabaseOperation():
         param :
         return : path
         """
+        path=None
         try:
            wb = xlwt.Workbook()
            ws = wb.add_sheet(generic_constants.DATABASE_SHEET)
@@ -371,12 +413,11 @@ class DatabaseOperation():
            path = maindir + '\Nineteen68\plugins\Generic' + generic_constants.DATABASE_FILE
 ##           path = 'D:\db5.xls'
            wb.save(path)
-           return path
         except Exception as e:
             log.error(e)
-
             logger.print_on_console(e)
             err_msg = e
+        return path
 
 
 ##obj = DatabaseOperation()
