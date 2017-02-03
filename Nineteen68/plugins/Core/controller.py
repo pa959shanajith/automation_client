@@ -708,7 +708,7 @@ class Controller():
 
 
     def invoke_execution(self,input_breakpoint,mythread,browser):
-
+        global terminate_flag
         obj = handler.Handler()
         t = test.Test()
         suites_list,flag = t.gettsplist()
@@ -718,20 +718,23 @@ class Controller():
         scenarios = scenario_num
         print 'No  of Suites : ',len(suites_list)
         j=1
+        #Iterate through the suites-list
         for suite in suites_list:
             #EXECUTION GOES HERE
             status = False
             flag=True
 
-            #Iterate through the suite
+            #Iterate through each suite
             if terminate_flag:
                 status=TERMINATE
+##                break
             log.info('---------------------------------------------------------------------')
             print( '=======================================================================================================')
             log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
             logger.print_on_console('***SUITE ', j ,' EXECUTION STARTED***')
             log.info('-----------------------------------------------')
             print( '=======================================================================================================')
+            #Iterate through each suite
             for i in range( len(suite)):
                 do_not_execute = False
                 #create a object of controller for each scenario
@@ -746,12 +749,17 @@ class Controller():
 
 
 
-                if (not do_not_execute) :
-                    print( '=======================================================================================================')
-                    logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
-                    print( '=======================================================================================================')
-                    log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
+                if not (do_not_execute) :
+                    #check for temrinate flag before printing loggers
+                    if not(terminate_flag):
+                        print( '=======================================================================================================')
+                        logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
+                        print( '=======================================================================================================')
+                        log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
                     for d in suite[i]:
+                        #check for temrinate flag before parsing tsp list
+                        if terminate_flag:
+                            break
                         flag=obj.parse_json(d)
                         if flag == False:
                             break
@@ -762,18 +770,21 @@ class Controller():
                                 tsplist[k].inputval = browser
 
                     if flag:
-                        con.action=EXECUTE
-                        con.conthread=mythread
-                        status = con.executor(tsplist,EXECUTE)
+                        #check for temrinate flag before execution
+                        if not(terminate_flag):
+                            con.action=EXECUTE
+                            con.conthread=mythread
+                            status = con.executor(tsplist,EXECUTE)
+                            print( '=======================================================================================================')
+                            logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
+                            print( '=======================================================================================================')
 
                     else:
                         print 'Invalid script'
-                    print( '=======================================================================================================')
-                    logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
-                    print( '=======================================================================================================')
-                    log.info('Saving the Report json of Scenario '+str((i  + 1 )))
-                    logger.print_on_console( '***Saving the Report json of Scenario ',(i  + 1 ),'***')
-                    log.info( '***Scenario' + str((i  + 1 )) +' execution completed***')
+##                    print( '=======================================================================================================')
+##                    logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
+##                    print( '=======================================================================================================')
+                    #Saving the report for the scenario
                     os.chdir(self.cur_dir)
                     filename='Scenario'+str(i  + 1)+'.json'
                     con.reporting_obj.save_report_json(filename)
@@ -783,8 +794,10 @@ class Controller():
                     logger.print_on_console( 'Scenario ' , (i + 1) ,' has been disabled for execution!!!')
                     log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
                     print( '=======================================================================================================')
-                #logic for condition check
-                report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+            #logic for condition check
+            report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+            #Check is made to fix issue #401
+            if len(report_json)>0:
                 overall_status=report_json[0]['overallstatus']
                 if(condition_check==True):
                     if(overall_status=='Pass'):
@@ -798,6 +811,10 @@ class Controller():
             log.info('-----------------------------------------------')
             print( '=======================================================================================================')
             j=j+1
+        if status==TERMINATE:
+            print( '=======================================================================================================')
+            logger.print_on_console( '***Terminating the Execution***')
+            print( '=======================================================================================================')
         return status
 
     def invoke_controller(self,action,input_breakpoint,mythread,*args):
@@ -867,32 +884,32 @@ def kill_process():
 #main method
 if __name__ == '__main__':
     kill_process()
-    #To debug from main method
-    obj = handler.Handler()
-    obj1=Controller()
-    obj1.get_all_the_imports(CORE)
-    print 'Controller object created'
-    t = test_debug.Test()
-    list_data,flag = t.gettsplist()
-    for d in list_data:
-            flag=obj.parse_json(d)
-            if flag == False:
-                break
-            print '\n'
-            tsplist = obj.read_step()
-            for k in range(len(tsplist)):
-                if tsplist[k].name.lower() == 'openbrowser':
-                    tsplist[k].inputval = browser
-    if flag:
-            status = obj1.executor(tsplist,DEBUG)
+##    #To debug from main method
+##    obj = handler.Handler()
+##    obj1=Controller()
+##    obj1.get_all_the_imports(CORE)
+##    print 'Controller object created'
+##    t = test_debug.Test()
+##    list_data,flag = t.gettsplist()
+##    for d in list_data:
+##            flag=obj.parse_json(d)
+##            if flag == False:
+##                break
+##            print '\n'
+##            tsplist = obj.read_step()
+##            for k in range(len(tsplist)):
+##                if tsplist[k].name.lower() == 'openbrowser':
+##                    tsplist[k].inputval = browsers
+##    if flag:
+##            status = obj1.executor(tsplist,DEBUG)
+##
+##    else:
+##        print 'Invalid script'
 
-    else:
-        print 'Invalid script'
-
-##    #To execute from main method
-##    obj=Controller()
-##    obj.invoke_execution(0,None,'3')
-##    kill_process()
+    #To execute from main method
+    obj=Controller()
+    obj.invoke_execution(0,None,'3')
+    kill_process()
 
 
 
