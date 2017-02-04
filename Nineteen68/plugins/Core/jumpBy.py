@@ -49,23 +49,32 @@ class  JumpBy():
             jumpByStepNum=-1
 
             log.debug('Finding out the step number to jump')
+            scenario=None
             if (stepToJump > 0) :
                 jumpByStepNum = index + 1+ stepToJump
+                scenario='positive'
             elif (stepToJump==0):
                 logger.print_on_console('ERR_JUMPBY_CAN''T_BE_0')
                 log.error('ERR_JUMPBY_CAN''T_BE_0')
             else:
-				jumpByStepNum = index - 1+ stepToJump
+                scenario='negative'
+                jumpByStepNum = index - 1+ stepToJump
+
 
 
             if jumpByStepNum<0:
+
                 logger.print_on_console('JumpTo for negitive step  number is not allowed')
                 log.error('JumpTo for negitive step  number is not allowed')
                 jumpByStepNum=-1
 
-            elif jumpByStepNum<len(tspList):
-                flag=self.__validate_jumpbystep(jumpByStepNum)
-                self.status=True
+            if jumpByStepNum<len(tspList):
+                flag,error=self.__validate_jumpbystep(jumpByStepNum,scenario)
+                if(flag):
+                    self.status=True
+                else:
+                    logger.print_on_console(error)
+                    jumpByStepNum=TERMINATE
 
             else:
                 jumpByStepNum=-1
@@ -80,6 +89,16 @@ class  JumpBy():
         #Reporting part
         self.step_description='JumpBy executed and the result is '+str(self.status)
         logger.print_on_console('JumpBy executed and the result is '+str(self.status))
+        log.info('JumpBy executed and the result is '+str(self.status))
+        self.parent_id=reporting_obj.get_pid()
+        reporting_obj.name=self.name
+        #Reporting part ends
+        return jumpByStepNum
+
+
+        #Reporting part
+        self.step_description='JumpBy executed and the result is '+str(self.status)
+        logger.print_on_console('JumpBy executed and the result is '+str(self.status))
         log.info('JumpBy executed and the result is '+self.status)
         self.parent_id=reporting_obj.get_pid()
         reporting_obj.name=self.name
@@ -87,10 +106,21 @@ class  JumpBy():
         return jumpByStepNum
 
 
-    def __validate_jumpbystep(self,input):
+    def __validate_jumpbystep(self,jumpByStepNum,scenario):
+
+        invalid_keyword_list=[STARTLOOP,ELSE_IF,ELSE]
         import handler
-        condition_list= handler.condition_keywords.keys()
+        condition_list= handler.copy_condition_keywords.keys()
         number=min(condition_list, key=lambda x:abs(x-self.index))
+        if scenario=='positive':
+            if jumpByStepNum>number:
+                return False,'Invalid Jump In If'
+        if scenario=='negative':
+            if jumpByStepNum<number:
+                return False,'Invalid Jump In If'
+        elif handler.tspList[jumpByStepNum].name.lower()==STARTLOOP:
+                return False, 'Jump By The given step is not allowed'
+        return True,''
 
 
 

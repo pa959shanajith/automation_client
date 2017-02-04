@@ -113,10 +113,10 @@ class ElementKeywords:
         if webelement is not None:
             try:
                 if webelement.is_enabled():
-                    log.info(ERROR_CODE_DICT['MSB_OBJECT_ENABLED'])
+                    log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
                     click_obj=ButtonLinkKeyword()
                     log.debug('ButtonLinkKeyword object created to call the click method')
-                    status,methodoutput=click_obj.click(webelement)
+                    status,methodoutput,err_msg,output=click_obj.click(webelement)
                     log.info(STATUS_METHODOUTPUT_UPDATE)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
