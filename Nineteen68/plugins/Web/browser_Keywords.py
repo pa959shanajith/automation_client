@@ -408,6 +408,8 @@ class BrowserKeywords():
                     log.info(cookies_list)
                     #delete_all_cookies()
                     driver_obj.delete_all_cookies()
+                    status=webconstants.TEST_RESULT_PASS
+                    result=webconstants.TEST_RESULT_TRUE
 
                 else:
                     logger.print_on_console('No Cookies found')
