@@ -11,7 +11,7 @@ import threading
 from values_from_ui import *
 log = logging.getLogger('clientwindow.py')
 from socketIO_client import SocketIO,BaseNamespace
-i = 0 
+i = 0
 wxObject = None
 browsername = None
 class MainNamespace(BaseNamespace):
@@ -19,44 +19,44 @@ class MainNamespace(BaseNamespace):
 ##        print args
 ##        print(args)
         if str(args[0]) == 'OPEN BROWSER CH':
-            print args[0]
+##            print args[0]
 
             global wxObject
-            print wxObject
+##            print wxObject
             global browsername
             browsername = 'CH'
-            print 'Browser name : ',browsername
+##            print 'Browser name : ',browsername
 ##            wxObject.test()
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
             time.sleep(5)
-            print 'Importing done'
+##            print 'Importing done'
         elif str(args[0]) == 'OPEN BROWSER IE':
-            print args[0]
+##            print args[0]
 
             global wxObject
-            print wxObject
+##            print wxObject
             global browsername
             browsername = 'IE'
-            print 'Browser name : ',browsername
+##            print 'Browser name : ',browsername
 ##            wxObject.test()
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
             time.sleep(5)
-            print 'Importing done'
+##            print 'Importing done'
         elif str(args[0]) == 'OPEN BROWSER FX':
-            print args[0]
+##            print args[0]
 
             global wxObject
-            print wxObject
+##            print wxObject
             global browsername
             browsername = 'FX'
-            print 'Browser name : ',browsername
+##            print 'Browser name : ',browsername
 ##            wxObject.test()
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
             time.sleep(5)
-            print 'Importing done'
+##            print 'Importing done'
 
         elif(str(args[0]) == 'connected'):
             print('Connection to the Node Server established')
@@ -81,12 +81,12 @@ class MainNamespace(BaseNamespace):
 
 
     def on_emit(self, *args):
-        print 'aaa', args[0]
+##        print 'aaa', args[0]
         if str(args[0]) == 'connected':
             print 'Connected'
 
     def on_focus(self, *args):
-        print 'in focus------------aaa', args[0]
+##        print 'in focus------------aaa', args[0]
         import highlight
         light =highlight.Highlight()
         res = light.highlight(args[0],None,None)
@@ -119,7 +119,7 @@ class SocketThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO
-        socketIO = SocketIO('10.41.31.29',3000,MainNamespace)
+        socketIO = SocketIO('10.41.31.41',3000,MainNamespace)
 
         ##socketIO = SocketIO('localhost',8124)
 ##        socketIO.send('I am ready to process the request')
@@ -561,7 +561,7 @@ class ClientWindow(wx.Frame):
         self.connectbutton.Disable()
 
     def test(self,event):
-        print 'Self',self
+##        print 'Self',self
         global browsername
         print 'Browser name : ',browsername
         con = controller.Controller()
