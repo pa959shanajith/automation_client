@@ -23,7 +23,7 @@ log = logging.getLogger('clickandadd.py')
 currenthandle = ''
 status = domconstants.STATUS_FAIL
 vie = {}
-data = []
+data = {}
 class Clickandadd():
     def startclickandadd(self):
         try:
@@ -216,15 +216,19 @@ class Clickandadd():
             callback_stopclicknadd2('', tempne_stopclicknadd)
             log.info('stopclickandadd operation on frame/iframe pages is completed')
             driver.switch_to.window(currenthandle)
-            global vie
-            vie = {'view': tempne_stopclicknadd}
-            global data
-            data.append(vie)
+##            global vie
+##            vie = {'view': tempne_stopclicknadd}
             screen = driver.get_screenshot_as_base64()
-            screenshot = {'mirror':screen}
-            scrapetype = {'scrapetype' : 'cna'}
-            data.append(screenshot)
-            data.append(scrapetype)
+            global data
+            data['view'] = tempne_stopclicknadd
+            data['mirror'] = screen
+            data['scrapetype'] = 'cna'
+##            data.append(vie)
+##            screen = driver.get_screenshot_as_base64()
+##            screenshot = {'mirror':screen}
+##            scrapetype = {'scrapetype' : 'cna'}
+##            data.append(screenshot)
+##            data.append(scrapetype)
             log.info('Creating a json object with key vie with value as return data')
             with open('domelements.json', 'w') as outfile:
                 log.info('Opening domelements.json file to write vie object')

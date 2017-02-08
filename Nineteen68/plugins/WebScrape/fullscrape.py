@@ -23,7 +23,7 @@ log = logging.getLogger('fullscrape.py')
 currenthandle = ''
 status = domconstants.STATUS_FAIL
 vie = {}
-data = []
+data = {}
 class Fullscrape():
     def fullscrape(self):
         try:
@@ -135,15 +135,24 @@ class Fullscrape():
             tempne = json.loads(tempne)
             log.info('json opertions dumps and loads are performed on the return data')
 ##            win32gui.ShowWindow(hwndg, win32con.SW_MINIMIZE)
-            global vie
-            vie = {"view": tempne}
+##            global vie
+##            vie = {"view": tempne}
             global data
-            data.append(vie)
+##            data.append(vie)
             screen = driver.get_screenshot_as_base64()
-            screenshot = {'mirror':screen}
-            scrapetype = {'scrapetype' : 'fs'}
-            data.append(screenshot)
-            data.append(scrapetype)
+##            screenshot = {'mirror':screen}
+##            scrapetype = {'scrapetype' : 'fs'}
+##            data['view'] = []
+##            data['mirror'] = ''
+##            data['scrapetype'] = ''
+
+            data['view'] = tempne
+            data['mirror'] = screen
+            data['scrapetype'] = 'fs'
+
+##            print 'Data created'
+##            data.append(screenshot)
+##            data.append(scrapetype)
             log.info('Creating a json object with key vie with value as return data')
             with open('domelements.json', 'w') as outfile:
                 log.info('Opening domelements.json file to write vie object')
