@@ -15,7 +15,7 @@ import constants
 log = logging.getLogger('teststepproperty.py')
 class TestStepProperty():
 
-    def __init__(self,name,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo):
+    def __init__(self,name,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,testcase_num):
         self.name=name
         self.index=index
         self.apptype=apptype
@@ -31,6 +31,7 @@ class TestStepProperty():
         self.custom_flag=False
         self.execute_flag=True
         self.keyword_status=constants.TEST_RESULT_FAIL
+        self.testcase_num=testcase_num
 
     def print_step(self):
         log.info(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+self.apptype)
