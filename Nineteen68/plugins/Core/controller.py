@@ -100,11 +100,6 @@ class Controller():
         self.get_all_the_imports(CORE)
         self.__load_generic()
         self.cur_dir= os.getcwd()
-##        self.__load_web()
-##        self.__load_webservice()
-##        self.__load_oebs()
-##        self.__load_outlook()
-##        self.__load_desktop()
         self.previous_step=''
         self.verify_dict={'web':VERIFY_EXISTS,
         'desktopjava':VERIFY_VISIBLE}
@@ -269,7 +264,7 @@ class Controller():
         log.debug('Wait is sover')
 
 
-    def methodinvocation(self,index,*args):
+    def methodinvocation(self,index,debug_mode,last_tc_num,*args):
 
         global pause_flag
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
@@ -279,6 +274,11 @@ class Controller():
         if break_point != -1 and break_point== tsp.stepnum:
             if self.action==DEBUG:
                 pause_flag=True
+
+        if debug_mode and tsp.testcase_num==last_tc_num:
+            pause_flag=True
+
+
 
         keyword_flag=True
         #Check for 'terminate_flag' before execution
@@ -565,12 +565,9 @@ class Controller():
             return index,TERMINATE
 
 
-    def executor(self,tsplist,action):
-
-        i = 0
-
+    def executor(self,tsplist,action,debug_mode,last_tc_num,debugfrom_step):
+        i=0
         status=True
-
         self.scenario_start_time=datetime.now()
         start_time_string=self.scenario_start_time.strftime(TIME_FORMAT)
         logger.print_on_console('Scenario Execution start time is : '+start_time_string,'\n')
@@ -578,6 +575,19 @@ class Controller():
 
         while (i < len(tsplist)):
             tsp = tsplist[i]
+            try:
+                debugfrom_step = int(debugfrom_step)
+            except ValueError as e:
+                debugfrom_step=0
+
+
+            if last_tc_num==1 and debugfrom_step>0:
+                if tsp.stepnum!=debugfrom_step:
+                    continue
+                i=debugfrom_step
+
+
+
             #Check for 'terminate_flag' before execution
             if not(terminate_flag):
                 #Check for 'pause_flag' before execution
@@ -585,7 +595,7 @@ class Controller():
                     self.pause_execution()
 
                 try:
-                    i = self.methodinvocation(i)
+                    i = self.methodinvocation(i,debug_mode,last_tc_num)
                     if i== TERMINATE:
                         #Changing the overallstatus of the report_obj to Terminate - (Sushma)
                         self.reporting_obj.overallstatus=TERMINATE
@@ -666,6 +676,7 @@ class Controller():
         os.chdir('..')
         curdir = os.getcwd()
         path= curdir + '//Nineteen68//plugins//'+plugin_path
+##        path = 'D:\Git\Nineteen68_Websrape_Integration\Nineteen68\plugins\\' + plugin_path
         sys.path.append(path)
         for root, dirs, files in os.walk(path):
             for d in dirs:
@@ -673,45 +684,61 @@ class Controller():
                 sys.path.append(p)
         os.chdir(maindir)
 
-    def invoke_debug(self,input_breakpoint,mythread,browser):
+    def invoke_debug(self,mythread,debug_mode,runfrom_step,json_data):
+        status=COMPLETED
         global break_point
         obj = handler.Handler()
         self.action=DEBUG
         handler.tspList=[]
-        t = test_debug.Test()
-        scenario,flag = t.gettsplist()
-        if flag:
-            try:
-                input_breakpoint=int(input_breakpoint)
-                if input_breakpoint >0:
-##                    break_point=input_breakpoint-1
-                    break_point=input_breakpoint
-                    logger.print_on_console('***Break_point is ***',input_breakpoint)
-            except Exception as e:
-                logger.print_on_console(e)
-                logger.print_on_console('Invalid breakpoint number')
+        #______reading from file
+##        t = test_debug.Test()
+##        scenario,flag = t.gettsplist()
+##        flag=True
+##        scenario1=json_data
+        #______reading from file
+
+        scenario=[json_data]
+
+
+
+##        if flag:
+        try:
+            input_breakpoint=int(input_breakpoint)
+            if input_breakpoint >0:
+                break_point=input_breakpoint
+                logger.print_on_console('***Break_point is ***',input_breakpoint)
+        except Exception as e:
+##                import traceback
+##                traceback.print_exc()
+            log.error(e)
+            logger.print_on_console('Invalid breakpoint number')
         print( '=======================================================================================================')
         log.info('***DEBUG STARTED***')
         logger.print_on_console('***DEBUG STARTED***')
+        print( '=======================================================================================================')
         for d in scenario:
-            flag=obj.parse_json(d)
+            flag,browser_type,last_tc_num=obj.parse_json(d)
+            print '===============browser_type==========',browser_type
             if flag == False:
                 break
             print '\n'
             tsplist = obj.read_step()
             for k in range(len(tsplist)):
                 if tsplist[k].name.lower() == 'openbrowser':
-                    tsplist[k].inputval = browser
+                    tsplist[k].inputval = browser_type
 
         if flag:
             self.conthread=mythread
-            status = self.executor(tsplist,DEBUG)
+            logger.print_on_console('Before calling executor ',debug_mode)
+            status = self.executor(tsplist,DEBUG,debug_mode,last_tc_num,runfrom_step)
 
         else:
             print 'Invalid script'
         print( '=======================================================================================================')
         log.info('***DEBUG COMPLETED***')
         logger.print_on_console('***DEBUG COMEPLETED***')
+        print( '=======================================================================================================')
+        return status
 
 
     def invoke_execution(self,input_breakpoint,mythread,browser):
@@ -767,7 +794,7 @@ class Controller():
                         #check for temrinate flag before parsing tsp list
                         if terminate_flag:
                             break
-                        flag=obj.parse_json(d)
+                        flag,browser,last_tc_num=obj.parse_json(d)
                         if flag == False:
                             break
                         print '\n'
@@ -781,7 +808,7 @@ class Controller():
                         if not(terminate_flag):
                             con.action=EXECUTE
                             con.conthread=mythread
-                            status = con.executor(tsplist,EXECUTE)
+                            status = con.executor(tsplist,EXECUTE,False,last_tc_num)
                             print( '=======================================================================================================')
                             logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
                             print( '=======================================================================================================')
@@ -824,8 +851,8 @@ class Controller():
             print( '=======================================================================================================')
         return status
 
-    def invoke_controller(self,action,input_breakpoint,mythread,*args):
-        status = False
+    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,*args):
+        status = COMPLETED
         global terminate_flag,break_point,pause_flag
         self.conthread=mythread
         self.clear_data()
@@ -839,7 +866,11 @@ class Controller():
                     if status==TERMINATE:
                         break
         elif action.lower()==DEBUG:
-            self.invoke_debug(input_breakpoint,mythread,unicode(browsers[0]))
+            status=self.invoke_debug(mythread,debug_mode,runfrom_step,json_data)
+        if status != TERMINATE:
+            status=COMPLETED
+        return status
+
 
     def invoke_parralel_exe(self,action,input_breakpoint,mythread):
         #create a ThreadPoolExecutor to perform parallel execution
@@ -899,19 +930,20 @@ if __name__ == '__main__':
     t = test_debug.Test()
     list_data,flag = t.gettsplist()
     for d in list_data:
-            flag=obj.parse_json(d)
-            if flag == False:
-                break
-            print '\n'
-            tsplist = obj.read_step()
-            for k in range(len(tsplist)):
-                if tsplist[k].name.lower() == 'openbrowser':
-                    tsplist[k].inputval = browsers
-    if flag:
-            status = obj1.executor(tsplist,DEBUG)
+        flag,browsers,last_num=obj.parse_json(d)
+        if flag == False:
+            break
+        print '\n'
+        tsplist = obj.read_step()
+        for k in range(len(tsplist)):
+            if tsplist[k].name.lower() == 'openbrowser':
+                tsplist[k].inputval = browsers
+        if flag:
+            debugfrom_step=2
+            status = obj1.executor(tsplist,DEBUG,False,last_num,debugfrom_step)
 
-    else:
-        print 'Invalid script'
+        else:
+            print 'Invalid script'
 
 ##    #To execute from main method
 ##    obj=Controller()
