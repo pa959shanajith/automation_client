@@ -354,6 +354,8 @@ EXECUTE='execute'
 
 DEBUG='debug'
 
+STEP_BY_SETP_DEBUG='step_debug'
+
 CORE='Core'
 
 INVALID_KEYWORD='Invalid Keyword'
@@ -370,6 +372,7 @@ DATABASE_KEYWORDS=['getdata','securegetdata']
 
 DB_VAR='ret_riever'
 
+COMPLETED='success'
 
 
 

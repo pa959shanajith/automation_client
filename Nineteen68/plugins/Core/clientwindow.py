@@ -6,6 +6,7 @@ import time
 from constants import *
 import logging
 import logging.config
+
 import logger
 import threading
 from values_from_ui import *
@@ -16,14 +17,20 @@ wxObject = None
 browsername = None
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
+##        print 'Inside debugTestCase method'
+##        print '------------------',args
+        global action,wxObject,browsername
+##        self.action=DEBUG
+##        global wxObject
+##        mythread = TestThread(wxObject,self.action)
 ##        print args
 ##        print(args)
         if str(args[0]) == 'OPEN BROWSER CH':
 ##            print args[0]
 
-            global wxObject
+##            global wxObject
 ##            print wxObject
-            global browsername
+##            global browsername
             browsername = 'CH'
 ##            print 'Browser name : ',browsername
 ##            wxObject.test()
@@ -34,9 +41,9 @@ class MainNamespace(BaseNamespace):
         elif str(args[0]) == 'OPEN BROWSER IE':
 ##            print args[0]
 
-            global wxObject
+##            global wxObject
 ##            print wxObject
-            global browsername
+##            global browsername
             browsername = 'IE'
 ##            print 'Browser name : ',browsername
 ##            wxObject.test()
@@ -47,19 +54,25 @@ class MainNamespace(BaseNamespace):
         elif str(args[0]) == 'OPEN BROWSER FX':
 ##            print args[0]
 
-            global wxObject
+##            global wxObject
 ##            print wxObject
-            global browsername
+
             browsername = 'FX'
 ##            print 'Browser name : ',browsername
 ##            wxObject.test()
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
             time.sleep(5)
-##            print 'Importing done'
+            print 'Importing done'
+        elif str(args[0]) == 'debugTestCase':
+            print 'on_debugTestCase',args
+            self.mythread = TestThread(wxObject,DEBUG,args[1])
 
-        elif(str(args[0]) == 'connected'):
+
+
+        if(str(args[0]) == 'connected'):
             print('Connection to the Node Server established')
+
 
 ##        elif (str(args[0]) == 'killbrowser'):
 ##            global wxObject
@@ -81,21 +94,50 @@ class MainNamespace(BaseNamespace):
 
 
     def on_emit(self, *args):
-##        print 'aaa', args[0]
+        print 'aaa', args[0]
         if str(args[0]) == 'connected':
             print 'Connected'
 
     def on_focus(self, *args):
-##        print 'in focus------------aaa', args[0]
+        print 'in focus------------aaa', args[0]
+        print '++++++++++++++++++',args
         import highlight
         light =highlight.Highlight()
         res = light.highlight(args[0],None,None)
         print 'Highlight result: ',res
 
+    def on_debugTestCase(self, *args):
+        print '------------------on_emit'
+        global wxObject
+        self.mythread = TestThread(wxObject,DEBUG,args[0])
+##        self.socketIO.send(d)
 
 
 
 
+
+    #----------------------------------------------------------------------
+    def __init__(self,wxObject):
+        """Init Worker Thread Class."""
+        threading.Thread.__init__(self)
+        self.wxobject = wxObject
+        self.start()
+
+
+
+
+    #----------------------------------------------------------------------
+    def run(self):
+        """Run Worker Thread."""
+        # This is the code executing in the new thread.
+        global socketIO
+        socketIO = SocketIO('10.41.31.41',3000,MainNamespace)
+
+        ##socketIO = SocketIO('localhost',8124)
+##        socketIO.send('I am ready to process the request')
+        socketIO.emit('news')
+        socketIO.emit('focus')
+        socketIO.wait()
 
 
 
@@ -119,12 +161,13 @@ class SocketThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO
-        socketIO = SocketIO('10.41.31.41',3000,MainNamespace)
+        socketIO = SocketIO('10.41.31.5',3000,MainNamespace)
 
         ##socketIO = SocketIO('localhost',8124)
 ##        socketIO.send('I am ready to process the request')
         socketIO.emit('news')
         socketIO.emit('focus')
+        socketIO.emit('debugTestCase')
         socketIO.wait()
 
 
@@ -155,6 +198,7 @@ class Parallel(threading.Thread):
 
     #----------------------------------------------------------------------
     def run(self):
+        global socketIO
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         try:
@@ -173,6 +217,7 @@ class Parallel(threading.Thread):
             value= self.wxObject.breakpoint.GetValue()
 
             status = self.con.invoke_parralel_exe(EXECUTE,value,self)
+
             if status==TERMINATE:
                 print '---------Termination Completed-------'
 
@@ -182,6 +227,7 @@ class Parallel(threading.Thread):
             self.wxObject.debugbutton.Enable()
             self.wxObject.executebutton.Enable()
             self.wxObject.cancelbutton.Enable()
+            socketIO.emit('debugTestCase',status)
 ##
         except Exception as m:
             print m
@@ -194,7 +240,7 @@ class TestThread(threading.Thread):
     """Test Worker Thread Class."""
 
     #----------------------------------------------------------------------
-    def __init__(self,wxObject,action):
+    def __init__(self,wxObject,action,json_data):
         """Init Worker Thread Class."""
         threading.Thread.__init__(self)
         self.wxObject = wxObject
@@ -209,6 +255,7 @@ class TestThread(threading.Thread):
         self.pause_cond = threading.Condition(threading.Lock())
         self.con=''
         self.action=action
+        self.json_data=json_data
         self.start()    # start the thread
 
 
@@ -222,6 +269,7 @@ class TestThread(threading.Thread):
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
+        global socketIO
         try:
             self.wxObject.executebutton.Disable()
             self.wxObject.debugbutton.Disable()
@@ -237,25 +285,22 @@ class TestThread(threading.Thread):
             controller.kill_process()
             self.con = controller.Controller()
             value= self.wxObject.breakpoint.GetValue()
+            debug_mode=False
+            runfrom_step=0
+            status = self.con.invoke_controller(self.action,self,debug_mode,runfrom_step,self.json_data)
+            logger.print_on_console('Execution status',status)
 
-
-            status = self.con.invoke_controller(self.action,value,self)
             if status==TERMINATE:
-                logger.print_on_console(  '---------Termination Completed-------')
-##                self.terminatebutton.Enable()
-            else:
-                print( '=======================================================================================================')
-                log.info('-----------------------------------------------')
-                logger.print_on_console('***SUITE EXECUTION COMPLETED***')
-                log.info('***SUITE EXECUTION COMPLETED***')
-                print( '=======================================================================================================')
-                log.info('-----------------------------------------------')
+                logger.print_on_console('---------Termination Completed-------')
+
 
             controller.kill_process()
             self.wxObject.debugbutton.Enable()
             self.wxObject.executebutton.Enable()
             self.wxObject.cancelbutton.Enable()
             self.wxObject.terminatebutton.Disable()
+
+            socketIO.emit('result_debugTestCase',status)
         except Exception as m:
             print m
 
@@ -311,6 +356,10 @@ class ClientWindow(wx.Frame):
         #own event
         self.Bind( wx.EVT_CHOICE, self.test)
         #own event
+
+        #own event
+##        self.Bind(wx.EVT_CHOICE, self.debug)
+        #own event
 ##        self.Bind(wx.EVT_CLOSE, self.closeScrapeWindow)
         self.configMenu = wx.Menu()
         self.infoItem = wx.MenuItem(self.configMenu, 100,text = "Info",kind = wx.ITEM_NORMAL)
@@ -336,14 +385,14 @@ class ClientWindow(wx.Frame):
         self.log.SetForegroundColour((0,50,250))
         self.log.SetFont(font1)
         box.Add(self.log, 1, wx.ALL|wx.EXPAND, 5)
-        self.debugbutton = wx.Button(self.panel, label="Debug" ,pos=(10, 548), size=(100, 28))
-        self.debugbutton.Bind(wx.EVT_BUTTON, self.OnDebug)
-        self.debugbutton.SetToolTip(wx.ToolTip("To Debug the script"))
+##        self.debugbutton = wx.Button(self.panel, label="Debug" ,pos=(10, 548), size=(100, 28))
+##        self.debugbutton.Bind(wx.EVT_BUTTON, self.OnDebug)
+##        self.debugbutton.SetToolTip(wx.ToolTip("To Debug the script"))
 
-        self.continue_debugbutton = wx.Button(self.panel, label="Resume Debug" ,pos=(120, 548), size=(100, 28))
-        self.continue_debugbutton.Bind(wx.EVT_BUTTON, self.OnContinueDebug)   # need to implement OnExit(). Leave notrace
-        self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution "))
-        self.continue_debugbutton.Hide()
+##        self.continue_debugbutton = wx.Button(self.panel, label="Resume Debug" ,pos=(120, 548), size=(100, 28))
+##        self.continue_debugbutton.Bind(wx.EVT_BUTTON, self.OnContinueDebug)   # need to implement OnExit(). Leave notrace
+##        self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution "))
+##        self.continue_debugbutton.Hide()
 
         self.terminatebutton = wx.Button(self.panel, label="Terminate" ,pos=(470, 548), size=(100, 28))
         self.terminatebutton.Bind(wx.EVT_BUTTON, self.OnTerminate)
@@ -466,8 +515,13 @@ class ClientWindow(wx.Frame):
 
         print 'KILLING THE THREAD'
         controller.terminate_flag=True
+        print self.debug
+        import debug_window
+        if isinstance(self.debug , debug_window.DebugWindow) and self.debug.IsShown():
+            self.debug.Destroy()
 
-        self.Destroy()  # you may also do:  event.Skip()
+        self.Destroy()
+         # you may also do:  event.Skip()
                         # since the default event handler does call Destroy(), too
 
 ##    def closeScrapeWindow(self):
@@ -487,6 +541,7 @@ class ClientWindow(wx.Frame):
             socketIO.disconnect()
             log.info(socketIO)
 ##            self.new.Close()
+        self.debug.Close()
         self.Close()
 
 
@@ -521,7 +576,7 @@ class ClientWindow(wx.Frame):
         self.pausebutton.Show()
     #----------------------------------------------------------------------
     def OnTerminate(self, event):
-        print '---------Termination Started-------'
+        logger.print_on_console('---------Termination Started-------')
         controller.terminate_flag=True
         #Handling the case where user clicks terminate when the execution is paused
         #Resume the execution
@@ -552,9 +607,34 @@ class ClientWindow(wx.Frame):
             logger.print_on_console('Please provide valid execution mode')
 
     def OnDebug(self,event):
-        global action
-        self.action=DEBUG
+        self.debug()
+##        global action
+##        self.action=STEP_BY_SETP_DEBUG
+##        self.mythread = TestThread(self,self.action)
+
+    def OnNodeConnect(self,event):
+        self.mythread = SocketThread(self)
+        self.connectbutton.Disable()
+
+    def test(self,event):
+##        print 'Self',self
+        global browsername
+        print 'Browser name : ',browsername
+        con = controller.Controller()
+        con.get_all_the_imports('WebScrape')
+        import Nineteen68_WebScrape
+        global socketIO
+        self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id =None, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO)
+
+    def debug(self):
+
+        import debug_window
+        global socketIO,action
+        self.action=STEP_BY_SETP_DEBUG
         self.mythread = TestThread(self,self.action)
+        thread_obj=self.mythread
+        self.debug = debug_window.DebugWindow(parent = None,id = -1, title="SLK Nineteen68 - Debug Window",browser = browsername,socketIO = socketIO,thread=self.mythread)
+##        self.new.Show()
 
     def OnNodeConnect(self,event):
         self.mythread = SocketThread(self)
@@ -587,4 +667,4 @@ if __name__ == "__main__":
     main()
 
 
-
+

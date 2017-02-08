@@ -102,16 +102,49 @@ class Handler():
         logger.print_on_console('-------------------------')
         json_string = json.dumps(test_data)
         new_obj = json.loads(json_string)
-        if len(new_obj)==1:
-            json_data=new_obj[0]
-        ws_template=json_data['template']
-        testcase=json_data['testcase']
-		#Checking if the testcase has key 'comments'
-        if testcase[len(testcase)-1].has_key('comments'):
-            comments=testcase[len(testcase)-1]['comments']
-        testscript_name=json_data['testscript_name']
-        flag=self.create_list(testcase,testscript_name)
-        return flag
+        script=[]
+        browser_type=[]
+        #Iterating through json array
+
+        for json_data in new_obj:
+            if json_data.has_key('template'):
+                ws_template=json_data['template']
+            if json_data.has_key('testcase'):
+                testcase=json_data['testcase']
+                script.append(testcase)
+            if json_data.has_key('comments'):
+                comments=json_data['comments']
+            #Checking if the testcase has key 'testscript_name' or 'testcasename'
+            if json_data.has_key('testscript_name'):
+                testscript_name=json_data['testscript_name']
+            elif json_data.has_key('testcasename'):
+                testscript_name=json_data['testcasename']
+
+            if json_data.has_key('browsertype'):
+                browser_type=json_data['browsertype']
+            elif json_data.has_key('browserType'):
+                browser_type=json_data['browserType']
+
+
+##        if len(new_obj)>1:
+##            json_data=new_obj[0]
+##            browser_type=new_obj[1]
+##        ws_template=json_data['template']
+##        testcase=json_data['testcase']
+##		#Checking if the testcase has key 'comments'
+##        if testcase[len(testcase)-1].has_key('comments'):
+##            comments=testcase[len(testcase)-1]['comments']
+##        #Checking if the testcase has key 'testscript_name' or 'testcasename'
+##        if json_data.has_key('testscript_name'):
+##            testscript_name=json_data['testscript_name']
+##        elif json_data.has_key('testcasename'):
+##            testscript_name=json_data['testcasename']
+
+
+
+##        testscript_name=json_data['testscript_name']
+        flag=self.create_list(script,testscript_name)
+        return flag,browser_type,len(script)
 
     def validate(self,start,end):
         """
@@ -347,7 +380,7 @@ class Handler():
 
 
 
-    def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo):
+    def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i):
         """
         def : create_step
         purpose : creates an object of each step
@@ -363,7 +396,7 @@ class Handler():
         if key_lower in for_array:
             if for_info[key] is None:
                 logger.print_on_console(str(start_end_dict[key_lower])+' missing in script:'+str(testscript_name))
-            tsp_step=for_step.For(index,keyword,inputval,outputval,stepnum,testscript_name,for_info[key],False,apptype,additionalinfo)
+            tsp_step=for_step.For(index,keyword,inputval,outputval,stepnum,testscript_name,for_info[key],False,apptype,additionalinfo,i)
 
         #block which creates the step of instances (if,elseIf,else,endIf)
         elif key_lower in if_array:
@@ -371,7 +404,7 @@ class Handler():
                 self.insert_into_ifdict(index,key_lower,None)
                 logger.print_on_console(str(start_end_dict[key_lower])+' keyword missing in script:'+str(testscript_name))
 
-            tsp_step=if_step.If(index,keyword,inputval,outputval,stepnum,testscript_name,if_info[key],False,apptype,additionalinfo)
+            tsp_step=if_step.If(index,keyword,inputval,outputval,stepnum,testscript_name,if_info[key],False,apptype,additionalinfo,i)
 
         #block which creates the step of instances of (getparam,startloop,endloop)
         elif key_lower in get_param:
@@ -379,22 +412,22 @@ class Handler():
                 self.insert_into_getParamdict(index,key_lower,None)
                 logger.print_on_console(key_lower+' keyword missing in script:'+str(testscript_name))
 
-            tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo)
+            tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i)
 
         #block which creates the step of instances of (jumpBy)
         elif key_lower == constants.JUMP_BY:
-            tsp_step=jumpBy.JumpBy(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype,additionalinfo)
+            tsp_step=jumpBy.JumpBy(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype,additionalinfo,i)
 
         #block which creates the step of instances of (jumpTo)
         elif key_lower == constants.JUMP_TO:
-            tsp_step=jumpTo.JumpTo(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype,additionalinfo)
+            tsp_step=jumpTo.JumpTo(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype,additionalinfo,i)
 
         #block which creates the step of instances of (Keywords)
         else:
-            tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo)
+            tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i)
         return tsp_step
 
-    def extract_field(self,step,index,testscript_name):
+    def extract_field(self,step,index,testscript_name,i):
         """
         def : extract_field
         purpose : extracts the value of each key present in test step json
@@ -416,7 +449,7 @@ class Handler():
         if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
             global tspIndex2
             tspIndex2+=1
-            return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo)
+            return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i)
         return None
 
 
@@ -429,16 +462,22 @@ class Handler():
 
         """
         #popping the comments key in testcase json before parsing if it has
-        if testcase[len(testcase)-1].has_key('comments'):
-            testcase.pop()
 
-        flag=self.parse_condition(testcase)
-        for x in testcase:
-            step=self.extract_field(x,tspIndex2,testscript_name)
-            if step is not None and step != False:
-                tspList.append(step)
-            elif step == False:
-                return step
+        for i in range(len(testcase)):
+            try:
+                d=eval(testcase[i])
+            except Exception as e:
+                d=testcase[i]
+            if d[len(d)-1].has_key('comments'):
+                d.pop()
+
+            flag=self.parse_condition(d)
+            for x in d:
+                step=self.extract_field(x,tspIndex2,testscript_name,i+1)
+                if step is not None and step != False:
+                    tspList.append(step)
+                elif step == False:
+                    return step
         return True
 
 
@@ -485,7 +524,7 @@ class Handler():
         """
         import dynamic_variable_handler
         del tspList[:]
-        global tspIndex,tspIndex2,copy_for_keywords,for_keywords,copy_condition_keywords,condition_keywords,copy_getparam_keywords,getparam_keywords,for_info,if_info,get_param_info
+        global tspIndex,tspIndex2,copy_for_keywords,for_keywords,copy_condition_keywords,condition_keywords,copy_getparam_keywords                        ,getparam_keywords,for_info,if_info,get_param_info
         tspIndex=-1
         tspIndex2=-1
         copy_for_keywords.clear()

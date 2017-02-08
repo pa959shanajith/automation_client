@@ -104,6 +104,14 @@ class Fullscrape():
                                 itemp = driver.execute_script(javascript_scrape, inpath)
                                 log.info('full scrape operation on frame page is done and data is obtained')
                                 tempne.extend(itemp)
+                            callback_scrape2(inpath, tempne)
+                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                            inpath = path + str(frames) + 'i' +  '/'
+                            if switchtoframe_scrape1(inpath):
+                                itemp = driver.execute_script(javascript_scrape, inpath)
+                                logger.log('FILE: fullscrape.py , DEF: callback_scrape1() , MSG: full scrape operation on frame page is done and data is obtained')
+                                tempne.extend(itemp)
+                            callback_scrape1(inpath, tempne)
 
                         callback_scrape1(path, tempne)
 
@@ -124,6 +132,15 @@ class Fullscrape():
                                 itemp = driver.execute_script(javascript_scrape, inpath)
                                 log.info('full scrape operation on iframe page is done and data is obtained')
                                 tempne.extend(itemp)
+                            callback_scrape1(inpath, tempne)
+                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                            inpath = path + str(frames) + 'f' +  '/'
+                            if switchtoframe_scrape1(inpath):
+                                itemp = driver.execute_script(javascript_scrape, inpath)
+                                logger.log('FILE: fullscrape.py , DEF: callback_scrape1() , MSG: full scrape operation on frame page is done and data is obtained')
+                                tempne.extend(itemp)
+                            callback_scrape2(inpath, tempne)
+
                         callback_scrape2(path, tempne)
             callback_scrape1('', tempne)
             log.info('full scrape operation on iframe/frame pages is completed')
@@ -191,4 +208,3 @@ class Fullscrape():
 ##                log.info('FILE: fullscrape.py , DEF: save_json_data() , MSG: vie is dumped into  domelements.json file ')
 ##        outfile.close()
 ##        return data
-
