@@ -116,6 +116,28 @@ class MainNamespace(BaseNamespace):
 
 
 
+    #----------------------------------------------------------------------
+    def __init__(self,wxObject):
+        """Init Worker Thread Class."""
+        threading.Thread.__init__(self)
+        self.wxobject = wxObject
+        self.start()
+
+
+
+
+    #----------------------------------------------------------------------
+    def run(self):
+        """Run Worker Thread."""
+        # This is the code executing in the new thread.
+        global socketIO
+        socketIO = SocketIO('10.41.31.41',3000,MainNamespace)
+
+        ##socketIO = SocketIO('localhost',8124)
+##        socketIO.send('I am ready to process the request')
+        socketIO.emit('news')
+        socketIO.emit('focus')
+        socketIO.wait()
 
 
 
@@ -614,6 +636,21 @@ class ClientWindow(wx.Frame):
         self.debug = debug_window.DebugWindow(parent = None,id = -1, title="SLK Nineteen68 - Debug Window",browser = browsername,socketIO = socketIO,thread=self.mythread)
 ##        self.new.Show()
 
+    def OnNodeConnect(self,event):
+        self.mythread = SocketThread(self)
+        self.connectbutton.Disable()
+
+    def test(self,event):
+##        print 'Self',self
+        global browsername
+        print 'Browser name : ',browsername
+        con = controller.Controller()
+        con.get_all_the_imports('WebScrape')
+        import Nineteen68_WebScrape
+        global socketIO
+        self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO)
+##        self.new.Show()
+
 
 
 
@@ -630,4 +667,4 @@ if __name__ == "__main__":
     main()
 
 
-
+
