@@ -718,7 +718,6 @@ class Controller():
         print( '=======================================================================================================')
         for d in scenario:
             flag,browser_type,last_tc_num=obj.parse_json(d)
-            print '===============browser_type==========',browser_type
             if flag == False:
                 break
             print '\n'
