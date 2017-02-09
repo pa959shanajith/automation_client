@@ -143,6 +143,8 @@ class BrowserOperations():
     def
     """
     def openFirefoxBrowser(self):
+        global browser
+        browser = 2
         try:
             # search all the drives to take firefox path
             def find_file(root_folder, rex):
