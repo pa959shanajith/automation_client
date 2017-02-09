@@ -65,7 +65,7 @@ class MainNamespace(BaseNamespace):
             time.sleep(5)
             print 'Importing done'
         elif str(args[0]) == 'debugTestCase':
-            print 'on_debugTestCase',args
+            print 'on_debugTestCase_message'
             self.mythread = TestThread(wxObject,DEBUG,args[1])
 
 
@@ -94,13 +94,13 @@ class MainNamespace(BaseNamespace):
 
 
     def on_emit(self, *args):
-        print 'aaa', args[0]
+##        print 'aaa', args[0]
         if str(args[0]) == 'connected':
             print 'Connected'
 
     def on_focus(self, *args):
-        print 'in focus------------aaa', args[0]
-        print '++++++++++++++++++',args
+##        print 'in focus------------aaa', args[0]
+##        print '++++++++++++++++++',args
         import highlight
         light =highlight.Highlight()
         res = light.highlight(args[0],None,None)
@@ -161,7 +161,7 @@ class SocketThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO
-        socketIO = SocketIO('10.41.31.5',3000,MainNamespace)
+        socketIO = SocketIO('10.41.31.35',3000,MainNamespace)
 
         ##socketIO = SocketIO('localhost',8124)
 ##        socketIO.send('I am ready to process the request')
@@ -204,7 +204,8 @@ class Parallel(threading.Thread):
         try:
 
             self.wxObject.executebutton.Disable()
-            self.wxObject.debugbutton.Disable()
+            #Removed debug button
+##            self.wxObject.debugbutton.Disable()
             self.wxObject.cancelbutton.Disable()
             self.wxObject.terminatebutton.Enable()
             self.wxObject.pausebutton.Show()
@@ -214,7 +215,9 @@ class Parallel(threading.Thread):
 ##            controller.kill_process()
             self.con = controller.Controller()
             self.con.conthread=self
-            value= self.wxObject.breakpoint.GetValue()
+            #Removed breakpoint
+##            value= self.wxObject.breakpoint.GetValue()
+            value=''
 
             status = self.con.invoke_parralel_exe(EXECUTE,value,self)
 
@@ -223,8 +226,8 @@ class Parallel(threading.Thread):
 
             else:
                 logger.print_on_console('***SUITE EXECUTION COMPLETED***')
-
-            self.wxObject.debugbutton.Enable()
+			
+##            self.wxObject.debugbutton.Enable()
             self.wxObject.executebutton.Enable()
             self.wxObject.cancelbutton.Enable()
             socketIO.emit('debugTestCase',status)
@@ -272,19 +275,19 @@ class TestThread(threading.Thread):
         global socketIO
         try:
             self.wxObject.executebutton.Disable()
-            self.wxObject.debugbutton.Disable()
+##            self.wxObject.debugbutton.Disable()
             self.wxObject.cancelbutton.Disable()
             self.wxObject.terminatebutton.Enable()
             if self.action==EXECUTE:
                 self.wxObject.pausebutton.Show()
-            else:
-                self.wxObject.continue_debugbutton.Show()
+##            else:
+##                self.wxObject.continue_debugbutton.Show()
 
 
             time.sleep(2)
             controller.kill_process()
             self.con = controller.Controller()
-            value= self.wxObject.breakpoint.GetValue()
+##            value= self.wxObject.breakpoint.GetValue()
             debug_mode=False
             runfrom_step=0
             status = self.con.invoke_controller(self.action,self,debug_mode,runfrom_step,self.json_data)
@@ -295,7 +298,7 @@ class TestThread(threading.Thread):
 
 
             controller.kill_process()
-            self.wxObject.debugbutton.Enable()
+##            self.wxObject.debugbutton.Enable()
             self.wxObject.executebutton.Enable()
             self.wxObject.cancelbutton.Enable()
             self.wxObject.terminatebutton.Disable()
@@ -411,12 +414,12 @@ class ClientWindow(wx.Frame):
 
 
 
-        self.breakpointbutton = wx.Button(self.panel, label="Breakpoint",pos=(590, 548), size=(100, 28))
-        self.breakpointbutton.Bind(wx.EVT_BUTTON,None)   # need to implement OnExtract()
-        self.breakpointbutton.SetToolTip(wx.ToolTip("Breakpoint"))
+##        self.breakpointbutton = wx.Button(self.panel, label="Breakpoint",pos=(590, 548), size=(100, 28))
+##        self.breakpointbutton.Bind(wx.EVT_BUTTON,None)   # need to implement OnExtract()
+##        self.breakpointbutton.SetToolTip(wx.ToolTip("Breakpoint"))
 
-        self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(700, 548), size=(50,28), style = wx.TE_RICH)
-        box.Add(self.breakpoint, 1, wx.ALL|wx.EXPAND, 5)
+##        self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(700, 548), size=(50,28), style = wx.TE_RICH)
+##        box.Add(self.breakpoint, 1, wx.ALL|wx.EXPAND, 5)
 
         self.executebutton = wx.Button(self.panel, label="Execute" ,pos=(12, 588), size=(100, 28))
         self.executebutton.Bind(wx.EVT_BUTTON, self.OnExecute)
@@ -515,11 +518,6 @@ class ClientWindow(wx.Frame):
 
         print 'KILLING THE THREAD'
         controller.terminate_flag=True
-        print self.debug
-        import debug_window
-        if isinstance(self.debug , debug_window.DebugWindow) and self.debug.IsShown():
-            self.debug.Destroy()
-
         self.Destroy()
          # you may also do:  event.Skip()
                         # since the default event handler does call Destroy(), too
@@ -541,7 +539,6 @@ class ClientWindow(wx.Frame):
             socketIO.disconnect()
             log.info(socketIO)
 ##            self.new.Close()
-        self.debug.Close()
         self.Close()
 
 
@@ -626,15 +623,15 @@ class ClientWindow(wx.Frame):
         global socketIO
         self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id =None, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO)
 
-    def debug(self):
-
-        import debug_window
-        global socketIO,action
-        self.action=STEP_BY_SETP_DEBUG
-        self.mythread = TestThread(self,self.action)
-        thread_obj=self.mythread
-        self.debug = debug_window.DebugWindow(parent = None,id = -1, title="SLK Nineteen68 - Debug Window",browser = browsername,socketIO = socketIO,thread=self.mythread)
-##        self.new.Show()
+##    def debug(self):
+##
+##        import debug_window
+##        global socketIO,action
+##        self.action=STEP_BY_SETP_DEBUG
+##        self.mythread = TestThread(self,self.action)
+##        thread_obj=self.mythread
+##        self.debug = debug_window.DebugWindow(parent = None,id = -1, title="SLK Nineteen68 - Debug Window",browser = browsername,socketIO = socketIO,thread=self.mythread)
+####        self.new.Show()
 
     def OnNodeConnect(self,event):
         self.mythread = SocketThread(self)
