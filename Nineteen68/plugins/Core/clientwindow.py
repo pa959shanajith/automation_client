@@ -226,7 +226,7 @@ class Parallel(threading.Thread):
 
             else:
                 logger.print_on_console('***SUITE EXECUTION COMPLETED***')
-
+			
 ##            self.wxObject.debugbutton.Enable()
             self.wxObject.executebutton.Enable()
             self.wxObject.cancelbutton.Enable()
