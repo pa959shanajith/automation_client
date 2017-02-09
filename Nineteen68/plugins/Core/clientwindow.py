@@ -161,7 +161,7 @@ class SocketThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO
-        socketIO = SocketIO('10.41.31.5',3000,MainNamespace)
+        socketIO = SocketIO('10.41.31.35',3000,MainNamespace)
 
         ##socketIO = SocketIO('localhost',8124)
 ##        socketIO.send('I am ready to process the request')
@@ -204,7 +204,8 @@ class Parallel(threading.Thread):
         try:
 
             self.wxObject.executebutton.Disable()
-            self.wxObject.debugbutton.Disable()
+            #Removed debug button
+##            self.wxObject.debugbutton.Disable()
             self.wxObject.cancelbutton.Disable()
             self.wxObject.terminatebutton.Enable()
             self.wxObject.pausebutton.Show()
@@ -214,7 +215,9 @@ class Parallel(threading.Thread):
 ##            controller.kill_process()
             self.con = controller.Controller()
             self.con.conthread=self
-            value= self.wxObject.breakpoint.GetValue()
+            #Removed breakpoint
+##            value= self.wxObject.breakpoint.GetValue()
+            value=''
 
             status = self.con.invoke_parralel_exe(EXECUTE,value,self)
 
@@ -224,7 +227,7 @@ class Parallel(threading.Thread):
             else:
                 logger.print_on_console('***SUITE EXECUTION COMPLETED***')
 
-            self.wxObject.debugbutton.Enable()
+##            self.wxObject.debugbutton.Enable()
             self.wxObject.executebutton.Enable()
             self.wxObject.cancelbutton.Enable()
             socketIO.emit('debugTestCase',status)
@@ -272,19 +275,19 @@ class TestThread(threading.Thread):
         global socketIO
         try:
             self.wxObject.executebutton.Disable()
-            self.wxObject.debugbutton.Disable()
+##            self.wxObject.debugbutton.Disable()
             self.wxObject.cancelbutton.Disable()
             self.wxObject.terminatebutton.Enable()
             if self.action==EXECUTE:
                 self.wxObject.pausebutton.Show()
-            else:
-                self.wxObject.continue_debugbutton.Show()
+##            else:
+##                self.wxObject.continue_debugbutton.Show()
 
 
             time.sleep(2)
             controller.kill_process()
             self.con = controller.Controller()
-            value= self.wxObject.breakpoint.GetValue()
+##            value= self.wxObject.breakpoint.GetValue()
             debug_mode=False
             runfrom_step=0
             status = self.con.invoke_controller(self.action,self,debug_mode,runfrom_step,self.json_data)
@@ -295,7 +298,7 @@ class TestThread(threading.Thread):
 
 
             controller.kill_process()
-            self.wxObject.debugbutton.Enable()
+##            self.wxObject.debugbutton.Enable()
             self.wxObject.executebutton.Enable()
             self.wxObject.cancelbutton.Enable()
             self.wxObject.terminatebutton.Disable()
