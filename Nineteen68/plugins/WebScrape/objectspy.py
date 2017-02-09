@@ -21,13 +21,17 @@ import logging
 import win32gui
 import win32con
 import logger
+import logging
+
+log = logging.getLogger('objectspy.py')
 currenthandle=''
+
 class Object_Mapper():
 
-    def compare(self,browserType):
-        a=browserops.BrowserOperations()
-        a.openBrowser(browserType)
-        time.sleep(10)
+    def compare(self):
+##        a=browserops.BrowserOperations()
+##        a.openBrowser(browserType)
+##        time.sleep(10)
         find_ele=highlight.Highlight()
 
         with open('domelements_scraped.json') as data_file:
@@ -35,31 +39,60 @@ class Object_Mapper():
             driver = browserops.driver
             time.sleep(10)
             hwndg = browserops.hwndg
-            logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: Obtained browser handle and driver from browserops.py class .....')
-            toolwindow = win32gui.GetForegroundWindow()
+            log.info( 'Obtained browser handle and driver from browserops.py class .....')
+##            toolwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
-            logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: Minimizing the foreground window i.e tool and assuming AUT on top .....')
-            time.sleep(2)
-            actwindow = win32gui.GetForegroundWindow()
+            log.info( 'Minimizing the foreground window i.e tool and assuming AUT on top .....')
+##            time.sleep(2)
+##            actwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
             javascript_hasfocus = """return(document.hasFocus());"""
 
             for eachdriverhand in driver.window_handles:
-                logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: Iterating through the number of windows open by the driver')
+                log.info( 'Iterating through the number of windows open by the driver')
                 driver.switch_to.window(eachdriverhand)
-                logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: Switching to each handle and checking weather it has focus ')
+                log.info( 'Switching to each handle and checking weather it has focus ')
                 time.sleep(3)
                 if (driver.execute_script(javascript_hasfocus)):
-                        logger.log('FILE: fullscrape.py , DEF: fullscrape() , MSG: Got the window which has the focus')
+                        log.info( 'Got the window which has the focus')
                         global currenthandle
                         currenthandle = eachdriverhand
             for element  in self.data['view']:
                     updated_ele=find_ele.highlight('OBJECTMAPPER'+','+element['xpath']+','+element['url'],element,currenthandle)
 
 
-            vie = {'view': highlight.lst}
-            with open('domelements.json', 'w') as outfile:
-                json.dump(vie, outfile, indent=4, sort_keys=False)
+    def update(self):
+        driver = browserops.driver
+##        global data
+        data = {}
+        lst =[]
+        cobject = {'changedobject' : highlight.changedobject}
+        ncobject = {'notchangedobject': highlight.notchangedobject}
+        nfobject = {'notfoundobject' : highlight.notfoundobject}
+        lst.append(cobject)
+        lst.append(ncobject)
+        lst.append(nfobject)
+##        vie = {'view': lst}
+        comparedin  =''
+        if browserops.browser == 2:
+            comparedin =  'FX'
+        elif browserops.browser == 3:
+            comparedin = 'IE'
+        elif browserops.browser == 1:
+            comparedin =  'CH'
+##        data.append(vie)
+        screen = driver.get_screenshot_as_base64()
+##        data['scrapetype'] = 'cna'
+        data['comparedin'] = comparedin
+        data['view'] = lst
+        data['mirror'] = screen
+##        screenshot = {'mirror':screen}
+##        scrapetype = {'scrapetype' : 'fs'}
+##        data.append(comparedin)
+##        data.append(screenshot)
+        with open('domelements.json', 'w') as outfile:
+            json.dump(data, outfile, indent=4, sort_keys=False)
+        return data
 
 
 
@@ -89,6 +122,5 @@ if __name__ == '__main__':
         a=Object_Mapper()
         a.compare('CH')
         a.clickandadd()
-
         print 'End of main'
 

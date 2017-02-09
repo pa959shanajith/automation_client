@@ -22,10 +22,11 @@ import logging
 log = logging.getLogger('fullscrape.py')
 currenthandle = ''
 status = domconstants.STATUS_FAIL
-vie = {}
-data = {}
+
 class Fullscrape():
     def fullscrape(self):
+##        vie = {}
+        data = {}
         try:
             log.info(' Inside fullscrape method .....')
 ##            vie = {}
@@ -81,7 +82,6 @@ class Fullscrape():
                                 cond_flag = False
                                 break
                         except Exception as e:
-                            Exceptions.error(e)
                             cond_flag = False
                 return cond_flag
 
@@ -109,7 +109,7 @@ class Fullscrape():
                             inpath = path + str(frames) + 'i' +  '/'
                             if switchtoframe_scrape1(inpath):
                                 itemp = driver.execute_script(javascript_scrape, inpath)
-                                logger.log('FILE: fullscrape.py , DEF: callback_scrape1() , MSG: full scrape operation on frame page is done and data is obtained')
+                                log.info('full scrape operation on frame page is done and data is obtained')
                                 tempne.extend(itemp)
                             callback_scrape1(inpath, tempne)
 
@@ -137,10 +137,9 @@ class Fullscrape():
                             inpath = path + str(frames) + 'f' +  '/'
                             if switchtoframe_scrape1(inpath):
                                 itemp = driver.execute_script(javascript_scrape, inpath)
-                                logger.log('FILE: fullscrape.py , DEF: callback_scrape1() , MSG: full scrape operation on frame page is done and data is obtained')
+                                log.info(' full scrape operation on frame page is done and data is obtained')
                                 tempne.extend(itemp)
                             callback_scrape2(inpath, tempne)
-
                         callback_scrape2(path, tempne)
             callback_scrape1('', tempne)
             log.info('full scrape operation on iframe/frame pages is completed')
@@ -154,22 +153,25 @@ class Fullscrape():
 ##            win32gui.ShowWindow(hwndg, win32con.SW_MINIMIZE)
 ##            global vie
 ##            vie = {"view": tempne}
-            global data
+##            global data
 ##            data.append(vie)
             screen = driver.get_screenshot_as_base64()
+            scrapedin = ''
+            if browserops.browser == 2:
+                scrapedin = 'FX'
+            elif browserops.browser == 3:
+                scrapedin =  'IE'
+            elif browserops.browser == 1:
+                scrapedin =  'CH'
 ##            screenshot = {'mirror':screen}
 ##            scrapetype = {'scrapetype' : 'fs'}
-##            data['view'] = []
-##            data['mirror'] = ''
-##            data['scrapetype'] = ''
-
+##            data.append(scrapetype)
+##            data.append(scrapedin)
+##            data.append(screenshot)
+            data['scrapetype'] = 'fs'
+            data['scrapedin'] = scrapedin
             data['view'] = tempne
             data['mirror'] = screen
-            data['scrapetype'] = 'fs'
-
-##            print 'Data created'
-##            data.append(screenshot)
-##            data.append(scrapetype)
             log.info('Creating a json object with key vie with value as return data')
             with open('domelements.json', 'w') as outfile:
                 log.info('Opening domelements.json file to write vie object')
@@ -188,7 +190,6 @@ class Fullscrape():
         except Exception as e:
             status = domconstants.STATUS_FAIL
             data = domconstants.STATUS_FAIL
-            Exceptions.error(e)
         return data
 
 ##    def save_json_data(self):
@@ -208,3 +209,4 @@ class Fullscrape():
 ##                log.info('FILE: fullscrape.py , DEF: save_json_data() , MSG: vie is dumped into  domelements.json file ')
 ##        outfile.close()
 ##        return data
+

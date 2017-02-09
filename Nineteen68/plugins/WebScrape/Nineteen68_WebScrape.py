@@ -8,6 +8,7 @@ import fullscrape
 import clientwindow
 from socketIO_client import SocketIO,BaseNamespace
 import time
+import objectspy
 
 browserobj = browserops.BrowserOperations()
 clickandaddoj = clickandadd.Clickandadd()
@@ -46,9 +47,10 @@ class ScrapeWindow(wx.Frame):
 ##            self.stopbutton.Hide()
             self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,38 ), size=(175, 28))
             self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)   # need to implement OnExtract()
+
 ##            self.fullscrapebutton.SetToolTip(wx.ToolTip("To perform FULLSCRAPE Scraping"))
-##            self.savescrapebutton = wx.Button(self.panel, label="Save Scrape",pos=(12,98 ), size=(175, 28))
-##            self.savescrapebutton.Bind(wx.EVT_BUTTON, self.savescrape)   # need to implement OnExtract()
+            self.comparebutton = wx.ToggleButton(self.panel, label="Compare",pos=(12,68 ), size=(175, 28))
+            self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)   # need to implement OnExtract()
 ##            self.savescrapebutton.SetToolTip(wx.ToolTip("To save SCRAPE data"))
 ##            self.savescrapebutton.Disable()
 ##            self.label1 = wx.StaticText(self.panel,label = "@ 2017 SLK Software Services Pvt. Ltd.",pos=(12,128 ), size=(220, 28))
@@ -75,8 +77,9 @@ class ScrapeWindow(wx.Frame):
         state = event.GetEventObject().GetValue()
         if state == True:
             self.fullscrapebutton.Disable()
-            event.GetEventObject().SetLabel("Stop ClickAndAdd")
+            self.comparebutton.Disable()
             clickandaddoj.startclickandadd()
+            event.GetEventObject().SetLabel("Stop ClickAndAdd")
 ##            wx.MessageBox('CLICKANDADD: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
             print 'click and add initiated, select the elements from AUT'
 
@@ -89,10 +92,26 @@ class ScrapeWindow(wx.Frame):
             event.GetEventObject().SetLabel("Start ClickAndAdd")
             print 'Click and add scrape  completed'
 
+    def compare(self,event):
+        state = event.GetEventObject().GetValue()
+        if state == True:
+            self.fullscrapebutton.Disable()
+            self.startbutton.Disable()
+            obj = objectspy.Object_Mapper()
+            obj.compare()
+            event.GetEventObject().SetLabel("Update")
+        else:
+            obj = objectspy.Object_Mapper()
+            d = obj.update()
+            self.socketIO.send(d)
+            self.Close()
+
+
     #----------------------------------------------------------------------
     def fullscrape(self,event):
         print 'Performing full scrape'
         self.startbutton.Disable()
+        self.comparebutton.Disable()
         d = fullscrapeobj.fullscrape()
 ##        self.startbutton.Enable()
 ##        self.savescrapebutton.Enable()

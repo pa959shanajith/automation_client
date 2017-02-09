@@ -22,8 +22,7 @@ import logging
 log = logging.getLogger('clickandadd.py')
 currenthandle = ''
 status = domconstants.STATUS_FAIL
-vie = {}
-data = {}
+
 class Clickandadd():
     def startclickandadd(self):
         try:
@@ -79,7 +78,6 @@ class Clickandadd():
                                 cond_flag_cna = False
                                 break
                         except Exception as e:
-                            Exceptions.error(e)
                             cond_flag_cna = False
                 return cond_flag_cna
 
@@ -100,6 +98,14 @@ class Clickandadd():
                                 log.info('Performing the click and add operation on frame/iframe page')
                                 driver.execute_script(javascript_clicknadd, inpath,browser)
                                 log.info('Performing the click and add operation on frame/iframe page done')
+                            callback_clicknadd2(inpath)
+                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                            inpath = path + str(frames) + 'i' + '/'
+                            if switchtoframe_clicknadd1(inpath):
+                                log.info('Performing the click and add operation on frame/iframe page')
+                                driver.execute_script(javascript_clicknadd, inpath,browser)
+                                log.info('Performing the click and add operation on frame/iframe page done')
+                            callback_clicknadd1(inpath)
                         callback_clicknadd1(path)
 
             def callback_clicknadd2(myipath):
@@ -117,6 +123,14 @@ class Clickandadd():
                                 log.info('Performing the click and add operation on iframe/frame page')
                                 driver.execute_script(javascript_clicknadd, inpath,browser)
                                 log.info('Performing the click and add operation on iframe/frame page done')
+                            callback_clicknadd1(inpath)
+                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                            inpath = path + str(frames) + 'f' + '/'
+                            if switchtoframe_clicknadd1(inpath):
+                                log.info(' Performing the click and add operation on iframe/frame page')
+                                driver.execute_script(javascript_clicknadd, inpath,browser)
+                                log.info(' Performing the click and add operation on iframe/frame page done')
+                            callback_clicknadd2(inpath)
                         callback_clicknadd2(path)
 
             callback_clicknadd1('')
@@ -132,6 +146,8 @@ class Clickandadd():
         return status
 
     def stopclickandadd(self):
+##        vie = {}
+        data = {}
         try:
             log.info('Inside stopclickandadd method .....')
             driver = browserops.driver
@@ -169,7 +185,6 @@ class Clickandadd():
                                 cond_flag_scna = False
                                 break
                         except Exception as e:
-                            Exceptions.error(e)
                             cond_flag_scna = False
                 return cond_flag_scna
 
@@ -185,19 +200,20 @@ class Clickandadd():
                         tempne_stopclicknadd.extend(temp)
                         for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
                             inpath = path + str(frames) + 'f' + '/'
-                            if switchtoframe_stopclicknadd1(inpath):
+                            if switchtoframe_clicknadd1(inpath):
                                 itemp = driver.execute_script(javascript_stopclicknadd)
-                                logger.log('FILE: clickandadd.py , DEF: callback_stopclicknadd1() , MSG: before stopclicknadd operation on frame page is done and data is obtained')
+                                log.info('before stopclicknadd operation on frame page is done and data is obtained')
                                 tempne_stopclicknadd.extend(itemp)
-                                logger.log('FILE: clickandadd.py , DEF: callback_stopclicknadd1() , MSG: stopclicknadd operation on frame page is done and data is obtained')
+                                log.info('stopclicknadd operation on frame page is done and data is obtained')
                             callback_stopclicknadd2(inpath, tempne_stopclicknadd)
                         for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
                             inpath = path + str(frames) + 'i' + '/'
                             if switchtoframe_stopclicknadd1(inpath):
                                 itemp = driver.execute_script(javascript_stopclicknadd)
-                                log.info('before stopclicknadd operation on frame page is done and data is obtained')
+                                log.info('stopclicknadd operation on frame page is done and data is obtained')
                                 tempne_stopclicknadd.extend(itemp)
                                 log.info('stopclicknadd operation on frame page is done and data is obtained')
+                            callback_stopclicknadd1(inpath, tempne_stopclicknadd)
                         callback_stopclicknadd1(path, tempne_stopclicknadd)
 
             def callback_stopclicknadd2(myipath, tempne_stopclicknadd):
@@ -217,15 +233,15 @@ class Clickandadd():
                                 itemp = driver.execute_script(javascript_stopclicknadd)
                                 log.info('stopclicknadd operation on iframe page is done and data is obtained')
                                 tempne_stopclicknadd.extend(itemp)
-                            callback_stopclicknadd1(inpath, tempne_stopclicknadd)
+                            callback_stopclicknadd2(inpath, tempne_stopclicknadd)
                         for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
                             inpath = path + str(frames) + 'f' + '/'
                             if switchtoframe_stopclicknadd1(inpath):
-                                logger.log('FILE: clickandadd.py , DEF: callback_stopclicknadd2() , MSG: before stopclicknadd operation on iframe page is done and data is obtained')
                                 itemp = driver.execute_script(javascript_stopclicknadd)
-                                logger.log('FILE: clickandadd.py , DEF: callback_stopclicknadd2() , MSG: stopclicknadd operation on iframe page is done and data is obtained')
+                                log.info('before stopclicknadd operation on frame page is done and data is obtained')
                                 tempne_stopclicknadd.extend(itemp)
-                            callback_stopclicknadd2(inpath, tempne_stopclicknadd)
+                                log.info('stopclicknadd operation on frame page is done and data is obtained')
+                            callback_stopclicknadd1(inpath, tempne_stopclicknadd)
                         callback_stopclicknadd2(path, tempne_stopclicknadd)
             callback_stopclicknadd1('', tempne_stopclicknadd)
             log.info('stopclickandadd operation on iframe/frame pages is completed')
@@ -235,17 +251,26 @@ class Clickandadd():
             driver.switch_to.window(currenthandle)
 ##            global vie
 ##            vie = {'view': tempne_stopclicknadd}
+##            global data
+##            data.append(vie)
             screen = driver.get_screenshot_as_base64()
-            global data
+##            scrapetype = {'scrapetype' : 'cna'}
+##            screenshot = {'mirror':screen}
+            scrapedin = ''
+            if browserops.browser == 2:
+                scrapedin = 'FX'
+            elif browserops.browser == 3:
+                scrapedin = 'IE'
+            elif browserops.browser == 1:
+                scrapedin = 'CH'
+##            data.append(scrapetype)
+##            data.append(scrapedin)
+##            data.append(screenshot)
+            data['scrapetype'] = 'cna'
+            data['scrapedin'] = scrapedin
             data['view'] = tempne_stopclicknadd
             data['mirror'] = screen
-            data['scrapetype'] = 'cna'
-##            data.append(vie)
-##            screen = driver.get_screenshot_as_base64()
-##            screenshot = {'mirror':screen}
-##            scrapetype = {'scrapetype' : 'cna'}
-##            data.append(screenshot)
-##            data.append(scrapetype)
+
             log.info('Creating a json object with key vie with value as return data')
             with open('domelements.json', 'w') as outfile:
                 log.info('Opening domelements.json file to write vie object')
@@ -262,7 +287,6 @@ class Clickandadd():
         except Exception as e:
             status = domconstants.STATUS_FAIL
             data = domconstants.STATUS_FAIL
-            Exceptions.error(e)
         return data
 
 ##    def save_json_data(self):
@@ -282,20 +306,4 @@ class Clickandadd():
 ##        outfile.close()
 ##        return data
 
-    def save_json_data(self):
-##        data = {'view' : vie}
-        data = []
-        driver = browserops.driver
-        data.append(vie)
-        screen = driver.get_screenshot_as_base64()
-        screenshot = {'mirror':screen}
-        scrapetype = {'scrapetype' : 'cna'}
-        data.append(screenshot)
-        data.append(scrapetype)
-        with open('domelements.json', 'w') as outfile:
-                logger.log('FILE: clickandadd.py , DEF: stopclickandadd() , MSG: Opening domelements.json file to write vie object')
-                json.dump(data, outfile, indent=4, sort_keys=False)
-                logger.log('FILE: clickandadd.py , DEF: stopclickandadd() , MSG: vie is dumped into  domelements.json file ')
-        outfile.close()
-        return data
 
