@@ -67,7 +67,9 @@ class BrowserKeywords():
             global webdriver_list
             global parent_handle
             driver = Singleton_DriverUtil()
-            driver_obj=driver.driver(self.browser_num)
+            if driver_obj == None:
+                driver_obj = driver.check_available_driver(self.browser_num)
+##
             webdriver_list.append(driver_obj)
             parent_handle = driver_obj.current_window_handle
             logger.print_on_console('Browser opened')
@@ -425,6 +427,45 @@ class BrowserKeywords():
 
 
 class Singleton_DriverUtil():
+    def check_available_driver(self,browser_num):
+        global driver_obj
+        try:
+            import browserops
+            logger.print_on_console("browserops.driver ",browserops.driver)
+##            scrapedriver = browserops.driver
+            toCheck = browserops.driver.window_handles
+            print toCheck
+            if(len(toCheck)== 0):
+                import win32com.client
+                my_processes = ['IEDriverServer.exe','IEDriverServer64.exe']
+                wmi=win32com.client.GetObject('winmgmts:')
+                for p in wmi.InstancesOf('win32_process'):
+                    if p.Name in my_processes:
+                        os.system("TASKKILL /F /IM " + p.Name)
+                if browserops.driver.name == 'internet explorer':
+                    driver_instance = self.driver('3')
+                    return driver_instance
+            else:
+                return browserops.driver
+
+
+        except Exception as e:
+            import win32com.client
+            my_processes = ['chromedriver.exe','phantomjs.exe','geckodriver.exe']
+            wmi=win32com.client.GetObject('winmgmts:')
+            for p in wmi.InstancesOf('win32_process'):
+                if p.Name in my_processes:
+                    os.system("TASKKILL /F /IM " + p.Name)
+            if browserops.driver == None:
+                return self.driver(browser_num)
+            else:
+                if browserops.driver.name == 'chrome':
+                    driver_instance =self.driver('1')
+                    return driver_instance
+                elif browserops.driver.name == 'firefox':
+                    driver_instance =self.driver('2')
+                    return driver_instance
+
     def driver(self,browser_num):
         driver=None
         log.debug('BROWSER NUM: ')
