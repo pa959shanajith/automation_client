@@ -161,7 +161,7 @@ class SocketThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO
-        socketIO = SocketIO('10.41.31.35',3000,MainNamespace)
+        socketIO = SocketIO('10.41.31.41',3000,MainNamespace)
 
         ##socketIO = SocketIO('localhost',8124)
 ##        socketIO.send('I am ready to process the request')
@@ -226,7 +226,7 @@ class Parallel(threading.Thread):
 
             else:
                 logger.print_on_console('***SUITE EXECUTION COMPLETED***')
-			
+
 ##            self.wxObject.debugbutton.Enable()
             self.wxObject.executebutton.Enable()
             self.wxObject.cancelbutton.Enable()
@@ -643,6 +643,7 @@ class ClientWindow(wx.Frame):
         print 'Browser name : ',browsername
         con = controller.Controller()
         con.get_all_the_imports('WebScrape')
+        con.get_all_the_imports('Web')
         import Nineteen68_WebScrape
         global socketIO
         self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO)

@@ -33,6 +33,7 @@ hwndg = None
 status = ''
 driver = None
 browser = 0
+import browser_Keywords
 class BrowserOperations():
     """
     ___init__ def
@@ -49,6 +50,14 @@ class BrowserOperations():
     param : Browser name such as CH - Chrome, IE - Internet Explorer and FX - Firefox
     """
     def openBrowser(self,browserType):
+        status=False
+##        global driver
+        print 'driver:',driver
+        if driver == None:
+            status=self.check_available_driver(browserType)
+        return status
+
+    def __openBrowser(self,browserType):
         options = {
                 "IE" : BrowserOperations.openIeBrowser,
                 "CH" : BrowserOperations.openChromeBrowser,
@@ -230,6 +239,56 @@ class BrowserOperations():
             status = domconstants.STATUS_FAIL
             Exceptions.error(e)
         return status
+
+    def check_available_driver(self,browser_num):
+        global driver
+        status = False
+        try:
+            import browser_Keywords
+            logger.print_on_console("browser_Keywords.driver ",browser_Keywords.driver_obj)
+##            scrapedriver = browserops.driver
+            toCheck = browser_Keywords.driver_obj.window_handles
+            print toCheck
+            if(len(toCheck)== 0):
+                print 'no browser'
+                print browser_Keywords.driver_obj.name
+                import win32com.client
+                my_processes = ['IEDriverServer.exe','IEDriverServer64.exe']
+                wmi=win32com.client.GetObject('winmgmts:')
+                for p in wmi.InstancesOf('win32_process'):
+                    if p.Name in my_processes:
+                        os.system("TASKKILL /F /IM " + p.Name)
+                if browser_Keywords.driver_obj.name == 'internet explorer':
+                    status =self.__openBrowser('IE')
+##                    return driver_instance
+            else:
+                driver= browser_Keywords.driver_obj
+                status = True
+
+
+        except Exception as e:
+##            import traceback
+##            traceback.print_exc()
+##            print e
+            import win32com.client
+            my_processes = ['chromedriver.exe','phantomjs.exe','geckodriver.exe']
+            wmi=win32com.client.GetObject('winmgmts:')
+            for p in wmi.InstancesOf('win32_process'):
+                if p.Name in my_processes:
+                    os.system("TASKKILL /F /IM " + p.Name)
+            if browser_Keywords.driver_obj == None:
+                status =  self.__openBrowser(browser_num)
+            else:
+                if browser_Keywords.driver_obj.name == 'chrome':
+                    status =self.__openBrowser('CH')
+##                    return status
+                elif browser_Keywords.driver_obj.name == 'firefox':
+                    status =self.__openBrowser('FX')
+##                    return status
+
+        return status
+
+
 
 
 
