@@ -20,46 +20,24 @@ class MainNamespace(BaseNamespace):
 ##        print 'Inside debugTestCase method'
 ##        print '------------------',args
         global action,wxObject,browsername
-##        self.action=DEBUG
-##        global wxObject
-##        mythread = TestThread(wxObject,self.action)
-##        print args
-##        print(args)
         if str(args[0]) == 'OPEN BROWSER CH':
-##            print args[0]
 
-##            global wxObject
-##            print wxObject
-##            global browsername
             browsername = 'CH'
-##            print 'Browser name : ',browsername
-##            wxObject.test()
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
             time.sleep(5)
-##            print 'Importing done'
         elif str(args[0]) == 'OPEN BROWSER IE':
-##            print args[0]
 
-##            global wxObject
-##            print wxObject
-##            global browsername
             browsername = 'IE'
-##            print 'Browser name : ',browsername
-##            wxObject.test()
+##
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
             time.sleep(5)
 ##            print 'Importing done'
         elif str(args[0]) == 'OPEN BROWSER FX':
-##            print args[0]
-
-##            global wxObject
-##            print wxObject
-
+##
             browsername = 'FX'
-##            print 'Browser name : ',browsername
-##            wxObject.test()
+##
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
             time.sleep(5)
@@ -74,71 +52,20 @@ class MainNamespace(BaseNamespace):
             print('Connection to the Node Server established')
 
 
-##        elif (str(args[0]) == 'killbrowser'):
-##            global wxObject
-##            print wxObject
-##            global browsername
-##            browsername = 'CH'
-##            print 'Browser name : ',browsername
-####            wxObject.test()
-##            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
-##            time.sleep(5)
-##            con = controller.Controller()
-##            con.get_all_the_imports('WebScrape')
-##            import browserops
-##            driver = browserops.driver
-##            driver.close()
-##            wxObject.new.Close()
-##            print 'Kill the drivers'
-
-
-
     def on_emit(self, *args):
-##        print 'aaa', args[0]
         if str(args[0]) == 'connected':
             print 'Connected'
 
     def on_focus(self, *args):
-##        print 'in focus------------aaa', args[0]
-##        print '++++++++++++++++++',args
+
         import highlight
         light =highlight.Highlight()
         res = light.highlight(args[0],None,None)
         print 'Highlight result: ',res
 
     def on_debugTestCase(self, *args):
-        print '------------------on_emit'
         global wxObject
-        self.mythread = TestThread(wxObject,DEBUG,args[0])
-##        self.socketIO.send(d)
-
-
-
-
-
-#     #----------------------------------------------------------------------
-#     def __init__(self,wxObject):
-#         """Init Worker Thread Class."""
-#         threading.Thread.__init__(self)
-#         self.wxobject = wxObject
-#         self.start()
-
-
-
-
-#     #----------------------------------------------------------------------
-#     def run(self):
-#         """Run Worker Thread."""
-#         # This is the code executing in the new thread.
-#         global socketIO
-#         socketIO = SocketIO('10.41.31.41',3000,MainNamespace)
-
-#         ##socketIO = SocketIO('localhost',8124)
-# ##        socketIO.send('I am ready to process the request')
-#         socketIO.emit('news')
-#         socketIO.emit('focus')
-#         socketIO.wait()
-
+        wxObject.mythread = TestThread(wxObject,DEBUG,args[0],wxObject.debug_mode)
 
 
 socketIO = None
@@ -161,7 +88,7 @@ class SocketThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO
-        socketIO = SocketIO('10.41.31.35',3000,MainNamespace)
+        socketIO = SocketIO('10.41.31.40',3000,MainNamespace)
 
         ##socketIO = SocketIO('localhost',8124)
 ##        socketIO.send('I am ready to process the request')
@@ -202,13 +129,13 @@ class Parallel(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         try:
-
-            self.wxObject.executebutton.Disable()
+            #Removed execute button
+##            self.wxObject.executebutton.Disable()
             #Removed debug button
 ##            self.wxObject.debugbutton.Disable()
             self.wxObject.cancelbutton.Disable()
             self.wxObject.terminatebutton.Enable()
-            self.wxObject.pausebutton.Show()
+##            self.wxObject.pausebutton.Show()
 
             import time
             time.sleep(2)
@@ -226,9 +153,9 @@ class Parallel(threading.Thread):
 
             else:
                 logger.print_on_console('***SUITE EXECUTION COMPLETED***')
-			
+
 ##            self.wxObject.debugbutton.Enable()
-            self.wxObject.executebutton.Enable()
+##            self.wxObject.executebutton.Enable()
             self.wxObject.cancelbutton.Enable()
             socketIO.emit('debugTestCase',status)
 ##
@@ -243,7 +170,7 @@ class TestThread(threading.Thread):
     """Test Worker Thread Class."""
 
     #----------------------------------------------------------------------
-    def __init__(self,wxObject,action,json_data):
+    def __init__(self,wxObject,action,json_data,debug_mode):
         """Init Worker Thread Class."""
         threading.Thread.__init__(self)
         self.wxObject = wxObject
@@ -259,11 +186,14 @@ class TestThread(threading.Thread):
         self.con=''
         self.action=action
         self.json_data=json_data
+        self.debug_mode=debug_mode
         self.start()    # start the thread
 
 
     #should just resume the thread
-    def resume(self):
+    def resume(self,debug_mode):
+        if not(debug_mode):
+            self.con.debug_mode=False
         self.con.resume_execution()
 
 
@@ -274,37 +204,63 @@ class TestThread(threading.Thread):
         # This is the code executing in the new thread.
         global socketIO
         try:
-            self.wxObject.executebutton.Disable()
-##            self.wxObject.debugbutton.Disable()
+            #Removed execute,debug button
+
             self.wxObject.cancelbutton.Disable()
-            self.wxObject.terminatebutton.Enable()
-            if self.action==EXECUTE:
-                self.wxObject.pausebutton.Show()
-##            else:
-##                self.wxObject.continue_debugbutton.Show()
+##            self.wxObject.terminatebutton.Enable()
+            if self.action==DEBUG:
+                self.debug_mode=False
+                self.wxObject.breakpoint.Disable()
+                if self.wxObject.choice in ['Stepwise','RunfromStep']:
+                    self.debug_mode=True
+                    self.wxObject.continue_debugbutton.Show()
+                    self.wxObject.continuebutton.Show()
+                    self.wxObject.continue_debugbutton.Enable()
+                    self.wxObject.continuebutton.Enable()
+                    if self.wxObject.choice=='RunfromStep':
+                        self.wxObject.breakpoint.Enable()
 
 
-            time.sleep(2)
-            controller.kill_process()
+
+
+
+##            runfrom_step=1
+            try:
+                runfrom_step=self.wxObject.breakpoint.GetValue()
+                runfrom_step=int(runfrom_step)
+            except Exception as e:
+                runfrom_step=1
+                log.error('Invalid step number, Hence default step num is taken as 1')
+                logger.print_on_console('Invalid step number, Hence default step num is taken as 1')
+            self.wxObject.rbox.Disable()
+
+            self.wxObject.breakpoint.Disable()
+##            controller.kill_process()
             self.con = controller.Controller()
-##            value= self.wxObject.breakpoint.GetValue()
-            debug_mode=False
-            runfrom_step=0
-            status = self.con.invoke_controller(self.action,self,debug_mode,runfrom_step,self.json_data)
+            self.wxObject.terminatebutton.Enable()
+            status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject.choice)
             logger.print_on_console('Execution status',status)
+
 
             if status==TERMINATE:
                 logger.print_on_console('---------Termination Completed-------')
 
 
-            controller.kill_process()
+##            controller.kill_process()
+            #Removed execute,debug button
 ##            self.wxObject.debugbutton.Enable()
-            self.wxObject.executebutton.Enable()
+##            self.wxObject.executebutton.Enable()
+            self.wxObject.breakpoint.Clear()
+            self.wxObject.rbox.Enable()
             self.wxObject.cancelbutton.Enable()
             self.wxObject.terminatebutton.Disable()
-
+            self.wxObject.continuebutton.Hide()
+            self.wxObject.continue_debugbutton.Hide()
+            self.wxObject.mythread=None
             socketIO.emit('result_debugTestCase',status)
         except Exception as m:
+            import traceback
+            traceback.print_exc()
             print m
 
 
@@ -324,8 +280,10 @@ class ClientWindow(wx.Frame):
         self.SetBackgroundColour(   (245,222,179))
         self.id =id
         self.mainclass = self
-        self.mythread = ''
+        self.mythread = None
         self.action=''
+        self.debug_mode=False
+        self.choice='N'
         global wxObject
         wxObject = self
         curdir = os.getcwd()
@@ -388,26 +346,49 @@ class ClientWindow(wx.Frame):
         self.log.SetForegroundColour((0,50,250))
         self.log.SetFont(font1)
         box.Add(self.log, 1, wx.ALL|wx.EXPAND, 5)
+
+
+        #Radio buttons
+        lblList = ['Normal', 'Stepwise', 'RunfromStep']
+        self.rbox = wx.RadioBox(self.panel,label = 'Debug options', pos = (10, 548), choices = lblList ,size=(90, 28),
+        majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+
+##        self.Bind(wx.EVT_RADIOBUTTON, self.OnRadiogroup)
+        self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
+
+        paly_img = wx.Image("play.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        terminate_img=wx.Image("terminate.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        step_img=wx.Image("step.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+
+##        self.button1 = wx.BitmapButton(self.panel1, id=-1, bitmap=image1,
+##        pos=(10, 20), size = (200, image1.GetHeight()+5))
+
 ##        self.debugbutton = wx.Button(self.panel, label="Debug" ,pos=(10, 548), size=(100, 28))
 ##        self.debugbutton.Bind(wx.EVT_BUTTON, self.OnDebug)
 ##        self.debugbutton.SetToolTip(wx.ToolTip("To Debug the script"))
 
-##        self.continue_debugbutton = wx.Button(self.panel, label="Resume Debug" ,pos=(120, 548), size=(100, 28))
-##        self.continue_debugbutton.Bind(wx.EVT_BUTTON, self.OnContinueDebug)   # need to implement OnExit(). Leave notrace
-##        self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution "))
-##        self.continue_debugbutton.Hide()
+##
 
-        self.terminatebutton = wx.Button(self.panel, label="Terminate" ,pos=(470, 548), size=(100, 28))
+        self.terminatebutton = wx.BitmapButton(self.panel, bitmap=terminate_img,pos=(470, 548), size=(50, 32))
+##        self.terminatebutton = wx.Button(self.panel, label="Terminate" ,pos=(470, 548), size=(100, 28))
         self.terminatebutton.Bind(wx.EVT_BUTTON, self.OnTerminate)
-        self.terminatebutton.SetToolTip(wx.ToolTip("Terminate button logic imp in progress"))
+        self.terminatebutton.SetToolTip(wx.ToolTip("To Terminate the execution"))
         self.terminatebutton.Disable()
 
-        self.pausebutton = wx.Button(self.panel, label="Pause" ,pos=(230, 548), size=(100, 28))
-        self.pausebutton.Bind(wx.EVT_BUTTON, self.OnPause)   # need to implement OnExit(). Leave notrace
-        self.pausebutton.SetToolTip(wx.ToolTip("To pause the execution "))
-        self.pausebutton.Hide()
+##        self.pausebutton = wx.Button(self.panel, label="Pause" ,pos=(230, 548), size=(75, 28))
+##        self.pausebutton.Bind(wx.EVT_BUTTON, self.OnPause)   # need to implement OnExit(). Leave notrace
+##        self.pausebutton.SetToolTip(wx.ToolTip("To pause the execution "))
+##        self.pausebutton.Hide()
 
-        self.continuebutton = wx.Button(self.panel, label="Continue" ,pos=(230, 548), size=(100, 28))
+
+##        self.continue_debugbutton = wx.Button(self.panel, label="Resume" ,pos=(140, 548), size=(75, 28))
+        self.continue_debugbutton = wx.BitmapButton(self.panel, bitmap=paly_img,pos=(70, 598), size=(35, 28))
+        self.continue_debugbutton.Bind(wx.EVT_BUTTON, self.Resume)   # need to implement OnExit(). Leave notrace
+        self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution "))
+        self.continue_debugbutton.Hide()
+
+        self.continuebutton = wx.BitmapButton(self.panel, bitmap=step_img,pos=(130, 598), size=(35,28))
+##        self.continuebutton = wx.Button(self.panel, label="Continue" ,pos=(230, 548), size=(75, 28))
         self.continuebutton.Bind(wx.EVT_BUTTON, self.OnContinue)   # need to implement OnExit(). Leave notrace
         self.continuebutton.SetToolTip(wx.ToolTip("To continue the execution "))
         self.continuebutton.Hide()
@@ -418,18 +399,19 @@ class ClientWindow(wx.Frame):
 ##        self.breakpointbutton.Bind(wx.EVT_BUTTON,None)   # need to implement OnExtract()
 ##        self.breakpointbutton.SetToolTip(wx.ToolTip("Breakpoint"))
 
-##        self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(700, 548), size=(50,28), style = wx.TE_RICH)
-##        box.Add(self.breakpoint, 1, wx.ALL|wx.EXPAND, 5)
+        self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(230, 598), size=(60,20), style = wx.TE_RICH)
+        box.Add(self.breakpoint, 1, wx.ALL|wx.EXPAND, 5)
+        self.breakpoint.Disable()
 
-        self.executebutton = wx.Button(self.panel, label="Execute" ,pos=(12, 588), size=(100, 28))
-        self.executebutton.Bind(wx.EVT_BUTTON, self.OnExecute)
-        self.executebutton.SetToolTip(wx.ToolTip("To execute the script"))
+##        self.executebutton = wx.Button(self.panel, label="Execute" ,pos=(12, 588), size=(100, 28))
+##        self.executebutton.Bind(wx.EVT_BUTTON, self.OnExecute)
+##        self.executebutton.SetToolTip(wx.ToolTip("To execute the script"))
 
         self.cancelbutton = wx.Button(self.panel, label="Exit" ,pos=(350, 548), size=(100, 28))
         self.cancelbutton.Bind(wx.EVT_BUTTON, self.OnExit)   # need to implement OnExit(). Leave notrace
         self.cancelbutton.SetToolTip(wx.ToolTip("To exit and close the browser"))
 
-        self.clearbutton = wx.Button(self.panel, label="Clear" ,pos=(120, 588), size=(100, 28))
+        self.clearbutton = wx.Button(self.panel, label="Clear" ,pos=(590, 548), size=(100, 28))
         self.clearbutton.Bind(wx.EVT_BUTTON, self.OnClear)   # need to implement OnExit(). Leave notrace
         self.clearbutton.SetToolTip(wx.ToolTip("To clear the console area"))
 
@@ -438,7 +420,7 @@ class ClientWindow(wx.Frame):
 
         box.AddStretchSpacer()
 
-        self.label1 = wx.StaticText(self.panel,label = "@ 2016 SLK Software Services Pvt. Ltd. All Rights Reserved. Patent Pending.",pos=(12, 628), size=(400, 28))
+##        self.label1 = wx.StaticText(self.panel,label = "@ 2016 SLK Software Services Pvt. Ltd. All Rights Reserved. Patent Pending.",pos=(12, 628), size=(400, 28))
 
         # redirect text here
         redir=RedirectText(self.log)
@@ -513,6 +495,35 @@ class ClientWindow(wx.Frame):
         # tell the handler to use this format
         console.setFormatter(formatter)
 
+##    def OnRadiogroup(self, e):
+##        rb = e.GetEventObject()
+##        print rb.GetLabel(),' is clicked from Radio Group'
+
+    def onRadioBox(self,e):
+        self.choice=self.rbox.GetStringSelection()
+        print self.choice,' is Selected'
+        self.debug_mode=False
+        self.breakpoint.Disable()
+        if self.choice in ['Stepwise','RunfromStep']:
+            self.debug_mode=True
+            self.continue_debugbutton.Show()
+            self.continuebutton.Show()
+            if self.choice=='RunfromStep':
+                self.breakpoint.Enable()
+            if self.mythread==None:
+                self.continue_debugbutton.Disable()
+                self.continuebutton.Disable()
+
+        else:
+            self.continuebutton.Hide()
+            self.continue_debugbutton.Hide()
+
+
+
+
+
+
+
 
     def OnClose(self, event):
 
@@ -547,16 +558,17 @@ class ClientWindow(wx.Frame):
         logger.print_on_console('Event Triggered to Pause')
         log.info('Event Triggered to Pause')
         controller.pause_flag=True
-        self.pausebutton.Hide()
+##        self.pausebutton.Hide()
         self.continuebutton.Show()
 
 
-    def OnContinueDebug(self, event):
+    def Resume(self, event):
         logger.print_on_console('Event Triggered to Resume Debug')
         log.info('Event Triggered to Resume Debug')
         controller.pause_flag=False
-        self.mythread.resume()
+        self.mythread.resume(False)
         self.continuebutton.Hide()
+        self.continue_debugbutton.Hide()
 
 
 
@@ -564,13 +576,13 @@ class ClientWindow(wx.Frame):
     def OnContinue(self, event):
         logger.print_on_console('Event Triggered to Resume')
         log.info('Event Triggered to Resume')
-        self.resume()
+        self.resume(True)
 
-    def resume(self):
+    def resume(self,debug_mode):
         controller.pause_flag=False
-        self.mythread.resume()
-        self.continuebutton.Hide()
-        self.pausebutton.Show()
+        self.mythread.resume(debug_mode)
+##        self.continuebutton.Hide()
+##        self.pausebutton.Show()
     #----------------------------------------------------------------------
     def OnTerminate(self, event):
         logger.print_on_console('---------Termination Started-------')
@@ -578,7 +590,7 @@ class ClientWindow(wx.Frame):
         #Handling the case where user clicks terminate when the execution is paused
         #Resume the execution
         if controller.pause_flag:
-            self.resume()
+            self.resume(False)
 
 
     #----------------------------------------------------------------------
@@ -643,6 +655,7 @@ class ClientWindow(wx.Frame):
         print 'Browser name : ',browsername
         con = controller.Controller()
         con.get_all_the_imports('WebScrape')
+        con.get_all_the_imports('Web')
         import Nineteen68_WebScrape
         global socketIO
         self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO)

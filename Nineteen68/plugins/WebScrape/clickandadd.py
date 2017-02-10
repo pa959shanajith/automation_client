@@ -200,7 +200,7 @@ class Clickandadd():
                         tempne_stopclicknadd.extend(temp)
                         for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
                             inpath = path + str(frames) + 'f' + '/'
-                            if switchtoframe_clicknadd1(inpath):
+                            if switchtoframe_stopclicknadd1(inpath):
                                 itemp = driver.execute_script(javascript_stopclicknadd)
                                 log.info('before stopclicknadd operation on frame page is done and data is obtained')
                                 tempne_stopclicknadd.extend(itemp)
@@ -228,7 +228,7 @@ class Clickandadd():
                         tempne_stopclicknadd.extend(temp)
                         for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
                             inpath = path + str(frames) + 'i' + '/'
-                            if switchtoframe_clicknadd1(inpath):
+                            if switchtoframe_stopclicknadd1(inpath):
                                 log.info('before stopclicknadd operation on iframe page is done and data is obtained')
                                 itemp = driver.execute_script(javascript_stopclicknadd)
                                 log.info('stopclicknadd operation on iframe page is done and data is obtained')
