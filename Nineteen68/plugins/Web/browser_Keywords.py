@@ -429,6 +429,7 @@ class BrowserKeywords():
 class Singleton_DriverUtil():
     def check_available_driver(self,browser_num):
         global driver_obj
+        import os
         try:
             import browserops
             logger.print_on_console("browserops.driver ",browserops.driver)

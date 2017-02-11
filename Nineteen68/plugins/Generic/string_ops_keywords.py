@@ -248,14 +248,14 @@ class StringOperation:
         try:
             if not (actual_string is None and actual_string is ''):
                 if not (to_find is None and to_find is ''):
-                    output = actual_string.find(to_find)
-                    if(output == -1):
+                    output_val = actual_string.find(to_find)
+                    if(output_val == -1):
                         status=TEST_RESULT_FAIL
                         result=TEST_RESULT_FALSE
                     else:
-                        logger.print_on_console('Result : ',output)
+                        logger.print_on_console('Result : ',output_val)
                         log.info('Result : ')
-                        log.info(output)
+                        log.info(output_val)
                         status=TEST_RESULT_PASS
                         result=TEST_RESULT_TRUE
             else:
