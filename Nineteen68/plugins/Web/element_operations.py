@@ -156,7 +156,12 @@ class ElementKeywords:
                         obj.mouse_move(int(location.get('x')+9),int(location.get('y')+yoffset))
                     else:
                         obj.enumwindows()
-                        obj.mouse_move(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6))
+                        if len(obj.rect)>1:
+                            obj.mouse_move(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6))
+                        else:
+                            err_msg='Element to be dragged should be on top'
+                            log.error=err_msg
+                            logger.print_on_console(err_msg)
                     import time
                     time.sleep(0.5)
                     obj.mouse_press(LEFT_BUTTON)
@@ -200,7 +205,12 @@ class ElementKeywords:
                         obj.slide(int(location.get('x')+9),int(location.get('y')+yoffset), 0);
                     else:
                         obj.enumwindows()
-                        obj.slide(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6), 0);
+                        if len(obj.rect)>1:
+                            obj.slide(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6), 0)
+                        else:
+                            err_msg='Element to be dragged should be on top'
+                            log.error=err_msg
+                            logger.print_on_console(err_msg)
                     time.sleep(0.5)
                     obj.mouse_release(LEFT_BUTTON)
                     log.info(STATUS_METHODOUTPUT_UPDATE)
