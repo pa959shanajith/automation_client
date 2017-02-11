@@ -208,6 +208,7 @@ class TestThread(threading.Thread):
 
             self.wxObject.cancelbutton.Disable()
 ##            self.wxObject.terminatebutton.Enable()
+            runfrom_step=1
             if self.action==DEBUG:
                 self.debug_mode=False
                 self.wxObject.breakpoint.Disable()
@@ -217,21 +218,23 @@ class TestThread(threading.Thread):
                     self.wxObject.continuebutton.Show()
                     self.wxObject.continue_debugbutton.Enable()
                     self.wxObject.continuebutton.Enable()
+
                     if self.wxObject.choice=='RunfromStep':
                         self.wxObject.breakpoint.Enable()
+                        try:
+                            runfrom_step=self.wxObject.breakpoint.GetValue()
+                            runfrom_step=int(runfrom_step)
+                        except Exception as e:
+                            runfrom_step=1
+                            log.error('Invalid step number, Hence default step num is taken as 1')
+                            logger.print_on_console('Invalid step number, Hence default step num is taken as 1')
 
 
 
 
 
-##            runfrom_step=1
-            try:
-                runfrom_step=self.wxObject.breakpoint.GetValue()
-                runfrom_step=int(runfrom_step)
-            except Exception as e:
-                runfrom_step=1
-                log.error('Invalid step number, Hence default step num is taken as 1')
-                logger.print_on_console('Invalid step number, Hence default step num is taken as 1')
+
+
             self.wxObject.rbox.Disable()
 
             self.wxObject.breakpoint.Disable()
@@ -384,7 +387,7 @@ class ClientWindow(wx.Frame):
 ##        self.continue_debugbutton = wx.Button(self.panel, label="Resume" ,pos=(140, 548), size=(75, 28))
         self.continue_debugbutton = wx.BitmapButton(self.panel, bitmap=paly_img,pos=(70, 598), size=(35, 28))
         self.continue_debugbutton.Bind(wx.EVT_BUTTON, self.Resume)   # need to implement OnExit(). Leave notrace
-        self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution "))
+        self.continue_debugbutton.SetToolTip(wx.ToolTip("To Resume the execution "))
         self.continue_debugbutton.Hide()
 
         self.continuebutton = wx.BitmapButton(self.panel, bitmap=step_img,pos=(130, 598), size=(35,28))

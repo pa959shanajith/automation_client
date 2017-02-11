@@ -116,6 +116,8 @@ class Controller():
         self.verify_exists=False
         self.debug_mode=False
         self.debug_choice='Normal'
+        self.last_tc_num=1
+        self.debugfrom_step=1
 
 
     def __load_generic(self):
@@ -267,7 +269,7 @@ class Controller():
         log.debug('Wait is sover')
 
 
-    def methodinvocation(self,index,last_tc_num,debugfrom_step,*args):
+    def methodinvocation(self,index,*args):
 
         global pause_flag
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
@@ -275,9 +277,9 @@ class Controller():
         tsp = handler.tspList[index]
 
         #logic to handle step by step debug
-        if self.debug_mode and tsp.testcase_num==last_tc_num:
+        if self.debug_mode and tsp.testcase_num==self.last_tc_num:
             #logic to handle run from setp debug
-            if self.debug_choice=='RunfromStep' and debugfrom_step>0 and tsp.stepnum < debugfrom_step :
+            if self.debug_choice=='RunfromStep' and self.debugfrom_step>0 and tsp.stepnum < self.debugfrom_step :
                 return index +1
             pause_flag=True
 
@@ -576,16 +578,16 @@ class Controller():
 
         while (i < len(tsplist)):
             tsp = tsplist[i]
-            logger.print_on_console('debugfrom_step ',debugfrom_step)
-
             #Check for 'terminate_flag' before execution
             if not(terminate_flag):
                 #Check for 'pause_flag' before execution
                 if pause_flag:
                     self.pause_execution()
+                self.last_tc_num=last_tc_num
+                self.debugfrom_step=debugfrom_step
 
                 try:
-                    i = self.methodinvocation(i,last_tc_num,debugfrom_step)
+                    i = self.methodinvocation(i)
                     if i== TERMINATE:
                         #Changing the overallstatus of the report_obj to Terminate - (Sushma)
                         self.reporting_obj.overallstatus=TERMINATE
