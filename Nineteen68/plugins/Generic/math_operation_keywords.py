@@ -124,6 +124,9 @@ class NumericStringParser(object):
             log.debug('Evaluating the expression')
             logger.print_on_console('Evaluating the expression')
             output=self.evaluateStack( self.exprStack[:] )
+            if isinstance(output,float):
+                if output % 1 == 0.0:
+                    output = int(output)
             log.debug('Got the result : %s', output)
             logger.print_on_console('Got the result : ', output)
             status=TEST_RESULT_PASS
