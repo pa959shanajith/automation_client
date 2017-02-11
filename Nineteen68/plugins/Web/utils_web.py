@@ -55,7 +55,7 @@ class Utils:
     def mouse_move(self,x,y):
         log.debug('Moving the mouse to')
         log.debug(x)
-        log.ddebug(y)
+        log.debug(y)
         self.robot.set_mouse_pos(x,y)
 
     def loop_childwindows(self,actwindow,param):

@@ -142,7 +142,7 @@ class ElementKeywords:
         if webelement is not None:
             try:
                 if webelement.is_enabled():
-                    log.info(ERROR_CODE_DICT['MSB_OBJECT_ENABLED'])
+                    log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
                     obj=Utils()
                     log.debug('Utils object created to call the get_element_location method')
                      #find the location of the element w.r.t viewport
@@ -169,7 +169,6 @@ class ElementKeywords:
                     logger.print_on_console(ERR_DISABLED_OBJECT)
             except Exception as e:
                 log.error(e)
-
                 logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
@@ -185,7 +184,7 @@ class ElementKeywords:
         if webelement is not None:
             try:
                 if webelement.is_enabled():
-                    log.info(ERROR_CODE_DICT['MSB_OBJECT_ENABLED'])
+                    log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
                     obj=Utils()
                     log.debug('Utils object created to call the get_element_location method')
                      #find the location of the element w.r.t viewport
@@ -231,11 +230,14 @@ class ElementKeywords:
             try:
                tool_tip=self.__get_tooltip(webelement)
                if tool_tip is not None and tool_tip != '':
-                   log.info('Tool tip text: ')
-                   log.info(tool_tip)
                    log.info(STATUS_METHODOUTPUT_UPDATE)
                    status=TEST_RESULT_PASS
                    methodoutput=TEST_RESULT_TRUE
+               else:
+                    tool_tip=None
+               log.info('Tool tip text is : ')
+               log.info(tool_tip)
+               logger.print_on_console('Tool tip text: '+str(tool_tip))
             except Exception as e:
                 log.error(e)
 
@@ -269,7 +271,7 @@ class ElementKeywords:
                         log.info('Tool tip Text mismatched')
                         logger.print_on_console('Expected: ',tool_tip)
                         log.info('Expected:')
-                        log.info(text)
+                        log.info(tool_tip)
                         logger.print_on_console('Actual: ',input)
                         log.info('Actual:')
                         log.info(input)
