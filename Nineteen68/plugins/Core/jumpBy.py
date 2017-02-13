@@ -72,6 +72,8 @@ class  JumpBy():
             if jumpByStepNum<len(tspList):
                 flag,error=self.__validate_jumpbystep(jumpByStepNum,scenario)
                 if(flag):
+                    logger.print_on_console('Encountered jumpBy ',str(stepToJump))
+                    log.info('Encountered jumpBy '+str(stepToJump))
                     self.status=True
                 else:
                     logger.print_on_console(error)
@@ -80,10 +82,10 @@ class  JumpBy():
             else:
                 jumpByStepNum=-1
                 logger.print_on_console('ERR_JUMPY_STEP_DOESN''T_EXISTS')
+                log.error('ERR_JUMPY_STEP_DOESN''T_EXISTS')
 
         except Exception as e:
              log.error(e)
-
              logger.print_on_console(e)
 
 

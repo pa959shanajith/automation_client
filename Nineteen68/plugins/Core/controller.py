@@ -169,11 +169,13 @@ class Controller():
 
     def __load_web(self):
         try:
+            self.get_all_the_imports('WebScrape')
             self.get_all_the_imports('Web')
             import web_dispatcher
             self.web_dispatcher_obj = web_dispatcher.Dispatcher()
             self.web_dispatcher_obj.exception_flag=exception_flag
-            self.get_all_the_imports('WebScrape')
+            self.web_dispatcher_obj.action=self.action
+
         except Exception as e:
              logger.print_on_console('Error loading Web plugin')
 
@@ -667,8 +669,8 @@ class Controller():
         maindir = os.getcwd()
         os.chdir('..')
         curdir = os.getcwd()
-        path= curdir + '//Nineteen68//plugins//'+plugin_path
-##        path = 'D:\Git\Nineteen68_Websrape_Integration\Nineteen68\plugins\\' + plugin_path
+         path= curdir + '//Nineteen68//plugins//'+plugin_path
+#        path = 'D:\Git\Nineteen68_Websrape_Integration\Nineteen68\plugins\\' + plugin_path
         sys.path.append(path)
         for root, dirs, files in os.walk(path):
             for d in dirs:
@@ -691,19 +693,6 @@ class Controller():
 
         scenario=[json_data]
 
-
-
-##        if flag:
-##        try:
-##            input_breakpoint=int(input_breakpoint)
-##            if input_breakpoint >0:
-##                break_point=input_breakpoint
-##                logger.print_on_console('***Break_point is ***',input_breakpoint)
-##        except Exception as e:
-##                import traceback
-##                traceback.print_exc()
-##            log.error(e)
-##            logger.print_on_console('Invalid breakpoint number')
         print( '=======================================================================================================')
         log.info('***DEBUG STARTED***')
         logger.print_on_console('***DEBUG STARTED***')
@@ -731,19 +720,22 @@ class Controller():
         return status
 
 
-    def invoke_execution(self,input_breakpoint,mythread,browser):
+    def invoke_execution(self,mythread,json_data,socketIO):
         global terminate_flag
         obj = handler.Handler()
-        t = test.Test()
-        suites_list,flag = t.gettsplist()
+        status=COMPLETED
+##        t = test.Test()
+##        suites_list,flag = t.gettsplist()
+        suiteId_list,suite_details,browser_type,scenarioIds,suite_data=obj.parse_json_execute(json_data)
         self.action=EXECUTE
 
         #in future this value will come from the UI
-        scenarios = scenario_num
-        print 'No  of Suites : ',len(suites_list)
+##        scenarios = scenario_num
+        log.info( 'No  of Suites : '+str(len(suiteId_list)))
+        logger.print_on_console('No  of Suites : ',len(suiteId_list))
         j=1
         #Iterate through the suites-list
-        for suite in suites_list:
+        for suite,suite_id,suite_id_data in zip(suite_details,suiteId_list,suite_data):
             #EXECUTION GOES HERE
             status = False
             flag=True
@@ -759,75 +751,79 @@ class Controller():
             log.info('-----------------------------------------------')
             print( '=======================================================================================================')
             #Iterate through each suite
-            for i in range( len(suite)):
-                do_not_execute = False
-                #create a object of controller for each scenario
-                con =Controller()
-                handler.tspList=[]
-                #Check for the disabled scenario
-
-                for k in scenarios:
-                    if k == (i + 1):
-                        do_not_execute = True
-                        break
+##            for i in range( len(suite)):
+            condition_check=False
+            do_not_execute = False
+            #create a object of controller for each scenario
+            con =Controller()
+            handler.tspList=[]
+            #Check for the disabled scenario
 
 
 
-                if not (do_not_execute) :
-                    #check for temrinate flag before printing loggers
-                    if not(terminate_flag):
-                        print( '=======================================================================================================')
-                        logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
-                        print( '=======================================================================================================')
-                        log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
-                    for d in suite[i]:
-                        #check for temrinate flag before parsing tsp list
-                        if terminate_flag:
-                            break
-                        flag,browser,last_tc_num=obj.parse_json(d)
-                        if flag == False:
-                            break
-                        print '\n'
-                        tsplist = obj.read_step()
-                        for k in range(len(tsplist)):
-                            if tsplist[k].name.lower() == 'openbrowser':
-                                tsplist[k].inputval = browser
-
-                    if flag:
-                        #check for temrinate flag before execution
+            if not (do_not_execute) :
+                i=0
+                for browser in browser_type[suite_id]:
+                    for scenario,scenario_id in zip(suite_id_data,scenarioIds[suite_id]):
+                         #check for temrinate flag before printing loggers
                         if not(terminate_flag):
-                            con.action=EXECUTE
-                            con.conthread=mythread
-                            status = con.executor(tsplist,EXECUTE,False,last_tc_num)
                             print( '=======================================================================================================')
-                            logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
+                            logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
                             print( '=======================================================================================================')
+                            log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
+                        for d in eval(scenario[scenario_id]):
 
+                            #check for temrinate flag before parsing tsp list
+                            if terminate_flag:
+                                break
+                            flag,browser_temp,last_tc_num=obj.parse_json([d])
+
+                            if flag == False:
+                                break
+                            print '\n'
+                            tsplist = handler.tspList
+                            for k in range(len(tsplist)):
+                                if tsplist[k].name.lower() == 'openbrowser':
+                                    tsplist[k].inputval = [browser]
+
+                        if flag:
+                            #check for temrinate flag before execution
+                            tsplist = obj.read_step()
+                            if not(terminate_flag):
+                                con.action=EXECUTE
+                                con.conthread=mythread
+                                status = con.executor(tsplist,EXECUTE,last_tc_num,1)
+                                print( '=======================================================================================================')
+                                logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
+                                print( '=======================================================================================================')
+
+                        else:
+                            print 'Invalid script'
+
+                        #Saving the report for the scenario
+                        logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
+                        log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
+                        os.chdir(self.cur_dir)
+                        filename='Scenario'+str(i  + 1)+'.json'
+                        con.reporting_obj.save_report_json(filename)
+                        socketIO.emit('result_executeTestSuite',con.reporting_obj.report_json)
+                        obj.clearList(con)
+                        i+=1
                     else:
-                        print 'Invalid script'
-##                    print( '=======================================================================================================')
-##                    logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
-##                    print( '=======================================================================================================')
-                    #Saving the report for the scenario
-                    os.chdir(self.cur_dir)
-                    filename='Scenario'+str(i  + 1)+'.json'
-                    con.reporting_obj.save_report_json(filename)
-                    obj.clearList(con)
-                else:
-                    print( '=======================================================================================================')
-                    logger.print_on_console( 'Scenario ' , (i + 1) ,' has been disabled for execution!!!')
-                    log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
-                    print( '=======================================================================================================')
-            #logic for condition check
-            report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-            #Check is made to fix issue #401
-            if len(report_json)>0:
-                overall_status=report_json[0]['overallstatus']
-                if(condition_check==True):
-                    if(overall_status=='Pass'):
-                        continue
-                    else:
-                        break
+                        print( '=======================================================================================================')
+                        logger.print_on_console( 'Scenario ' , (i + 1) ,' has been disabled for execution!!!')
+                        log.info('Scenario ' + str((i + 1) ) +' has been disabled for execution!!!')
+                        print( '=======================================================================================================')
+                    #logic for condition check
+                    report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+                    #Check is made to fix issue #401
+                    if len(report_json)>0:
+                        overall_status=report_json[0]['overallstatus']
+                        if(condition_check==True):
+                            if(overall_status==TEST_RESULT_PASS):
+                                continue
+                            else:
+                                break
             log.info('---------------------------------------------------------------------')
             print( '=======================================================================================================')
             log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
@@ -841,23 +837,26 @@ class Controller():
             print( '=======================================================================================================')
         return status
 
-    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,debug_choice,*args):
+    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,debug_choice,socketIO,*args):
         status = COMPLETED
         global terminate_flag,break_point,pause_flag
         self.conthread=mythread
         self.clear_data()
-        self.debug_mode=debug_mode
+
         self.debug_choice=debug_choice
         if action.lower()==EXECUTE:
+            self.execution_mode=SERIAL
             #Parallel Execution
-            if execution_mode.lower() == PARALLEL:
-                status=self.invoke_execution(input_breakpoint,mythread,unicode(args[0]))
-            elif execution_mode.lower() == SERIAL:
-                 for browser in range( len(browsers)):
-                    status=self.invoke_execution(input_breakpoint,mythread,unicode(browsers[browser]))
-                    if status==TERMINATE:
-                        break
+            obj=handler.Handler()
+##            if execution_mode.lower() == PARALLEL:
+##                status=self.invoke_execution(mythread,json_data)
+            if self.execution_mode.lower() == SERIAL:
+##                 for browser in range( len(browsers)):
+                status=self.invoke_execution(mythread,json_data,socketIO)
+##                    if status==TERMINATE:
+##                        break
         elif action.lower()==DEBUG:
+            self.debug_mode=debug_mode
             status=self.invoke_debug(mythread,runfrom_step,json_data)
         if status != TERMINATE:
             status=COMPLETED
@@ -912,7 +911,7 @@ def kill_process():
         logger.print_on_console(e)
 
 #main method
-##if __name__ == '__main__':
+if __name__ == '__main__':
 ##    kill_process()
 ##    #To debug from main method
 ##    obj = handler.Handler()
@@ -937,9 +936,102 @@ def kill_process():
 ##        else:
 ##            print 'Invalid script'
 
-##    #To execute from main method
-##    obj=Controller()
-##    obj.invoke_execution(0,None,'3')
+    #To execute from main method
+    obj=Controller()
+    json_data={
+
+	"suitedetails": [{
+
+		"ts1": [{
+
+			"f432bd8c-ccc3-462f-9281-40fded159eeb": [{
+
+				"template": "",
+
+				"testcase": "[{ \"outputVal\": \"\", \"keywordVal\": \"openBrowser\", \"objectName\": \" \", \"_id_\": \"1\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 1, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [\"this is first remark\", \"this is second remark\"] }, { \"outputVal\": \"\", \"keywordVal\": \"navigateToURL\", \"objectName\": \" \", \"_id_\": \"2\", \"inputVal\": [\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\"], \"appType\": \"Web\", \"stepNo\": 2, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"3\", \"inputVal\": [\"{a};D:\\\\OEBS\"], \"appType\": \"Generic\", \"stepNo\": 3, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"4\", \"inputVal\": [\"{b};txt\"], \"appType\": \"Generic\", \"stepNo\": 4, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"{1}\", \"keywordVal\": \"verifyExists\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"5\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 5, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"displayVariableValue\", \"objectName\": \" \", \"_id_\": \"6\", \"inputVal\": [\"{1}\"], \"appType\": \"Generic\", \"stepNo\": 6, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"click\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"7\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 7, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"sendFunctionKeys\", \"objectName\": \" \", \"_id_\": \"8\", \"inputVal\": [\"ctrl+s\"], \"appType\": \"Generic\", \"stepNo\": 8, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"saveFile\", \"objectName\": \" \", \"_id_\": \"9\", \"inputVal\": [\"{a};{b}\"], \"appType\": \"Generic\", \"stepNo\": 9, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }]",
+
+				"testcasename": "Dev_Testing1"
+
+			}, {
+
+				"template": "",
+
+				"testcase": "[{\"stepNo\":1,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"doubleClick\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Comments updated\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"1\"},{\"stepNo\":2,\"objectName\":\" \",\"custname\":\"@Generic\",\"keywordVal\":\"captureScreenshot\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Remarks for step 2\",\"url\":\" \",\"appType\":\"Generic\",\"_id_\":\"2\"},{\"stepNo\":3,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"getElementText\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 3\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"3\"},{\"stepNo\":4,\"objectName\":\" \",\"custname\":\"@Browser\",\"keywordVal\":\"getCurrentURL\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 4\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"4\"}]",
+
+				"testcasename": "Dev_Testing"
+
+			}]
+
+		}],
+
+		"scenarioIds": ["f432bd8c-ccc3-462f-9281-40fded159eeb"],
+
+		"browserType": ["1",'3']
+
+	}, {
+
+		"ts2": [{
+
+			"f432bd8c-ccc3-462f-9281-40fded159ccb": [{
+
+				"template": "",
+
+				"testcase": "[{ \"outputVal\": \"\", \"keywordVal\": \"openBrowser\", \"objectName\": \" \", \"_id_\": \"1\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 1, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [\"this is first remark\", \"this is second remark\"] }, { \"outputVal\": \"\", \"keywordVal\": \"navigateToURL\", \"objectName\": \" \", \"_id_\": \"2\", \"inputVal\": [\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\"], \"appType\": \"Web\", \"stepNo\": 2, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"3\", \"inputVal\": [\"{a};D:\\\\OEBS\"], \"appType\": \"Generic\", \"stepNo\": 3, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"4\", \"inputVal\": [\"{b};txt\"], \"appType\": \"Generic\", \"stepNo\": 4, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"{1}\", \"keywordVal\": \"verifyExists\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"5\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 5, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"displayVariableValue\", \"objectName\": \" \", \"_id_\": \"6\", \"inputVal\": [\"{1}\"], \"appType\": \"Generic\", \"stepNo\": 6, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"click\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"7\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 7, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"sendFunctionKeys\", \"objectName\": \" \", \"_id_\": \"8\", \"inputVal\": [\"ctrl+s\"], \"appType\": \"Generic\", \"stepNo\": 8, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"saveFile\", \"objectName\": \" \", \"_id_\": \"9\", \"inputVal\": [\"{a};{b}\"], \"appType\": \"Generic\", \"stepNo\": 9, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }]",
+
+				"testcasename": "Dev_Testing1"
+
+			}, {
+
+				"template": "",
+
+				"testcase": "[{\"stepNo\":1,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"doubleClick\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Comments updated\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"1\"},{\"stepNo\":2,\"objectName\":\" \",\"custname\":\"@Generic\",\"keywordVal\":\"captureScreenshot\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Remarks for step 2\",\"url\":\" \",\"appType\":\"Generic\",\"_id_\":\"2\"},{\"stepNo\":3,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"getElementText\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 3\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"3\"},{\"stepNo\":4,\"objectName\":\" \",\"custname\":\"@Browser\",\"keywordVal\":\"getCurrentURL\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 4\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"4\"}]",
+
+				"testcasename": "Dev_Testing"
+
+			}]
+
+		}],
+
+		"scenarioIds": ["f432bd8c-ccc3-462f-9281-40fded159ccb"],
+
+		"browserType": ["3"]
+
+	}],
+
+
+	"testsuiteIds": ["ts1", "ts2"]
+
+    }
+
+
+##json_data1=[{
+##                "f432bd8c-ccc3-462f-9281-40fded159778": [{
+##                                "f432bd8c-ccc3-462f-9281-40fded159eeb": [{
+##                                                "template": "",
+##                                                "testcase": "[{ \"outputVal\": \"\", \"keywordVal\": \"openBrowser\", \"objectName\": \" \", \"_id_\": \"1\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 1, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [\"this is first remark\", \"this is second remark\"] }, { \"outputVal\": \"\", \"keywordVal\": \"navigateToURL\", \"objectName\": \" \", \"_id_\": \"2\", \"inputVal\": [\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\"], \"appType\": \"Web\", \"stepNo\": 2, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"3\", \"inputVal\": [\"{a};D:\\\\OEBS\"], \"appType\": \"Generic\", \"stepNo\": 3, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"4\", \"inputVal\": [\"{b};txt\"], \"appType\": \"Generic\", \"stepNo\": 4, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"{1}\", \"keywordVal\": \"verifyExists\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"5\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 5, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"displayVariableValue\", \"objectName\": \" \", \"_id_\": \"6\", \"inputVal\": [\"{1}\"], \"appType\": \"Generic\", \"stepNo\": 6, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"click\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"7\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 7, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"sendFunctionKeys\", \"objectName\": \" \", \"_id_\": \"8\", \"inputVal\": [\"ctrl+s\"], \"appType\": \"Generic\", \"stepNo\": 8, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"saveFile\", \"objectName\": \" \", \"_id_\": \"9\", \"inputVal\": [\"{a};{b}\"], \"appType\": \"Generic\", \"stepNo\": 9, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }]",
+##                                                "testcasename": "Dev_Testing1"
+##                                }, {
+##                                                "template": "",
+##                                                "testcase": "[{\"stepNo\":1,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"doubleClick\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Comments updated\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"1\"},{\"stepNo\":2,\"objectName\":\" \",\"custname\":\"@Generic\",\"keywordVal\":\"captureScreenshot\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Remarks for step 2\",\"url\":\" \",\"appType\":\"Generic\",\"_id_\":\"2\"},{\"stepNo\":3,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"getElementText\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 3\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"3\"},{\"stepNo\":4,\"objectName\":\" \",\"custname\":\"@Browser\",\"keywordVal\":\"getCurrentURL\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 4\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"4\"}]",
+##                                                "testcasename": "Dev_Testing"
+##                                }],
+##                                "f432bd8c-ccc3-462f-9281-40fded159eec": [{
+##                                                "template": "",
+##                                                "testcase": "[{ \"outputVal\": \"\", \"keywordVal\": \"openBrowser\", \"objectName\": \" \", \"_id_\": \"1\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 1, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [\"this is first remark\", \"this is second remark\"] }, { \"outputVal\": \"\", \"keywordVal\": \"navigateToURL\", \"objectName\": \" \", \"_id_\": \"2\", \"inputVal\": [\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\"], \"appType\": \"Web\", \"stepNo\": 2, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"3\", \"inputVal\": [\"{a};D:\\\\OEBS\"], \"appType\": \"Generic\", \"stepNo\": 3, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"4\", \"inputVal\": [\"{b};txt\"], \"appType\": \"Generic\", \"stepNo\": 4, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"{1}\", \"keywordVal\": \"verifyExists\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"5\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 5, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"displayVariableValue\", \"objectName\": \" \", \"_id_\": \"6\", \"inputVal\": [\"{1}\"], \"appType\": \"Generic\", \"stepNo\": 6, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"click\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"7\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 7, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"sendFunctionKeys\", \"objectName\": \" \", \"_id_\": \"8\", \"inputVal\": [\"ctrl+s\"], \"appType\": \"Generic\", \"stepNo\": 8, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"saveFile\", \"objectName\": \" \", \"_id_\": \"9\", \"inputVal\": [\"{a};{b}\"], \"appType\": \"Generic\", \"stepNo\": 9, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }]",
+##                                                "testcasename": "Dev_Testing1"
+##                                }, {
+##                                                "template": "",
+##                                                "testcase": "[{\"stepNo\":1,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"doubleClick\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Comments updated\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"1\"},{\"stepNo\":2,\"objectName\":\" \",\"custname\":\"@Generic\",\"keywordVal\":\"captureScreenshot\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Remarks for step 2\",\"url\":\" \",\"appType\":\"Generic\",\"_id_\":\"2\"},{\"stepNo\":3,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"getElementText\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 3\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"3\"},{\"stepNo\":4,\"objectName\":\" \",\"custname\":\"@Browser\",\"keywordVal\":\"getCurrentURL\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 4\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"4\"}]",
+##                                                "testcasename": "Dev_Testing"
+##                                }]
+##                }],
+####                "scenarioIds": ["f432bd8c-ccc3-462f-9281-40fded159eeb","f432bd8c-ccc3-462f-9281-40fded159eec"],
+##                "browserType": ["1","2"]
+##}]
+##    obj1=handler.Handler()
+##    suiteId_list,suite_details=obj1.parse_json_execute(json_data)
+##    json_data={u'suitedetails': [{u'13bbacaf-82c7-4c4a-9f91-0933462b10d4': [{u'f432bd8c-ccc3-462f-9281-40fded159eeb': u'[{"template":"","testcase":"[{ \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"openBrowser\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"1\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 1, \\"url\\": \\" \\", \\"custname\\": \\"@Browser\\", \\"remarks\\": [\\"this is first remark\\", \\"this is second remark\\"] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"navigateToURL\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"2\\", \\"inputVal\\": [\\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 2, \\"url\\": \\" \\", \\"custname\\": \\"@Browser\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"createDynVariable\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"3\\", \\"inputVal\\": [\\"{a};D:\\\\\\\\OEBS\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 3, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"createDynVariable\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"4\\", \\"inputVal\\": [\\"{b};txt\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 4, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"{1}\\", \\"keywordVal\\": \\"verifyExists\\", \\"objectName\\": \\"//*[@id=\\\\\\"wsite-content\\\\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\\", \\"_id_\\": \\"5\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 5, \\"url\\": \\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\", \\"custname\\": \\"Download File\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"displayVariableValue\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"6\\", \\"inputVal\\": [\\"{1}\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 6, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"click\\", \\"objectName\\": \\"//*[@id=\\\\\\"wsite-content\\\\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\\", \\"_id_\\": \\"7\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 7, \\"url\\": \\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\", \\"custname\\": \\"Download File\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"sendFunctionKeys\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"8\\", \\"inputVal\\": [\\"ctrl+s\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 8, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"saveFile\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"9\\", \\"inputVal\\": [\\"{a};{b}\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 9, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }]","testcasename":"Dev_Testing1"},{"template":"","testcase":"[{\\"stepNo\\":1,\\"objectName\\":\\"@Custom\\",\\"custname\\":\\"@Custom\\",\\"keywordVal\\":\\"doubleClick\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"##\\",\\"remarks\\":\\"Comments updated\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"1\\"},{\\"stepNo\\":2,\\"objectName\\":\\" \\",\\"custname\\":\\"@Generic\\",\\"keywordVal\\":\\"captureScreenshot\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"##\\",\\"remarks\\":\\"Remarks for step 2\\",\\"url\\":\\" \\",\\"appType\\":\\"Generic\\",\\"_id_\\":\\"2\\"},{\\"stepNo\\":3,\\"objectName\\":\\"@Custom\\",\\"custname\\":\\"@Custom\\",\\"keywordVal\\":\\"getElementText\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarks\\":\\"Remarks for step 3\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"3\\"},{\\"stepNo\\":4,\\"objectName\\":\\" \\",\\"custname\\":\\"@Browser\\",\\"keywordVal\\":\\"getCurrentURL\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarks\\":\\"Remarks for step 4\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"4\\"}]","testcasename":"Dev_Testing"}]', u'72bcc08e-15a7-4de6-ad59-389aee2230cb': u'[{"template":"","testcase":"[{ \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"openBrowser\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"1\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 1, \\"url\\": \\" \\", \\"custname\\": \\"@Browser\\", \\"remarks\\": [\\"this is first remark\\", \\"this is second remark\\"] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"navigateToURL\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"2\\", \\"inputVal\\": [\\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 2, \\"url\\": \\" \\", \\"custname\\": \\"@Browser\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"createDynVariable\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"3\\", \\"inputVal\\": [\\"{a};D:\\\\\\\\OEBS\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 3, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"createDynVariable\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"4\\", \\"inputVal\\": [\\"{b};txt\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 4, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"{1}\\", \\"keywordVal\\": \\"verifyExists\\", \\"objectName\\": \\"//*[@id=\\\\\\"wsite-content\\\\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\\", \\"_id_\\": \\"5\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 5, \\"url\\": \\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\", \\"custname\\": \\"Download File\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"displayVariableValue\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"6\\", \\"inputVal\\": [\\"{1}\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 6, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"click\\", \\"objectName\\": \\"//*[@id=\\\\\\"wsite-content\\\\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\\", \\"_id_\\": \\"7\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 7, \\"url\\": \\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\", \\"custname\\": \\"Download File\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"sendFunctionKeys\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"8\\", \\"inputVal\\": [\\"ctrl+s\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 8, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"saveFile\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"9\\", \\"inputVal\\": [\\"{a};{b}\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 9, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }]","testcasename":"Dev_Testing1"},{"template":"","testcase":"[{\\"stepNo\\":1,\\"objectName\\":\\"@Custom\\",\\"custname\\":\\"@Custom\\",\\"keywordVal\\":\\"doubleClick\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"##\\",\\"remarks\\":\\"Comments updated\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"1\\"},{\\"stepNo\\":2,\\"objectName\\":\\" \\",\\"custname\\":\\"@Generic\\",\\"keywordVal\\":\\"captureScreenshot\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"##\\",\\"remarks\\":\\"Remarks for step 2\\",\\"url\\":\\" \\",\\"appType\\":\\"Generic\\",\\"_id_\\":\\"2\\"},{\\"stepNo\\":3,\\"objectName\\":\\"@Custom\\",\\"custname\\":\\"@Custom\\",\\"keywordVal\\":\\"getElementText\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarks\\":\\"Remarks for step 3\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"3\\"},{\\"stepNo\\":4,\\"objectName\\":\\" \\",\\"custname\\":\\"@Browser\\",\\"keywordVal\\":\\"getCurrentURL\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarks\\":\\"Remarks for step 4\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"4\\"}]","testcasename":"Dev_Testing"}]'}, {u'f432bd8c-ccc3-462f-9281-40fded159eeb': u'[{"template":"","testcase":"[{ \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"openBrowser\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"1\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 1, \\"url\\": \\" \\", \\"custname\\": \\"@Browser\\", \\"remarks\\": [\\"this is first remark\\", \\"this is second remark\\"] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"navigateToURL\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"2\\", \\"inputVal\\": [\\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 2, \\"url\\": \\" \\", \\"custname\\": \\"@Browser\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"createDynVariable\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"3\\", \\"inputVal\\": [\\"{a};D:\\\\\\\\OEBS\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 3, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"createDynVariable\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"4\\", \\"inputVal\\": [\\"{b};txt\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 4, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"{1}\\", \\"keywordVal\\": \\"verifyExists\\", \\"objectName\\": \\"//*[@id=\\\\\\"wsite-content\\\\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\\", \\"_id_\\": \\"5\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 5, \\"url\\": \\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\", \\"custname\\": \\"Download File\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"displayVariableValue\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"6\\", \\"inputVal\\": [\\"{1}\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 6, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"click\\", \\"objectName\\": \\"//*[@id=\\\\\\"wsite-content\\\\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\\", \\"_id_\\": \\"7\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 7, \\"url\\": \\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\", \\"custname\\": \\"Download File\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"sendFunctionKeys\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"8\\", \\"inputVal\\": [\\"ctrl+s\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 8, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"saveFile\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"9\\", \\"inputVal\\": [\\"{a};{b}\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 9, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }]","testcasename":"Dev_Testing1"},{"template":"","testcase":"[{\\"stepNo\\":1,\\"objectName\\":\\"@Custom\\",\\"custname\\":\\"@Custom\\",\\"keywordVal\\":\\"doubleClick\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"##\\",\\"remarks\\":\\"Comments updated\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"1\\"},{\\"stepNo\\":2,\\"objectName\\":\\" \\",\\"custname\\":\\"@Generic\\",\\"keywordVal\\":\\"captureScreenshot\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"##\\",\\"remarks\\":\\"Remarks for step 2\\",\\"url\\":\\" \\",\\"appType\\":\\"Generic\\",\\"_id_\\":\\"2\\"},{\\"stepNo\\":3,\\"objectName\\":\\"@Custom\\",\\"custname\\":\\"@Custom\\",\\"keywordVal\\":\\"getElementText\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarks\\":\\"Remarks for step 3\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"3\\"},{\\"stepNo\\":4,\\"objectName\\":\\" \\",\\"custname\\":\\"@Browser\\",\\"keywordVal\\":\\"getCurrentURL\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarks\\":\\"Remarks for step 4\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"4\\"}]","testcasename":"Dev_Testing"}]', u'72bcc08e-15a7-4de6-ad59-389aee2230cb': u'[{"template":"","testcase":"[{ \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"openBrowser\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"1\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 1, \\"url\\": \\" \\", \\"custname\\": \\"@Browser\\", \\"remarks\\": [\\"this is first remark\\", \\"this is second remark\\"] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"navigateToURL\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"2\\", \\"inputVal\\": [\\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 2, \\"url\\": \\" \\", \\"custname\\": \\"@Browser\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"createDynVariable\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"3\\", \\"inputVal\\": [\\"{a};D:\\\\\\\\OEBS\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 3, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"createDynVariable\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"4\\", \\"inputVal\\": [\\"{b};txt\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 4, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"{1}\\", \\"keywordVal\\": \\"verifyExists\\", \\"objectName\\": \\"//*[@id=\\\\\\"wsite-content\\\\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\\", \\"_id_\\": \\"5\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 5, \\"url\\": \\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\", \\"custname\\": \\"Download File\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"displayVariableValue\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"6\\", \\"inputVal\\": [\\"{1}\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 6, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"click\\", \\"objectName\\": \\"//*[@id=\\\\\\"wsite-content\\\\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\\", \\"_id_\\": \\"7\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 7, \\"url\\": \\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\", \\"custname\\": \\"Download File\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"sendFunctionKeys\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"8\\", \\"inputVal\\": [\\"ctrl+s\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 8, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"saveFile\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"9\\", \\"inputVal\\": [\\"{a};{b}\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 9, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }]","testcasename":"Dev_Testing1"},{"template":"","testcase":"[{\\"stepNo\\":1,\\"objectName\\":\\"@Custom\\",\\"custname\\":\\"@Custom\\",\\"keywordVal\\":\\"doubleClick\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"##\\",\\"remarks\\":\\"Comments updated\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"1\\"},{\\"stepNo\\":2,\\"objectName\\":\\" \\",\\"custname\\":\\"@Generic\\",\\"keywordVal\\":\\"captureScreenshot\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"##\\",\\"remarks\\":\\"Remarks for step 2\\",\\"url\\":\\" \\",\\"appType\\":\\"Generic\\",\\"_id_\\":\\"2\\"},{\\"stepNo\\":3,\\"objectName\\":\\"@Custom\\",\\"custname\\":\\"@Custom\\",\\"keywordVal\\":\\"getElementText\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarks\\":\\"Remarks for step 3\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"3\\"},{\\"stepNo\\":4,\\"objectName\\":\\" \\",\\"custname\\":\\"@Browser\\",\\"keywordVal\\":\\"getCurrentURL\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarks\\":\\"Remarks for step 4\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"4\\"}]","testcasename":"Dev_Testing"}]'}], u'browserType': [u'1', u'3'], u'scenarioIds': [u'72bcc08e-15a7-4de6-ad59-389aee2230cb', u'f432bd8c-ccc3-462f-9281-40fded159eeb']}], u'testsuiteIds': [u'13bbacaf-82c7-4c4a-9f91-0933462b10d4']}
+##    obj.invoke_execution('',json_data,'')
 ##    kill_process()
 
 
