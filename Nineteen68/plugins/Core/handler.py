@@ -138,8 +138,11 @@ class Handler():
         suite_data=[]
         scenarioIds={}
         browser_type={}
+        dataparam_path={}
+        condition_check={}
         suiteId_list=[]
         suite_details=[]
+        execution_id=[]
         #Iterating through json array
 
         try:
@@ -147,6 +150,7 @@ class Handler():
             suite_details=new_obj['suitedetails']
             #Getting suite_ids
             suiteId_list=new_obj['testsuiteIds']
+            execution_id=new_obj['executionId']
             for json_data,suite_id in zip(suite_details,suiteId_list):
                 if type(suite_id)==unicode:
                     suite_id=str(suite_id)
@@ -157,9 +161,15 @@ class Handler():
 
                 if json_data.has_key('browserType'):
                     browser_type[suite_id]=json_data['browserType']
+
+                if json_data.has_key('condition'):
+                    condition_check[suite_id]=json_data['condition']
+
+                if json_data.has_key('dataparampath'):
+                    dataparam_path[suite_id]=json_data['dataparampath']
         except Exception as e:
             print e
-        return suiteId_list,suite_details,browser_type,scenarioIds,suite_data
+        return suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path
 
     def validate(self,start,end):
         """
@@ -483,7 +493,8 @@ class Handler():
                 d=eval(testcase[i])
             except Exception as e:
                 d=testcase[i]
-            if d[len(d)-1].has_key('comments'):
+
+            if len(d)>0 and d[len(d)-1].has_key('comments'):
                 d.pop()
 
             flag=self.parse_condition(d)
