@@ -148,7 +148,9 @@ class RadioCheckboxKeywords():
                         temp_status=self.__fetch_status_array(webelement,input)
                         status=temp_status[0]
                 if status==None and webelement!=None:
-                    status,methodoutput=self.__fetch_status(webelement)
+                    output=self.__fetch_status(webelement)
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
 
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
@@ -160,13 +162,11 @@ class RadioCheckboxKeywords():
             log.debug('Type is '+input_type)
             if webelement.is_selected():
                 status=self.status[input_type]
-                methodoutput=TEST_RESULT_TRUE
             else:
                 status='Un'+self.status[input_type].lower()
-                methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
-        return status,methodoutput
+        return status
 
     def __fetch_status_array(self,webelement,input):
         status_list=[]
