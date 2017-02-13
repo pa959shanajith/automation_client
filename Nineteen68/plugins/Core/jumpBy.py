@@ -111,16 +111,19 @@ class  JumpBy():
 
         invalid_keyword_list=[STARTLOOP,ELSE_IF,ELSE]
         import handler
-        condition_list= handler.copy_condition_keywords.keys()
-        number=min(condition_list, key=lambda x:abs(x-self.index))
-        if scenario=='positive':
-            if jumpByStepNum>number:
-                return False,'Invalid Jump In If'
-        if scenario=='negative':
-            if jumpByStepNum<number:
-                return False,'Invalid Jump In If'
-        elif handler.tspList[jumpByStepNum].name.lower()==STARTLOOP:
-                return False, 'Jump By The given step is not allowed'
+        try:
+            condition_list= handler.copy_condition_keywords.keys()
+            number=min(condition_list, key=lambda x:abs(x-self.index))
+            if scenario=='positive':
+                if jumpByStepNum>number:
+                    return False,'Invalid Jump In If'
+            if scenario=='negative':
+                if jumpByStepNum<number:
+                    return False,'Invalid Jump In If'
+            elif handler.tspList[jumpByStepNum].name.lower()==STARTLOOP:
+                    return False, 'Jump By The given step is not allowed'
+        except Exception as e:
+            log.error(e)
         return True,''
 
 
