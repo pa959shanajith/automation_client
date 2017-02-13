@@ -42,10 +42,10 @@ class MainNamespace(BaseNamespace):
 
             time.sleep(5)
             print 'Importing done'
+
         elif str(args[0]) == 'debugTestCase':
             print 'on_debugTestCase_message'
-            self.mythread = TestThread(wxObject,DEBUG,args[1])
-
+            wxObject.mythread = TestThread(wxObject,DEBUG,args[1])
 
 
         if(str(args[0]) == 'connected'):
@@ -63,9 +63,17 @@ class MainNamespace(BaseNamespace):
         res = light.highlight(args[0],None,None)
         print 'Highlight result: ',res
 
+    def on_executeTestSuite(self, *args):
+        global wxObject
+        args=list(args)
+        wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode)
+
     def on_debugTestCase(self, *args):
         global wxObject
+        args=list(args)
         wxObject.mythread = TestThread(wxObject,DEBUG,args[0],wxObject.debug_mode)
+
+
 
 
 socketIO = None
@@ -88,13 +96,14 @@ class SocketThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO
-        socketIO = SocketIO('10.41.31.40',3000,MainNamespace)
+        socketIO = SocketIO('10.41.31.72',3000,MainNamespace)
 
         ##socketIO = SocketIO('localhost',8124)
 ##        socketIO.send('I am ready to process the request')
         socketIO.emit('news')
         socketIO.emit('focus')
         socketIO.emit('debugTestCase')
+        socketIO.emit('executeTestSuite')
         socketIO.wait()
 
 
@@ -157,7 +166,7 @@ class Parallel(threading.Thread):
 ##            self.wxObject.debugbutton.Enable()
 ##            self.wxObject.executebutton.Enable()
             self.wxObject.cancelbutton.Enable()
-            socketIO.emit('debugTestCase',status)
+            socketIO.emit('result_executeTestSuite',status)
 ##
         except Exception as m:
             print m
@@ -187,6 +196,7 @@ class TestThread(threading.Thread):
         self.action=action
         self.json_data=json_data
         self.debug_mode=debug_mode
+
         self.start()    # start the thread
 
 
@@ -241,7 +251,7 @@ class TestThread(threading.Thread):
 ##            controller.kill_process()
             self.con = controller.Controller()
             self.wxObject.terminatebutton.Enable()
-            status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject.choice)
+            status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject.choice,socketIO)
             logger.print_on_console('Execution status',status)
 
 
@@ -261,10 +271,10 @@ class TestThread(threading.Thread):
             self.wxObject.continue_debugbutton.Hide()
             self.wxObject.mythread=None
             socketIO.emit('result_debugTestCase',status)
-        except Exception as m:
-            import traceback
-            traceback.print_exc()
-            print m
+            socketIO.emit('result_executeTestSuite',status)
+        except Exception as e:
+            print e
+            log.error(e)
 
 
 

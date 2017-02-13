@@ -72,6 +72,8 @@ class  JumpBy():
             if jumpByStepNum<len(tspList):
                 flag,error=self.__validate_jumpbystep(jumpByStepNum,scenario)
                 if(flag):
+                    logger.print_on_console('Encountered jumpBy ',str(stepToJump))
+                    log.info('Encountered jumpBy '+str(stepToJump))
                     self.status=True
                 else:
                     logger.print_on_console(error)
@@ -80,10 +82,10 @@ class  JumpBy():
             else:
                 jumpByStepNum=-1
                 logger.print_on_console('ERR_JUMPY_STEP_DOESN''T_EXISTS')
+                log.error('ERR_JUMPY_STEP_DOESN''T_EXISTS')
 
         except Exception as e:
              log.error(e)
-
              logger.print_on_console(e)
 
 
@@ -111,16 +113,19 @@ class  JumpBy():
 
         invalid_keyword_list=[STARTLOOP,ELSE_IF,ELSE]
         import handler
-        condition_list= handler.copy_condition_keywords.keys()
-        number=min(condition_list, key=lambda x:abs(x-self.index))
-        if scenario=='positive':
-            if jumpByStepNum>number:
-                return False,'Invalid Jump In If'
-        if scenario=='negative':
-            if jumpByStepNum<number:
-                return False,'Invalid Jump In If'
-        elif handler.tspList[jumpByStepNum].name.lower()==STARTLOOP:
-                return False, 'Jump By The given step is not allowed'
+        try:
+            condition_list= handler.copy_condition_keywords.keys()
+            number=min(condition_list, key=lambda x:abs(x-self.index))
+            if scenario=='positive':
+                if jumpByStepNum>number:
+                    return False,'Invalid Jump In If'
+            if scenario=='negative':
+                if jumpByStepNum<number:
+                    return False,'Invalid Jump In If'
+            elif handler.tspList[jumpByStepNum].name.lower()==STARTLOOP:
+                    return False, 'Jump By The given step is not allowed'
+        except Exception as e:
+            log.error(e)
         return True,''
 
 

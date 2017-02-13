@@ -187,13 +187,9 @@ class TextboxKeywords:
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
-                if webelement.is_enabled():
-                   log.debug(WEB_ELEMENT_ENABLED)
-                   text=self.__get_text(webelement)
-                   status=TEST_RESULT_PASS
-                   methodoutput=TEST_RESULT_TRUE
-                else:
-                    err_msg=self.__element_disabled()
+               text=self.__get_text(webelement)
+               status=TEST_RESULT_PASS
+               methodoutput=TEST_RESULT_TRUE
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
 

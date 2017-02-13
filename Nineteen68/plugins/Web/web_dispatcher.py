@@ -49,6 +49,7 @@ class Dispatcher:
 
     def __init__(self):
         self.exception_flag=''
+        self.action=None
 
     def dispatcher(self,teststepproperty,input,reporting_obj):
         objectname = teststepproperty.objectname

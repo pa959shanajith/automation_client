@@ -92,14 +92,10 @@ class Handler():
 
         """
         global ws_template
-        logger.print_on_console('Parsing')
-        log.info('Parsing')
-        log.info('-------------------------')
-        log.info('TSP list')
-        log.info('-------------------------')
-        logger.print_on_console('-------------------------')
-        logger.print_on_console('TSP list')
-        logger.print_on_console('-------------------------')
+        log.debug('Parsing')
+        log.debug('-------------------------')
+        log.debug('TSP list')
+        log.debug('-------------------------')
         json_string = json.dumps(test_data)
         new_obj = json.loads(json_string)
         script=[]
@@ -124,27 +120,56 @@ class Handler():
                 browser_type=json_data['browsertype']
             elif json_data.has_key('browserType'):
                 browser_type=json_data['browserType']
-
-
-##        if len(new_obj)>1:
-##            json_data=new_obj[0]
-##            browser_type=new_obj[1]
-##        ws_template=json_data['template']
-##        testcase=json_data['testcase']
-##		#Checking if the testcase has key 'comments'
-##        if testcase[len(testcase)-1].has_key('comments'):
-##            comments=testcase[len(testcase)-1]['comments']
-##        #Checking if the testcase has key 'testscript_name' or 'testcasename'
-##        if json_data.has_key('testscript_name'):
-##            testscript_name=json_data['testscript_name']
-##        elif json_data.has_key('testcasename'):
-##            testscript_name=json_data['testcasename']
-
-
-
-##        testscript_name=json_data['testscript_name']
         flag=self.create_list(script,testscript_name)
         return flag,browser_type,len(script)
+
+
+    def parse_json_execute(self,test_data):
+        """
+        def : parse_json
+        purpose : parses the given json and passes it to create list
+        param : test_data (json list)
+        return : None
+
+        """
+        logger.print_on_console('Parsing')
+        json_string = json.dumps(test_data)
+        new_obj = json.loads(json_string)
+        suite_data=[]
+        scenarioIds={}
+        browser_type={}
+        dataparam_path={}
+        condition_check={}
+        suiteId_list=[]
+        suite_details=[]
+        execution_id=[]
+        #Iterating through json array
+
+        try:
+            #Getting suite_data
+            suite_details=new_obj['suitedetails']
+            #Getting suite_ids
+            suiteId_list=new_obj['testsuiteIds']
+            execution_id=new_obj['executionId']
+            for json_data,suite_id in zip(suite_details,suiteId_list):
+                if type(suite_id)==unicode:
+                    suite_id=str(suite_id)
+
+                suite_data.append(json_data[suite_id])
+                if json_data.has_key('scenarioIds'):
+                    scenarioIds[suite_id]=json_data['scenarioIds']
+
+                if json_data.has_key('browserType'):
+                    browser_type[suite_id]=json_data['browserType']
+
+                if json_data.has_key('condition'):
+                    condition_check[suite_id]=json_data['condition']
+
+                if json_data.has_key('dataparampath'):
+                    dataparam_path[suite_id]=json_data['dataparampath']
+        except Exception as e:
+            print e
+        return suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path
 
     def validate(self,start,end):
         """
@@ -468,7 +493,8 @@ class Handler():
                 d=eval(testcase[i])
             except Exception as e:
                 d=testcase[i]
-            if d[len(d)-1].has_key('comments'):
+
+            if len(d)>0 and d[len(d)-1].has_key('comments'):
                 d.pop()
 
             flag=self.parse_condition(d)

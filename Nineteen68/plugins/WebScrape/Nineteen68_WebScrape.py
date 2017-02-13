@@ -86,7 +86,7 @@ class ScrapeWindow(wx.Frame):
         else:
             d = clickandaddoj.stopclickandadd()
             print 'Scrapped data saved successfully in domelements.json file'
-            self.socketIO.send(d)
+            self.socketIO.emit('scrape',d)
 ##            wx.MessageBox('CLICKANDADD: Scrape completed', 'Info',wx.OK | wx.ICON_INFORMATION)
             self.Close()
             event.GetEventObject().SetLabel("Start ClickAndAdd")
@@ -118,7 +118,7 @@ class ScrapeWindow(wx.Frame):
 ##        wx.MessageBox('FULLSCRAPE: Scrape completed', 'Info', wx.OK | wx.ICON_INFORMATION)
 ##        print 'self.socketIO : ',self.socketIO
 ##        print 'Acknoledgement id : ',self.socketIO._ack_id
-        self.socketIO.send(d)
+        self.socketIO.emit('scrape',d)
         self.Close()
         print 'Full scrape  completed'
 
