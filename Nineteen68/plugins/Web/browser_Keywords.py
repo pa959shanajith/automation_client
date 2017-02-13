@@ -432,7 +432,7 @@ class Singleton_DriverUtil():
         import os
         try:
             import browserops
-            logger.print_on_console("browserops.driver ",browserops.driver)
+            log.debug("browserops.driver ",browserops.driver)
 ##            scrapedriver = browserops.driver
             toCheck = browserops.driver.window_handles
             print toCheck
