@@ -34,6 +34,8 @@ IE_DRIVER_PATH_32 = os.getcwd()+'\IEDriverServer.exe'
 
 PHANTOM_DRIVER_PATH = os.getcwd()+'\phantomjs.exe'
 
+GECKODRIVER_PATH = os.getcwd()+'\geckodriver.exe'
+
 SET_TEXT_SCRIPT="""arguments[0].value=arguments[1]"""
 
 CLICK_RADIO_CHECKBOX="""arguments[0].click()"""
