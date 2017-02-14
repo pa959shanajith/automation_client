@@ -272,6 +272,9 @@ class Dispatcher:
 
                 if result != TERMINATE:
 
+                    if keyword==OPEN_BROWSER:
+                        input.append(self.action)
+
                     result= dict[keyword](webelement,input)
                     if flag and webelement==None:
                         result=list(result)

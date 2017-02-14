@@ -67,8 +67,12 @@ class BrowserKeywords():
             global webdriver_list
             global parent_handle
             driver = Singleton_DriverUtil()
-            if driver_obj == None:
+            #Logic to make sure that logic of usage of existing driver is not applicable to execution
+            if driver_obj == None and browser_num[-1] != EXECUTE:
                 driver_obj = driver.check_available_driver(self.browser_num)
+            elif browser_num[-1] == EXECUTE:
+                driver_obj=driver.driver(self.browser_num)
+
 ##
             webdriver_list.append(driver_obj)
             parent_handle = driver_obj.current_window_handle
