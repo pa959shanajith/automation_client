@@ -70,7 +70,6 @@ class Reporting:
             'webservices':self.step_description_obj.webservices,
             'desktop':self.step_description_obj.desktop}
             description=apptype_description[apptype.lower()](*params)
-            print description
 
         except Exception as e:
             log.error(e)
