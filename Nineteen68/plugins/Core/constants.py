@@ -374,5 +374,8 @@ DB_VAR='ret_riever'
 
 COMPLETED='success'
 
+MULTIPLE_OUTPUT_KEYWORDS=['getSelected','split']
+
+GENERIC_KEYWORD='displayVariableValue'
 
 

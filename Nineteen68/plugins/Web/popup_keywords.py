@@ -14,7 +14,6 @@ import logger
 import time
 import webconstants
 from selenium import webdriver
-
 import browser_Keywords
 import logging
 from constants import *
@@ -27,6 +26,8 @@ class PopupKeywords():
         log.debug(driver)
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             #code to accept the pop up
@@ -40,9 +41,9 @@ class PopupKeywords():
         except Exception as e:
             logger.print_on_console(EXCEPTION_OCCURED,e)
             log.error(EXCEPTION_OCCURED)
-            log.error(e)
+            err_msg = "EXCEPTION OCCURED"
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
     def dismiss_popup(self,webelement,*args):
         driver = browser_Keywords.driver_obj
@@ -50,6 +51,8 @@ class PopupKeywords():
         log.debug(driver)
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             #code to dismiss the pop up
@@ -63,9 +66,9 @@ class PopupKeywords():
         except Exception as e:
             logger.print_on_console(EXCEPTION_OCCURED,e)
             log.error(EXCEPTION_OCCURED)
-            log.error(e)
+            err_msg = "EXCEPTION OCCURED"
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output, err_msg
 
     def get_popup_text(self,webelement,*args):
         driver = browser_Keywords.driver_obj
@@ -73,6 +76,8 @@ class PopupKeywords():
         log.debug(driver)
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        text = None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             #code to get the pop up text
@@ -89,8 +94,9 @@ class PopupKeywords():
             logger.print_on_console(EXCEPTION_OCCURED,e)
             log.error(EXCEPTION_OCCURED)
             log.error(e)
+            err_msg = "EXCEPTION OCCURED"
         log.info(RETURN_RESULT)
-        return status,methodoutput,text
+        return status,methodoutput,text,err_msg
 
     def verify_popup_text(self,webelement,inputs,*args):
         driver = browser_Keywords.driver_obj
@@ -98,6 +104,8 @@ class PopupKeywords():
         log.debug(driver)
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             #code to verify the pop up text
@@ -129,9 +137,9 @@ class PopupKeywords():
         except Exception as e:
             logger.print_on_console(EXCEPTION_OCCURED,e)
             log.error(EXCEPTION_OCCURED)
-            log.error(e)
+            err_msg = "EXCEPTION OCCURED"
         log.info(RETURN_RESULT)
-        return status,methodoutput
+        return status,methodoutput,output,err_msg
 
 
 

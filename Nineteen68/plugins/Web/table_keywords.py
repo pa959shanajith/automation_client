@@ -43,7 +43,7 @@ class TableOperationKeywords():
                     if webElement!=None:
                         log.debug('performing java script on element')
                         js='var targetTable = arguments[0]; var rowCount = targetTable.rows; return rowCount.length;'
-                        row_count = driver.execute_script(js,webElement)
+                        row_count = browser_Keywords.driver_obj.execute_script(js,webElement)
                         if(row_count>=0):
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
@@ -79,7 +79,7 @@ class TableOperationKeywords():
                     if webElement!=None:
                         log.debug('performing java script on element')
                         js='var targetTable = arguments[0]; var columnCount = 0; var rows = targetTable.rows; if(rows.length > 0) { 	for (var i = 0; i < rows.length; i++) { 		var cells = rows[i].cells; 		var tempColumnCount = 0; 		for (var j = 0; j < cells.length; j++) { 			tempColumnCount += cells[j].colSpan; 		} 		if (tempColumnCount > columnCount) { 			columnCount = tempColumnCount; 		} 	} } return columnCount;'
-                        coloumn_count = driver.execute_script(js,webElement)
+                        coloumn_count = browser_Keywords.driver_obj.execute_script(js,webElement)
                         if(coloumn_count>=0):
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
@@ -273,23 +273,23 @@ class TableOperationKeywords():
                             element_list=cell.find_elements_by_xpath('.//*')
                             if len(list(element_list))>0:
                                 xpath=self.getElemntXpath(element_list[0])
-                                cell=driver.find_element_by_xpath(xpath)
+                                cell=browser_Keywords.driver_obj.find_element_by_xpath(xpath)
                             try:
                                 log.debug('checking for element not none')
                                 if(cell!=None):
                                     log.debug('checking for element enabled')
                                     if cell.is_enabled():
-                                        if isinstance(driver,webdriver.Ie):
+                                        if isinstance(browser_Keywords.driver_obj,webdriver.Ie):
                                             try:
                                                 log.debug('performing java script click')
                                                 js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
-                                                click=driver.execute_script(js,webElement)
+                                                click=browser_Keywords.driver_obj.execute_script(js,webElement)
                                                 status=webconstants.TEST_RESULT_PASS
                                                 log.info('click action performed successfully')
                                                 logger.print_on_console('click action performed successfully')
                                             except Exceptions as e:
                                                 log.debug('error occured so trying action events')
-                                                action=action_chains.ActionChains(driver)
+                                                action=action_chains.ActionChains(browser_Keywords.driver_obj)
                                                 action.move_to_element(cell).click(cell).perform()
                                                 status=TEST_RESULT_PASS
                                                 methodoutput=TEST_RESULT_TRUE
@@ -305,7 +305,7 @@ class TableOperationKeywords():
                                                 logger.print_on_console('click action performed successfully')
                                             except Exception as e:
                                                 js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
-                                                click=driver.execute_script(js,webElement)
+                                                click=browser_Keywords.driver_obj.execute_script(js,webElement)
                                                 status=TEST_RESULT_PASS
                                                 methodoutput=TEST_RESULT_TRUE
                                                 log.info('click action performed successfully')
@@ -327,8 +327,8 @@ class TableOperationKeywords():
                             element_list=cell.find_elements_by_xpath('.//*')
                             for member in element_list:
                                   js1='function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();'
-                                  xpath=driver.execute_script(js1,member)
-                                  cellChild = driver.find_element_by_xpath(xpath)
+                                  xpath=browser_Keywords.driver_obj.execute_script(js1,member)
+                                  cellChild = browser_Keywords.driver_obj.find_element_by_xpath(xpath)
                                   tagName = cellChild.tag_name
                                   tagType = cellChild.get_attribute('type')
                                   xpath_elements=xpath.split('/')
@@ -418,18 +418,18 @@ class TableOperationKeywords():
                                     if cellChild.is_enabled():
                                         try:
                                           if not (cellChild is None):
-                                            driver.execute_script("arguments[0].scrollIntoView(true);",cellChild);
-                                            if isinstance(driver,webdriver.Ie):
+                                            browser_Keywords.driver_obj.execute_script("arguments[0].scrollIntoView(true);",cellChild);
+                                            if isinstance(browser_Keywords.driver_obj,webdriver.Ie):
                                                 try:
                                                     log.debug('performing click')
                                                     js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
-                                                    click=driver.execute_script(js,cellChild)
+                                                    click=browser_Keywords.driver_obj.execute_script(js,cellChild)
                                                     status=webconstants.TEST_RESULT_PASS
                                                     methodoutput=TEST_RESULT_TRUE
                                                     break;
                                                 except Exceptions as e:
                                                     log.debug('performing click')
-                                                    action=action_chains.ActionChains(driver)
+                                                    action=action_chains.ActionChains(browser_Keywords.driver_obj)
                                                     action.move_to_element(cellChild).click(cellChild).perform()
                                                     status=webconstants.TEST_RESULT_PASS
                                                     methodoutput=TEST_RESULT_TRUE
@@ -444,7 +444,7 @@ class TableOperationKeywords():
                                                 except Exception as e:
                                                     log.debug('performing click')
                                                     js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
-                                                    click=driver.execute_script(js,cellChild)
+                                                    click=browser_Keywords.driver_obj.execute_script(js,cellChild)
                                                     status=TEST_RESULT_PASS
                                                     methodoutput=TEST_RESULT_TRUE
                                                     break
@@ -473,7 +473,6 @@ class TableOperationKeywords():
 
 
 
-
         def getRowNumByText(self,webElement,text,*args):
 
             logger.print_on_console('Executing keyword : getRowNumByText')
@@ -489,7 +488,7 @@ class TableOperationKeywords():
             if visibleFlag==True:
                 try:
                     js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return yyy + cell.rowSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return yyy + cell.rowSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return yyy + cell.rowSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
-                    row_number=driver.execute_script(js,webElement,text)
+                    row_number=browser_Keywords.driver_obj.execute_script(js,webElement,text)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                     log.info('Got the result : %s',row_number)

@@ -61,9 +61,9 @@ class Delay_keywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        display_input=''
         try:
             import time
-            display_input=''
             input_list=list(args)
             index=input_list.index(';')
             values=input_list[0:index]
@@ -79,8 +79,7 @@ class Delay_keywords:
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             log.error(e)
-            
             logger.print_on_console(e)
-        return status,methodoutput,output,err_msg
+        return status,methodoutput,output,err_msg,display_input
 
 

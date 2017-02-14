@@ -336,7 +336,6 @@ class TextboxKeywords:
                             if not(visibilityFlag and is_visble):
                                 self.clear_text(webelement)
                             else:
-                                logger.print_on_console('Hidden')
                                 webelement.clear()
                             encryption_obj = AESCipher()
                             input_val = encryption_obj.decrypt(input)
@@ -347,6 +346,8 @@ class TextboxKeywords:
                                 browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
+                            else:
+                                err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         else:
                             err_msg=self.__read_only()
                 else:

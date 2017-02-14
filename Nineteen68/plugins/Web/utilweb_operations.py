@@ -317,7 +317,7 @@ class UtilWebKeywords:
             if webelement is not None:
                 status=self.__setfocus(webelement)
                 if status==TEST_RESULT_PASS:
-                    info_msg='Eleemnt is focused'
+                    info_msg='Element is focused'
                     log.info(info_msg)
                     logger.print_on_console(info_msg)
                     methodoutput=TEST_RESULT_TRUE
