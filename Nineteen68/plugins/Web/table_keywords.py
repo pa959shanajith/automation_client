@@ -43,7 +43,7 @@ class TableOperationKeywords():
                     if webElement!=None:
                         log.debug('performing java script on element')
                         js='var targetTable = arguments[0]; var rowCount = targetTable.rows; return rowCount.length;'
-                        row_count = driver.execute_script(js,webElement)
+                        row_count = browser_Keywords.driver_obj.execute_script(js,webElement)
                         if(row_count>=0):
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
@@ -79,7 +79,7 @@ class TableOperationKeywords():
                     if webElement!=None:
                         log.debug('performing java script on element')
                         js='var targetTable = arguments[0]; var columnCount = 0; var rows = targetTable.rows; if(rows.length > 0) { 	for (var i = 0; i < rows.length; i++) { 		var cells = rows[i].cells; 		var tempColumnCount = 0; 		for (var j = 0; j < cells.length; j++) { 			tempColumnCount += cells[j].colSpan; 		} 		if (tempColumnCount > columnCount) { 			columnCount = tempColumnCount; 		} 	} } return columnCount;'
-                        coloumn_count = driver.execute_script(js,webElement)
+                        coloumn_count = browser_Keywords.driver_obj.execute_script(js,webElement)
                         if(coloumn_count>=0):
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
