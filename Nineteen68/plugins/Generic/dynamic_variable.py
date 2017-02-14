@@ -118,28 +118,29 @@ class DynamicVariables:
                 log.debug('Check if the given variable to be modified is dynamic or not')
                 res=self.dyn_obj.check_for_dynamicvariables(variable)
                 if res==TEST_RESULT_TRUE:
-                    #Check if the variable already exists
-                    log.debug('Check if the variable already exists')
-                    if not(dynamic_variable_handler.dynamic_variable_map.has_key(variable)):
+                    #Fixing issue #123(ALM) check for the variable if it already exists is removed
+##                    #Check if the variable already exists
+##                    log.debug('Check if the variable already exists')
+##                    if not(dynamic_variable_handler.dynamic_variable_map.has_key(variable)):
 
-                        #Check if the value to be updated is dynamic and get its value
-                        log.debug('Check if the value to be updated is dynamic and get its value')
-                        if self.dyn_obj.check_for_dynamicvariables(value)==TEST_RESULT_TRUE:
-                            value=self.dyn_obj.get_dynamic_value(value)
-                            #Add the variable to the map with the given value
-                            dynamic_variable_handler.dynamic_variable_map[variable]=value
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
-                            log.debug('Variable copied is '+str(variable)+'='+str(value))
-                            logger.print_on_console('Variable copied is '+str(variable)+'='+str(value))
-                        else:
-                            log.debug('Invalid Input: 2nd input should be dynamic variable')
-                            logger.print_on_console('Invalid Input: 2nd input should be dynamic variable')
-
+                    #Check if the value to be updated is dynamic and get its value
+                    log.debug('Check if the value to be updated is dynamic and get its value')
+                    if self.dyn_obj.check_for_dynamicvariables(value)==TEST_RESULT_TRUE:
+                        value=self.dyn_obj.get_dynamic_value(value)
+                        #Add the variable to the map with the given value
+                        dynamic_variable_handler.dynamic_variable_map[variable]=value
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                        log.debug('Variable copied is '+str(variable)+'='+str(value))
+                        logger.print_on_console('Variable copied is '+str(variable)+'='+str(value))
                     else:
-                        err_msg=ERROR_CODE_DICT['ERR_DYNVAR']
-                        log.error(err_msg)
-                        logger.print_on_console(err_msg)
+                        log.debug('Invalid Input: 2nd input should be dynamic variable')
+                        logger.print_on_console('Invalid Input: 2nd input should be dynamic variable')
+
+##                    else:
+##                        err_msg=ERROR_CODE_DICT['ERR_DYNVAR']
+##                        log.error(err_msg)
+##                        logger.print_on_console(err_msg)
                 else:
                     err_msg=INVALID_INPUT
                     log.error(err_msg)
