@@ -329,7 +329,7 @@ class Controller():
                 log.info('Step number is : '+str(tsp.stepnum))
 
                 if tsp != None and isinstance(tsp,TestStepProperty) :
-                    logger.print_on_console( "----Keyword :",tsp.name,' execution Started----')
+                    log.info( "----Keyword :",tsp.name,' execution Started----')
                     start_time = datetime.now()
                     start_time_string=start_time.strftime(TIME_FORMAT)
                     logger.print_on_console('Step Execution start time is : '+start_time_string)
@@ -555,7 +555,7 @@ class Controller():
 
             if pause_flag:
                 self.pause_execution()
-            logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',temp_result)
+##            logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',temp_result)
             log.info('Result in methodinvocation : '+ str(teststepproperty.name)+' : ')
             log.info(result)
 
