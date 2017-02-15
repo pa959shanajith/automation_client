@@ -124,7 +124,7 @@ class StepDescription:
             return "Compare the contents of file '"+ input+ "' and '"+ tsp.inputval[1]+ "'"
 
         def concatenate():
-            return "Concatenate string '"+ input + "," + tsp.inputval[1]+ "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
+            return "Concatenate string '"+ input + "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
         def copyValue():
             return "Copy value to variable '"+ input+ "' from variable '"+ tsp.inputval[1] + "'"
         def createDynVariable():
@@ -376,7 +376,7 @@ class StepDescription:
             return 'Select '+ tsp.custname
         def getStatus():
             return 'Get the status of the ' + tsp.custname+ ' and save the status ' + output + ' in '+ tsp.outputval
-        def SelectCheckbox():
+        def selectCheckbox():
             return 'Select '+ tsp.custname
         def unselectCheckbox():
             return 'Unselect '+ tsp.custname
