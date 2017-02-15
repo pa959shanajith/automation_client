@@ -64,7 +64,9 @@ class Reporting:
             if (tsp.name in MULTIPLE_OUTPUT_KEYWORDS and output != '' and output != None) or tsp.name==GENERIC_KEYWORD  :
                 output=tsp.additionalinfo
             apptype=tsp.apptype
-            params=tsp.name,tsp,input,output,con,self
+            tsp_temp=tsp
+            tsp_temp.outputval=tsp_temp.outputval.split(';')[0]
+            params=tsp.name,tsp_temp,input,output,con,self
             apptype_description={'generic':self.step_description_obj.generic,
             'web':self.step_description_obj.web,
             'webservices':self.step_description_obj.webservices,

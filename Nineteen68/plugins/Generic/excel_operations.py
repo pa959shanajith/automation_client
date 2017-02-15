@@ -520,7 +520,7 @@ class ExcelXLS:
                 indices = [i for i, x in enumerate(sheet.col_values(col)) if x == content]
                 line_number=indices
                 if line_number != None:
-                    logger.print_on_console('line numbers are '+''.join(line_number))
+                    log.debug('line numbers are '+''.join(str(line_number)))
                 log.debug(line_number)
                 status=True
         except Exception as e:

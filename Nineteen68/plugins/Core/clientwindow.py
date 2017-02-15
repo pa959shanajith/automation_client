@@ -22,13 +22,13 @@ class MainNamespace(BaseNamespace):
         global action,wxObject,browsername
         if str(args[0]) == 'OPEN BROWSER CH':
 
-            browsername = 'CH'
+            browsername = '1'
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
             time.sleep(5)
         elif str(args[0]) == 'OPEN BROWSER IE':
 
-            browsername = 'IE'
+            browsername = '3'
 ##
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
@@ -36,7 +36,7 @@ class MainNamespace(BaseNamespace):
 ##            print 'Importing done'
         elif str(args[0]) == 'OPEN BROWSER FX':
 ##
-            browsername = 'FX'
+            browsername = '2'
 ##
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
@@ -96,7 +96,7 @@ class SocketThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO
-        socketIO = SocketIO('10.41.31.72',3000,MainNamespace)
+        socketIO = SocketIO('10.41.31.50',3000,MainNamespace)
 
         ##socketIO = SocketIO('localhost',8124)
 ##        socketIO.send('I am ready to process the request')
@@ -270,8 +270,10 @@ class TestThread(threading.Thread):
             self.wxObject.continuebutton.Hide()
             self.wxObject.continue_debugbutton.Hide()
             self.wxObject.mythread=None
-            socketIO.emit('result_debugTestCase',status)
-            socketIO.emit('result_executeTestSuite',status)
+            if self.action==DEBUG:
+                socketIO.emit('result_debugTestCase',status)
+            elif self.action==EXECUTE:
+                socketIO.emit('result_executeTestSuite',status)
         except Exception as e:
             print e
             log.error(e)
@@ -290,7 +292,11 @@ class ClientWindow(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, parent=None,id=-1, title="SLK Nineteen68 - Client Window",
                    pos=(300, 150),  size=(800, 730)  )
-        self.SetBackgroundColour(   (245,222,179))
+##        self.SetBackgroundColour(   (245,222,179))
+        self.SetBackgroundColour('#d3d3d3')
+##        self.ShowFullScreen(True,wx.ALL)
+##        self.SetBackgroundColour('#D0D0D0')
+
         self.id =id
         self.mainclass = self
         self.mythread = None
@@ -351,23 +357,27 @@ class ClientWindow(wx.Frame):
         self.SetMenuBar(self.menubar)
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
-        self.connectbutton = wx.Button(self.panel, label="Connect To Node" ,pos=(10, 10), size=(100, 28))
+        connect_img=wx.Image("connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.connectbutton = wx.BitmapButton(self.panel, bitmap=connect_img,pos=(10, 10), size=(100, 25))
+##        self.connectbutton = wx.Button(self.panel, label="Connect" ,pos=(10, 10), size=(100, 28))
         self.connectbutton.Bind(wx.EVT_BUTTON, self.OnNodeConnect)
         self.connectbutton.SetToolTip(wx.ToolTip("Connect to node Server"))
         self.log = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_MULTILINE|wx.TE_READONLY)
         font1 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL,  False, u'Consolas')
         self.log.SetForegroundColour((0,50,250))
         self.log.SetFont(font1)
-        box.Add(self.log, 1, wx.ALL|wx.EXPAND, 5)
 
+        box.Add(self.log, 1, wx.ALL|wx.EXPAND, 5)
+##        size=(90, 28)
 
         #Radio buttons
         lblList = ['Normal', 'Stepwise', 'RunfromStep']
-        self.rbox = wx.RadioBox(self.panel,label = 'Debug options', pos = (10, 548), choices = lblList ,size=(90, 28),
+        self.rbox = wx.RadioBox(self.panel,label = 'Debug options', pos = (10, 548), choices = lblList ,size=(300, 100),
         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
 
 ##        self.Bind(wx.EVT_RADIOBUTTON, self.OnRadiogroup)
         self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
+##        self.rbox.SetBackgroundColour('#9f64e2')
 
         paly_img = wx.Image("play.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         terminate_img=wx.Image("terminate.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
@@ -381,12 +391,15 @@ class ClientWindow(wx.Frame):
 ##        self.debugbutton.SetToolTip(wx.ToolTip("To Debug the script"))
 
 ##
-
-        self.terminatebutton = wx.BitmapButton(self.panel, bitmap=terminate_img,pos=(470, 548), size=(50, 32))
-##        self.terminatebutton = wx.Button(self.panel, label="Terminate" ,pos=(470, 548), size=(100, 28))
-        self.terminatebutton.Bind(wx.EVT_BUTTON, self.OnTerminate)
+        self.terminatebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap("terminate.png", wx.BITMAP_TYPE_ANY), (470, 548), (50, 40))
+        self.terminatebutton.Bind(wx.EVT_LEFT_DOWN, self.OnTerminate)
         self.terminatebutton.SetToolTip(wx.ToolTip("To Terminate the execution"))
-        self.terminatebutton.Disable()
+
+##        self.terminatebutton = wx.BitmapButton(self.panel, bitmap=terminate_img,pos=(470, 548), size=(50, 40))
+####        self.terminatebutton = wx.Button(self.panel, label="Terminate" ,pos=(470, 548), size=(100, 28))
+##        self.terminatebutton.Bind(wx.EVT_BUTTON, self.OnTerminate)
+##        self.terminatebutton.SetToolTip(wx.ToolTip("To Terminate the execution"))
+##        self.terminatebutton.Disable()
 
 ##        self.pausebutton = wx.Button(self.panel, label="Pause" ,pos=(230, 548), size=(75, 28))
 ##        self.pausebutton.Bind(wx.EVT_BUTTON, self.OnPause)   # need to implement OnExit(). Leave notrace
@@ -395,14 +408,22 @@ class ClientWindow(wx.Frame):
 
 
 ##        self.continue_debugbutton = wx.Button(self.panel, label="Resume" ,pos=(140, 548), size=(75, 28))
-        self.continue_debugbutton = wx.BitmapButton(self.panel, bitmap=paly_img,pos=(70, 598), size=(35, 28))
-        self.continue_debugbutton.Bind(wx.EVT_BUTTON, self.Resume)   # need to implement OnExit(). Leave notrace
-        self.continue_debugbutton.SetToolTip(wx.ToolTip("To Resume the execution "))
+##        self.continue_debugbutton = wx.BitmapButton(self.rbox, bitmap=paly_img,pos=(70, 598), size=(35, 28))
+
+        self.continue_debugbutton = wx.StaticBitmap(self.rbox, -1, wx.Bitmap("play.png", wx.BITMAP_TYPE_ANY), (75, 50), (35, 28))
+        self.continue_debugbutton.Bind(wx.EVT_LEFT_DOWN, self.Resume)
+        self.continue_debugbutton.SetToolTip(wx.ToolTip("To Resume the execution"))
         self.continue_debugbutton.Hide()
 
-        self.continuebutton = wx.BitmapButton(self.panel, bitmap=step_img,pos=(130, 598), size=(35,28))
+##        self.continue_debugbutton = wx.BitmapButton(self.rbox, bitmap=paly_img,pos=(75, 50), size=(35, 28))
+##        self.continue_debugbutton.Bind(wx.EVT_BUTTON, self.Resume)
+##        self.continue_debugbutton.SetToolTip(wx.ToolTip("To Resume the execution "))
+##        self.continue_debugbutton.Hide()
+
+        self.continuebutton = wx.StaticBitmap(self.rbox, -1, wx.Bitmap("step.png", wx.BITMAP_TYPE_ANY), (105, 50), (35, 28))
+##        self.continuebutton = wx.BitmapButton(self.panel, bitmap=step_img,pos=(130, 598), size=(35,28))
 ##        self.continuebutton = wx.Button(self.panel, label="Continue" ,pos=(230, 548), size=(75, 28))
-        self.continuebutton.Bind(wx.EVT_BUTTON, self.OnContinue)   # need to implement OnExit(). Leave notrace
+        self.continuebutton.Bind(wx.EVT_BUTTON, self.OnContinue)
         self.continuebutton.SetToolTip(wx.ToolTip("To continue the execution "))
         self.continuebutton.Hide()
 
@@ -420,13 +441,27 @@ class ClientWindow(wx.Frame):
 ##        self.executebutton.Bind(wx.EVT_BUTTON, self.OnExecute)
 ##        self.executebutton.SetToolTip(wx.ToolTip("To execute the script"))
 
-        self.cancelbutton = wx.Button(self.panel, label="Exit" ,pos=(350, 548), size=(100, 28))
-        self.cancelbutton.Bind(wx.EVT_BUTTON, self.OnExit)   # need to implement OnExit(). Leave notrace
-        self.cancelbutton.SetToolTip(wx.ToolTip("To exit and close the browser"))
+        killprocess_img = wx.Image("killStaleProcess.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap("killStaleProcess.png", wx.BITMAP_TYPE_ANY), (360, 548), (50, 40))
+        self.cancelbutton.Bind(wx.EVT_LEFT_DOWN, self.OnExit)
+        self.cancelbutton.SetToolTip(wx.ToolTip("To kill Stale process"))
 
-        self.clearbutton = wx.Button(self.panel, label="Clear" ,pos=(590, 548), size=(100, 28))
-        self.clearbutton.Bind(wx.EVT_BUTTON, self.OnClear)   # need to implement OnExit(). Leave notrace
+
+##        self.cancelbutton = wx.BitmapButton(self.panel, bitmap=killprocess_img,pos=(350, 548), size=(50, 40))
+####        self.cancelbutton = wx.Button(self.panel, label="Exit" ,pos=(350, 548), size=(100, 28))
+##        self.cancelbutton.Bind(wx.EVT_BUTTON, self.OnExit)
+##        self.cancelbutton.SetToolTip(wx.ToolTip("To kill Stale process"))
+
+        self.clearbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap("clear.png", wx.BITMAP_TYPE_ANY), (590, 548), (50, 40))
+        self.clearbutton.Bind(wx.EVT_LEFT_DOWN, self.OnClear)
         self.clearbutton.SetToolTip(wx.ToolTip("To clear the console area"))
+
+
+##        clear_img = wx.Image("clear.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+##        self.clearbutton = wx.BitmapButton(self.panel, bitmap=clear_img,pos=(590, 548), size=(50,40))
+####        self.clearbutton = wx.Button(self.panel, label="Clear" ,pos=(590, 548), size=(100, 28))
+##        self.clearbutton.Bind(wx.EVT_BUTTON, self.OnClear)   # need to implement OnExit(). Leave notrace
+##        self.clearbutton.SetToolTip(wx.ToolTip("To clear the console area"))
 
 
         self.Bind(wx.EVT_CLOSE, self.OnClose)
@@ -542,6 +577,14 @@ class ClientWindow(wx.Frame):
 
         print 'KILLING THE THREAD'
         controller.terminate_flag=True
+        global socketIO
+        print 'SocketIO : ',socketIO
+        if socketIO != None:
+            log.info('Closing the socket')
+            socketIO.disconnect()
+            log.info(socketIO)
+##            self.new.Close()
+##        self.Close()
         self.Destroy()
          # you may also do:  event.Skip()
                         # since the default event handler does call Destroy(), too
@@ -556,14 +599,15 @@ class ClientWindow(wx.Frame):
 ##            self.new.Close()
 
     def OnExit(self, event):
-        global socketIO
-        print 'SocketIO : ',socketIO
-        if socketIO != None:
-            log.info('Closing the socket')
-            socketIO.disconnect()
-            log.info(socketIO)
-##            self.new.Close()
-        self.Close()
+        controller.kill_process()
+##        global socketIO
+##        print 'SocketIO : ',socketIO
+##        if socketIO != None:
+##            log.info('Closing the socket')
+##            socketIO.disconnect()
+##            log.info(socketIO)
+####            self.new.Close()
+##        self.Close()
 
 
         #----------------------------------------------------------------------
@@ -667,8 +711,8 @@ class ClientWindow(wx.Frame):
         global browsername
         print 'Browser name : ',browsername
         con = controller.Controller()
-        con.get_all_the_imports('WebScrape')
         con.get_all_the_imports('Web')
+        con.get_all_the_imports('WebScrape')
         import Nineteen68_WebScrape
         global socketIO
         self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO)

@@ -21,7 +21,7 @@ import time
 
 from constants import *
 import logging
-
+drivermap = []
 log = logging.getLogger('browser_Keywords.py')
 
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
@@ -66,14 +66,32 @@ class BrowserKeywords():
             global driver_obj
             global webdriver_list
             global parent_handle
-            driver = Singleton_DriverUtil()
-            #Logic to make sure that logic of usage of existing driver is not applicable to execution
-            if driver_obj == None and browser_num[-1] != EXECUTE:
-                driver_obj = driver.check_available_driver(self.browser_num)
-            elif browser_num[-1] == EXECUTE:
-                driver_obj=driver.driver(self.browser_num)
-
+            obj = Singleton_DriverUtil()
+##            if driver_obj == None:
+##                driver_obj = driver.check_available_driver(self.browser_num)
 ##
+            #Logic to make sure that logic of usage of existing driver is not applicable to execution
+            if  browser_num[-1] != EXECUTE:
+                d = obj.chech_if_driver_exists_in_map(self.browser_num)
+                if d == 'stale':
+                    #stale logic
+                    import win32com.client
+                    my_processes = ['chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe']
+                    wmi=win32com.client.GetObject('winmgmts:')
+                    for p in wmi.InstancesOf('win32_process'):
+                        if p.Name in my_processes:
+                            os.system("TASKKILL /F /IM " + p.Name)
+                    del drivermap[:]
+                    driver_obj = obj.getBrowser(self.browser_num)
+                elif d != None:
+                    #driver exist in map, get it
+                    driver_obj = d
+                else:
+                    #instantiate new browser and add it to the map
+                    driver_obj = obj.getBrowser(self.browser_num)
+            elif browser_num[-1] == EXECUTE:
+                driver_obj=obj.getBrowser(self.browser_num)
+                del drivermap[:]
             webdriver_list.append(driver_obj)
             parent_handle = driver_obj.current_window_handle
             logger.print_on_console('Browser opened')
@@ -94,7 +112,7 @@ class BrowserKeywords():
             global driver_obj
             global webdriver_list
             driver = Singleton_DriverUtil()
-            driver_obj=driver.driver(self.browser_num)
+            driver_obj=driver.getBrowser(self.browser_num)
             webdriver_list.append(driver_obj)
             parent_handle = driver_obj.current_window_handle
             logger.print_on_console('Opened new browser')
@@ -431,47 +449,88 @@ class BrowserKeywords():
 
 
 class Singleton_DriverUtil():
-    def check_available_driver(self,browser_num):
-        global driver_obj
-        import os
-        try:
-            import browserops
-            log.debug("browserops.driver ",browserops.driver)
-##            scrapedriver = browserops.driver
-            toCheck = browserops.driver.window_handles
-            print toCheck
-            if(len(toCheck)== 0):
-                import win32com.client
-                my_processes = ['IEDriverServer.exe','IEDriverServer64.exe']
-                wmi=win32com.client.GetObject('winmgmts:')
-                for p in wmi.InstancesOf('win32_process'):
-                    if p.Name in my_processes:
-                        os.system("TASKKILL /F /IM " + p.Name)
-                if browserops.driver.name == 'internet explorer':
-                    driver_instance = self.driver('3')
-                    return driver_instance
-            else:
-                return browserops.driver
+##    def check_available_driver(self,browser_num):
+##        global driver_obj
+##        import os
+##        try:
+##            import browserops
+##            log.debug("browserops.driver ",browserops.driver)
+####            scrapedriver = browserops.driver
+##            toCheck = browserops.driver.window_handles
+##            print toCheck
+##            if(len(toCheck)== 0):
+##                import win32com.client
+##                my_processes = ['IEDriverServer.exe','IEDriverServer64.exe']
+##                wmi=win32com.client.GetObject('winmgmts:')
+##                for p in wmi.InstancesOf('win32_process'):
+##                    if p.Name in my_processes:
+##                        os.system("TASKKILL /F /IM " + p.Name)
+##                if browserops.driver.name == 'internet explorer':
+##                    driver_instance = self.driver('3')
+##                    return driver_instance
+##            else:
+##                return browserops.driver
+##
+##
+##        except Exception as e:
+##            import win32com.client
+##            my_processes = ['chromedriver.exe','phantomjs.exe','geckodriver.exe']
+##            wmi=win32com.client.GetObject('winmgmts:')
+##            for p in wmi.InstancesOf('win32_process'):
+##                if p.Name in my_processes:
+##                    os.system("TASKKILL /F /IM " + p.Name)
+##            if browserops.driver == None:
+##                return self.driver(browser_num)
+##            else:
+##                if browserops.driver.name == 'chrome':
+##                    driver_instance =self.driver('1')
+##                    return driver_instance
+##                elif browserops.driver.name == 'firefox':
+##                    driver_instance =self.driver('2')
+##                    return driver_instance
 
+    def chech_if_driver_exists_in_map(self,browserType):
+        d = None
+        print 'browserType-----------------------------',browserType
+##        drivermap.reverse()
+        if browserType == '1':
+            if len(drivermap) > 0:
+                for i in drivermap:
+                    if isinstance(i,webdriver.Chrome ):
+                        try:
+                            if len (i.window_handles) > 0:
+                                d = i
+                        except Exception as e:
+                            d = 'stale'
+                            break
 
-        except Exception as e:
-            import win32com.client
-            my_processes = ['chromedriver.exe','phantomjs.exe','geckodriver.exe']
-            wmi=win32com.client.GetObject('winmgmts:')
-            for p in wmi.InstancesOf('win32_process'):
-                if p.Name in my_processes:
-                    os.system("TASKKILL /F /IM " + p.Name)
-            if browserops.driver == None:
-                return self.driver(browser_num)
-            else:
-                if browserops.driver.name == 'chrome':
-                    driver_instance =self.driver('1')
-                    return driver_instance
-                elif browserops.driver.name == 'firefox':
-                    driver_instance =self.driver('2')
-                    return driver_instance
+        elif browserType == '2':
+            if len(drivermap) > 0:
+                for i in drivermap:
+                    if isinstance(i,webdriver.Firefox ):
+                        try:
+                            if len (i.window_handles) > 0:
+                                d = i
+                        except Exception as e:
+                            d = 'stale'
+                            break
+        elif browserType == '3':
+            if len(drivermap) > 0:
+                for i in drivermap:
+                    if isinstance(i,webdriver.Ie ):
+                        try:
+                            if len (i.window_handles) == 0:
+                                d = 'stale'
+                                break
+                            else:
+                                d = i
+                        except Exception as e:
+                            d = 'stale'
+                            break
+##        drivermap.reverse()
+        return d
 
-    def driver(self,browser_num):
+    def getBrowser(self,browser_num):
         driver=None
         log.debug('BROWSER NUM: ')
         log.debug(browser_num)
@@ -481,6 +540,7 @@ class Singleton_DriverUtil():
             choptions.add_argument('start-maximized')
             choptions.add_argument('--disable-extensions')
             driver = webdriver.Chrome(chrome_options=choptions, executable_path=webconstants.CHROME_DRIVER_PATH)
+            drivermap.append(driver)
             logger.print_on_console('Chrome browser started')
             log.info('Chrome browser started')
 
@@ -527,6 +587,7 @@ class Singleton_DriverUtil():
                 # opening firefox browser through selenium if the version 47 and less than 47
                 if int(version) < 48:
                     driver = webdriver.Firefox()
+                    drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('Firefox browser started')
                     log.info('Firefox browser started')
@@ -534,6 +595,7 @@ class Singleton_DriverUtil():
                     caps=webdriver.DesiredCapabilities.FIREFOX
                     caps['marionette'] = True
                     driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH)
+                    drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('geckodriver started')
                     log.info('geckodriver started')
@@ -549,20 +611,24 @@ class Singleton_DriverUtil():
             caps['ignoreZoomSetting'] = True
             caps['NATIVE_EVENTS'] = True
             driver = webdriver.Ie(capabilities=caps,executable_path=webconstants.IE_DRIVER_PATH_64)
+            drivermap.append(driver)
             driver.maximize_window()
             logger.print_on_console('IE browser started')
             log.info('IE browser started')
 
         elif(browser_num == '4'):
             driver = webdriver.Opera()
+            drivermap.append(driver)
             logger.print_on_console('Opera browser started')
 
         elif(browser_num == '5'):
             driver = webdriver.PhantomJS(executable_path=webconstants.PHANTOM_DRIVER_PATH)
+            drivermap.append(driver)
             logger.print_on_console('Phantom browser started')
 
         elif(browser_num == '6'):
             driver = webdriver.Safari()
+            drivermap.append(driver)
             logger.print_on_console('Safari browser started')
             log.info('Safari browser started')
 ##        print __driver
