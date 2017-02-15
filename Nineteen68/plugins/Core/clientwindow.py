@@ -22,13 +22,13 @@ class MainNamespace(BaseNamespace):
         global action,wxObject,browsername
         if str(args[0]) == 'OPEN BROWSER CH':
 
-            browsername = 'CH'
+            browsername = '1'
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
             time.sleep(5)
         elif str(args[0]) == 'OPEN BROWSER IE':
 
-            browsername = 'IE'
+            browsername = '3'
 ##
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
@@ -36,7 +36,7 @@ class MainNamespace(BaseNamespace):
 ##            print 'Importing done'
         elif str(args[0]) == 'OPEN BROWSER FX':
 ##
-            browsername = 'FX'
+            browsername = '2'
 ##
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
@@ -96,7 +96,7 @@ class SocketThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO
-        socketIO = SocketIO('10.41.31.72',3000,MainNamespace)
+        socketIO = SocketIO('10.41.31.41',3000,MainNamespace)
 
         ##socketIO = SocketIO('localhost',8124)
 ##        socketIO.send('I am ready to process the request')
@@ -667,8 +667,8 @@ class ClientWindow(wx.Frame):
         global browsername
         print 'Browser name : ',browsername
         con = controller.Controller()
-        con.get_all_the_imports('WebScrape')
         con.get_all_the_imports('Web')
+        con.get_all_the_imports('WebScrape')
         import Nineteen68_WebScrape
         global socketIO
         self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO)
