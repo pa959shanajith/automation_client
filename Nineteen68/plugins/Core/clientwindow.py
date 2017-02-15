@@ -96,7 +96,7 @@ class SocketThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO
-        socketIO = SocketIO('10.41.31.50',3000,MainNamespace)
+        socketIO = SocketIO('127.0.0.1',3000,MainNamespace)
 
         ##socketIO = SocketIO('localhost',8124)
 ##        socketIO.send('I am ready to process the request')
@@ -245,7 +245,7 @@ class TestThread(threading.Thread):
 
 
 
-            self.wxObject.rbox.Disable()
+##            self.wxObject.rbox.Disable()
 
             self.wxObject.breakpoint.Disable()
 ##            controller.kill_process()
@@ -423,7 +423,7 @@ class ClientWindow(wx.Frame):
         self.continuebutton = wx.StaticBitmap(self.rbox, -1, wx.Bitmap("step.png", wx.BITMAP_TYPE_ANY), (105, 50), (35, 28))
 ##        self.continuebutton = wx.BitmapButton(self.panel, bitmap=step_img,pos=(130, 598), size=(35,28))
 ##        self.continuebutton = wx.Button(self.panel, label="Continue" ,pos=(230, 548), size=(75, 28))
-        self.continuebutton.Bind(wx.EVT_BUTTON, self.OnContinue)
+        self.continuebutton.Bind(wx.EVT_LEFT_DOWN, self.OnContinue)
         self.continuebutton.SetToolTip(wx.ToolTip("To continue the execution "))
         self.continuebutton.Hide()
 
