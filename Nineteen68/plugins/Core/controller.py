@@ -329,7 +329,7 @@ class Controller():
                 log.info('Step number is : '+str(tsp.stepnum))
 
                 if tsp != None and isinstance(tsp,TestStepProperty) :
-                    log.info( "----Keyword :",tsp.name,' execution Started----')
+                    log.info( "----Keyword :"+str(tsp.name)+' execution Started----')
                     start_time = datetime.now()
                     start_time_string=start_time.strftime(TIME_FORMAT)
                     logger.print_on_console('Step Execution start time is : '+start_time_string)
