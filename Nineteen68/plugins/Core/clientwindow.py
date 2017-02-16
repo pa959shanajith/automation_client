@@ -217,7 +217,7 @@ class TestThread(threading.Thread):
             #Removed execute,debug button
 
             self.wxObject.cancelbutton.Disable()
-##            self.wxObject.terminatebutton.Enable()
+            self.wxObject.terminatebutton.Enable()
             runfrom_step=1
             if self.action==DEBUG:
                 self.debug_mode=False
@@ -238,6 +238,8 @@ class TestThread(threading.Thread):
                             runfrom_step=1
                             log.error('Invalid step number, Hence default step num is taken as 1')
                             logger.print_on_console('Invalid step number, Hence default step num is taken as 1')
+            else:
+                self.wxObject.rbox.Disable()
 
 
 
@@ -245,7 +247,7 @@ class TestThread(threading.Thread):
 
 
 
-##            self.wxObject.rbox.Disable()
+##
 
             self.wxObject.breakpoint.Disable()
 ##            controller.kill_process()
@@ -290,10 +292,10 @@ class RedirectText(object):
 class ClientWindow(wx.Frame):
     #----------------------------------------------------------------------
     def __init__(self):
-        wx.Frame.__init__(self, parent=None,id=-1, title="SLK Nineteen68 - Client Window",
+        wx.Frame.__init__(self, parent=None,id=-1, title="ICE Engine",
                    pos=(300, 150),  size=(800, 730)  )
 ##        self.SetBackgroundColour(   (245,222,179))
-        self.SetBackgroundColour('#d3d3d3')
+        self.SetBackgroundColour('#e6e7e8')
 ##        self.ShowFullScreen(True,wx.ALL)
 ##        self.SetBackgroundColour('#D0D0D0')
 
@@ -302,7 +304,7 @@ class ClientWindow(wx.Frame):
         self.mythread = None
         self.action=''
         self.debug_mode=False
-        self.choice='N'
+        self.choice='Normal'
         global wxObject
         wxObject = self
         curdir = os.getcwd()
@@ -391,9 +393,7 @@ class ClientWindow(wx.Frame):
 ##        self.debugbutton.SetToolTip(wx.ToolTip("To Debug the script"))
 
 ##
-        self.terminatebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap("terminate.png", wx.BITMAP_TYPE_ANY), (470, 548), (50, 40))
-        self.terminatebutton.Bind(wx.EVT_LEFT_DOWN, self.OnTerminate)
-        self.terminatebutton.SetToolTip(wx.ToolTip("To Terminate the execution"))
+
 
 ##        self.terminatebutton = wx.BitmapButton(self.panel, bitmap=terminate_img,pos=(470, 548), size=(50, 40))
 ####        self.terminatebutton = wx.Button(self.panel, label="Terminate" ,pos=(470, 548), size=(100, 28))
@@ -412,7 +412,7 @@ class ClientWindow(wx.Frame):
 
         self.continue_debugbutton = wx.StaticBitmap(self.rbox, -1, wx.Bitmap("play.png", wx.BITMAP_TYPE_ANY), (75, 50), (35, 28))
         self.continue_debugbutton.Bind(wx.EVT_LEFT_DOWN, self.Resume)
-        self.continue_debugbutton.SetToolTip(wx.ToolTip("To Resume the execution"))
+        self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution"))
         self.continue_debugbutton.Hide()
 
 ##        self.continue_debugbutton = wx.BitmapButton(self.rbox, bitmap=paly_img,pos=(75, 50), size=(35, 28))
@@ -424,7 +424,7 @@ class ClientWindow(wx.Frame):
 ##        self.continuebutton = wx.BitmapButton(self.panel, bitmap=step_img,pos=(130, 598), size=(35,28))
 ##        self.continuebutton = wx.Button(self.panel, label="Continue" ,pos=(230, 548), size=(75, 28))
         self.continuebutton.Bind(wx.EVT_LEFT_DOWN, self.OnContinue)
-        self.continuebutton.SetToolTip(wx.ToolTip("To continue the execution "))
+        self.continuebutton.SetToolTip(wx.ToolTip("To Resume the execution "))
         self.continuebutton.Hide()
 
 
@@ -445,6 +445,12 @@ class ClientWindow(wx.Frame):
         self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap("killStaleProcess.png", wx.BITMAP_TYPE_ANY), (360, 548), (50, 40))
         self.cancelbutton.Bind(wx.EVT_LEFT_DOWN, self.OnExit)
         self.cancelbutton.SetToolTip(wx.ToolTip("To kill Stale process"))
+        self.cancel_label=wx.StaticText(self.panel, -1, 'Kill Stale Process', (340, 600), (100, 70))
+
+        self.terminatebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap("terminate.png", wx.BITMAP_TYPE_ANY), (470, 548), (50, 40))
+        self.terminatebutton.Bind(wx.EVT_LEFT_DOWN, self.OnTerminate)
+        self.terminatebutton.SetToolTip(wx.ToolTip("To Terminate the execution"))
+        self.terminate_label=wx.StaticText(self.panel, -1, 'Terminate', (470, 600), (100, 70))
 
 
 ##        self.cancelbutton = wx.BitmapButton(self.panel, bitmap=killprocess_img,pos=(350, 548), size=(50, 40))
@@ -455,6 +461,9 @@ class ClientWindow(wx.Frame):
         self.clearbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap("clear.png", wx.BITMAP_TYPE_ANY), (590, 548), (50, 40))
         self.clearbutton.Bind(wx.EVT_LEFT_DOWN, self.OnClear)
         self.clearbutton.SetToolTip(wx.ToolTip("To clear the console area"))
+        self.clear_label=wx.StaticText(self.panel, -1, 'Clear', (600, 600), (100, 70))
+
+
 
 
 ##        clear_img = wx.Image("clear.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
