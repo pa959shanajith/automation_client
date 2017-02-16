@@ -329,7 +329,7 @@ class Controller():
                 log.info('Step number is : '+str(tsp.stepnum))
 
                 if tsp != None and isinstance(tsp,TestStepProperty) :
-                    log.info( "----Keyword :",tsp.name,' execution Started----')
+                    log.info( "----Keyword :"+str(tsp.name)+' execution Started----')
                     start_time = datetime.now()
                     start_time_string=start_time.strftime(TIME_FORMAT)
                     logger.print_on_console('Step Execution start time is : '+start_time_string)
@@ -731,6 +731,8 @@ class Controller():
         log.info('***DEBUG COMPLETED***')
         logger.print_on_console('***DEBUG COMPLETED***')
         print( '=======================================================================================================')
+        #clearing of dynamic variables
+        obj.clearList(self)
         return status
 
 
@@ -768,8 +770,8 @@ class Controller():
 ##            condition_check=False
             do_not_execute = False
             #create a object of controller for each scenario
-            con =Controller()
-            handler.tspList=[]
+##            con =Controller()
+##            handler.tspList=[]
             #Check for the disabled scenario
 
 
@@ -780,6 +782,8 @@ class Controller():
                 for browser in browser_type[suite_id]:
                     #Logic to iterate through each scenario in the suite
                     for scenario,scenario_id,condition_check_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id]):
+                        con =Controller()
+                        handler.tspList=[]
                          #check for temrinate flag before printing loggers
                         if not(terminate_flag):
                             print( '=======================================================================================================')
