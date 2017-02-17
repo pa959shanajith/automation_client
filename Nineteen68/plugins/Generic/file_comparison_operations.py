@@ -18,7 +18,7 @@ log = logging.getLogger('file_comparison_operations.py')
 
 class PdfFile:
 
-    def verify_content(self,input_path,pagenumber):
+    def verify_content(self,input_path,pagenumber,content):
         """
         def : verify_content
         purpose : verifies whether the content is given pagenumber of pdf file
