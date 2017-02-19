@@ -1087,10 +1087,10 @@ class ExcelXLSX:
 
         """
         status=False
-        res,line_number=self.get_linenumber_xlsx(input_path,sheetname,content)
+        res,line_number,err_msg=self.get_linenumber_xlsx(input_path,sheetname,content)
         if res and line_number != None:
             status=True
-        return status
+        return status,err_msg
 
 
 
