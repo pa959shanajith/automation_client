@@ -37,7 +37,7 @@ class Delay_keywords:
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
         return status,methodoutput,output,err_msg
 
@@ -47,12 +47,13 @@ class Delay_keywords:
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            pause_display_operation.execute()
+            o = pause_display_operation.PauseAndDisplay()
+            o.execute(args[-2],args[-1])
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
         return status,methodoutput,output,err_msg
 
@@ -74,7 +75,8 @@ class Delay_keywords:
                 if type(y)==unicode or type(y)==str:
                     y=str(y)
                 display_input+=x+' = '+(y if type(y)==str else repr(y))+'\n'
-            pause_display_operation.display_value(display_input)
+            o = pause_display_operation.PauseAndDisplay()
+            o.display_value(display_input,args[-2],args[-1])
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
