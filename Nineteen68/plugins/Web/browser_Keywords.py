@@ -15,15 +15,17 @@ import webconstants
 driver_obj = None
 parent_handle=None
 webdriver_list = []
-
 import threading
 import time
-
+import os
 from constants import *
 import logging
 drivermap = []
 log = logging.getLogger('browser_Keywords.py')
-
+import utils_web
+import psutil
+import win32gui
+import win32api
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
 class TestThread(threading.Thread):
     """Test Worker Thread Class."""
@@ -92,6 +94,26 @@ class BrowserKeywords():
             elif browser_num[-1] == EXECUTE:
                 driver_obj=obj.getBrowser(self.browser_num)
                 del drivermap[:]
+            utilobject = utils_web.Utils()
+            pid = None
+            print 'Browser num :',browser_num
+            if (self.browser_num == '1'):
+                #logic to the pid of chrome window
+                p = psutil.Process(driver_obj.service.process.pid)
+                pidchrome = p.children()[0]
+                pid = pidchrome.pid
+                print 'Pid in chrome:',pid
+            elif(self.browser_num == '2'):
+                #logic to get the pid of the firefox window
+                pid = driver_obj.binary.process.pid
+            elif(self.browser_num == '3'):
+                #Logic to get the pid of the ie window
+                p = psutil.Process(driver_obj.iedriver.process.pid)
+                pidie = p.children()[0]
+                pid = pidie.pid
+                print 'Pid in IE:',pid
+            print 'Pid :',pid
+            hwndg = utilobject.bring_Window_Front(pid)
             webdriver_list.append(driver_obj)
             parent_handle = driver_obj.current_window_handle
             logger.print_on_console('Browser opened')

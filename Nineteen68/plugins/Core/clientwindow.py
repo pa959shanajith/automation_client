@@ -253,7 +253,7 @@ class TestThread(threading.Thread):
 ##            controller.kill_process()
             self.con = controller.Controller()
             self.wxObject.terminatebutton.Enable()
-            status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject.choice,socketIO)
+            status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO)
             logger.print_on_console('Execution status',status)
 
 
@@ -293,7 +293,7 @@ class ClientWindow(wx.Frame):
     #----------------------------------------------------------------------
     def __init__(self):
         wx.Frame.__init__(self, parent=None,id=-1, title="ICE Engine",
-                   pos=(300, 150),  size=(800, 730)  )
+                   pos=(300, 150),  size=(800, 730),style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.RESIZE_BOX |wx.MAXIMIZE_BOX)  )
 ##        self.SetBackgroundColour(   (245,222,179))
         self.SetBackgroundColour('#e6e7e8')
 ##        self.ShowFullScreen(True,wx.ALL)
@@ -393,7 +393,6 @@ class ClientWindow(wx.Frame):
 ##        self.debugbutton.SetToolTip(wx.ToolTip("To Debug the script"))
 
 ##
-
 
 ##        self.terminatebutton = wx.BitmapButton(self.panel, bitmap=terminate_img,pos=(470, 548), size=(50, 40))
 ####        self.terminatebutton = wx.Button(self.panel, label="Terminate" ,pos=(470, 548), size=(100, 28))
@@ -718,14 +717,27 @@ class ClientWindow(wx.Frame):
     def test(self,event):
 ##        print 'Self',self
         global browsername
-        print 'Browser name : ',browsername
-        con = controller.Controller()
-        con.get_all_the_imports('Web')
-        con.get_all_the_imports('WebScrape')
-        import Nineteen68_WebScrape
-        global socketIO
-        self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO)
-##        self.new.Show()
+        browsernumbers = ['1','2','3']
+        if browsername in browsernumbers:
+            print 'Browser name : ',browsername
+            con = controller.Controller()
+            con.get_all_the_imports('Web')
+            con.get_all_the_imports('WebScrape')
+            import Nineteen68_WebScrape
+            global socketIO
+            self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO)
+            browsername = ''
+        else:
+            import pause_display_operation
+            o = pause_display_operation.PauseAndDisplay()
+            flag,inputvalue = o.getflagandinput()
+            if flag == 'pause':
+                #call pause logic
+                self.new = pause_display_operation.Pause(parent = None,id = -1, title="SLK Nineteen68 - Pause")
+            elif flag == 'display':
+                #call display logic
+                self.new = pause_display_operation.Display(parent = self,id = -1, title="SLK Nineteen68 - Display Variable",input = inputvalue)
+
 
 
 

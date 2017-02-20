@@ -70,6 +70,8 @@ DYNAMIC_STATIC=['dynamic','static']
 
 DISPLAY_VARIABLE_VALUE='displayVariableValue'
 
+PAUSE = 'pause'
+
 SENDFUNCTIONKEYS='sendFunctionKeys'
 
 DATE_COMPARE='dateCompare'

@@ -277,7 +277,6 @@ class Controller():
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
 		#COmapring breakpoint with the step number of tsp instead of index - (Sushma)
         tsp = handler.tspList[index]
-
         #logic to handle step by step debug
         if self.debug_mode and tsp.testcase_num==self.last_tc_num:
             #logic to handle run from setp debug
@@ -584,14 +583,13 @@ class Controller():
             return index,TERMINATE
 
 
-    def executor(self,tsplist,action,last_tc_num,debugfrom_step):
+    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread):
         i=0
         status=True
         self.scenario_start_time=datetime.now()
         start_time_string=self.scenario_start_time.strftime(TIME_FORMAT)
         logger.print_on_console('Scenario Execution start time is : '+start_time_string,'\n')
         global pause_flag
-
         while (i < len(tsplist)):
             tsp = tsplist[i]
             #Check for 'terminate_flag' before execution
@@ -642,7 +640,7 @@ class Controller():
 
     def invokegenerickeyword(self,teststepproperty,dispatcher_obj,inputval):
         keyword = teststepproperty.name
-        res = dispatcher_obj.dispatcher(teststepproperty,*inputval)
+        res = dispatcher_obj.dispatcher(teststepproperty,self.wx_object,self.conthread,*inputval)
         return res
 
     def invokeoebskeyword(self,teststepproperty,dispatcher_obj,inputval):
@@ -723,7 +721,7 @@ class Controller():
 
         if flag:
             self.conthread=mythread
-            status = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step)
+            status = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread)
 
         else:
             print 'Invalid script'
@@ -736,7 +734,7 @@ class Controller():
         return status
 
 
-    def invoke_execution(self,mythread,json_data,socketIO):
+    def invoke_execution(self,mythread,json_data,socketIO,wxObject):
         global terminate_flag
         obj = handler.Handler()
         status=COMPLETED
@@ -783,6 +781,7 @@ class Controller():
                     #Logic to iterate through each scenario in the suite
                     for scenario,scenario_id,condition_check_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id]):
                         con =Controller()
+                        con.wx_object=wxObject
                         handler.tspList=[]
                          #check for temrinate flag before printing loggers
                         if not(terminate_flag):
@@ -812,7 +811,7 @@ class Controller():
                             if not(terminate_flag):
                                 con.action=EXECUTE
                                 con.conthread=mythread
-                                status = con.executor(tsplist,EXECUTE,last_tc_num,1)
+                                status = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
                                 print( '=======================================================================================================')
                                 logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
                                 print( '=======================================================================================================')
@@ -862,7 +861,7 @@ class Controller():
         'executionId':execution_id}
         return obj
 
-    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,debug_choice,socketIO,*args):
+    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,wxObject,socketIO,*args):
         status = COMPLETED
         global terminate_flag,break_point,pause_flag
         self.conthread=mythread
@@ -870,19 +869,21 @@ class Controller():
         #Logic to make sure that logic of usage of existing driver is not applicable to execution
         if self.web_dispatcher_obj != None:
             self.web_dispatcher_obj.action=action
-        self.debug_choice=debug_choice
+        self.debug_choice=wxObject.choice
         if action.lower()==EXECUTE:
             self.execution_mode=SERIAL
+
             #Parallel Execution
             obj=handler.Handler()
             kill_process()
 ##            if execution_mode.lower() == PARALLEL:
 ##                status=self.invoke_execution(mythread,json_data)
             if self.execution_mode.lower() == SERIAL:
-                status=self.invoke_execution(mythread,json_data,socketIO)
+                status=self.invoke_execution(mythread,json_data,socketIO,wxObject)
             kill_process()
         elif action.lower()==DEBUG:
             self.debug_mode=debug_mode
+            self.wx_object=wxObject
             status=self.invoke_debug(mythread,runfrom_step,json_data)
         if status != TERMINATE:
             status=COMPLETED

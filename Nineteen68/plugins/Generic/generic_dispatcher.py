@@ -56,7 +56,7 @@ class GenericKeywordDispatcher:
             log.error(e)
         return output
 
-    def dispatcher(self,tsp,*message):
+    def dispatcher(self,tsp,wxObject,mythread,*message):
          keyword=tsp.name
          logger.print_on_console('Keyword is '+keyword)
          err_msg=None
@@ -139,12 +139,15 @@ class GenericKeywordDispatcher:
 
                 }
             if keyword in dict.keys():
-                if keyword in [generic_constants.DISPLAY_VARIABLE_VALUE,generic_constants.SENDFUNCTIONKEYS]:
+                if keyword in [generic_constants.DISPLAY_VARIABLE_VALUE,generic_constants.SENDFUNCTIONKEYS,generic_constants.PAUSE]:
                     actual_input=tsp.inputval[0].split(';')
                     message=list(message)
                     if keyword != generic_constants.SENDFUNCTIONKEYS:
                         message.append(';')
                     message.extend(actual_input)
+                    if keyword ==generic_constants.DISPLAY_VARIABLE_VALUE or keyword == generic_constants.PAUSE:
+                        message.append(wxObject)
+                        message.append(mythread)
                 elif keyword in generic_constants.DATA_BASE_KEYWORDS:
                     message=list(message)
                     output=[tsp.outputval]
