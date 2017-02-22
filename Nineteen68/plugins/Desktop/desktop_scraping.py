@@ -23,7 +23,9 @@ from threading import Thread
 from ldtp import *
 from ldtp.client_exception import LdtpExecutionError
 from constants import *
-
+import launch_keywords
+import ninteen_68_desktop_scrape
+import base64
 ctrldownflag = False
 stopumpingmsgs = False
 pressedescape = False
@@ -43,7 +45,7 @@ obj_ref = None
 
 class Scrape:
 
-    def clickandadd(self,process_id,page_title,operation):
+    def clickandadd(self,operation):
         if operation == 'STARTCLICKANDADD':
             try:
                 class OutlookThread(Thread):
@@ -55,7 +57,7 @@ class Scrape:
 
                     def run(self):
                         """Run Worker Thread."""
-                        self.DataToInt = int(process_id)
+                        self.DataToInt = int(launch_keywords.window_pid)
                         self.currForeWin = win32gui.GetForegroundWindow()
                         self.PidToCheck = win32process.GetWindowThreadProcessId(self.currForeWin)
                         if self.PidToCheck[1] == self.DataToInt:
@@ -185,6 +187,8 @@ class Scrape:
             try:
                 global obj_ref
                 obj_ref.StopPump()
+##                print jsonArray
+                return jsonArray
             except Exception as exception:
                 pass
 ##        except Exception as esxception:
@@ -192,20 +196,33 @@ class Scrape:
 ##            pass
 
 
-    def full_scrape(self, window_title):
+    def full_scrape(self):
+        scraped_object=''
         try:
-            print ' full scrape'
-            scraped_object=ldtp.getentireobjectlist(window_title)
+
+            scraped_object=ldtp.getentireobjectlist(launch_keywords.window_name)
+            img=ninteen_68_desktop_scrape.obj.captureScreenshot()
+            img.save('out.png')
+            with open("out.png", "rb") as image_file:
+                encoded_string = base64.b64encode(image_file.read())
+            import json
+            scraped_object=json.loads(scraped_object)
+##            scraped_object1['']=scraped_object
+            scraped_object['mirror'] =encoded_string.encode('UTF-8').strip()
+
             with open('domelements.json', 'w') as outfile:
                 json.dump(scraped_object, outfile, indent=4, sort_keys=False)
-            outfile.close()
+                outfile.close()
+            return scraped_object
         except LdtpExecutionError as exception:
             pass
+        return scraped_object
 
 
 ##obj = Scrape()
-##obj.clickandadd('5584','Calculator','STARTCLICKANDADD')
+##obj.clickandadd('9584','Calculator','STARTCLICKANDADD')
 ##import time
 ##time.sleep(10)
-##obj.clickandadd('5584','Calculator','STOPCLICKANDADD')
+##abc=obj.clickandadd('5584','Calculator','STOPCLICKANDADD')
+##print 'ABCCCCCCCCCCCC',abc
 ##obj.full_scrape('Software Center')

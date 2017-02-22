@@ -53,7 +53,7 @@ APPTYPE_WEBSERVICE = 'webservice'
 
 APPTYPE_MAINFRAME = 'mainframe'
 
-APPTYPE_DESKTOP = 'desktop'
+APPTYPE_DESKTOP = 'Desktop'
 
 APPTYPE_DESKTOP_JAVA = 'desktopjava'
 
