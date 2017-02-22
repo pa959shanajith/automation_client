@@ -15,11 +15,12 @@ from socketIO_client import SocketIO,BaseNamespace
 i = 0
 wxObject = None
 browsername = None
+desktopScrapeFlag=False
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
 ##        print 'Inside debugTestCase method'
 ##        print '------------------',args
-        global action,wxObject,browsername
+        global action,wxObject,browsername,desktopScrapeFlag
         if str(args[0]) == 'OPEN BROWSER CH':
 
             browsername = '1'
@@ -740,6 +741,7 @@ class ClientWindow(wx.Frame):
 
     def test(self,event):
 ##        print 'Self',self
+        global desktopScrapeFlag
         if desktopScrapeFlag==True:
             global socketIO
 
