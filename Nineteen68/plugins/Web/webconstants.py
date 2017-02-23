@@ -25,16 +25,16 @@ TEST_RESULT_FALSE = "False";
 
 METHOD_INVALID='Invalid Keyword'
 
-CHROME_DRIVER_PATH = os.getcwd()+'\chromedriver.exe'
+CHROME_DRIVER_PATH = 'chromedriver.exe'
 
 
-IE_DRIVER_PATH_64 = os.getcwd()+'\IEDriverServer64.exe'
+IE_DRIVER_PATH_64 = 'IEDriverServer64.exe'
 
-IE_DRIVER_PATH_32 = os.getcwd()+'\IEDriverServer.exe'
+IE_DRIVER_PATH_32 = 'IEDriverServer.exe'
 
-PHANTOM_DRIVER_PATH = os.getcwd()+'\phantomjs.exe'
+PHANTOM_DRIVER_PATH = 'phantomjs.exe'
 
-GECKODRIVER_PATH = os.getcwd()+'\geckodriver.exe'
+GECKODRIVER_PATH = 'geckodriver.exe'
 
 SET_TEXT_SCRIPT="""arguments[0].value=arguments[1]"""
 

@@ -12,10 +12,16 @@ import threading
 from values_from_ui import *
 log = logging.getLogger('clientwindow.py')
 from socketIO_client import SocketIO,BaseNamespace
+import readconfig
 i = 0
 wxObject = None
 browsername = None
 desktopScrapeFlag=False
+
+
+
+configobj = readconfig.readConfig()
+configvalues = configobj.readJson()
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
 ##        print 'Inside debugTestCase method'
@@ -26,14 +32,14 @@ class MainNamespace(BaseNamespace):
             browsername = '1'
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
-            time.sleep(5)
+##            time.sleep(5)
         elif str(args[0]) == 'OPEN BROWSER IE':
 
             browsername = '3'
 ##
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
-            time.sleep(5)
+##            time.sleep(5)
 ##            print 'Importing done'
         elif str(args[0]) == 'OPEN BROWSER FX':
 ##
@@ -41,7 +47,7 @@ class MainNamespace(BaseNamespace):
 ##
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
-            time.sleep(5)
+##            time.sleep(5)
             print 'Importing done'
 
         elif str(args[0]) == 'debugTestCase':
@@ -60,12 +66,13 @@ class MainNamespace(BaseNamespace):
     def on_focus(self, *args):
 
         appType=args[1]
+        appType=appType.lower()
         if appType==APPTYPE_WEB:
             import highlight
             light =highlight.Highlight()
             res = light.highlight(args[0],None,None)
             print 'Highlight result: ',res
-        elif appType==APPTYPE_DESKTOP:
+        elif appType==APPTYPE_DESKTOP.lower():
             con =controller.Controller()
             con.get_all_the_imports('Desktop')
             import desktop_highlight
@@ -120,7 +127,7 @@ class SocketThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO
-        socketIO = SocketIO('127.0.0.1',3000,MainNamespace)
+        socketIO = SocketIO(configvalues['node_ip'],int(configvalues['node_port']),MainNamespace)
 
         ##socketIO = SocketIO('localhost',8124)
 ##        socketIO.send('I am ready to process the request')
@@ -340,7 +347,7 @@ class ClientWindow(wx.Frame):
         logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s %(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s',
                             datefmt='%y-%m-%d %H:%M:%S',
-                            filename='TestautoV2.log',
+                            filename=configvalues['logFile_Path'] + 'TestautoV2.log',
                             filemode='a')
         # define a Handler which writes INFO messages or higher to the sys.stderr
         console = logging.StreamHandler()
@@ -527,7 +534,7 @@ class ClientWindow(wx.Frame):
         logging.basicConfig(level=logging.INFO,
                             format='[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s',
                             datefmt='%y-%m-%d %H:%M:%S',
-                            filename='TestautoV2.log',
+                            filename=configvalues['logFile_Path'] + 'TestautoV2.log',
                             filemode='a')
         # define a Handler which writes INFO messages or higher to the sys.stderr
         console = logging.StreamHandler()
@@ -546,7 +553,7 @@ class ClientWindow(wx.Frame):
         logging.basicConfig(level=logging.DEBUG,
                             format='%(asctime)s %(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s',
                             datefmt='%y-%m-%d %H:%M:%S',
-                            filename='TestautoV2.log',
+                            filename=configvalues['logFile_Path'] + 'TestautoV2.log',
                             filemode='a')
         # define a Handler which writes INFO messages or higher to the sys.stderr
         console = logging.StreamHandler()
@@ -565,7 +572,7 @@ class ClientWindow(wx.Frame):
         logging.basicConfig(level=logging.ERROR,
                             format='%(asctime)s %(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s',
                             datefmt='%y-%m-%d %H:%M:%S',
-                            filename='TestautoV2.log',
+                            filename=configvalues['logFile_Path'] + 'TestautoV2.log',
                             filemode='a')
         # define a Handler which writes INFO messages or higher to the sys.stderr
         console = logging.StreamHandler()
