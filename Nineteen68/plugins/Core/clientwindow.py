@@ -58,10 +58,19 @@ class MainNamespace(BaseNamespace):
 
     def on_focus(self, *args):
 
-        import highlight
-        light =highlight.Highlight()
-        res = light.highlight(args[0],None,None)
-        print 'Highlight result: ',res
+        appType=args[1]
+        if appType==APPTYPE_WEB:
+            import highlight
+            light =highlight.Highlight()
+            res = light.highlight(args[0],None,None)
+            print 'Highlight result: ',res
+        elif appType==APPTYPE_DESKTOP:
+            con =controller.Controller()
+            con.get_all_the_imports('Desktop')
+            import desktop_highlight
+            highlightObj=desktop_highlight.highLight()
+            highlightObj.highLiht_element(args[0].split(',')[0],args[0].split(',')[1])
+            print 'highlight called'
 
     def on_executeTestSuite(self, *args):
         global wxObject
@@ -72,6 +81,20 @@ class MainNamespace(BaseNamespace):
         global wxObject
         args=list(args)
         wxObject.mythread = TestThread(wxObject,DEBUG,args[0],wxObject.debug_mode)
+
+    def on_LAUNCH_DESKTOP(self, *args):
+        con = controller.Controller()
+        global browsername
+        browsername = args[0]
+        con =controller.Controller()
+        con.get_all_the_imports('Desktop')
+        import ninteen_68_desktop_scrape
+        global desktopScrapeObj
+        desktopScrapeObj=ninteen_68_desktop_scrape
+        global desktopScrapeFlag
+        desktopScrapeFlag=True
+
+        wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
 
 
@@ -104,6 +127,7 @@ class SocketThread(threading.Thread):
         socketIO.emit('focus')
         socketIO.emit('debugTestCase')
         socketIO.emit('executeTestSuite')
+        socketIO.emit('LAUNCH_DESKTOP')
         socketIO.wait()
 
 
@@ -716,27 +740,33 @@ class ClientWindow(wx.Frame):
 
     def test(self,event):
 ##        print 'Self',self
-        global browsername
-        browsernumbers = ['1','2','3']
-        if browsername in browsernumbers:
-            print 'Browser name : ',browsername
-            con = controller.Controller()
-            con.get_all_the_imports('Web')
-            con.get_all_the_imports('WebScrape')
-            import Nineteen68_WebScrape
+        if desktopScrapeFlag==True:
             global socketIO
-            self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO)
-            browsername = ''
+
+            self.new = desktopScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO)
+            desktopScrapeFlag=False
         else:
-            import pause_display_operation
-            o = pause_display_operation.PauseAndDisplay()
-            flag,inputvalue = o.getflagandinput()
-            if flag == 'pause':
-                #call pause logic
-                self.new = pause_display_operation.Pause(parent = None,id = -1, title="SLK Nineteen68 - Pause")
-            elif flag == 'display':
-                #call display logic
-                self.new = pause_display_operation.Display(parent = self,id = -1, title="SLK Nineteen68 - Display Variable",input = inputvalue)
+            global browsername
+            browsernumbers = ['1','2','3']
+            if browsername in browsernumbers:
+                print 'Browser name : ',browsername
+                con = controller.Controller()
+                con.get_all_the_imports('Web')
+                con.get_all_the_imports('WebScrape')
+                import Nineteen68_WebScrape
+                global socketIO
+                self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO)
+                browsername = ''
+            else:
+                import pause_display_operation
+                o = pause_display_operation.PauseAndDisplay()
+                flag,inputvalue = o.getflagandinput()
+                if flag == 'pause':
+                    #call pause logic
+                    self.new = pause_display_operation.Pause(parent = None,id = -1, title="SLK Nineteen68 - Pause")
+                elif flag == 'display':
+                    #call display logic
+                    self.new = pause_display_operation.Display(parent = self,id = -1, title="SLK Nineteen68 - Display Variable",input = inputvalue)
 
 
 

@@ -31,6 +31,7 @@ from constants import *
 
 window_name=None
 window_handle=None
+window_pid=None
 
 class Launch_Keywords():
 
@@ -124,16 +125,17 @@ class Launch_Keywords():
             err_msg = desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
-    def captureScreenshot(self,hwnd):
-        time.sleep(0.120)
-        image=None
 
+    def captureScreenshot(self):
+##        time.sleep(0.120)
+        image=None
+        hwnd=window_handle
         if(hwnd!=None):
             mainhandle=hwnd
             hdc=win32gui.GetDC(win32gui.GetDesktopWindow())
             hdcMemDc=win32gui.CreateCompatibleDC(hdc)
 
-            parent=win32gui.GetWindow(hwnd,4)
+            parent=win32gui.GetWindow(window_handle,4)
             ancestor=win32gui.GetWindow(mainhandle,3)
             foreground=win32gui.GetForegroundWindow()
             if foreground!=mainhandle:
@@ -146,20 +148,23 @@ class Launch_Keywords():
                     image=self.capture_window( ancestor)
                 elif self.getWindowText(parent)!=None and len(self.getWindowText(parent))>0:
                     image=self.capture_window( parent)
-                else:
-                    image=self.capture_window( hwnd)
+            if image==None:
+                win32gui.SetForegroundWindow(window_handle)
+                image=self.capture_window( window_handle)
+
+        print  'image taken'
         return image
 
 
 
-    def capture_window(self,hwnd):
+    def capture_window(self,handle):
         toplist, winlist = [], []
         def enum_cb(hwnd, results):
             winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
         win32gui.EnumWindows(enum_cb, toplist)
         hwnd=win32gui.GetForegroundWindow()
-        win32gui.SetForegroundWindow(hwnd)
-        bbox = win32gui.GetWindowRect(hwnd)
+        win32gui.SetForegroundWindow(handle)
+        bbox = win32gui.GetWindowRect(handle)
         img = ImageGrab.grab(bbox)
         return img
 
@@ -211,8 +216,10 @@ class Launch_Keywords():
 
     def set_to_foreground(self):
         try:
-            windowname=window_name
-            aut_handle = win32gui.FindWindow(None,windowname)
+##            windowname=window_name
+##            aut_handle = win32gui.FindWindow(None,windowname)
+            aut_handle=window_handle
+            print aut_handle
             if aut_handle> 0:
                 foreground=win32gui.GetForegroundWindow()
                 application_pid=win32process.GetWindowThreadProcessId(aut_handle)
@@ -220,6 +227,7 @@ class Launch_Keywords():
                 if application_pid!=foreground_pid:
                     process_id=    win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
                     i= win32gui.GetWindowRect(aut_handle)
+                    print i
                     if i[0] <= -32000:
                         fg_thread, fg_process = win32process.GetWindowThreadProcessId(foreground)
                         aut_thread, aut_process = win32process.GetWindowThreadProcessId(aut_handle)
@@ -227,7 +235,10 @@ class Launch_Keywords():
                         self.bring_to_top(aut_handle,4)
                         return True
                     else:
-                        self.bring_to_top(aut_handle,5)
+##                        self.bring_to_top(aut_handle,4)
+##                        self.bring_to_top(aut_handle,5)
+                        self.hide_always_on_top_windows()
+                        win32gui.SetForegroundWindow(aut_handle)
                         return True
                 else:
                     self.bring_to_top(aut_handle,1)
@@ -236,6 +247,24 @@ class Launch_Keywords():
             err_msg = desktop_constants.ERROR_MSG
 
         return False
+
+    def hide_always_on_top_windows(self):
+        win32gui.EnumWindows(self._window_enum_callback_hide, None)
+
+    def _window_enum_callback_hide(self, hwnd, unused):
+        if hwnd != window_handle: # ignore self
+            # Is the window visible and marked as an always-on-top (topmost) window?
+            if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE) & win32con.WS_EX_TOPMOST:
+                # Ignore windows of class 'Button' (the Start button overlay) and
+                # 'Shell_TrayWnd' (the Task Bar).
+                className = win32gui.GetClassName(hwnd)
+                if not (className == 'Button' or className == 'Shell_TrayWnd'):
+                    # Force-minimize the window.
+                    # Fortunately, this seems to work even with windows that
+                    # have no Minimize button.
+                    # Note that if we tried to hide the window with SW_HIDE,
+                    # it would disappear from the Task Bar as well.
+                    win32gui.ShowWindow(hwnd, win32con.SW_FORCEMINIMIZE)
 
     def bring_to_top(self,aut_handle,value):
        try:
@@ -247,13 +276,14 @@ class Launch_Keywords():
             err_msg = desktop_constants.ERROR_MSG
 
     def higlight(self,objectname,parent,*args):
-        status=False
+        status=desktop_constants.TEST_RESULT_FAIL
         try:
             method_input=objectname.split(';')
             actual_obj=method_input[0]
             index=method_input[1]
 
             self.set_to_foreground()
+##            self.bring_to_top(window_handle,4)
             time.sleep(1)
 #           for menu buttons click and highlight
             if actual_obj[:3]=='mnu':
@@ -266,10 +296,10 @@ class Launch_Keywords():
                             if obj_index==None:
                                 actual_obj=actual_obj[0:-1]
                                 index=ldtp.getObjectProperty(self,windowname,actual_obj, "obj_index")
-            states=ldtp.getAllStates(self.windowname,actual_obj)
+            states=ldtp.getallstates(self.windowname,actual_obj)
 
             if desktop_constants.VISIBLE_CHECK in states:
-                size=ldtp.getobjectsize(self.windowname,object)
+                size=ldtp.getobjectsize(self.windowname,actual_obj)
                 logger.print_on_console( 'object size '+str(size))
                 rgn1=win32gui.CreateRectRgnIndirect((size[0] + 1, size[1] + 1,
         							size[0] + size[2] - 1, size[1] + size[3] - 1))
@@ -287,6 +317,8 @@ class Launch_Keywords():
         except Exception as e:
             status=False
 ##            Exceptions.error(e)
+            import traceback
+            traceback.print_exc()
             err_msg = desktop_constants.ERROR_MSG
         return status
 
@@ -314,6 +346,8 @@ class Launch_Keywords():
                     window_name=self.windowname
                     global window_handle
                     window_handle=title_matched_windows[0]
+                    global window_pid
+                    window_pid=self.get_window_pid(self.windowname)
                     break
                 if(self.windowname!=''):
                     break
@@ -331,6 +365,10 @@ class Launch_Keywords():
                 GetWindowText(hwnd, buff, length + 1)
                 text=buff.value
         return text
+    def get_window_pid(self,title):
+        hwnd = win32gui.FindWindow(None, title)
+        threadid,pid = win32process.GetWindowThreadProcessId(hwnd)
+        return pid
 
     def verifyWindowTitle(self):
         try:
@@ -348,4 +386,7 @@ class Launch_Keywords():
             return aut_handle
         return None
 
-
+##
+##Launch_Keywords=Launch_Keywords()
+##Launch_Keywords.launch_application(['C:\Windows\system32\calc.exe','Calculator'])
+##print Launch_Keywords.captureScreenshot()
