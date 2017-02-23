@@ -25,7 +25,7 @@ from constants import *
 import pause_execution
 import dynamic_variable_handler
 import reporting
-
+import readconfig
 from values_from_ui import *
 from concurrent.futures import ThreadPoolExecutor
 import threading
@@ -437,8 +437,14 @@ class Controller():
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
     def keywordinvocation(self,index,inpval,*args):
-        import time
-        time.sleep(1)
+        configobj = readconfig.readConfig()
+        configvalues = configobj.readJson()
+        try:
+            import time
+            time.sleep(int(configvalues['stepExecutionWait']))
+        except Exception as e:
+            log.error('stepExecutionWait should be a integer, please change it in config.json')
+            logger.print_on_console('stepExecutionWait should be a integer, please change it in config.json')
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
         #Check for 'terminate_flag' before execution
         if not(terminate_flag):

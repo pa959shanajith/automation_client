@@ -26,6 +26,7 @@ import utils_web
 import psutil
 import win32gui
 import win32api
+import readconfig
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
 class TestThread(threading.Thread):
     """Test Worker Thread Class."""
@@ -557,11 +558,17 @@ class Singleton_DriverUtil():
         log.debug('BROWSER NUM: ')
         log.debug(browser_num)
         logger.print_on_console( 'BROWSER NUM: ',browser_num)
+        configobj = readconfig.readConfig()
+        configvalues = configobj.readJson()
+
         if (browser_num == '1'):
+            chrome_path = configvalues['chrome_path']
+            if ((str(chrome_path).lower()) == 'default'):
+                chrome_path = webconstants.CHROME_DRIVER_PATH
             choptions = webdriver.ChromeOptions()
             choptions.add_argument('start-maximized')
             choptions.add_argument('--disable-extensions')
-            driver = webdriver.Chrome(chrome_options=choptions, executable_path=webconstants.CHROME_DRIVER_PATH)
+            driver = webdriver.Chrome(chrome_options=choptions, executable_path=chrome_path)
             drivermap.append(driver)
             logger.print_on_console('Chrome browser started')
             log.info('Chrome browser started')
@@ -632,7 +639,12 @@ class Singleton_DriverUtil():
             caps['IE_ENSURE_CLEAN_SESSION'] = True
             caps['ignoreZoomSetting'] = True
             caps['NATIVE_EVENTS'] = True
-            driver = webdriver.Ie(capabilities=caps,executable_path=webconstants.IE_DRIVER_PATH_64)
+            bit_64 = configvalues['bit_64']
+            if ((str(bit_64).lower()) == 'no'):
+                iepath = webconstants.IE_DRIVER_PATH_32
+            else:
+                iepath = webconstants.IE_DRIVER_PATH_64
+            driver = webdriver.Ie(capabilities=caps,executable_path=iepath)
             drivermap.append(driver)
             driver.maximize_window()
             logger.print_on_console('IE browser started')

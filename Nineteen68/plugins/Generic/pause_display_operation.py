@@ -30,6 +30,7 @@ dispflag = ''
 dispinput = None
 cont = None
 import controller
+import readconfig
 class Pause(wx.Frame):
     def __init__(self, parent,id, title):
         wx.Frame.__init__(self, parent, title=title,
@@ -117,7 +118,17 @@ class Display(wx.Frame):
 ##        s
         self.Show()
 ##        self.timer(5)
-        t = threading.Timer(5,self.hello)
+        configobj = readconfig.readConfig()
+        configvalues = configobj.readJson()
+        interval = configvalues['displayVariableTimeOut']
+        if interval == '':
+            interval = 3
+        else:
+            try:
+                interval = int( configvalues['displayVariableTimeOut'])
+            except Exception as e:
+                interval = 3
+        t = threading.Timer(interval,self.hello)
         t.start()
 
 
