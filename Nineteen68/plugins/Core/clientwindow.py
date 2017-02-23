@@ -60,12 +60,13 @@ class MainNamespace(BaseNamespace):
     def on_focus(self, *args):
 
         appType=args[1]
+        appType=appType.lower()
         if appType==APPTYPE_WEB:
             import highlight
             light =highlight.Highlight()
             res = light.highlight(args[0],None,None)
             print 'Highlight result: ',res
-        elif appType==APPTYPE_DESKTOP:
+        elif appType==APPTYPE_DESKTOP.lower():
             con =controller.Controller()
             con.get_all_the_imports('Desktop')
             import desktop_highlight

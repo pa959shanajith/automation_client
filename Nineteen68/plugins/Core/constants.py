@@ -45,7 +45,7 @@ TEST_RESULT_TRUE = 'True'
 
 HYPHEN = '-'
 
-APPTYPE_WEB = 'Web'
+APPTYPE_WEB = 'web'
 
 APPTYPE_GENERIC = 'generic'
 
@@ -53,7 +53,7 @@ APPTYPE_WEBSERVICE = 'webservice'
 
 APPTYPE_MAINFRAME = 'mainframe'
 
-APPTYPE_DESKTOP = 'Desktop'
+APPTYPE_DESKTOP = 'desktop'
 
 APPTYPE_DESKTOP_JAVA = 'desktopjava'
 
