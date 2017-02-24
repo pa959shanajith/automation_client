@@ -72,6 +72,8 @@ class Delay_keywords:
             for x, y in zip(variables, values):
                 if type(x)==unicode or type(x)==str:
                     x=str(x)
+                if y == 'None' or y == None:
+                    y = 'null'
                 if type(y)==unicode or type(y)==str:
                     y=str(y)
                 display_input+=x+' = '+(y if type(y)==str else repr(y))+'\n'

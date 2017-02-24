@@ -23,7 +23,7 @@ class DynamicVariables:
         res=False
         dyn_value=None
         variable=re.findall("\{(.*?)\[",inp_value)
-        if len(variable)>0 and variable[0] != '':
+        if len(variable)>0 and variable[0] != '' and dynamic_variable_map.has_key(DB_VAR):
             dbvalue=dynamic_variable_map[DB_VAR]
             if dbvalue!=None and dbvalue[-1]=='{'+variable[0]+'}':
                 dbvalue[-1]=inp_value

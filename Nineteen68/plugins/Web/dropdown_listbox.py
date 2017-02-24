@@ -37,17 +37,23 @@ class DropdownKeywords():
         verb = OUTPUT_CONSTANT
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        if webelement is not None:
-            log.info('Recieved web element from the web dispatcher')
-            if webelement.tag_name=='table':
-                    webelement=self.radioKeywordsObj.getActualElement(webelement,input)
-            if ((webelement.is_enabled()) and webelement.is_displayed()):
-                log.debug(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
-                log.debug(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
-                try:
+        index = None
+        try:
+            if webelement is not None:
+                log.info('Recieved web element from the web dispatcher')
+                if webelement.tag_name=='table':
+                        webelement=self.radioKeywordsObj.getActualElement(webelement,input)
+                        index = input[4]
+
+                if ((webelement.is_enabled()) and webelement.is_displayed()):
+                    log.debug(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
+                    log.debug(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                     if (input is not None) :
-                        if len(input[0].strip()) != 0:
-                            input_val = int(input[0])
+                        if index == None:
+                            index = input[0]
+                        if len(index.strip()) != 0:
+                            input_val = int(index)
+                            input_val = input_val - 1
                             log.info('Input value obtained')
                             log.info(input_val)
                             select = Select(webelement)
@@ -71,13 +77,14 @@ class DropdownKeywords():
                             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     else:
                         log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                except Exception as e:
-                    log.error(e)
-                    logger.print_on_console(e)
-                log.info(RETURN_RESULT)
-            else:
-                log.info('Element is not enabled or dispalyed')
-                err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
+                else:
+                    log.info('Element is not enabled or dispalyed')
+                    err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+        log.info(RETURN_RESULT)
+
         return status,result,verb,err_msg
 
     def getCount(self,webelement,*args):
