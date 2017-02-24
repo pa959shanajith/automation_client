@@ -78,12 +78,15 @@ class BrowserKeywords():
                 d = obj.chech_if_driver_exists_in_map(self.browser_num)
                 if d == 'stale':
                     #stale logic
-                    import win32com.client
-                    my_processes = ['chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe']
-                    wmi=win32com.client.GetObject('winmgmts:')
-                    for p in wmi.InstancesOf('win32_process'):
-                        if p.Name in my_processes:
-                            os.system("TASKKILL /F /IM " + p.Name)
+                    try:
+                        import win32com.client
+                        my_processes = ['chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe']
+                        wmi=win32com.client.GetObject('winmgmts:')
+                        for p in wmi.InstancesOf('win32_process'):
+                            if p.Name in my_processes:
+                                os.system("TASKKILL /F /IM " + p.Name)
+                    except Exception as e:
+                        log.error(e)
                     del drivermap[:]
                     driver_obj = obj.getBrowser(self.browser_num)
                 elif d != None:
