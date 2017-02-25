@@ -101,7 +101,19 @@ class MainNamespace(BaseNamespace):
         desktopScrapeObj=ninteen_68_desktop_scrape
         global desktopScrapeFlag
         desktopScrapeFlag=True
+        wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
+    def on_LAUNCH_MOBILE(self, *args):
+        con = controller.Controller()
+        global browsername
+        browsername = args[0]+";"+args[1]
+        con =controller.Controller()
+        con.get_all_the_imports('Mobility')
+        import ninteen_68_mobile_scrape
+        global mobileScrapeObj
+        mobileScrapeObj=ninteen_68_mobile_scrape
+        global mobileScrapeFlag
+        mobileScrapeFlag=True
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
 
@@ -136,6 +148,7 @@ class SocketThread(threading.Thread):
         socketIO.emit('debugTestCase')
         socketIO.emit('executeTestSuite')
         socketIO.emit('LAUNCH_DESKTOP')
+        socketIO.emit('LAUNCH_MOBILE')
         socketIO.wait()
 
 
@@ -748,6 +761,11 @@ class ClientWindow(wx.Frame):
 
     def test(self,event):
 ##        print 'Self',self
+        global mobileScrapeFlag
+        if mobileScrapeFlag==True:
+            global socketIO
+            self.new = mobileScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
+            mobileScrapeFlag=False
         global desktopScrapeFlag
         if desktopScrapeFlag==True:
             global socketIO
