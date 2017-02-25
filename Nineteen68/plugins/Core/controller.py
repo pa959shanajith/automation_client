@@ -419,14 +419,16 @@ class Controller():
             if keyword_response != []:
                 display_keyword_response='DB data fetched'
 
-        logger.print_on_console('Result obtained is ',display_keyword_response)
-        log.info('Result obtained is: ')
-        log.info(display_keyword_response)
 
         if len(result_temp)>4:
             tsp.additionalinfo=result_temp[-1]
         elif result_temp[2] != OUTPUT_CONSTANT:
             tsp.additionalinfo=result_temp[2]
+            display_keyword_response=result_temp[2]
+
+        logger.print_on_console('Result obtained is ',display_keyword_response)
+        log.info('Result obtained is: ')
+        log.info(display_keyword_response)
 
 
 

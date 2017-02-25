@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 import desktop_scraping
 import wx
-import clientwindow
+##import clientwindow
 from socketIO_client import SocketIO,BaseNamespace
 import launch_keywords
 desktop_scraping_obj = desktop_scraping.Scrape()

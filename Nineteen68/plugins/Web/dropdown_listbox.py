@@ -337,19 +337,22 @@ class DropdownKeywords():
                             result=webconstants.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
-                            logger.print_on_console('ERR_VALUES_DOESNOT_MATCH')
-                            log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
                             err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                            logger.print_on_console(err_msg)
+                            log.error(err_msg)
+
                     else:
-                        logger.print_on_console('Element is not displayed')
-                        log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
                         err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
+                        logger.print_on_console(err_msg)
+                        log.error(err_msg)
+
             else:
-                logger.print_on_console('Provided input not present in element')
+                err_msg='Provided input not present in element'
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
 
         except Exception as e:
             log.error(e)
-
             logger.print_on_console(e)
         return status,result,verb,err_msg
 
