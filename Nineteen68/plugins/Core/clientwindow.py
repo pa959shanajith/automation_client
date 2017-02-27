@@ -17,7 +17,7 @@ i = 0
 wxObject = None
 browsername = None
 desktopScrapeFlag=False
-mobileScrapeFlag==False
+mobileScrapeFlag=False
 
 
 
