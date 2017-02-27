@@ -60,7 +60,7 @@ APPTYPE_DESKTOP_JAVA = 'desktopjava'
 
 APPTYPE_MOBILE='mobileweb'
 
-APPTYPE_MOBILE_APP = 'mobileapp'
+APPTYPE_MOBILE_APP = 'mobility'
 
 IGNORE_THIS_STEP = '<<Ignore.This.Step>>'
 

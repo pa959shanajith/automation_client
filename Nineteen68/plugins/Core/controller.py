@@ -96,6 +96,7 @@ class Controller():
     mobile_app_dispatcher_obj = None
 
 
+
     def __init__(self):
         self.get_all_the_imports(CORE)
         self.__load_generic()
@@ -118,6 +119,7 @@ class Controller():
         self.debug_choice='Normal'
         self.last_tc_num=1
         self.debugfrom_step=1
+        self.configvalues={}
 
 
     def __load_generic(self):
@@ -439,8 +441,8 @@ class Controller():
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
     def keywordinvocation(self,index,inpval,*args):
-        configobj = readconfig.readConfig()
-        configvalues = configobj.readJson()
+        #configobj = readconfig.readConfig()
+        configvalues = self.configvalues
         try:
             import time
             time.sleep(int(configvalues['stepExecutionWait']))
@@ -742,7 +744,7 @@ class Controller():
         return status
 
 
-    def invoke_execution(self,mythread,json_data,socketIO,wxObject):
+    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues):
         global terminate_flag
         obj = handler.Handler()
         status=COMPLETED
@@ -789,6 +791,7 @@ class Controller():
                     #Logic to iterate through each scenario in the suite
                     for scenario,scenario_id,condition_check_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id]):
                         con =Controller()
+                        con.configvalues=configvalues
                         con.wx_object=wxObject
                         handler.tspList=[]
                          #check for temrinate flag before printing loggers
@@ -881,13 +884,14 @@ class Controller():
         if action.lower()==EXECUTE:
             self.execution_mode=SERIAL
 
+
             #Parallel Execution
             obj=handler.Handler()
             kill_process()
 ##            if execution_mode.lower() == PARALLEL:
 ##                status=self.invoke_execution(mythread,json_data)
             if self.execution_mode.lower() == SERIAL:
-                status=self.invoke_execution(mythread,json_data,socketIO,wxObject)
+                status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues)
             kill_process()
         elif action.lower()==DEBUG:
             self.debug_mode=debug_mode

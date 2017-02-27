@@ -15,6 +15,7 @@ log = logging.getLogger('install_and_launch.py')
 import logger
 from constants import *
 driver = None
+import mobile_app_constants
 
 class LaunchAndInstall():
 
@@ -57,7 +58,7 @@ class LaunchAndInstall():
             maindir = os.getcwd()
             os.chdir('..')
             curdir = os.getcwd()
-            path= curdir + '//Nineteen68//plugins//Mobility//node_modules//appium//build//lib//main.js'
+            path= curdir + '//Nineteen68//plugins//Mobility//MobileApp//node_modules//appium//build//lib//main.js'
 ##            path='C:\\Nineteen68\\plugins\\Mobility\\node_modules\\appium\\build\\lib\main.js'
             log.info('Server file path')
             log.info(path)
