@@ -20,7 +20,6 @@ desktopScrapeFlag=False
 mobileScrapeFlag=False
 
 
-
 configobj = readconfig.readConfig()
 configvalues = configobj.readJson()
 class MainNamespace(BaseNamespace):
@@ -299,6 +298,7 @@ class TestThread(threading.Thread):
 ##            controller.kill_process()
             self.con = controller.Controller()
             self.wxObject.terminatebutton.Enable()
+            self.con.configvalues=configvalues
             status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO)
             logger.print_on_console('Execution status',status)
 
