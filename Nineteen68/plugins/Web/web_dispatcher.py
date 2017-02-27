@@ -276,6 +276,7 @@ class Dispatcher:
                         input.append(self.action)
 
                     result= dict[keyword](webelement,input)
+                    driver.switch_to.default_content()
                     if flag and webelement==None:
                         result=list(result)
                         result[3]=WEB_ELEMENT_NOT_FOUND
