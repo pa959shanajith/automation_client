@@ -483,6 +483,7 @@ class ExcelXLS:
                     logger.print_on_console('Cell Type not supported')
                     log.info('Cell Type not supported')
             else:
+                status= True
                 value=str(value)
                 s.write(int(row),int(col),value)
 
