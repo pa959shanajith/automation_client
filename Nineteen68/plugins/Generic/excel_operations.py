@@ -858,7 +858,7 @@ class ExcelXLS:
             workbook_info=self.__load_workbook_xls(input_path,sheetname)
             row=workbook_info[2]
             col=workbook_info[3]
-            if len(args)>0 and args[0] == 'newline':
+            if len(args)>0 and args[0].lower() == 'newline'  :
                 col=0
                 if workbook_info[3] != -1:
                     row=row+1

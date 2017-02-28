@@ -24,21 +24,33 @@ import logging
 
 log = logging.getLogger('screenshot_keywords.py')
 class Screenshot():
-    def captureScreenshot(self,inputval,filename,*args):
+    def captureScreenshot(self,*args):
+        print
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+##        inputval,filename,
+        filePath = ''
         try:
-            log.debug('Reading the inputs')
-            if not os.path.exists(inputval):
-                os.makedirs(inputval)
-            if filename!=None:
-                if '.' in filename:
-                    filename=filename.split('.')[0]
+            if len(args) == 2:
+                inputval = args[0]
+                filename = args[1]
+                log.debug('Reading the inputs')
+                if not os.path.exists(inputval):
+                    os.makedirs(inputval)
+                if filename!=None:
+                    if '.' in filename:
+                        filename=filename.split('.')[0]
+                    filePath=str(inputval) + '//'+ filename
+                else:
+                    filename=self.generateUniqueFileName()
+                    filePath=str(inputval) + '//'+ filename
             else:
                 filename=self.generateUniqueFileName()
-            filePath=str(inputval)+'//'+filename
+                filePath = os.getcwd() +'//' + filename
+
+
             log.debug('capturing the screenshot')
             logger.print_on_console('capturing the screenshot')
             img=ImageGrab.grab()
