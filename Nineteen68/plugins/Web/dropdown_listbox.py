@@ -495,7 +495,10 @@ class DropdownKeywords():
                             temp.append(value)
                         output = ';'.join(temp)
                         logger.print_on_console(output)
-                        output=temp
+                        if len(temp)>1:
+                            output=temp
+                        else:
+                            output = value
                         status=webconstants.TEST_RESULT_PASS
                         result=webconstants.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)

@@ -451,6 +451,8 @@ class StepDescription:
             return ' Upload the file '+ filename + ' present in the path ' + input + '.'
         def getLinkText():
             return ' Get Text From '+ "'" + tsp.custname + "'" + ' and save the text '+ output + ' in ' + tsp.outputval
+        def getButtonName():
+            return ' Get ButtonName From '+ "'" + tsp.custname + "'" + ' and save the text '+ output + ' in ' + tsp.outputval
         def verifyLinkText():
             return 'Verify text ' + input + ' is the name of the ' +"'" + tsp.custname + "'"
 

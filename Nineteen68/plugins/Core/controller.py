@@ -387,7 +387,7 @@ class Controller():
 
         input_list = input[0].split(SEMICOLON)
 
-        if keyword in WS_KEYWORDS:
+        if keyword in WS_KEYWORDS or keyword == 'navigateToURL':
             input_list=[input[0]]
 
         elif keyword in DYNAMIC_KEYWORDS:
