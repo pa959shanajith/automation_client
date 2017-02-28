@@ -566,12 +566,17 @@ class Singleton_DriverUtil():
 
         if (browser_num == '1'):
             chrome_path = configvalues['chrome_path']
+            exec_path = webconstants.CHROME_DRIVER_PATH
             if ((str(chrome_path).lower()) == 'default'):
-                chrome_path = webconstants.CHROME_DRIVER_PATH
-            choptions = webdriver.ChromeOptions()
-            choptions.add_argument('start-maximized')
-            choptions.add_argument('--disable-extensions')
-            driver = webdriver.Chrome(chrome_options=choptions, executable_path=chrome_path)
+                choptions = webdriver.ChromeOptions()
+                choptions.add_argument('start-maximized')
+                choptions.add_argument('--disable-extensions')
+                driver = webdriver.Chrome(chrome_options=choptions, executable_path=exec_path)
+            else:
+                choptions = webdriver.ChromeOptions()
+                choptions.add_argument('start-maximized')
+                choptions.add_argument('--disable-extensions')
+                driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
             drivermap.append(driver)
             logger.print_on_console('Chrome browser started')
             log.info('Chrome browser started')
