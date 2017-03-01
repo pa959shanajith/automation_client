@@ -27,8 +27,8 @@ import logging
 import re
 import os
 log = logging.getLogger('browserops.py')
-xtree = ET.parse(domconstants.CONFIG_FILE)
-xroot = xtree.getroot()
+##xtree = ET.parse(domconstants.CONFIG_FILE)
+##xroot = xtree.getroot()
 hwndg = None
 status = ''
 driver = None
