@@ -139,7 +139,7 @@ class SocketThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO
-        socketIO = SocketIO(configvalues['node_ip'],int(configvalues['node_port']),MainNamespace)
+        socketIO = SocketIO(configvalues['server_ip'],int(configvalues['server_port']),MainNamespace)
 
         ##socketIO = SocketIO('localhost',8124)
 ##        socketIO.send('I am ready to process the request')

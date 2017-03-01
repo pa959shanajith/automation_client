@@ -116,7 +116,6 @@ class FileOperations:
 
         """
         try:
-
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             err_msg=None
@@ -303,6 +302,10 @@ class FileOperations:
             err_msg=None
             output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
+            input_path1 = str(input_path1)
+            input_path2 = str (input_path2)
+            input_path1 = input_path1.replace(',',';')
+            input_path2 = input_path2.replace(',',';')
             params=self.__split(input_path1,input_path2,*args)
             path2=params[1]
             if len(params)>2:
