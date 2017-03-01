@@ -172,8 +172,8 @@ class TextFile:
         try:
             content1=self.get_content(input_path1)
             content2=self.get_content(input_path2)
-            log.debug('File1 content is '+content1)
-            log.debug('File2 content is '+content2)
+            log.debug('File1 content is ',content1)
+            log.debug('File2 content is ',content2)
             if content1==content2:
                 status=True
             else:
@@ -229,7 +229,7 @@ class TextFile:
         try:
             with open(input_path) as myFile:
                 content=myFile.read()
-                logger.print_on_console('Content is:'+content)
+##                logger.print_on_console('Content is:'+content)
                 log.info('Content is '+str(content))
                 status=True
         except IOError:
