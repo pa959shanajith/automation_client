@@ -37,8 +37,8 @@ class readConfig():
         configvalues={}
         config = json.loads(open('config.json').read())
         params=config['configuration']
-        configvalues['node_ip']=params['node_ip']
-        configvalues['node_port']=params['node_port']
+        configvalues['server_ip']=params['server_ip']
+        configvalues['server_port']=params['server_port']
         configvalues['screenShot_PathName']=params['screenShot_PathName']
         configvalues['ignore_certificate']=params['ignore_certificate']
         configvalues['chrome_path']=params['chrome_path']
