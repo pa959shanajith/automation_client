@@ -47,8 +47,14 @@ class Screenshot():
                     filename=self.generateUniqueFileName()
                     filePath=str(inputval) + '//'+ filename
             else:
+                import readconfig
+                configobj = readconfig.readConfig()
+                configvalues = configobj.readJson()
+                path = configvalues['screenShot_PathName']
+                if not os.path.exists(path):
+                    os.makedirs(path)
                 filename=self.generateUniqueFileName()
-                filePath = os.getcwd() +'//' + filename
+                filePath = path + filename
 
 
             log.debug('capturing the screenshot')
