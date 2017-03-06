@@ -1282,7 +1282,7 @@ class ExcelXLSX:
             workbook_info=self.__load_workbook_xlsx(input_path,sheetname)
             row=workbook_info[2]
             col=workbook_info[3]
-            if len(args)>0 and args[0] == 'newline':
+            if len(args)>0 and args[0].lower() == 'newline':
                 row=row+1
                 col=1
 
