@@ -18,6 +18,7 @@ wxObject = None
 browsername = None
 desktopScrapeFlag=False
 mobileScrapeFlag=False
+mobileWebScrapeFlag=False
 
 
 configobj = readconfig.readConfig()
@@ -25,7 +26,7 @@ configvalues = configobj.readJson()
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
 ##        print 'Inside debugTestCase method'
-##        print '------------------',args
+        print '------------------',args
         global action,wxObject,browsername,desktopScrapeFlag
         if str(args[0]) == 'OPEN BROWSER CH':
 
@@ -68,6 +69,11 @@ class MainNamespace(BaseNamespace):
         appType=args[1]
         appType=appType.lower()
         if appType==APPTYPE_WEB:
+            import highlight
+            light =highlight.Highlight()
+            res = light.highlight(args[0],None,None)
+            print 'Highlight result: ',res
+        if appType==APPTYPE_MOBILE.lower():
             import highlight
             light =highlight.Highlight()
             res = light.highlight(args[0],None,None)
@@ -116,6 +122,22 @@ class MainNamespace(BaseNamespace):
         mobileScrapeFlag=True
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
+    def on_LAUNCH_MOBILE_WEB(self, *args):
+
+        con = controller.Controller()
+        global browsername
+        browsername = args[0]+";"+args[1]
+        con =controller.Controller()
+
+        con.get_all_the_imports('Mobility')
+        import ninteen_68_mobile_web_scrape
+        global mobileWebScrapeObj
+        mobileWebScrapeObj=ninteen_68_mobile_web_scrape
+        global mobileWebScrapeFlag
+        mobileWebScrapeFlag=True
+        print mobileWebScrapeFlag
+        wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+
 
 
 
@@ -149,6 +171,7 @@ class SocketThread(threading.Thread):
         socketIO.emit('executeTestSuite')
         socketIO.emit('LAUNCH_DESKTOP')
         socketIO.emit('LAUNCH_MOBILE')
+        socketIO.emit('LAUNCH_MOBILE_WEB')
         socketIO.wait()
 
 
@@ -767,6 +790,11 @@ class ClientWindow(wx.Frame):
             global socketIO
             self.new = mobileScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
             mobileScrapeFlag=False
+        global mobileWebScrapeFlag
+        if mobileWebScrapeFlag==True:
+            global socketIO
+            self.new = mobileWebScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",browser = browsername,socketIO = socketIO)
+            mobileWebScrapeFlag=False
         global desktopScrapeFlag
         if desktopScrapeFlag==True:
             global socketIO
