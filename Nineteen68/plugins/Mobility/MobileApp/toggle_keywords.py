@@ -48,7 +48,7 @@ class ToggleKeywords():
                             action = TouchAction(install_and_launch.driver)
                             action.tap(element).perform()
                             status=TEST_RESULT_PASS
-                            result=TEST_RESULT_TRUE
+                            methodoutput=TEST_RESULT_TRUE
                         else:
                             err_msg=TOGGLE_ON
                             log.error(err_msg)
@@ -63,7 +63,8 @@ class ToggleKeywords():
                     logger.print_on_console(err_msg)
 
         except Exception as e:
-            err_msg=self.__driver_exception(e)
+            err_msg="error occured"
+
         return status,methodoutput,output,err_msg
 
     def toggle_off(self,webelement,input,*args):
@@ -77,20 +78,20 @@ class ToggleKeywords():
         if webelement is not None:
             try:
 
-                if element is not None:
-                    visibility=element.is_displayed()
+                if webelement is not None:
+                    visibility=webelement.is_displayed()
                     log.debug('element is visible')
                     if visibility:
-                        enable=element.is_enabled()
+                        enable=webelement.is_enabled()
                         if enable:
                             log.debug(WEB_ELEMENT_ENABLED)
                             log.debug('performing the action')
                             res=element.get_attribute("checked")
                             if res.upper()=='ON':
                                 action = TouchAction(install_and_launch.driver)
-                                action.tap(element).perform()
+                                action.tap(webelement).perform()
                                 status=TEST_RESULT_PASS
-                                result=TEST_RESULT_TRUE
+                                methodoutput=TEST_RESULT_TRUE
                             else:
                                  err_msg=TOGGLE_OFF
                                  log.error(err_msg)

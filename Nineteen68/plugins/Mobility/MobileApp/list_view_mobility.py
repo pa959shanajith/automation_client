@@ -18,7 +18,7 @@ import logging
 log = logging.getLogger('list_view_mobility.py')
 
 class ButtonKeywords():
-    def getListCount(self, mobile_element,*args):
+    def getListCount(self, mobile_element,inputval,*args):
         status = mobile_constants.TEST_RESULT_FAIL
         methodoutput = mobile_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -120,6 +120,6 @@ class ButtonKeywords():
             err_msg=''
         #return status and methodoutput
         log.info(RETURN_RESULT)
-        return status,methodoutput,output,err_msg
+        return status,methodoutput,index,err_msg
 
 

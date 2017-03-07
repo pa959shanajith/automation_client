@@ -1856,3 +1856,8 @@ def get_arsc_info(arscobj):
                 except AttributeError:
                     pass
     return buff
+
+
+
+##abc=APK('D:\\Mobility\\apk\\Loan EMI Calculator - Bank_1.0.3_apk-dl.apk')
+##print abc.get_package()

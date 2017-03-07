@@ -135,8 +135,8 @@ class Controller():
         try:
             if self.mobile_web_dispatcher_obj==None:
                 self.get_all_the_imports('Mobility')
-                import mobile_dispatcher
-                self.mobile_web_dispatcher_obj = mobile_dispatcher.Dispatcher()
+                import web_dispatcher
+                self.mobile_web_dispatcher_obj = web_dispatcher.Dispatcher()
         except Exception as e:
             logger.print_on_console('Error loading MobileWeb plugin')
 
@@ -727,7 +727,8 @@ class Controller():
             tsplist = obj.read_step()
             for k in range(len(tsplist)):
                 if tsplist[k].name.lower() == 'openbrowser':
-                    tsplist[k].inputval = browser_type
+                    if tsplist[k].apptype.lower()=='web':
+                        tsplist[k].inputval = browser_type
 
         if flag:
             self.conthread=mythread
@@ -814,7 +815,8 @@ class Controller():
                             tsplist = handler.tspList
                             for k in range(len(tsplist)):
                                 if tsplist[k].name.lower() == 'openbrowser':
-                                    tsplist[k].inputval = [browser]
+                                    if tsplist[k].apptype.lower()=='web':
+                                        tsplist[k].inputval = [browser]
 
                         if flag:
                             #check for temrinate flag before execution
@@ -938,7 +940,21 @@ def kill_process():
         wmi=win32com.client.GetObject('winmgmts:')
         for p in wmi.InstancesOf('win32_process'):
             if p.Name in my_processes:
+
                 os.system("TASKKILL /F /IM " + p.Name)
+## logic to kill the appium server
+        try:
+            import psutil
+            import os
+            processes = psutil.net_connections()
+            for line in processes:
+                p =  line.laddr
+                if p[1] == 4723:
+                    log.info( 'Pid Found' )
+                    log.info(line.pid)
+                    os.system("TASKKILL /F /PID " + str(line.pid))
+        except Exception as e:
+            log.error(e)
         log.info('Stale processes killed')
         logger.print_on_console( 'Stale processes killed')
     except Exception as e:

@@ -25,14 +25,16 @@ TEST_RESULT_FALSE = "False";
 
 METHOD_INVALID='Invalid Keyword'
 
-CHROME_DRIVER_PATH = 'D:\chromedriver.exe'
+CHROME_DRIVER_PATH = 'chromedriver.exe'
 
 
-IE_DRIVER_PATH_64 = 'D:\IEDriverServer64.exe'
+IE_DRIVER_PATH_64 = 'IEDriverServer64.exe'
 
-IE_DRIVER_PATH_32 = os.getcwd()+'\IEDriverServer.exe'
+IE_DRIVER_PATH_32 = 'IEDriverServer.exe'
 
-PHANTOM_DRIVER_PATH = os.getcwd()+'\phantomjs.exe'
+PHANTOM_DRIVER_PATH = 'phantomjs.exe'
+
+GECKODRIVER_PATH = 'geckodriver.exe'
 
 SET_TEXT_SCRIPT="""arguments[0].value=arguments[1]"""
 
@@ -142,7 +144,7 @@ CLOSE_BROWSER='closeBrowser'
 
 
 NON_WEBELEMENT_KEYWORDS=['openBrowser','openNewBrowser','navigateToURL','getPageTitle','verifyPageTitle','getCurrentURL','verifyCurrentURL','closeBrowser',
-'switchToWindow','closeSubWindows','verifyTextExists','waitforelementvisible','refresh','maximizeBrowser','getCurrentURL','acceptPopUp','dismissPopUp',
+'switchToWindow','closeSubWindows','verifyTextExists','waitForElementVisible','refresh','maximizeBrowser','getCurrentURL','acceptPopUp','dismissPopUp',
 'getPopUpText','verifyPopUpText','clearCache','navigateWithAuthenticate']
 
 FOUND='found'
