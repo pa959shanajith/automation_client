@@ -940,7 +940,21 @@ def kill_process():
         wmi=win32com.client.GetObject('winmgmts:')
         for p in wmi.InstancesOf('win32_process'):
             if p.Name in my_processes:
+
                 os.system("TASKKILL /F /IM " + p.Name)
+## logic to kill the appium server
+        try:
+            import psutil
+            import os
+            processes = psutil.net_connections()
+            for line in processes:
+                p =  line.laddr
+                if p[1] == 4723:
+                    log.info( 'Pid Found' )
+                    log.info(line.pid)
+                    os.system("TASKKILL /F /PID " + str(line.pid))
+        except Exception as e:
+            log.error(e)
         log.info('Stale processes killed')
         logger.print_on_console( 'Stale processes killed')
     except Exception as e:
