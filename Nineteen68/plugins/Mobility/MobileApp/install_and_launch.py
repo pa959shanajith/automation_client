@@ -39,6 +39,7 @@ class LaunchAndInstall():
             desired_caps['logLevel'] = 'debug'
             global driver
             driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
+            self.driver_obj=driver
             status=mobile_app_constants.TEST_RESULT_PASS
             result=mobile_app_constants.TEST_RESULT_TRUE
 ##            import time
@@ -92,35 +93,40 @@ class LaunchAndInstall():
             logger.print_on_console('Exception in stoping server')
             logger.print_on_console(e)
 
-    def uninstallApplication(self,input_val):
+    def uninstallApplication(self,objectname,input_val,*args):
         status=mobile_app_constants.TEST_RESULT_FAIL
         result=mobile_app_constants.TEST_RESULT_FALSE
         err_msg=None
         output=OUTPUT_CONSTANT
         try:
             apk_loc = input_val[0]
-            from apk import APK
-            apkf = APK(apk_loc)
+            import apk
+            apkf = apk.APK(apk_loc)
             package_name = None
-            package_name = apkf.get_package
+            package_name = apkf.get_package()
             log.debug(' package_name')
             log.debug( package_name)
-            global driver
-            driver.remove_app(package_name)
+            self.driver_obj.remove_app(package_name)
+            self.stop_server()
             status=mobile_app_constants.TEST_RESULT_PASS
             result=mobile_app_constants.TEST_RESULT_TRUE
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             log.error(e)
             logger.print_on_console(e)
+        return status,result,output,err_msg
 
-    def closeApplication(self):
+    def closeApplication(self,inputval,*args):
         status=mobile_app_constants.TEST_RESULT_FAIL
         result=mobile_app_constants.TEST_RESULT_FALSE
         err_msg=None
         output=OUTPUT_CONSTANT
         try:
-            global driver
-            driver.quit()
+##            global driver
+
+            self.driver_obj.close_app()
+            self.stop_server()
             status=mobile_app_constants.TEST_RESULT_PASS
             result=mobile_app_constants.TEST_RESULT_TRUE
         except Exception as e:

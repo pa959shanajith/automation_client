@@ -29,18 +29,19 @@ class Device_Keywords():
         output=None
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-
+        maindir=os.getcwd()
         devices = []
         try:
             android_home=os.environ['ANDROID_HOME']
             cmd=android_home+'\\platform-tools\\'
+
             os.chdir(cmd)
             cmd=cmd +'adb.exe'
             if android_home!=None:
                 with open(os.devnull, 'wb') as devnull:
                     subprocess.check_call([cmd, 'start-server'], stdout=devnull,
                               stderr=devnull)
-                print subprocess.check_output([cmd, 'devices'])
+##                print subprocess.check_output([cmd, 'devices'])
                 out = self.split_lines(subprocess.check_output([cmd, 'devices']))
                 # The first line of `adb devices` just says "List of attached devices", so
                 # skip that.
@@ -54,6 +55,7 @@ class Device_Keywords():
                     devices.append(serial)
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
+                os.chdir(maindir)
 
         except Exception as e:
             log.error(e)
@@ -64,23 +66,24 @@ class Device_Keywords():
 
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        output=None
+        output=OUTPUT_CONSTANT
         err_msg=None
-        device=input_val[0]
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-
         devices = []
+        device=None
+        maindir=os.getcwd()
         try:
+
+            device=args[0]
+            log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
             android_home=os.environ['ANDROID_HOME']
             cmd=android_home+'\\platform-tools\\'
-            print cmd
             os.chdir(cmd)
             cmd=cmd +'adb.exe'
             if android_home!=None:
                 with open(os.devnull, 'wb') as devnull:
                     subprocess.check_call([cmd, 'start-server'], stdout=devnull,
                               stderr=devnull)
-                print subprocess.check_output([cmd, 'devices'])
+##                print subprocess.check_output([cmd, 'devices'])
                 out = self.split_lines(subprocess.check_output([cmd, 'devices']))
                 # The first line of `adb devices` just says "List of attached devices", so
                 # skip that.
@@ -92,13 +95,14 @@ class Device_Keywords():
                         continue
                     serial, _ = re.split(r'\s+', line, maxsplit=1)
                     devices.append(serial)
-                if device is not None and device in devices:
+                if device is not None and device[0] in devices:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                os.chdir(maindir)
         except Exception as e:
             log.error(e)
             logger.print_on_console(err_msg)
-        return status,methodoutput,devices,err_msg
+        return status,methodoutput,OUTPUT_CONSTANT,err_msg
 
     def split_lines(self,s):
         """Splits lines in a way that works even on Windows and old devices.

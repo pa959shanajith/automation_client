@@ -36,8 +36,8 @@ class SliderKeywords():
         starty=(size['width']*0.80)
         endy=(size['width']*0.20)
         startx=(size['height']/2)
-        log.debug(startx,starty,endx)
-        return startx,starty,endx
+        log.debug(startx,starty,endy)
+        return startx,starty,endy
 
 
 
@@ -50,10 +50,10 @@ class SliderKeywords():
         try:
             startx,starty,endx=self.find_coordinates_horizontal()
             #Swipe from Right to Left
-            driver.swipe(startx, starty, endx, starty, 3000)
+            install_and_launch.driver.swipe(startx, starty, endx, starty, 3000)
             time.sleep(3)
             status=TEST_RESULT_PASS
-            result=TEST_RESULT_TRUE
+            methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             err_msg='Error thrown be android driver'
             log.error(e)
@@ -70,10 +70,10 @@ class SliderKeywords():
         try:
             startx,starty,endx=self.find_coordinates_horizontal()
             #Swipe from left to Right
-            driver.swipe(endx, starty, startx, starty, 3000);
+            install_and_launch.driver.swipe(endx, starty, startx, starty, 3000);
             time.sleep(3)
             status=TEST_RESULT_PASS
-            result=TEST_RESULT_TRUE
+            methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             err_msg='Error thrown be android driver'
             log.error(e)
@@ -89,13 +89,15 @@ class SliderKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            startx,starty,endx=self.find_coordinates_vertical()
+            startx,starty,endy=self.find_coordinates_vertical()
             #Swipe from down to up
-            driver.swipe(startx, starty, startx, endy, 3000)
+            install_and_launch.driver.swipe(startx, starty, startx, endy, 3000)
             time.sleep(3)
             status=TEST_RESULT_PASS
-            result=TEST_RESULT_TRUE
+            methodoutput=TEST_RESULT_TRUE
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             err_msg='Error thrown be android driver'
             log.error(e)
             logger.print_on_console(err_msg)
@@ -111,11 +113,54 @@ class SliderKeywords():
         try:
             startx,starty,endx=self.find_coordinates_vertical()
             #Swipe from up to bottom
-            driver.swipe(startx, endy, startx, starty, 3000)
+            install_and_launch.driver.swipe(startx, endx, startx, starty, 3000)
+            time.sleep(3)
+            status=TEST_RESULT_PASS
+            methodoutput=TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg='Error thrown be android driver'
+            log.error(e)
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output,err_msg
+
+    def hide_soft_keyboard(self,obj,inputval,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            startx,starty,endx=self.find_coordinates_vertical()
+            #Swipe from up to bottom
+            install_and_launch.driver.hide_keyboard(inputval[0])
             time.sleep(3)
             status=TEST_RESULT_PASS
             result=TEST_RESULT_TRUE
         except Exception as e:
+            import traceback
+            traceback.print_exc()
+            err_msg='Error thrown be android driver'
+            log.error(e)
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output,err_msg
+
+    def backPress(self,inputval,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+##            startx,starty,endx=self.find_coordinates_vertical()
+            #Swipe from up to bottom
+            print 'performing the back press'
+            install_and_launch.driver.keyevent(4)
+            time.sleep(3)
+            status=TEST_RESULT_PASS
+            result=TEST_RESULT_TRUE
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
             err_msg='Error thrown be android driver'
             log.error(e)
             logger.print_on_console(err_msg)
