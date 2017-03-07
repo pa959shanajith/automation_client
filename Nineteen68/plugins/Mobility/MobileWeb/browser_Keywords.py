@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 from selenium import webdriver
-
+import domconstants
 import logger
 import webconstants
 driver_obj = None
@@ -58,13 +58,29 @@ class BrowserKeywords():
         logger.print_on_console(e)
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         return err_msg
-
-    def openBrowser(self,webelement,browser_num,*args):
+    def start_server(self):
+        try:
+            import subprocess
+            import os
+            maindir = os.getcwd()
+            os.chdir('..')
+            curdir = os.getcwd()
+            path= curdir + '//Nineteen68//plugins//Mobility//MobileApp//node_modules//appium//build//lib//main.js'
+            nodePath = maindir+'//node.exe'
+            proc = subprocess.Popen([nodePath, path], shell=True,stdin=None, stdout=None, stderr=None, close_fds=True)
+            import time
+            time.sleep(15)
+            logger.print_on_console('Server started')
+            os.chdir(maindir)
+        except Exception as e:
+            logger.print_on_console('Exception in starting server')
+    def openBrowser(self,webelement,inputs,*args):
+        self.start_server()
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        self.browser_num=browser_num[0]
+##        self.browser_num=browser_num[0]
         try:
             global driver_obj
             global webdriver_list
@@ -89,6 +105,7 @@ class BrowserKeywords():
             global driver
             logger.log('FILE: browserops.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
             driver.get(domconstants.BLANK_PAGE)
+            driver_obj=driver
                 ##            p = psutil.Process(driver.service.process.pid)
                 ##            # logging.warning(p.get_children(recursive=True))
                 ##            pidchrome = p.children()[0]
@@ -98,6 +115,7 @@ class BrowserKeywords():
                 ##            hwndg = util.bring_Window_Front(pidchrome.pid)
                 ##            logger.log('FILE: browserops.py , DEF: openChromeBrowser() , MSG:  Using Pid handle is obtained')
             logger.log('FILE: browserops.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
+            result=webconstants.TEST_RESULT_TRUE
             status = domconstants.STATUS_SUCCESS
         except Exception as e:
                         err_msg=self.__web_driver_exception(e)

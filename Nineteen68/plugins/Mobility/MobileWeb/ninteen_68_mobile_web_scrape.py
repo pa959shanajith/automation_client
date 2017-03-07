@@ -5,7 +5,7 @@ from selenium import webdriver
 import browserops
 import clickandadd
 import fullscrape
-import clientwindow
+
 from socketIO_client import SocketIO,BaseNamespace
 import time
 import objectspy
@@ -15,7 +15,7 @@ clickandaddoj = clickandadd.Clickandadd()
 fullscrapeobj = fullscrape.Fullscrape()
 
 class ScrapeWindow(wx.Frame):
-    print 'pavvvvvvvvvvv'
+
     #----------------------------------------------------------------------
     def __init__(self, parent,id, title,browser,socketIO):
         wx.Frame.__init__(self, parent, title=title,

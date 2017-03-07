@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 import android_scrapping
 import wx
-import clientwindow
+
 from socketIO_client import SocketIO,BaseNamespace
 ##import launch_keywords
 ##desktop_scraping_obj = desktop_scraping.Scrape()
@@ -18,7 +18,7 @@ import os
 import logger
 obj=None
 class ScrapeWindow(wx.Frame):
-    print 'AAAAAAAA'
+
     def __init__(self, parent,id, title,filePath,socketIO):
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(200, 150) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.RESIZE_BOX |wx.MAXIMIZE_BOX) )

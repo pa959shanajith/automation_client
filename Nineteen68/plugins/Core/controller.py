@@ -135,8 +135,8 @@ class Controller():
         try:
             if self.mobile_web_dispatcher_obj==None:
                 self.get_all_the_imports('Mobility')
-                import mobile_dispatcher
-                self.mobile_web_dispatcher_obj = mobile_dispatcher.Dispatcher()
+                import web_dispatcher
+                self.mobile_web_dispatcher_obj = web_dispatcher.Dispatcher()
         except Exception as e:
             logger.print_on_console('Error loading MobileWeb plugin')
 
@@ -727,7 +727,8 @@ class Controller():
             tsplist = obj.read_step()
             for k in range(len(tsplist)):
                 if tsplist[k].name.lower() == 'openbrowser':
-                    tsplist[k].inputval = browser_type
+                    if tsplist[k].apptype.lower()=='web':
+                        tsplist[k].inputval = browser_type
 
         if flag:
             self.conthread=mythread
@@ -814,7 +815,8 @@ class Controller():
                             tsplist = handler.tspList
                             for k in range(len(tsplist)):
                                 if tsplist[k].name.lower() == 'openbrowser':
-                                    tsplist[k].inputval = [browser]
+                                    if tsplist[k].apptype.lower()=='web':
+                                        tsplist[k].inputval = [browser]
 
                         if flag:
                             #check for temrinate flag before execution

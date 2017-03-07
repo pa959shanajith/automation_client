@@ -242,7 +242,7 @@ class Dispatcher:
 
                   'openBrowser':self.browser_object.openBrowser,
                   'navigateToURL':self.browser_object.navigateToURL,
-                  'openNewBrowser':self.browser_object.openNewBrowser,
+                  'openNewBrowser':self.browser_object.openBrowser,
                   'getPageTitle':self.browser_object.getPageTitle,
                   'getCurrentURL':self.browser_object.getCurrentURL,
                   'maximizeBrowser':self.browser_object.maximizeBrowser,
@@ -276,7 +276,7 @@ class Dispatcher:
                         input.append(self.action)
 
                     result= dict[keyword](webelement,input)
-                    driver.switch_to.default_content()
+##                    driver.switch_to.default_content()
                     if flag and webelement==None:
                         result=list(result)
                         result[3]=WEB_ELEMENT_NOT_FOUND
@@ -299,8 +299,12 @@ class Dispatcher:
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             log.error(e)
+            print 'iiiiiiiiiii'
             logger.print_on_console('Exception at dispatcher')
+
         if err_msg!=None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
