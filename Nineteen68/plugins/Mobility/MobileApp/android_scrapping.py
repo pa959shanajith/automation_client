@@ -116,6 +116,8 @@ class InstallAndLaunch():
                 new_file.write('')
                 new_file.close()
           except Exception as e:
+            import traceback
+            traceback.print_exc()
             logger.print_on_console("Error occured in scraping")
 
           self.stop_server()
@@ -139,11 +141,13 @@ class BuildJson:
 ##            'y':ele_bounds[1],
 ##            'height':ele_bounds[3],
 ##            'width':ele_bounds[2]}
+            width=int(ele_bounds[2])-int(ele_bounds[0])
+            height=int(ele_bounds[3])-int(ele_bounds[1])
             xpath=resource_id[i]+';'+XpathList[i]
             ScrapeList.append({'xpath': xpath, 'tag': class_name[i],
                                                     'text': text,
                                                     'id': resource_id[i], 'custname': text,
-                                                    'reference': str(uuid.uuid4()),'enabled':enabled[i],'left':ele_bounds[0],'top':ele_bounds[1],'width':ele_bounds[2],'height':ele_bounds[3]})
+                                                    'reference': str(uuid.uuid4()),'enabled':enabled[i],'left':ele_bounds[0],'top':ele_bounds[1],'width':width,'height':height})
 
         return self.save_json(ScrapeList,driver)
 

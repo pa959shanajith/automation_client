@@ -19,6 +19,8 @@ log = logging.getLogger('textbox_keywords_mobility.py')
 
 class Textbox_keywords():
 
+
+
     def set_text(self, element,input_val,*args):
 
         status=TEST_RESULT_FAIL
@@ -82,7 +84,7 @@ class Textbox_keywords():
                             log.debug('clearing  the existing text')
                             element.clear()
                             status=TEST_RESULT_PASS
-                            result=TEST_RESULT_TRUE
+                            methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
@@ -118,22 +120,21 @@ class Textbox_keywords():
                     log.info(INPUT_IS)
                     log.info(input)
                     if input is not None:
-                            if len(element.text)>0:
+                            if len(webelement.text)>0:
                                 webelement.clear()
                             encryption_obj = AESCipher()
                             input_val = encryption_obj.decrypt(input)
-                            user_input=self.validate_input(webelement,input_val)
-                            if user_input is not None:
-                                input_val=user_input
-                            element.send_keys(input_val)
+##                            user_input=self.validate_input(webelement,input_val)
+##                            if user_input is not None:
+##                                input_val=user_input
+                            webelement.send_keys(input_val)
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg='element is disabled'
-            except InvalidElementStateException as e:
-                err_msg='Invalid element state'
+
             except Exception as e:
-                err_msg='web driver exception'
+                err_msg='exception occured'
                 log.error(e)
                 logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
@@ -163,7 +164,7 @@ class Textbox_keywords():
                         log.debug('Sending the keys')
                         element.send_keys(text)
                         status=TEST_RESULT_PASS
-                        result=TEST_RESULT_TRUE
+                        methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
@@ -192,8 +193,8 @@ class Textbox_keywords():
                     if webelement.is_enabled():
                         log.debug(WEB_ELEMENT_ENABLED)
                         output=webelement.text
-                        status=webconstants.TEST_RESULT_PASS
-                        result=webconstants.TEST_RESULT_TRUE
+                        status=TEST_RESULT_PASS
+                        result=TEST_RESULT_TRUE
                     else:
                         err_msg='ERR_DISABLED_OBJECT'
         except Exception as e:
@@ -217,8 +218,8 @@ class Textbox_keywords():
                             log.debug(WEB_ELEMENT_ENABLED)
                             if webelement.text==input_val:
                                 log.debug('text matched')
-                                status=webconstants.TEST_RESULT_PASS
-                                result=webconstants.TEST_RESULT_TRUE
+                                status=TEST_RESULT_PASS
+                                result=TEST_RESULT_TRUE
                         else:
                             err_msg='ERR_DISABLED_OBJECT'
                             logger.print_on_console(err_msg)
@@ -240,12 +241,16 @@ class Textbox_keywords():
                         if webelement.is_enabled():
                             log.debug(WEB_ELEMENT_ENABLED)
                             output=webelement.get_attribute('maxLength')
-                            status=webconstants.TEST_RESULT_PASS
-                            result=webconstants.TEST_RESULT_TRUE
+                            status=TEST_RESULT_PASS
+                            result=TEST_RESULT_TRUE
                         else:
                             err_msg='ERR_DISABLED_OBJECT'
                             logger.print_on_console(err_msg)
+
         except Exception as e:
+                err_msg='This element does not have the length property'
+                import traceback
+                traceback.print_exc()
                 log.error(e)
                 logger.print_on_console(err_msg)
         return status,result,output,err_msg
@@ -267,8 +272,8 @@ class Textbox_keywords():
                             log.debug(WEB_ELEMENT_ENABLED)
                             if webelement.get_attribute('maxLength')==int(input_val):
                                 log.debug('text matched')
-                                status=webconstants.TEST_RESULT_PASS
-                                result=webconstants.TEST_RESULT_TRUE
+                                status=TEST_RESULT_PASS
+                                result=TEST_RESULT_TRUE
                         else:
                             err_msg='ERR_DISABLED_OBJECT'
                             logger.print_on_console(err_msg)
@@ -276,6 +281,7 @@ class Textbox_keywords():
                 log.error('Invalid input')
                 err_msg='Invalid input'
         except Exception as e:
+                err_msg='This element does not have the length property'
                 log.error(e)
                 logger.print_on_console(err_msg)
         return status,result,output,err_msg

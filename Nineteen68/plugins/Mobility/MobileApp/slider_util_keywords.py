@@ -37,7 +37,7 @@ class SliderKeywords():
                         log.info(WEB_ELEMENT_ENABLED)
                         log.debug('performing the action')
                         status=TEST_RESULT_PASS
-                        result=TEST_RESULT_TRUE
+                        methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg=WEB_ELEMENT_DISABLED
                         log.error(err_msg)
@@ -70,7 +70,7 @@ class SliderKeywords():
                         log.info(WEB_ELEMENT_DISABLED)
                         log.debug('performing the action')
                         status=TEST_RESULT_PASS
-                        result=TEST_RESULT_TRUE
+                        methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg=WEB_ELEMENT_ENABLED
                         log.error(err_msg)
@@ -99,7 +99,7 @@ class SliderKeywords():
                 if visibility:
                     log.info(ERROR_CODE_DICT['ERR_OBJECT_VISIBLE'])
                     status=TEST_RESULT_PASS
-                    result=TEST_RESULT_TRUE
+                    methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
                     log.error(err_msg)
@@ -123,7 +123,7 @@ class SliderKeywords():
                 if not(visibility):
                     log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                     status=TEST_RESULT_PASS
-                    result=TEST_RESULT_TRUE
+                    methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_OBJECT_VISIBLE']
                     log.error(err_msg)
@@ -145,7 +145,7 @@ class SliderKeywords():
             if element is not None:
                 log.info(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
                 status=TEST_RESULT_PASS
-                result=TEST_RESULT_TRUE
+                methodoutput=TEST_RESULT_TRUE
 
             else:
                 err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']

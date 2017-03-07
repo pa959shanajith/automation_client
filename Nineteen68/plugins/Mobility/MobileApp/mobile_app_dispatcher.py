@@ -50,12 +50,12 @@ class MobileDispatcher:
         try:
             dict={'SetText':self.textbox_keywords_object.set_text,
                     'ClearText' : self.textbox_keywords_object.clear_text,
-                    'Setsecuretext' : self.textbox_keywords_object.setsecuretext,
+                    'SetSecureText' : self.textbox_keywords_object.setsecuretext,
                     'SendValue' : self.textbox_keywords_object.send_value,
                     'GetText' : self.textbox_keywords_object.get_text,
                     'VerifyText' : self.textbox_keywords_object.verify_text,
-                    'GetTextBoxLength': self.textbox_keywords_object.get_textBoxLength,
-                    'VerifyTextBoxLength' : self.textbox_keywords_object.verify_textBoxLength,
+                    'GetTextboxLength': self.textbox_keywords_object.get_textBoxLength,
+                    'VerifyTextboxLength' : self.textbox_keywords_object.verify_textBoxLength,
                     'SelectRadioButton' : self.radio_button_object.select_radio_button,
                     'GetStatus' : self.radio_button_object.get_status,
                     'SelectCheckbox' : self.radio_button_object.select_checkbox,
@@ -63,7 +63,7 @@ class MobileDispatcher:
                     'Press' : self.button_link_object.press,
                     'LongPress' : self.button_link_object.long_press,
                     'GetButtonName' : self.button_link_object.get_button_name,
-                    'VerifyButtonName' : self.button_link_object.get_button_name,
+                    'VerifyButtonName' : self.button_link_object.verify_button_name,
                     'InstallApplication' : self.install_and_launch_object.installApplication,
                     'LaunchApplication' : self.install_and_launch_object.installApplication,
                     'UnInstallApplication' : self.install_and_launch_object.uninstallApplication,
@@ -81,7 +81,15 @@ class MobileDispatcher:
                     'VerifyExists' : self.slider_util_keywords_object.verify_exists,
                     'GetDevices' : self.device_keywords_object.get_device_list,
                     'InvokeDevice' : self.device_keywords_object.invoke_device,
-                    'StopServer':self.install_and_launch_object.stop_server
+                    'StopServer':self.install_and_launch_object.stop_server,
+                    'HideSoftKeyBoard':self.swipe_keywords_object.hide_soft_keyboard,
+                    'BackPress':self.swipe_keywords_object.hide_soft_keyboard,
+                    'PressElement':self.button_link_object.press,
+                    'LongPressElement':self.button_link_object.long_press,
+                    'GetElementText':self.textbox_keywords_object.get_text,
+                    'VerifyElementExists':self.slider_util_keywords_object.verify_exists,
+                    'VerifyElementEnabled':self.slider_util_keywords_object.verify_exists,
+                    'VerifyElementText':self.textbox_keywords_object.verify_text
 
                 }
             ELEMENT_FOUND=True
@@ -98,6 +106,8 @@ class MobileDispatcher:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             log.error(e)
             logger.print_on_console('Exception at dispatcher')
         return result

@@ -42,7 +42,7 @@ class Radio_Button_Keywords():
                         action = TouchAction(install_and_launch.driver)
                         action.tap(element).perform()
                         status=TEST_RESULT_PASS
-                        result=TEST_RESULT_TRUE
+                        methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
@@ -55,6 +55,7 @@ class Radio_Button_Keywords():
         except Exception as e:
             log.error(e)
             logger.print_on_console(err_msg)
+        return status,methodoutput,output,result
 
     def get_status(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
@@ -64,33 +65,33 @@ class Radio_Button_Keywords():
         err_msg=None
         status=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        if webelement is not None:
-            try:
 
-                if element is not None:
-                    visibility=element.is_displayed()
-                    log.debug('element is visible')
-                    if visibility:
-                        enable=element.is_enabled()
-                        log.debug(WEB_ELEMENT_ENABLED)
-                        if enable:
-                            log.debug('performing the action')
-                            status=element.get_attribute("checked")
-                            log.info(status)
-                            result=TEST_RESULT_TRUE
-                        else:
-                            err_msg='element is disabled'
-                            log.error('element is disabled')
-                            logger.print_on_console(err_msg)
+        try:
+
+            if webelement is not None:
+                visibility=webelement.is_displayed()
+                log.debug('element is visible')
+                if visibility:
+                    enable=webelement.is_enabled()
+                    log.debug(WEB_ELEMENT_ENABLED)
+                    if enable:
+                        log.debug('performing the action')
+                        status=webelement.get_attribute("checked")
+                        log.info(status)
+                        methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg='element is not visible'
-                        log.error('element is not visible')
+                        err_msg='element is disabled'
+                        log.error('element is disabled')
                         logger.print_on_console(err_msg)
+                else:
+                    err_msg='element is not visible'
+                    log.error('element is not visible')
+                    logger.print_on_console(err_msg)
 
 
 
-            except Exception as e:
-                err_msg=self.__web_driver_exception(e)
+        except Exception as e:
+                err_msg='error occured'
         return status,methodoutput,output,err_msg
 
     def select_checkbox(self, element,input_val,*args):
@@ -112,7 +113,7 @@ class Radio_Button_Keywords():
                         action = TouchAction(install_and_launch.driver)
                         action.tap(element).perform()
                         status=TEST_RESULT_PASS
-                        result=TEST_RESULT_TRUE
+                        methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
@@ -147,7 +148,7 @@ class Radio_Button_Keywords():
                         action = TouchAction(install_and_launch.driver)
                         action.tap(element).perform()
                         status=TEST_RESULT_PASS
-                        result=TEST_RESULT_TRUE
+                        methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
