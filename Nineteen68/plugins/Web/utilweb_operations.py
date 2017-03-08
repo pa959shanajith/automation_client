@@ -145,7 +145,7 @@ class UtilWebKeywords:
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement is not None:
+            if webelement is not None and webelement != '':
                 #call to highlight the webelement
                 self.highlight(webelement)
                 logger.print_on_console(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
