@@ -74,7 +74,6 @@ class DatabaseOperation():
             encryption_obj = AESCipher()
             decrypted_password = encryption_obj.decrypt(password)
             status,result,verb,err_msg=self.runQuery(ip,port,userName,decrypted_password,dbName,query,dbtype)
-            print status,result
         except Exceptions as e:
             log.error(e)
             err_msg = str(e)
@@ -160,8 +159,6 @@ class DatabaseOperation():
                 log.error(e)
                 err_msg = str(e)
                 logger.print_on_console(err_msg)
-                import traceback
-                traceback.print_exc()
             finally:
                 cursor.close()
                 cnxn.close()
@@ -304,6 +301,9 @@ class DatabaseOperation():
                             ws = wb.add_sheet(inp_sheet)
                        else:
                             ws = wb.add_sheet(inp_sheet)
+                            log.debug('Input Sheet and file path while creating file :')
+                            log.debug(inp_sheet)
+                            log.debug(fields)
                        wb.save(fields)
                     except Exception as e:
                         log.error(e)
@@ -365,7 +365,7 @@ class DatabaseOperation():
             encryption_obj = AESCipher()
             decrypted_password = encryption_obj.decrypt(password)
             out_col = args
-            status,result,verb,err_msg=self.exportData(ip,port,userName,decrypted_password,dbName, query, dbtype, out_col)
+            status,result,verb,err_msg=self.exportData(ip,port,userName,decrypted_password,dbName, query, dbtype, out_col[0])
         except Exceptions as e:
             log.error(e)
             err_msg = str(e)
