@@ -65,8 +65,9 @@ class Launch_Keywords():
                     logger.print_on_console('please close the existing application instnace with the given window name and try again')
                     logger.print_on_console('Terminate the execution')
                     term = TERMINATE
-                elif len(title_matched_windows)==0:
+                if len(title_matched_windows)==0:
                     value=win32api.ShellExecute(0,'open',filePath,None,directory,1)
+                    time.sleep(3)
                     if int(value)>32:
                         logger.print_on_console('The specified application is launched')
                         res=self.find_window_and_attach(windowName,int(timeout))
@@ -75,6 +76,7 @@ class Launch_Keywords():
                             result = desktop_constants.TEST_RESULT_TRUE
 ##                            return status,self.windowname
                         else:
+                            logger.print_on_console('The given window name is not found')
                             term = TERMINATE
                     else :
                         error_code=int(win32api.GetLastError())
@@ -115,11 +117,10 @@ class Launch_Keywords():
         verb = OUTPUT_CONSTANT
         err_msg=None
         try:
-            if window_handle!=None:
-                win32gui.PostMessage(window_handle,win32con.WM_CLOSE,0,0)
+            if self.windowHandle!=None:
+                win32gui.PostMessage(self.windowHandle,win32con.WM_CLOSE,0,0)
                 status=desktop_constants.TEST_RESULT_PASS
                 result = desktop_constants.TEST_RESULT_TRUE
-                return status
         except Exception as e:
 ##            Exceptions.error(e)
             err_msg = desktop_constants.ERROR_MSG
@@ -152,7 +153,7 @@ class Launch_Keywords():
                 win32gui.SetForegroundWindow(window_handle)
                 image=self.capture_window( window_handle)
 
-        print  'image taken'
+
         return image
 
 
@@ -193,7 +194,7 @@ class Launch_Keywords():
     def patternMatching(self,toMatch,matchIn):
         regex=None
         pattern=None
-
+        status=None
         toMatch=toMatch.strip().replace('*','.*')
         matchIn=matchIn.strip()
         if toMatch.endswith('*'):
@@ -206,6 +207,7 @@ class Launch_Keywords():
         else :
             return toMatch==matchIn
         status= re.match(regex,matchIn)
+
         try:
             if status.group()!=None:
                 return True
@@ -219,7 +221,6 @@ class Launch_Keywords():
 ##            windowname=window_name
 ##            aut_handle = win32gui.FindWindow(None,windowname)
             aut_handle=window_handle
-            print aut_handle
             if aut_handle> 0:
                 foreground=win32gui.GetForegroundWindow()
                 application_pid=win32process.GetWindowThreadProcessId(aut_handle)
@@ -227,7 +228,7 @@ class Launch_Keywords():
                 if application_pid!=foreground_pid:
                     process_id=    win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
                     i= win32gui.GetWindowRect(aut_handle)
-                    print i
+
                     if i[0] <= -32000:
                         fg_thread, fg_process = win32process.GetWindowThreadProcessId(foreground)
                         aut_thread, aut_process = win32process.GetWindowThreadProcessId(aut_handle)
@@ -317,40 +318,51 @@ class Launch_Keywords():
         except Exception as e:
             status=False
 ##            Exceptions.error(e)
-            import traceback
-            traceback.print_exc()
+##            import traceback
+##            traceback.print_exc()
             err_msg = desktop_constants.ERROR_MSG
         return status
 
     def find_window_and_attach(self,windowname,launch_time_out):
-        logger.print_on_console('windowname is '+windowname)
-        status=False
-        if not(windowname is None and windowname is ''):
-            start_time = time.time()
-            while True:
-                if int(time.time()-start_time) >= launch_time_out:
-                    break
-                title_matched_windows=self.getProcessWindows(windowname)
-                if len(title_matched_windows)>1:
-                    break
-                elif len(title_matched_windows)==1:
-                    self.windowHandle=title_matched_windows[0]
-                    self.windowname=self.getWindowText(self.windowHandle)
+        logger.print_on_console('Given windowname is '+windowname)
+        try:
 
-                    self.set_to_foreground()
-                    time.sleep(0.5)
-                    logger.print_on_console('Application handle found')
-##                        tempTitle = windowTitle.replaceAll("[^a-zA-Z0-9]", "*")
-                    # need  to create a ldtp object here
-                    global window_name
-                    window_name=self.windowname
-                    global window_handle
-                    window_handle=title_matched_windows[0]
-                    global window_pid
-                    window_pid=self.get_window_pid(self.windowname)
-                    break
-                if(self.windowname!=''):
-                    break
+            if not(windowname is None and windowname is ''):
+                start_time = time.time()
+                var = 1
+                while var==1:
+
+                    if int(time.time()-start_time) >= launch_time_out:
+                        break
+                    title_matched_windows=self.getProcessWindows(windowname)
+
+                    if len(title_matched_windows)>1:
+                        break
+                    elif len(title_matched_windows)==1:
+
+                        self.windowHandle=title_matched_windows[0]
+                        self.windowname=self.getWindowText(self.windowHandle)
+
+    ##                    self.set_to_foreground()
+    ##                    time.sleep(0.5)
+                        logger.print_on_console('Application handle found')
+    ##                        tempTitle = windowTitle.replaceAll("[^a-zA-Z0-9]", "*")
+                        # need  to create a ldtp object here
+                        global window_name
+                        window_name=self.windowname
+                        global window_handle
+                        window_handle=title_matched_windows[0]
+                        global window_pid
+                        window_pid=self.get_window_pid(self.windowname)
+                        self.windowHandle=title_matched_windows[0]
+                        break
+
+                    if(self.windowname!=''):
+                        break
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+
         return self.windowname
 
 

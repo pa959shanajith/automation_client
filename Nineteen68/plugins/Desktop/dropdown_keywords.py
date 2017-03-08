@@ -90,7 +90,7 @@ class Dropdown_Keywords():
             result=desktop_constants.TEST_RESULT_FALSE
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
-            item_text=input_val[0].strip()
+            item_text=input_val[0]
             verb = OUTPUT_CONSTANT
             err_msg=None
             try:
@@ -218,7 +218,7 @@ class Dropdown_Keywords():
             result=desktop_constants.TEST_RESULT_FALSE
             object_xpath=element.split(';')[0]
             object_index=element.split(';')[1]
-            item_text=input_val[0].strip()
+            item_text=input_val[0]
             verb = OUTPUT_CONSTANT
             err_msg=None
             try:

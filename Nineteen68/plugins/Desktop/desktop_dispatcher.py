@@ -134,6 +134,8 @@ class DesktopDispatcher:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             log.error(e)
             logger.print_on_console('Exception at dispatcher')
         if err_msg!=None:
