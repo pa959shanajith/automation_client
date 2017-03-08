@@ -26,7 +26,7 @@ configvalues = configobj.readJson()
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
 ##        print 'Inside debugTestCase method'
-        print '------------------',args
+        ##print '------------------',args
         global action,wxObject,browsername,desktopScrapeFlag
         if str(args[0]) == 'OPEN BROWSER CH':
 
@@ -135,7 +135,7 @@ class MainNamespace(BaseNamespace):
         mobileWebScrapeObj=ninteen_68_mobile_web_scrape
         global mobileWebScrapeFlag
         mobileWebScrapeFlag=True
-        print mobileWebScrapeFlag
+        ##print mobileWebScrapeFlag
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
 
