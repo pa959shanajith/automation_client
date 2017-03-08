@@ -41,6 +41,8 @@ class Util_Keywords():
             except Exception as e:
                 Exceptions.error(e)
                 err_msg = desktop_constants.ERROR_MSG
+            print status
+            print result
             return status,result,verb,err_msg
 
         def verifyDisabled(self,element,parent,*args):

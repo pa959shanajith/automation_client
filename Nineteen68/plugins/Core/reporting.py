@@ -72,6 +72,7 @@ class Reporting:
             'webservices':self.step_description_obj.webservices,
             'desktop':self.step_description_obj.desktop}
             description=apptype_description[apptype.lower()](*params)
+            description=description.encode('utf-8')
 
         except Exception as e:
             log.error(e)

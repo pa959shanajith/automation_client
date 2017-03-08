@@ -74,7 +74,6 @@ class DatabaseOperation():
             encryption_obj = AESCipher()
             decrypted_password = encryption_obj.decrypt(password)
             status,result,verb,err_msg=self.runQuery(ip,port,userName,decrypted_password,dbName,query,dbtype)
-            print status,result
         except Exceptions as e:
             log.error(e)
             err_msg = str(e)
@@ -160,8 +159,6 @@ class DatabaseOperation():
                 log.error(e)
                 err_msg = str(e)
                 logger.print_on_console(err_msg)
-                import traceback
-                traceback.print_exc()
             finally:
                 cursor.close()
                 cnxn.close()
@@ -287,49 +284,67 @@ class DatabaseOperation():
             out_tuple = args
             fields = out_tuple[0]
             inp_sheet = None
+            path=None
             if ';' in fields:
                 inp_sheet=fields.split(';')[1]
                 fields=fields.split(';')[0]
-            verify = os.path.isfile(fields)
-            if (verify == True):
-                ext = self.get_ext(fields)
-                if (ext == '.xls'):
-                    if(inp_sheet is None or inp_sheet == ''):
-                        inp_sheet = 'Sheet1'
-                    log.debug('Input Sheet is :')
-                    log.debug(inp_sheet)
-                    obj=excel_operations.ExcelFile()
-                    obj.set_excel_path(fields,inp_sheet)
-                    i=1
-                    j=1
-                    for x in columns:
-                        obj.write_cell(i,j,x)
-                        j+=1
-                    b =0
-                    k=2
+##            verify = os.path.isfile(fields)
+##            if (verify == True):
+            ext = self.get_ext(fields)
+            if (ext == '.xls'):
+                verify = os.path.isfile(fields)
+                if(verify == False):
+                    try:
+                       wb = xlwt.Workbook()
+                       if(inp_sheet is None or inp_sheet == ''):
+                            inp_sheet = 'Sheet1'
+                            ws = wb.add_sheet(inp_sheet)
+                       else:
+                            ws = wb.add_sheet(inp_sheet)
+                            log.debug('Input Sheet and file path while creating file :')
+                            log.debug(inp_sheet)
+                            log.debug(fields)
+                       wb.save(fields)
+                    except Exception as e:
+                        log.error(e)
+                        logger.print_on_console(e)
+                        err_msg = e
+                if(inp_sheet is None or inp_sheet == ''):
+                    inp_sheet = 'Sheet1'
+                log.debug('Input Sheet is :')
+                log.debug(inp_sheet)
+                obj=excel_operations.ExcelFile()
+                obj.set_excel_path(fields,inp_sheet)
+                i=1
+                j=1
+                for x in columns:
+                    obj.write_cell(i,j,x)
+                    j+=1
+                b =0
+                k=2
+                for row in rows:
+                    l=1
+                    for y in row:
+                        obj.write_cell(k,l,y)
+                        l+=1
+                    k+=1
+                status=generic_constants.TEST_RESULT_PASS
+                result=generic_constants.TEST_RESULT_TRUE
+            elif(ext == '.csv'):
+                path = inp_file
+                with open(path,'w') as csvfile:
+                    writer = csv.writer(csvfile)
+                    writer.writerow(columns)
                     for row in rows:
-                        l=1
-                        for y in row:
-                            obj.write_cell(k,l,y)
-                            l+=1
-                        k+=1
-                    status=generic_constants.TEST_RESULT_PASS
-                    result=generic_constants.TEST_RESULT_TRUE
-                elif(ext == '.csv'):
-                    path = inp_file
-                    with open(path,'w') as csvfile:
-                        writer = csv.writer(csvfile)
-                        writer.writerow(columns)
-                        for row in rows:
-                            writer.writerow(row)
-                    status=generic_constants.TEST_RESULT_PASS
-                    result=generic_constants.TEST_RESULT_TRUE
-                else:
-                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                    log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                        writer.writerow(row)
+                status=generic_constants.TEST_RESULT_PASS
+                result=generic_constants.TEST_RESULT_TRUE
             else:
-                logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
+                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+##            else:
+##                logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
             log.error(e)
             err_msg = str(e)
@@ -350,7 +365,7 @@ class DatabaseOperation():
             encryption_obj = AESCipher()
             decrypted_password = encryption_obj.decrypt(password)
             out_col = args
-            status,result,verb,err_msg=self.exportData(ip,port,userName,decrypted_password,dbName, query, dbtype, out_col)
+            status,result,verb,err_msg=self.exportData(ip,port,userName,decrypted_password,dbName, query, dbtype, out_col[0])
         except Exceptions as e:
             log.error(e)
             err_msg = str(e)
@@ -427,5 +442,6 @@ class DatabaseOperation():
 ##obj.secureGetData('10.44.10.54','1433','version20_test','O0v/vLLjfD+hR22U9lzTifYYAt8ag1cO0JE5cEDdotg=','Version20_TestDB',"select * from Persons",'4')
 ##obj.exportData('4','10.44.10.54','1433','Version20_TestDB','version20_test','version2.0_Test',"select * from Persons",'D:\db6.xls','Sheet1')
 ##obj.secureExportData('10.44.10.54','1433','version20_test','O0v/vLLjfD+hR22U9lzTifYYAt8ag1cO0JE5cEDdotg=','Version20_TestDB',"select * from Persons",'4','D:\db6.xls','Sheet1')
+##obj.exportData('10.44.10.54','1433','version20_test','version2.0_Test','Version20_TestDB',"select * from Persons",'4','D:\db6.xls','Sheet1')
 ##obj.verifyData('4','10.44.10.54','1433','Version20_TestDB','version20_test','version2.0_Test',"select * from Persons",'D:\db5.xls','Sheet1')
 ##obj.secureVerifyData('10.44.10.54','1433','version20_test','O0v/vLLjfD+hR22U9lzTifYYAt8ag1cO0JE5cEDdotg=','Version20_TestDB',"select * from Persons",'4','D:\db6.xls','Sheet1')
