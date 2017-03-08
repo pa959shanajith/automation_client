@@ -347,6 +347,11 @@ class TestThread(threading.Thread):
                 socketIO.emit('result_executeTestSuite',status)
         except Exception as e:
             print e
+            status=TERMINATE
+            if self.action==DEBUG:
+                socketIO.emit('result_debugTestCase',status)
+            elif self.action==EXECUTE:
+                socketIO.emit('result_executeTestSuite',status)
             log.error(e)
 
 
