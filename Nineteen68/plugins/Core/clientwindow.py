@@ -123,7 +123,7 @@ class MainNamespace(BaseNamespace):
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_LAUNCH_MOBILE_WEB(self, *args):
-
+        global mobileWebScrapeObj,mobileWebScrapeFlag
         con = controller.Controller()
         global browsername
         browsername = args[0]+";"+args[1]
@@ -131,9 +131,9 @@ class MainNamespace(BaseNamespace):
 
         con.get_all_the_imports('Mobility')
         import ninteen_68_mobile_web_scrape
-        global mobileWebScrapeObj
+
         mobileWebScrapeObj=ninteen_68_mobile_web_scrape
-        global mobileWebScrapeFlag
+
         mobileWebScrapeFlag=True
         ##print mobileWebScrapeFlag
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
