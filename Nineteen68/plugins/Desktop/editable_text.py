@@ -62,7 +62,8 @@ class Text_Box:
                     err_msg = 'element not present on the page where operation is trying to be performed'
         except LdtpExecutionError as exception:
             log.error(exception)
-            logger.print_on_console(exception)
+            logger.print_on_console('Unable to perform SetText')
+            err_msg='Unable to perform SetText'
         log.info(RETURN_RESULT)
         return status,result,verb,err_msg
 
@@ -97,7 +98,7 @@ class Text_Box:
                         ldtp.grabfocus(launch_keywords.window_name,dektop_element[0])
                         ldtp.activatetext(launch_keywords.window_name,dektop_element[0])
                         encryption_obj = AESCipher()
-                        input_val_temp = encryption_obj.decrypt(launch_keywords.window_name)
+                        input_val_temp = encryption_obj.decrypt(input_val)
                         if input_val_temp is not None:
                             ldtp.settextvalue(launch_keywords.window_name,dektop_element[0],input_val_temp)
                             status = desktop_constants.TEST_RESULT_PASS
@@ -133,11 +134,13 @@ class Text_Box:
                 log.debug('Parent check status')
                 log.debug(check)
                 if (check == True):
+
                     log.info('Parent matched')
                     states = ldtp.getallstates(launch_keywords.window_name,dektop_element[0])
                     log.debug('states of element')
                     log.debug(states)
                     if(desktop_constants.ENABLED_CHECK in states):
+
                         log.info('Element state is enabled')
                         ldtp.grabfocus(launch_keywords.window_name,dektop_element[0])
                         ldtp.activatetext(launch_keywords.window_name,dektop_element[0])
@@ -147,12 +150,13 @@ class Text_Box:
                         result = desktop_constants.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
-                        log.info('Element state does not allow to perform the operation')
-                        err_msg = 'Element state does not allow to perform the operation'
+
+                        output = ldtp.gettextvalue(launch_keywords.window_name,dektop_element[0])
                 else:
                     log.info('element not present on the page where operation is trying to be performed')
                     err_msg = 'element not present on the page where operation is trying to be performed'
         except LdtpExecutionError as exception:
+            print exception
             log.error(exception)
             logger.print_on_console(exception)
         log.info(RETURN_RESULT)
@@ -197,7 +201,8 @@ class Text_Box:
                     err_msg = 'element not present on the page where operation is trying to be performed'
         except LdtpExecutionError as exception:
             log.error(exception)
-            logger.print_on_console(exception)
+            logger.print_on_console('Unable to perform ClearText')
+            err_msg='Unable to perform ClearText'
         log.info(RETURN_RESULT)
         return status,result,verb,err_msg
 
