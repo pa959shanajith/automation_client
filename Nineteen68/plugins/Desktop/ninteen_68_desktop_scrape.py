@@ -20,8 +20,8 @@ obj=None
 class ScrapeWindow(wx.Frame):
     def __init__(self, parent,id, title,filePath,socketIO):
         wx.Frame.__init__(self, parent, title=title,
-                   pos=(300, 150),  size=(200, 150) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
-        self.SetBackgroundColour(   (245,222,179))
+                   pos=(300, 150),  size=(200, 150) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.RESIZE_BOX |wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
+        self.SetBackgroundColour( '#e6e7e8')
         curdir = os.getcwd()
         global obj
         obj = launch_keywords.Launch_Keywords()
