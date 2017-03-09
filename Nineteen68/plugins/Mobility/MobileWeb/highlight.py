@@ -84,16 +84,16 @@ class Highlight():
                     log.info('Before highlighting .....')
                     apply_style(str(original_style) + "background: #fff300; border: 2px solid #cc3300;outline: 2px solid #fff300;", 3)
                     log.info('Element highlighted .....')
-                    if (driver.capabilities['version'] != unicode(8)):
-                        log.info('FILE: highlight.py , DEF: highlight1() , MSG: Before removing the style for ie8 .....')
-                        if(action!='OBJECTMAPPER'):
-                            apply_style(original_style, 0)
-                            log.info('Removed the style for ie8 .....')
-                    else:
-                        log.info('Before removing the style for other browsers .....')
-                        if(action!='OBJECTMAPPER'):
-                            apply_style(str(original_style) + "background: 0; border: 0px none 0; outline: none", 0)
-                            log.info('Removed the style for other browsers .....')
+##                    if (driver.capabilities['version'] != unicode(8)):
+##                        log.info('FILE: highlight.py , DEF: highlight1() , MSG: Before removing the style for ie8 .....')
+##                        if(action!='OBJECTMAPPER'):
+##                            apply_style(original_style, 0)
+##                            log.info('Removed the style for ie8 .....')
+##                    else:
+                    log.info('Before removing the style for other browsers .....')
+                    if(action!='OBJECTMAPPER'):
+                        apply_style(str(original_style) + "background: 0; border: 0px none 0; outline: none", 0)
+                        log.info('Removed the style for other browsers .....')
 
             def is_int(url):
                 try:
