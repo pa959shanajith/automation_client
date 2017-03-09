@@ -791,23 +791,24 @@ class ClientWindow(wx.Frame):
     def test(self,event):
 ##        print 'Self',self
         global mobileScrapeFlag
+        global mobileWebScrapeFlag
+        global desktopScrapeFlag
+        global socketIO
+        global browsername
         if mobileScrapeFlag==True:
-            global socketIO
+##            global socketIO
             self.new = mobileScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
             mobileScrapeFlag=False
-        global mobileWebScrapeFlag
-        if mobileWebScrapeFlag==True:
-            global socketIO
+        elif mobileWebScrapeFlag==True:
+##            global socketIO
             self.new = mobileWebScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",browser = browsername,socketIO = socketIO)
             mobileWebScrapeFlag=False
-        global desktopScrapeFlag
-        if desktopScrapeFlag==True:
-            global socketIO
-
+        elif desktopScrapeFlag==True:
+##            global socketIO
             self.new = desktopScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO)
             desktopScrapeFlag=False
         else:
-            global browsername
+##            global browsername
             browsernumbers = ['1','2','3']
             if browsername in browsernumbers:
                 print 'Browser name : ',browsername
@@ -815,7 +816,7 @@ class ClientWindow(wx.Frame):
                 con.get_all_the_imports('Web')
                 con.get_all_the_imports('WebScrape')
                 import Nineteen68_WebScrape
-                global socketIO
+##                global socketIO
                 self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO)
                 browsername = ''
             else:

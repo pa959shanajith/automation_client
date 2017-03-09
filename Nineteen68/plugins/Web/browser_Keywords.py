@@ -100,23 +100,24 @@ class BrowserKeywords():
                 del drivermap[:]
             utilobject = utils_web.Utils()
             pid = None
-            print 'Browser num :',browser_num
             if (self.browser_num == '1'):
                 #logic to the pid of chrome window
                 p = psutil.Process(driver_obj.service.process.pid)
                 pidchrome = p.children()[0]
                 pid = pidchrome.pid
-                print 'Pid in chrome:',pid
             elif(self.browser_num == '2'):
                 #logic to get the pid of the firefox window
-                pid = driver_obj.binary.process.pid
+                try:
+                    pid = driver_obj.binary.process.pid
+                except Exception as e:
+                    p = psutil.Process(driver_obj.service.process.pid)
+                    pidchrome = p.children()[0]
+                    pid = pidchrome.pid
             elif(self.browser_num == '3'):
                 #Logic to get the pid of the ie window
                 p = psutil.Process(driver_obj.iedriver.process.pid)
                 pidie = p.children()[0]
                 pid = pidie.pid
-                print 'Pid in IE:',pid
-            print 'Pid :',pid
             hwndg = utilobject.bring_Window_Front(pid)
             webdriver_list.append(driver_obj)
             parent_handle = driver_obj.current_window_handle
@@ -517,7 +518,6 @@ class Singleton_DriverUtil():
 
     def chech_if_driver_exists_in_map(self,browserType):
         d = None
-        print 'browserType-----------------------------',browserType
 ##        drivermap.reverse()
         if browserType == '1':
             if len(drivermap) > 0:
@@ -634,9 +634,8 @@ class Singleton_DriverUtil():
                     driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH)
                     drivermap.append(driver)
                     driver.maximize_window()
-                    logger.print_on_console('geckodriver started')
-                    log.info('geckodriver started')
-
+                    logger.print_on_console('Firefox browser started using geckodriver')
+                    log.info('Firefox browser started using geckodriver ')
             except Exception as e:
                 logger.print_on_console(e)
 
