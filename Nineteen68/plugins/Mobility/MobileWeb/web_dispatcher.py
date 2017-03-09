@@ -161,6 +161,7 @@ class Dispatcher:
             dict={'getObjectCount':self.custom_object.get_object_count,
                   'click': self.button_link_object.click,
                   'verifyButtonName' : self.button_link_object.verify_button_name,
+                  'getButtonName' : self.button_link_object.get_button_name,
                   'getLinkText'    : self.button_link_object.get_link_text,
                   'verifyLinkText' : self.button_link_object.verify_link_text,
                   'press'  : self.button_link_object.press,

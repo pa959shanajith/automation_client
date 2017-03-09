@@ -90,6 +90,55 @@ class ButtonLinkKeyword():
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
+    def get_button_name(self,webelement,inputs,*args):
+        status = webconstants.TEST_RESULT_FAIL
+        methodoutput = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        #verify_button_name keyword implementation
+        try:
+            if webelement != None:
+                log.info('Recieved web element from the web dispatcher')
+                log.debug(webelement)
+                #fetch the text (button name) using selenium webelement.text
+                log.debug('Going to fetch the button name')
+                buttonname = webelement.text
+                log.info('Button name fetched from the AUT using selenium')
+
+                if buttonname != None and len(buttonname)>0:
+                    logger.print_on_console('Button name : ' , buttonname)
+                    status = webconstants.TEST_RESULT_PASS
+                    methodoutput = webconstants.TEST_RESULT_TRUE
+
+                if buttonname == None or len(buttonname) == 0:
+                    log.debug('Button name not recieved using selenium text method, Getting value attribute')
+                    #if text is empty search for the value attribute
+                    buttonname = webelement.get_attribute(webconstants.VALUE)
+                    log.info('Button name fetched from the AUT using value attribute')
+                    log.info(buttonname)
+                    logger.print_on_console('Button name : ' , buttonname)
+                    status = webconstants.TEST_RESULT_PASS
+                    methodoutput = webconstants.TEST_RESULT_TRUE
+                    output = buttonname
+                if buttonname == None or len(buttonname) == 0:
+                    log.debug('Button name not recieved using selenium text method/ value attribute, Getting name attribute')
+                    #if value is empty search for the name attribute
+                    buttonname = webelement.get_attribute(webconstants.NAME)
+                    log.info('Button name fetched from the AUT using name attribute')
+                    log.info(buttonname)
+                    logger.print_on_console('Button name : ' , buttonname)
+                    status = webconstants.TEST_RESULT_PASS
+                    methodoutput = webconstants.TEST_RESULT_TRUE
+                    output = buttonname
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        #return status and methodoutput
+        return status,methodoutput,output,err_msg
+
+
     def verify_button_name(self,webelement,inputs,*args):
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
