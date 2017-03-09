@@ -234,7 +234,7 @@ class ExcelFile:
                     log.info(info_msg)
                     info_msg='Row is '+str(row)+' col is '+str(col)+' and Value: '+str(value)
                     log.info(info_msg)
-                    logger.print_on_console(info_msg)
+##                    logger.print_on_console(info_msg)
                     row=int(row)
                     col=int(col)
                     if row>0 and col>0:
