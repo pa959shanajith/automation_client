@@ -223,7 +223,7 @@ class DatabaseOperation():
                         k+=1
                     obj = file_operations.FileOperations()
                     output = obj.compare_content(file_path,generic_constants.DATABASE_SHEET,inp_file,inp_sheet)
-                    if output == "True":
+                    if output[1] == "True":
                         status=generic_constants.TEST_RESULT_PASS
                         result=generic_constants.TEST_RESULT_TRUE
                     else:
@@ -423,11 +423,13 @@ class DatabaseOperation():
         try:
            wb = xlwt.Workbook()
            ws = wb.add_sheet(generic_constants.DATABASE_SHEET)
+           working_dir = os.getcwd()
            os.chdir('..')
            maindir = os.getcwd()
            path = maindir + '\Nineteen68\plugins\Generic' + generic_constants.DATABASE_FILE
 ##           path = 'D:\db5.xls'
            wb.save(path)
+           os.chdir(working_dir)
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
