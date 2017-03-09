@@ -34,7 +34,7 @@ import readconfig
 class Pause(wx.Frame):
     def __init__(self, parent,id, title):
         wx.Frame.__init__(self, parent, title=title,
-                          size=(300, 130),style=wx.STAY_ON_TOP| wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.RESIZE_BOX |wx.MAXIMIZE_BOX))
+                          size=(300, 130),style=wx.STAY_ON_TOP| wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.RESIZE_BOX |wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
         self.SetBackgroundColour('#e6e7e8')
         self.panel = wx.Panel(self)
         self.sizer = wx.GridBagSizer(1, 2)
@@ -88,7 +88,7 @@ class Pause(wx.Frame):
 class Display(wx.Frame):
     def __init__(self, parent, id,title,input):
         str=input
-        wx.Frame.__init__(self, parent, title="Nineteen68 - DisplayValue",   size=(400, 300),style=wx.STAY_ON_TOP|wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.RESIZE_BOX |wx.MAXIMIZE_BOX))
+        wx.Frame.__init__(self, parent, title="Nineteen68 - DisplayValue",   size=(400, 300),style=wx.STAY_ON_TOP|wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.RESIZE_BOX |wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
         self.SetBackgroundColour('#e6e7e8')
         self.panel = wx.Panel(self)
         curdir = os.getcwd()

@@ -38,7 +38,7 @@ class Dropdown_Keywords():
                                 if object_xpath!=None and editable_text.verify_parent(object_xpath,parent):
                                     states=ldtp.getallstates(launch_keywords.window_name,object_xpath)
                                     if desktop_constants.ENABLED_CHECK in states:
-                                        select=ldtp.selectdropdownitem(launch_keywords.window_name,object_xpath, item_index)
+                                        select=ldtp.selectdropdownitem(launch_keywords.window_name,object_xpath, item_index-1)
                                         if select==1:
                                             status=desktop_constants.TEST_RESULT_PASS
                                             result=desktop_constants.TEST_RESULT_TRUE
@@ -51,7 +51,7 @@ class Dropdown_Keywords():
                                 if isinstance(e,LdtpExecutionError):
                                     self.clickOnCombo(object_xpath)
                                 else:
-                                    Exceptions.error(e)
+                                    logger.print_on_console('Error occured')
                 elif ldtp.getobjectproperty(launch_keywords.window_name, object_xpath,desktop_constants.CLASS)==desktop_constants.LIST_BOX:
                     try:
                         if object_xpath!=None and editable_text.verify_parent(object_xpath,parent):
@@ -64,7 +64,7 @@ class Dropdown_Keywords():
                                        list_count= list_count+1
                                 if item_index>0 and len(children_list)-list_count>item_index:
                                     item_index=item_index+list_count
-                                    select=ldtp.selectindex(launch_keywords.window_name,object_xpath, item_index)
+                                    select=ldtp.selectindex(launch_keywords.window_name,object_xpath, item_index-1)
                                     if select==1:
                                         status=desktop_constants.TEST_RESULT_PASS
                                         result=desktop_constants.TEST_RESULT_TRUE
@@ -79,10 +79,10 @@ class Dropdown_Keywords():
                         Exceptions.error(e)
                         err_msg = desktop_constants.ERROR_MSG
                 else:
-                    print 'not a list'
+                     logger.print_on_console('not a list')
 
             except Exception as e:
-                Exceptions.error(e)
+                logger.print_on_console('Error occured')
             return status,result,verb,err_msg
 
         def selectValueByText(self,element,parent,input_val, *args):
@@ -116,7 +116,7 @@ class Dropdown_Keywords():
                                 if isinstance(e,LdtpExecutionError):
                                     self.clickOnCombo(object_xpath)
                                 else:
-                                    Exceptions.error(e)
+                                    logger.print_on_console('Error occured')
                 elif ldtp.getobjectproperty(launch_keywords.window_name, object_xpath,desktop_constants.CLASS)==desktop_constants.LIST_BOX:
                     try:
                         if object_xpath!=None and editable_text.verify_parent(object_xpath,parent):
@@ -135,7 +135,7 @@ class Dropdown_Keywords():
                     except Exception as e:
                         Exceptions.error(e)
             except Exception as e:
-                Exceptions.error(e)
+                 logger.print_on_console('Error occured')
             return status,result,verb,err_msg
 
         def getSelected(self,element,parent,input_val, *args):
@@ -167,7 +167,7 @@ class Dropdown_Keywords():
                                     if isinstance(e,LdtpExecutionError):
                                         self.clickOnCombo(object_xpath)
                                     else:
-                                        Exceptions.error(e)
+                                        logger.print_on_console('Error occured')
                         elif ldtp.getobjectproperty(launch_keywords.window_name, object_xpath,desktop_constants.CLASS)==desktop_constants.LIST_BOX:
                             try:
                                 if object_xpath!=None and editable_text.verify_parent(object_xpath,parent):
@@ -207,9 +207,9 @@ class Dropdown_Keywords():
                                     logger.print_on_console('element not found')
                                     err_msg = 'element not found'
                             except Exception as e:
-                                Exceptions.error(e)
+                                logger.print_on_console('Error occured')
                 except Exception as e:
-                    Exceptions.error(e)
+                    logger.print_on_console('Error occured')
                     err_msg = desktop_constants.ERROR_MSG
                 return status,method_output,result,err_msg
 
@@ -243,7 +243,7 @@ class Dropdown_Keywords():
                                 if isinstance(e,LdtpExecutionError):
                                     self.clickOnCombo(object_xpath)
                                 else:
-                                    Exceptions.error(e)
+                                     logger.print_on_console('Error occured')
                     elif ldtp.getobjectproperty(launch_keywords.window_name, object_xpath,desktop_constants.CLASS)==desktop_constants.LIST_BOX:
                         try:
                             if object_xpath!=None and editable_text.verify_parent(object_xpath,parent):
@@ -289,7 +289,7 @@ class Dropdown_Keywords():
                         except Exception as e:
                             Exceptions.error(e)
             except Exception as e:
-                Exceptions.error(e)
+                logger.print_on_console('Error occured')
                 err_msg = desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
@@ -322,7 +322,7 @@ class Dropdown_Keywords():
                                 if isinstance(e,LdtpExecutionError):
                                     self.clickOnCombo(object_xpath)
                                 else:
-                                    Exceptions.error(e)
+                                     logger.print_on_console('Error occured')
                     elif ldtp.getobjectproperty(launch_keywords.window_name, object_xpath,desktop_constants.CLASS)==desktop_constants.LIST_BOX:
                         try:
                             if object_xpath!=None and editable_text.verify_parent(object_xpath,parent):
@@ -344,10 +344,10 @@ class Dropdown_Keywords():
                             else:
                                 logger.print_on_console('element not found')
                         except Exception as e:
-                            Exceptions.error(e)
+                            logger.print_on_console('Error occured')
                             err_msg = desktop_constants.ERROR_MSG
             except Exception as e:
-                Exceptions.error(e)
+                 logger.print_on_console('Error occured')
             return status,method_output,result,err_msg
 
         def verifyCount(self,element,parent,input_val, *args):
@@ -380,7 +380,7 @@ class Dropdown_Keywords():
                                 if isinstance(e,LdtpExecutionError):
                                     self.clickOnCombo(object_xpath)
                                 else:
-                                    Exceptions.error(e)
+                                     logger.print_on_console('Error occured')
                     elif ldtp.getobjectproperty(launch_keywords.window_name, object_xpath,desktop_constants.CLASS)==desktop_constants.LIST_BOX:
                         try:
                             if object_xpath!=None and editable_text.verify_parent(object_xpath,parent) :
@@ -400,10 +400,10 @@ class Dropdown_Keywords():
                                 logger.print_on_console('element not found')
                                 err_msg = 'element not found'
                         except Exception as e:
-                            Exceptions.error(e)
+                            logger.print_on_console('Error occured')
                             err_msg = desktop_constants.ERROR_MSG
             except Exception as e:
-                Exceptions.error(e)
+                 logger.print_on_console('Error occured')
             return status,result,verb,err_msg
 
         def verifyValuesExists(self,element,parent,input_val, *args):
@@ -486,7 +486,7 @@ class Dropdown_Keywords():
                             Exceptions.error(e)
                             err_msg = desktop_constants.ERROR_MSG
             except Exception as e:
-                Exceptions.error(e)
+                 logger.print_on_console('Error occured')
             return status,result,verb,err_msg
 
 
@@ -524,7 +524,7 @@ class Dropdown_Keywords():
                                 if isinstance(e,LdtpExecutionError):
                                     self.clickOnCombo(object_xpath)
                                 else:
-                                    Exceptions.error(e)
+                                     logger.print_on_console('Error occured')
                     elif ldtp.getobjectproperty(launch_keywords.window_name, object_xpath,desktop_constants.CLASS)==desktop_constants.LIST_BOX:
                         try:
                             if object_xpath!=None and editable_text.verify_parent(object_xpath,parent):
@@ -565,10 +565,10 @@ class Dropdown_Keywords():
                             else:
                                 logger.print_on_console('element not found')
                         except Exception as e:
-                            Exceptions.error(e)
+                            logger.print_on_console('Error occured')
                             err_msg = desktop_constants.ERROR_MSG
             except Exception as e:
-                Exceptions.error(e)
+                 logger.print_on_console('Error occured')
             return status,result,verb,err_msg
 
 
@@ -599,11 +599,11 @@ class Dropdown_Keywords():
                                 else:
                                     logger.print_on_console('element not found')
                             except Exception as e:
-                                raise e
+                                print e
                                 if isinstance(e,LdtpExecutionError):
                                     self.clickOnCombo(object_xpath)
                                 else:
-                                    Exceptions.error(e)
+                                    logger.print_on_console('Error occured')
                     elif ldtp.getobjectproperty(launch_keywords.window_name, object_xpath,desktop_constants.CLASS)==desktop_constants.LIST_BOX:
                         try:
                             if object_xpath!=None and editable_text.verify_parent(object_xpath,parent):
@@ -643,9 +643,10 @@ class Dropdown_Keywords():
                             else:
                                 logger.print_on_console('element not found')
                         except Exception as e:
-                            Exceptions.error(e)
+                            logger.print_on_console('Error occured')
             except Exception as e:
-                Exceptions.error(e)
+                print e
+                logger.print_on_console('Error occured')
                 err_msg = desktop_constants.ERROR_MSG
             return status,method_output,result,err_msg
 
@@ -698,7 +699,7 @@ class Dropdown_Keywords():
                         else:
                             logger.print_on_console('element not found')
             except Exception as e:
-                Exceptions.error(e)
+                logger.print_on_console('Error occured')
                 err_msg = desktop_constants.ERROR_MSG
             return status,method_output,result,err_msg
 
@@ -742,7 +743,7 @@ class Dropdown_Keywords():
                         else:
                             logger.print_on_console('element not found')
             except Exception as e:
-                Exceptions.error(e)
+                logger.print_on_console('Error occured')
                 err_msg = desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
@@ -786,7 +787,7 @@ class Dropdown_Keywords():
                         else:
                             logger.print_on_console('element not found')
             except Exception as e:
-                Exceptions.error(e)
+                logger.print_on_console('Error occured')
                 err_msg = desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
@@ -830,7 +831,7 @@ class Dropdown_Keywords():
                         else:
                             logger.print_on_console('element not found')
             except Exception as e:
-                Exceptions.error(e)
+                logger.print_on_console('Error occured')
                 err_msg = desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
@@ -870,7 +871,7 @@ class Dropdown_Keywords():
                         else:
                             logger.print_on_console('element not found')
             except Exception as e:
-                Exceptions.error(e)
+                logger.print_on_console('Error occured')
                 err_msg = desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 

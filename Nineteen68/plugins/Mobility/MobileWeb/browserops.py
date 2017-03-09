@@ -107,10 +107,10 @@ class BrowserOperations():
             time.sleep(5)
             desired_caps = {}
             desired_caps['platformName'] = 'Android'
-            desired_caps['platformVersion'] =input_list[1]
+            ##desired_caps['platformVersion'] =input_list[1]
             desired_caps['deviceName'] = input_list[0]
             desired_caps['browserName'] = 'Chrome'
-            desired_caps['appium-version'] = '1.4.0'
+            ##desired_caps['appium-version'] = '1.4.0'
             desired_caps['newCommandTimeout'] = '36000'
             driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
             global driver

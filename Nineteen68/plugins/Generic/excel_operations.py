@@ -234,7 +234,7 @@ class ExcelFile:
                     log.info(info_msg)
                     info_msg='Row is '+str(row)+' col is '+str(col)+' and Value: '+str(value)
                     log.info(info_msg)
-                    logger.print_on_console(info_msg)
+##                    logger.print_on_console(info_msg)
                     row=int(row)
                     col=int(col)
                     if row>0 and col>0:
@@ -249,7 +249,7 @@ class ExcelFile:
         except ValueError as e:
             err_msg=ERROR_CODE_DICT['ERR_NUMBER_FORMAT_EXCEPTION']
         except IOError:
-            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
+            err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
             err_msg='Error occured in writing excel cell value'
             log.error(e)
@@ -296,7 +296,7 @@ class ExcelFile:
         except ValueError as e:
             err_msg=ERROR_CODE_DICT['ERR_NUMBER_FORMAT_EXCEPTION']
         except IOError:
-            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
+            err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
             err_msg='Error occured in clearing excel cell value'
             log.error(e)
