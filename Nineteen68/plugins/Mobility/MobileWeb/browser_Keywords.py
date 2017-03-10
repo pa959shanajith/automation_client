@@ -342,36 +342,51 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
+    def stop_server(self):
+            try:
+                import psutil
+                import os
+                processes = psutil.net_connections()
+                for line in processes:
+                    p =  line.laddr
+                    if p[1] == 4723:
+                        os.system("TASKKILL /F /PID " + str(line.pid))
+                        logger.print_on_console('Server stopped')
+            except Exception as e:
+                logger.print_on_console('Exception in stopping server')
 
     def closeBrowser(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        if(len(webdriver_list) > 0):
-            try:
-                driver_instance = len(webdriver_list)-1
-                winHandles = webdriver_list[driver_instance].window_handles
-                current_handle = webdriver_list[driver_instance].current_window_handle
-                count = 0
-                for x in winHandles:
-                    count+=1
-                    if(current_handle == x):
-                        break
+        try:
+##        if(len(webdriver_list) > 0):
+##
+##                driver_instance = len(webdriver_list)-1
+##                winHandles = webdriver_list[driver_instance].window_handles
+##                current_handle = webdriver_list[driver_instance].current_window_handle
+##                count = 0
+##                for x in winHandles:
+##                    count+=1
+##                    if(current_handle == x):
+##                        break
+##
+##                count = count - 2
+##                webdriver_list[driver_instance].close()
+##                logger.print_on_console('browser closed')
+##                log.info('browser closed')
+##                if(len(winHandles) > 1):
+##                    webdriver_list[driver_instance].switch_to.window(winHandles[count])
+##                if(len(winHandles) == 1):
+##                    webdriver_list.pop(len(webdriver_list)-1)
+##                    print 'Kill driver logic'
+          driver_obj.close()
+          self.stop_server()
+          status=webconstants.TEST_RESULT_PASS
+          result=webconstants.TEST_RESULT_TRUE
 
-                count = count - 2
-                webdriver_list[driver_instance].close()
-                logger.print_on_console('browser closed')
-                log.info('browser closed')
-                if(len(winHandles) > 1):
-                    webdriver_list[driver_instance].switch_to.window(winHandles[count])
-                if(len(winHandles) == 1):
-                    webdriver_list.pop(len(webdriver_list)-1)
-                    print 'Kill driver logic'
-                status=webconstants.TEST_RESULT_PASS
-                result=webconstants.TEST_RESULT_TRUE
-
-            except Exception as e:
+        except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         else:
             logger.print_on_console('For this close browser open browser or open new browser is not present')
