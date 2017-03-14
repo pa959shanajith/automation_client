@@ -19,6 +19,7 @@ browsername = None
 desktopScrapeFlag=False
 mobileScrapeFlag=False
 mobileWebScrapeFlag=False
+debugFlag = False
 
 
 configobj = readconfig.readConfig()
@@ -95,6 +96,19 @@ class MainNamespace(BaseNamespace):
         global wxObject
         args=list(args)
         wxObject.mythread = TestThread(wxObject,DEBUG,args[0],wxObject.debug_mode)
+        wxObject.choice=wxObject.rbox.GetStringSelection()
+        print wxObject.choice,' is Selected'
+        if wxObject.choice == 'Normal':
+            if wxObject.debugwindow != None:
+                wxObject.debugwindow.Close()
+                wxObject.debugwindow = None
+
+        wxObject.debug_mode=False
+        wxObject.breakpoint.Disable()
+        if wxObject.choice in ['Stepwise','RunfromStep']:
+            global debugFlag
+            debugFlag = True
+            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_LAUNCH_DESKTOP(self, *args):
         con = controller.Controller()
@@ -292,10 +306,10 @@ class TestThread(threading.Thread):
                 self.wxObject.breakpoint.Disable()
                 if self.wxObject.choice in ['Stepwise','RunfromStep']:
                     self.debug_mode=True
-                    self.wxObject.continue_debugbutton.Show()
-                    self.wxObject.continuebutton.Show()
-                    self.wxObject.continue_debugbutton.Enable()
-                    self.wxObject.continuebutton.Enable()
+##                    self.wxObject.continue_debugbutton.Show()
+##                    self.wxObject.continuebutton.Show()
+##                    self.wxObject.continue_debugbutton.Enable()
+##                    self.wxObject.continuebutton.Enable()
 
                     if self.wxObject.choice=='RunfromStep':
                         self.wxObject.breakpoint.Enable()
@@ -306,6 +320,7 @@ class TestThread(threading.Thread):
                             runfrom_step=1
                             log.error('Invalid step number, Hence default step num is taken as 1')
                             logger.print_on_console('Invalid step number, Hence default step num is taken as 1')
+                self.wxObject.rbox.Disable()
             else:
                 self.wxObject.rbox.Disable()
 
@@ -336,12 +351,15 @@ class TestThread(threading.Thread):
 ##            self.wxObject.executebutton.Enable()
             self.wxObject.breakpoint.Clear()
             self.wxObject.rbox.Enable()
+            self.wxObject.breakpoint.Enable()
             self.wxObject.cancelbutton.Enable()
             self.wxObject.terminatebutton.Disable()
-            self.wxObject.continuebutton.Hide()
-            self.wxObject.continue_debugbutton.Hide()
+##            self.wxObject.continuebutton.Hide()
+##            self.wxObject.continue_debugbutton.Hide()
             self.wxObject.mythread=None
             if self.action==DEBUG:
+                if self.wxObject.debugwindow != None:
+                    self.wxObject.debugwindow.Close()
                 socketIO.emit('result_debugTestCase',status)
             elif self.action==EXECUTE:
                 socketIO.emit('result_executeTestSuite',status)
@@ -349,6 +367,8 @@ class TestThread(threading.Thread):
             print e
             status=TERMINATE
             if self.action==DEBUG:
+##                if self.wxObject.debugwindow != None:
+##                    self.wxObject.debugwindow.Close()
                 socketIO.emit('result_debugTestCase',status)
             elif self.action==EXECUTE:
                 socketIO.emit('result_executeTestSuite',status)
@@ -372,7 +392,7 @@ class ClientWindow(wx.Frame):
         self.SetBackgroundColour('#e6e7e8')
 ##        self.ShowFullScreen(True,wx.ALL)
 ##        self.SetBackgroundColour('#D0D0D0')
-
+        self.debugwindow = None
         self.id =id
         self.mainclass = self
         self.mythread = None
@@ -455,64 +475,30 @@ class ClientWindow(wx.Frame):
         self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
 ##        self.rbox.SetBackgroundColour('#9f64e2')
 
-        paly_img = wx.Image("play.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+##        paly_img = wx.Image("play.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         terminate_img=wx.Image("terminate.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        step_img=wx.Image("step.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-
-##        self.button1 = wx.BitmapButton(self.panel1, id=-1, bitmap=image1,
-##        pos=(10, 20), size = (200, image1.GetHeight()+5))
-
-##        self.debugbutton = wx.Button(self.panel, label="Debug" ,pos=(10, 548), size=(100, 28))
-##        self.debugbutton.Bind(wx.EVT_BUTTON, self.OnDebug)
-##        self.debugbutton.SetToolTip(wx.ToolTip("To Debug the script"))
-
-##
-
-##        self.terminatebutton = wx.BitmapButton(self.panel, bitmap=terminate_img,pos=(470, 548), size=(50, 40))
-####        self.terminatebutton = wx.Button(self.panel, label="Terminate" ,pos=(470, 548), size=(100, 28))
-##        self.terminatebutton.Bind(wx.EVT_BUTTON, self.OnTerminate)
-##        self.terminatebutton.SetToolTip(wx.ToolTip("To Terminate the execution"))
-##        self.terminatebutton.Disable()
-
-##        self.pausebutton = wx.Button(self.panel, label="Pause" ,pos=(230, 548), size=(75, 28))
-##        self.pausebutton.Bind(wx.EVT_BUTTON, self.OnPause)   # need to implement OnExit(). Leave notrace
-##        self.pausebutton.SetToolTip(wx.ToolTip("To pause the execution "))
-##        self.pausebutton.Hide()
+##        step_img=wx.Image("step.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
 
 
-##        self.continue_debugbutton = wx.Button(self.panel, label="Resume" ,pos=(140, 548), size=(75, 28))
-##        self.continue_debugbutton = wx.BitmapButton(self.rbox, bitmap=paly_img,pos=(70, 598), size=(35, 28))
-
-        self.continue_debugbutton = wx.StaticBitmap(self.rbox, -1, wx.Bitmap("play.png", wx.BITMAP_TYPE_ANY), (75, 50), (35, 28))
-        self.continue_debugbutton.Bind(wx.EVT_LEFT_DOWN, self.Resume)
-        self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution"))
-        self.continue_debugbutton.Hide()
-
-##        self.continue_debugbutton = wx.BitmapButton(self.rbox, bitmap=paly_img,pos=(75, 50), size=(35, 28))
-##        self.continue_debugbutton.Bind(wx.EVT_BUTTON, self.Resume)
-##        self.continue_debugbutton.SetToolTip(wx.ToolTip("To Resume the execution "))
+##        self.continue_debugbutton = wx.StaticBitmap(self.rbox, -1, wx.Bitmap("play.png", wx.BITMAP_TYPE_ANY), (75, 50), (35, 28))
+##        self.continue_debugbutton.Bind(wx.EVT_LEFT_DOWN, self.Resume)
+##        self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution"))
 ##        self.continue_debugbutton.Hide()
+##
+##
+##
+##        self.continuebutton = wx.StaticBitmap(self.rbox, -1, wx.Bitmap("step.png", wx.BITMAP_TYPE_ANY), (105, 50), (35, 28))
+##        self.continuebutton.Bind(wx.EVT_LEFT_DOWN, self.OnContinue)
+##        self.continuebutton.SetToolTip(wx.ToolTip("To Resume the execution "))
+##        self.continuebutton.Hide()
 
-        self.continuebutton = wx.StaticBitmap(self.rbox, -1, wx.Bitmap("step.png", wx.BITMAP_TYPE_ANY), (105, 50), (35, 28))
-##        self.continuebutton = wx.BitmapButton(self.panel, bitmap=step_img,pos=(130, 598), size=(35,28))
-##        self.continuebutton = wx.Button(self.panel, label="Continue" ,pos=(230, 548), size=(75, 28))
-        self.continuebutton.Bind(wx.EVT_LEFT_DOWN, self.OnContinue)
-        self.continuebutton.SetToolTip(wx.ToolTip("To Resume the execution "))
-        self.continuebutton.Hide()
 
 
-
-##        self.breakpointbutton = wx.Button(self.panel, label="Breakpoint",pos=(590, 548), size=(100, 28))
-##        self.breakpointbutton.Bind(wx.EVT_BUTTON,None)   # need to implement OnExtract()
-##        self.breakpointbutton.SetToolTip(wx.ToolTip("Breakpoint"))
 
         self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(230, 598), size=(60,20), style = wx.TE_RICH)
         box.Add(self.breakpoint, 1, wx.ALL|wx.EXPAND, 5)
         self.breakpoint.Disable()
 
-##        self.executebutton = wx.Button(self.panel, label="Execute" ,pos=(12, 588), size=(100, 28))
-##        self.executebutton.Bind(wx.EVT_BUTTON, self.OnExecute)
-##        self.executebutton.SetToolTip(wx.ToolTip("To execute the script"))
 
         killprocess_img = wx.Image("killStaleProcess.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap("killStaleProcess.png", wx.BITMAP_TYPE_ANY), (360, 548), (50, 40))
@@ -526,10 +512,7 @@ class ClientWindow(wx.Frame):
         self.terminate_label=wx.StaticText(self.panel, -1, 'Terminate', (470, 600), (100, 70))
 
 
-##        self.cancelbutton = wx.BitmapButton(self.panel, bitmap=killprocess_img,pos=(350, 548), size=(50, 40))
-####        self.cancelbutton = wx.Button(self.panel, label="Exit" ,pos=(350, 548), size=(100, 28))
-##        self.cancelbutton.Bind(wx.EVT_BUTTON, self.OnExit)
-##        self.cancelbutton.SetToolTip(wx.ToolTip("To kill Stale process"))
+
 
         self.clearbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap("clear.png", wx.BITMAP_TYPE_ANY), (590, 548), (50, 40))
         self.clearbutton.Bind(wx.EVT_LEFT_DOWN, self.OnClear)
@@ -539,18 +522,14 @@ class ClientWindow(wx.Frame):
 
 
 
-##        clear_img = wx.Image("clear.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-##        self.clearbutton = wx.BitmapButton(self.panel, bitmap=clear_img,pos=(590, 548), size=(50,40))
-####        self.clearbutton = wx.Button(self.panel, label="Clear" ,pos=(590, 548), size=(100, 28))
-##        self.clearbutton.Bind(wx.EVT_BUTTON, self.OnClear)   # need to implement OnExit(). Leave notrace
-##        self.clearbutton.SetToolTip(wx.ToolTip("To clear the console area"))
+
 
 
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 
         box.AddStretchSpacer()
 
-##        self.label1 = wx.StaticText(self.panel,label = "@ 2016 SLK Software Services Pvt. Ltd. All Rights Reserved. Patent Pending.",pos=(12, 628), size=(400, 28))
+
 
         # redirect text here
         redir=RedirectText(self.log)
@@ -632,21 +611,27 @@ class ClientWindow(wx.Frame):
     def onRadioBox(self,e):
         self.choice=self.rbox.GetStringSelection()
         print self.choice,' is Selected'
+        if self.choice == 'Normal':
+            if self.debugwindow != None:
+                self.debugwindow.Close()
+                self.debugwindow = None
+
         self.debug_mode=False
         self.breakpoint.Disable()
         if self.choice in ['Stepwise','RunfromStep']:
             self.debug_mode=True
-            self.continue_debugbutton.Show()
-            self.continuebutton.Show()
+##            if self.debugwindow == None:
+##                self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
+##            self.continue_debugbutton.Show()
+##            self.continuebutton.Show()
             if self.choice=='RunfromStep':
                 self.breakpoint.Enable()
-            if self.mythread==None:
-                self.continue_debugbutton.Disable()
-                self.continuebutton.Disable()
-
-        else:
-            self.continuebutton.Hide()
-            self.continue_debugbutton.Hide()
+##            if self.mythread==None:
+##                self.continue_debugbutton.Disable()
+##                self.continuebutton.Disable()
+##        else:
+##            self.continuebutton.Hide()
+##            self.continue_debugbutton.Hide()
 
 
 
@@ -698,7 +683,7 @@ class ClientWindow(wx.Frame):
         log.info('Event Triggered to Pause')
         controller.pause_flag=True
 ##        self.pausebutton.Hide()
-        self.continuebutton.Show()
+##        self.continuebutton.Show()
 
 
     def Resume(self, event):
@@ -706,8 +691,8 @@ class ClientWindow(wx.Frame):
         log.info('Event Triggered to Resume Debug')
         controller.pause_flag=False
         self.mythread.resume(False)
-        self.continuebutton.Hide()
-        self.continue_debugbutton.Hide()
+##        self.continuebutton.Hide()
+##        self.continue_debugbutton.Hide()
 
 
 
@@ -726,6 +711,10 @@ class ClientWindow(wx.Frame):
     def OnTerminate(self, event):
         logger.print_on_console('---------Termination Started-------')
         controller.terminate_flag=True
+        #Close the debug window
+        if self.debugwindow != None:
+            self.debugwindow.Close()
+            self.debugwindow = None
         #Handling the case where user clicks terminate when the execution is paused
         #Resume the execution
         if controller.pause_flag:
@@ -793,6 +782,7 @@ class ClientWindow(wx.Frame):
         global mobileScrapeFlag
         global mobileWebScrapeFlag
         global desktopScrapeFlag
+        global debugFlag
         global socketIO
         global browsername
         if mobileScrapeFlag==True:
@@ -807,6 +797,9 @@ class ClientWindow(wx.Frame):
 ##            global socketIO
             self.new = desktopScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO)
             desktopScrapeFlag=False
+        elif debugFlag == True:
+            self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
+            debugFlag = False
         else:
 ##            global browsername
             browsernumbers = ['1','2','3']
@@ -832,7 +825,77 @@ class ClientWindow(wx.Frame):
 
 
 
+class DebugWindow(wx.Frame):
+    #----------------------------------------------------------------------
+    def __init__(self, parent,id, title):
+        wx.Frame.__init__(self, parent, title=title,
+                   pos=(300, 150),  size=(200, 75) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.RESIZE_BOX |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
+        self.SetBackgroundColour('#e6e7e8')
+##        style = wx.CAPTION|wx.CLIP_CHILDREN
+        curdir = os.getcwd()
+        self.iconpath = curdir + "\\slk.ico"
+        self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
+        self.SetIcon(self.wicon)
+        self.panel = wx.Panel(self)
+        #Radio buttons
+##        lblList = ['Normal', 'Stepwise', 'RunfromStep']
+##        self.rbox = wx.RadioBox(self.panel,label = 'Debug options', pos = (10, 548), choices = lblList ,size=(300, 100),
+##        majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
 
+##        self.Bind(wx.EVT_RADIOBUTTON, self.OnRadiogroup)
+##        self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
+##        self.rbox.SetBackgroundColour('#9f64e2')
+
+        paly_img = wx.Image("play.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        terminate_img=wx.Image("terminate.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        step_img=wx.Image("step.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+
+
+        self.continue_debugbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap("play.png", wx.BITMAP_TYPE_ANY), (65, 15), (35, 28))
+        self.continue_debugbutton.Bind(wx.EVT_LEFT_DOWN, self.Resume)
+        self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution"))
+##        self.continue_debugbutton.Hide()
+
+
+
+        self.continuebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap("step.png", wx.BITMAP_TYPE_ANY), (105, 15), (35, 28))
+        self.continuebutton.Bind(wx.EVT_LEFT_DOWN, self.OnContinue)
+        self.continuebutton.SetToolTip(wx.ToolTip("To Resume the execution "))
+##        self.continuebutton.Hide()
+
+        self.Centre()
+        style = self.GetWindowStyle()
+        self.SetWindowStyle( style|wx.STAY_ON_TOP )
+        wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
+        self.Show()
+
+
+    def Resume(self, event):
+        logger.print_on_console('Event Triggered to Resume Debug')
+        log.info('Event Triggered to Resume Debug')
+        controller.pause_flag=False
+        wxObject.mythread.resume(False)
+        self.Close()
+        wxObject.debugwindow = None
+##        self.continuebutton.Hide()
+##        self.continue_debugbutton.Hide()
+
+
+
+    #----------------------------------------------------------------------
+    def OnContinue(self, event):
+        logger.print_on_console('Event Triggered to Resume')
+        log.info('Event Triggered to Resume')
+        self.resume(True)
+
+    #----------------------------------------------------------------------
+    def resume(self,debug_mode):
+        controller.pause_flag=False
+        wxObject.mythread.resume(debug_mode)
+
+    def OnExit(self, event):
+        self.Close()
+        wxObject.debugwindow = None
 
 #----------------------------------------------------------------------
 def main():
