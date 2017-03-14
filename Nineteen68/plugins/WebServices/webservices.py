@@ -29,10 +29,12 @@ import ast
 
 from lxml import etree
 
+import clientwindow
 
 import logging
 from constants import *
 
+import handler
 log = logging.getLogger('webservices.py')
 class WSkeywords:
 
@@ -438,6 +440,7 @@ class WSkeywords:
         return status,methodoutput,output,err_msg
 
      def executeRequest(self,*args):
+        testcasename = handler.testcasename
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -458,6 +461,19 @@ class WSkeywords:
             log.error(ERROR_CODE_DICT['ERR_INVALID_METHOD'])
             err_msg = ERROR_CODE_DICT['ERR_INVALID_METHOD']
             logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_METHOD'])
+        response=''
+        socketIO = args[1]
+        if(result[2] != None):
+            res = result[2]
+            a = ''
+            for key in res[0]:
+                a = a +str(key) + ":" + str (res[0][key]) + "##"
+            response=a+'rEsPONseBOdY:'+res[1]
+        response = str(response)
+        if response == '':
+            response = 'fail'
+        if testcasename == '':
+            socketIO.emit('result_debugTestCaseWS',response)
         return result
 
      def getHeader(self,*args):

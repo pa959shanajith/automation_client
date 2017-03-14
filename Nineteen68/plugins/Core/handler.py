@@ -77,6 +77,8 @@ start_end_dict={constants.ENDFOR:[constants.FOR],
 
 ws_template=''
 
+testcasename = ''
+
 ##dynamic_variable_map=OrderedDict()
 log = logging.getLogger('handler.py')
 
@@ -101,7 +103,6 @@ class Handler():
         script=[]
         browser_type=[]
         #Iterating through json array
-
         for json_data in new_obj:
             if json_data.has_key('template'):
                 ws_template=json_data['template']
@@ -115,7 +116,8 @@ class Handler():
                 testscript_name=json_data['testscript_name']
             elif json_data.has_key('testcasename'):
                 testscript_name=json_data['testcasename']
-
+            global testcasename
+            testcasename =testscript_name
             if json_data.has_key('browsertype'):
                 browser_type=json_data['browsertype']
             elif json_data.has_key('browserType'):
