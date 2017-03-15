@@ -692,8 +692,8 @@ class Controller():
         maindir = os.getcwd()
         os.chdir('..')
         curdir = os.getcwd()
-##        path= curdir + '//Nineteen68//plugins//'+plugin_path
-        path = 'D:\Git\Nineteen68_IntegrationWithUI\Nineteen68\plugins\\' + plugin_path
+        path= curdir + '//Nineteen68//plugins//'+plugin_path
+##        path = 'D:\Git\Nineteen68_IntegrationWithUI\Nineteen68\plugins\\' + plugin_path
         sys.path.append(path)
         for root, dirs, files in os.walk(path):
             for d in dirs:
