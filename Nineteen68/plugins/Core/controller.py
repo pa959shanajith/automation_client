@@ -692,8 +692,8 @@ class Controller():
         maindir = os.getcwd()
         os.chdir('..')
         curdir = os.getcwd()
-        path= curdir + '//Nineteen68//plugins//'+plugin_path
-#        path = 'D:\Git\Nineteen68_Websrape_Integration\Nineteen68\plugins\\' + plugin_path
+##        path= curdir + '//Nineteen68//plugins//'+plugin_path
+        path = 'D:\Git\Nineteen68_IntegrationWithUI\Nineteen68\plugins\\' + plugin_path
         sys.path.append(path)
         for root, dirs, files in os.walk(path):
             for d in dirs:
@@ -825,7 +825,7 @@ class Controller():
                             if not(terminate_flag):
                                 con.action=EXECUTE
                                 con.conthread=mythread
-                                status = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
+                                status = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,socketIO)
                                 print( '=======================================================================================================')
                                 logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
                                 print( '=======================================================================================================')
@@ -942,7 +942,6 @@ def kill_process():
         wmi=win32com.client.GetObject('winmgmts:')
         for p in wmi.InstancesOf('win32_process'):
             if p.Name in my_processes:
-
                 os.system("TASKKILL /F /IM " + p.Name)
 ## logic to kill the appium server
         try:

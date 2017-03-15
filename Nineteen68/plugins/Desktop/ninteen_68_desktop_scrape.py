@@ -79,9 +79,9 @@ class ScrapeWindow(wx.Frame):
             wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
             self.Show()
         else:
-            print 'in else block'
-            self.socketIO.emit('getScrapeData Fail.','')
-            print 'sent responce'
+
+            self.socketIO.emit('scrape','Fail')
+
 
      #----------------------------------------------------------------------
 ##    def OnExit(self, event):
