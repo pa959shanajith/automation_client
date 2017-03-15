@@ -158,7 +158,7 @@ class Reporting:
 
     def add_termination_step(self):
         """
-        def : add_testscriptname
+        def : add_termination_step
         purpose : adds the Termination_step to the report
 
         """
@@ -188,6 +188,10 @@ class Reporting:
         if report_obj.testscript_name != self.testscript_name:
             self.testscript_name=report_obj.testscript_name
             self.add_testscriptname(report_obj)
+            try:
+                report_obj._id+=1
+            except Exception as e:
+                log.error(e)
         obj={}
         obj[ID]=report_obj._id
         obj[KEYWORD]=report_obj.name
