@@ -13,9 +13,11 @@ import webservices
 import logger
 import ws_constants
 import constants
+import logging
+log = logging.getLogger('websevice_dispatcher.py')
 class Dispatcher:
     webservice = webservices.WSkeywords()
-    def dispatcher(self,tsp,*message):
+    def dispatcher(self,tsp,socketIO,*message):
         keyword=tsp.name
         err_msg=None
         result=[constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
@@ -38,6 +40,10 @@ class Dispatcher:
                 if keyword in ['setTagValue','setTagAttribute']:
                     message=list(message)
                     message.append(tsp.objectname)
+                elif keyword == 'executeRequest':
+                    message=list(message)
+                    message.append(socketIO)
+
                 result= dict[keyword](*message)
             else:
                 err_msg=ws_constants.METHOD_INVALID

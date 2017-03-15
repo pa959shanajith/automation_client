@@ -357,12 +357,16 @@ class TestThread(threading.Thread):
 ##            self.wxObject.continuebutton.Hide()
 ##            self.wxObject.continue_debugbutton.Hide()
             self.wxObject.mythread=None
+            import handler
+            testcasename = handler.testcasename
             if self.action==DEBUG:
                 if self.wxObject.debugwindow != None:
                     self.wxObject.debugwindow.Close()
-                socketIO.emit('result_debugTestCase',status)
+                if len(testcasename) > 0:
+                    socketIO.emit('result_debugTestCase',status)
             elif self.action==EXECUTE:
-                socketIO.emit('result_executeTestSuite',status)
+                if len(testcasename) > 0:
+                    socketIO.emit('result_executeTestSuite',status)
         except Exception as e:
             print e
             status=TERMINATE

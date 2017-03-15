@@ -290,7 +290,7 @@ STEP='Step '
 
 KEYWORD='Keyword'
 
-TEST_SCRIPT_NAME='Testscriptname'
+TEST_SCRIPT_NAME='TestCase Name'
 
 END_TIME='EndTime'
 
