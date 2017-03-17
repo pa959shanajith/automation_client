@@ -32,7 +32,6 @@ import threading
 from datetime import datetime
 import logging
 import time
-import clientwindow
 
 
 
@@ -44,6 +43,7 @@ i = 0
 terminate_flag=False
 pause_flag=False
 break_point=-1
+socket_object = None
 
 
 thread_tracker = []
@@ -274,7 +274,7 @@ class Controller():
         log.debug('Wait is sover')
 
 
-    def methodinvocation(self,index,socketIO,*args):
+    def methodinvocation(self,index,*args):
 
         global pause_flag
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
@@ -336,7 +336,7 @@ class Controller():
                     start_time_string=start_time.strftime(TIME_FORMAT)
                     logger.print_on_console('Step Execution start time is : '+start_time_string)
                     log.info('Step Execution start time is : '+start_time_string)
-                    index,result = self.keywordinvocation(index,inpval,self.reporting_obj,socketIO,*args)
+                    index,result = self.keywordinvocation(index,inpval,self.reporting_obj,*args)
                 else:
                     keyword_flag=False
                     if tsp != None and isinstance(tsp,if_step.If):
@@ -441,8 +441,9 @@ class Controller():
         if len(output)>1:
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
-    def keywordinvocation(self,index,inpval,reportingobj,socketIO,*args):
+    def keywordinvocation(self,index,inpval,*args):
         #configobj = readconfig.readConfig()
+        global socket_object
         configvalues = self.configvalues
         try:
             import time
@@ -520,7 +521,7 @@ class Controller():
                     #Web apptype module call
                     if self.web_dispatcher_obj == None:
                         self.__load_web()
-                    result = self.invokewebkeyword(teststepproperty,self.web_dispatcher_obj,inpval,reportingobj,socketIO)
+                    result = self.invokewebkeyword(teststepproperty,self.web_dispatcher_obj,inpval,args[0])
 
                 elif teststepproperty.apptype.lower() == APPTYPE_MOBILE:
                     #MobileWeb apptype module call
@@ -538,7 +539,7 @@ class Controller():
                     #Webservice apptype module call
                     if self.webservice_dispatcher_obj == None:
                         self.__load_webservice()
-                    result = self.invokewebservicekeyword(teststepproperty,self.webservice_dispatcher_obj,inpval,socketIO)
+                    result = self.invokewebservicekeyword(teststepproperty,self.webservice_dispatcher_obj,inpval,socket_object)
 
                 elif teststepproperty.apptype.lower() == APPTYPE_DESKTOP:
                     #Desktop apptype module call
@@ -594,7 +595,7 @@ class Controller():
             return index,TERMINATE
 
 
-    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,socketIO):
+    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread):
         i=0
         status=True
         self.scenario_start_time=datetime.now()
@@ -612,7 +613,7 @@ class Controller():
                 self.debugfrom_step=debugfrom_step
 
                 try:
-                    i = self.methodinvocation(i,socketIO)
+                    i = self.methodinvocation(i)
                     if i== TERMINATE:
                         #Changing the overallstatus of the report_obj to Terminate - (Sushma)
                         self.reporting_obj.overallstatus=TERMINATE
@@ -659,12 +660,12 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
         return res
 
-    def invokewebservicekeyword(self,teststepproperty,dispatcher_obj,inputval,socketIO):
+    def invokewebservicekeyword(self,teststepproperty,dispatcher_obj,inputval,socket_object):
         keyword = teststepproperty.name
-        res = dispatcher_obj.dispatcher(teststepproperty,socketIO,*inputval)
+        res = dispatcher_obj.dispatcher(teststepproperty,socket_object,*inputval)
         return res
 
-    def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj,socketIO):
+    def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
 
         keyword = teststepproperty.name
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
@@ -701,7 +702,7 @@ class Controller():
                 sys.path.append(p)
         os.chdir(maindir)
 
-    def invoke_debug(self,mythread,runfrom_step,json_data,socketIO):
+    def invoke_debug(self,mythread,runfrom_step,json_data):
         status=COMPLETED
         global break_point
         obj = handler.Handler()
@@ -733,7 +734,7 @@ class Controller():
 
         if flag:
             self.conthread=mythread
-            status = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread,socketIO)
+            status = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread)
 
         else:
             print 'Invalid script'
@@ -825,7 +826,7 @@ class Controller():
                             if not(terminate_flag):
                                 con.action=EXECUTE
                                 con.conthread=mythread
-                                status = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,socketIO)
+                                status = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
                                 print( '=======================================================================================================')
                                 logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
                                 print( '=======================================================================================================')
@@ -877,9 +878,10 @@ class Controller():
 
     def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,wxObject,socketIO,*args):
         status = COMPLETED
-        global terminate_flag,break_point,pause_flag
+        global terminate_flag,break_point,pause_flag,socket_object
         self.conthread=mythread
         self.clear_data()
+        socket_object = socketIO
         #Logic to make sure that logic of usage of existing driver is not applicable to execution
         if self.web_dispatcher_obj != None:
             self.web_dispatcher_obj.action=action
@@ -899,7 +901,7 @@ class Controller():
         elif action.lower()==DEBUG:
             self.debug_mode=debug_mode
             self.wx_object=wxObject
-            status=self.invoke_debug(mythread,runfrom_step,json_data,socketIO)
+            status=self.invoke_debug(mythread,runfrom_step,json_data)
         if status != TERMINATE:
             status=COMPLETED
         return status

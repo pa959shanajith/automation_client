@@ -29,7 +29,6 @@ import ast
 
 from lxml import etree
 
-import clientwindow
 
 import logging
 from constants import *

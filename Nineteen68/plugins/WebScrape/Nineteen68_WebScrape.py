@@ -5,7 +5,6 @@ from selenium import webdriver
 import browserops
 import clickandadd
 import fullscrape
-import clientwindow
 from socketIO_client import SocketIO,BaseNamespace
 import time
 import objectspy
