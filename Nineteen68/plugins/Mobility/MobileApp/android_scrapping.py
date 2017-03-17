@@ -89,7 +89,7 @@ class InstallAndLaunch():
             self.driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
         except Exception as e:
             logger.print_on_console("Not able to install or launch application")
-        return driver
+        return self.driver
 
      def scrape(self):
         finalJson=''
