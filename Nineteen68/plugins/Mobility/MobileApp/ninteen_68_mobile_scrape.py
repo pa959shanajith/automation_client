@@ -10,7 +10,6 @@
 #-------------------------------------------------------------------------------
 import android_scrapping
 import wx
-import clientwindow
 from socketIO_client import SocketIO,BaseNamespace
 ##import launch_keywords
 ##desktop_scraping_obj = desktop_scraping.Scrape()
