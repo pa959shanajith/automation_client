@@ -13,6 +13,7 @@ import logger
 import logging
 import constants
 import json
+import os
 
 ##log = logging.getLogger('readconfig.py')
 
@@ -34,8 +35,9 @@ class readConfig():
 
     def readJson(self):
 ##        global configvalues
+        config_path = os.environ["NINETEEN68_HOME"] + '\\config.json'
         configvalues={}
-        config = json.loads(open('config.json').read())
+        config = json.loads(open(config_path).read())
         params=config['configuration']
         configvalues['server_ip']=params['server_ip']
         configvalues['server_port']=params['server_port']

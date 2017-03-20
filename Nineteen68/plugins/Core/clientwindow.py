@@ -6,6 +6,7 @@ import time
 from constants import *
 import logging
 import logging.config
+import argparse
 
 import logger
 import threading
@@ -21,6 +22,15 @@ mobileScrapeFlag=False
 mobileWebScrapeFlag=False
 debugFlag = False
 
+parser = argparse.ArgumentParser(description="Nineteen68 Platform")
+parser.add_argument('--NINETEEN68_HOME', type=str, help='A Required path to Nineteen68 root location')
+args = parser.parse_args()
+
+if args.NINETEEN68_HOME < 1:
+    parser.error("Required at least 1 argument")
+
+os.environ["NINETEEN68_HOME"] = args.NINETEEN68_HOME
+IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "\\Nineteen68\\plugins\\Core\\Images"
 
 configobj = readconfig.readConfig()
 configvalues = configobj.readJson()
@@ -407,7 +417,7 @@ class ClientWindow(wx.Frame):
         wxObject = self
         curdir = os.getcwd()
         ID_FILE_NEW = 1
-        self.iconpath = curdir + "\\slk.ico"
+        self.iconpath = IMAGES_PATH +"\\slk.ico"
 
         # set up logging to file - see previous section for more details
         logging.basicConfig(level=logging.INFO,
@@ -457,7 +467,7 @@ class ClientWindow(wx.Frame):
         self.SetMenuBar(self.menubar)
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
-        connect_img=wx.Image("connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        connect_img=wx.Image(IMAGES_PATH +"\\connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.connectbutton = wx.BitmapButton(self.panel, bitmap=connect_img,pos=(10, 10), size=(100, 25))
 ##        self.connectbutton = wx.Button(self.panel, label="Connect" ,pos=(10, 10), size=(100, 28))
         self.connectbutton.Bind(wx.EVT_BUTTON, self.OnNodeConnect)
@@ -480,7 +490,7 @@ class ClientWindow(wx.Frame):
 ##        self.rbox.SetBackgroundColour('#9f64e2')
 
 ##        paly_img = wx.Image("play.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        terminate_img=wx.Image("terminate.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        terminate_img=wx.Image(IMAGES_PATH +"\\terminate.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
 ##        step_img=wx.Image("step.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
 
 
@@ -504,13 +514,13 @@ class ClientWindow(wx.Frame):
         self.breakpoint.Disable()
 
 
-        killprocess_img = wx.Image("killStaleProcess.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap("killStaleProcess.png", wx.BITMAP_TYPE_ANY), (360, 548), (50, 40))
+        killprocess_img = wx.Image(IMAGES_PATH +"\\killStaleProcess.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"\\killStaleProcess.png", wx.BITMAP_TYPE_ANY), (360, 548), (50, 40))
         self.cancelbutton.Bind(wx.EVT_LEFT_DOWN, self.OnExit)
         self.cancelbutton.SetToolTip(wx.ToolTip("To kill Stale process"))
         self.cancel_label=wx.StaticText(self.panel, -1, 'Kill Stale Process', (340, 600), (100, 70))
 
-        self.terminatebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap("terminate.png", wx.BITMAP_TYPE_ANY), (470, 548), (50, 40))
+        self.terminatebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"\\terminate.png", wx.BITMAP_TYPE_ANY), (470, 548), (50, 40))
         self.terminatebutton.Bind(wx.EVT_LEFT_DOWN, self.OnTerminate)
         self.terminatebutton.SetToolTip(wx.ToolTip("To Terminate the execution"))
         self.terminate_label=wx.StaticText(self.panel, -1, 'Terminate', (470, 600), (100, 70))
@@ -518,7 +528,7 @@ class ClientWindow(wx.Frame):
 
 
 
-        self.clearbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap("clear.png", wx.BITMAP_TYPE_ANY), (590, 548), (50, 40))
+        self.clearbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"\\clear.png", wx.BITMAP_TYPE_ANY), (590, 548), (50, 40))
         self.clearbutton.Bind(wx.EVT_LEFT_DOWN, self.OnClear)
         self.clearbutton.SetToolTip(wx.ToolTip("To clear the console area"))
         self.clear_label=wx.StaticText(self.panel, -1, 'Clear', (600, 600), (100, 70))
@@ -837,7 +847,7 @@ class DebugWindow(wx.Frame):
         self.SetBackgroundColour('#e6e7e8')
 ##        style = wx.CAPTION|wx.CLIP_CHILDREN
         curdir = os.getcwd()
-        self.iconpath = curdir + "\\slk.ico"
+        self.iconpath = IMAGES_PATH +"\\slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         self.panel = wx.Panel(self)
@@ -850,19 +860,19 @@ class DebugWindow(wx.Frame):
 ##        self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
 ##        self.rbox.SetBackgroundColour('#9f64e2')
 
-        paly_img = wx.Image("play.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        terminate_img=wx.Image("terminate.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        step_img=wx.Image("step.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        paly_img = wx.Image(IMAGES_PATH +"\\play.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        terminate_img=wx.Image(IMAGES_PATH +"\\terminate.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        step_img=wx.Image(IMAGES_PATH +"\\step.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
 
 
-        self.continue_debugbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap("play.png", wx.BITMAP_TYPE_ANY), (65, 15), (35, 28))
+        self.continue_debugbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"\\play.png", wx.BITMAP_TYPE_ANY), (65, 15), (35, 28))
         self.continue_debugbutton.Bind(wx.EVT_LEFT_DOWN, self.Resume)
         self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution"))
 ##        self.continue_debugbutton.Hide()
 
 
 
-        self.continuebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap("step.png", wx.BITMAP_TYPE_ANY), (105, 15), (35, 28))
+        self.continuebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"\\step.png", wx.BITMAP_TYPE_ANY), (105, 15), (35, 28))
         self.continuebutton.Bind(wx.EVT_LEFT_DOWN, self.OnContinue)
         self.continuebutton.SetToolTip(wx.ToolTip("To Resume the execution "))
 ##        self.continuebutton.Hide()

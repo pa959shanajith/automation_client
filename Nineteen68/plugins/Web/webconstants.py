@@ -1,5 +1,7 @@
 import os
 
+drivers_path = os.environ["NINETEEN68_HOME"] + "\\Drivers"
+
 GET_XPATH_JS="""function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();"""
 
 CLICK_JAVASCRIPT = """var evType; element=arguments[0]; if (document.createEvent) {     evType = 'Click executed through part-1';     var evt = document.createEvent('MouseEvents');     evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = 'Click executed through part-2';   	setTimeout(function() {     element.click();   	}, 100); } return (evType);"""
@@ -25,16 +27,16 @@ TEST_RESULT_FALSE = "False";
 
 METHOD_INVALID='Invalid Keyword'
 
-CHROME_DRIVER_PATH = 'chromedriver.exe'
+##CHROME_DRIVER_PATH = 'chromedriver.exe'
+CHROME_DRIVER_PATH = drivers_path + "\\chromedriver.exe"
 
+IE_DRIVER_PATH_64 =  drivers_path +'\\IEDriverServer64.exe'
 
-IE_DRIVER_PATH_64 = 'IEDriverServer64.exe'
+IE_DRIVER_PATH_32 =   drivers_path +'\\IEDriverServer.exe'
 
-IE_DRIVER_PATH_32 = 'IEDriverServer.exe'
+PHANTOM_DRIVER_PATH =  drivers_path +'\\phantomjs.exe'
 
-PHANTOM_DRIVER_PATH = 'phantomjs.exe'
-
-GECKODRIVER_PATH = 'geckodriver.exe'
+GECKODRIVER_PATH =  drivers_path +'\\geckodriver.exe'
 
 SET_TEXT_SCRIPT="""arguments[0].value=arguments[1]"""
 

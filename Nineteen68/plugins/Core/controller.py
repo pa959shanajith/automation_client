@@ -690,17 +690,12 @@ class Controller():
         return res
 
     def get_all_the_imports(self,plugin_path):
-        maindir = os.getcwd()
-        os.chdir('..')
-        curdir = os.getcwd()
-        path= curdir + '//Nineteen68//plugins//'+plugin_path
-##        path = 'D:\Git\Nineteen68_IntegrationWithUI\Nineteen68\plugins\\' + plugin_path
+        path= os.environ["NINETEEN68_HOME"] + '//Nineteen68//plugins//'+plugin_path
         sys.path.append(path)
         for root, dirs, files in os.walk(path):
             for d in dirs:
                 p = path + '\\' + d
                 sys.path.append(p)
-        os.chdir(maindir)
 
     def invoke_debug(self,mythread,runfrom_step,json_data):
         status=COMPLETED
