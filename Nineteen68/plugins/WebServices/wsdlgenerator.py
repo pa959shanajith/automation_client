@@ -1,11 +1,18 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
-# Purpose:
+# Name:        wsdlgenerator.py
+# Purpose:		listing the wsdl operations
+#				generating services provided
 #
 # Author:      rakesh.v
 #
 # Created:     19-09-2016
 # Copyright:   (c) rakesh.v 2016
+# Licence:     <your licence>
+#
+# Author:      vishvas.a
+#
+# Modified:     20-03-2017
+# Copyright:   (c) vishvas.a 2017
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
@@ -37,9 +44,15 @@ class WebservicesWSDL():
             self.wsdlURL = wsdlURL
             list_method = Client(wsdlURL)
             obt_list_method = [method for method in list_method.wsdl.services[0].ports[0].methods]
+            obt_list_method1 = [method for method in list_method.wsdl.services[0].ports[1].methods]
             log.info('List of methods obtained')
-            log.info(obt_list_method)
-            return obt_list_method
+            allmethodslist=[]
+            for methodindex in range(0,len(obt_list_method)):
+               allmethodslist.append(str('SOAP1.1-'+obt_list_method[methodindex]))
+            for methodindex in range(0,len(obt_list_method1)):
+               allmethodslist.append(str('SOAP1.2-'+obt_list_method[methodindex]))
+            log.info(allmethodslist)
+            return allmethodslist
         except Exception as e:
             logger.print_on_console(EXCEPTION_OCCURED,e)
             log.error(EXCEPTION_OCCURED)
@@ -54,9 +67,9 @@ class BodyGenarator():
 ##  3. soap_type i.e to which soap version request body and header needs to be generated(SOAP11 or SOAP12)
 ##  4. It also creates object of client
     def __init__(self, wsdl , operation_name , soap_type):
-        self.wsdl = wsdl
-        self.operation_name=operation_name
-        self.soap_type = soap_type
+        self.wsdl = str(wsdl)
+        self.operation_name=str(operation_name)
+        self.soap_type = int(soap_type)
         self.client_obj = zeep.Client(self.wsdl)
 
     def get_string(self ,count):
@@ -64,7 +77,6 @@ class BodyGenarator():
         for i in range(count):
             str.append('?')
         return str
-
 
 ## 1. requestHeader method generates header based on
 ## a. operation name
@@ -76,7 +88,7 @@ class BodyGenarator():
                 self.client_obj.soaptype = 0
                 log.info('soap type is 0 i.e is soap 11')
                 request_header_soap11 = self.client_obj.service._binding.create_message_header(self.operation_name)
-                request_header_soap11 = str(request_header_soap11)
+##                request_header_soap11 = str(request_header_soap11)
                 log.info('request header of soap11')
                 log.info(request_header_soap11)
                 return request_header_soap11
@@ -84,7 +96,7 @@ class BodyGenarator():
                 self.client_obj.soaptype = 1
                 log.info('soap type is 1 i.e is soap 12')
                 request_header_soap12 = self.client_obj.service._binding.create_message_header(self.operation_name)
-                request_header_soap12 = str(request_header_soap12)
+##                request_header_soap12 = str(request_header_soap12)
                 log.info('request header of soap12')
                 log.info(request_header_soap12)
                 return request_header_soap12
@@ -96,7 +108,7 @@ class BodyGenarator():
                 log.info(request_header_soap11)
                 self.client_obj.soaptype = 1
                 request_header_soap12 = self.client_obj.service._binding.create_message_header(self.operation_name)
-                request_header_soap12 = str(request_header_soap12)
+##                request_header_soap12 = str(request_header_soap12)
                 log.info('request header of soap12')
                 log.info(request_header_soap12)
                 return request_header_soap11,request_header_soap12

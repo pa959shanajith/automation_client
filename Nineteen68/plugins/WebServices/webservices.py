@@ -7,6 +7,12 @@
 # Created:     08-09-2016
 # Copyright:   (c) sushma.p wasimakram.sutar 2016
 # Licence:     <your licence>
+#
+# Author:      vishvas.a
+#
+# Created:     20-03-2017
+# Copyright:   (c) vishvas.a 2017
+# Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
 """logger - File which prints the code loggers """
@@ -27,7 +33,7 @@ import json
 import ast
 
 
-from lxml import etree
+from xml.etree import ElementTree as etree
 
 
 import logging
@@ -558,31 +564,35 @@ class WSkeywords:
         return status,methodoutput,output,err_msg
 
      def parse_xml(self,input_xml,path,value,attribute_name,flag):
-        result=None
-        from lxml import etree
-        doc=etree.fromstring(self.baseReqBody)
-        namespaces={}
-        xyz={}
-
-        for ns in doc.xpath('//namespace::*'):
-            namespaces[ns[0]]=ns[1]
-
+        template = etree.fromstring(input_xml)
+        index=0
         new_path=path.split('/')
         new_path= new_path[1:]
-        for x in new_path:
-            x=x.split(':')
-            xyz[x[0]]=namespaces[x[0]]
-        element=doc.xpath(path,namespaces=xyz)
-        if len(element)>0:
-            element=element[0]
-            if flag=='tagname':
-                element.text=value
-            elif flag=='attribute':
-                element.attrib[attribute_name]=value
-            result=etree.tostring(doc,pretty_print=True)
-        else:
-            logger.print_on_console('Element not found')
+        result=None
+        element_to_change=new_path[len(new_path)-1]
+        if element_to_change.startswith('ns',0,2):
+            element_to_change=element_to_change.split(":")[1]
+        self.actual_parser(element_to_change,value,template,index,flag)
+        result=etree.tostring(template)
         return result
+
+     def actual_parser(self,element_to_change,value,obj,index,flag):
+        index+=1
+        for body_object in obj:
+            ##if(type(body_object))
+            body_tag = body_object.tag
+            if flag == 'tagname':
+                actual_tag=str(body_object.tag).split('}')[1]
+                if element_to_change == actual_tag:
+##                    print 'tag to change: \'',element_to_change,'\' equals available tag : \'',actual_tag,'\' \'',element_to_change == actual_tag,'\''
+                    body_object.text = value
+                    break
+            if flag == 'attribute':
+                if len(body_object.attrib) > 0:
+                    if element_to_change in body_object.attrib:
+                        body_object.attrib[element_to_change]=value
+                        break
+            self.actual_parser(element_to_change,value,body_object,index,flag)
 
      def setTagAttribute(self,attribute_name,attribute_value,element_path):
         status = ws_constants.TEST_RESULT_FAIL
@@ -599,6 +609,7 @@ class WSkeywords:
                     result=self.parse_xml(self.baseReqBody,element_path,attribute_value,attribute_name,'attribute')
                     if result != None:
                         self.baseReqBody=result
+                        handler.ws_template=self.baseReqBody
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                         status = ws_constants.TEST_RESULT_PASS
                         methodoutput = ws_constants.TEST_RESULT_TRUE
@@ -623,19 +634,20 @@ class WSkeywords:
         output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         import handler
+        if self.baseReqBody == '':
+            self.baseReqBody=handler.ws_template
         try:
             if value != None and value != '' and element_path != None and element_path != '':
-                if self.baseReqBody == '':
-                    self.baseReqBody=handler.ws_template
-                    if self.baseReqBody != None and self.baseReqBody != '':
-                        result=self.parse_xml(self.baseReqBody,element_path,value,'','tagname')
-                        if result != None:
-                            self.baseReqBody=result
-                            log.info(STATUS_METHODOUTPUT_UPDATE)
-                            status = ws_constants.TEST_RESULT_PASS
-                            methodoutput = ws_constants.TEST_RESULT_TRUE
-                    else:
-                        err_msg=ws_constants.ERR_SET_TAG_VALUE
+                if self.baseReqBody != None and self.baseReqBody != '':
+                    result=self.parse_xml(self.baseReqBody,element_path,value,'','tagname')
+                    if result != None:
+                        self.baseReqBody=result
+                        handler.ws_template=self.baseReqBody
+                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                        status = ws_constants.TEST_RESULT_PASS
+                        methodoutput = ws_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg=ws_constants.ERR_SET_TAG_VALUE
             else:
                 err_msg=ws_constants.METHOD_INVALID_INPUT
 

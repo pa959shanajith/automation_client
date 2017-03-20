@@ -162,7 +162,42 @@ class MainNamespace(BaseNamespace):
         ##print mobileWebScrapeFlag
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
+    def on_wsdl_listOfOperation(self, *args):
+        global socketIO
+        contrlr = controller.Controller()
+        contrlr.get_all_the_imports('WebServices')
+        import wsdlgenerator
+        wsdlurl = str(args[0])
+        wsdl_object = wsdlgenerator.WebservicesWSDL()
+        response = wsdl_object.listOfOperation(wsdlurl)
+        response=str(response)
+        print response
+        socketIO.emit('result_wsdl_listOfOperation',response)
 
+    def on_wsdl_ServiceGenerator(self, *args):
+        global socketIO
+        contrlr = controller.Controller()
+        contrlr.get_all_the_imports('WebServices')
+        import wsdlgenerator
+        wsgen_inputs=eval(str(args[0]))
+        wsdlurl = wsgen_inputs['wsdlurl']
+        operations = wsgen_inputs['operations']
+        soapVersion = wsgen_inputs['soapVersion']
+        wsdl_object = wsdlgenerator.BodyGenarator(wsdlurl,operations,soapVersion)
+        responseHeader = wsdl_object.requestHeader()
+        responseBody = wsdl_object.requestBody()
+        stringHeader=''
+        if(responseHeader != None):
+            for key in responseHeader:
+                print key,'==========',responseHeader[key]
+                stringHeader = stringHeader + str(key) + ": " + str (responseHeader[key]) + "##"
+        responseHeader = stringHeader
+        print 'responseHeader after:::',responseHeader
+        print 'responseBody:::::',responseBody
+        response=responseHeader+"rEsPONseBOdY:"+responseBody
+        response=str(response)
+        print response
+        socketIO.emit('result_wsdl_ServiceGenerator',response)
 
 
 socketIO = None
@@ -195,6 +230,8 @@ class SocketThread(threading.Thread):
         socketIO.emit('executeTestSuite')
         socketIO.emit('LAUNCH_DESKTOP')
         socketIO.emit('LAUNCH_MOBILE')
+        socketIO.emit('wsdl_listOfOperation')
+        socketIO.emit('wsdl_ServiceGenerator')
         socketIO.emit('LAUNCH_MOBILE_WEB')
         socketIO.wait()
 
