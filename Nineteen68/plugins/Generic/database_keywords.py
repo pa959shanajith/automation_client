@@ -423,13 +423,10 @@ class DatabaseOperation():
         try:
            wb = xlwt.Workbook()
            ws = wb.add_sheet(generic_constants.DATABASE_SHEET)
-           working_dir = os.getcwd()
-           os.chdir('..')
-           maindir = os.getcwd()
+           maindir = os.environ["NINETEEN68_HOME"]
            path = maindir + '\Nineteen68\plugins\Generic' + generic_constants.DATABASE_FILE
 ##           path = 'D:\db5.xls'
            wb.save(path)
-           os.chdir(working_dir)
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
