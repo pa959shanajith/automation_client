@@ -51,16 +51,15 @@ class BrowserOperations():
         try:
             import subprocess
             import os
-            maindir = os.getcwd()
-            os.chdir('..')
-            curdir = os.getcwd()
-            path= curdir + '//Nineteen68//plugins//Mobility//MobileApp//node_modules//appium//build//lib//main.js'
-            nodePath = maindir+'//node.exe'
+##            maindir = os.getcwd()
+##            os.chdir('..')
+            curdir = os.environ["NINETEEN68_HOME"]
+            path= curdir + '\\Nineteen68\\plugins\\Mobility\\MobileApp\\node_modules\\appium\\build\\lib\\main.js'
+            nodePath = os.environ["NINETEEN68_HOME"] + "\\Drivers"+'\\node.exe'
             proc = subprocess.Popen([nodePath, path], shell=True,stdin=None, stdout=None, stderr=None, close_fds=True)
             import time
             time.sleep(15)
             logger.print_on_console('Server started')
-            os.chdir(maindir)
         except Exception as e:
             logger.print_on_console('Exception in starting server')
 

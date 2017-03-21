@@ -149,10 +149,12 @@ class DatabaseOperation():
                 col = data[1]
                 row = int(row)
                 col = int(col)
+                row_no = row - 1
+                col_no = col - 1
                 cursor = cnxn.cursor()
                 cursor.execute(input_val[5])
                 rows = cursor.fetchall()
-                value = rows[row][col]
+                value = rows[row_no][col_no]
                 log.info('Value obtained :')
                 log.info(value)
             except Exception as e:
@@ -297,7 +299,7 @@ class DatabaseOperation():
                     try:
                        wb = xlwt.Workbook()
                        if(inp_sheet is None or inp_sheet == ''):
-                            inp_sheet = 'Sheet1'
+                            inp_sheet = 'Sheet0'
                             ws = wb.add_sheet(inp_sheet)
                        else:
                             ws = wb.add_sheet(inp_sheet)
@@ -310,7 +312,7 @@ class DatabaseOperation():
                         logger.print_on_console(e)
                         err_msg = e
                 if(inp_sheet is None or inp_sheet == ''):
-                    inp_sheet = 'Sheet1'
+                    inp_sheet = 'Sheet0'
                 log.debug('Input Sheet is :')
                 log.debug(inp_sheet)
                 obj=excel_operations.ExcelFile()
