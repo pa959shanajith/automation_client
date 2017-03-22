@@ -150,8 +150,9 @@ class Text_Box:
                         result = desktop_constants.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
-
                         output = ldtp.gettextvalue(launch_keywords.window_name,dektop_element[0])
+                        status = desktop_constants.TEST_RESULT_PASS
+                        result = desktop_constants.TEST_RESULT_TRUE
                 else:
                     log.info('element not present on the page where operation is trying to be performed')
                     err_msg = 'element not present on the page where operation is trying to be performed'
