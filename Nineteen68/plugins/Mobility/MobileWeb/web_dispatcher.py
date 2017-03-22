@@ -210,6 +210,7 @@ class Dispatcher:
                   'selectValueByIndex':self.dropdown_list_object.selectValueByIndex,
                   'getCount':self.dropdown_list_object.getCount,
                   'selectValueByText':self.dropdown_list_object.selectValueByText,
+                  ## defect 360
                   'verifySelectedValue':self.dropdown_list_object.verifySelectedValue,
                   'verifyCount':self.dropdown_list_object.verifyCount,
                   'selectAllValues':self.dropdown_list_object.selectAllValues,
