@@ -53,7 +53,8 @@ class DropdownKeywords():
                             index = input[0]
                         if len(index.strip()) != 0:
                             input_val = int(index)
-                            input_val = input_val - 1
+                            #Issue fix ALM 131: ICE-Test Case: List and Dropdown -> "selectValueByIndex" is starting from index 1 instead of index 0
+##                            input_val = input_val - 1
                             log.info('Input value obtained')
                             log.info(input_val)
                             select = Select(webelement)
