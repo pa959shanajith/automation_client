@@ -191,7 +191,7 @@ class DropdownKeywords():
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
         return status,result,verb,err_msg
 
-    def verifySelectedValues(self,webelement,input,*args):
+    def verifySelectedValue(self,webelement,input,*args):
         """
         def : verifySelectedValue
         purpose : to verify default/current selected value in dropdown/listbox
