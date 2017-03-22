@@ -207,7 +207,7 @@ class GetParam():
                         logger.print_on_console('Data Param start row: ',startRow)
                         log.info('Data Param end row: ')
                         log.info(endRow)
-                        logger.print_on_console('Data Param start row: ',endRow)
+                        logger.print_on_console('Data Param end row: ',endRow)
                     else:
                         filter = fileinfo[1]
                         log.info('Data Param  row: ')
@@ -284,7 +284,7 @@ class GetParam():
                         logger.print_on_console('Data Param start row: ',startRow)
                         log.info('Data Param end row: ')
                         log.info(endRow)
-                        logger.print_on_console('Data Param start row: ',endRow)
+                        logger.print_on_console('Data Param end row: ',endRow)
                     else:
                         filter = fileinfo[1]
                         log.info('Data Param  row: ')
@@ -451,7 +451,8 @@ class GetParam():
                                     columnname = temp[0:temp.find(PIPE)]
                                     variable = PIPE + columnname + PIPE
                                     p = p + len(variable)
-                                    inputresult = data[columnname][row]
+                                    if row >=0:
+                                        inputresult = data[columnname][row]
                                     if isinstance(inputresult,float):
                                         if inputresult % 1 == 0.0:
                                             inputresult = int(inputresult)
@@ -554,7 +555,7 @@ class GetParam():
                             logger.print_on_console('Data Param start row: ',startRow)
                             log.info('Data Param end row: ')
                             log.info(endRow)
-                            logger.print_on_console('Data Param start row: ',endRow)
+                            logger.print_on_console('Data Param end row: ',endRow)
                         else:
                             filter1 = fileinfo[2]
                             filter = int(filter1)
@@ -576,7 +577,7 @@ class GetParam():
                             logger.print_on_console('Data Param start row: ',startRow)
                             log.info('Data Param end row: ')
                             log.info(endRow)
-                            logger.print_on_console('Data Param start row: ',endRow)
+                            logger.print_on_console('Data Param end row: ',endRow)
                         else:
                             filter1 = fileinfo[1]
                             filter = int(filter1)
@@ -591,7 +592,7 @@ class GetParam():
                     reporting_obj.name=GETPARAM
                     self.add_report_step_getparam(reporting_obj,step_description)
                     #Reporting part ends
-                    for i in range(startRow,endRow+1):
+                    for i in range(startRow-1,endRow):
                         if self.name.lower()==GETPARAM:
                             inputval = self.inputval[0]
                             paramindex = self.index+1;
@@ -628,6 +629,7 @@ class GetParam():
                     reporting_obj.name=GETPARAM
                     self.add_report_step_getparam(reporting_obj,step_description)
                     #Reporting part ends
+                    filter = filter - 2
                     if self.name.lower()==GETPARAM:
                         inputval = self.inputval[0]
                         paramindex = self.index+1;
@@ -641,7 +643,7 @@ class GetParam():
                             #Reporting part ends
                             iterations = len(data.values()[0])
                             while (paramindex < endlopnum):
-                                    input = self.retrievestaticvariable(data,paramindex,filter-1)
+                                    input = self.retrievestaticvariable(data,paramindex,filter)
                                     paramindex =con.methodinvocation(paramindex,input)
                                     if paramindex in [TERMINATE,BREAK_POINT]:
                                         return paramindex
