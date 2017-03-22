@@ -191,6 +191,7 @@ class DropdownKeywords():
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
         return status,result,verb,err_msg
 
+## defect 360
     def verifySelectedValue(self,webelement,input,*args):
         """
         def : verifySelectedValue
