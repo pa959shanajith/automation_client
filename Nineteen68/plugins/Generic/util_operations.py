@@ -30,7 +30,7 @@ class UtilOperations:
         return : bool
 
         """
-        
+
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         log.debug('reading the inputs')
@@ -115,7 +115,7 @@ class UtilOperations:
         return status,methodoutput,output,err_msg
 
     def verify_file_images(self,file1,file2):
-        
+
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -145,7 +145,7 @@ class UtilOperations:
         return status,methodoutput,output,err_msg
 
     def verify_values(self,input1,input2):
-        
+
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -173,12 +173,13 @@ class UtilOperations:
     def stop(self,*args):
         status=TEST_RESULT_PASS
         methodoutput=TEST_RESULT_TRUE
+        err_msg=None
         log.info('Stopping the Execution')
         logger.print_on_console('Stopping the Execution')
         log.debug('Stopping the Execution')
         import handler
         output=len(handler.tspList)
-        return status,methodoutput,output
+        return status,methodoutput,output,err_msg
 
 
 

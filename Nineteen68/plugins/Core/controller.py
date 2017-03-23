@@ -113,8 +113,8 @@ class Controller():
         self.reporting_obj=reporting.Reporting()
         self.conthread=None
         self.action=None
-        self.counter=-1
-        self.jumpto_previousindex=-1
+        self.counter=[]
+        self.jumpto_previousindex=[]
         self.verify_exists=False
         self.debug_mode=False
         self.debug_choice='Normal'
@@ -348,8 +348,9 @@ class Controller():
                     elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
                         index = tsp.invoke_jumpby(inpval,self.reporting_obj)
                     elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
-                        self.jumpto_previousindex=index+1
-                        index,self.counter = tsp.invoke_jumpto(inpval,self.reporting_obj,self.counter)
+                        self.jumpto_previousindex.append(index+1)
+                        index,counter = tsp.invoke_jumpto(inpval,self.reporting_obj,self.counter)
+                        self.counter.append(counter)
 
             else:
 
@@ -377,7 +378,7 @@ class Controller():
 ##            self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
             self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result[3])
 
-        if self.counter>-1 and self.counter-index==0:
+        if len(self.counter)>0 and self.counter[-1]>-1 and self.counter[-1]-index==0:
             return JUMP_TO
 
         return index
@@ -417,15 +418,14 @@ class Controller():
         if result[-2] == OUTPUT_CONSTANT:
             keyword_response=result[-3]
         display_keyword_response=keyword_response
-		#To Handle dynamic variables of DB keywords
-
 
         if len(result_temp)>4:
             tsp.additionalinfo=result_temp[-1]
         elif result_temp[2] != OUTPUT_CONSTANT:
             tsp.additionalinfo=result_temp[2]
             display_keyword_response=result_temp[2]
-
+            
+		#To Handle dynamic variables of DB keywords
         if tsp.name.lower() in DATABASE_KEYWORDS:
             if keyword_response != []:
                 display_keyword_response='DB data fetched'
@@ -623,9 +623,10 @@ class Controller():
                         status=i
                         break
                     elif i==JUMP_TO:
-                        i=self.jumpto_previousindex
-                        self.jumpto_previousindex=-1
-                        self.counter=-1
+                        i=self.jumpto_previousindex[-1]
+                        if len(self.jumpto_previousindex)>0 and len(self.counter)>0:
+                            self.jumpto_previousindex.pop()
+                            self.counter.pop()
 
                 except Exception as e:
                     log.error(e)
