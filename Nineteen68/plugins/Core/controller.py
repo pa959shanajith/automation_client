@@ -418,9 +418,6 @@ class Controller():
             keyword_response=result[-3]
         display_keyword_response=keyword_response
 		#To Handle dynamic variables of DB keywords
-        if tsp.name.lower() in DATABASE_KEYWORDS:
-            if keyword_response != []:
-                display_keyword_response='DB data fetched'
 
 
         if len(result_temp)>4:
@@ -428,6 +425,11 @@ class Controller():
         elif result_temp[2] != OUTPUT_CONSTANT:
             tsp.additionalinfo=result_temp[2]
             display_keyword_response=result_temp[2]
+
+        if tsp.name.lower() in DATABASE_KEYWORDS:
+            if keyword_response != []:
+                display_keyword_response='DB data fetched'
+
 
         logger.print_on_console('Result obtained is ',display_keyword_response)
         log.info('Result obtained is: ')
@@ -986,7 +988,7 @@ if __name__ == '__main__':
 ##            print 'Invalid script'
 
     #To execute from main method
-    obj=Controller()
+    #obj=Controller()
     json_data={
 
 	"suitedetails": [{

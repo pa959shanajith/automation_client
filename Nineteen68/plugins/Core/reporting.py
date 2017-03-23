@@ -65,6 +65,7 @@ class Reporting:
                 output=tsp.additionalinfo
             apptype=tsp.apptype
             tsp_temp=tsp
+            tsp_temp.inputval=tsp.inputval[0].split(';')
             tsp_temp.outputval=tsp_temp.outputval.split(';')[0]
             params=tsp.name,tsp_temp,input,output,con,self
             apptype_description={'generic':self.step_description_obj.generic,

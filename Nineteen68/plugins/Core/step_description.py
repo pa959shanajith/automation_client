@@ -50,8 +50,6 @@ class StepDescription:
             return ' Change ' + input+ ' to Lower case and save the value ' + output+ ' in ' + tsp.outputval
         def evaluate():
             return 'Evaluate Mathematical expression ' + input+ ' and save the result ' + output + '  in '+ tsp.outputval
-        def concatenate():
-            return ' Concatenate string '+ input + ',' + sb.toString()+ ' and save the value ' + output + ' in '+ tsp.outputval
         def toUpperCase():
             return ' Change ' + input+ ' to Upper case and save the value ' + output+ ' in ' + tsp.outputval
         def trim():
@@ -69,7 +67,7 @@ class StepDescription:
         #Dynamic variable keywords
         def deleteDynVariable():
             return 'Delete variable ' + tsp.inputval[0]
-        return locals()[keyword]()
+
 
 
         def GetBlockValue():
@@ -215,6 +213,7 @@ class StepDescription:
             return "Write '"+ tsp.inputval[1] + "' to file  '" + input + "'"
         def yearAddition():
             return "Add Years '"+ input + "' value to '"+ tsp.inputval[1] + "'"
+        return locals()[keyword]()
 
 
     def webservices(self,keyword,tsp,input,output,con,reporting_obj):
@@ -247,7 +246,7 @@ class StepDescription:
             return 'Fetch the Server certificate and save it in '+ tsp.inputval[1] + '.'
         def executeRequest():
             return 'Execute the request.'
-        locals()[key](keyword)
+        return locals()[key](keyword)
 
 
     def desktop(self,keyword,tsp,input,output,con,reporting_obj):

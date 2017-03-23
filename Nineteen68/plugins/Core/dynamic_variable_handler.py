@@ -25,7 +25,14 @@ class DynamicVariables:
         variable=re.findall("\{(.*?)\[",inp_value)
         if len(variable)>0 and variable[0] != '' and dynamic_variable_map.has_key(DB_VAR):
             dbvalue=dynamic_variable_map[DB_VAR]
-            if dbvalue!=None and dbvalue[-1]=='{'+variable[0]+'}':
+            temp_dbvalue=re.findall("\{(.*?)\[",dbvalue[-1])
+            #To Fix issue with displaying/Fetching of Databse values
+            if len(temp_dbvalue)==0:
+                temp_dbvalue.append(dbvalue[-1])
+            else:
+                temp_dbvalue[0]='{'+temp_dbvalue[0]+'}'
+            if dbvalue!=None and temp_dbvalue[0]=='{'+variable[0]+'}':
+                  #Dynamic variable is sent to DB keyword 'fetch_data' to get the cell value present in given row and col of DB
                 dbvalue[-1]=inp_value
                 dyn_value=con_obj.generic_dispatcher_obj.fetch_data(dbvalue)
                 res=True
