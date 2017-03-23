@@ -144,6 +144,10 @@ OPEN_NEW_BROWSER='openNewBrowser'
 
 CLOSE_BROWSER='closeBrowser'
 
+GET_POPUP_TEXT = 'getPopUpText'
+
+VERIFY_POPUP_TEXT = 'verifyPopUpText'
+
 
 NON_WEBELEMENT_KEYWORDS=['openBrowser','openNewBrowser','navigateToURL','getPageTitle','verifyPageTitle','getCurrentURL','verifyCurrentURL','closeBrowser',
 'switchToWindow','closeSubWindows','verifyTextExists','waitForElementVisible','refresh','maximizeBrowser','getCurrentURL','acceptPopUp','dismissPopUp',

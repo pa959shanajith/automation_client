@@ -277,14 +277,15 @@ class Dispatcher:
                         input.append(self.action)
 
                     result= dict[keyword](webelement,input)
-                    driver.switch_to.default_content()
+                    if keyword not in [GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
+                        driver.switch_to.default_content()
                     if flag and webelement==None:
                         result=list(result)
                         result[3]=WEB_ELEMENT_NOT_FOUND
                     if keyword == GET_INNER_TABLE and (output != '' and output.startswith('{') and output.endswith('}')):
                         self.webelement_map[output]=result[2]
 
-                    elif keyword not in [OPEN_BROWSER,OPEN_NEW_BROWSER,CLOSE_BROWSER]:
+                    elif keyword not in [OPEN_BROWSER,OPEN_NEW_BROWSER,CLOSE_BROWSER,GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
                         res,value=self.check_url_error_code()
                         if res:
                             result=TERMINATE

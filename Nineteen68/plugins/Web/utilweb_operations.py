@@ -162,7 +162,7 @@ class UtilWebKeywords:
         output=OUTPUT_CONSTANT
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        if webelement is None:
+        if webelement is None or webelement == '':
             logger.print_on_console(ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS'])
             log.info(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
             status=TEST_RESULT_PASS
