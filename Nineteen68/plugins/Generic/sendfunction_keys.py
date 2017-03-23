@@ -49,13 +49,14 @@ class SendFunctionKeys:
                 methodoutput=TEST_RESULT_TRUE
             else:
                 log.debug('Invalid input')
-                logger.print_on_console('Invalid input')
-                err_msg='Invalid input'
+##                logger.print_on_console('Invalid input')
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
 
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            err_msg=INPUT_ERROR
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
 
     def execute_key(self,key,count):

@@ -64,7 +64,7 @@ class Screenshot():
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
             log.debug('screenshot captured and saved in : ',filePath+'.png')
-            logger.print_on_console('screenshot captured and saved in : ',filePath+'.png')
+            logger.print_on_console('The Specified path is not found, hence screenshot captured and saved in default path')
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)

@@ -87,7 +87,7 @@ class FileOperations:
             log.debug('reading the inputs')
             inputpath=inputpath.strip()
             log.debug(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
-            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
+##            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             if not (input is None and input is '') and self.folder.validateFolderName(file_name) :
                 if not os.path.isfile(inputpath+'/'+file_name):
                     log.debug('opening the file')
@@ -124,15 +124,15 @@ class FileOperations:
             inputpath=inputpath.strip()
             info_msg=generic_constants.INPUT_IS+inputpath
             log.info(info_msg)
-            logger.print_on_console(info_msg)
+##            logger.print_on_console(info_msg)
             if inputpath!= None and inputpath!='':
                 if file_name!= None and file_name!='':
-                    logger.print_on_console(' and File name is:'+file_name)
+##                    logger.print_on_console(' and File name is:'+file_name)
                     log.info(' and File name is:'+file_name)
                     inputpath=inputpath+'\\'+file_name
                 if os.path.isfile(inputpath):
                     log.debug(generic_constants.FILE_EXISTS)
-                    logger.print_on_console(generic_constants.FILE_EXISTS)
+##                    logger.print_on_console(generic_constants.FILE_EXISTS)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
@@ -166,7 +166,7 @@ class FileOperations:
             log.debug('reading the inputs')
             inputpath=inputpath.strip()
             log.debug(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
-            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
+##            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             if not (inputpath is None and inputpath is ''):
                 rename_path=inputpath+'/'+rename_file
                 inputpath=inputpath+'/'+file_name
@@ -205,7 +205,7 @@ class FileOperations:
             output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             log.debug(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
-            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
+##            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             if not (input is None and input is ''):
                 if os.path.isfile(inputpath+'/'+file_name):
                     log.debug('removing the file')
@@ -279,12 +279,15 @@ class FileOperations:
                 status=True
             else:
                 log.debug(generic_constants.INVALID_FILE_FORMAT)
-                logger.print_on_console(generic_constants.INVALID_FILE_FORMAT)
+                err_msg=generic_constants.INVALID_FILE_FORMAT
             return file_ext,status
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
             err_msg=INPUT_ERROR
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         return '',status
 
     def compare_content(self,input_path1,input_path2,*args):
@@ -519,7 +522,7 @@ class FileOperations:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
                     res,linenumbers,err_msg= self.dict[file_ext+'_get_line_number'](*params)
-                    logger.print_on_console(linenumbers)
+##                    logger.print_on_console(linenumbers)
                     if linenumbers is not None:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -553,7 +556,7 @@ class FileOperations:
             folder_path=str(folder_path)
             file_path=str(file_path)
             log.debug('Folder path is '+folder_path+' and File is '+file_path)
-            logger.print_on_console('Folder path is '+folder_path+' and File is '+file_path)
+##            logger.print_on_console('Folder path is '+folder_path+' and File is '+file_path)
             if (not(folder_path is None or folder_path == '' or file_path is None or file_path == '') and os.path.exists(folder_path)):
                 log.debug('saving the file')
                 from sendfunction_keys import SendFunctionKeys

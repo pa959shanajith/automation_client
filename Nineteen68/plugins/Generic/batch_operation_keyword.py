@@ -22,7 +22,7 @@ log = logging.getLogger('batch_operation_keyword.py')
 class BatchOperationKeyword():
 
     def executeFile(self, filePath):
-        logger.print_on_console('Executing keyword : executeFile')
+        #logger.print_on_console('Executing keyword : executeFile')
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None

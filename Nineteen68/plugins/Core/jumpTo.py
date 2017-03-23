@@ -57,7 +57,9 @@ class  JumpTo():
                 if inputVal==tsp.testscript_name:
                     flag=True
                     log.debug('Found  target index in tsp list')
-                    logger.print_on_console('Target index ' +str(i))
+##                    logger.print_on_console('Target index ' +str(i))
+                    logger.print_on_console('Jump to Testcase:' +tsp.testscript_name)
+                    log.info('Jump to Testcase:' +tsp.testscript_name)
                     return_value=i
                     self.status=True
                     no_Of_Test_steps=self.getNoOfStepsInTestScript(i,tsp.testscript_name,handler.tspList)

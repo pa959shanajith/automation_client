@@ -88,6 +88,7 @@ class For():
             self.executed=True
             index=self.getEndfor()
             logger.print_on_console('***For: Iteration '+str(iteration_count)+' completed***\n\n')
+            log.info('***For: Iteration '+str(iteration_count)+' completed***\n\n')
             #Reporting part
             self.add_report_step(reporting_obj,'For: Iteration '+str(iteration_count)+' completed')
             #Reporting part ends
@@ -134,6 +135,7 @@ class For():
                     self.executed=True
                     iteration_count=self.count
                     logger.print_on_console('***For: Iteration '+str(self.count)+ ' started***')
+                    log.info('***For: Iteration '+str(self.count)+ ' started***')
 
                     #Reporting part
                     self.add_report_step_iteration(reporting_obj,'For: Iteration '+str(iteration_count)+' started')

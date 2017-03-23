@@ -342,8 +342,8 @@ class DatabaseOperation():
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
             else:
-                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                #log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
 ##            else:
 ##                logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
@@ -354,6 +354,8 @@ class DatabaseOperation():
         finally:
             cursor.close()
             cnxn.close()
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
         return status,result,verb,err_msg
 
     def secureExportData(self, ip , port , userName , password, dbName, query, dbtype,*args):

@@ -118,22 +118,27 @@ class NumericStringParser(object):
         self.exprStack=[]
         parseAll=True
         try:
-            log.debug('Parsing the expression')
-            logger.print_on_console('Parsing the expression')
-            results=self.bnf.parseString(num_string,parseAll)
-            log.debug('Evaluating the expression')
-            logger.print_on_console('Evaluating the expression')
-            output=self.evaluateStack( self.exprStack[:] )
-            if isinstance(output,float):
-                if output % 1 == 0.0:
-                    output = int(output)
-            log.debug('Got the result : %s', output)
-            logger.print_on_console('Got the result : ', output)
-            status=TEST_RESULT_PASS
-            methodoutput=TEST_RESULT_TRUE
+            if not (num_string is None or num_string is ''):
+                log.debug('Parsing the expression')
+                #logger.print_on_console('Parsing the expression')
+                results=self.bnf.parseString(num_string,parseAll)
+                log.debug('Evaluating the expression')
+                #logger.print_on_console('Evaluating the expression')
+                output=self.evaluateStack( self.exprStack[:] )
+                if isinstance(output,float):
+                    if output % 1 == 0.0:
+                        output = int(output)
+                log.debug('Got the result : %s', output)
+                #logger.print_on_console('Got the result : ', output)
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+            else:
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
+
             log.error(e)
-            logger.print_on_console(e)
-            err_msg=INPUT_ERROR
+            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 

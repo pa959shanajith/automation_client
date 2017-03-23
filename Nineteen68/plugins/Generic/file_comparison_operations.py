@@ -42,6 +42,8 @@ class PdfFile:
             err_msg=generic_constants.ERR_MSG1+'verifying PDF content'+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
         return status,err_msg
 
     def compare_content(self,input_path1,input_path2):
@@ -66,6 +68,8 @@ class PdfFile:
             err_msg=generic_constants.ERR_MSG1+'Comparing PDF content'+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
         return status,err_msg
 
 
@@ -103,7 +107,7 @@ class PdfFile:
                         endIndex=content.find(end)
                     content=content[startIndex:endIndex]
                     log.info('Content between Start and End string is ')
-                    logger.print_on_console('Content between Start and End string is ')
+##                    logger.print_on_console('Content between Start and End string is ')
                 elif len(args)==1:
                     with open(args[0],'w') as file:
                         file.write(content)
@@ -113,7 +117,7 @@ class PdfFile:
              else:
                 err_msg=generic_constants.INVALID_INPUT
                 log.error(err_msg)
-                logger.print_on_console(err_msg)
+##                logger.print_on_console(err_msg)
 
         except ValueError as e:
             err_msg=generic_constants.INVALID_INPUT
@@ -123,6 +127,8 @@ class PdfFile:
             err_msg=generic_constants.ERR_MSG1+'Fetching PDF content'+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
         return status,content,err_msg
 
 
@@ -145,7 +151,7 @@ class TextFile:
                 for num, line in enumerate(myFile, 1):
                     if content in line:
                         log.info('found at line:'+str(num))
-                        logger.print_on_console('found at line:',(num))
+##                        logger.print_on_console('found at line:',(num))
                         status=True
             if not(status):
                 err_msg=generic_constants.CONTENT_NOT_PRESENT
@@ -155,6 +161,8 @@ class TextFile:
             err_msg=generic_constants.ERR_MSG1+'Verifying Text content'+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
         return status,err_msg
 
 
@@ -184,6 +192,8 @@ class TextFile:
             err_msg=generic_constants.ERR_MSG1+'Comparing Text content'+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
         return status,err_msg
 
 
@@ -211,6 +221,8 @@ class TextFile:
             err_msg=generic_constants.ERR_MSG1+'Clearing Text content'+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
         return status,err_msg
 
 
@@ -238,6 +250,8 @@ class TextFile:
             err_msg=generic_constants.ERR_MSG1+'Fetching Text content'+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
         return status,content,err_msg
 
     def get_linenumber(self,input_path,content):
@@ -260,13 +274,15 @@ class TextFile:
                         line_numbers.append(num)
                         status=True
             log.info(line_numbers)
-            logger.print_on_console(line_numbers)
+##            logger.print_on_console(line_numbers)
         except IOError:
             err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
             err_msg=generic_constants.ERR_MSG1+'Fetching line number of text '+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
         return status,line_numbers,err_msg
 
 
@@ -298,6 +314,8 @@ class TextFile:
             err_msg=generic_constants.ERR_MSG1+'Replacing of text '+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
         return status,err_msg
 
 
@@ -312,7 +330,7 @@ class TextFile:
         """
         status=False
         err_msg=None
-        logger.print_on_console('Writing '+str(content)+' to text file '+str(input_path))
+##        logger.print_on_console('Writing '+str(content)+' to text file '+str(input_path))
         log.info('Writing '+str(content)+' to text file '+str(input_path))
         try:
             if len(args)>0:
@@ -328,6 +346,8 @@ class TextFile:
             err_msg=generic_constants.ERR_MSG1+'Writing to text '+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
         return status,err_msg
 
 
@@ -343,7 +363,7 @@ class XML:
         """
         status=False
         err_msg=None
-        logger.print_on_console('Writing '+str(content)+' to XML file '+str(input_path))
+##        logger.print_on_console('Writing '+str(content)+' to XML file '+str(input_path))
         log.info('Writing '+str(content)+' to XML file '+str(input_path))
         import xml.dom.minidom as minidom
         from xml.etree import ElementTree as ET
@@ -353,7 +373,7 @@ class XML:
             rough_string = ElementTree.tostring(tree)
             reparsed = minidom.parseString(rough_string)
             val=reparsed.toprettyxml(indent="\t")
-            logger.print_on_console(val)
+##            logger.print_on_console(val)
             with open(input_path, 'a') as file:
                 file.write(val)
                 file.close()
@@ -365,6 +385,8 @@ class XML:
             err_msg=generic_constants.ERR_MSG1+'Writing to XML '+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
         return status,err_msg
 
 
@@ -391,5 +413,7 @@ class XML:
             err_msg=generic_constants.ERR_MSG1+'Clearing XML '+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
         return status,err_msg
 
