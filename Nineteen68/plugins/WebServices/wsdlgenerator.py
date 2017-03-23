@@ -43,15 +43,30 @@ class WebservicesWSDL():
         try:
             self.wsdlURL = wsdlURL
             list_method = Client(wsdlURL)
-            obt_list_method = [method for method in list_method.wsdl.services[0].ports[0].methods]
-            obt_list_method1 = [method for method in list_method.wsdl.services[0].ports[1].methods]
-            log.info('List of methods obtained')
+##            print list_method
             allmethodslist=[]
-            for methodindex in range(0,len(obt_list_method)):
-               allmethodslist.append(str('SOAP1.1-'+obt_list_method[methodindex]))
-            for methodindex in range(0,len(obt_list_method1)):
-               allmethodslist.append(str('SOAP1.2-'+obt_list_method[methodindex]))
-            log.info(allmethodslist)
+            for portindex in range(0,len(list_method.wsdl.services[0].ports)):
+                portname=list_method.wsdl.services[0].ports[portindex].name
+                obt_list_method = [method for method in list_method.wsdl.services[0].ports[portindex].methods]
+                for methodindex in range(0,len(obt_list_method)):
+                    if 'Soap12' in portname:
+                        allmethodslist.append(str('SOAP1.2-'+obt_list_method[methodindex]))
+                    elif 'Soap' in portname:
+                        allmethodslist.append(str('SOAP1.1-'+obt_list_method[methodindex]))
+                    else:
+                        allmethodslist.append(str(obt_list_method[methodindex]))
+##            print list_method.wsdl.services[0].ports[0].name
+##                obt_list_method = [method for method in list_method.wsdl.services[0].ports[0].methods]
+##                obt_list_method1 = [method for method in list_method.wsdl.services[0].ports[1].methods]
+##                log.info('List of methods obtained')
+##                print obt_list_method
+##                print obt_list_method1
+##                for methodindex in range(0,len(obt_list_method)):
+##                   allmethodslist.append(str('SOAP1.1-'+obt_list_method[methodindex]))
+##                for methodindex in range(0,len(obt_list_method1)):
+##                   allmethodslist.append(str('SOAP1.2-'+obt_list_method[methodindex]))
+##                log.info(allmethodslist)
+            print allmethodslist
             return allmethodslist
         except Exception as e:
             logger.print_on_console(EXCEPTION_OCCURED,e)
@@ -192,7 +207,3 @@ class BodyGenarator():
 ##print abc
 ##xyz = re.requestBody()
 ##print xyz
-
-
-
-

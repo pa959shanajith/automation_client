@@ -411,6 +411,8 @@ class TestThread(threading.Thread):
                     self.wxObject.debugwindow.Close()
                 if len(testcasename) > 0:
                     socketIO.emit('result_debugTestCase',status)
+                else:
+                    socketIO.emit('result_debugTestCaseWS',status)
             elif self.action==EXECUTE:
                 if len(testcasename) > 0:
                     socketIO.emit('result_executeTestSuite',status)
