@@ -24,13 +24,18 @@ class Delay_keywords:
         err_msg=None
         try:
             import time
-            if not(input is None and input is ''):
-                input=int(input)
-                log.info('Wait for :' + str(input) + 'seconds')
-                logger.print_on_console('Wait for :' , str(input) , 'seconds')
-                time.sleep(input)
-                status=TEST_RESULT_PASS
-                methodoutput=TEST_RESULT_TRUE
+            if not(input is None or input is ''):
+                if  (type(input) is int):
+                    input=int(input)
+                    log.info('Wait for :' + str(input) + 'seconds')
+                    logger.print_on_console('Wait for :' , str(input) , 'seconds')
+                    time.sleep(input)
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+                else:
+                 log.error(INVALID_INPUT)
+                 err_msg=INVALID_INPUT
+                 logger.print_on_console(INVALID_INPUT)
             else:
                 log.error(INVALID_INPUT)
                 err_msg=INVALID_INPUT
@@ -64,26 +69,31 @@ class Delay_keywords:
         err_msg=None
         display_input=''
         try:
-            import time
-            input_list=list(args)
-            index=input_list.index(';')
-            values=input_list[0:index]
-            variables=input_list[index+1:len(input_list)]
-            for x, y in zip(variables, values):
-                if type(x)==unicode or type(x)==str:
-                    x=str(x)
-                if y == 'None' or y == None:
-                    y = 'null'
-                if type(y)==unicode or type(y)==str:
-                    y=str(y)
-                display_input+=x+' = '+(y if type(y)==str else repr(y))+'\n'
-            o = pause_display_operation.PauseAndDisplay()
-            o.display_value(display_input,args[-2],args[-1])
-            status=TEST_RESULT_PASS
-            methodoutput=TEST_RESULT_TRUE
+             if not (args is None or args is ''):
+                import time
+                input_list=list(args)
+                index=input_list.index(';')
+                values=input_list[0:index]
+                variables=input_list[index+1:len(input_list)]
+                for x, y in zip(variables, values):
+                    if type(x)==unicode or type(x)==str:
+                        x=str(x)
+                    if y == 'None' or y == None:
+                        y = 'null'
+                    if type(y)==unicode or type(y)==str:
+                        y=str(y)
+                    display_input+=x+' = '+(y if type(y)==str else repr(y))+'\n'
+                o = pause_display_operation.PauseAndDisplay()
+                o.display_value(display_input,args[-2],args[-1])
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+             else :
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg,display_input
 
 

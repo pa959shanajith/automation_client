@@ -161,7 +161,7 @@ class GenericKeywordDispatcher:
             result[3]=err_msg
          except Exception as e:
             log.error(e)
-            logger.print_on_console('Exception at dispatcher')
+##            logger.print_on_console('Exception at dispatcher')
          if err_msg!=None:
             log.error(err_msg)
             logger.print_on_console(err_msg)

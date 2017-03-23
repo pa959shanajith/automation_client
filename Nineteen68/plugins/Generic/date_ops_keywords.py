@@ -30,7 +30,7 @@ class DateOperation:
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
         try:
-            if not (input is None and input is ''):
+            if not (input is None or input is ''):
                 ret_format = self.validate(input)
                 if ret_format != -1:
                     cur_date = datetime.datetime.now()
@@ -39,10 +39,11 @@ class DateOperation:
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
                 else:
-                    logger.print_on_console('Format not supported')
-                    err_msg = 'Format not supported'
+                    #logger.print_on_console('Format not supported')
+                    #err_msg = 'Format not supported'
+                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             else:
-                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
@@ -63,7 +64,7 @@ class DateOperation:
         result=generic_constants.TEST_RESULT_FALSE
         err_msg = None
         try:
-            if not (input is None and input is ''):
+            if not (input is None or input is ''):
                 ret_format = self.validate(input)
                 if ret_format != -1:
                     cur_time = datetime.datetime.now()
@@ -74,10 +75,11 @@ class DateOperation:
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
                 else:
-                    logger.print_on_console('Format not supported')
-                    err_msg = 'Format not supported'
+                    #logger.print_on_console('Format not supported')
+                    #err_msg = 'Format not supported'
+                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             else:
-                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
@@ -97,7 +99,7 @@ class DateOperation:
         result=generic_constants.TEST_RESULT_FALSE
         err_msg = None
         try:
-            if not (input is None and input is ''):
+            if not (input is None or input is ''):
                 ret_format = self.validate(input)
                 if ret_format != -1:
                     cur_date_time = datetime.datetime.now()
@@ -108,10 +110,11 @@ class DateOperation:
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
                 else:
-                    logger.print_on_console('Format not supported')
-                    err_msg = 'Format not supported'
+                    #logger.print_on_console('Format not supported')
+                    #err_msg = 'Format not supported'
+                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             else:
-                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
@@ -131,9 +134,9 @@ class DateOperation:
         result=generic_constants.TEST_RESULT_FALSE
         err_msg = None
         try:
-            if not (input_date is None and input_date is ''):
-                if not (date_or_count is None and date_or_count is ''):
-                    if not (date_format is None and date_format is ''):
+            if not (input_date is None or input_date is ''):
+                if not (date_or_count is None or date_or_count is ''):
+                    if not (date_format is None or date_format is ''):
                         ret_inp_format = self.validate(date_format)
                         if ret_inp_format != -1:
                             if(len(input_date) == len(date_or_count)):
@@ -156,16 +159,17 @@ class DateOperation:
                                 status=generic_constants.TEST_RESULT_PASS
                                 result=generic_constants.TEST_RESULT_TRUE
                         else:
-                            logger.print_on_console('Format not supported')
-                            err_msg = 'Format not supported'
+                            #logger.print_on_console('Format not supported')
+                             #err_msg = 'Format not supported'
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     else:
-                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 else:
-                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                     err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             else:
-                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
@@ -185,9 +189,9 @@ class DateOperation:
         result=generic_constants.TEST_RESULT_FALSE
         err_msg = None
         try:
-            if not (input_date is None and input_date is ''):
-                if not (date_or_count is None and date_or_count is ''):
-                    if not (date_format is None and date_format is ''):
+            if not (input_date is None or input_date is ''):
+                if not (date_or_count is None or date_or_count is ''):
+                    if not (date_format is None or date_format is ''):
                         ret_inp_format = self.validate(date_format)
                         if ret_inp_format != -1:
                                 count = datetime.datetime.strptime(input_date, ret_inp_format)
@@ -200,16 +204,17 @@ class DateOperation:
                                 status=generic_constants.TEST_RESULT_PASS
                                 result=generic_constants.TEST_RESULT_TRUE
                         else:
-                            logger.print_on_console('Format not supported')
-                            err_msg = 'Format not supported'
+                            #logger.print_on_console('Format not supported')
+                    #err_msg = 'Format not supported'
+                             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     else:
-                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 else:
-                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                   # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                     err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             else:
-                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
 
         except Exception as e:
@@ -233,9 +238,9 @@ class DateOperation:
         result=generic_constants.TEST_RESULT_FALSE
         err_msg = None
         try:
-            if not (inp_date is None and inp_date is ''):
-                 if not (inp_date_format is None and inp_date_format is ''):
-                    if not (out_format is None and out_format is ''):
+            if not (inp_date is None or inp_date is ''):
+                 if not (inp_date_format is None or inp_date_format is ''):
+                    if not (out_format is None or out_format is ''):
                         ret_inp_format = self.validate(inp_date_format)
                         ret_out_format = self.validate(out_format)
                         if ret_inp_format != -1:
@@ -247,16 +252,17 @@ class DateOperation:
                                 status=generic_constants.TEST_RESULT_PASS
                                 result=generic_constants.TEST_RESULT_TRUE
                         else:
-                            logger.print_on_console('Format not supported')
-                            err_msg = 'Format not supported'
+                           #logger.print_on_console('Format not supported')
+                    #err_msg = 'Format not supported'
+                           err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     else:
-                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                  else:
-                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                     err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             else:
-                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+               # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
@@ -277,14 +283,14 @@ class DateOperation:
         err_msg = None
         verb = OUTPUT_CONSTANT
         try:
-            if not (input_from is None and input_from is ''):
+            if not (input_from is None or input_from is ''):
                 try:
                     if '==' in input_from:
                         input_to=input_from.split('==')[1]
                         input_from = input_from.split('==')[0]
                 except Exception as e:
                     log.error(e)
-                if not (input_to is None and input_to is ''):
+                if not (input_to is None or input_to is ''):
                     if  (input_format is None):
                         date1 = datetime.datetime.strptime(input_from, generic_constants.DATE_FORMAT )
                         date2 = datetime.datetime.strptime(input_to, generic_constants.DATE_FORMAT )
@@ -310,13 +316,14 @@ class DateOperation:
                                 status=generic_constants.TEST_RESULT_FAIL
                                 result=generic_constants.TEST_RESULT_FALSE
                         else:
-                            logger.print_on_console('Format not supported')
-                            err_msg = 'Format not supported'
+                            #logger.print_on_console('Format not supported')
+                    #err_msg = 'Format not supported'
+                              err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 else:
-                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                     err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             else:
-                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             err_msg=generic_constants.ERR_MSG1+' dateCompare'
@@ -359,4 +366,3 @@ class DateOperation:
 ##obj.dateDifference("03/10/2016","8893","dd/MM/yyyy")
 ##obj.dateDifference("03/10/2016","29/05/1992","dd/MM/yyyy")
 ##obj.dateAddition("29/05/1992","8893","dd/MM/yyyy")
-
