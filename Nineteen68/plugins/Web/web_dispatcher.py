@@ -277,6 +277,7 @@ class Dispatcher:
                         input.append(self.action)
 
                     result= dict[keyword](webelement,input)
+                    driver=browser_Keywords.driver_obj
                     if keyword not in [GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
                         driver.switch_to.default_content()
                     if flag and webelement==None:

@@ -445,8 +445,8 @@ class FileOperations:
                 file_ext,res=self.__get_ext(params[0])
                 if res == True:
                     log.debug('replacing the content of file')
-                    res,err_msg=self.dict[file_ext+'_replace_content'](*params)
-                    if res:
+                    res1=self.dict[file_ext+'_replace_content'](*params)
+                    if res1:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
             else:

@@ -154,8 +154,6 @@ class ExcelFile:
         except ValueError as e:
             err_msg=ERROR_CODE_DICT['ERR_NUMBER_FORMAT_EXCEPTION']
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             err_msg='Error occured in deleting row'
             log.error(e)
         if err_msg!=None:
@@ -598,8 +596,6 @@ class ExcelXLS:
             else:
                 err_msg='Excel is Read only'
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             err_msg='Error occured in deleting row of excel file'
             log.error(e)
         finally:
@@ -707,7 +703,7 @@ class ExcelXLS:
             excel_file.Close(True)
             status=True
         except Exception as e:
-            err_msg='Error occured in clearing the content of excel sheet'
+            err_msg='File/Sheet does not exist to clear'
             log.error(e)
         return status,err_msg
 
@@ -1034,10 +1030,11 @@ class ExcelXLSX:
             sheet = book.get_sheet_by_name(sheetname)
             for row in sheet.iter_rows():
                 for cell in row:
-                    if existingcontent == cell.value:
+                    if existingcontent ==  str(cell.value):
                         cell.value=replacecontent
+                        status=True
             book.save(input_path)
-            status=True
+
         except Exception as e:
            log.error(e)
            logger.print_on_console(e)
