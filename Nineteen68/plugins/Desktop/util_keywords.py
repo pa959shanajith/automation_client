@@ -41,8 +41,6 @@ class Util_Keywords():
             except Exception as e:
                 Exceptions.error(e)
                 err_msg = desktop_constants.ERROR_MSG
-            print status
-            print result
             return status,result,verb,err_msg
 
         def verifyDisabled(self,element,parent,*args):
@@ -166,7 +164,7 @@ class Util_Keywords():
                             temp_obj.set_to_foreground()
                             ldtp.wait()
                             objCoordinates=ldtp.getobjectsize(launch_keywords.window_name,object_xpath)
-                            xCoordinate = objCoordinates[0] + (50);
+                            xCoordinate = objCoordinates[0] + (20);
                             yCoordinate = objCoordinates[1] + (objCoordinates[3]/2);
                             flagEnable=ldtp.simulatemousemove(0, 0, xCoordinate, yCoordinate);
                             if flagEnable==1:

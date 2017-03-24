@@ -14,6 +14,7 @@ from launch_keywords import ldtp
 import launch_keywords
 from ldtp.client_exception import LdtpExecutionError
 from constants import *
+import logger
 
 class Radio_Checkbox_keywords():
     def select_radiobutton(self, element , parent  , *args):

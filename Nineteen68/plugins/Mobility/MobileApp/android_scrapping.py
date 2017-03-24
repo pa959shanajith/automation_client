@@ -67,7 +67,7 @@ class InstallAndLaunch():
 
 
      def installApplication(self,apk_path,platform_version,device_name,*args):
-        driver=None
+        self.driver=None
         from appium import webdriver
         try:
             self.start_server()

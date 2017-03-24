@@ -211,7 +211,7 @@ class ElementKeywords():
                     logger.print_on_console('element text obtained: ' , label)
                     log.info('element text obtained')
                     log.info(label)
-                    if(link_text == input_val):
+                    if(label == input_val):
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)
