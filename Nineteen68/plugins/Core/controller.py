@@ -935,7 +935,34 @@ class Controller():
 
 
 def kill_process():
-    import os
+    import os, shutil
+    try:
+        import tempfile
+        folder = tempfile.gettempdir()
+        profdir = ["~DF","scoped_dir","IE","chrome_","anonymous", "userprofile",
+							"seleniumSslSupport","webdriver-ie", "Low", "screenshot", "_MEI", "CVR","tmp",
+							"jar_cache","DMI","~nsu","moz-"]
+        for the_file in os.listdir(folder):
+            folderwithnum = ''
+            try:
+                folderwithnum = int(the_file[0:3])
+            except Exception as e:
+                p = 1
+            for name in profdir:
+                if the_file.startswith(name) or isinstance(folderwithnum,int):
+                    try:
+                        file_path = os.path.join(folder, the_file)
+                        if os.path.isfile(file_path):
+                            os.unlink(file_path)
+                            break
+                        elif os.path.isdir(file_path):
+                            shutil.rmtree(file_path,ignore_errors=True)
+                            break
+                    except Exception as e:
+                        m=1
+    except Exception as e:
+        log.error('Error while deleting file/folder')
+
     try:
         import win32com.client
         my_processes = ['chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe','geckodriver.exe']

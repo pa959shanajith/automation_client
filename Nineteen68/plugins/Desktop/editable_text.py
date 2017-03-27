@@ -278,7 +278,7 @@ class Text_Box:
 
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
+##            logger.print_on_console(e)
         desktop_constants.ELEMENT_FOUND=status
         return status
 

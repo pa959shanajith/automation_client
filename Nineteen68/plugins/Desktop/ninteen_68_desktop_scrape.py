@@ -36,7 +36,6 @@ class ScrapeWindow(wx.Frame):
         input_val.append(windowname)
         input_val.append(5)
         status = obj.launch_application(input_val)
-        print status
         if status!=TERMINATE:
             self.panel = wx.Panel(self)
             self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd",pos=(12,8 ), size=(175, 28))
