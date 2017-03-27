@@ -87,6 +87,7 @@ class Launch_Keywords():
                             logger.print_on_console('unable to launch the application')
                             term =TERMINATE
             else:
+                term =TERMINATE
                 logger.print_on_console('The file does not exists')
 
         except Exception as e:
