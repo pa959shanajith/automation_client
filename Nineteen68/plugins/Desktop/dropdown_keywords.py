@@ -591,15 +591,16 @@ class Dropdown_Keywords():
                                     if  index>=0:
                                         ldtp.showlist(launch_keywords.window_name, object_xpath)
                                         result=ldtp.getobjectproperty(launch_keywords.window_name,'lst#'+str(index), desktop_constants.LABEL)
-                                        ldtp.hidelist(launch_keywords.window_name, object_xpath)
                                         status=desktop_constants.TEST_RESULT_PASS
                                         method_output=desktop_constants.TEST_RESULT_TRUE
+                                        ldtp.hidelist(launch_keywords.window_name, object_xpath)
+
                                     else:
                                         logger.print_on_console('invalid input')
                                 else:
                                     logger.print_on_console('element not found')
                             except Exception as e:
-                                print e
+
                                 if isinstance(e,LdtpExecutionError):
                                     self.clickOnCombo(object_xpath)
                                 else:
