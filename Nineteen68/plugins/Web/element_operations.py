@@ -116,7 +116,7 @@ class ElementKeywords:
                     log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
                     click_obj=ButtonLinkKeyword()
                     log.debug('ButtonLinkKeyword object created to call the click method')
-                    status,methodoutput,err_msg,output=click_obj.click(webelement)
+                    status,methodoutput,output,err_msg=click_obj.click(webelement)
                     log.info(STATUS_METHODOUTPUT_UPDATE)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE

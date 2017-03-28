@@ -57,14 +57,15 @@ class Dropdown_Keywords():
                         if object_xpath!=None and editable_text.verify_parent(object_xpath,parent):
                             child=ldtp.getobjectproperty(launch_keywords.window_name, object_xpath,desktop_constants.CHILD)
                             if child!=None:
-                                list_count=-1
+                                list_count=0
                                 children_list=child.split(',')
                                 for element in children_list:
                                     if  ldtp.getobjectproperty(launch_keywords.window_name, element,desktop_constants.CLASS)!=desktop_constants.LIST_ITEM:
                                        list_count= list_count+1
                                 if item_index>0 and len(children_list)-list_count>item_index:
                                     item_index=item_index+list_count
-                                    select=ldtp.selectindex(launch_keywords.window_name,object_xpath, item_index-1)
+
+                                    select=ldtp.selectindex(launch_keywords.window_name,object_xpath, item_index)
                                     if select==1:
                                         status=desktop_constants.TEST_RESULT_PASS
                                         result=desktop_constants.TEST_RESULT_TRUE
@@ -76,8 +77,8 @@ class Dropdown_Keywords():
                             logger.print_on_console('element not found')
                             err_msg = 'element not found'
                     except Exception as e:
-                        Exceptions.error(e)
-                        err_msg = desktop_constants.ERROR_MSG
+                         logger.print_on_console(e)
+                         err_msg = desktop_constants.ERROR_MSG
                 else:
                      logger.print_on_console('not a list')
 
@@ -113,27 +114,43 @@ class Dropdown_Keywords():
                                     logger.print_on_console('element not found')
                                     err_msg = 'element not found'
                             except Exception as e:
+
                                 if isinstance(e,LdtpExecutionError):
                                     self.clickOnCombo(object_xpath)
                                 else:
                                     logger.print_on_console('Error occured')
-                elif ldtp.getobjectproperty(launch_keywords.window_name, object_xpath,desktop_constants.CLASS)==desktop_constants.LIST_BOX:
-                    try:
-                        if object_xpath!=None and editable_text.verify_parent(object_xpath,parent):
-                            states=ldtp.getallstates(launch_keywords.window_name,object_xpath)
-                            if desktop_constants.ENABLED_CHECK in states:
-                                select=ldtp.selectitem(launch_keywords.window_name,object_xpath, item_text)
-                                if select==1:
-                                    status=desktop_constants.TEST_RESULT_PASS
-                                    result=desktop_constants.TEST_RESULT_TRUE
 
-                                else:
-                                    logger.print_on_console('unable to select list item')
-                                    err_msg = 'unable to select list item'
-                        else:
-                            logger.print_on_console('element not found')
-                    except Exception as e:
-                        Exceptions.error(e)
+                    elif ldtp.getobjectproperty(launch_keywords.window_name, object_xpath,desktop_constants.CLASS)==desktop_constants.LIST_BOX:
+
+                        try:
+                            if object_xpath!=None and editable_text.verify_parent(object_xpath,parent):
+                                states=ldtp.getallstates(launch_keywords.window_name,object_xpath)
+                                if desktop_constants.ENABLED_CHECK in states:
+
+                                    child=ldtp.getobjectproperty(launch_keywords.window_name,object_xpath, desktop_constants.CHILD)
+                                    indexes=[]
+                                    index=0
+                                    if child!=None:
+                                        children_list=child.split(',')
+                                        for element in children_list:
+                                            if  ldtp.getobjectproperty(launch_keywords.window_name, element,desktop_constants.LABEL) == item_text:
+                                                if not  desktop_constants.SELECTED_CHECK in  ldtp.getallstates(launch_keywords.window_name, element):
+                                                    select=ldtp.selectindex(launch_keywords.window_name,object_xpath, index)
+                                                    break
+                                            else:
+                                                index=index+1
+
+                                    if select==1:
+                                        status=desktop_constants.TEST_RESULT_PASS
+                                        result=desktop_constants.TEST_RESULT_TRUE
+
+                                    else:
+                                        logger.print_on_console('unable to select list item')
+                                        err_msg = 'unable to select list item'
+                            else:
+                                logger.print_on_console('element not found')
+                        except Exception as e:
+                            logger.print_on_console('Error occured')
             except Exception as e:
                  logger.print_on_console('Error occured')
             return status,result,verb,err_msg
@@ -594,7 +611,6 @@ class Dropdown_Keywords():
                                         status=desktop_constants.TEST_RESULT_PASS
                                         method_output=desktop_constants.TEST_RESULT_TRUE
                                         ldtp.hidelist(launch_keywords.window_name, object_xpath)
-
                                     else:
                                         logger.print_on_console('invalid input')
                                 else:

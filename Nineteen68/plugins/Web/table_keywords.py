@@ -83,7 +83,7 @@ class TableOperationKeywords():
                         if(coloumn_count>=0):
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
-                            log.info('Column count is : ',coloumn_count)
+##                            log.info('Column count is : ',coloumn_count)
                             logger.print_on_console('Column count is : ',coloumn_count)
                 except Exception as e:
                     log.error(e)
@@ -287,7 +287,7 @@ class TableOperationKeywords():
                                                 status=webconstants.TEST_RESULT_PASS
                                                 log.info('click action performed successfully')
                                                 logger.print_on_console('click action performed successfully')
-                                            except Exceptions as e:
+                                            except Exception as e:
                                                 log.debug('error occured so trying action events')
                                                 action=action_chains.ActionChains(browser_Keywords.driver_obj)
                                                 action.move_to_element(cell).click(cell).perform()
@@ -319,7 +319,7 @@ class TableOperationKeywords():
                             log.info('click on an element inside a cell')
                             logger.print_on_console('click on an element inside a cell')
                             tag=input_arr[2]
-                            index=input_arr[3]
+                            index=int(input_arr[3])
                             eleStatus=False
                             counter = 1
                             log.debug('fiding the cell with given inputs')
@@ -334,6 +334,7 @@ class TableOperationKeywords():
                                   xpath_elements=xpath.split('/')
                                   lastElement=xpath_elements[len(xpath_elements)-1]
                                   childindex=lastElement[lastElement.find("[")+1:lastElement.find("]")]
+                                  childindex = int(childindex)
                                   if tag=='button':
                                        log.debug('clicking on button')
                                        if( (tagName==('input') and tagType==('button')) or tagType==('submit') or tagType==('reset') or tagType==('file')):
@@ -344,7 +345,7 @@ class TableOperationKeywords():
                                                index =childindex
                                                eleStatus =True
                                             else:
-                                                counter+=counter
+                                                counter+=1
                                   elif tag=='image':
                                       log.debug('clicking on image')
                                       if(tagName==('input') and (tagType==('img') or tagType==('image'))):
@@ -355,7 +356,17 @@ class TableOperationKeywords():
                                                index =childindex
                                                eleStatus =True
                                             else:
-                                                counter+=counter
+                                                counter+=1
+                                      elif tagName =='img':
+                                         log.debug('clicking on img')
+                                         if index==childindex:
+                                                eleStatus =True
+                                         else:
+                                                if counter==index:
+                                                   index =childindex
+                                                   eleStatus =True
+                                                else:
+                                                    counter+=1
                                   elif tag=='img':
                                      log.debug('clicking on img')
                                      if index==childindex:
@@ -365,7 +376,7 @@ class TableOperationKeywords():
                                                index =childindex
                                                eleStatus =True
                                             else:
-                                                counter+=counter
+                                                counter+=1
                                   elif tag=='checkbox':
                                      log.debug('clicking on check box')
                                      if(tagName==('input') and (tagType==('checkbox')) ):
@@ -376,7 +387,7 @@ class TableOperationKeywords():
                                                index =childindex
                                                eleStatus =True
                                             else:
-                                                counter+=counter
+                                                counter+=1
                                   elif tag=='radiobutton':
                                      log.debug('clicking on radio button')
                                      if (tagName==('input') and tagType==('radio')):
@@ -387,7 +398,7 @@ class TableOperationKeywords():
                                                index =childindex
                                                eleStatus =True
                                             else:
-                                                counter+=counter
+                                                counter+=1
                                   elif tag=='textbox':
                                      log.debug('clicking on radio text box')
                                      if (tagName==('input') and (tagType==('text') or tagType==('email') or tagType==('password') or tagType==('range') or tagType==('search') or tagType==('url')) ):
@@ -398,7 +409,7 @@ class TableOperationKeywords():
                                                index =childindex
                                                eleStatus =True
                                             else:
-                                                counter+=counter
+                                                counter+=1
                                   elif tag=='link':
                                     log.debug('clicking on link')
                                     if(tagName==('a')):
@@ -409,7 +420,7 @@ class TableOperationKeywords():
                                                index =childindex
                                                eleStatus =True
                                             else:
-                                                counter+=counter
+                                                counter+=1
                                   else:
                                         eleStatus=True
 
@@ -427,7 +438,7 @@ class TableOperationKeywords():
                                                     status=webconstants.TEST_RESULT_PASS
                                                     methodoutput=TEST_RESULT_TRUE
                                                     break;
-                                                except Exceptions as e:
+                                                except Exception as e:
                                                     log.debug('performing click')
                                                     action=action_chains.ActionChains(browser_Keywords.driver_obj)
                                                     action.move_to_element(cellChild).click(cellChild).perform()
@@ -457,10 +468,10 @@ class TableOperationKeywords():
                                              err_msg=E
 
                     except Exception as e:
-                       log.error(e)
+                        log.error(e)
 
-                       logger.print_on_console(e)
-                       err_msg=E
+                        logger.print_on_console(e)
+                        err_msg=E
                 else:
                     log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                     err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
@@ -541,9 +552,9 @@ class TableOperationKeywords():
                 js='var mytarget = arguments[0]; var mynodes = mytarget.childNodes; var result = []; if (typeof  String.prototype.trim  !== "function")  {       String.prototype.trim  =   function()  {             return  this.replace(/^\\s+|\\s+$/g,"");        } } recursfunc(mynodes); return result.toString();  function recursfunc(mynodes) {     for (var i = 0; i < mynodes.length; i++) {         if (mynodes[i].nodeName.toUpperCase() == \"#TEXT\") {             if ((mynodes[i].parentNode.nodeName.toUpperCase() != \"OPTION\") & (mynodes[i].parentNode.nodeName.toUpperCase() != \"SCRIPT\")) {                 var myvalue = mynodes[i].nodeValue;                 if (myvalue.trim().length > 0) {                     result.push(myvalue);                 }             }         } else if (mynodes[i].nodeName.toUpperCase() == \"INPUT\") {             if (mynodes[i].type.toUpperCase() == \"RADIO\") {                 if (mynodes[i].checked == true) {                     var myvalue = \"Selected\";                 } else {                     var myvalue = \"Unselected\";                 }             } else if (mynodes[i].type.toUpperCase() == \"CHECKBOX\") {                 if (mynodes[i].checked == true) {                     var myvalue = \"Checked\";                 } else {                     var myvalue = \"Unchecked\";                 }             } else if ((mynodes[i].type.toUpperCase() == \"BUTTON\") | (mynodes[i].type.toUpperCase() == \"SUBMIT\") | (mynodes[i].type.toUpperCase() == \"TEXT\")) {                 var myvalue = mynodes[i].value;             } else if (mynodes[i].type.toUpperCase() == \"IMAGE\") {                 var myvalue = mynodes[i].title;                 if (myvalue.trim().length < 1) {                     myvalue = mynodes[i].value;                     if (myvalue != undefined) {                         if (myvalue.trim().length < 1) {                             myvalue = \"Image\";                         }                     } else {                         myvalue = \"Image\";                     }                 }             }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \"IMG\") {             var myvalue = mynodes[i].title;             if (myvalue.trim().length < 1) {                 myvalue = mynodes[i].value;                 if (myvalue != undefined) {                     if (myvalue.trim().length < 1) {                         myvalue = \"Image\";                     }                 } else {                     myvalue = \"Image\";                 }             }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \"TEXTAREA\") {             var myvalue = mynodes[i].value;             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \"SELECT\") {             var myselect = mynodes[i].selectedOptions;             if (myselect != undefined | myselect != null) {                 for (var j = 0; j < myselect.length; j++) {                     var myvalue = mynodes[i].selectedOptions[j].textContent;                     result.push(myvalue);                 }             } else {                 var myvalue = dropdowncallie(mynodes[i]);                 result.push(myvalue);             }         } else if ((mynodes[i].nodeName.toUpperCase() == \"I\")) {             var myvalue = mynodes[i].textContent;             result.push(myvalue);         }         if (mynodes[i].hasChildNodes()) {             recursfunc(mynodes[i].childNodes);         }     } }  function dropdowncallie(op) {     var x = op.options[op.selectedIndex].text;     return x; };'
                 contents = browser_Keywords.driver_obj.execute_script(js,webElement)
             except Exception as e:
-                Exceptions.error(e)
-            print contents
-            print type(contents)
+                log.error(e)
+##            print contents
+##            print type(contents)
             return contents
 
         def getRowCountJs(self,webElement):
@@ -557,7 +568,7 @@ class TableOperationKeywords():
                 js='var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };'
                 remoteWebElement=browser_Keywords.driver_obj.execute_script(js,webElement,row_num,col_num)
             except Exception as e:
-                Exceptions.error(e)
+                log.error(e)
             return remoteWebElement
 
         def getColoumnCountJs(self,webElement):
@@ -571,7 +582,7 @@ class TableOperationKeywords():
                 js = 'var temp = tooltip(arguments[0], arguments[1], arguments[2]); return temp;  function tooltip(table, row, col) {     var no_of_rows = table.rows.length;     var no_of_col = table.rows[row - 1].cells.length;     var ele = table.rows[row - 1];     var i, j, k, tp;     for (i = 0; i < no_of_rows; i++) {         for (j = 0; j < no_of_col; j++) {             if (i == row - 1 && j == col - 1) {                 if (ele.cells[col - 1].hasAttribute(\"title\")) {                     tp = ele.cells[col - 1].title;                 } else if (ele.cells[col - 1].children.length > 0) {                     for (k = 0; k < ele.cells[col - 1].children.length; k++) {                         finalele = recurseDomChildren(ele.cells[col - 1].children[k]);                         if (finalele != undefined && finalele != \"\") {                             if (finalele.hasAttribute(\"title\") && finalele != undefined) {                                 tp = finalele.title;                                 break;                             }                         }                     }                 } else {                     if (ele.hasAttribute(\"title\") && ele != undefined) {                         tp = ele.title;                     }                 }             }         }     }     return tp; };  function recurseDomChildren(start) {     var nodes, ele1;     if (start.hasAttribute(\"title\") && start != undefined) {         ele1 = start;         return ele1;     } else if (start.childNodes.length > 0) {         nodes = start.childNodes;         ele1 = loopNodeChildren(nodes);         if (ele1 != \"\") {             return ele1;         }     } }  function loopNodeChildren(nodes) {     var node, ele2;     for (var i = 0; i < nodes.length; i++) {         node = nodes[i];         if (node.childNodes.length > 0) {             ele2 = recurseDomChildren(node);             if (ele2 != \"\"  && ele2 != undefined) {               if(ele2.hasAttribute(\"title\")){                 break;               }             }         } else if (node.nodeType === 1) {             if (node.hasAttribute(\"title\") && node != undefined) {                 ele2 = node;                 break;             }         } else {             ele2 = \"\";         }     }     return ele2; };'
                 contents = browser_Keywords.driver_obj.execute_script(js,webElement,row_num,col_num)
             except Exception as e:
-                Exceptions.error(e)
+                log.error(e)
             return contents
 
         def getElemntXpath(self,webElement):
@@ -580,7 +591,7 @@ class TableOperationKeywords():
                 js = 'function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();'
                 xpath = browser_Keywords.driver_obj.execute_script(js,webElement)
             except Exception as e:
-                Exceptions.error(e)
+                log.error(e)
             return xpath
 
 

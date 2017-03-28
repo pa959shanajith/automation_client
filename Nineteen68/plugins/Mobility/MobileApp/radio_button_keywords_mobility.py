@@ -55,7 +55,7 @@ class Radio_Button_Keywords():
         except Exception as e:
             log.error(e)
             logger.print_on_console(err_msg)
-        return status,methodoutput,output,result
+        return status,methodoutput,output,err_msg
 
     def get_status(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
