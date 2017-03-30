@@ -25,8 +25,8 @@ class Delay_keywords:
         try:
             import time
             if not(input is None or input is ''):
+                input=int(input)
                 if  (type(input) is int):
-                    input=int(input)
                     log.info('Wait for :' + str(input) + 'seconds')
                     logger.print_on_console('Wait for :' , str(input) , 'seconds')
                     time.sleep(input)

@@ -364,9 +364,7 @@ class TestThread(threading.Thread):
                             runfrom_step=self.wxObject.breakpoint.GetValue()
                             runfrom_step=int(runfrom_step)
                         except Exception as e:
-                            runfrom_step=1
-                            log.error('Invalid step number, Hence default step num is taken as 1')
-                            logger.print_on_console('Invalid step number, Hence default step num is taken as 1')
+                            runfrom_step=0
                 self.wxObject.rbox.Disable()
             else:
                 self.wxObject.rbox.Disable()
@@ -664,10 +662,14 @@ class ClientWindow(wx.Frame):
     def onRadioBox(self,e):
         self.choice=self.rbox.GetStringSelection()
         print self.choice,' is Selected'
+
         if self.choice == 'Normal':
+            self.breakpoint.Clear()
+            self.breakpoint.Disable()
             if self.debugwindow != None:
                 self.debugwindow.Close()
                 self.debugwindow = None
+
 
         self.debug_mode=False
         self.breakpoint.Disable()
@@ -679,6 +681,10 @@ class ClientWindow(wx.Frame):
 ##            self.continuebutton.Show()
             if self.choice=='RunfromStep':
                 self.breakpoint.Enable()
+            else:
+                self.breakpoint.Clear()
+                self.breakpoint.Disable()
+
 ##            if self.mythread==None:
 ##                self.continue_debugbutton.Disable()
 ##                self.continuebutton.Disable()
