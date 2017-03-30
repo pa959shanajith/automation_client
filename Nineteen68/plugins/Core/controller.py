@@ -424,7 +424,7 @@ class Controller():
         elif result_temp[2] != OUTPUT_CONSTANT:
             tsp.additionalinfo=result_temp[2]
             display_keyword_response=result_temp[2]
-            
+
 		#To Handle dynamic variables of DB keywords
         if tsp.name.lower() in DATABASE_KEYWORDS:
             if keyword_response != []:
@@ -731,9 +731,12 @@ class Controller():
                         tsplist[k].inputval = browser_type
 
         if flag:
-            self.conthread=mythread
-            status = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread)
-
+            if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
+                self.conthread=mythread
+                status = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread)
+            else:
+                logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
+                log.info('Invalid step number!! Please provide run from step number')
         else:
             print 'Invalid script'
         print( '=======================================================================================================')
