@@ -327,7 +327,7 @@ class Controller():
                     self.__print_details(tsp,input,inpval)
 
                 #Calculating Start time
-                logger.print_on_console('Step number is : ',tsp.stepnum)
+##                logger.print_on_console('Step number is : ',tsp.stepnum)
                 log.info('Step number is : '+str(tsp.stepnum))
 
                 if tsp != None and isinstance(tsp,TestStepProperty) :
