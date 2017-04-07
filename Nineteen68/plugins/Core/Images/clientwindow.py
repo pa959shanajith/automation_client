@@ -21,7 +21,6 @@ desktopScrapeFlag=False
 mobileScrapeFlag=False
 mobileWebScrapeFlag=False
 debugFlag = False
-oebsScrapeFlag = False
 
 parser = argparse.ArgumentParser(description="Nineteen68 Platform")
 parser.add_argument('--NINETEEN68_HOME', type=str, help='A Required path to Nineteen68 root location')
@@ -90,18 +89,20 @@ class MainNamespace(BaseNamespace):
             light =highlight.Highlight()
             res = light.highlight(args[0],None,None)
             print 'Highlight result: ',res
-        if appType==APPTYPE_DESKTOP_JAVA.lower():
-            con =controller.Controller()
-            con.get_all_the_imports('Oebs')
-            import utils
-            light =utils.Utils()
-            res = light.highlight(args[0].split(',')[0],args[0].split(',')[1])
-            print 'Highlight result: ',res
         elif appType==APPTYPE_DESKTOP.lower():
             con =controller.Controller()
             con.get_all_the_imports('Desktop')
             import desktop_highlight
             highlightObj=desktop_highlight.highLight()
+            highlightObj.highLiht_element(args[0].split(',')[0],args[0].split(',')[1])
+            print 'highlight called'
+
+        elif appType==APPTYPE_SAP.lower():
+            con =controller.Controller()
+            con.get_all_the_imports('SAP')
+            import sap_highlight
+            highlightObj=sap_highlight.highLight()
+            print 'calling highlight'
             highlightObj.highLiht_element(args[0].split(',')[0],args[0].split(',')[1])
             print 'highlight called'
 
@@ -170,23 +171,27 @@ class MainNamespace(BaseNamespace):
         ##print mobileWebScrapeFlag
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
-    def on_LAUNCH_OEBS(self, *args):
-        global oebsScrapeObj,oebsScrapeFlag
-        print("Entering inside OEBS")
-        con = controller.Controller()
-        global browsername
-        browsername = args[0]
-        print("Entering inside OEBS : ",browsername)
-        con =controller.Controller()
+    def on_LAUNCH_SAP(self, *args):
 
-        con.get_all_the_imports('Oebs')
-        import scrape_dispatcher
+        try:
 
-        oebsScrapeObj=scrape_dispatcher
+            con = controller.Controller()
+            global browsername
+            browsername = args[0]
+            con =controller.Controller()
+            con.get_all_the_imports('SAP')
+            import ninteen_68_sap_scrape
+            global sapScrapeObj
+            sapScrapeObj=ninteen_68_sap_scrape
+            global sapScrapeFlag
+            sapScrapeFlag=True
+            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
-        oebsScrapeFlag=True
-        ##print mobileWebScrapeFlag
-        wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            print e
+
 
     def on_wsdl_listOfOperation(self, *args):
         global socketIO
@@ -259,7 +264,7 @@ class SocketThread(threading.Thread):
         socketIO.emit('wsdl_listOfOperation')
         socketIO.emit('wsdl_ServiceGenerator')
         socketIO.emit('LAUNCH_MOBILE_WEB')
-        socketIO.emit('LAUNCH_OEBS')
+        socketIO.emit('LAUNCH_SAP')
         socketIO.wait()
 
 
@@ -871,7 +876,6 @@ class ClientWindow(wx.Frame):
         global debugFlag
         global socketIO
         global browsername
-        global oebsScrapeFlag
         if mobileScrapeFlag==True:
 ##            global socketIO
             self.new = mobileScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
@@ -884,10 +888,12 @@ class ClientWindow(wx.Frame):
 ##            global socketIO
             self.new = desktopScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO)
             desktopScrapeFlag=False
-        elif oebsScrapeFlag==True:
+
+        elif sapScrapeFlag==True:
 ##            global socketIO
-            self.new = oebsScrapeObj.ScrapeDispatcher(parent = None,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO)
-            oebsScrapeFlag=False
+            self.new = sapScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO)
+            sapScrapeFlag=False
+
         elif debugFlag == True:
             self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
             debugFlag = False

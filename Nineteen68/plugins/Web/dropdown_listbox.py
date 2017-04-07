@@ -10,7 +10,8 @@
 #-------------------------------------------------------------------------------
 
 from selenium.webdriver.support.ui import Select
-##import browser_Keywords
+from selenium import webdriver
+import browser_Keywords
 import webconstants
 from utilweb_operations import UtilWebKeywords
 import logger
@@ -64,7 +65,10 @@ class DropdownKeywords():
                             if(input_val < iListSize):
                                 for i in range(0,iListSize):
                                     if(input_val == i):
-                                        select.select_by_index(input_val)
+                                        if (isinstance(browser_Keywords.driver_obj,webdriver.Firefox)):
+                                            iList[i].click()
+                                        else:
+                                            select.select_by_index(input_val)
                                         status=webconstants.TEST_RESULT_PASS
                                         result=webconstants.TEST_RESULT_TRUE
                                         log.info(STATUS_METHODOUTPUT_UPDATE)

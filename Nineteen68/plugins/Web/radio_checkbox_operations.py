@@ -204,7 +204,7 @@ class RadioCheckboxKeywords():
             row_number=int(row_number)
             col_number=int(col_number)
             tag=input[2]
-            index=input[3]
+            index=int(input[3])
             eleStatus=False
             counter = 1
             actualElement=None
@@ -220,6 +220,7 @@ class RadioCheckboxKeywords():
                   xpath_elements=xpath.split('/')
                   lastElement=xpath_elements[len(xpath_elements)-1]
                   childindex=lastElement[lastElement.find("[")+1:lastElement.find("]")]
+                  childindex = int(childindex)
                   if tag.lower()=='dropdown' or tag.lower()=='listbox' and tagName=='select':
                     multiSelect=cellChild.get_attribute('multiple')
                     if multiSelect!=None and multiSelect=='true' or multiSelect=='multiple':
@@ -230,7 +231,7 @@ class RadioCheckboxKeywords():
                                index =childindex
                                eleStatus =True
                             else:
-                                counter+=counter
+                                counter+=1
                     else:
                         if tag=='dropdown':
                             if index==childindex:
@@ -240,7 +241,7 @@ class RadioCheckboxKeywords():
                                     index =childindex
                                     eleStatus =True
                                 else:
-                                    counter+=counter
+                                    counter+=1
 
                   elif tag.lower()=='checkbox' or tag.lower()=='radio':
                     if tagName=='input' and tagType=='radio':
@@ -251,7 +252,7 @@ class RadioCheckboxKeywords():
                                     index =childindex
                                     eleStatus =True
                                 else:
-                                    counter+=counter
+                                    counter+=1
                     elif tagName=='input' and tagType=='checkbox':
                             if index==childindex:
                                     eleStatus =True
@@ -260,7 +261,7 @@ class RadioCheckboxKeywords():
                                         index =childindex
                                         eleStatus =True
                                     else:
-                                        counter+=counter
+                                        counter+=1
                   else:
                             eleStatus=True
 
