@@ -21,6 +21,7 @@ desktopScrapeFlag=False
 mobileScrapeFlag=False
 mobileWebScrapeFlag=False
 debugFlag = False
+oebsScrapeFlag = False
 
 parser = argparse.ArgumentParser(description="Nineteen68 Platform")
 parser.add_argument('--NINETEEN68_HOME', type=str, help='A Required path to Nineteen68 root location')
@@ -88,6 +89,13 @@ class MainNamespace(BaseNamespace):
             import highlight
             light =highlight.Highlight()
             res = light.highlight(args[0],None,None)
+            print 'Highlight result: ',res
+        if appType==APPTYPE_DESKTOP_JAVA.lower():
+            con =controller.Controller()
+            con.get_all_the_imports('Oebs')
+            import utils
+            light =utils.Utils()
+            res = light.highlight(args[0].split(',')[0],args[0].split(',')[1])
             print 'Highlight result: ',res
         elif appType==APPTYPE_DESKTOP.lower():
             con =controller.Controller()
@@ -162,6 +170,24 @@ class MainNamespace(BaseNamespace):
         ##print mobileWebScrapeFlag
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
+    def on_LAUNCH_OEBS(self, *args):
+        global oebsScrapeObj,oebsScrapeFlag
+        print("Entering inside OEBS")
+        con = controller.Controller()
+        global browsername
+        browsername = args[0]
+        print("Entering inside OEBS : ",browsername)
+        con =controller.Controller()
+
+        con.get_all_the_imports('Oebs')
+        import scrape_dispatcher
+
+        oebsScrapeObj=scrape_dispatcher
+
+        oebsScrapeFlag=True
+        ##print mobileWebScrapeFlag
+        wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+
     def on_wsdl_listOfOperation(self, *args):
         global socketIO
         contrlr = controller.Controller()
@@ -233,6 +259,7 @@ class SocketThread(threading.Thread):
         socketIO.emit('wsdl_listOfOperation')
         socketIO.emit('wsdl_ServiceGenerator')
         socketIO.emit('LAUNCH_MOBILE_WEB')
+        socketIO.emit('LAUNCH_OEBS')
         socketIO.wait()
 
 
@@ -844,6 +871,7 @@ class ClientWindow(wx.Frame):
         global debugFlag
         global socketIO
         global browsername
+        global oebsScrapeFlag
         if mobileScrapeFlag==True:
 ##            global socketIO
             self.new = mobileScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
@@ -856,6 +884,10 @@ class ClientWindow(wx.Frame):
 ##            global socketIO
             self.new = desktopScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO)
             desktopScrapeFlag=False
+        elif oebsScrapeFlag==True:
+##            global socketIO
+            self.new = oebsScrapeObj.ScrapeDispatcher(parent = None,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO)
+            oebsScrapeFlag=False
         elif debugFlag == True:
             self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
             debugFlag = False

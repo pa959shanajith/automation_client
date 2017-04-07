@@ -71,7 +71,7 @@ class OebsKeywords:
     def getobjectsize(self,windowname,path):
         self.utils_obj.windowsrun()
         log.debug('MSG:\nWindows Run Executed.',DEF_GETENTIREOBJECTLIST)
-        isjavares, hwnd = self.utils_obj.javawindow(windowname)
+        isjavares, hwnd = self.utils_obj.isjavawindow(windowname)
         log.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',str(isjavares))
         if (isjavares):
 ##            log.debug('MSG:\nThe Scraped Data is:\n %s',DEF_GETENTIREOBJECTLIST)

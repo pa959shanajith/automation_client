@@ -71,12 +71,12 @@ class Utils:
         win32gui.ShowWindow(aut_handle,value)
         win32gui.SetForegroundWindow(aut_handle)
 
-    def higlight(self,objectname):
+    def highlight(self,objectname,windowname):
         status=True
         try:
-            self.set_to_foreground(self.windowname)
+            self.set_to_foreground(windowname)
             obj=oebsServer.OebsKeywords()
-            size=obj.getobjectsize(self.windowname,objectname)
+            size=obj.getobjectsize(windowname,objectname)
             logger.print_on_console( 'object size '+str(size))
             rgn1=win32gui.CreateRectRgnIndirect((size[0] + 1, size[1] + 1,
     							size[0] + size[2] - 1, size[1] + size[3] - 1))
@@ -92,7 +92,8 @@ class Utils:
             win32gui.DeleteDC(hdc)
         except Exception as e:
             status=False
-            Exceptions.error(e)
+            log.error(e)
+            logger.print_on_console(e)
         return status
 
     def find_oebswindow_and_attach(self,windowname,*args):
