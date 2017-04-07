@@ -75,6 +75,7 @@ class InstallAndLaunch():
             desired_caps['platformName'] = 'Android'
 ##            desired_caps['platformVersion'] = platform_version
             desired_caps['deviceName'] = device_name
+            desired_caps['udid'] = device_name
             desired_caps['noReset'] = True
             desired_caps['newCommandTimeout'] = 0
             ##desired_caps['app'] = 'D:\\mobility\\selendroid-test-app-0.17.0.apk'
