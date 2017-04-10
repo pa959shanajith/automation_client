@@ -58,6 +58,7 @@ class SAPDispatcher:
                   'enterkey':self.launch_keywords_obj.enter_keyword,
                   'getpagetitle':self.launch_keywords_obj.getPageTitle,
                   'settext' : self.editable_text_obj.setText,
+                  'setsecuretext':self.editable_text_obj.setSecureText,
                   'gettext':self.editable_text_obj.getText,
                   'cleartext':self.editable_text_obj.clearText,
                   'verifytext':self.editable_text_obj.verifyText,
