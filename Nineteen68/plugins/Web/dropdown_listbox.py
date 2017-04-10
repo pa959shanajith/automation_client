@@ -279,6 +279,7 @@ class DropdownKeywords():
                             else:
                                 flag = False
                                 break
+
                         if(len(temp) ==  0 and flag == True):
                             status=webconstants.TEST_RESULT_PASS
                             result=webconstants.TEST_RESULT_TRUE
@@ -293,6 +294,7 @@ class DropdownKeywords():
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 except Exception as e:
                     log.error(e)
+
                     logger.print_on_console(e)
             else:
                 logger.print_on_console('Element is not displayed')

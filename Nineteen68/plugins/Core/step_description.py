@@ -351,10 +351,10 @@ class StepDescription:
             return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']',
         def getMultipleValuesByIndexes():
             return 'Get values with indexes ' + inputValsb.toString() + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + TestAutomationController.multipleOutputResult + ' in  '+ tsp.outputval
-        def verifySelectedValues():
-            return 'Verify values ' + input + ' are selected in the '+ "'" + tsp.custname + "'"
         def verifySelectedValue():
             return 'Verify value ' + input + ' are selected in the '+ "'" + tsp.custname + "'"
+        def verifySelectedValues():
+            return 'Verify values ' + input + ' are selected in the '+ "'" + tsp.custname + "'"
         def getAllValues():
             return 'getAllValues ' + output + ' are present in the' + "'" + tsp.custname + "'"
         def verifyAllValues():
