@@ -94,6 +94,7 @@ class Controller():
     webservice_dispatcher_obj = None
     outlook_dispatcher_obj = None
     desktop_dispatcher_obj = None
+    sap_dispatcher_obj = None
     mobile_app_dispatcher_obj = None
 
 
@@ -190,6 +191,23 @@ class Controller():
             self.desktop_dispatcher_obj.exception_flag=exception_flag
         except Exception as e:
             logger.print_on_console('Error loading Desktop plugin')
+            #--------------------------------------------------------------------------------SAP change
+    def __load_sap(self):
+        try:
+
+            self.get_all_the_imports('SAP')
+            #logger.print_on_console('all imports',get_all_the_imports('SAP'))
+            import sap_dispatcher
+            #logger.print_on_console('sap_dispatcher.SAPDispatcher()',sap_dispatcher.SAPDispatcher())
+            self.sap_dispatcher_obj = sap_dispatcher.SAPDispatcher()
+            #logger.print_on_console('sap_dispatcher_obj.exception_flag before :'sap_dispatcher_obj.exception_flag)
+            self.sap_dispatcher_obj.exception_flag=exception_flag
+            #ogger.print_on_console('sap_dispatcher_obj.exception_flag after :'sap_dispatcher_obj.exception_flag)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            logger.print_on_console('Error loading SAP plugin',e)
+    #--------------------------------------------------------------------------------SAP change
 
     def dangling_status(self,index):
         step=handler.tspList[index]
@@ -548,6 +566,15 @@ class Controller():
                     if self.desktop_dispatcher_obj == None:
                         self.__load_desktop()
                     result = self.invokeDesktopkeyword(teststepproperty,self.desktop_dispatcher_obj,inpval)
+                    #----------------------------------------------------------------------------------------------SAP change
+
+
+                elif teststepproperty.apptype.lower() == APPTYPE_SAP:
+                    #SAP apptype module call
+                    if self.sap_dispatcher_obj == None:
+                        self.__load_sap()
+                    result = self.invokeSAPkeyword(teststepproperty,self.sap_dispatcher_obj,inpval)
+                #----------------------------------------------------------------------------------------------SAP change
 
                 elif teststepproperty.apptype.lower() == APPTYPE_DESKTOP_JAVA:
                     #OEBS apptype module call
@@ -691,7 +718,13 @@ class Controller():
         keyword = teststepproperty.name
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
         return res
-
+  #-----------------------------------------------------------------------------------------SAP change
+    def invokeSAPkeyword(self,teststepproperty,dispatcher_obj,inputval):
+        keyword = teststepproperty.name
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval)
+        logger.print_on_console('res in invoke method :',res)
+        return res
+    #-----------------------------------------------------------------------------------------SAP change
     def get_all_the_imports(self,plugin_path):
         path= os.environ["NINETEEN68_HOME"] + '//Nineteen68//plugins//'+plugin_path
         sys.path.append(path)
