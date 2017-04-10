@@ -241,6 +241,69 @@ class DropdownKeywords():
                 err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
         return status,result,verb,err_msg
 
+    def verifySelectedValues(self,webelement,input,*args):
+        """
+        def : verifySelectedValue
+        purpose : to verify default/current selected value in dropdown/listbox
+        param  : webelement,list
+        return : bool
+        """
+        status=webconstants.TEST_RESULT_FAIL
+        result=webconstants.TEST_RESULT_FALSE
+        visibilityFlag=True
+        verb = OUTPUT_CONSTANT
+        err_msg=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        if webelement is not None:
+            log.info('Recieved web element from the web dispatcher')
+            if webelement.is_displayed():
+                log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
+                try:
+                    if (input is not None) :
+##                        if not(visibilityFlag and isvisble):
+                        select = Select(webelement)
+                        all_value = select.all_selected_options
+                        len_all_values = len(all_value)
+                        inp_val_len = len(input)
+                        temp = []
+                        flag = True
+                        for x in range(0,len_all_values):
+                            internal_val = all_value[x].text
+                            temp.append(internal_val)
+                        log.info('temp value')
+                        log.info(temp)
+                        for y in range(0,inp_val_len):
+                            input_val = input[y]
+                            if (input_val in temp):
+                                temp.remove(input_val)
+                            else:
+                                flag = False
+                                break
+
+                        if(len(temp) ==  0 and flag == True):
+                            status=webconstants.TEST_RESULT_PASS
+                            result=webconstants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                        else:
+                            err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                            logger.print_on_console(err_msg)
+                            log.error(err_msg)
+                    else:
+                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                except Exception as e:
+                    log.error(e)
+
+                    logger.print_on_console(e)
+            else:
+                logger.print_on_console('Element is not displayed')
+                log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
+        return status,result,verb,err_msg
+
+
+
     def verifyCount(self,webelement,input,*args):
         """
         def : verifyCount

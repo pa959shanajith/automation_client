@@ -115,7 +115,7 @@ class Launch_Keywords():
                 keyboard.SendKeys('{ENTER}')
                 #logger.print_on_console('Pressed enter key')
                 #incase onening second window fails , connect via giving a sleep command
-                time.sleep(7)
+                time.sleep(4)
                 logger.print_on_console('The specified application is launched Successfully')
 
                 if app!=None and app!='':

@@ -18,6 +18,7 @@ i = 0
 wxObject = None
 browsername = None
 desktopScrapeFlag=False
+sapScrapeFlag=False
 mobileScrapeFlag=False
 mobileWebScrapeFlag=False
 debugFlag = False
@@ -105,6 +106,18 @@ class MainNamespace(BaseNamespace):
             highlightObj.highLiht_element(args[0].split(',')[0],args[0].split(',')[1])
             print 'highlight called'
 
+  #--------------------------------------------------------------------------------------------------sap change
+        elif appType==APPTYPE_SAP.lower():
+            con =controller.Controller()
+            con.get_all_the_imports('SAP')
+            import sap_highlight
+            highlightObj=sap_highlight.highLight()
+            print 'calling highlight'
+            highlightObj.highLiht_element(args[0].split(',')[0],args[0].split(',')[1])
+            print 'highlight called'
+#--------------------------------------------------------------------------------------------------sap change
+
+
     def on_executeTestSuite(self, *args):
         global wxObject
         args=list(args)
@@ -140,6 +153,27 @@ class MainNamespace(BaseNamespace):
         global desktopScrapeFlag
         desktopScrapeFlag=True
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+
+    def on_LAUNCH_SAP(self, *args):
+
+        try:
+
+            con = controller.Controller()
+            global browsername
+            browsername = args[0]
+            con =controller.Controller()
+            con.get_all_the_imports('SAP')
+            import ninteen_68_sap_scrape
+            global sapScrapeObj
+            sapScrapeObj=ninteen_68_sap_scrape
+            global sapScrapeFlag
+            sapScrapeFlag=True
+            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            print e
 
     def on_LAUNCH_MOBILE(self, *args):
         con = controller.Controller()
@@ -255,6 +289,7 @@ class SocketThread(threading.Thread):
         socketIO.emit('debugTestCase')
         socketIO.emit('executeTestSuite')
         socketIO.emit('LAUNCH_DESKTOP')
+        socketIO.emit('LAUNCH_SAP')
         socketIO.emit('LAUNCH_MOBILE')
         socketIO.emit('wsdl_listOfOperation')
         socketIO.emit('wsdl_ServiceGenerator')
@@ -868,6 +903,7 @@ class ClientWindow(wx.Frame):
         global mobileScrapeFlag
         global mobileWebScrapeFlag
         global desktopScrapeFlag
+        global sapScrapeFlag
         global debugFlag
         global socketIO
         global browsername
@@ -884,6 +920,10 @@ class ClientWindow(wx.Frame):
 ##            global socketIO
             self.new = desktopScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO)
             desktopScrapeFlag=False
+        elif sapScrapeFlag==True:
+##            global socketIO
+            self.new = sapScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO)
+            sapScrapeFlag=False
         elif oebsScrapeFlag==True:
 ##            global socketIO
             self.new = oebsScrapeObj.ScrapeDispatcher(parent = None,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO)

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        text_keywords_sap
+# Name:       text_keywords_sap
 # Purpose:    Module for textbox keywords
 #
 #Author:      anas.ahmed1,kavyashree,sakshi.goyal,saloni.goyal
@@ -9,17 +9,13 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import sap_constants
-##from text_keywords_sap import Text_Box
-##from launch_keywords import ldtp
 import launch_keywords
 import win32com.client
-##from ldtp.client_exception import LdtpExecutionError
 from constants import *
 from sap_scraping import Scrape
-##import sap_scraping.Scrape
 import logger
 import time
-##import logging
+from encryption_utility import AESCipher
 class Text_Keywords():
     def attach(self,sap_id,*args):
         SapGui=None
@@ -54,12 +50,8 @@ class Text_Keywords():
 
 
     def getText(self, sap_id,url, *args):
-##        logger.print_on_console('inside  setText')
-##        logger.print_on_console('sap_id:  ',sap_id)
-##        logger.print_on_console('input_va type: ',type(input_va))
-##        logger.print_on_console('input_val type: ',type(input_val))
         tk=Text_Keywords()
-        time.sleep(10)
+        time.sleep(2)
         id,ses=tk.attach(sap_id)
         status=sap_constants.TEST_RESULT_FALSE
         result=sap_constants.TEST_RESULT_FAIL
@@ -68,11 +60,10 @@ class Text_Keywords():
         try:
             if(id != None):
                 if(ses.FindById(id).type == 'GuiCTextField' or 'GuiTextField'):
-                    #ses.FindById(id).text
                     status = sap_constants.TEST_RESULT_TRUE
                     result = sap_constants.TEST_RESULT_PASS
                     value=ses.FindById(id).text
-                    #logger.print_on_console('The text obtained is ',result)
+
                 else:
                     logger.print_on_console('Element state does not allow to perform the operation')
                     err_msg = sap_constants.ERROR_MSG
@@ -87,31 +78,16 @@ class Text_Keywords():
 
     def setText(self, sap_id,url,input_va, *args):
         input_val=input_va[0]
-##        logger.print_on_console('inside  setText')
-##        logger.print_on_console('sap_id:  ',sap_id)
-##        logger.print_on_console('input_va type: ',type(input_va))
-##        logger.print_on_console('input_val type: ',type(input_val))
         tk=Text_Keywords()
-        time.sleep(8)
+        time.sleep(2)
         id,ses=tk.attach(sap_id)
-##        logger.print_on_console('ses from attach method :',ses)
-##        logger.print_on_console('id from attach method :',id)
         status=sap_constants.TEST_RESULT_FALSE
         result=sap_constants.TEST_RESULT_FAIL
         value=''
         err_msg=None
-        #iid='/app/con[0]/ses[0]/wnd[0]/usr/txtRSYST-MANDT'
         try:
             if(id != None):
-                #logger.print_on_console('inside first if ')
                 if(ses.FindById(id).type == 'GuiCTextField' or 'GuiTextField'):
-                    #logger.print_on_console('type of element is :')
-                    #logger.print_on_console('inside second if and type of ID is ',ses.FindById(id).type)
-                    #logger.print_on_console('inputvale is :',input_val)
-
-                    #logger.print_on_console('wait time started')
-                    #time.sleep(2)
-                    #logger.print_on_console('wait time ended')
                     try:
                      ses.FindById(id).text = input_val
                      status = sap_constants.TEST_RESULT_TRUE
@@ -132,21 +108,45 @@ class Text_Keywords():
             err_msg = sap_constants.ERROR_MSG
             import traceback
             traceback.print_exc()
-##            logger.print_on_console('Error cooured in getText and is a :',e)
-##        logger.print_on_console('The text obtained is ',result)
-##        logger.print_on_console('The text obtained is ',status)
-##        logger.print_on_console('The text obtained is ',value)
-##        logger.print_on_console('The text obtained is ',err_msg)
+        return status,result,value,err_msg
+
+    def setSecureText(self, sap_id,url, input_val,*args):
+        text=input_val[0]
+        tk=Text_Keywords()
+        time.sleep(2)
+        id,ses=tk.attach(sap_id)
+        status=sap_constants.TEST_RESULT_FALSE
+        result=sap_constants.TEST_RESULT_FAIL
+        value=''
+        err_msg=None
+        result = None
+        encryption_obj = AESCipher()
+        try:
+            text_decrypted = encryption_obj.decrypt(text)
+            #id = elem.__getattr__("Id")
+            if(id != None):
+                if(ses.FindById(id).Changeable == True):
+                    ses.FindById(id).text = text_decrypted
+                    status = sap_constants.TEST_RESULT_TRUE
+                    result = sap_constants.TEST_RESULT_PASS
+                else:
+                    logger.print_on_console('Element state does not allow to perform the operation')
+                    err_msg = sap_constants.ERROR_MSG
+            else:
+                  logger.print_on_console('element not present on the page where operation is trying to be performed')
+                  err_msg = sap_constants.ERROR_MSG
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG
+            import traceback
+            traceback.print_exc()
+            logger.print_on_console(err_msg,e)
         return status,result,value,err_msg
 
     def clearText(self, sap_id,url, *args):
-        #input_val=input_va[0]
         logger.print_on_console('inside  setText')
         logger.print_on_console('sap_id:  ',sap_id)
-        #logger.print_on_console('input_va type: ',type(input_va))
-        #logger.print_on_console('input_val type: ',type(input_val))
         tk=Text_Keywords()
-        time.sleep(10)
+        time.sleep(2)
         id,ses=tk.attach(sap_id)
         status=sap_constants.TEST_RESULT_FALSE
         result=sap_constants.TEST_RESULT_FAIL
@@ -169,14 +169,10 @@ class Text_Keywords():
             logger.print_on_console('Error cooured in getText and is a :',e)
         return status,result,value,err_msg
 
-    def verifyText(self, sap_id,url,text, *args):
-        input_val=text[0]
-##        logger.print_on_console('inside  setText')
-##        logger.print_on_console('sap_id:  ',sap_id)
-##        logger.print_on_console('input_va type: ',type(input_va))
-##        logger.print_on_console('input_val type: ',type(input_val))
+    def verifyText(self, sap_id,url,input_val, *args):
+        text=input_val[0]
         tk=Text_Keywords()
-        time.sleep(3)
+        time.sleep(2)
         id,ses=tk.attach(sap_id)
         status=sap_constants.TEST_RESULT_FALSE
         result=sap_constants.TEST_RESULT_FAIL
@@ -194,22 +190,11 @@ class Text_Keywords():
                   logger.print_on_console('element not present on the page where operation is trying to be performed')
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            Exceptions.error(e)
-##            logger.print_on_console('Error cooured in getText and is a :',e)
-##        logger.print_on_console('The text obtained is ',result)
-##        logger.print_on_console('The text obtained is ',status)
-##        logger.print_on_console('The text obtained is ',value)
-##        logger.print_on_console('The text obtained is ',err_msg)
         return status,result,value,err_msg
 
-    def getTextboxLength(self, sap_id,url, *args):
-        #input_val=input_va[0]
-##        logger.print_on_console('inside  setText')
-##        logger.print_on_console('sap_id:  ',sap_id)
-        #logger.print_on_console('input_va type: ',type(input_va))
-        #logger.print_on_console('input_val type: ',type(input_val))
+    def getTextboxLength(self, sap_id, *args):
         tk=Text_Keywords()
-        time.sleep(3)
+        time.sleep(2)
         id,ses=tk.attach(sap_id)
         status=sap_constants.TEST_RESULT_FALSE
         result=sap_constants.TEST_RESULT_FAIL
@@ -221,26 +206,21 @@ class Text_Keywords():
                     value= ses.FindById(id).MaxLength#1:40
                     status = sap_constants.TEST_RESULT_FAIL
                     result = sap_constants.TEST_RESULT_PASS
-                    #logger.print_on_console('The lenght obtained is ',result)
+
                 else:
                     logger.print_on_console('Element state does not allow to perform the operation')
             else:
                   logger.print_on_console('element not present on the page where operation is trying to be performed')
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            Exceptions.error(e)
             logger.print_on_console('Error cooured in getText and is a :',e)
         return status,result,value,err_msg
 
 
-    def verifyTextboxLength(self, sap_id,url, *args):
-        #input_val=input_va[0]
-        logger.print_on_console('inside  setText')
-        logger.print_on_console('sap_id:  ',sap_id)
-        #logger.print_on_console('input_va type: ',type(input_va))
-        #logger.print_on_console('input_val type: ',type(input_val))
+    def verifyTextboxLength(self, sap_id,url,input_val, *args):
+        length=int(input_val[0])
         tk=Text_Keywords()
-        time.sleep(3)
+        time.sleep(2)
         id,ses=tk.attach(sap_id)
         status=sap_constants.TEST_RESULT_FALSE
         result=sap_constants.TEST_RESULT_FAIL
@@ -255,12 +235,12 @@ class Text_Keywords():
                     status = sap_constants.TEST_RESULT_TRUE
 
                 else:
-                    logger.print_on_console('Element state does not allow to perform the operation')
+                    err_msg = sap_constants.ERROR_MSG
+                    logger.print_on_console('Given Length Does not match')
 
             else:
                   logger.print_on_console('element not present on the page where operation is trying to be performed')
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            Exceptions.error(e)
             logger.print_on_console('Error cooured in getText and is a :',e)
         return status,result,value,err_msg

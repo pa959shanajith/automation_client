@@ -55,12 +55,14 @@ APPTYPE_MAINFRAME = 'mainframe'
 
 APPTYPE_DESKTOP = 'desktop'
 
+APPTYPE_SAP = 'sap'
+
 APPTYPE_DESKTOP_JAVA = 'desktopjava'
 
 
-APPTYPE_MOBILE='mobileweb'
+APPTYPE_MOBILE='MobileWeb'
 
-APPTYPE_MOBILE_APP = 'mobility'
+APPTYPE_MOBILE_APP = 'MobileApp'
 
 IGNORE_THIS_STEP = '<<Ignore.This.Step>>'
 
