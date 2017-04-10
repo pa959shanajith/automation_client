@@ -55,6 +55,8 @@ APPTYPE_MAINFRAME = 'mainframe'
 
 APPTYPE_DESKTOP = 'desktop'
 
+APPTYPE_SAP = 'sap'
+
 APPTYPE_DESKTOP_JAVA = 'desktopjava'
 
 

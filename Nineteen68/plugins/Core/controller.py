@@ -449,7 +449,7 @@ class Controller():
                 display_keyword_response='DB data fetched'
 
 
-        logger.print_on_console('Result obtained is ',display_keyword_response)
+        ##logger.print_on_console('Result obtained is ',display_keyword_response)
         log.info('Result obtained is: ')
         log.info(display_keyword_response)
 
@@ -722,7 +722,7 @@ class Controller():
     def invokeSAPkeyword(self,teststepproperty,dispatcher_obj,inputval):
         keyword = teststepproperty.name
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
-        logger.print_on_console('res in invoke method :',res)
+        ##logger.print_on_console('res in invoke method :',res)
         return res
     #-----------------------------------------------------------------------------------------SAP change
     def get_all_the_imports(self,plugin_path):
