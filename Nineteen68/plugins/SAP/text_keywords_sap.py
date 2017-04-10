@@ -15,6 +15,7 @@ from constants import *
 from sap_scraping import Scrape
 import logger
 import time
+from encryption_utility import AESCipher
 class Text_Keywords():
     def attach(self,sap_id,*args):
         SapGui=None
