@@ -212,6 +212,7 @@ class Dispatcher:
                   'selectValueByText':self.dropdown_list_object.selectValueByText,
                   ## defect 360
                   'verifySelectedValue':self.dropdown_list_object.verifySelectedValue,
+                  'verifySelectedValues':self.dropdown_list_object.verifySelectedValues,
                   'verifyCount':self.dropdown_list_object.verifyCount,
                   'selectAllValues':self.dropdown_list_object.selectAllValues,
                   'selectMultipleValuesByIndexes':self.dropdown_list_object.selectMultipleValuesByIndexes,
