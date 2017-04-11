@@ -124,8 +124,8 @@ class GenericKeywordDispatcher:
                   'sendFunctionKeys':self.generic_sendkeys.sendfunction_keys,
                   'getBlockCount' : self.xml_oper.get_block_count,
                   'getTagValue' : self.xml_oper.get_tag_value,
-                  'GetBlockValue' : self.xml_oper.get_block_value,
-                  'VerifyObjects': self.xml_oper.verifyObjects,
+                  'getBlockValue' : self.xml_oper.get_block_value,
+                  'verifyObjects': self.xml_oper.verifyObjects,
                   'typeCast':self.util_operation_obj.type_cast,
                   'verifyFileImages':self.util_operation_obj.verify_file_images,
                   'stop':self.util_operation_obj.stop,
@@ -134,7 +134,7 @@ class GenericKeywordDispatcher:
                   'modifyValue':self.dyn_var_obj.modify_value,
                   'deleteDynVariable':self.dyn_var_obj.delete_dyn_value,
                   'displayVariableValue':self.generic_delay.display_variable_value,
-                  'VerifyValues':self.util_operation_obj.verify_values
+                  'verifyValues':self.util_operation_obj.verify_values
 
 
                 }

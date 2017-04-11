@@ -80,7 +80,7 @@ class  JumpBy():
                     jumpByStepNum=TERMINATE
 
             else:
-                jumpByStepNum=-1
+                jumpByStepNum=index + 1
                 logger.print_on_console('ERR_JUMPY_STEP_DOESN''T_EXISTS')
                 log.error('ERR_JUMPY_STEP_DOESN''T_EXISTS')
 

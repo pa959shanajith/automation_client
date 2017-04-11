@@ -176,6 +176,8 @@ class BrowserKeywords():
             url = url[0]
             if not (url is None and url is ''):
             	url.strip()
+                if url[0:4].lower()!='http' and url[0:4].lower()!='file':
+                    url='http://'+url
                 driver_obj.get(url)
                 logger.print_on_console('Navigated to URL')
                 log.info('Navigated to URL')

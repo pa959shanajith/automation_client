@@ -69,8 +69,7 @@ class WebservicesWSDL():
             print allmethodslist
             return allmethodslist
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
+            logger.print_on_console('Invalid end point URl')
             log.error(e)
 
 
@@ -128,8 +127,7 @@ class BodyGenarator():
                 log.info(request_header_soap12)
                 return request_header_soap11,request_header_soap12
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
+            logger.print_on_console('Invalid end point url')
             log.error(e)
 
 
@@ -181,8 +179,7 @@ class BodyGenarator():
                 log.info(obt_request_body_soap12)
                 return obt_request_body_soap11,obt_request_body_soap12
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
+            logger.print_on_console('Invalid end point url')
             log.error(e)
 
 

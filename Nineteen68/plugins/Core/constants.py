@@ -60,9 +60,9 @@ APPTYPE_SAP = 'sap'
 APPTYPE_DESKTOP_JAVA = 'desktopjava'
 
 
-APPTYPE_MOBILE='MobileWeb'
+APPTYPE_MOBILE='mobileweb'
 
-APPTYPE_MOBILE_APP = 'MobileApp'
+APPTYPE_MOBILE_APP = 'mobileapp'
 
 IGNORE_THIS_STEP = '<<Ignore.This.Step>>'
 
