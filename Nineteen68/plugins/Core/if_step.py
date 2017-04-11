@@ -165,6 +165,14 @@ class Logical_eval():
         expression=str(expression)
         expression=expression.replace('AND','and').replace('OR','or').replace('NOT','not')
         try:
+            exp = expression
+            exp = exp.replace('>=','/').replace('<=','/').replace('>','/').replace('<','/').replace('==','/').replace('OR','/').replace('NOT','/').replace('AND','/').replace('(','/').replace(')','/')
+            operands = exp.split('/')
+            for i in operands:
+                if i== None or i.lower() == 'null' or i.lower() == 'none':
+                    logger.print_on_console('expression should not contain null/None operands')
+                    return INVALID
+
             result=satisfiable(expression)
             if type(result)==dict:
                 for res in result.iterkeys():
