@@ -113,7 +113,7 @@ class MainNamespace(BaseNamespace):
             import sap_highlight
             highlightObj=sap_highlight.highLight()
             print 'calling highlight'
-            highlightObj.highLiht_element(args[0].split(',')[0],args[0].split(',')[1])
+            highlightObj.highlight_element(args[0].split(',')[0])
             print 'highlight called'
 #--------------------------------------------------------------------------------------------------sap change
 
