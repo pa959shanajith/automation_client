@@ -26,8 +26,6 @@ from PIL import ImageGrab
 from PIL.ImageOps import flip
 import struct
 from ctypes import wintypes
-import ldtp
-from ldtp.client_exception import LdtpExecutionError
 from constants import *
 
 window_name=None
