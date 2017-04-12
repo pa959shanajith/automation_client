@@ -26,16 +26,17 @@ log = logging.getLogger('sap_highlight.py')
 
 class highLight():
 
+class highLight():
+
     def highlight_element(self, elem):
-        logger.print_on_console('Highlight Object: ' +objname)
         with open('domelements.json', 'r') as f:
             data = json.load(f)
         view = data['view']
         screen_name = ""
         for obj in view:
-            if(obj['id'] == elem):
-                i = str(obj['path']).index('/')
-                screen_name = obj['path'][:i]
+            if(obj['xpath'] == elem):
+                i = str(obj['xpath']).index('/')
+                screen_name = obj['xpath'][:i]
                 top_left_x = obj['screenleft']
                 top_left_y = obj['screentop']
                 bottom_right_x = obj['screenleft'] + obj['width']
@@ -49,10 +50,20 @@ class highLight():
         app = app[0]
         hwnd = app[0]
         try:
-            win32gui.SetForegroundWindow(hwnd)
+            foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
+            appThread = win32api.GetCurrentThreadId()
+            if( foreThread != appThread ):
+                win32process.AttachThreadInput(foreThread[0], appThread, True)
+                win32gui.BringWindowToTop(hwnd)
+                win32gui.ShowWindow(hwnd,3)
+                win32process.AttachThreadInput(foreThread[0], appThread, False)
+            else:
+                win32gui.BringWindowToTop(hwnd)
+                win32gui.ShowWindow(hwnd,3)
             time.sleep(2)
             #win32gui.BringWindowToTop(hwnd)
             #win32gui.ShowWindow(hwnd,1)
+
             rgn1=win32gui.CreateRectRgnIndirect((top_left_x,top_left_y,bottom_right_x,bottom_right_y))
             rgn2=win32gui.CreateRectRgnIndirect((top_left_x+4,top_left_y+4,bottom_right_x-4,bottom_right_y-4))
             hdc=win32gui.CreateDC("DISPLAY", None, None)
