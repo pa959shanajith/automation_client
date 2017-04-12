@@ -580,6 +580,8 @@ class ExcelXLS:
         log.debug('Deleting a row of .xls file')
         excel_file=None
         try:
+            import pythoncom
+            pythoncom.CoInitialize()
             from win32com.client.gencache import EnsureDispatch
             excel = EnsureDispatch("Excel.Application")
             excel.DisplayAlerts = False
