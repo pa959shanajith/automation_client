@@ -26,8 +26,6 @@ log = logging.getLogger('sap_highlight.py')
 
 class highLight():
 
-class highLight():
-
     def highlight_element(self, elem):
         with open('domelements.json', 'r') as f:
             data = json.load(f)
