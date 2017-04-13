@@ -204,7 +204,7 @@ class Text_Keywords():
             if(id != None):
                 if(ses.FindById(id).type == "GuiTextField" or "GuiCTextField"):
                     value= ses.FindById(id).MaxLength#1:40
-                    status = sap_constants.TEST_RESULT_FAIL
+                    status = sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_PASS
 
                 else:

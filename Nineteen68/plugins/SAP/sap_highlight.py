@@ -26,8 +26,6 @@ log = logging.getLogger('sap_highlight.py')
 
 class highLight():
 
-class highLight():
-
     def highlight_element(self, elem):
         with open('domelements.json', 'r') as f:
             data = json.load(f)
@@ -46,7 +44,7 @@ class highLight():
         def enum_cb(hwnd, results):
             winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
         win32gui.EnumWindows(enum_cb, toplist)
-        app = [(hwnd, title) for hwnd, title in winlist if screen_name in title]
+        app = [(hwnd, title) for hwnd, title in winlist if screen_name == title]
         app = app[0]
         hwnd = app[0]
         try:

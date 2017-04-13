@@ -123,7 +123,7 @@ class UtilWebKeywords:
                 self.highlight(webelement)
                 res=self.is_visible(webelement)
                 log.info('The visible status is '+str(res))
-                logger.print_on_console('The visible status is '+str(res))
+               ## logger.print_on_console('The visible status is '+str(res))
                 if res:
                     logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_VISIBLE'])
                     log.info(ERROR_CODE_DICT['ERR_OBJECT_VISIBLE'])
@@ -184,7 +184,7 @@ class UtilWebKeywords:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                     info_msg=ERROR_CODE_DICT['MSG_OBJECT_ENABLED']
-                    logger.print_on_console(err_msg)
+                    #logger.print_on_console(err_msg)
                     log.info(info_msg)
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
@@ -273,7 +273,7 @@ class UtilWebKeywords:
                 browser_info=browser_Keywords.driver_obj.capabilities
                 browser_name=browser_info.get('browserName')
                 browser_version=browser_info.get('version')
-                log.info('Browser is:'+browser_name+'Version is:'+browser_version)
+                ##log.info('Browser is:'+browser_name+'Version is:'+browser_version)
                 #get the original style of the element
                 original_style = webelement.get_attribute('style')
                 #Apply css to the element
