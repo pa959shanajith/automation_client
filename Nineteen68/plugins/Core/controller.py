@@ -449,7 +449,7 @@ class Controller():
                 display_keyword_response='DB data fetched'
 
 
-        ##logger.print_on_console('Result obtained is ',display_keyword_response)
+        logger.print_on_console('Result obtained is ',display_keyword_response)
         log.info('Result obtained is: ')
         log.info(display_keyword_response)
 
