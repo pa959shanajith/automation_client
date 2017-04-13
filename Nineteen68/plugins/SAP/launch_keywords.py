@@ -73,6 +73,22 @@ class Launch_Keywords():
             #logger.print_on_console('Failed to press ENTER',e)
         return status,result,value,err_msg
 
+    def startTransaction(ses,input_val,*args):
+        tcode= input_val[0]
+        status=sap_constants.TEST_RESULT_FALSE
+        result=sap_constants.TEST_RESULT_FAIL
+        err_msg=None
+        value=''
+        try:
+            ses.StartTransaction(tcode)
+            status=sap_constants.TEST_RESULT_TRUE
+            result=sap_constants.TEST_RESULT_PASS
+        except Exception as e:
+            err_msg='Failed to start transaction'
+            log.error(err_msg,e)
+            logger.print_on_console('Failed to start transaction reason being :',e)
+        return status,result,value,err_msg
+
     def launch_application(self,input_val,*args):
         server = "SL2 [52.165.148.179]"
         status=sap_constants.TEST_RESULT_FAIL
