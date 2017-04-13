@@ -158,32 +158,35 @@ class Launch_Keywords():
     def closeApplication(self, *args):
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
-        verb = OUTPUT_CONSTANT
+        verb = ''
         err_msg=None
-        SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
-        i, j = 0, 0
-        connections = []
-        while True:
-            try:
-                connections.append(SapGui.Children(i))
-            except Exception as e:
-                break
-            i = i + 1
-        for con in connections:
-            j = 0
+        try:
+            SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
+            i, j = 0, 0
+            connections = []
             while True:
                 try:
-                    ses = con.Children(j)
-                    id = ses.__getattr__("Id")
-                    con.CloseSession(id)
+                    connections.append(SapGui.Children(i))
                 except Exception as e:
-                    print e
                     break
-                j = j + 1
-        app = Application(backend="win32").connect(path = r"C:\Program Files (x86)\SAP\FrontEnd\SAPgui\saplogon.exe").window(title="SAP Logon 740")
-        app.Close()
-        status=sap_constants.TEST_RESULT_PASS
-        result=sap_constants.TEST_RESULT_TRUE
+                i = i + 1
+            for con in connections:
+                j = 0
+                while True:
+                    try:
+                        ses = con.Children(j)
+                        id = ses.__getattr__("Id")
+                        con.CloseSession(id)
+                    except Exception as e:
+                        logger.print_on_console("The specified application is closed Successfully ")
+                        break
+                    j = j + 1
+            app = Application(backend="win32").connect(path = r"C:\Program Files (x86)\SAP\FrontEnd\SAPgui\saplogon.exe").window(title="SAP Logon 740")
+            app.Close()
+            status=sap_constants.TEST_RESULT_PASS
+            result=sap_constants.TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg='Error has occured :',e
         return status,result,verb,err_msg
 
 ##    def captureScreenshot(self, SapGui, data):
