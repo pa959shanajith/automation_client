@@ -53,15 +53,15 @@ class Text_Keywords():
         tk=Text_Keywords()
         time.sleep(2)
         id,ses=tk.attach(sap_id)
-        status=sap_constants.TEST_RESULT_FALSE
-        result=sap_constants.TEST_RESULT_FAIL
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
         value=''
         try:
             if(id != None):
                 if(ses.FindById(id).type == 'GuiCTextField' or 'GuiTextField'):
-                    status = sap_constants.TEST_RESULT_TRUE
-                    result = sap_constants.TEST_RESULT_PASS
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
                     value=ses.FindById(id).text
 
                 else:
@@ -81,22 +81,21 @@ class Text_Keywords():
         tk=Text_Keywords()
         time.sleep(2)
         id,ses=tk.attach(sap_id)
-        status=sap_constants.TEST_RESULT_FALSE
-        result=sap_constants.TEST_RESULT_FAIL
-        value=''
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
+        value=OUTPUT_CONSTANT
         err_msg=None
         try:
             if(id != None):
                 if(ses.FindById(id).type == 'GuiCTextField' or 'GuiTextField'):
                     try:
                      ses.FindById(id).text = input_val
-                     status = sap_constants.TEST_RESULT_TRUE
-                     result = sap_constants.TEST_RESULT_PASS
+                     status = sap_constants.TEST_RESULT_PASS
+                     result = sap_constants.TEST_RESULT_TRUE
                     except Exception as e:
                         err_msg = sap_constants.ERROR_MSG
                         logger.print_on_console('error in set text:  :',e)
-                        import traceback
-                        traceback.print_exc()
+
 
                 else:
                     logger.print_on_console('Element state does not allow to perform the operation')
@@ -115,9 +114,9 @@ class Text_Keywords():
         tk=Text_Keywords()
         time.sleep(2)
         id,ses=tk.attach(sap_id)
-        status=sap_constants.TEST_RESULT_FALSE
-        result=sap_constants.TEST_RESULT_FAIL
-        value=''
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
+        value=OUTPUT_CONSTANT
         err_msg=None
         result = None
         encryption_obj = AESCipher()
@@ -127,8 +126,8 @@ class Text_Keywords():
             if(id != None):
                 if(ses.FindById(id).Changeable == True):
                     ses.FindById(id).text = text_decrypted
-                    status = sap_constants.TEST_RESULT_TRUE
-                    result = sap_constants.TEST_RESULT_PASS
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
                 else:
                     logger.print_on_console('Element state does not allow to perform the operation')
                     err_msg = sap_constants.ERROR_MSG
@@ -148,17 +147,17 @@ class Text_Keywords():
         tk=Text_Keywords()
         time.sleep(2)
         id,ses=tk.attach(sap_id)
-        status=sap_constants.TEST_RESULT_FALSE
-        result=sap_constants.TEST_RESULT_FAIL
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
-        value=''
+        value=OUTPUT_CONSTANT
         try:
             if(id != None):
               if(ses.FindById(id).Changeable == True):
                 if(ses.FindById(id).type == 'GuiCTextField' or 'GuiTextField'):
                     ses.FindById(id).text = ""
-                    status = sap_constants.TEST_RESULT_TRUE
-                    result = sap_constants.TEST_RESULT_PASS
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
                 else:
                     logger.print_on_console('Element state does not allow to perform the operation')
             else:
@@ -174,15 +173,15 @@ class Text_Keywords():
         tk=Text_Keywords()
         time.sleep(2)
         id,ses=tk.attach(sap_id)
-        status=sap_constants.TEST_RESULT_FALSE
-        result=sap_constants.TEST_RESULT_FAIL
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
-        value=''
+        value=OUTPUT_CONSTANT
         try:
             if(id != None):
                 if(ses.FindById(id).text == text):
-                    status = sap_constants.TEST_RESULT_TRUE
-                    result = sap_constants.TEST_RESULT_PASS
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
                     logger.print_on_console('The text obtained is ',result)
                 else:
                     logger.print_on_console('Element state does not allow to perform the operation')
@@ -196,8 +195,8 @@ class Text_Keywords():
         tk=Text_Keywords()
         time.sleep(2)
         id,ses=tk.attach(sap_id)
-        status=sap_constants.TEST_RESULT_FALSE
-        result=sap_constants.TEST_RESULT_FAIL
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
         value=''
         try:
@@ -205,7 +204,7 @@ class Text_Keywords():
                 if(ses.FindById(id).type == "GuiTextField" or "GuiCTextField"):
                     value= ses.FindById(id).MaxLength#1:40
                     status = sap_constants.TEST_RESULT_PASS
-                    result = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
 
                 else:
                     logger.print_on_console('Element state does not allow to perform the operation')
@@ -222,10 +221,10 @@ class Text_Keywords():
         tk=Text_Keywords()
         time.sleep(2)
         id,ses=tk.attach(sap_id)
-        status=sap_constants.TEST_RESULT_FALSE
-        result=sap_constants.TEST_RESULT_FAIL
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
-        value=''
+        value=OUTPUT_CONSTANT
         try:
             if(id != None):
               if(ses.FindById(id).Changeable == True):

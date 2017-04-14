@@ -57,16 +57,16 @@ class Launch_Keywords():
         self.windowHandle=None
 
     def enter_keyword(self,*args):
-        status=sap_constants.TEST_RESULT_FALSE
-        result=sap_constants.TEST_RESULT_FAIL
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
-        value=''
+        value=OUTPUT_CONSTANT
         try:
             handle = win32gui.FindWindow(None, 'SAP')
             win32gui.SetForegroundWindow(handle)
             keyboard.SendKeys('{ENTER}')
-            status=sap_constants.TEST_RESULT_TRUE
-            result=sap_constants.TEST_RESULT_PASS
+            status=sap_constants.TEST_RESULT_PASS
+            result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
             err_msg='Failed to press ENTER'
             log.error(err_msg,e)
@@ -75,14 +75,14 @@ class Launch_Keywords():
 
     def startTransaction(ses,input_val,*args):
         tcode= input_val[0]
-        status=sap_constants.TEST_RESULT_FALSE
-        result=sap_constants.TEST_RESULT_FAIL
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
         value=''
         try:
             ses.StartTransaction(tcode)
-            status=sap_constants.TEST_RESULT_TRUE
-            result=sap_constants.TEST_RESULT_PASS
+            status=sap_constants.TEST_RESULT_PASS
+            result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
             err_msg='Failed to start transaction'
             log.error(err_msg,e)
@@ -205,54 +205,7 @@ class Launch_Keywords():
             err_msg='Error has occured :',e
         return status,result,verb,err_msg
 
-##    def captureScreenshot(self, SapGui, data):
-##
-##        """
-##        name: captureScreenshot
-##        purpose: To capture screenshot of the scraped window
-##        parameters: List of scraped elements
-##        returns: Nothing
-##        """
-##        screen_name = ""
-##        for obj in data:
-##            if(obj['custname'] == 'titl'):
-##                screen_name = obj['text']
-##                break
-##
-##        if(screen_name == ""):
-##            name = ""
-##            name = data[0]['xpath']
-##            i = name.index('/')
-##            screen_name = name[:i]
-##            print screen_name
-##
-##        handle = win32gui.FindWindow(None, screen_name)
-##        left, top, right, bottom = win32gui.GetWindowRect(handle)
-##        width = right - left
-##        height = bottom - top
-##        handleDC = win32gui.GetWindowDC(handle)
-##        DC  = win32ui.CreateDCFromHandle(handleDC)
-##        saveDC = DC.CreateCompatibleDC()
-##        saveBitMap = win32ui.CreateBitmap()
-##        saveBitMap.CreateCompatibleBitmap(DC, width, height)
-##        saveDC.SelectObject(saveBitMap)
-##        result = windll.user32.PrintWindow(handle, saveDC.GetSafeHdc(), 0)
-####        logger.print_on_console(' result from print on window:',result)
-##        bmpinfo = saveBitMap.GetInfo()
-##        bmpbuff = saveBitMap.GetBitmapBits(True)
-##        im = Image.frombuffer(
-##            'RGB',
-##            (bmpinfo['bmWidth'], bmpinfo['bmHeight']),
-##            bmpbuff, 'raw', 'BGRX', 0, 1)
-##        win32gui.DeleteObject(saveBitMap.GetHandle())
-##        saveDC.DeleteDC()
-##        DC.DeleteDC()
-##        win32gui.ReleaseDC(handle, handleDC)
-##        if result == 1:
-####            logger.print_on_console('saving screenshot as screenshot.png')
-##            im.save(r'.\screenshot.png')
-####        logger.print_on_console('image obtained and going to 1968_sap_scrape ',im)
-##        return im
+
     def captureScreenshot(self, SapGui, data):
 
         """

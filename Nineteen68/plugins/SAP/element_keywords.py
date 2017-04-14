@@ -26,18 +26,18 @@ class ElementKeywords():
     def click_element(self, sap_id, *args):
         tk=Text_Keywords()
         id,ses=tk.attach(sap_id)
-        status=sap_constants.TEST_RESULT_FALSE
-        result=sap_constants.TEST_RESULT_FAIL
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
         #verb = OUTPUT_CONSTANT
-        value=''
+        value=OUTPUT_CONSTANT
         err_msg=None
         result = None
         try:
             if(id != None):
                 if(ses.FindById(id).Changeable == True):
                     ses.FindById(id).SetFocus()
-                    status=sap_constants.TEST_RESULT_TRUE
-                    result=sap_constants.TEST_RESULT_PASS
+                    status=sap_constants.TEST_RESULT_PASS
+                    result=sap_constants.TEST_RESULT_TRUE
                 else:
                         log.info('Element state does not allow to perform the operation')
                         err_msg='element not present on the page where operation is trying to be performed'
@@ -53,8 +53,8 @@ class ElementKeywords():
     def get_element_text(self, sap_id, *args):
         tk=Text_Keywords()
         id,ses=tk.attach(sap_id)
-        status=sap_constants.TEST_RESULT_FALSE
-        result=sap_constants.TEST_RESULT_FAIL
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
         value=''
         err_msg=None
         try:
@@ -62,8 +62,8 @@ class ElementKeywords():
                 if(ses.FindById(id).Changeable == True):
                     if(ses.FindById(id).type == 'GuiLabel'):
                         value =  ses.FindById(id).text
-                        status=sap_constants.TEST_RESULT_FALSE
-                        result=sap_constants.TEST_RESULT_FAIL
+                        status=sap_constants.TEST_RESULT_PASS
+                        result=sap_constants.TEST_RESULT_TRUE
                 else:
                     log.info('element not present on the page where operation is trying to be performed')
                     err_msg='element not present on the page where operation is trying to be performed'
