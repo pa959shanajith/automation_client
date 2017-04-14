@@ -29,18 +29,18 @@ class ButtonLinkKeyword():
 
         tk=Text_Keywords()
         id,ses=tk.attach(sap_id)
-        status=sap_constants.TEST_RESULT_FALSE
-        result=sap_constants.TEST_RESULT_FAIL
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
         #log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         #verb = OUTPUT_CONSTANT
-        value=''
+        value=OUTPUT_CONSTANT
         err_msg=None
         try:
                 if(id != None):
                  if(ses.FindById(id).Changeable == True):
                     ses.FindById(id).Press()
-                    status =sap_constants.TEST_RESULT_TRUE
-                    result = sap_constants.TEST_RESULT_PASS
+                    status =sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
                  else:
                         log.info('Element state does not allow to perform the operation')
                         err_msg = 'Element state does not allow to perform the operation'
@@ -57,21 +57,21 @@ class ButtonLinkKeyword():
     def verify_button_name(self,  sap_id ,url, input_val, *args):
         tk=Text_Keywords()
         id,ses=tk.attach(sap_id)
-        status=sap_constants.TEST_RESULT_FALSE
-        result=sap_constants.TEST_RESULT_FAIL
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
         #log.debug(launch_keywords.window_name)
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         name=input_val[0]
         #verb = OUTPUT_CONSTANT
-        value=''
+        value=OUTPUT_CONSTANT
         err_msg=None
         try:
             if(id != None):
                 if(ses.FindById(id).Changeable == True):
                     if(ses.FindById(id).tooltip == name):
-                        status =sap_constants.TEST_RESULT_TRUE
-                        result = sap_constants.TEST_RESULT_PASS
+                        status =sap_constants.TEST_RESULT_PASS
+                        result = sap_constants.TEST_RESULT_TRUE
                     else:
                         log.info('element not Matching')
                         err_msg = 'element not Matching'
@@ -89,14 +89,14 @@ class ButtonLinkKeyword():
 
         tk=Text_Keywords()
         id,ses=tk.attach(sap_id)
-        status=sap_constants.TEST_RESULT_FALSE
-        result=sap_constants.TEST_RESULT_FAIL
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
         filepath=input_val[0]
         log.debug('Got window name after launching application')
         log.debug(launch_keywords.window_name)
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         #verb = OUTPUT_CONSTANT
-        value=''
+        value=OUTPUT_CONSTANT
         err_msg=None
         try:
             result = None
@@ -120,8 +120,8 @@ class ButtonLinkKeyword():
                                 li[k] = li[k] + 1
                             j = j + 1
                     ses.FindById(id).text = filepath
-                    status =sap_constants.TEST_RESULT_TRUE
-                    result = sap_constants.TEST_RESULT_PASS
+                    status =sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
                 else:
                     log.info('element not present on the page where operation is trying to be performed')
                     err_msg = 'element not present on the page where operation is trying to be performed'

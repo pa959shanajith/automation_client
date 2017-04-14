@@ -67,9 +67,8 @@ class SAPDispatcher:
                   'verifytextboxlength':self.editable_text_obj.verifyTextboxLength,
                   'selectcheckbox':self.radiocheckbox_keywords_obj.select_checkbox,
                   'unselectcheckbox':self.radiocheckbox_keywords_obj.unselect_checkbox,
-                  'getcheckboxstatus':self.radiocheckbox_keywords_obj.get_status_checkbox,
                   'selectradiobutton':self.radiocheckbox_keywords_obj.select_radiobutton,
-                  'getradiobuttonstatus':self.radiocheckbox_keywords_obj.get_status_radiobtn,
+                  'getstatus': self.radiocheckbox_keywords_obj.get_status,
                   'click':self.button_link_obj.click,
                   'verifybuttonname':self.button_link_obj.verify_button_name,
                   'uploadfile':self.button_link_obj.button_uploadFile,
@@ -90,7 +89,7 @@ class SAPDispatcher:
 
             keyword=keyword.lower()
             if keyword in dict.keys():
-                if keyword=='launch_application' or keyword=='LaunchApplication' or keyword=='launchapplication' :
+                if keyword=='launch_application' or keyword=='LaunchApplication' or keyword=='launchapplication' or keyword=='starttransaction' :
                     result= dict[keyword](input,output)
                 else:
                     result= dict[keyword](objectname,url,input,output)

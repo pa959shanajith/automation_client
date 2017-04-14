@@ -71,7 +71,8 @@ class Reporting:
             apptype_description={'generic':self.step_description_obj.generic,
             'web':self.step_description_obj.web,
             'webservices':self.step_description_obj.webservices,
-            'desktop':self.step_description_obj.desktop}
+            'desktop':self.step_description_obj.desktop,
+            'sap':self.step_description_obj.sap}
             description=apptype_description[apptype.lower()](*params)
             description=description.encode('utf-8')
 
