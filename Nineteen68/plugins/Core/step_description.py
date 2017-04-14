@@ -248,6 +248,74 @@ class StepDescription:
             return 'Execute the request.'
         return locals()[key](keyword)
 
+    def sap(self,keyword,tsp,input,output,con,reporting_obj):
+
+        #Launch keywords
+        def LaunchApplication():
+            return ' The application present in the path  '+ tsp.inputval[0]+ 'is launched'+ '.'
+        def getPageTitle():
+            return ' The page title is '+ output +' and  is saved  in the variable ' +tsp.outputval+ '.'
+        def closeApplication():
+            return ' The application is closed'+ '.'
+        #Textbox keywords
+        def GetText():
+            return ' Get Text From '+ "'" +tsp.custname + "'" + ' and save the text '+ output + ' in ' + tsp.outputval+ '.'
+        def setSecureText():
+             return 'Enter secure text ' +tsp.inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
+        def ClearText():
+             return 'Clear text from the'+ "'" + tsp.custname + "'"+ '.'
+        def SetText():
+            return 'Enter text '+ tsp.inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
+        def verifyText():
+            return 'Verify ' + input + ' is the the text in the '+ "'" + tsp.custname + "'"+ '.'
+        def GetTextBoxLength():
+            return 'Get length from the '+ "'" + tsp.custname + "'"+ 'and save the length '+output+'in'+tsp.outputval+ '.'
+        def verifyTextboxLength():
+            return 'Verify ' + input + ' is the length of textbox '+ "'" + tsp.custname + "'"+ '.'
+
+        #Button link keywords
+        def click():
+            return  'Click on ' +"'" + tsp.custname + "'"+'.'
+        def verify_button_name():
+            return 'Verify text ' + input + ' is the name of the '+ "'" + tsp.custname + "'"+ '.'
+        def button_uploadFile():
+            return ' Upload the file '+ filename + ' present in the path ' + input + '.'
+
+        #Dropdown keywords
+        def getSelected():
+            return 'Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save value ' + output + ' in '+ tsp.outputval+ '.'
+        def getValueByIndex():
+            return 'Get value with index ' + input + ' in the '+ "'" + tsp.custname + "'" + ' and save the value ' + output + ' in '+ tsp.outputval+'.'
+        def verifyValuesExists():
+            return 'Verify values ' + input + ' exists in the '+ "'" + tsp.custname + "'"+'.'
+        def selectValueByText():
+            return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']'+'.'
+        def verifySelectedValue():
+            return 'Verify value ' + input + ' are selected in the '+ "'" + tsp.custname + "'"+'.'
+        def verifyAllValues():
+            return 'Verify values ' + input + ' are present in the '+ "'" + tsp.custname + "'"+'.'
+        def verifyCount():
+            return 'Verify ' + input + ' is the list count of the ' +"'" + tsp.custname + "'"+'.'
+        def selectValueByIndex():
+            return 'Select the value '+ input+' of the '+"'" + tsp.custname + "'"+' with the index '+input+' present in the table cell  '+"'" + tsp.custname + "'"+'-['+input+']['+input+']'+'.'
+        def getCount():
+            return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' + output + ' in ' +tsp.outputval+'.'
+        #Element Keywords
+        def click_element():
+            return 'Click on ' +"'" + tsp.custname + "'"+'.'
+        def get_element_text():
+            return 'Get the text of the element '+ "'" + tsp.custname + "'"+ ' and save the value  '+ output + ' in '+ tsp.outputval+'.'
+              #Radio checkbox keywords
+        def select_radiobutton():
+            return 'Select '+ "'" + tsp.custname + "'"+'.'
+        def get_status():
+            return 'Get the status of the ' + "'" + tsp.custname + "'"+ ' and save the status ' + output + ' in '+ tsp.outputval+'.'
+        def select_checkbox():
+            return 'Select '+ "'" + tsp.custname + "'"+'.'
+        def unselect_checkbox():
+            return 'Unselect '+ "'" + tsp.custname + "'"+'.'
+        return locals()[keyword]()
+
 
     def desktop(self,keyword,tsp,input,output,con,reporting_obj):
         #dropdown keywords
