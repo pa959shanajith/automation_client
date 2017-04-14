@@ -108,7 +108,7 @@ class Radio_Checkbox_keywords():
             log.error(err_msg,e)
         return status,result,value,err_msg
 
-    def get_status_checkbox(self, sap_id, *args):
+    def get_status(self, sap_id, *args):
         tk=Text_Keywords()
         id,ses=tk.attach(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
@@ -117,40 +117,16 @@ class Radio_Checkbox_keywords():
         value=''
         err_msg=None
         try:
-
             if(id != None):
                 if(ses.FindById(id).Changeable == True):
-                    if(ses.FindById(id).type == "GuiCheckBox"):
+                    #----------------------------------------------------------Check for radio
+                    if(ses.FindById(id).type == "GuiRadioButton"):
                         value = ses.FindById(id).selected
                         status=sap_constants.TEST_RESULT_PASS
                         result=sap_constants.TEST_RESULT_TRUE
-                    else:
-                        logger.print_on_console('Element state does not allow to perform the operation')
-                        err_msg = sap_constants.ERROR_MSG
-                        log.info(err_msg)
-                else:
-                    logger.print_on_console('element not present on the page where operation is trying to be performed')
-                    err_msg = sap_constants.ERROR_MSG
-                    log.info(err_msg)
-        except Exception as e:
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console(err_msg,e)
-            log.error(err_msg,e)
-        return status,result,value,err_msg
 
-    def get_status_radiobtn(self, sap_id, *args):
-        tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
-        status=sap_constants.TEST_RESULT_FAIL
-        result=sap_constants.TEST_RESULT_FALSE
-        #verb = OUTPUT_CONSTANT
-        value=''
-        err_msg=None
-        try:
-
-            if(id != None):
-                if(ses.FindById(id).Changeable == True):
-                    if(ses.FindById(id).type == "GuiCheckBox"):
+                    #----------------------------------------------------------Check for Checkbox
+                    elif(ses.FindById(id).type == "GuiCheckBox"):
                         value = ses.FindById(id).selected
                         status=sap_constants.TEST_RESULT_PASS
                         result=sap_constants.TEST_RESULT_TRUE
