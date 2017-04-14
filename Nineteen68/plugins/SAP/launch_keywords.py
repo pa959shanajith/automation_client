@@ -46,6 +46,8 @@ import logging
 import logging.config
 log = logging.getLogger('launch_keywords.py')
 
+from sap_scraping import Scrape
+
 class Launch_Keywords():
 
 
@@ -55,6 +57,23 @@ class Launch_Keywords():
         self.aut_handle=None
         self.ldtpObj=None
         self.windowHandle=None
+
+    def getSession(self,*args):
+        SapGui=None
+        try:
+            time.sleep(2)
+            SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
+            scrappingObj=Scrape()
+            wnd = scrappingObj.getWindow(SapGui)
+            wndId =  wnd.__getattr__('id')
+            i = wndId.index('wnd')
+            wndNumber = wndId[i+4]
+            j = wndId.index('ses')
+            sesId = wndId[j:j+6]
+            ses = SapGui.FindByid(str(sesId))
+            return ses
+        except Exception as e:
+            logger.print_on_console( 'no instance open error :',e)
 
     def enter_keyword(self,*args):
         status=sap_constants.TEST_RESULT_FAIL
@@ -73,8 +92,11 @@ class Launch_Keywords():
             #logger.print_on_console('Failed to press ENTER',e)
         return status,result,value,err_msg
 
-    def startTransaction(ses,input_val,*args):
-        tcode= input_val[0]
+
+    def startTransaction(self,input_val,*args):
+        lk=Launch_Keywords()
+        ses=lk.getSession()
+        tcode=input_val[0]
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
