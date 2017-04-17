@@ -79,7 +79,7 @@ class SAPDispatcher:
                   'selectvaluebytext':self.dropdown_keywords_obj.selectValueByText,
                   'verifycount':self.dropdown_keywords_obj.verifyCount,
                   'verifyselectedvalue':self.dropdown_keywords_obj.verifySelectedValue,
-                  'verifyvalueexists':self.dropdown_keywords_obj.verifyValuesExists,
+                  'verifyvaluesexists':self.dropdown_keywords_obj.verifyValuesExists,
                   'verifyallvalues':self.dropdown_keywords_obj.verifyAllValues,
                   'clickelement':self.element_keywords_obj.click_element,
                   'getelementtext':self.element_keywords_obj.get_element_text

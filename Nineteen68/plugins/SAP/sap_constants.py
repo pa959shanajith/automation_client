@@ -66,7 +66,11 @@ VISIBLE_CHECK = 'visible'
 
 CHECKED_CHECK = 'checked'
 
+UNCHECKED_CHECK = 'unchecked'
+
 SELECTED_CHECK = 'selected'
+
+UNSELECTED_CHECK = 'unselected'
 
 COMBO_BOX='cbo'
 
