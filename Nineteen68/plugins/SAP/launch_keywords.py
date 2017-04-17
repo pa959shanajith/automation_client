@@ -100,7 +100,7 @@ class Launch_Keywords():
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
-        value=''
+        value=OUTPUT_CONSTANT
         try:
             ses.StartTransaction(tcode)
             status=sap_constants.TEST_RESULT_PASS
@@ -196,7 +196,7 @@ class Launch_Keywords():
     def closeApplication(self, *args):
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
-        verb = ''
+        verb = OUTPUT_CONSTANT
         err_msg=None
         try:
             SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
