@@ -77,9 +77,10 @@ class WSkeywords:
                  url=url.strip()
                  self.baseEndPointURL = url
                  log.debug('End point URL is set')
-                 logger.print_on_console('End point URL ',url , 'has been set')
-                 log.info(STATUS_METHODOUTPUT_UPDATE)
+                 logger.print_on_console('End point URL:',url , 'has been set')
+                 log.debug(STATUS_METHODOUTPUT_UPDATE)
                  status = ws_constants.TEST_RESULT_PASS
+                 output=self.baseEndPointURL
                  methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_END_POINT_URL']
@@ -113,8 +114,9 @@ class WSkeywords:
                  self.baseOperation = str(operation)
                  log.info('Base operation name has been set to input operation name')
                  logger.print_on_console('Base operation name has been set to: ',operation)
-                 log.info(STATUS_METHODOUTPUT_UPDATE)
+                 log.debug(STATUS_METHODOUTPUT_UPDATE)
                  status = ws_constants.TEST_RESULT_PASS
+                 output=self.baseOperation
                  methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
                 err_msg =ERROR_CODE_DICT['ERR_INVALID_OPERATION']
@@ -150,7 +152,8 @@ class WSkeywords:
                     self.baseMethod = method
                     log.info('Base method name has been set to input method name')
                     logger.print_on_console('Base method name has been set to: ',method)
-                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                    log.debug(STATUS_METHODOUTPUT_UPDATE)
+                    output=self.baseMethod
                     status = ws_constants.TEST_RESULT_PASS
                     methodoutput = ws_constants.TEST_RESULT_TRUE
                 else:
@@ -185,7 +188,8 @@ class WSkeywords:
                 log.debug('Setting the input header template to Header ')
                 self.setHeader(header)
                 log.info('Input header template has been set ')
-                log.info(STATUS_METHODOUTPUT_UPDATE)
+                log.debug(STATUS_METHODOUTPUT_UPDATE)
+                output=self.baseReqHeader
                 status = ws_constants.TEST_RESULT_PASS
                 methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
@@ -216,9 +220,9 @@ class WSkeywords:
             header=str(header)
             if header != None and header.strip() != '':
                 header = str(header).replace('\n','').replace("'",'').strip()
-                log.info('Removed new line and single quote from the input header')
+                log.debug('Removed new line and single quote from the input header')
                 header=header.split('##')
-                log.info('Header is split with ##')
+                log.debug('Header is split with ##')
                 header_dict={}
                 if self.baseReqHeader is not None and isinstance(self.baseReqHeader,dict):
                     header_dict=self.baseReqHeader
@@ -235,7 +239,8 @@ class WSkeywords:
                 else:
                     self.baseReqHeader=header[0]
                 log.info('Header is set')
-                log.info(STATUS_METHODOUTPUT_UPDATE)
+                log.debug(STATUS_METHODOUTPUT_UPDATE)
+                output=self.baseReqHeader
                 status = ws_constants.TEST_RESULT_PASS
                 methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
@@ -249,6 +254,8 @@ class WSkeywords:
             logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
+
+
 
      def setWholeBody(self,body):
         """
@@ -269,7 +276,8 @@ class WSkeywords:
                  body=body.strip()
                  self.baseReqBody = body
                  log.info('Input body has been set to base Request body ')
-                 log.info(STATUS_METHODOUTPUT_UPDATE)
+                 log.debug(STATUS_METHODOUTPUT_UPDATE)
+                 output=self.baseReqBody
                  status = ws_constants.TEST_RESULT_PASS
                  methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
@@ -287,7 +295,7 @@ class WSkeywords:
      def __saveResults(self,response):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         output=None
         try:
             logger.print_on_console('Status code: ',response.status_code)
@@ -296,10 +304,10 @@ class WSkeywords:
             self.baseResHeader=response.headers
             #added status code
             self.baseResHeader['StatusCode']=response.status_code
-            logger.print_on_console(ws_constants.RESPONSE_HEADER,str(self.baseResHeader))
+            log.info(ws_constants.RESPONSE_HEADER+'\n'+str(self.baseResHeader))
             self.baseResBody=response.content
-            logger.print_on_console(ws_constants.RESPONSE_BODY,str(self.baseResBody))
-            log.info(STATUS_METHODOUTPUT_UPDATE)
+            log.info(ws_constants.RESPONSE_BODY+'\n'+str(self.baseResBody))
+            log.debug(STATUS_METHODOUTPUT_UPDATE)
             status = ws_constants.TEST_RESULT_PASS
             methodoutput = ws_constants.TEST_RESULT_TRUE
             output=(self.baseResHeader,self.baseResBody)
@@ -313,7 +321,7 @@ class WSkeywords:
      def post(self):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         output=None
         err_msg=None
         try:
@@ -345,7 +353,7 @@ class WSkeywords:
         methodoutput = ws_constants.TEST_RESULT_FALSE
         output=None
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if not (self.baseEndPointURL is '' or self.baseOperation is '' or self.baseReqHeader is ''):
                 print self.baseReqHeader
@@ -360,7 +368,7 @@ class WSkeywords:
             err_msg=str(e)
             log.error(e)
             logger.print_on_console(e)
-        log.info(RETURN_RESULT)
+        log.debug(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
      def put(self):
@@ -368,7 +376,7 @@ class WSkeywords:
         methodoutput = ws_constants.TEST_RESULT_FALSE
         output=None
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
              s=Session()
              if not (self.baseEndPointURL is '' or self.baseReqBody is '' or self.baseOperation is ''):
@@ -385,13 +393,13 @@ class WSkeywords:
             err_msg=str(e)
             log.error(e)
             logger.print_on_console(e)
-        log.info(RETURN_RESULT)
+        log.debug(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
      def delete(self):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         output=None
         err_msg=None
         try:
@@ -410,7 +418,7 @@ class WSkeywords:
             err_msg=str(e)
             log.error(e)
             logger.print_on_console(e)
-        log.info(RETURN_RESULT)
+        log.debug(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
      def head(self):
@@ -418,7 +426,7 @@ class WSkeywords:
         methodoutput = ws_constants.TEST_RESULT_FALSE
         output=None
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             s=Session()
 
@@ -441,7 +449,7 @@ class WSkeywords:
             err_msg=str(e)
             log.error(e)
             logger.print_on_console(e)
-        log.info(RETURN_RESULT)
+        log.debug(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
      def executeRequest(self,*args):
@@ -492,13 +500,13 @@ class WSkeywords:
                 key=args[0]
                 if key!= None and key != '':
                     logger.print_on_console(ws_constants.RESULT,str(self.baseResHeader[key]))
-                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                    log.debug(STATUS_METHODOUTPUT_UPDATE)
                     status = ws_constants.TEST_RESULT_PASS
                     methodoutput = ws_constants.TEST_RESULT_TRUE
                     output=self.baseResHeader[key]
                 else:
                     logger.print_on_console(ws_constants.RESULT,str(self.baseResHeader))
-                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                    log.debug(STATUS_METHODOUTPUT_UPDATE)
                     if self.baseResHeader != None:
                         status = ws_constants.TEST_RESULT_PASS
                         methodoutput = ws_constants.TEST_RESULT_TRUE
@@ -520,24 +528,28 @@ class WSkeywords:
         try:
             if len(args) == 1:
                     logger.print_on_console(ws_constants.RESULT,self.baseResBody)
-                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                    log.debug(STATUS_METHODOUTPUT_UPDATE)
                     if self.baseResBody != None:
                         status = ws_constants.TEST_RESULT_PASS
                         methodoutput = ws_constants.TEST_RESULT_TRUE
                     output= self.baseResBody
             elif len(args) == 2:
                 key=args[0]
+                print 'args[2]',args
                 if not(self.baseResBody is None):
                     response_body=self.baseResBody
-                    if not (args[0] is '' or args[1] is ''):
+                    if args[0] !='' and args[1]!='' and args[0] !=None and args[1]!=None:
                         start=response_body.find(args[0])+len(args[0])
                         end=response_body.find(args[1])
                         response_body=response_body[start:end]
                         logger.print_on_console(ws_constants.RESULT,response_body)
-                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                        log.debug(STATUS_METHODOUTPUT_UPDATE)
                         status = ws_constants.TEST_RESULT_PASS
                         methodoutput = ws_constants.TEST_RESULT_TRUE
                         output=response_body
+                    else:
+                        err_msg='Invalid input'
+
         except Exception as e:
             log.error(e)
             err_msg=ws_constants.ERR_MSG1+'getBody'
@@ -554,7 +566,7 @@ class WSkeywords:
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             response=requests.get(url, cert=(filepath_cert, filepath_key))
-            log.info(STATUS_METHODOUTPUT_UPDATE)
+            log.debug(STATUS_METHODOUTPUT_UPDATE)
             status = ws_constants.TEST_RESULT_PASS
             methodoutput = ws_constants.TEST_RESULT_TRUE
         except Exception as e:
@@ -599,7 +611,7 @@ class WSkeywords:
         methodoutput = ws_constants.TEST_RESULT_FALSE
         err_msg=None
         output=OUTPUT_CONSTANT
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         import handler
         if self.baseReqBody == '':
             self.baseReqBody=handler.ws_template
@@ -610,7 +622,7 @@ class WSkeywords:
                     if result != None:
                         self.baseReqBody=result
                         handler.ws_template=self.baseReqBody
-                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                        log.debug(STATUS_METHODOUTPUT_UPDATE)
                         status = ws_constants.TEST_RESULT_PASS
                         methodoutput = ws_constants.TEST_RESULT_TRUE
                 else:
@@ -632,7 +644,7 @@ class WSkeywords:
         methodoutput = ws_constants.TEST_RESULT_FALSE
         err_msg=None
         output=OUTPUT_CONSTANT
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         import handler
         if self.baseReqBody == '':
             self.baseReqBody=handler.ws_template
@@ -643,7 +655,7 @@ class WSkeywords:
                     if result != None:
                         self.baseReqBody=result
                         handler.ws_template=self.baseReqBody
-                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                        log.debug(STATUS_METHODOUTPUT_UPDATE)
                         status = ws_constants.TEST_RESULT_PASS
                         methodoutput = ws_constants.TEST_RESULT_TRUE
                 else:
@@ -666,7 +678,7 @@ class WSkeywords:
         methodoutput = ws_constants.TEST_RESULT_FALSE
         err_msg=None
         output=OUTPUT_CONSTANT
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             import ssl
             import re
@@ -684,7 +696,7 @@ class WSkeywords:
                 with open(filepath, 'w') as text_file:
                     text_file.write(cert)
                     text_file.close()
-                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                    log.debug(STATUS_METHODOUTPUT_UPDATE)
                     status = ws_constants.TEST_RESULT_PASS
                     methodoutput = ws_constants.TEST_RESULT_TRUE
             else:

@@ -252,24 +252,24 @@ class StepDescription:
 
         #Launch keywords
         def LaunchApplication():
-            return ' The application present in the path  '+ tsp.inputval[0]+ 'is launched'+ '.'
+            return ' The application present in the path '+ tsp.inputval[0]+ ' is launched'+ '.'
         def getPageTitle():
             return ' The page title is '+ output +' and  is saved  in the variable ' +tsp.outputval+ '.'
         def closeApplication():
             return ' The application is closed'+ '.'
         #Textbox keywords
         def GetText():
-            return ' Get Text From '+ "'" +tsp.custname + "'" + ' and save the text '+ output + ' in ' + tsp.outputval+ '.'
+            return 'Get Text From '+ "'" +tsp.custname + "'" + ' and save the text '+ output + ' in ' + tsp.outputval+ '.'
         def setSecureText():
              return 'Enter secure text ' +tsp.inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
         def ClearText():
-             return 'Clear text from the'+ "'" + tsp.custname + "'"+ '.'
+             return 'Clear text from the '+ "'" + tsp.custname + "'"+ '.'
         def SetText():
             return 'Enter text '+ tsp.inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
         def verifyText():
             return 'Verify ' + input + ' is the the text in the '+ "'" + tsp.custname + "'"+ '.'
         def GetTextBoxLength():
-            return 'Get length from the '+ "'" + tsp.custname + "'"+ 'and save the length '+output+'in'+tsp.outputval+ '.'
+            return 'Get length from the '+ "'" + tsp.custname + "'"+ ' and save the length '+output+'in'+tsp.outputval+ '.'
         def verifyTextboxLength():
             return 'Verify ' + input + ' is the length of textbox '+ "'" + tsp.custname + "'"+ '.'
 
@@ -279,7 +279,7 @@ class StepDescription:
         def verify_button_name():
             return 'Verify text ' + input + ' is the name of the '+ "'" + tsp.custname + "'"+ '.'
         def button_uploadFile():
-            return ' Upload the file '+ filename + ' present in the path ' + input + '.'
+            return 'Upload the file '+ filename + ' present in the path ' + input + '.'
 
         #Dropdown keywords
         def getSelected():
@@ -305,7 +305,7 @@ class StepDescription:
             return 'Click on ' +"'" + tsp.custname + "'"+'.'
         def get_element_text():
             return 'Get the text of the element '+ "'" + tsp.custname + "'"+ ' and save the value  '+ output + ' in '+ tsp.outputval+'.'
-              #Radio checkbox keywords
+        #Radio checkbox keywords
         def select_radiobutton():
             return 'Select '+ "'" + tsp.custname + "'"+'.'
         def get_status():

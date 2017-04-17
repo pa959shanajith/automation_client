@@ -100,7 +100,7 @@ class Launch_Keywords():
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
-        value=''
+        value=OUTPUT_CONSTANT
         try:
             ses.StartTransaction(tcode)
             status=sap_constants.TEST_RESULT_PASS

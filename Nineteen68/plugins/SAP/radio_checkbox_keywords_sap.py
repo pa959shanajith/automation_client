@@ -113,8 +113,7 @@ class Radio_Checkbox_keywords():
         id,ses=tk.attach(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
-        #verb = OUTPUT_CONSTANT
-        value=''
+        value=OUTPUT_CONSTANT
         err_msg=None
         try:
             if(id != None):
@@ -122,14 +121,22 @@ class Radio_Checkbox_keywords():
                     #----------------------------------------------------------Check for radio
                     if(ses.FindById(id).type == "GuiRadioButton"):
                         value = ses.FindById(id).selected
-                        status=sap_constants.TEST_RESULT_PASS
-                        result=sap_constants.TEST_RESULT_TRUE
+                        if(value==True):
+                            value=sap_constants.SELECTED_CHECK
+                            status=sap_constants.TEST_RESULT_PASS
+                            result=sap_constants.TEST_RESULT_TRUE
+                        else:
+                            value=sap_constants.UNSELECTED_CHECK
 
                     #----------------------------------------------------------Check for Checkbox
                     elif(ses.FindById(id).type == "GuiCheckBox"):
                         value = ses.FindById(id).selected
-                        status=sap_constants.TEST_RESULT_PASS
-                        result=sap_constants.TEST_RESULT_TRUE
+                        if(value ==True):
+                            value=sap_constants.CHECKED_CHECK
+                            status=sap_constants.TEST_RESULT_PASS
+                            result=sap_constants.TEST_RESULT_TRUE
+                        else:
+                            value=sap_constants.UNCHECKED_CHECK
                     else:
                         logger.print_on_console('Element state does not allow to perform the operation')
                         err_msg = sap_constants.ERROR_MSG
