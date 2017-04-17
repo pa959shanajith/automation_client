@@ -51,7 +51,8 @@ class Dropdown_Keywords():
             status = sap_constants.TEST_RESULT_FAIL
             result = sap_constants.TEST_RESULT_FALSE
             verb = OUTPUT_CONSTANT
-            index=input_val[0]
+            index=int(input_val[0])
+            index=index+1
             err_msg=None
             i = 0
             result = None
@@ -62,7 +63,7 @@ class Dropdown_Keywords():
                         while True:
                             try:
                                 #print entries(i).key
-                                if(entries(i).key == index):
+                                if(int(entries(i).key) == index):
                                     ses.FindById(id).value = entries(i).value
                                     status=sap_constants.TEST_RESULT_PASS
                                     result=sap_constants.TEST_RESULT_TRUE
@@ -83,7 +84,8 @@ class Dropdown_Keywords():
             result = sap_constants.TEST_RESULT_FALSE
             #verb = OUTPUT_CONSTANT
             value=''
-            index=input_val[0]
+            index=int(input_val[0])
+            index=index+1
             err_msg=None
             i = 0
             result = None
@@ -94,7 +96,7 @@ class Dropdown_Keywords():
                         while True:
                             try:
                                 #print entries(i).key
-                                if(entries(i).key == index):
+                                if(int(entries(i).key) == index):
                                     value = entries(i).value
                                     status=sap_constants.TEST_RESULT_PASS
                                     result=sap_constants.TEST_RESULT_TRUE
@@ -152,8 +154,8 @@ class Dropdown_Keywords():
             status = sap_constants.TEST_RESULT_FAIL
             result = sap_constants.TEST_RESULT_FALSE
 
-            #verb = OUTPUT_CONSTANT
-            value=OUTPUT_CONSTANT
+            verb = OUTPUT_CONSTANT
+            #value=OUTPUT_CONSTANT
             err_msg=None
             result = None
             try:
@@ -168,7 +170,7 @@ class Dropdown_Keywords():
             except Exception as e:
                 log.error('Error occured',e)
                 err_msg = sap_constants.ERROR_MSG
-            return status,result,value,err_msg
+            return status,result,verb,err_msg
 
 
         def getCount(self,sap_id, *args):
@@ -202,8 +204,8 @@ class Dropdown_Keywords():
             length = int(input_val[0])
             tk=Text_Keywords()
             id,ses=tk.attach(sap_id)
-
-            value=OUTPUT_CONSTANT
+            verb = OUTPUT_CONSTANT
+            value=''
             status = sap_constants.TEST_RESULT_FAIL
             result = sap_constants.TEST_RESULT_FALSE
             count = 0
@@ -226,7 +228,7 @@ class Dropdown_Keywords():
                         log.info('Count Verify has failed ')
             except Exception as e:
                   log.error('Error occured',e)
-            return status,result,value,err_msg
+            return status,result,verb,err_msg
 
         def verifyValuesExists(self,sap_id,url,input_val, *args):
             tk=Text_Keywords()
@@ -234,8 +236,8 @@ class Dropdown_Keywords():
             status = sap_constants.TEST_RESULT_FAIL
             result = sap_constants.TEST_RESULT_FALSE
             err_msg=None
-            #verb = OUTPUT_CONSTANT
-            value=OUTPUT_CONSTANT
+            verb = OUTPUT_CONSTANT
+            #value=OUTPUT_CONSTANT
             val=input_val[0]
             i = 0
             result = None
@@ -259,7 +261,7 @@ class Dropdown_Keywords():
 
             except Exception as e:
                   log.error('Error occured',e)
-            return status,result,value,err_msg
+            return status,result,verb,err_msg
 
 
         def verifyAllValues(self,sap_id,url,input_val, *args):
