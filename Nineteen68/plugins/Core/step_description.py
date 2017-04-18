@@ -276,6 +276,8 @@ class StepDescription:
         #Button link keywords
         def click():
             return  'Click on ' +"'" + tsp.custname + "'"+'.'
+        def get_button_name():
+            return ' Get ButtonName From '+ "'" + tsp.custname + "'" + ' and save the text '+ output + ' in ' + tsp.outputval+'.'
         def verify_button_name():
             return 'Verify text ' + input + ' is the name of the '+ "'" + tsp.custname + "'"+ '.'
         def button_uploadFile():

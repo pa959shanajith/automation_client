@@ -70,6 +70,7 @@ class SAPDispatcher:
                   'selectradiobutton':self.radiocheckbox_keywords_obj.select_radiobutton,
                   'getstatus': self.radiocheckbox_keywords_obj.get_status,
                   'click':self.button_link_obj.click,
+                  'getbuttonname':self.button_link_obj.get_button_name,
                   'verifybuttonname':self.button_link_obj.verify_button_name,
                   'uploadfile':self.button_link_obj.button_uploadFile,
                   'getselected':self.dropdown_keywords_obj.getSelected,
