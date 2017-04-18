@@ -31,7 +31,7 @@ class Dropdown_Keywords():
             try:
                 if(id != None):
                     if(ses.FindById(id).Changeable == True):
-                        value = ses.FindById(id).selected()
+                        value = ses.FindById(id).Text.strip()
                         status=sap_constants.TEST_RESULT_PASS
                         result=sap_constants.TEST_RESULT_TRUE
                 else:
@@ -161,7 +161,7 @@ class Dropdown_Keywords():
             try:
                 if(id != None):
                     if(ses.FindById(id).Changeable == True):
-                        if(ses.FindById(id).selected() == in_value):
+                        if(ses.FindById(id).Text.strip() == in_value):
                                     status=sap_constants.TEST_RESULT_PASS
                                     result=sap_constants.TEST_RESULT_TRUE
                         else:

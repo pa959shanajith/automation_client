@@ -23,11 +23,12 @@ import static_text_keywords
 import logger
 from webconstants import *
 import custom_keyword
+import screenshot_keywords
 from collections import OrderedDict
 from constants import *
 import requests
 import re
-
+import readconfig
 import logging
 
 log = logging.getLogger('web_dispatcher.py')
@@ -298,9 +299,19 @@ class Dispatcher:
 
             else:
                 err_msg=INVALID_KEYWORD
+                result=list(result)
                 result[3]=err_msg
+            screen_shot_obj = screenshot_keywords.Screenshot()
+            configobj = readconfig.readConfig()
+            configvalues = configobj.readJson()
+            if configvalues['screenShot_Flag'].lower() == 'fail':
+                if res[0].lower() == 'fail':
+                    screen_shot_obj.captureScreenshot()
+            elif configvalues['screenShot_Flag'].lower() == 'all':
+                screen_shot_obj.captureScreenshot()
         except TypeError as e:
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
+            result=list(result)
             result[3]=err_msg
         except Exception as e:
             log.error(e)

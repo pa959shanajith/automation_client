@@ -12,7 +12,7 @@
 class StepDescription:
 
 
-    def generic(self,keyword,tsp,input,output,con,reporting_obj):
+    def generic(self,keyword,tsp,inputval,input,output,con,reporting_obj):
 
         #Date operations
         def getCurrentTime():
@@ -20,14 +20,14 @@ class StepDescription:
         def getCurrentDate():
             return 'Get current date of the system and save the date ' + tsp.outputval + ' in '+ tsp.outputval
         def getCurrentDateAndTime():
-            return 'Get current date and time of the system and save the date and time '+ tsp.inputval[0] + ' and '+ tsp.inputval[1] + ' in '+ tsp.outputval
+            return 'Get current date and time of the system and save the date and time '+ inputval[0] + ' and '+ inputval[1] + ' in '+ tsp.outputval
 
 
         #File operations
         def executeFile():
             return 'Perform execution of the file'  + input
         def verifyContent():
-            return ' Verify '+ tsp.inputval[1]+ ' is present in the file ' + input
+            return ' Verify '+ inputval[1]+ ' is present in the file ' + input
         def getContent():
                 return 'Get content from the file ' + input+ ' and save it in '+ tsp.outputval
         def compareFiles():
@@ -66,7 +66,7 @@ class StepDescription:
 
         #Dynamic variable keywords
         def deleteDynVariable():
-            return 'Delete variable ' + tsp.inputval[0]
+            return 'Delete variable ' + inputval[0]
 
 
 
@@ -74,7 +74,7 @@ class StepDescription:
             return 'Get Block Value of XML and save the value '" + output+ "' in '" + tsp.outputval + "''
 
         def VerifyValues():
-            return "Verify values \"" + input + "\" and \"" + tsp.inputval[1]+ "\" and save the result in \""+ tsp.outputval + "\"."
+            return "Verify values \"" + input + "\" and \"" + inputval[1]+ "\" and save the result in \""+ tsp.outputval + "\"."
 
         def captureScreenshot():
 
@@ -82,7 +82,7 @@ class StepDescription:
 
         def changeDateFormat():
 
-            return "Change the format of the date '"+ input + "' to format '"+ tsp.inputval[1]+ "' and save the date  '" + output + "' in "+tsp.outputval
+            return "Change the format of the date '"+ input + "' to format '"+ inputval[1]+ "' and save the date  '" + output + "' in "+tsp.outputval
 
         def clearFileContent():
 #            this needs to be implemeted
@@ -119,24 +119,24 @@ class StepDescription:
 
 
         def compareContent():
-            return "Compare the contents of file '"+ input+ "' and '"+ tsp.inputval[1]+ "'"
+            return "Compare the contents of file '"+ input+ "' and '"+ inputval[1]+ "'"
 
         def concatenate():
             return "Concatenate string '"+ input + "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
         def copyValue():
-            return "Copy value to variable '"+ input+ "' from variable '"+ tsp.inputval[1] + "'"
+            return "Copy value to variable '"+ input+ "' from variable '"+ inputval[1] + "'"
         def createDynVariable():
-            return "Create a variable '"+ input+ "' with value '"+ tsp.inputval[1] + "'"
+            return "Create a variable '"+ input+ "' with value '"+ inputval[1] + "'"
         def dateAddition():
-            return "Add the date '"+ input + "' to'"+ tsp.inputval[1]+ "' number of days and save the date'" + output + "' in '"+ tsp.outputval
+            return "Add the date '"+ input + "' to'"+ inputval[1]+ "' number of days and save the date'" + output + "' in '"+ tsp.outputval
         def dateCompare():
-            return "Compare '" + input+ "' and '" + tsp.inputval[1] + "'."
+            return "Compare '" + input+ "' and '" + inputval[1] + "'."
         def dateDifference():
-            return "Get the difference between the dates '"+ input+ "' and '"+ tsp.inputval[1]+ "' and save the date '" + output+ "' in '"+ tsp.outputval + "'"
+            return "Get the difference between the dates '"+ input+ "' and '"+ inputval[1]+ "' and save the date '" + output+ "' in '"+ tsp.outputval + "'"
         def exportData():
-            return "Execute SQL Query '"+ tsp.inputval[5]+" and save resultset in " + output
+            return "Execute SQL Query '"+ inputval[5]+" and save resultset in " + output
         def find():
-            return "Verify input string '"+ input + "' contains '"+ tsp.inputval[1] + "'"
+            return "Verify input string '"+ input + "' contains '"+ inputval[1] + "'"
         def getBlockCount():
             return "Get the Block Count of XML and save the value '" + output+ "' in '" + tsp.outputval + "'"
         def getContent():
@@ -144,53 +144,53 @@ class StepDescription:
         def getCurrentDate():
             return 'Get current date of the system and save the date ' + tsp.outputval + ' in '+ tsp.outputval
         def getCurrentDateAndTime():
-            return 'Get current date and time of the system and save the date and time '+ tsp.inputval[0] + ' and '+ tsp.inputval[1] + ' in '+ tsp.outputval
+            return 'Get current date and time of the system and save the date and time '+ inputval[0] + ' and '+ inputval[1] + ' in '+ tsp.outputval
         def getCurrentTime():
             return 'Get current time of the system and save the time '+ output + ' in '+ tsp.outputval
         def getData():
-            return "Execute SQL Query '"+ tsp.inputval[5]+" and save resultset in " + output
+            return "Execute SQL Query '"+ inputval[5]+" and save resultset in " + output
         def getIndexCount():
-            return "The index count for the dynamic variable '"+ input+ "' is '"+ tsp.inputval[1] + "'"
+            return "The index count for the dynamic variable '"+ input+ "' is '"+ inputval[1] + "'"
         def getLineNumber():
-            return "Get the line number of content '"+ input+ "' from file '"+ tsp.inputval[1]+ "' and save the value '" + output + "' in "+tsp.outputval
+            return "Get the line number of content '"+ input+ "' from file '"+ inputval[1]+ "' and save the value '" + output + "' in "+tsp.outputval
         def getParam():
-            return "Get data from file '"+ input + "' and  sheet '"+ tsp.inputval[1] + "'"
+            return "Get data from file '"+ input + "' and  sheet '"+ inputval[1] + "'"
         def getStringLength():
             return "Get the length of the string '" + input+ "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
         def getSubString():
-            return "Get Substring of the string '"+ input+ "' with index/range '"+ tsp.inputval[1]+ "'  and save the value '" + output+ "' in variable '"+ tsp.outputval + "'"
+            return "Get Substring of the string '"+ input+ "' with index/range '"+ inputval[1]+ "'  and save the value '" + output+ "' in variable '"+ tsp.outputval + "'"
         def getTagValue():
             return "Get Tag Value of XML and save the value '" + output+ "' in '" + tsp.outputval + "'"
         def left():
-            return "Perform String operation Left on string '"+ input+ "' with index '"+ tsp.inputval[1]+ "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
+            return "Perform String operation Left on string '"+ input+ "' with index '"+ inputval[1]+ "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
         def mid():
             return "Perform String operation Mid on string '" + input+ "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
         def modifyValue():
-            return "Modify variable '"+ input + "' value to '"+ tsp.inputval[1] + "'"
+            return "Modify variable '"+ input + "' value to '"+ inputval[1] + "'"
         def monthAddition():
-            return "Add Months '"+ input + "' value to '"+ tsp.inputval[1] + "'"
+            return "Add Months '"+ input + "' value to '"+ inputval[1] + "'"
         def mousePress():
             return 'Mouse Pressed'
         def replace():
-            return "In string '"+ input + "' replace '"+ tsp.inputval[1] + "' with '"+ tsp.inputval[2]+ "' and save the updated input string '" + output+ "' in '" + tsp.outputval + "'"
+            return "In string '"+ input + "' replace '"+ inputval[1] + "' with '"+ inputval[2]+ "' and save the updated input string '" + output+ "' in '" + tsp.outputval + "'"
         def replaceContent():
-            return "Replace '"+ input + "' in the '"+ tsp.inputval[1] + " with the "+ tsp.inputval[2]
+            return "Replace '"+ input + "' in the '"+ inputval[1] + " with the "+ inputval[2]
         def right():
-            return "Perform String operation right on string '"+ input+ "' with index '"+ tsp.inputval[1]+ "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
+            return "Perform String operation right on string '"+ input+ "' with index '"+ inputval[1]+ "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
         def runQuery():
-            return "Execute SQL Query '"+ tsp.inputval[5]+" and save resultset in " + output
+            return "Execute SQL Query '"+ inputval[5]+" and save resultset in " + output
         def secureExportData():
-            return "Execute SQL Query '"+ tsp.inputval[5]+" and save resultset in " + output
+            return "Execute SQL Query '"+ inputval[5]+" and save resultset in " + output
         def secureGetData():
-            return "Execute SQL Query '"+ tsp.inputval[5]+" and save resultset in " + output
+            return "Execute SQL Query '"+ inputval[5]+" and save resultset in " + output
         def secureRunQuery():
-            return "Execute SQL Query '"+ tsp.inputval[5]+" and save resultset in " + output
+            return "Execute SQL Query '"+ inputval[5]+" and save resultset in " + output
         def secureVerifyData():
-            return "Verify SQL Query '"+ tsp.inputval[5]+ "' and result is same as '"+ tsp.inputval[7] + ","+ tsp.inputval[8] + "'"
+            return "Verify SQL Query '"+ inputval[5]+ "' and result is same as '"+ inputval[7] + ","+ inputval[8] + "'"
         def sendFunctionKeys():
             return "Execute Function key  "+ input
         def split():
-            return "Split the string '"+ input+ "' with split character '"+ tsp.inputval[1]+ "' and save the value:"+ tsp.inputval[2] + " in '"+ tsp.outputval + "'"
+            return "Split the string '"+ input+ "' with split character '"+ inputval[1]+ "' and save the value:"+ inputval[2] + " in '"+ tsp.outputval + "'"
         def stop():
             return "Stop the Exceution"
         def stringGeneration():
@@ -202,21 +202,21 @@ class StepDescription:
         def trim():
             return ' Trim ' + input+ ' and save the value ' + output + ' in '+ tsp.outputval
         def verifyContent():
-            return "Verify '"+ tsp.inputval[1]+ "' is present in the file '" + input + "'"
+            return "Verify '"+ inputval[1]+ "' is present in the file '" + input + "'"
         def verifyData():
-            return "Verify SQL Query '"+ tsp.inputval[5]+ "' and result is same as '"+ tsp.inputval[7] + ","+ tsp.inputval[8] + "'"
+            return "Verify SQL Query '"+ inputval[5]+ "' and result is same as '"+ inputval[7] + ","+ inputval[8] + "'"
         def verifyFileImages():
-            return "Compare images '" + input+ "' and '" + tsp.inputval[1]+ "'"
+            return "Compare images '" + input+ "' and '" + inputval[1]+ "'"
         def wait():
             return 'Wait for ' + input+ ' Second(s)'
         def writeToFile():
-            return "Write '"+ tsp.inputval[1] + "' to file  '" + input + "'"
+            return "Write '"+ inputval[1] + "' to file  '" + input + "'"
         def yearAddition():
-            return "Add Years '"+ input + "' value to '"+ tsp.inputval[1] + "'"
+            return "Add Years '"+ input + "' value to '"+ inputval[1] + "'"
         return locals()[keyword]()
 
 
-    def webservices(self,keyword,tsp,input,output,con,reporting_obj):
+    def webservices(self,keyword,tsp,inputval,input,output,con,reporting_obj):
 
         def setWholeBody():
             return 'Set the entire body ' + input+ ' that needs to be sent in the request'
@@ -241,18 +241,18 @@ class StepDescription:
         def getBody():
             return 'Fetch the entire body ' + output+ ' that was received as a response.'
         def addClientCertificate():
-            return 'Add the certificate present in the '+ tsp.inputval[0]+ ' to the '+ tsp.inputval[1] + '.'
+            return 'Add the certificate present in the '+ inputval[0]+ ' to the '+ inputval[1] + '.'
         def getServerCertificate():
-            return 'Fetch the Server certificate and save it in '+ tsp.inputval[1] + '.'
+            return 'Fetch the Server certificate and save it in '+ inputval[1] + '.'
         def executeRequest():
             return 'Execute the request.'
         return locals()[key](keyword)
 
-    def sap(self,keyword,tsp,input,output,con,reporting_obj):
+    def sap(self,keyword,tsp,inputval,input,output,con,reporting_obj):
 
         #Launch keywords
         def LaunchApplication():
-            return ' The application present in the path '+ tsp.inputval[0]+ ' is launched'+ '.'
+            return ' The application present in the path '+ inputval[0]+ ' is launched'+ '.'
         def getPageTitle():
             return ' The page title is '+ output +' and  is saved  in the variable ' +tsp.outputval+ '.'
         def closeApplication():
@@ -261,11 +261,11 @@ class StepDescription:
         def GetText():
             return 'Get Text From '+ "'" +tsp.custname + "'" + ' and save the text '+ output + ' in ' + tsp.outputval+ '.'
         def setSecureText():
-             return 'Enter secure text ' +tsp.inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
+             return 'Enter secure text ' +inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
         def ClearText():
              return 'Clear text from the '+ "'" + tsp.custname + "'"+ '.'
         def SetText():
-            return 'Enter text '+ tsp.inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
+            return 'Enter text '+ inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
         def verifyText():
             return 'Verify ' + input + ' is the the text in the '+ "'" + tsp.custname + "'"+ '.'
         def GetTextBoxLength():
@@ -319,7 +319,7 @@ class StepDescription:
         return locals()[keyword]()
 
 
-    def desktop(self,keyword,tsp,input,output,con,reporting_obj):
+    def desktop(self,keyword,tsp,inputval,input,output,con,reporting_obj):
         #dropdown keywords
         def DeselectAll():
             return 'Deselect all values in the '+ "'" + tsp.custname + "'"
@@ -358,7 +358,7 @@ class StepDescription:
 
         #Application keywords
         def LaunchApplication():
-            return ' The application present in the path  '+ tsp.inputval[0]+ 'is launched'
+            return ' The application present in the path  '+ inputval[0]+ 'is launched'
         def GetPageTitle():
             return ' The page title is '+ output +' and  is saved  in the variable ' +tsp.outputval
         def CloseApplication():
@@ -375,7 +375,7 @@ class StepDescription:
         #text box
         return locals()[keyword]()
 
-    def web(self,keyword,tsp,input,output,con,reporting_obj):
+    def web(self,keyword,tsp,inputval,input,output,con,reporting_obj):
 
         #Popup keywords
         def verifyPopUpText():
@@ -398,7 +398,7 @@ class StepDescription:
         def verifyTextboxLength():
             return 'Verify ' + input + ' is the length of textbox '+ "'" + tsp.custname + "'"
         def setSecureText():
-            return 'Enter secure text ' +tsp.inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"
+            return 'Enter secure text ' +inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"
 
 
 

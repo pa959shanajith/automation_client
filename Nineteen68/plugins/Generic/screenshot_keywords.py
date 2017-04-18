@@ -37,38 +37,45 @@ class Screenshot():
                 inputval = args[0]
                 filename = args[1]
                 log.debug('Reading the inputs')
-                if not os.path.exists(inputval):
-                    os.makedirs(inputval)
-                if filename!=None:
-                    if '.' in filename:
-                        filename=filename.split('.')[0]
-                    filePath=str(inputval) + '//'+ filename
-                else:
-                    filename=self.generateUniqueFileName()
-                    filePath=str(inputval) + '//'+ filename
+                try:
+                    if not os.path.exists(inputval):
+                        os.makedirs(inputval)
+                    if filename!=None:
+                        if '.' in filename:
+                            filename=filename.split('.')[0]
+                        filePath=str(inputval) + '//'+ filename
+                    else:
+                        filename=self.generateUniqueFileName()
+                        filePath=str(inputval) + '//'+ filename
+                except Exception as e:
+                    logger.print_on_console( e)
             else:
-                import readconfig
-                configobj = readconfig.readConfig()
-                configvalues = configobj.readJson()
-                path = configvalues['screenShot_PathName']
-                if not os.path.exists(path):
-                    os.makedirs(path)
-                filename=self.generateUniqueFileName()
-                filePath = path + filename
+                try:
+                    import readconfig
+                    configobj = readconfig.readConfig()
+                    configvalues = configobj.readJson()
+                    path = configvalues['screenShot_PathName']
+                    if not os.path.exists(path):
+                        os.makedirs(path)
+                    filename=self.generateUniqueFileName()
+                    filePath = path + filename
+                except Exception as e:
+                    logger.print_on_console( e)
 
 
-            log.debug('capturing the screenshot')
-            logger.print_on_console('capturing the screenshot')
+            log.debug('screenshot captured')
+            logger.print_on_console('screenshot captured')
             img=ImageGrab.grab()
             img.save(filePath+'.png')
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
-            log.debug('screenshot captured and saved in : ',filePath+'.png')
-            logger.print_on_console('The Specified path is not found, hence screenshot captured and saved in default path')
+##            log.debug('screenshot captured and saved in : ',filePath+'.png')
+##            logger.print_on_console('The Specified path is not found, hence screenshot captured and saved in default path')
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            err_msg=INPUT_ERROR
+            err_msg="Screenshot not captured - You do not have write permission to screenshot folder!!! - "
+            logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
     def generateUniqueFileName(self):
