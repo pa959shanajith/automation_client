@@ -123,20 +123,20 @@ class Radio_Checkbox_keywords():
                         value = ses.FindById(id).selected
                         if(value==True):
                             value=sap_constants.SELECTED_CHECK
-                            status=sap_constants.TEST_RESULT_PASS
-                            result=sap_constants.TEST_RESULT_TRUE
                         else:
                             value=sap_constants.UNSELECTED_CHECK
+                        status=sap_constants.TEST_RESULT_PASS
+                        result=sap_constants.TEST_RESULT_TRUE
 
                     #----------------------------------------------------------Check for Checkbox
                     elif(ses.FindById(id).type == "GuiCheckBox"):
                         value = ses.FindById(id).selected
                         if(value ==True):
                             value=sap_constants.CHECKED_CHECK
-                            status=sap_constants.TEST_RESULT_PASS
-                            result=sap_constants.TEST_RESULT_TRUE
                         else:
                             value=sap_constants.UNCHECKED_CHECK
+                        status=sap_constants.TEST_RESULT_PASS
+                        result=sap_constants.TEST_RESULT_TRUE
                     else:
                         logger.print_on_console('Element state does not allow to perform the operation')
                         err_msg = sap_constants.ERROR_MSG

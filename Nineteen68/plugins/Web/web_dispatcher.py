@@ -305,7 +305,7 @@ class Dispatcher:
             configobj = readconfig.readConfig()
             configvalues = configobj.readJson()
             if configvalues['screenShot_Flag'].lower() == 'fail':
-                if res[0].lower() == 'fail':
+                if result[0].lower() == 'fail':
                     screen_shot_obj.captureScreenshot()
             elif configvalues['screenShot_Flag'].lower() == 'all':
                 screen_shot_obj.captureScreenshot()
