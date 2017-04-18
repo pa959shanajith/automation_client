@@ -54,6 +54,38 @@ class ButtonLinkKeyword():
         log.error(e)
         return status,result,value,err_msg
 
+    def get_button_name(self,  sap_id ,url, input_val, *args):
+        tk=Text_Keywords()
+        id,ses=tk.attach(sap_id)
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
+        log.debug('Got window name after launching application')
+        #log.debug(launch_keywords.window_name)
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        name=input_val[0]
+        #verb = OUTPUT_CONSTANT
+        value=OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            if(id != None):
+                if(ses.FindById(id).Changeable == True):
+                   if(ses.FindById(id).Text != None):
+                     value=ses.FindById(id).Text
+                     status =sap_constants.TEST_RESULT_PASS
+                     result = sap_constants.TEST_RESULT_TRUE
+                   else:
+                     print 'Button name is not defined'
+
+            else:
+                    log.info('element not present on the page where operation is trying to be performed')
+                    err_msg = 'element not present on the page where operation is trying to be performed'
+        except Exception as e:
+            import traceback
+            traceback.getexc()
+            log.error(e)
+
+        return status,result,value,err_msg
+
     def verify_button_name(self,  sap_id ,url, input_val, *args):
         tk=Text_Keywords()
         id,ses=tk.attach(sap_id)
@@ -69,12 +101,12 @@ class ButtonLinkKeyword():
         try:
             if(id != None):
                 if(ses.FindById(id).Changeable == True):
-                    if(ses.FindById(id).tooltip == name):
+                    if(ses.FindById(id).Text != None and ses.FindById(id).Text == name):
                         status =sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
                     else:
-                        log.info('element not Matching')
-                        err_msg = 'element not Matching'
+                        log.info('Button name is not Matching')
+                        err_msg = 'Button name is not Matching'
             else:
                     log.info('element not present on the page where operation is trying to be performed')
                     err_msg = 'element not present on the page where operation is trying to be performed'
