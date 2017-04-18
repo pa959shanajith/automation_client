@@ -460,6 +460,7 @@ class ExcelXLS:
                 if type in self.cell_type.keys():
                     type=self.cell_type[type]
                     if type=='0.00':
+                        flag=True
                     	#Setting cell format to number
                         style=XFStyle()
                         style.num_format_str=type
@@ -472,6 +473,7 @@ class ExcelXLS:
 ##                        value='='+value
                         s.write(int(row),int(col),value)
                     else:
+                        flag=True
                         value=str(value)
                         s.write(int(row),int(col),value)
 
@@ -481,6 +483,7 @@ class ExcelXLS:
                     logger.print_on_console('Cell Type not supported')
                     log.info('Cell Type not supported')
             else:
+                flag=True
                 status= True
                 value=str(value)
                 s.write(int(row),int(col),value)
@@ -956,10 +959,12 @@ class ExcelXLSX:
                 if type=='0.00':
                     cell.number_format=type
                     value=int(value)
+                    flag=True
                 elif type in ['f','b']:
                     flag=True
                     value='='+value
                 else:
+                    flag=True
                     value=str(value)
                 cell.value=value
                 status=True
@@ -968,6 +973,7 @@ class ExcelXLSX:
            else:
                 cell.value=value
                 status=True
+                flag = True
         except IOError:
             err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
             log.error(err_msg)
