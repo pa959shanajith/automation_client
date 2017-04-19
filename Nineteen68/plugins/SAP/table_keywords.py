@@ -10,9 +10,6 @@
 #-------------------------------------------------------------------------------
 
 import win32com.client
-import fullScrape
-import object_keywords as ok
-
 import logger
 
 import sap_constants
@@ -31,11 +28,6 @@ from radio_checkbox_keywords_sap import Radio_Checkbox_keywords
 #-----------------------------------------------------Module Imports
 
 class Table_keywords():
-    lk= Launch_Keywords()
-    bk =ButtonLinkKeyword()
-    dk = Dropdown_Keywords()
-    rk= Radio_Checkbox_keywords()
-    ek=ElementKeywords()
 
     def getXpath(elem,row,col):
         try:
