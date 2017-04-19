@@ -19,6 +19,7 @@ import text_keywords_sap
 import element_keywords
 import dropdown_keywords
 import radio_checkbox_keywords_sap
+import saputil_operations
 #-------------------------------------------------------------
 import sap_constants
 import constants
@@ -33,6 +34,7 @@ class SAPDispatcher:
     dropdown_keywords_obj = dropdown_keywords.Dropdown_Keywords()
     radiocheckbox_keywords_obj= radio_checkbox_keywords_sap.Radio_Checkbox_keywords()
     element_keywords_obj=element_keywords.ElementKeywords()
+	saputil_keywords_obj=saputil_operations.SapUtilKeywords()
 
 
     def __init__(self):
