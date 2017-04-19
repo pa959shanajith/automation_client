@@ -181,17 +181,20 @@ class Launch_Keywords():
         return status,result,verb,self.windowname,err_msg
 
     def getPageTitle(self,*args):
+        lk=Launch_Keywords()
+        ses=lk.getSession()
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
+        value=OUTPUT_CONSTANT
         try:
-            if self.windowname!='':
+                value = ses.ActiveWindow.Text
                 status=sap_constants.TEST_RESULT_PASS
                 result = sap_constants.TEST_RESULT_TRUE
-                return status,self.windowname
         except Exception as e:
+            logger.print_on_console('unable to get the page title because',e)
             err_msg = sap_constants.ERROR_MSG
-        return status,result,self.windowname,err_msg
+        return status,result,value,err_msg
 
     def closeApplication(self, *args):
         status=sap_constants.TEST_RESULT_FAIL
