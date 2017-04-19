@@ -84,7 +84,11 @@ class SAPDispatcher:
                   'verifyallvalues':self.dropdown_keywords_obj.verifyAllValues,
                   'clickelement':self.element_keywords_obj.click_element,
                   'getelementtext':self.element_keywords_obj.get_element_text,
-                  'gettooltiptext':self.editable_text_obj.getTooltipText
+                  'gettooltiptext':self.editable_text_obj.getTooltipText,
+                  'verifyenabled':self.saputil_keywords_obj.verifyEnabled,
+                  'verifydisabled':self.saputil_keywords_obj.verifyDisabled,
+                  'verifyexists':self.saputil_keywords_obj.VerifyExists,
+                  'setfocus':self.saputil_keywords_obj.setFocus
                    }
 
 
