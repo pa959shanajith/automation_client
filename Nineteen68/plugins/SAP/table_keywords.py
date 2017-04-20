@@ -10,9 +10,6 @@
 #-------------------------------------------------------------------------------
 
 import win32com.client
-import fullScrape
-import object_keywords as ok
-
 import logger
 
 import sap_constants
@@ -31,11 +28,6 @@ from radio_checkbox_keywords_sap import Radio_Checkbox_keywords
 #-----------------------------------------------------Module Imports
 
 class Table_keywords():
-    lk= Launch_Keywords()
-    bk =ButtonLinkKeyword()
-    dk = Dropdown_Keywords()
-    rk= Radio_Checkbox_keywords()
-    ek=ElementKeywords()
 
     def getXpath(elem,row,col):
         try:
@@ -106,7 +98,7 @@ class Table_keywords():
 
 
 
-    def mouseHover(self, sap_id, input_val,*args):
+    def mouseHover(self, sap_id,url, input_val,*args):
         row=input_val[0]
         col=input_val[1]
         tk=Text_Keywords()
@@ -127,7 +119,7 @@ class Table_keywords():
 
 
 
-    def getColNumByText(self, sap_id, input_val,*args):
+    def getColNumByText(self, sap_id,url, input_val,*args):
         colName=input_val[0]
         tk=Text_Keywords()
         id,ses=tk.attach(sap_id)
@@ -151,7 +143,7 @@ class Table_keywords():
 
 
 
-    def getRowNumByText(self, sap_id, input_val,*args):
+    def getRowNumByText(self, sap_id,url, input_val,*args):
         rowText=input_val[0]
         tk=Text_Keywords()
         id,ses=tk.attach(sap_id)
@@ -179,7 +171,7 @@ class Table_keywords():
 
 
 
-    def getCellValue(self, sap_id, input_val,*args):
+    def getCellValue(self, sap_id,url, input_val,*args):
         row=input_val[0]
         col=input_val[1]
         tk=Text_Keywords()
@@ -200,7 +192,7 @@ class Table_keywords():
 
 
 
-    def verifyCellValue(self, sap_id, input_val,*args):
+    def verifyCellValue(self, sap_id,url, input_val,*args):
         row=input_val[0]
         col=input_val[1]
         cell_value=input_val[2]
@@ -225,7 +217,7 @@ class Table_keywords():
 
 
 
-    def verifyTextExists(self, sap_id, input_val,*args):
+    def verifyTextExists(self, sap_id,url, input_val,*args):
         text=input_val[0]
         tk=Text_Keywords()
         id,ses=tk.attach(sap_id)
@@ -534,7 +526,8 @@ class Table_keywords():
             row_to_select = rows[rowNum]
             if(row_to_select.Selectable == True):
                 row_to_select.selected = False
-                result = True
+                status=sap_constants.TEST_RESULT_PASS
+                result=sap_constants.TEST_RESULT_TRUE
             else:
                 logger.print_on_console('Element state does not allow to perform the operation')
                 err_msg = sap_constants.ERROR_MSG

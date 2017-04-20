@@ -230,8 +230,8 @@ class Text_Keywords():
               if(ses.FindById(id).Changeable == True):
                 if(ses.FindById(id).MaxLength == length):
                     value = ses.FindById(id).MaxLength
-                    result=sap_constants.TEST_RESULT_PASS
-                    status = sap_constants.TEST_RESULT_TRUE
+                    status=sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
 
                 else:
                     err_msg = sap_constants.ERROR_MSG
@@ -244,29 +244,3 @@ class Text_Keywords():
             logger.print_on_console('Error cooured in getText and is a :',e)
         return status,result,value,err_msg
 
-    def getTooltipText(self, sap_id,*args):
-        tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
-        status=sap_constants.TEST_RESULT_FAIL
-        result=sap_constants.TEST_RESULT_FALSE
-        value=OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            #id = elem.__getattr__("Id")
-            if(id != None):
-                if(ses.FindById(id).Changeable == True):
-                    value = ses.FindById(id).tooltip
-                    result=sap_constants.TEST_RESULT_PASS
-                    status = sap_constants.TEST_RESULT_TRUE
-
-                else:
-                    err_msg = sap_constants.ERROR_MSG
-                    logger.print_on_console('Given Length Does not match')
-            else:
-                err_msg = sap_constants.ERROR_MSG
-                logger.print_on_console('Element does not exist')
-
-        except Exception as e:
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console('Error cooured in getTooltipText and is :',e)
-        return status,result,value,err_msg

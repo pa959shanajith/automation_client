@@ -75,6 +75,23 @@ class Launch_Keywords():
         except Exception as e:
             logger.print_on_console( 'no instance open error :',e)
 
+    def getSessWindow(self,*args):
+        SapGui=None
+        try:
+            time.sleep(2)
+            SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
+            scrappingObj=Scrape()
+            wnd = scrappingObj.getWindow(SapGui)
+            wndId =  wnd.__getattr__('id')
+            i = wndId.index('wnd')
+            wndNumber = wndId[i+4]
+            j = wndId.index('ses')
+            sesId = wndId[j:j+6]
+            ses = SapGui.FindByid(str(sesId))
+            return ses,wnd
+        except Exception as e:
+            logger.print_on_console( 'no instance open error :',e)
+
     def enter_keyword(self,*args):
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
@@ -112,7 +129,7 @@ class Launch_Keywords():
         return status,result,value,err_msg
 
     def launch_application(self,input_val,*args):
-        server = "SL2 [52.165.148.179]"
+        #server = "SL2 [52.165.148.179]"
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
@@ -124,9 +141,10 @@ class Launch_Keywords():
         # check file exists
             if len(input_val)==2:
                 filePath,windowName=input_val[0],input_val[1]
+                server = "SL2 [52.165.148.179]"
                 timeout=5
             elif len(input_val)==3:
-                filePath,windowName,timeout=input_val[0],input_val[1],input_val[2]
+                filePath,windowName,server=input_val[0],input_val[1],input_val[2]
             start_window=0
             try:
              start_window = pywinauto.findwindows.find_window(title=windowName)
@@ -181,17 +199,20 @@ class Launch_Keywords():
         return status,result,verb,self.windowname,err_msg
 
     def getPageTitle(self,*args):
+        lk=Launch_Keywords()
+        ses=lk.getSession()
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
+        value=OUTPUT_CONSTANT
         try:
-            if self.windowname!='':
+                value = ses.ActiveWindow.Text
                 status=sap_constants.TEST_RESULT_PASS
                 result = sap_constants.TEST_RESULT_TRUE
-                return status,self.windowname
         except Exception as e:
+            logger.print_on_console('unable to get the page title because',e)
             err_msg = sap_constants.ERROR_MSG
-        return status,result,self.windowname,err_msg
+        return status,result,value,err_msg
 
     def closeApplication(self, *args):
         status=sap_constants.TEST_RESULT_FAIL
@@ -226,6 +247,85 @@ class Launch_Keywords():
         except Exception as e:
             err_msg='Error has occured :',e
         return status,result,verb,err_msg
+
+    def sendFunctionKeys(self,input_val,*args):
+            status = sap_constants.TEST_RESULT_FAIL
+            result = sap_constants.TEST_RESULT_FALSE
+            lk=Launch_Keywords()
+            ses,window=lk.getSessWindow()
+            keys=input_val[0]
+            logger.print_on_console('keys : ',keys)
+            err_msg=None
+            verb = OUTPUT_CONSTANT
+            keyCodes = {
+                    'BACKSPACE': "{BACKSPACE}",
+                    'BREAK': "{BREAK}",
+                    'CAPS LOCK': "{CAPSLOCK}",
+                    'CLEAR': "{CLEAR}",
+                    'DELETE': "{DELETE}",
+                    'DOWN ARROW': "{DOWN}",
+                    'END': "{END}",
+                    'ENTER': "~",
+                    'ESC': "{ESC}",
+                    'HELP': "{HELP}",
+                    'HOME': "{HOME}",
+                    'INSERT': "{INSERT}",
+                    'LEFT ARROW': "{LEFT}",
+                    'NUM LOCK': "{NUMLOCK}",
+                    'PAGE DOWN': "{PGDN}",
+                    'PAGE UP': "{PGUP}",
+                    'RETURN': "{RETURN}",
+                    'RIGHT ARROW': "{RIGHT}",
+                    'SCROLL LOCK': "{SCROLLLOCK}",
+                    'SPACE': " ",
+                    'TAB': "{TAB}",
+                    'UP ARROW': "{UP}",
+                    'F1': "{F1}",
+                    'F2': "{F2}",
+                    'F3': "{F3}",
+                    'F4': "{F4}",
+                    'F5': "{F5}",
+                    'F6': "{F6}",
+                    'F7': "{F7}",
+                    'F8': "{F8}",
+                    'F9': "{F9}",
+                    'F10': "{F10}",
+                    'F11': "{F11}",
+                    'F12': "{F12}",
+                    'F13': "{F13}",
+                    'F14': "{F14}",
+                    'F15': "{F15}",
+                    'SHIFT': "+",
+                    'CTRL': "^",
+                    'ALT': "%"
+                    }
+            try:
+                keys = key.split("+")
+                logger.print_on_console('keys :',keys)
+                id = window.__getattr__("Id")
+                #print window.Text
+                if(id != None):
+                    shell = win32com.client.Dispatch("WScript.Shell")
+                    shell.AppActivate(window.Text)
+                    time.sleep(2)
+
+                    key_comb = ""
+                    for key in keys:
+                        if(key.upper() in keyCodes.keys()):
+                            key_comb = key_comb + keyCodes[key.upper()]
+                        else:
+                            key_comb = key_comb + "{" + key + "}"
+
+                    shell.SendKeys(key_comb)
+                    status=sap_constants.TEST_RESULT_PASS
+                    result=sap_constants.TEST_RESULT_TRUE
+                else:
+                    logger.print_on_console('Window not found')
+                    err_msg = sap_constants.ERROR_MSG
+
+            except Exception as e:
+                err_msg='Error has occured :',e
+            return status,result,verb,err_msg
 
 
     def captureScreenshot(self, SapGui, data):

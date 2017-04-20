@@ -19,6 +19,8 @@ import text_keywords_sap
 import element_keywords
 import dropdown_keywords
 import radio_checkbox_keywords_sap
+import saputil_operations
+import table_keywords
 #-------------------------------------------------------------
 import sap_constants
 import constants
@@ -33,6 +35,8 @@ class SAPDispatcher:
     dropdown_keywords_obj = dropdown_keywords.Dropdown_Keywords()
     radiocheckbox_keywords_obj= radio_checkbox_keywords_sap.Radio_Checkbox_keywords()
     element_keywords_obj=element_keywords.ElementKeywords()
+    saputil_keywords_obj=saputil_operations.SapUtilKeywords()
+    table_keywords_obj=table_keywords.Table_keywords()
 
 
     def __init__(self):
@@ -58,6 +62,7 @@ class SAPDispatcher:
                   'enterkey':self.launch_keywords_obj.enter_keyword,
                   'getpagetitle':self.launch_keywords_obj.getPageTitle,
                   'starttransaction':self.launch_keywords_obj.startTransaction,
+                  'sendfunctionkeys':self.launch_keywords_obj.sendFunctionKeys,
                   'settext' : self.editable_text_obj.setText,
                   'setsecuretext':self.editable_text_obj.setSecureText,
                   'gettext':self.editable_text_obj.getText,
@@ -84,14 +89,36 @@ class SAPDispatcher:
                   'verifyallvalues':self.dropdown_keywords_obj.verifyAllValues,
                   'clickelement':self.element_keywords_obj.click_element,
                   'getelementtext':self.element_keywords_obj.get_element_text,
-                  'gettooltiptext':self.editable_text_obj.getTooltipText
+                  'gettooltiptext':self.element_keywords_obj.getTooltipText,
+                  'verifyenabled':self.saputil_keywords_obj.verifyEnabled,
+                  'verifydisabled':self.saputil_keywords_obj.verifyDisabled,
+                  'verifyexists':self.saputil_keywords_obj.VerifyExists,
+                  'setfocus':self.saputil_keywords_obj.setFocus,
+                  'getrowcount':self.table_keywords_obj.getRowCount,
+                  'getcolumncount':self.table_keywords_obj.getColumnCount,
+                  'mousehover':self.table_keywords_obj.mouseHover,
+                  'getcolnumbytext':self.table_keywords_obj.getColNumByText,
+                  'getrownumbytext':self.table_keywords_obj.getRowNumByText,
+                  'getcellvalue':self.table_keywords_obj.getCellValue,
+                  'verifycellvalue':self.table_keywords_obj.verifyCellValue,
+                  'verifytextexists':self.table_keywords_obj.verifyTextExists,
+                  'cellclick':self.table_keywords_obj.cellClick,
+                  'selectvaluebyindex':self.table_keywords_obj.selectValueByIndex,
+                  'selectvaluebytext':self.table_keywords_obj.selectValueByText,
+                  'getselected':self.table_keywords_obj.getSelected,
+                  'gettablestatus':self.table_keywords_obj.getStatus,
+                  'getcelltooltip':self.table_keywords_obj.getCellToolTip,
+                  'tablecellclick':self.table_keywords_obj.tableCell_click,
+                  'tablecelldoubleclick':self.table_keywords_obj.tableCell_doubleClick,
+                  'selectrow':self.table_keywords_obj.selectRow,
+                  'unselectrow':self.table_keywords_obj.unselectRow
                    }
 
 
 
             keyword=keyword.lower()
             if keyword in dict.keys():
-                if keyword=='launch_application' or keyword=='LaunchApplication' or keyword=='launchapplication' or keyword=='starttransaction' :
+                if keyword=='launch_application' or keyword=='sendfunctionkeys' or keyword=='launchapplication' or keyword=='starttransaction' :
                     result= dict[keyword](input,output)
                 else:
                     result= dict[keyword](objectname,url,input,output)

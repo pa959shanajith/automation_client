@@ -51,7 +51,7 @@ class ButtonLinkKeyword():
             import traceback
             traceback.getexc()
 ##            logger.print_on_console('Error has occured',e)
-        log.error(e)
+            log.error(e)
         return status,result,value,err_msg
 
     def get_button_name(self,  sap_id ,url, input_val, *args):

@@ -75,3 +75,34 @@ class ElementKeywords():
             logger.print_on_console("Exception has occured :",e)
         #log.info(RETURN_RESULT)
         return status,result,value,err_msg
+
+    def getTooltipText(self, sap_id,*args):
+        tk=Text_Keywords()
+        id,ses=tk.attach(sap_id)
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
+        value=OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            #id = elem.__getattr__("Id")
+            if(id != None):
+                if(ses.FindById(id).Changeable == True):
+                    value = ses.FindById(id).tooltip
+                    if(value != None):
+                        result=sap_constants.TEST_RESULT_PASS
+                        status = sap_constants.TEST_RESULT_TRUE
+                    else:
+                        value=OUTPUT_CONSTANT
+                        logger.print_on_console('ToolTipText not avaliable for the element ')
+
+                else:
+                    err_msg = sap_constants.ERROR_MSG
+                    logger.print_on_console('Cannot get ToolTipText for the element ')
+            else:
+                err_msg = sap_constants.ERROR_MSG
+                logger.print_on_console('Element does not exist')
+
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG
+            logger.print_on_console('Error cooured in getTooltipText and is :',e)
+        return status,result,value,err_msg
