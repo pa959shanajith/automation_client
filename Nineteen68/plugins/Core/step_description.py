@@ -318,7 +318,22 @@ class StepDescription:
             return 'Select '+ "'" + tsp.custname + "'"+'.'
         def UnSelectCheckbox():
             return 'Unselect '+ "'" + tsp.custname + "'"+'.'
+        #Table Keywords
+        def getRowCount():
+            return 'Get Row count of '+ "'" + tsp.custname + "'"+ ' and save value ' + output + ' in '+ tsp.outputval+ '.'
+        def getColumnCount():
+            return 'Get Column Count of ' + "'" + tsp.custname + "'" + ' and save the value ' + output + ' in '+ tsp.outputval+'.'
+        def mouseHover():
+            return 'Mouse hovered over  ' + "'" + tsp.custname + "'"+'.'
+        def getColNumByText():
+            return 'Get column number of ' + "'" + tsp.custname + "'" + ' by text '+input +' and save the column number ' + output + ' in '+ tsp.outputval
+        def getRowNumByText():
+            return 'Get row number of ' + "'" + tsp.custname + "'" + ' by text '+input +' and save the row number ' + output + ' in '+ tsp.outputval
+        def getCellValue():
+            return 'Get Cell value of  '+ "'" + tsp.custname + "'" ' by row, column '+input +  ' and save it in outputs as  '+ output + " in " + tsp.custname +'.'
+            
         return locals()[keyword]()
+        
 
         #Saputil keywords
         def VerifyEnabled():

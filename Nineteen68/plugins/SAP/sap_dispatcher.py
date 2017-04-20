@@ -20,6 +20,7 @@ import element_keywords
 import dropdown_keywords
 import radio_checkbox_keywords_sap
 import saputil_operations
+import table_keywords
 #-------------------------------------------------------------
 import sap_constants
 import constants
@@ -35,6 +36,7 @@ class SAPDispatcher:
     radiocheckbox_keywords_obj= radio_checkbox_keywords_sap.Radio_Checkbox_keywords()
     element_keywords_obj=element_keywords.ElementKeywords()
 	saputil_keywords_obj=saputil_operations.SapUtilKeywords()
+    table_keywords_obj=table_keywords.Table_keywords()
 
 
     def __init__(self):
@@ -90,7 +92,25 @@ class SAPDispatcher:
                   'verifyenabled':self.saputil_keywords_obj.verifyEnabled,
                   'verifydisabled':self.saputil_keywords_obj.verifyDisabled,
                   'verifyexists':self.saputil_keywords_obj.VerifyExists,
-                  'setfocus':self.saputil_keywords_obj.setFocus
+                  'setfocus':self.saputil_keywords_obj.setFocus,
+                  'getrowcount':self.table_keywords_obj.getRowCount,
+                  'getcolumncount':self.table_keywords_obj.getColumnCount,
+                  'mousehover':self.table_keywords_obj.mouseHover,
+                  'getcolnumbytext':self.table_keywords_obj.getColNumByText,
+                  'getrownumbytext':self.table_keywords_obj.getRowNumByText,
+                  'getcellvalue':self.table_keywords_obj.getCellValue,
+                  'verifycellvalue':self.table_keywords_obj.verifyCellValue,
+                  'verifytextexists':self.table_keywords_obj.verifyTextExists,
+                  'cellclick':self.table_keywords_obj.cellClick,
+                  'selectvaluebyindex':self.table_keywords_obj.selectValueByIndex,
+                  'selectvaluebytext':self.table_keywords_obj.selectValueByText,
+                  'getselected':self.table_keywords_obj.getSelected,
+                  'gettablestatus':self.table_keywords_obj.getStatus,
+                  'getcelltooltip':self.table_keywords_obj.getCellToolTip,
+                  'tablecellclick':self.table_keywords_obj.tableCell_click,
+                  'tablecelldoubleclick':self.table_keywords_obj.tableCell_doubleClick,
+                  'selectrow':self.table_keywords_obj.selectRow,
+                  'unselectrow':self.table_keywords_obj.unselectRow
                    }
 
 
