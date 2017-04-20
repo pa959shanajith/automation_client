@@ -305,10 +305,13 @@ class StepDescription:
         def GetCount():
             return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' + output + ' in ' +tsp.outputval+'.'
         #Element Keywords
-        def click_element():
+        def ClickElement():
             return 'Click on ' +"'" + tsp.custname + "'"+'.'
-        def get_element_text():
+        def GetElementText():
             return 'Get the text of the element '+ "'" + tsp.custname + "'"+ ' and save the value  '+ output + ' in '+ tsp.outputval+'.'
+        def GetToolTipText():
+            return 'Get Tool Tip of  ' +"'" + tsp.custname + "'"+'.'
+
         #Radio checkbox keywords
         def SelectRadioButton():
             return 'Select '+ "'" + tsp.custname + "'"+'.'
@@ -319,21 +322,45 @@ class StepDescription:
         def UnSelectCheckbox():
             return 'Unselect '+ "'" + tsp.custname + "'"+'.'
         #Table Keywords
-        def getRowCount():
+        def GetRowCount():
             return 'Get Row count of '+ "'" + tsp.custname + "'"+ ' and save value ' + output + ' in '+ tsp.outputval+ '.'
-        def getColumnCount():
+        def GetColumnCount():
             return 'Get Column Count of ' + "'" + tsp.custname + "'" + ' and save the value ' + output + ' in '+ tsp.outputval+'.'
-        def mouseHover():
+        def MouseHover():
             return 'Mouse hovered over  ' + "'" + tsp.custname + "'"+'.'
-        def getColNumByText():
+        def GetColNumByText():
             return 'Get column number of ' + "'" + tsp.custname + "'" + ' by text '+input +' and save the column number ' + output + ' in '+ tsp.outputval
-        def getRowNumByText():
+        def GetRowNumByText():
             return 'Get row number of ' + "'" + tsp.custname + "'" + ' by text '+input +' and save the row number ' + output + ' in '+ tsp.outputval
-        def getCellValue():
+        def GetCellValue():
             return 'Get Cell value of  '+ "'" + tsp.custname + "'" ' by row, column '+input +  ' and save it in outputs as  '+ output + " in " + tsp.custname +'.'
-            
+        def VerifyCellValue():
+            return 'Verify cell value of element in row number ' + input[0] +' and column number '+input[1] +' against the input value '+input[2]+' present in ' +"'" + tsp.custname + "'"+'.'
+        def VerifyTextExists():
+            return 'Verify Text '+ input[2]+' exists in row number '+input[0]+' and column number '+input[1]+' of '+"'" + tsp.custname + "'"+'.'
+        def CellClick():
+            return 'Click on '+ "'" + tsp.custname + "'"+'.'
+        def SelectValueByIndex():
+            return 'Select the value '+ input+' of the '+"'" + tsp.custname + "'"+' with the index '+input+' present in the table cell  '+"'" + tsp.custname + "'"+'-['+input+']['+input+']'
+        def SelectValueByText():
+            return 'Select the value '+ input+' of the '+"'" + tsp.custname + "'"+' with the Text '+input+' present in the table cell  '+"'" + tsp.custname + "'"+'-['+input+']['+input+']'
+        def GetSelected():
+            return 'Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save value ' + output + ' in '+"'"+ tsp.custname + "'"+'.'
+        def GetTableStatus():
+            return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']'+'.'
+        def GetCellToolTip():
+            return 'Get CellToolTip of  ' + input + ' and save the result as  '+output+' in ' + "'" + tsp.custname + "'"+'.'
+        def TableCellClick():
+            return 'Click on table cell ' + input + ' in '+ "'" + tsp.custname + "'"+'.'
+        def TableCellDoubleClick():
+            return 'Double click on cell ' + input + ' in ' +"'" + tsp.custname + "'"+'.'
+        def SelectRow():
+            return 'Select the row '+ input+' in '+"'" + tsp.custname + "'"+'.'
+        def UnSelectRow():
+            return 'Unselect the row  '+input+' of '+ "'" + tsp.custname + "'"+ '.'
+
         return locals()[keyword]()
-        
+
 
         #Saputil keywords
         def VerifyEnabled():
