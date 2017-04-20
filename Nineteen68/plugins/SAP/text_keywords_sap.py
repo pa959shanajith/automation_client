@@ -230,8 +230,8 @@ class Text_Keywords():
               if(ses.FindById(id).Changeable == True):
                 if(ses.FindById(id).MaxLength == length):
                     value = ses.FindById(id).MaxLength
-                    result=sap_constants.TEST_RESULT_PASS
-                    status = sap_constants.TEST_RESULT_TRUE
+                    status=sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
 
                 else:
                     err_msg = sap_constants.ERROR_MSG
