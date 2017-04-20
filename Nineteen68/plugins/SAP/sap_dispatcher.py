@@ -118,7 +118,7 @@ class SAPDispatcher:
 
             keyword=keyword.lower()
             if keyword in dict.keys():
-                if keyword=='launch_application' or keyword=='LaunchApplication' or keyword=='launchapplication' or keyword=='starttransaction' :
+                if keyword=='launch_application' or keyword=='sendfunctionkeys' or keyword=='launchapplication' or keyword=='starttransaction' :
                     result= dict[keyword](input,output)
                 else:
                     result= dict[keyword](objectname,url,input,output)
