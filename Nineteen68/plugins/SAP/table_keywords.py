@@ -98,7 +98,7 @@ class Table_keywords():
 
 
 
-    def mouseHover(self, sap_id, input_val,*args):
+    def mouseHover(self, sap_id,url, input_val,*args):
         row=input_val[0]
         col=input_val[1]
         tk=Text_Keywords()
@@ -119,7 +119,7 @@ class Table_keywords():
 
 
 
-    def getColNumByText(self, sap_id, input_val,*args):
+    def getColNumByText(self, sap_id,url, input_val,*args):
         colName=input_val[0]
         tk=Text_Keywords()
         id,ses=tk.attach(sap_id)
@@ -143,7 +143,7 @@ class Table_keywords():
 
 
 
-    def getRowNumByText(self, sap_id, input_val,*args):
+    def getRowNumByText(self, sap_id,url, input_val,*args):
         rowText=input_val[0]
         tk=Text_Keywords()
         id,ses=tk.attach(sap_id)
@@ -171,7 +171,7 @@ class Table_keywords():
 
 
 
-    def getCellValue(self, sap_id, input_val,*args):
+    def getCellValue(self, sap_id,url, input_val,*args):
         row=input_val[0]
         col=input_val[1]
         tk=Text_Keywords()
@@ -192,7 +192,7 @@ class Table_keywords():
 
 
 
-    def verifyCellValue(self, sap_id, input_val,*args):
+    def verifyCellValue(self, sap_id,url, input_val,*args):
         row=input_val[0]
         col=input_val[1]
         cell_value=input_val[2]
@@ -217,7 +217,7 @@ class Table_keywords():
 
 
 
-    def verifyTextExists(self, sap_id, input_val,*args):
+    def verifyTextExists(self, sap_id,url, input_val,*args):
         text=input_val[0]
         tk=Text_Keywords()
         id,ses=tk.attach(sap_id)
