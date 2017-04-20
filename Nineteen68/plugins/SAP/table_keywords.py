@@ -526,7 +526,8 @@ class Table_keywords():
             row_to_select = rows[rowNum]
             if(row_to_select.Selectable == True):
                 row_to_select.selected = False
-                result = True
+                status=sap_constants.TEST_RESULT_PASS
+                result=sap_constants.TEST_RESULT_TRUE
             else:
                 logger.print_on_console('Element state does not allow to perform the operation')
                 err_msg = sap_constants.ERROR_MSG
