@@ -19,6 +19,10 @@ import logger
 import Exceptions
 import logging.config
 import logging
+import os
+import time
+from PIL import Image
+from selenium import webdriver
 log = logging.getLogger('fullscrape.py')
 currenthandle = ''
 status = domconstants.STATUS_FAIL
@@ -32,6 +36,8 @@ class Fullscrape():
 ##            vie = {}
             driver = browserops.driver
             hwndg = browserops.hwndg
+            maindir = os.environ["NINETEEN68_HOME"]
+            screen_shot_path = maindir + '\Nineteen68\plugins\WebScrape' + domconstants.SCREENSHOT_IMG
             log.info('Obtained browser handle and driver from browserops.py class .....')
             toolwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
@@ -141,6 +147,61 @@ class Fullscrape():
                                 tempne.extend(itemp)
                             callback_scrape1(inpath, tempne)
                         callback_scrape2(path, tempne)
+
+            def fullpage_screenshot(driver, screen_shot_path):
+                total_width = driver.execute_script("return document.body.offsetWidth")
+                total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
+                viewport_width = driver.execute_script("return document.body.clientWidth")
+                viewport_height = driver.execute_script("return window.innerHeight")
+                rectangles = []
+
+                i = 0
+                while i < total_height:
+                    ii = 0
+                    top_height = i + viewport_height
+
+                    if top_height > total_height:
+                        top_height = total_height
+
+                    while ii < total_width:
+                        top_width = ii + viewport_width
+
+                        if top_width > total_width:
+                            top_width = total_width
+                        rectangles.append((ii, i, top_width,top_height))
+
+                        ii = ii + viewport_width
+
+                    i = i + viewport_height
+
+                stitched_image = Image.new('RGB', (total_width, total_height))
+                previous = None
+                part = 0
+                for rectangle in rectangles:
+                    if not previous is None:
+                        driver.execute_script("window.scrollTo({0}, {1})".format(rectangle[0], rectangle[1]))
+                        time.sleep(0.2)
+
+                    file_name = "part_{0}.png".format(part)
+                    driver.get_screenshot_as_file(file_name)
+                    screenshot = Image.open(file_name)
+
+                    if rectangle[1] + viewport_height > total_height:
+                        offset = (rectangle[0], total_height - viewport_height)
+                    else:
+                        offset = (rectangle[0], rectangle[1])
+                    stitched_image.paste(screenshot, offset)
+                    del screenshot
+                    os.remove(file_name)
+                    part = part + 1
+                    previous = rectangle
+                stitched_image.save(screen_shot_path)
+                screen = None
+                with open(screen_shot_path, "rb") as f:
+                    data = f.read()
+                    screen =  data.encode("base64")
+                return screen
+
             callback_scrape1('', tempne)
             log.info('full scrape operation on iframe/frame pages is completed')
             driver.switch_to.window(currenthandle)
@@ -155,7 +216,11 @@ class Fullscrape():
 ##            vie = {"view": tempne}
 ##            global data
 ##            data.append(vie)
-            screen = driver.get_screenshot_as_base64()
+##            screen = driver.get_screenshot_as_base64()
+            if (isinstance(driver,webdriver.Firefox) or isinstance(driver,webdriver.Chrome)):
+                screen = fullpage_screenshot(driver, screen_shot_path )
+            else:
+                screen = driver.get_screenshot_as_base64()
             scrapedin = ''
             if browserops.browser == 2:
                 scrapedin = 'FX'
