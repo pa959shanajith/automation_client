@@ -270,7 +270,7 @@ class Dropdown_Keywords():
             result = sap_constants.TEST_RESULT_FALSE
             tk=Text_Keywords()
             id,ses=tk.attach(sap_id)
-            val=input_val[0]
+            val=input_val
             err_msg=None
             verb = OUTPUT_CONSTANT
             i = 0
@@ -282,13 +282,13 @@ class Dropdown_Keywords():
                         entries = ses.FindById(id).Entries
                         while True:
                             try:
-                                dd_entries.append(entries(i).value)
+                                dd_entries.append(str(entries(i).value))
                                 i = i + 1
                             except Exception as e:
                                 #print e
                                 break
-                    print dd_entries
-                    if(collections.Counter(dd_entries) == collections.Counter(val)):
+                    if(cmp(dd_entries,val) == 0):
+
                         result =sap_constants.TEST_RESULT_PASS
                         status =sap_constants.TEST_RESULT_TRUE
                     else:
