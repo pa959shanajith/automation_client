@@ -22,7 +22,7 @@ import logging
 import logging.config
 log = logging.getLogger('clientwindow.py')
 
-
+from text_keywords_sap import Text_Keywords
 
 import json
 
@@ -92,10 +92,11 @@ class ScrapeWindow(wx.Frame):
 
 
     def fullscrape(self,event):
+        tk=Text_Keywords()
         #logger.print_on_console('Performing full scrape')
         self.startbutton.Disable()
         #logger.print_on_console('going to SapGui :')
-        SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
+        SapGui=tk.getSapObject()
         #logger.print_on_console('SapGui :',SapGui)
         wndname=sap_scraping_obj.getWindow(SapGui)
         wnd_title = wndname.__getattr__("Text")

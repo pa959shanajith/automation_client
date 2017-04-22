@@ -28,7 +28,7 @@ class ButtonLinkKeyword():
     def click(self, sap_id, *args):
 
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         #log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -56,7 +56,7 @@ class ButtonLinkKeyword():
 
     def get_button_name(self,  sap_id ,url, input_val, *args):
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
@@ -88,7 +88,7 @@ class ButtonLinkKeyword():
 
     def verify_button_name(self,  sap_id ,url, input_val, *args):
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
@@ -120,7 +120,7 @@ class ButtonLinkKeyword():
     def button_uploadFile(self,sap_id, url, input_val, *args):
 
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         filepath=input_val[0]

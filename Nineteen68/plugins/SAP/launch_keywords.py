@@ -32,6 +32,10 @@ window_name=None
 window_handle=None
 window_pid=None
 
+#-----------------------------
+from text_keywords_sap import Text_Keywords
+#---------------------------
+
 from pywinauto.application import Application
 from pywinauto import keyboard
 import win32com.client
@@ -59,10 +63,13 @@ class Launch_Keywords():
         self.windowHandle=None
 
     def getSession(self,*args):
-        SapGui=None
+        tk=Text_Keywords()
         try:
             time.sleep(2)
-            SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
+            try:
+                SapGui=tk.getSapObject()
+            except Exception as e:
+                logger.print_on_console( 'no instance open error :',e)
             scrappingObj=Scrape()
             wnd = scrappingObj.getWindow(SapGui)
             wndId =  wnd.__getattr__('id')
@@ -76,10 +83,10 @@ class Launch_Keywords():
             logger.print_on_console( 'no instance open error :',e)
 
     def getSessWindow(self,*args):
-        SapGui=None
+        tk=Text_Keywords()
         try:
             time.sleep(2)
-            SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
+            SapGui=tk.getSapObject()
             scrappingObj=Scrape()
             wnd = scrappingObj.getWindow(SapGui)
             wndId =  wnd.__getattr__('id')
@@ -129,14 +136,13 @@ class Launch_Keywords():
         return status,result,value,err_msg
 
     def launch_application(self,input_val,*args):
-        #server = "SL2 [52.165.148.179]"
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
         app_just=False
         err_msg=None
         term = None
-
+        tk=Text_Keywords()
         try:
         # check file exists
             if len(input_val)==2:
@@ -154,9 +160,33 @@ class Launch_Keywords():
 
             if start_window>=1:
                 #self.multiInstance=title_matched_windows[0]
+                try:
+                    SapGui=tk.getSapObject()
+                except Exception as e:
+                    logger.print_on_console("error1  ",e)
                 logger.print_on_console('SAP window already exists please close the first instance')
+                try:
+                    SapGui.Children(0).Children(0)
+                    logger.print_on_console('SAP login exists')
+                    status=sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                except:
+                    app = Application(backend="win32").connect(path = filePath).window(title=windowName)
+                    print app
+                    app.Edit.set_edit_text(u'')
+                    app.Edit.type_keys(server, with_spaces = True)
+                    #app.Edit.type_keys("{ENTER}")
+                    keyboard.SendKeys('{ENTER}')
+                    time.sleep(5)
+                    if app!=None and app!='':
+                        status=sap_constants.TEST_RESULT_PASS
+                        result = sap_constants.TEST_RESULT_TRUE
+                    else:
+                        logger.print_on_console('The given window name is not found')
+                        term = TERMINATE
 
-            if start_window==0:
+
+            elif start_window==0:
                 logger.print_on_console('Starting new SAP window')
                 #app = Application(backend="win32").start(r"C:\Program Files (x86)\SAP\FrontEnd\SAPgui\saplogon.exe").window(title="SAP Logon 740")
                 app = Application(backend="win32").start(filePath).window(title=windowName)
@@ -215,12 +245,16 @@ class Launch_Keywords():
         return status,result,value,err_msg
 
     def closeApplication(self, *args):
+        tk=Text_Keywords()
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
         err_msg=None
         try:
-            SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
+            try:
+                SapGui=tk.getSapObject()
+            except Exception as e:
+                logger.print_on_console("error1  ",e)
             i, j = 0, 0
             connections = []
             while True:
