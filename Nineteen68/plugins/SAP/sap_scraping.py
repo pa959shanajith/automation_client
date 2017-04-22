@@ -97,22 +97,7 @@ class Scrape:
                             try:
                                 wnd = ses.Children(w)
                                 number_of_active_screens = number_of_active_screens + 1
-                                if(number_of_active_screens == 1):
-                                    window_to_scrape = wnd
-                                elif(number_of_active_screens == 2):
-                                    #title = raw_input()
-##                                    if(window_to_scrape.__getattr__("Text").lower() == title.strip().lower()):
-##                                        logger.print_on_console('Performing full scrape-----if')
-##                                        return window_to_scrape
-##                                    elif(wnd.__getattr__("Text").lower() == title.strip().lower()):
-                                    logger.print_on_console('Window that is being scraped is :',wnd.text)
-                                    window_to_scrape = wnd
-                                    #return window_to_scrape
-                                elif(number_of_active_screens > 2):
-                                    #if(wnd.__getattr__("Text").lower() == title.strip().lower()):
-                                    window_to_scrape = wnd
-                                    logger.print_on_console('Window that is being scraped is :',wnd.text)
-                                    return window_to_scrape
+                                window_to_scrape = wnd
                                 w = w + 1
                             except:
                                 #logger.print_on_console('error in w:',e)
@@ -125,13 +110,16 @@ class Scrape:
             except:
                 #logger.print_on_console('error in c:',e)
                 break
-        #logger.print_on_console('Number of screens are :',number_of_active_screens)
-        if(number_of_active_screens != 1):
+        logger.print_on_console('Number of screens are :',number_of_active_screens)
+        if(number_of_active_screens > 10):
+            logger.print_on_console('Number of Active Screens Greater than 10 not supported at the moment')
+            title=None
             try:
                 if(window_to_scrape.__getattr__("Text").lower() != title.strip().lower()):
                     self.getWindow(object)
             except Exception as e:
                 print e
                 return None
+        logger.print_on_console('Window that is being scraped is :',wnd.text)
         return window_to_scrape
 
