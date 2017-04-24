@@ -274,8 +274,13 @@ class Launch_Keywords():
                         logger.print_on_console("The specified application is closed Successfully ")
                         break
                     j = j + 1
-            app = Application(backend="win32").connect(path = r"C:\Program Files (x86)\SAP\FrontEnd\SAPgui\saplogon.exe").window(title="SAP Logon 740")
-            app.Close()
+            try:
+                time.sleep(2)
+                app = Application(backend="win32").connect(path = r"C:\Program Files (x86)\SAP\FrontEnd\SAPgui\saplogon.exe").window(title="SAP Logon 740")
+                time.sleep(2)
+                app.Close()
+            except:
+                logger.print_on_console("SAP Logon 740 has encountered a problem . Please close manually ")
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
