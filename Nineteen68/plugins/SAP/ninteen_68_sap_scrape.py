@@ -79,17 +79,18 @@ class ScrapeWindow(wx.Frame):
         state = event.GetEventObject().GetValue()
         if state == True:
             self.fullscrapebutton.Disable()
-
+            print 'calling start click and add'
             sap_scraping_obj.clickandadd('STARTCLICKANDADD')
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
         else:
+            print 'calling stop click and add'
             d = sap_scraping_obj.clickandadd('STOPCLICKANDADD')
+            #print 'returning data---------------------------',d
             event.GetEventObject().SetLabel("Start ClickAndAdd")
 
             self.socketIO.emit('scrape',d)
 
             self.Close()
-
 
     def fullscrape(self,event):
         tk=Text_Keywords()
