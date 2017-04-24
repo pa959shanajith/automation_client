@@ -116,7 +116,7 @@ class BrowserKeywords():
                 ##            logger.log('FILE: browserops.py , DEF: openChromeBrowser() , MSG:  Using Pid handle is obtained')
             logger.log('FILE: browserops.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
             result=webconstants.TEST_RESULT_TRUE
-            status = domconstants.STATUS_SUCCESS
+            status = webconstants.TEST_RESULT_PASS
         except Exception as e:
                         err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg

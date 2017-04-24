@@ -305,7 +305,6 @@ class Dispatcher:
             import traceback
             traceback.print_exc()
             log.error(e)
-            print 'iiiiiiiiiii'
             logger.print_on_console('Exception at dispatcher')
 
         if err_msg!=None:

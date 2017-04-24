@@ -24,7 +24,7 @@ class Dropdown_Keywords():
         def getSelected(self,sap_id, *args):
 
             tk=Text_Keywords()
-            id,ses=tk.attach(sap_id)
+            id,ses=tk.getSapElement(sap_id)
             status = sap_constants.TEST_RESULT_FAIL
             result = sap_constants.TEST_RESULT_FALSE
             err_msg=None
@@ -48,7 +48,7 @@ class Dropdown_Keywords():
 
         def selectValueByIndex(self,sap_id,url,input_val, *args):
             tk=Text_Keywords()
-            id,ses=tk.attach(sap_id)
+            id,ses=tk.getSapElement(sap_id)
             status = sap_constants.TEST_RESULT_FAIL
             result = sap_constants.TEST_RESULT_FALSE
             verb = OUTPUT_CONSTANT
@@ -80,7 +80,7 @@ class Dropdown_Keywords():
 
         def getValueByIndex(self, sap_id, url,input_val,*args):
             tk=Text_Keywords()
-            id,ses=tk.attach(sap_id)
+            id,ses=tk.getSapElement(sap_id)
             status = sap_constants.TEST_RESULT_FAIL
             result = sap_constants.TEST_RESULT_FALSE
             #verb = OUTPUT_CONSTANT
@@ -116,7 +116,7 @@ class Dropdown_Keywords():
 
         def selectValueByText(self,sap_id,url,input_val, *args):
             tk=Text_Keywords()
-            id,ses=tk.attach(sap_id)
+            id,ses=tk.getSapElement(sap_id)
             status = sap_constants.TEST_RESULT_FAIL
             result = sap_constants.TEST_RESULT_FALSE
             text=input_val[0]
@@ -150,7 +150,7 @@ class Dropdown_Keywords():
 
         def verifySelectedValue(self,sap_id,url,input_val ,*args):
             tk=Text_Keywords()
-            id,ses=tk.attach(sap_id)
+            id,ses=tk.getSapElement(sap_id)
             in_value=input_val[0]
             status = sap_constants.TEST_RESULT_FAIL
             result = sap_constants.TEST_RESULT_FALSE
@@ -176,7 +176,7 @@ class Dropdown_Keywords():
 
         def getCount(self,sap_id, *args):
             tk=Text_Keywords()
-            id,ses=tk.attach(sap_id)
+            id,ses=tk.getSapElement(sap_id)
 
             status = sap_constants.TEST_RESULT_FAIL
             result = sap_constants.TEST_RESULT_FALSE
@@ -204,7 +204,7 @@ class Dropdown_Keywords():
         def verifyCount(self,sap_id,url,input_val, *args):
             length = int(input_val[0])
             tk=Text_Keywords()
-            id,ses=tk.attach(sap_id)
+            id,ses=tk.getSapElement(sap_id)
             verb = OUTPUT_CONSTANT
             value=''
             status = sap_constants.TEST_RESULT_FAIL
@@ -233,7 +233,7 @@ class Dropdown_Keywords():
 
         def verifyValuesExists(self,sap_id,url,input_val, *args):
             tk=Text_Keywords()
-            id,ses=tk.attach(sap_id)
+            id,ses=tk.getSapElement(sap_id)
             status = sap_constants.TEST_RESULT_FAIL
             result = sap_constants.TEST_RESULT_FALSE
             err_msg=None
@@ -269,8 +269,8 @@ class Dropdown_Keywords():
             status = sap_constants.TEST_RESULT_FAIL
             result = sap_constants.TEST_RESULT_FALSE
             tk=Text_Keywords()
-            id,ses=tk.attach(sap_id)
-            val=input_val[0]
+            id,ses=tk.getSapElement(sap_id)
+            val=input_val
             err_msg=None
             verb = OUTPUT_CONSTANT
             i = 0
@@ -282,13 +282,13 @@ class Dropdown_Keywords():
                         entries = ses.FindById(id).Entries
                         while True:
                             try:
-                                dd_entries.append(entries(i).value)
+                                dd_entries.append(str(entries(i).value))
                                 i = i + 1
                             except Exception as e:
                                 #print e
                                 break
-                    print dd_entries
-                    if(collections.Counter(dd_entries) == collections.Counter(val)):
+                    if(cmp(dd_entries,val) == 0):
+
                         result =sap_constants.TEST_RESULT_PASS
                         status =sap_constants.TEST_RESULT_TRUE
                     else:

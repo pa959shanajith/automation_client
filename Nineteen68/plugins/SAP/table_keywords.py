@@ -43,7 +43,7 @@ class Table_keywords():
 
     def setFocus(self, sap_id, *args):
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
@@ -62,7 +62,7 @@ class Table_keywords():
 
     def getRowCount(self, sap_id, *args):
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
@@ -81,7 +81,7 @@ class Table_keywords():
 
     def getColumnCount(self, sap_id, *args):
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         result = OUTPUT_CONSTANT
@@ -102,7 +102,7 @@ class Table_keywords():
         row=input_val[0]
         col=input_val[1]
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
@@ -122,7 +122,7 @@ class Table_keywords():
     def getColNumByText(self, sap_id,url, input_val,*args):
         colName=input_val[0]
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
@@ -146,7 +146,7 @@ class Table_keywords():
     def getRowNumByText(self, sap_id,url, input_val,*args):
         rowText=input_val[0]
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
@@ -175,7 +175,7 @@ class Table_keywords():
         row=input_val[0]
         col=input_val[1]
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
@@ -198,7 +198,7 @@ class Table_keywords():
         cell_value=input_val[2]
 
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
@@ -220,7 +220,7 @@ class Table_keywords():
     def verifyTextExists(self, sap_id,url, input_val,*args):
         text=input_val[0]
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
@@ -250,7 +250,7 @@ class Table_keywords():
         col=input_val[1]
         text=input_val[2]
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         rk=Radio_Checkbox_keywords()
         bk =ButtonLinkKeyword()
         dk = Dropdown_Keywords()
@@ -300,7 +300,7 @@ class Table_keywords():
         col=input_val[1]
         index=input_val[2]
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         dk = Dropdown_Keywords()
         url=''#dummy variable
         status = sap_constants.TEST_RESULT_FAIL
@@ -331,7 +331,7 @@ class Table_keywords():
         col=input_val[1]
         text= input_val[2]
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         dk = Dropdown_Keywords()
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -360,7 +360,7 @@ class Table_keywords():
         row=input_val[0]
         col=input_val[1]
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         dk = Dropdown_Keywords()
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -389,7 +389,7 @@ class Table_keywords():
         row=input_val[0]
         col=input_val[1]
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         rk=Radio_Checkbox_keywords()
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -424,7 +424,7 @@ class Table_keywords():
         row=input_val[0]
         col=input_val[1]
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         """Object type is dropdown and lists. For SAP, we only have dropdowns."""
@@ -446,7 +446,7 @@ class Table_keywords():
 
     def tableCell_click(self, sap_id,*args):
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
@@ -465,7 +465,7 @@ class Table_keywords():
 
     def tableCell_doubleClick(self, sap_id,*args):
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
@@ -489,7 +489,7 @@ class Table_keywords():
     def selectRow(self, sap_id,url, input_val,*args):
         rowNum=input_val[0]
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
@@ -515,7 +515,7 @@ class Table_keywords():
     def unselectRow(self, sap_id,url, input_val,*args):
         rowNum=input_val[0]
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT

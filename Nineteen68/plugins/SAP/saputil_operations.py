@@ -26,7 +26,7 @@ class SapUtilKeywords:
     def verifyEnabled(self, sap_id, *args):
         tk=Text_Keywords()
         time.sleep(2)
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -48,7 +48,7 @@ class SapUtilKeywords:
     def verifyDisabled(self, sap_id, *args):
         tk=Text_Keywords()
         time.sleep(2)
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -70,7 +70,7 @@ class SapUtilKeywords:
     def VerifyExists(self, sap_id, *args):
         tk=Text_Keywords()
         time.sleep(2)
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -88,7 +88,7 @@ class SapUtilKeywords:
 
     def setFocus(self, sap_id, *args):
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT

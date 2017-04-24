@@ -15,44 +15,52 @@ from constants import *
 from sap_scraping import Scrape
 import logger
 import time
+import pythoncom
 from encryption_utility import AESCipher
 class Text_Keywords():
-    def attach(self,sap_id,*args):
+    def getSapObject(self):
         SapGui=None
         try:
-            time.sleep(2)
-            #logger.print_on_console( 'inside try block')
-            SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
-            #logger.print_on_console( 'SapGui-------',SapGui)
-            scrappingObj=Scrape()
-            #logger.print_on_console( 'scrappingObj',scrappingObj)
+                pythoncom.CoInitialize()
+                SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
+        except Exception as e:
+                logger.print_on_console( 'Not able to find window to getSapElement',e)
+                import traceback
+                traceback.print_exc()
+        return SapGui
 
-            wnd = scrappingObj.getWindow(SapGui)
+    def getSapElement(self,sap_id,*args):
+        try:
+            tk=Text_Keywords()
+            SapGui=tk.getSapObject()
+            scrappingObj=Scrape()                                   #calling scrape class
+            wnd = scrappingObj.getWindow(SapGui)                      #calling window method
             #logger.print_on_console( 'wnd--------------------',wnd)
-            wndId =  wnd.__getattr__('id')
+            wndId =  wnd.__getattr__('id')                         # windowid from name
             i = wndId.index('wnd')
-            wndNumber = wndId[i+4]
+            wndNumber = wndId[i+4]                  #getting window number
             j = wndId.index('ses')
-            sesId = wndId[j:j+6]
+            sesId = wndId[0:j+6]
             #print sesId
             ses = SapGui.FindByid(str(sesId))
-            sesNumber = wndId[j+4]
+            sesNumber = wndId[j+4]                  #get session number
             k = wndId.index('con')
-            conNumber = wndId[k+4]
+            conNumber = wndId[k+4]                   #get connection number
             index = sap_id.index('/')
             path = sap_id[index:]
 
             id = '/app/con[' + conNumber + ']/ses[' + sesNumber + ']/wnd[' + wndNumber + ']' + path
             return id,ses
         except Exception as e:
-
             logger.print_on_console( 'no instance open error :',e)
+        except AttributeError as e1:
+            logger.print_on_console( ' attribute  error :',e1)
 
 
     def getText(self, sap_id,url, *args):
         tk=Text_Keywords()
         time.sleep(2)
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -73,14 +81,14 @@ class Text_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
             Exceptions.error(e)
-            logger.print_on_console('Error cooured in getText and is a :',e)
+            logger.print_on_console('Error occured in getText and is a :',e)
         return status,result,value,err_msg
 
     def setText(self, sap_id,url,input_va, *args):
         input_val=input_va[0]
         tk=Text_Keywords()
         time.sleep(2)
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         value=OUTPUT_CONSTANT
@@ -113,7 +121,7 @@ class Text_Keywords():
         text=input_val[0]
         tk=Text_Keywords()
         time.sleep(2)
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         value=OUTPUT_CONSTANT
@@ -146,7 +154,7 @@ class Text_Keywords():
         logger.print_on_console('sap_id:  ',sap_id)
         tk=Text_Keywords()
         time.sleep(2)
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -172,7 +180,7 @@ class Text_Keywords():
         text=input_val[0]
         tk=Text_Keywords()
         time.sleep(2)
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -194,7 +202,7 @@ class Text_Keywords():
     def getTextboxLength(self, sap_id, *args):
         tk=Text_Keywords()
         time.sleep(2)
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -220,7 +228,7 @@ class Text_Keywords():
         length=int(input_val[0])
         tk=Text_Keywords()
         time.sleep(2)
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         err_msg=None

@@ -25,7 +25,7 @@ class ElementKeywords():
 
     def click_element(self, sap_id, *args):
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         #verb = OUTPUT_CONSTANT
@@ -52,7 +52,7 @@ class ElementKeywords():
 
     def get_element_text(self, sap_id, *args):
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         value=''
@@ -78,7 +78,7 @@ class ElementKeywords():
 
     def getTooltipText(self, sap_id,*args):
         tk=Text_Keywords()
-        id,ses=tk.attach(sap_id)
+        id,ses=tk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         value=OUTPUT_CONSTANT
@@ -89,8 +89,8 @@ class ElementKeywords():
                 if(ses.FindById(id).Changeable == True):
                     value = ses.FindById(id).tooltip
                     if(value != None):
-                        result=sap_constants.TEST_RESULT_PASS
-                        status = sap_constants.TEST_RESULT_TRUE
+                        status=sap_constants.TEST_RESULT_PASS
+                        result = sap_constants.TEST_RESULT_TRUE
                     else:
                         value=OUTPUT_CONSTANT
                         logger.print_on_console('ToolTipText not avaliable for the element ')
