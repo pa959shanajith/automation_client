@@ -15,14 +15,14 @@ from constants import *
 from sap_scraping import Scrape
 import logger
 import time
+import pythoncom
 from encryption_utility import AESCipher
 class Text_Keywords():
     def getSapObject(self):
         SapGui=None
         try:
-                logger.print_on_console( 'Hooking onto SAPGUI, the current value of SAPGUI is--(1)--:',SapGui)
+                pythoncom.CoInitialize()
                 SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
-                logger.print_on_console( 'Hooked onto SAPGUI, the current value of SAPGUI is:-(2)----',SapGui.text)
         except Exception as e:
                 logger.print_on_console( 'Not able to find window to getSapElement',e)
                 import traceback
@@ -81,7 +81,7 @@ class Text_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
             Exceptions.error(e)
-            logger.print_on_console('Error cooured in getText and is a :',e)
+            logger.print_on_console('Error occured in getText and is a :',e)
         return status,result,value,err_msg
 
     def setText(self, sap_id,url,input_va, *args):
