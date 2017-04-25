@@ -12,23 +12,23 @@
 import sap_constants
 import launch_keywords
 from launch_keywords import Launch_Keywords
+from saputil_operations import SapUtilKeywords
 from constants import *
 import logger
 import logging
 import logging.config
 log = logging.getLogger('button_link_keywords_sap.py')
 
-from text_keywords_sap import Text_Keywords
+#from text_keywords_sap import Text_Keywords
 
 
 class ButtonLinkKeyword():
-
-
+    def __init__(self):
+        self.uk = SapUtilKeywords()
 
     def click(self, sap_id, *args):
 
-        tk=Text_Keywords()
-        id,ses=tk.getSapElement(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         #log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -55,8 +55,7 @@ class ButtonLinkKeyword():
         return status,result,value,err_msg
 
     def get_button_name(self,  sap_id ,url, input_val, *args):
-        tk=Text_Keywords()
-        id,ses=tk.getSapElement(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
@@ -87,8 +86,7 @@ class ButtonLinkKeyword():
         return status,result,value,err_msg
 
     def verify_button_name(self,  sap_id ,url, input_val, *args):
-        tk=Text_Keywords()
-        id,ses=tk.getSapElement(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
@@ -118,16 +116,13 @@ class ButtonLinkKeyword():
         return status,result,value,err_msg
 
     def button_uploadFile(self,sap_id, url, input_val, *args):
-
-        tk=Text_Keywords()
-        id,ses=tk.getSapElement(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         filepath=input_val[0]
         log.debug('Got window name after launching application')
         log.debug(launch_keywords.window_name)
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        #verb = OUTPUT_CONSTANT
         value=OUTPUT_CONSTANT
         err_msg=None
         try:

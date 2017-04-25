@@ -14,18 +14,18 @@ import launch_keywords
 from launch_keywords import Launch_Keywords
 from constants import *
 import logger
-from text_keywords_sap import Text_Keywords
+from saputil_operations import SapUtilKeywords
 
 import logging
 import logging.config
 log = logging.getLogger('element_keywords.py')
 
 class ElementKeywords():
-
+    def __init__(self):
+        self.uk = SapUtilKeywords()
 
     def click_element(self, sap_id, *args):
-        tk=Text_Keywords()
-        id,ses=tk.getSapElement(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         #verb = OUTPUT_CONSTANT
@@ -51,8 +51,7 @@ class ElementKeywords():
         return status,result,value,err_msg
 
     def get_element_text(self, sap_id, *args):
-        tk=Text_Keywords()
-        id,ses=tk.getSapElement(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         value=''
@@ -77,8 +76,7 @@ class ElementKeywords():
         return status,result,value,err_msg
 
     def getTooltipText(self, sap_id,*args):
-        tk=Text_Keywords()
-        id,ses=tk.getSapElement(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         value=OUTPUT_CONSTANT
