@@ -18,6 +18,22 @@ import logging
 import logging.config
 log = logging.getLogger('sap_scraping.py')
 
+
+import pyHook
+import pythoncom
+import ctypes
+import win32gui
+import win32api
+import time
+import win32process
+from threading import Thread
+ctrldownflag = False
+stopumpingmsgs = False
+view = []
+data = {}
+obj_ref = None
+window_id = None
+
 """ Class to fully scrape a SAP Gui."""
 
 class Scrape:
@@ -124,7 +140,6 @@ class Scrape:
         return window_to_scrape
 
     def clickandadd(self,operation):
-        print 'inside methodddd start click and add'
         if operation == 'STARTCLICKANDADD':
             try:
                 class OutlookThread(Thread):
@@ -140,10 +155,8 @@ class Scrape:
                         pythoncom.CoInitialize()
                         get_object = GetObject()
                         ses = get_object.GetSession(self.window_id)
-                        print "Coordinates" , self.coordX, self.coordY
                         try:
                             obj = ses.FindByPosition(self.coordX, self.coordY, False)
-                            print "Id of object", obj(0)
                             elem = ses.FindById(obj(0))
 
                             wnd_title = ses.FindById(self.window_id).Text
@@ -180,7 +193,6 @@ class Scrape:
                         self.start()
 
                     def StopPump(self):
-                        print "Inside stop pump"
                         #ctypes.windll.user32.PostQuitMessage(0)
                         self.stopumpingmsgs = True
                         wsh = win32com.client.Dispatch("WScript.Shell")
@@ -212,16 +224,14 @@ class Scrape:
                                 return True
                             else:
                                 if (event.Key == 'Lcontrol'):
-                                    print "Inside OnKeyDown LControl"
                                     ctrldownflag = True
-                                    #ctypes.windll.user32.PostQuitMessage(0)
+                                    ctypes.windll.user32.PostQuitMessage(0)
                                     return True
                                 else:
                                     ctrldownflag = False
                                     return True
 
                         def OnKeyUp(evnt):
-                            print "Inside OnKeyUp event"
                             global ctrldownflag
                             ctrldownflag = False
                             self.stopumpingmsgs = True
@@ -231,14 +241,14 @@ class Scrape:
                         def dumpToJson():
                             """ Storing scraped elements in json """
                             try:
-                                print "Dumping to json"
+
                                 data['scrapetype'] = 'cna'
                                 data['scrapedin'] = ''
                                 data['view'] = view
                                 with open('domelements.json', 'w') as outfile:
                                     json.dump(data, outfile, indent=4, sort_keys=False)
                                     outfile.close()
-                                print "Data dumped to json"
+
                             except Exception as e:
                                 print e
 

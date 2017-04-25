@@ -79,13 +79,10 @@ class ScrapeWindow(wx.Frame):
         state = event.GetEventObject().GetValue()
         if state == True:
             self.fullscrapebutton.Disable()
-            print 'calling start click and add'
             sap_scraping_obj.clickandadd('STARTCLICKANDADD')
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
         else:
-            print 'calling stop click and add'
             d = sap_scraping_obj.clickandadd('STOPCLICKANDADD')
-            #print 'returning data---------------------------',d
             event.GetEventObject().SetLabel("Start ClickAndAdd")
 
             self.socketIO.emit('scrape',d)
@@ -94,14 +91,10 @@ class ScrapeWindow(wx.Frame):
 
     def fullscrape(self,event):
         tk=Text_Keywords()
-        #logger.print_on_console('Performing full scrape')
         self.startbutton.Disable()
-        #logger.print_on_console('going to SapGui :')
         SapGui=tk.getSapObject()
-        #logger.print_on_console('SapGui :',SapGui)
         wndname=sap_scraping_obj.getWindow(SapGui)
         wnd_title = wndname.__getattr__("Text")
-        #logger.print_on_console('wndtitle :',wnd_title)
         data={}
         scraped_data = sap_scraping_obj.full_scrape(wndname,wnd_title)
         obj=launch_keywords.Launch_Keywords()
@@ -117,14 +110,11 @@ class ScrapeWindow(wx.Frame):
 
 
         data['mirror'] =encoded_string.encode('UTF-8').strip()
-        #logger.print_on_console( 'scrape_data before loads',scraped_data)
         data['view'] = scraped_data
-        #logger.print_on_console( 'scrape_data before dumping',scraped_data)
         with open('domelements.json', 'w') as outfile:
                 json.dump(data, outfile, indent=4, sort_keys=False)
                 outfile.close()
         self.socketIO.emit('scrape',data)
-        #logger.print_on_console('Full scrape  completed')
         self.Close()
 
 
