@@ -29,7 +29,6 @@ from element_keywords import ElementKeywords
 class Table_keywords():
 
     def __init__(self):
-        self.tk = Text_Keywords()
         self.uk = SapUtilKeywords()
 
     def getXpath(elem,row,col):
