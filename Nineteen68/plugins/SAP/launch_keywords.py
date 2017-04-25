@@ -33,7 +33,7 @@ window_handle=None
 window_pid=None
 
 #-----------------------------
-from text_keywords_sap import Text_Keywords
+from saputil_operations import SapUtilKeywords
 #---------------------------
 
 from pywinauto.application import Application
@@ -57,17 +57,18 @@ class Launch_Keywords():
 
 
     def __init__(self):
+        self.uk = SapUtilKeywords()
         self.windowname=''
+        self.filePath=''
         self.aut_handle=None
         self.ldtpObj=None
         self.windowHandle=None
 
     def getSession(self,*args):
-        tk=Text_Keywords()
         try:
             time.sleep(2)
             try:
-                SapGui=tk.getSapObject()
+                SapGui=self.uk.getSapObject()
             except Exception as e:
                 logger.print_on_console( 'no instance open error :',e)
             scrappingObj=Scrape()
@@ -83,10 +84,9 @@ class Launch_Keywords():
             logger.print_on_console( 'no instance open error :',e)
 
     def getSessWindow(self,*args):
-        tk=Text_Keywords()
         try:
             time.sleep(2)
-            SapGui=tk.getSapObject()
+            SapGui=self.uk.getSapObject()
             scrappingObj=Scrape()
             wnd = scrappingObj.getWindow(SapGui)
             wndId =  wnd.__getattr__('id')
@@ -118,8 +118,7 @@ class Launch_Keywords():
 
 
     def startTransaction(self,input_val,*args):
-        lk=Launch_Keywords()
-        ses=lk.getSession()
+        ses=self.getSession()
         tcode=input_val[0]
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
@@ -142,76 +141,36 @@ class Launch_Keywords():
         app_just=False
         err_msg=None
         term = None
-        tk=Text_Keywords()
         try:
         # check file exists
             if len(input_val)==2:
-                filePath,windowName=input_val[0],input_val[1]
-                server = "SL2 [52.165.148.179]"
+                self.filePath,self.windowName=input_val[0],input_val[1]
                 timeout=5
-            elif len(input_val)==3:
-                filePath,windowName,server=input_val[0],input_val[1],input_val[2]
             start_window=0
             try:
-             start_window = pywinauto.findwindows.find_window(title=windowName)
+             start_window = pywinauto.findwindows.find_window(title=self.windowName)
             except Exception as e:
                   log.error(e)
                   logger.print_on_console("Could not find specified window name")
-
-            if start_window>=1:
-                #self.multiInstance=title_matched_windows[0]
-                try:
-                    SapGui=tk.getSapObject()
-                except Exception as e:
-                    logger.print_on_console("error1  ",e)
-                logger.print_on_console('SAP window already exists please close the first instance')
-                try:
-                    SapGui.Children(0).Children(0)
-                    logger.print_on_console('SAP login exists')
-                    status=sap_constants.TEST_RESULT_PASS
-                    result = sap_constants.TEST_RESULT_TRUE
-                except:
-                    app = Application(backend="win32").connect(path = filePath).window(title=windowName)
-                    print app
-                    app.Edit.set_edit_text(u'')
-                    app.Edit.type_keys(server, with_spaces = True)
-                    #app.Edit.type_keys("{ENTER}")
-                    keyboard.SendKeys('{ENTER}')
-                    time.sleep(5)
-                    if app!=None and app!='':
-                        status=sap_constants.TEST_RESULT_PASS
-                        result = sap_constants.TEST_RESULT_TRUE
-                    else:
-                        logger.print_on_console('The given window name is not found')
-                        term = TERMINATE
-
-
-            elif start_window==0:
+            if start_window==0:
                 logger.print_on_console('Starting new SAP window')
-                #app = Application(backend="win32").start(r"C:\Program Files (x86)\SAP\FrontEnd\SAPgui\saplogon.exe").window(title="SAP Logon 740")
-                app = Application(backend="win32").start(filePath).window(title=windowName)
+                app = Application(backend="win32").start(self.filePath).window(title=self.windowName)
                 logger.print_on_console('connecting to  new SAP window')
-                #app = Application(backend="win32").connect(path = r"C:\Program Files (x86)\SAP\FrontEnd\SAPgui\saplogon.exe").window(title="SAP Logon 740")
-                app = Application(backend="win32").connect(path = filePath).window(title=windowName)
-                app.Edit.set_edit_text(u'')
-                app.Edit.type_keys(server, with_spaces = True)
-                #app.Edit.type_keys("{ENTER}") #keyboard.SendKeys('{KEY}')- is win32 equivalent in pywinauto.application
-                keyboard.SendKeys('{ENTER}')
-                #logger.print_on_console('Pressed enter key')
-                #incase onening second window fails , connect via giving a sleep command
                 time.sleep(4)
                 logger.print_on_console('The specified application is launched Successfully')
 
                 if app!=None and app!='':
                     status=sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_TRUE
-##                            return status,self.windowname
                 else:
                     logger.print_on_console('The given window name is not found')
                     term = TERMINATE
+            elif start_window>1:
+                logger.print_on_console('SAP Logon window already exists ,Please close the window')
+                err_msg='SAP Logon window already exists'
+                term =TERMINATE
             else :
                 error_code=int(win32api.GetLastError())
-                #logger.print_on_console("inside else part ")
                 if error_code in sap_constants.SAP_ERROR_CODES.keys():
                     logger.print_on_console("checking for error codes ")
                     logger.print_on_console(sap_constants.SAP_ERROR_CODES.get(error_code))
@@ -228,9 +187,53 @@ class Launch_Keywords():
             return term
         return status,result,verb,self.windowname,err_msg
 
+    def serverConnect(self,input_val,*args):
+        server=input_val[0]
+        #server = "SL2 [52.165.148.179]"
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
+        term = None
+        app = None
+        start_window=0
+        try:
+            start_window = pywinauto.findwindows.find_window(title=self.windowName)
+            if(start_window>1):
+                try:
+                    app = Application(backend="win32").connect(path =self.filePath).window(title=self.windowName)
+                    app.Edit.set_edit_text(u'')
+                    app.Edit.type_keys(server, with_spaces = True)
+                    keyboard.SendKeys('{ENTER}')
+                    time.sleep(5)
+                    if app!=None and app!='':
+                        try:
+                            SapGui=self.uk.getSapObject()
+                            SapGui.Children(0).Children(0)
+                            logger.print_on_console('Connected to SAP')
+                            status=sap_constants.TEST_RESULT_PASS
+                            result = sap_constants.TEST_RESULT_TRUE
+                        except:
+                            logger.print_on_console('Given Server discription is incorrect')
+                            err_msg='Given Server discription is incorrect'
+                            term = TERMINATE
+                    else:
+                        logger.print_on_console('The given window name is not found')
+                        err_msg='Not connected to SAP Logon , window not found'
+                        term = TERMINATE
+                except:
+                    logger.print_on_console('SAP Logon window does not exist')
+                    err_msg='SAP Logon window does not exist'
+                    term = TERMINATE
+            elif start_window==0:
+                logger.print_on_console('SAP Logon window does not exist')
+                term = TERMINATE
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console("Could not find specified window name")
+
     def getPageTitle(self,*args):
-        lk=Launch_Keywords()
-        ses=lk.getSession()
+        ses=self.getSession()
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -245,14 +248,13 @@ class Launch_Keywords():
         return status,result,value,err_msg
 
     def closeApplication(self, *args):
-        tk=Text_Keywords()
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
         err_msg=None
         try:
             try:
-                SapGui=tk.getSapObject()
+                SapGui=self.uk.getSapObject()
             except Exception as e:
                 logger.print_on_console("error1  ",e)
             i, j = 0, 0
@@ -290,8 +292,7 @@ class Launch_Keywords():
     def sendFunctionKeys(self,input_val,*args):
             status = sap_constants.TEST_RESULT_FAIL
             result = sap_constants.TEST_RESULT_FALSE
-            lk=Launch_Keywords()
-            ses,window=lk.getSessWindow()
+            ses,window=self.getSessWindow()
             keys=input_val[0]
             logger.print_on_console('keys : ',keys)
             err_msg=None

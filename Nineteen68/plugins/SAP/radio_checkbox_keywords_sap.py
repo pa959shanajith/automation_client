@@ -12,16 +12,17 @@ import sap_constants
 import launch_keywords
 import logger
 from constants import *
-from text_keywords_sap import Text_Keywords
-
+from saputil_operations import SapUtilKeywords
 import logging
 import logging.config
 log = logging.getLogger('radio_checkbox_keywords_sap.py')
 
 class Radio_Checkbox_keywords():
+    def __init__(self):
+        self.uk = SapUtilKeywords()
+
     def select_radiobutton(self, sap_id, *args):
-        tk=Text_Keywords()
-        id,ses=tk.getSapElement(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         #verb = OUTPUT_CONSTANT
@@ -49,8 +50,7 @@ class Radio_Checkbox_keywords():
         return status,result,value,err_msg
 
     def select_checkbox(self, sap_id , *args):
-        tk=Text_Keywords()
-        id,ses=tk.getSapElement(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         #verb = OUTPUT_CONSTANT
@@ -79,8 +79,7 @@ class Radio_Checkbox_keywords():
         return status,result,value,err_msg
 
     def unselect_checkbox(self, sap_id, *args):
-        tk=Text_Keywords()
-        id,ses=tk.getSapElement(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         #verb = OUTPUT_CONSTANT
@@ -109,8 +108,7 @@ class Radio_Checkbox_keywords():
         return status,result,value,err_msg
 
     def get_status(self, sap_id, *args):
-        tk=Text_Keywords()
-        id,ses=tk.getSapElement(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         value=OUTPUT_CONSTANT

@@ -22,7 +22,7 @@ import logging
 import logging.config
 log = logging.getLogger('clientwindow.py')
 
-from text_keywords_sap import Text_Keywords
+from saputil_operations import SapUtilKeywords
 
 import json
 
@@ -39,6 +39,7 @@ import base64
 obj=None
 class ScrapeWindow(wx.Frame):
     def __init__(self, parent,id, title,filePath,socketIO):
+        self.uk=SapUtilKeywords()
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(200, 150) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
         self.SetBackgroundColour('#e6e7e8')
@@ -90,9 +91,8 @@ class ScrapeWindow(wx.Frame):
             self.Close()
 
     def fullscrape(self,event):
-        tk=Text_Keywords()
         self.startbutton.Disable()
-        SapGui=tk.getSapObject()
+        SapGui=self.uk.getSapObject()
         wndname=sap_scraping_obj.getWindow(SapGui)
         wnd_title = wndname.__getattr__("Text")
         data={}

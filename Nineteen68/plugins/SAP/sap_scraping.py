@@ -265,10 +265,13 @@ class Scrape:
                         dumpToJson()
 
                 class GetObject():
+                    def __init__(self):
+                        from saputil_operations import SapUtilKeywords
+                        self.uk= SapUtilKeywords()
+
                     def GetSession(self, window_id):
                         """ Returns the session of window to scrape """
-                        pythoncom.CoInitialize()
-                        SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
+                        SapGui = self.uk.getSapObject()
                         i = window_id.index("ses")
                         sesId = window_id[0:i+6]
                         ses = SapGui.FindById(str(sesId))
@@ -276,8 +279,7 @@ class Scrape:
 
                     def GetWindow(self):
                         """ Returns the id of window to scrape and brings the window to foreground """
-                        pythoncom.CoInitialize()
-                        SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
+                        SapGui = self.uk.getSapObject()
                         scrape = Scrape()
                         wnd = scrape.getWindow(SapGui)
                         wndId = wnd.Id
