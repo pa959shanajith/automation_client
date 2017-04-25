@@ -54,7 +54,6 @@ class ScrapeWindow(wx.Frame):
         input_val=[]
         input_val.append(fileLoc)
         input_val.append(windowname)
-        input_val.append(5)
         status = obj.launch_application(input_val)
         print status
         if status!=TERMINATE:

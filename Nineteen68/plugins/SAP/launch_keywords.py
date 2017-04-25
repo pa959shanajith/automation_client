@@ -154,10 +154,14 @@ class Launch_Keywords():
                   logger.print_on_console("Could not find specified window name")
             if start_window==0:
                 logger.print_on_console('Starting new SAP window')
-                app = Application(backend="win32").start(self.filePath).window(title=self.windowName)
-                logger.print_on_console('connecting to  new SAP window')
-                time.sleep(4)
-                logger.print_on_console('The specified application is launched Successfully')
+                try:
+                    app = Application(backend="win32").start(self.filePath).window(title=self.windowName)
+                    logger.print_on_console('connecting to  new SAP window')
+                    time.sleep(4)
+                    logger.print_on_console('The specified application is launched Successfully')
+                except:
+                    logger.print_on_console('Incorrect file path or window name')
+                    term = TERMINATE
 
                 if app!=None and app!='':
                     status=sap_constants.TEST_RESULT_PASS
