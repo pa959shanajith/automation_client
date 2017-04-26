@@ -154,7 +154,7 @@ class Scrape:
                     def run(self):
                         pythoncom.CoInitialize()
                         get_object = GetObject()
-                        ses = get_object.GetSession(self.window_id)
+                        ses = get_object.getSession(self.window_id)
                         try:
                             obj = ses.FindByPosition(self.coordX, self.coordY, False)
                             elem = ses.FindById(obj(0))
@@ -241,7 +241,7 @@ class Scrape:
                         def dumpToJson():
                             """ Storing scraped elements in json """
                             try:
-
+                                data = {}
                                 data['scrapetype'] = 'cna'
                                 data['scrapedin'] = ''
                                 data['view'] = view
@@ -254,7 +254,7 @@ class Scrape:
 
                         global window_id
                         get_obj = GetObject()
-                        window_id = get_obj.GetWindow()
+                        window_id = get_obj.getWindowToForeGround()
                         self.hm = pyHook.HookManager()
                         self.hm.KeyDown = OnKeyDown
                         self.hm.KeyUp = OnKeyUp
@@ -269,7 +269,7 @@ class Scrape:
                         from saputil_operations import SapUtilKeywords
                         self.uk= SapUtilKeywords()
 
-                    def GetSession(self, window_id):
+                    def getSession(self, window_id):
                         """ Returns the session of window to scrape """
                         SapGui = self.uk.getSapObject()
                         i = window_id.index("ses")
@@ -277,7 +277,7 @@ class Scrape:
                         ses = SapGui.FindById(str(sesId))
                         return ses
 
-                    def GetWindow(self):
+                    def getWindowToForeGround(self):
                         """ Returns the id of window to scrape and brings the window to foreground """
                         SapGui = self.uk.getSapObject()
                         scrape = Scrape()

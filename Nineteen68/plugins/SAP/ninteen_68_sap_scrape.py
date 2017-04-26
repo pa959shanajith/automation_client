@@ -82,10 +82,10 @@ class ScrapeWindow(wx.Frame):
             sap_scraping_obj.clickandadd('STARTCLICKANDADD')
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
         else:
-            d = sap_scraping_obj.clickandadd('STOPCLICKANDADD')
+            click_data = sap_scraping_obj.clickandadd('STOPCLICKANDADD')
             event.GetEventObject().SetLabel("Start ClickAndAdd")
 
-            self.socketIO.emit('scrape',d)
+            self.socketIO.emit('scrape',click_data)
 
             self.Close()
 
