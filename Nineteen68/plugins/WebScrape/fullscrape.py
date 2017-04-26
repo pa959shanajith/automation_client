@@ -260,8 +260,6 @@ class Fullscrape():
 ##            log.info('FILE: fullscrape.py , DEF: fullscrape() , MSG: Maximizing the tool once full scrape is done ')
 ##            win32gui.ShowWindow(toolwindow, win32con.SW_MAXIMIZE)
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             status = domconstants.STATUS_FAIL
             data = domconstants.STATUS_FAIL
         return data
