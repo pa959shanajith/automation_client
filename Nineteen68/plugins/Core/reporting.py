@@ -229,6 +229,8 @@ class Reporting:
             parent_id=tsp.parent_id
             step_description=tsp.step_description
             name=self.name
+            ##            Added this line to remove status for conditional keyword in reports
+            status = ''
         if len(args)>0:
             if args[0] != None:
                 comments=args[0]
