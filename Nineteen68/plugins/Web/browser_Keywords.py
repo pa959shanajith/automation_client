@@ -370,7 +370,7 @@ class BrowserKeywords():
                         break
 
                 count = count - 2
-                webdriver_list[driver_instance].close()
+                webdriver_list[driver_instance].quit()
                 logger.print_on_console('browser closed')
                 log.info('browser closed')
                 if(len(winHandles) > 1):
