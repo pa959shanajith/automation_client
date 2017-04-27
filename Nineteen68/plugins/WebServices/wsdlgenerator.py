@@ -11,7 +11,7 @@
 #
 # Author:      vishvas.a
 #
-# Modified:     20-03-2017
+# Modified:     27-04-2017
 # Copyright:   (c) vishvas.a 2017
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
@@ -71,6 +71,7 @@ class WebservicesWSDL():
         except Exception as e:
             logger.print_on_console('Invalid end point URl')
             log.error(e)
+            return "fail"
 
 
 class BodyGenarator():

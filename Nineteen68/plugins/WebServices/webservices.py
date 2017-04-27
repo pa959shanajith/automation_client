@@ -10,7 +10,7 @@
 #
 # Author:      vishvas.a
 #
-# Created:     20-03-2017
+# Created:     27-04-2017
 # Copyright:   (c) vishvas.a 2017
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
@@ -57,6 +57,17 @@ class WSkeywords:
         self.verify=''
         self.content_type=''
 
+     def clearValues(self):
+        self.baseEndPointURL=''
+        self.baseOperation=''
+        self.baseMethod=''
+        self.baseReqHeader= ''
+        self.baseReqBody=''
+        self.baseResHeader = None
+        self.baseResBody=None
+        self.modifiedTemplate = ''
+        self.verify=''
+        self.content_type=''
 
      def setEndPointURL(self,url):
         """
@@ -74,14 +85,15 @@ class WSkeywords:
         try:
             url=str(url)
             if url != None and url.strip() != '':
-                 url=url.strip()
-                 self.baseEndPointURL = url
-                 log.debug('End point URL is set')
-                 logger.print_on_console('End point URL:',url , 'has been set')
-                 log.debug(STATUS_METHODOUTPUT_UPDATE)
-                 status = ws_constants.TEST_RESULT_PASS
-                 output=self.baseEndPointURL
-                 methodoutput = ws_constants.TEST_RESULT_TRUE
+                self.clearValues()
+                url=url.strip()
+                self.baseEndPointURL = url
+                log.debug('End point URL is set')
+                logger.print_on_console('End point URL:',url , 'has been set')
+                log.debug(STATUS_METHODOUTPUT_UPDATE)
+                status = ws_constants.TEST_RESULT_PASS
+                output=self.baseEndPointURL
+                methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_END_POINT_URL']
         except Exception as e:
@@ -305,12 +317,12 @@ class WSkeywords:
             #added status code
             self.baseResHeader['StatusCode']=response.status_code
             log.info(ws_constants.RESPONSE_HEADER+'\n'+str(self.baseResHeader))
-            self.baseResBody=response.content
+            self.baseResBody=str(response.content).replace("&gt;",">").replace("&lt;","<")
             log.info(ws_constants.RESPONSE_BODY+'\n'+str(self.baseResBody))
             log.debug(STATUS_METHODOUTPUT_UPDATE)
             status = ws_constants.TEST_RESULT_PASS
             methodoutput = ws_constants.TEST_RESULT_TRUE
-            output=(self.baseResHeader,self.baseResBody)
+            output=(self.baseResHeader,str(self.baseResBody).replace("&gt;",">").replace("&lt;","<"))
         except Exception as e:
             log.error(e)
 
@@ -478,10 +490,15 @@ class WSkeywords:
         socketIO = args[1]
         if(result[2] != None):
             res = result[2]
-            a = ''
-            for key in res[0]:
-                a = a +str(key) + ":" + str (res[0][key]) + "##"
-            response=a+'rEsPONseBOdY:'+res[1]
+            headerresp = ''
+            if type(res) == tuple:
+                for key in res[0]:
+                    headerresp = headerresp +str(key) + ":" + str (res[0][key]) + "##"
+                response=headerresp+'rEsPONseBOdY:'+res[1]
+            else:
+                for key in res:
+                    headerresp = headerresp +str(key) + ":" + str (res[key]) + "##"
+                response=headerresp+'rEsPONseBOdY: '
         response = str(response)
         if response == '':
             response = 'fail'
