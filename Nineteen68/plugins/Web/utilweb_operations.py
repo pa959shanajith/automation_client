@@ -439,10 +439,13 @@ class UtilWebKeywords:
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             input=input[0]
-            logger.print_on_console(INPUT_IS+input)
-            input=float(str(input))
-            if not(input is None or int(input) <0):
+            try:
                 to_window=int(input)
+            except Exception as e:
+                to_window = -1
+            if not(input is None or input is '' or to_window <0):
+                logger.print_on_console(INPUT_IS+input)
+##                input=int(input)
                 log.info('Switching to the window ')
                 log.info(to_window)
                 window_handles=self.__get_window_handles()
@@ -459,17 +462,27 @@ class UtilWebKeywords:
                     logger.print_on_console('Switched to window handle'+browser_Keywords.driver_obj.current_window_handle)
                     logger.print_on_console('Control switched from window ' + str(from_window)
 							+ " to window " + str(to_window))
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg='Current window handle not found'
                     logger.print_on_console(err_msg)
                     log.error(err_msg)
-
+            elif (input is None or input is ''):
+                window_handles=self.__get_window_handles()
+                log.info('Current window handles are ')
+                log.info(window_handles)
+                log.debug(len(window_handles))
+                if len(window_handles)>0:
+                    total_handles=len(window_handles)
+                    browser_Keywords.driver_obj.switch_to.window(window_handles[total_handles-1])
+                    logger.print_on_console('Control switched to latest window')
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
             else:
                 logger.print_on_console(INVALID_INPUT)
                 err_msg=INVALID_INPUT
                 log.error(INVALID_INPUT)
-            status=TEST_RESULT_PASS
-            methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             etype=type(e)
             err_msg=self.__web_driver_exception(e)
