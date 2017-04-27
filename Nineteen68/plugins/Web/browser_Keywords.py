@@ -373,11 +373,14 @@ class BrowserKeywords():
                 webdriver_list[driver_instance].quit()
                 logger.print_on_console('browser closed')
                 log.info('browser closed')
-                if(len(winHandles) > 1):
-                    webdriver_list[driver_instance].switch_to.window(winHandles[count])
-                if(len(winHandles) == 1):
-                    webdriver_list.pop(len(webdriver_list)-1)
-                    print 'Kill driver logic'
+                try:
+                    if(len(winHandles) > 1):
+                        webdriver_list[driver_instance].switch_to.window(winHandles[count])
+                    if(len(winHandles) == 1):
+                        webdriver_list.pop(len(webdriver_list)-1)
+                        print 'Kill driver logic'
+                except Exception as e:
+                    a=1
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
 
@@ -415,22 +418,37 @@ class BrowserKeywords():
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
+            if (len(args) > 1):
+                inp = str(args[1])
             winHandles = driver_obj.window_handles
             winHandles = driver_obj.window_handles
             if len(winHandles) > 1:
-                for x in winHandles:
-                    if(not(parent_handle == x)):
-                        try:
-                            driver_obj.switch_to.window(parent_handle)
-                            driver_obj.switch_to.window(x)
-                            driver_obj.close()
-                            logger.print_on_console('Sub windows closed')
-                            log.info('Sub windows closed')
-                        except Exception as e:
-                            err_msg=self.__web_driver_exception(e)
+                if(inp == 'ALL'):
+                    for x in winHandles:
+                        if(not(parent_handle == x)):
+                            try:
+                                driver_obj.switch_to.window(parent_handle)
+                                driver_obj.switch_to.window(x)
+                                driver_obj.close()
+                                driver_obj.switch_to.window(parent_handle)
+                                logger.print_on_console('Sub window closed')
+                                log.info('Sub window closed')
+                            except Exception as e:
+                                err_msg=self.__web_driver_exception(e)
+                else:
+                    try:
+                        driver_obj.switch_to.window(parent_handle)
+                        driver_obj.switch_to.window(winHandles[len(winHandles) - 1])
+                        driver_obj.close()
+                        driver_obj.switch_to.window(parent_handle)
+                        logger.print_on_console('Sub window closed')
+                        log.info('Sub windows closed')
+                    except Exception as e:
+                        err_msg=self.__web_driver_exception(e)
+
                 after_close = driver_obj.window_handles
                 after_close = driver_obj.window_handles
-                if(len(after_close) == 1):
+                if(len(after_close) >= 1):
                     driver_obj.switch_to.window(parent_handle)
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE

@@ -57,6 +57,8 @@ class ExcelFile:
     def open_and_save_file(self,input_path):
         #win32 part opening and closing of file to claculate and save values of the formula
         #This is to support the feature of   simulataneous writing and reading to a file
+        import pythoncom
+        pythoncom.CoInitialize()
         from win32com.client.gencache import EnsureDispatch
         excel = EnsureDispatch("Excel.Application")
         excel.DisplayAlerts = False
