@@ -14,6 +14,7 @@ from values_from_ui import *
 log = logging.getLogger('clientwindow.py')
 from socketIO_client import SocketIO,BaseNamespace
 import readconfig
+import httplib
 i = 0
 wxObject = None
 browsername = None
@@ -870,9 +871,9 @@ class ClientWindow(wx.Frame):
 ##        self.action=STEP_BY_SETP_DEBUG
 ##        self.mythread = TestThread(self,self.action)
 
-    def OnNodeConnect(self,event):
-        self.mythread = SocketThread(self)
-        self.connectbutton.Disable()
+##    def OnNodeConnect(self,event):
+##        self.mythread = SocketThread(self)
+##        self.connectbutton.Disable()
 
     def test(self,event):
 ##        print 'Self',self
@@ -895,8 +896,16 @@ class ClientWindow(wx.Frame):
 ####        self.new.Show()
 
     def OnNodeConnect(self,event):
-        self.mythread = SocketThread(self)
-        self.connectbutton.Disable()
+        try:
+            url = configvalues['server_ip'] + ':' + configvalues['server_port']
+            url = str(url)
+            conn  = httplib.HTTPConnection(url)
+            conn.connect()
+            conn.close()
+            self.mythread = SocketThread(self)
+            self.connectbutton.Disable()
+        except Exception as e:
+            print 'Forbidden request, Connection refused, please check the server ip and server port in Config.json, and restart the client window.'
 
     def test(self,event):
 ##        print 'Self',self
