@@ -10,7 +10,7 @@
 #
 # Author:      vishvas.a
 #
-# Created:     27-04-2017
+# Created:     28-04-2017
 # Copyright:   (c) vishvas.a 2017
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ class WSkeywords:
                 url=url.strip()
                 self.baseEndPointURL = url
                 log.debug('End point URL is set')
-                logger.print_on_console('End point URL:',url , 'has been set')
+                logger.print_on_console('End point URL: ',url , ' has been set.')
                 log.debug(STATUS_METHODOUTPUT_UPDATE)
                 status = ws_constants.TEST_RESULT_PASS
                 output=self.baseEndPointURL
@@ -124,8 +124,8 @@ class WSkeywords:
                  operation=operation.strip()
                  log.debug('Setting base operation name with the input operation name')
                  self.baseOperation = str(operation)
+                 logger.print_on_console('Operation has been set to :',operation)
                  log.info('Base operation name has been set to input operation name')
-                 logger.print_on_console('Base operation name has been set to: ',operation)
                  log.debug(STATUS_METHODOUTPUT_UPDATE)
                  status = ws_constants.TEST_RESULT_PASS
                  output=self.baseOperation
@@ -163,7 +163,7 @@ class WSkeywords:
                     log.debug('Setting input method name to base method name ')
                     self.baseMethod = method
                     log.info('Base method name has been set to input method name')
-                    logger.print_on_console('Base method name has been set to: ',method)
+                    logger.print_on_console('Method name has been set to: ',method)
                     log.debug(STATUS_METHODOUTPUT_UPDATE)
                     output=self.baseMethod
                     status = ws_constants.TEST_RESULT_PASS
@@ -199,6 +199,7 @@ class WSkeywords:
                 header=header.strip()
                 log.debug('Setting the input header template to Header ')
                 self.setHeader(header)
+                logger.print_on_console('Header has been set to :',self.baseReqHeader)
                 log.info('Input header template has been set ')
                 log.debug(STATUS_METHODOUTPUT_UPDATE)
                 output=self.baseReqHeader
@@ -255,6 +256,7 @@ class WSkeywords:
                 output=self.baseReqHeader
                 status = ws_constants.TEST_RESULT_PASS
                 methodoutput = ws_constants.TEST_RESULT_TRUE
+                logger.print_on_console('Request Header has been set to :',self.baseReqHeader)
             else:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_HEADER']
 
@@ -275,7 +277,6 @@ class WSkeywords:
         purpose : sets the body provided in param body
         param body : body of the webservice to set
         return : Returns True if it sets the url else False
-
         """
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
@@ -292,6 +293,7 @@ class WSkeywords:
                  output=self.baseReqBody
                  status = ws_constants.TEST_RESULT_PASS
                  methodoutput = ws_constants.TEST_RESULT_TRUE
+                 logger.print_on_console('Request Body has been set to :',self.baseReqBody)
             else:
                 err_msg = ws_constants.ERR_SET_WHOLE_BODY
         except Exception as e:
@@ -325,7 +327,6 @@ class WSkeywords:
             output=(self.baseResHeader,str(self.baseResBody).replace("&gt;",">").replace("&lt;","<"))
         except Exception as e:
             log.error(e)
-
             logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output
@@ -642,6 +643,7 @@ class WSkeywords:
                         log.debug(STATUS_METHODOUTPUT_UPDATE)
                         status = ws_constants.TEST_RESULT_PASS
                         methodoutput = ws_constants.TEST_RESULT_TRUE
+                        logger.print_on_console('Tag Attribute changed to :',self.baseReqBody)
                 else:
                     err_msg=err_msg=ws_constants.ERR_SET_TAG_VALUE
             else:
@@ -675,6 +677,7 @@ class WSkeywords:
                         log.debug(STATUS_METHODOUTPUT_UPDATE)
                         status = ws_constants.TEST_RESULT_PASS
                         methodoutput = ws_constants.TEST_RESULT_TRUE
+                        logger.print_on_console('Tag Value changed to :',self.baseReqBody)
                 else:
                     err_msg=ws_constants.ERR_SET_TAG_VALUE
             else:
