@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 
 from selenium.webdriver.support.ui import Select
-##import browser_Keywords
+import  browser_Keywords
 import webconstants
 from utilweb_operations import UtilWebKeywords
 import logger
@@ -53,7 +53,8 @@ class DropdownKeywords():
                             index = input[0]
                         if len(index.strip()) != 0:
                             input_val = int(index)
-                            input_val = input_val - 1
+                            #Issue fix ALM 131: ICE-Test Case: List and Dropdown -> "selectValueByIndex" is starting from index 1 instead of index 0
+##                            input_val = input_val - 1
                             log.info('Input value obtained')
                             log.info(input_val)
                             select = Select(webelement)
@@ -63,10 +64,17 @@ class DropdownKeywords():
                             if(input_val < iListSize):
                                 for i in range(0,iListSize):
                                     if(input_val == i):
+##                                        if (isinstance(browser_Keywords.driver_obj,webdriver.Firefox)):
+##                                            iList[i].click()
+##                                        else:
                                         select.select_by_index(input_val)
                                         status=webconstants.TEST_RESULT_PASS
                                         result=webconstants.TEST_RESULT_TRUE
                                         log.info(STATUS_METHODOUTPUT_UPDATE)
+##                                    else:
+##                                      logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+##                                      log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+##                                      err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                             else:
                                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -391,9 +399,14 @@ class DropdownKeywords():
                                 flag = False
                                 for x in range(0,count):
                                     if int(input[x]) <= iListSize:
-                                        input_val_temp = input[x]
-                                        input_val = int(input_val_temp)
-                                        select.select_by_index(input_val)
+                                        for i in range(0,iListSize):
+                                            input_val_temp = input[x]
+                                            input_val = int(input_val_temp)
+                                            if( input_val == i):
+                                                if (isinstance(browser_Keywords.driver_obj,webdriver.Firefox)):
+                                                    iList[i].click()
+                                                else:
+                                                    select.select_by_index(input_val)
                                     else:
                                         flag = True
                                         logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -427,9 +440,20 @@ class DropdownKeywords():
                                 flag = False
                                 for x in range(0,count):
                                     if int(input[x]) <= iListSize:
-                                        input_val_temp = input[x]
-                                        input_val = int(input_val_temp)
-                                        select.select_by_index(input_val)
+                                        for i in range(0,iListSize):
+                                            input_val_temp = input[x]
+                                            input_val = int(input_val_temp)
+                                            if( input_val == i):
+##                                                if (isinstance(browser_Keywords.driver_obj,webdriver.Firefox)):
+##                                                    iList[i].click()
+##                                                else:
+                                                    select.select_by_index(input_val)
+                                            else:
+
+                                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+
                                     else:
                                         flag = True
                                         logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -496,7 +520,11 @@ class DropdownKeywords():
                             temp.append(value)
                         output = ';'.join(temp)
                         logger.print_on_console(output)
-                        output=temp
+
+                        if len(temp)>1:
+                            output=temp
+                        else:
+                            output = value
                         status=webconstants.TEST_RESULT_PASS
                         result=webconstants.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)
