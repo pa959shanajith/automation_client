@@ -92,7 +92,7 @@ class WSkeywords:
                 logger.print_on_console('End point URL: ',url , ' has been set.')
                 log.debug(STATUS_METHODOUTPUT_UPDATE)
                 status = ws_constants.TEST_RESULT_PASS
-                output=self.baseEndPointURL
+##                output=self.baseEndPointURL
                 methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_END_POINT_URL']
@@ -128,7 +128,7 @@ class WSkeywords:
                  log.info('Base operation name has been set to input operation name')
                  log.debug(STATUS_METHODOUTPUT_UPDATE)
                  status = ws_constants.TEST_RESULT_PASS
-                 output=self.baseOperation
+##                 output=self.baseOperation
                  methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
                 err_msg =ERROR_CODE_DICT['ERR_INVALID_OPERATION']
@@ -165,7 +165,7 @@ class WSkeywords:
                     log.info('Base method name has been set to input method name')
                     logger.print_on_console('Method name has been set to: ',method)
                     log.debug(STATUS_METHODOUTPUT_UPDATE)
-                    output=self.baseMethod
+##                    output=self.baseMethod
                     status = ws_constants.TEST_RESULT_PASS
                     methodoutput = ws_constants.TEST_RESULT_TRUE
                 else:
@@ -202,7 +202,7 @@ class WSkeywords:
                 logger.print_on_console('Header has been set to :',self.baseReqHeader)
                 log.info('Input header template has been set ')
                 log.debug(STATUS_METHODOUTPUT_UPDATE)
-                output=self.baseReqHeader
+##                output=self.baseReqHeader
                 status = ws_constants.TEST_RESULT_PASS
                 methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
@@ -253,13 +253,12 @@ class WSkeywords:
                     self.baseReqHeader=header[0]
                 log.info('Header is set')
                 log.debug(STATUS_METHODOUTPUT_UPDATE)
-                output=self.baseReqHeader
+##                output=self.baseReqHeader
                 status = ws_constants.TEST_RESULT_PASS
                 methodoutput = ws_constants.TEST_RESULT_TRUE
                 logger.print_on_console('Request Header has been set to :',self.baseReqHeader)
             else:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_HEADER']
-
         except Exception as e:
             log.error(e)
             err_msg=ws_constants.ERR_MSG1+'setHeader'
@@ -290,7 +289,7 @@ class WSkeywords:
                  self.baseReqBody = body
                  log.info('Input body has been set to base Request body ')
                  log.debug(STATUS_METHODOUTPUT_UPDATE)
-                 output=self.baseReqBody
+##                 output=self.baseReqBody
                  status = ws_constants.TEST_RESULT_PASS
                  methodoutput = ws_constants.TEST_RESULT_TRUE
                  logger.print_on_console('Request Body has been set to :',self.baseReqBody)
