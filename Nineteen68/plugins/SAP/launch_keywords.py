@@ -243,7 +243,7 @@ class Launch_Keywords():
         except Exception as e:
             log.error(e)
             logger.print_on_console("Could not find specified window name")
-        return status,result,value,err_msg
+        return status,result,verb,err_msg
 
     def getPageTitle(self,*args):
         ses=self.getSession()

@@ -111,7 +111,7 @@ class SAPDispatcher:
                   'gettablestatus':self.table_keywords_obj.getStatus,
                   'getcelltooltip':self.table_keywords_obj.getCellToolTip,
                   'tablecellclick':self.table_keywords_obj.tableCell_click,
-                  'tablecelldoubleclick':self.table_keywords_obj.tableCell_doubleClick,
+                  'doubleclick':self.table_keywords_obj.tableCell_doubleClick,
                   'selectrow':self.table_keywords_obj.selectRow,
                   'unselectrow':self.table_keywords_obj.unselectRow
                    }
