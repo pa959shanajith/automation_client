@@ -40,6 +40,7 @@ class SAPDispatcher:
 
 
     def __init__(self):
+
         self.exception_flag=''
 
 
@@ -62,6 +63,7 @@ class SAPDispatcher:
                   'getpagetitle':self.launch_keywords_obj.getPageTitle,
                   'starttransaction':self.launch_keywords_obj.startTransaction,
                   'serverconnect':self.launch_keywords_obj.serverConnect,
+                  'geterrormessage':self.launch_keywords_obj.getErrorMessage,
                   'settext' : self.editable_text_obj.setText,
                   'setsecuretext':self.editable_text_obj.setSecureText,
                   'gettext':self.editable_text_obj.getText,
@@ -101,7 +103,7 @@ class SAPDispatcher:
                   'getcellvalue':self.table_keywords_obj.getCellValue,
                   'verifycellvalue':self.table_keywords_obj.verifyCellValue,
                   #commenting dropdown code inside table cell
-##                  'verifytextexists':self.table_keywords_obj.verifyTextExists,
+                  'verifytextexists':self.table_keywords_obj.verifyTextExists,
                   'cellclick':self.table_keywords_obj.cellClick,
 ##                  'selectvaluebyindex':self.table_keywords_obj.selectValueByIndex,
 ##                  'selectvaluebytext':self.table_keywords_obj.selectValueByText,
@@ -109,7 +111,7 @@ class SAPDispatcher:
                   'gettablestatus':self.table_keywords_obj.getStatus,
                   'getcelltooltip':self.table_keywords_obj.getCellToolTip,
                   'tablecellclick':self.table_keywords_obj.tableCell_click,
-                  'tablecelldoubleclick':self.table_keywords_obj.tableCell_doubleClick,
+                  'doubleclick':self.table_keywords_obj.tableCell_doubleClick,
                   'selectrow':self.table_keywords_obj.selectRow,
                   'unselectrow':self.table_keywords_obj.unselectRow
                    }
@@ -118,7 +120,7 @@ class SAPDispatcher:
 
             keyword=keyword.lower()
             if keyword in dict.keys():
-                if keyword=='serverconnect'  or keyword=='launchapplication' or keyword=='starttransaction' :
+                if keyword=='serverconnect' or keyword=='launchapplication' or keyword=='starttransaction' :
                     result= dict[keyword](input,output)
                 else:
                     result= dict[keyword](objectname,url,input,output)

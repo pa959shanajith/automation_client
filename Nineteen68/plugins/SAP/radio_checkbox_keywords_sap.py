@@ -9,7 +9,6 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import sap_constants
-import launch_keywords
 import logger
 from constants import *
 from saputil_operations import SapUtilKeywords

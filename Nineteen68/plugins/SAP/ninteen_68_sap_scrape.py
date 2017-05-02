@@ -82,10 +82,10 @@ class ScrapeWindow(wx.Frame):
             sap_scraping_obj.clickandadd('STARTCLICKANDADD')
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
         else:
-            click_data = sap_scraping_obj.clickandadd('STOPCLICKANDADD')
+            d = sap_scraping_obj.clickandadd('STOPCLICKANDADD')
             event.GetEventObject().SetLabel("Start ClickAndAdd")
 
-            self.socketIO.emit('scrape',click_data)
+            self.socketIO.emit('scrape',d)
 
             self.Close()
 
@@ -97,9 +97,10 @@ class ScrapeWindow(wx.Frame):
         data={}
         scraped_data = sap_scraping_obj.full_scrape(wndname,wnd_title)
         obj=launch_keywords.Launch_Keywords()
-
+        self.Hide()
+        time.sleep(1)
         try:
-            img=obj.captureScreenshot(SapGui,scraped_data)
+            img=obj.captureScreenshot(wnd_title)
             img.save('out.png')
             with open("out.png", "rb") as image_file:
                       encoded_string = base64.b64encode(image_file.read())
@@ -110,9 +111,9 @@ class ScrapeWindow(wx.Frame):
 
         data['mirror'] =encoded_string.encode('UTF-8').strip()
         data['view'] = scraped_data
-        with open('domelements.json', 'w') as outfile:
-                json.dump(data, outfile, indent=4, sort_keys=False)
-                outfile.close()
+##        with open('domelements.json', 'w') as outfile:
+##                json.dump(data, outfile, indent=4, sort_keys=False)
+##                outfile.close()
         self.socketIO.emit('scrape',data)
         self.Close()
 

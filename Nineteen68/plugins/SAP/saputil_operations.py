@@ -41,19 +41,20 @@ class SapUtilKeywords:
             wnd = scrappingObj.getWindow(SapGui)                      #calling window method
             #logger.print_on_console( 'wnd--------------------',wnd)
             wndId =  wnd.__getattr__('id')                         # windowid from name
-            i = wndId.index('wnd')
-            wndNumber = wndId[i+4]                  #getting window number
+##            i = wndId.index('wnd')
+##            wndNumber = wndId[i+4]                  #getting window number
             j = wndId.index('ses')
             sesId = wndId[0:j+6]
             #print sesId
             ses = SapGui.FindByid(str(sesId))
-            sesNumber = wndId[j+4]                  #get session number
-            k = wndId.index('con')
-            conNumber = wndId[k+4]                   #get connection number
-            index = sap_id.index('/')
-            path = sap_id[index:]
-
-            id = '/app/con[' + conNumber + ']/ses[' + sesNumber + ']/wnd[' + wndNumber + ']' + path
+##            sesNumber = wndId[j+4]                  #get session number
+##            k = wndId.index('con')
+##            conNumber = wndId[k+4]                   #get connection number
+##            index = sap_id.index('/')
+##            path = sap_id[index:]
+##            id = '/app/con[' + conNumber + ']/ses[' + sesNumber + ']/wnd[' + wndNumber + ']' + path
+            i = sap_id.index("/")
+            id = wndId + sap_id[i:]
             return id,ses
         except Exception as e:
             logger.print_on_console( 'No instance open error :',e)

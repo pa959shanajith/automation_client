@@ -54,6 +54,7 @@ class Scrape:
         i = 0;
         while True:
             try:
+                custname=None
                 elem = object.Children(i)
                 # Not scraping GuiMenuBar and GuiToolBar with id tbar[0]
                 if("mbar" in str(elem.__getattr__("Id")) or "tbar[0]" in str(elem.__getattr__("Id"))):
@@ -63,13 +64,28 @@ class Scrape:
 
                     path = wnd_title + elem.__getattr__("Id")[25:]
 
+                    if(elem.__getattr__("Type") == "GuiButton"):
+                        custname = elem.__getattr__("Name") + "_btn"
+                    elif(elem.__getattr__("Type") == "GuiTextField"):
+                        custname = elem.__getattr__("Name") + "_txt"
+                    elif(elem.__getattr__("Type") == "GuiComboBox"):
+                        custname = elem.__getattr__("Name") + "_select"
+                    elif(elem.__getattr__("Type") == "GuiLabel"):
+                        custname = elem.__getattr__("Name") + "_lbl"
+                    elif(elem.__getattr__("Type") == "GuiRadioButton"):
+                        custname = elem.__getattr__("Name") + "_radiobtn"
+                    elif(elem.__getattr__("Type") == "GuiCheckBox"):
+                        custname = elem.__getattr__("Name") + "_chkbox"
+                    else:
+                        custname = elem.__getattr__("Name")
+
                     """ Python dictionary to store the properties associated with the objects."""
                     dict = {
                             'xpath': path,
                             'id': elem.__getattr__("Id"),
                             'text': elem.__getattr__("Text"),
                             'tag': elem.__getattr__("Type"),
-                            'custname': elem.__getattr__("Name"),
+                            'custname': custname,
                             'screenleft': elem.__getattr__("ScreenLeft"),
                             'screentop': elem.__getattr__("ScreenTop"),
                             'left': elem.__getattr__("Left"),
@@ -154,19 +170,34 @@ class Scrape:
                     def run(self):
                         pythoncom.CoInitialize()
                         get_object = GetObject()
-                        ses = get_object.getSession(self.window_id)
+                        ses = get_object.GetSession(self.window_id)
                         try:
                             obj = ses.FindByPosition(self.coordX, self.coordY, False)
                             elem = ses.FindById(obj(0))
-
+                            custname=None
                             wnd_title = ses.FindById(self.window_id).Text
                             path = wnd_title + elem.__getattr__("Id")[25:]
+
+                            if(elem.__getattr__("Type") == "GuiButton"):
+                                custname = elem.__getattr__("Name") + "_btn"
+                            elif(elem.__getattr__("Type") == "GuiTextField"):
+                                custname = elem.__getattr__("Name") + "_txt"
+                            elif(elem.__getattr__("Type") == "GuiComboBox"):
+                                custname = elem.__getattr__("Name") + "_select"
+                            elif(elem.__getattr__("Type") == "GuiLabel"):
+                                custname = elem.__getattr__("Name") + "_lbl"
+                            elif(elem.__getattr__("Type") == "GuiRadioButton"):
+                                custname = elem.__getattr__("Name") + "_radiobtn"
+                            elif(elem.__getattr__("Type") == "GuiCheckBox"):
+                                custname = elem.__getattr__("Name") + "_chkbox"
+                            else:
+                                custname = elem.__getattr__("Name")
                             dict = {
                                     'xpath': path,
                                     'id': elem.__getattr__("Id"),
                                     'text': elem.__getattr__("Text"),
                                     'tag': elem.__getattr__("Type"),
-                                    'custname': elem.__getattr__("Name"),
+                                    'custname': custname,
                                     'screenleft': elem.__getattr__("ScreenLeft"),
                                     'screentop': elem.__getattr__("ScreenTop"),
                                     'left': elem.__getattr__("Left"),
@@ -178,7 +209,7 @@ class Scrape:
                                    }
                             view.append(dict)
                         except Exception as e:
-                            print e
+                            logger.print_on_console('Clicked option is not a part of SAPGUI')
                         return True
 
                     def abort(self):
@@ -193,20 +224,18 @@ class Scrape:
                         self.start()
 
                     def StopPump(self):
-                        #ctypes.windll.user32.PostQuitMessage(0)
                         self.stopumpingmsgs = True
                         wsh = win32com.client.Dispatch("WScript.Shell")
                         wsh.SendKeys("^")
 
                     def run(self):
                         def OnMouseLeftDown(evnt):
-                            global ctrldownflag
                             if (self.stopumpingmsgs == True):
                                 self.hm.UnhookKeyboard()
                                 self.hm.UnhookMouse()
                                 ctypes.windll.user32.PostQuitMessage(0)
                                 return True
-                            if (ctrldownflag is True):
+                            if (self.ctrldownflag is True):
                                 return True
                             else:
                                 pos = evnt.Position
@@ -216,7 +245,6 @@ class Scrape:
                                 return False
 
                         def OnKeyDown(event):
-                            global ctrldownflag
                             if (self.stopumpingmsgs == True):
                                 self.hm.UnhookKeyboard()
                                 self.hm.UnhookMouse()
@@ -224,24 +252,20 @@ class Scrape:
                                 return True
                             else:
                                 if (event.Key == 'Lcontrol'):
-                                    ctrldownflag = True
-                                    ctypes.windll.user32.PostQuitMessage(0)
+                                    self.ctrldownflag = True
                                     return True
                                 else:
-                                    ctrldownflag = False
+                                    self.ctrldownflag = False
                                     return True
 
                         def OnKeyUp(evnt):
-                            global ctrldownflag
-                            ctrldownflag = False
-                            self.stopumpingmsgs = True
-                            obj_ref.StopPump()
+                            self.ctrldownflag = False
                             return True
 
                         def dumpToJson():
                             """ Storing scraped elements in json """
                             try:
-                                data = {}
+
                                 data['scrapetype'] = 'cna'
                                 data['scrapedin'] = ''
                                 data['view'] = view
@@ -254,7 +278,7 @@ class Scrape:
 
                         global window_id
                         get_obj = GetObject()
-                        window_id = get_obj.getWindowToForeGround()
+                        window_id = get_obj.GetWindow()
                         self.hm = pyHook.HookManager()
                         self.hm.KeyDown = OnKeyDown
                         self.hm.KeyUp = OnKeyUp
@@ -269,7 +293,7 @@ class Scrape:
                         from saputil_operations import SapUtilKeywords
                         self.uk= SapUtilKeywords()
 
-                    def getSession(self, window_id):
+                    def GetSession(self, window_id):
                         """ Returns the session of window to scrape """
                         SapGui = self.uk.getSapObject()
                         i = window_id.index("ses")
@@ -277,7 +301,7 @@ class Scrape:
                         ses = SapGui.FindById(str(sesId))
                         return ses
 
-                    def getWindowToForeGround(self):
+                    def GetWindow(self):
                         """ Returns the id of window to scrape and brings the window to foreground """
                         SapGui = self.uk.getSapObject()
                         scrape = Scrape()
