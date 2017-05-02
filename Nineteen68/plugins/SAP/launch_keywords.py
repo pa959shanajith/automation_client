@@ -388,7 +388,7 @@ class Launch_Keywords():
 ##            return status,result,verb,err_msg
 
 
-    def captureScreenshot(self,screen_name):
+    def captureScreenshot(self,screen_name,screen_id):
 
         """
         name: captureScreenshot
@@ -397,6 +397,14 @@ class Launch_Keywords():
         returns: Nothing
         """
         img = None
+        if("wnd[0]" not in screen_id):
+            try:
+                ses = self.getSession()
+                i = screen_id.index("wnd")
+                screen_id = screen_id[:i+4] + "0" + screen_id[i+5:]
+                screen_name = ses.FindById(screen_id).Text
+            except Exception as e:
+                print e
         try:
             handle = win32gui.FindWindow(None, screen_name)
             bbox = win32gui.GetWindowRect(handle)

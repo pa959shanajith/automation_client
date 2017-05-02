@@ -86,16 +86,15 @@ class Scrape:
                             'text': elem.__getattr__("Text"),
                             'tag': elem.__getattr__("Type"),
                             'custname': custname,
-                            'screenleft': elem.__getattr__("ScreenLeft"),
-                            'screentop': elem.__getattr__("ScreenTop"),
-                            'left': elem.__getattr__("Left"),
-                            'top': elem.__getattr__("Top"),
+                            #'screenleft': elem.__getattr__("ScreenLeft"),
+                            #'screentop': elem.__getattr__("ScreenTop"),
+                            'left': elem.__getattr__("ScreenLeft"),
+                            'top': elem.__getattr__("ScreenTop"),
                             'height': elem.__getattr__("Height"),
                             'width': elem.__getattr__("Width"),
                             'tooltip': elem.__getattr__("ToolTip"),
                             'defaulttooltip': elem.__getattr__("DefaultToolTip")
                            }
-
                     view.append(dict)
                     i = i + 1
                     # recursive call to self
@@ -198,15 +197,15 @@ class Scrape:
                                     'text': elem.__getattr__("Text"),
                                     'tag': elem.__getattr__("Type"),
                                     'custname': custname,
-                                    'screenleft': elem.__getattr__("ScreenLeft"),
-                                    'screentop': elem.__getattr__("ScreenTop"),
-                                    'left': elem.__getattr__("Left"),
-                                    'top': elem.__getattr__("Top"),
+                                    #'screenleft': elem.__getattr__("ScreenLeft"),
+                                    #'screentop': elem.__getattr__("ScreenTop"),
+                                    'left': elem.__getattr__("ScreenLeft"),
+                                    'top': elem.__getattr__("ScreenTop"),
                                     'height': elem.__getattr__("Height"),
                                     'width': elem.__getattr__("Width"),
                                     'tooltip': elem.__getattr__("ToolTip"),
                                     'defaulttooltip': elem.__getattr__("DefaultToolTip")
-                                   }
+                                    }
                             view.append(dict)
                         except Exception as e:
                             logger.print_on_console('Clicked option is not a part of SAPGUI')
