@@ -29,17 +29,18 @@ import constants
 
 class SAPDispatcher:
 
-    launch_keywords_obj = launch_keywords.Launch_Keywords()
-    editable_text_obj = text_keywords_sap.Text_Keywords()
-    button_link_obj =button_link_keywords_sap.ButtonLinkKeyword()
-    dropdown_keywords_obj = dropdown_keywords.Dropdown_Keywords()
-    radiocheckbox_keywords_obj= radio_checkbox_keywords_sap.Radio_Checkbox_keywords()
-    element_keywords_obj=element_keywords.ElementKeywords()
-    saputil_keywords_obj=saputil_operations.SapUtilKeywords()
-    table_keywords_obj=table_keywords.Table_keywords()
+
 
 
     def __init__(self):
+        self.launch_keywords_obj = launch_keywords.Launch_Keywords()
+        self.editable_text_obj = text_keywords_sap.Text_Keywords()
+        self.button_link_obj =button_link_keywords_sap.ButtonLinkKeyword()
+        self.dropdown_keywords_obj = dropdown_keywords.Dropdown_Keywords()
+        self.radiocheckbox_keywords_obj= radio_checkbox_keywords_sap.Radio_Checkbox_keywords()
+        self.element_keywords_obj=element_keywords.ElementKeywords()
+        self.saputil_keywords_obj=saputil_operations.SapUtilKeywords()
+        self.table_keywords_obj=table_keywords.Table_keywords()
         self.exception_flag=''
 
 
@@ -62,6 +63,7 @@ class SAPDispatcher:
                   'getpagetitle':self.launch_keywords_obj.getPageTitle,
                   'starttransaction':self.launch_keywords_obj.startTransaction,
                   'serverconnect':self.launch_keywords_obj.serverConnect,
+                  'geterrormessage':self.launch_keywords_obj.getErrorMessage,
                   'settext' : self.editable_text_obj.setText,
                   'setsecuretext':self.editable_text_obj.setSecureText,
                   'gettext':self.editable_text_obj.getText,
@@ -101,7 +103,7 @@ class SAPDispatcher:
                   'getcellvalue':self.table_keywords_obj.getCellValue,
                   'verifycellvalue':self.table_keywords_obj.verifyCellValue,
                   #commenting dropdown code inside table cell
-##                  'verifytextexists':self.table_keywords_obj.verifyTextExists,
+                  'verifytextexists':self.table_keywords_obj.verifyTextExists,
                   'cellclick':self.table_keywords_obj.cellClick,
 ##                  'selectvaluebyindex':self.table_keywords_obj.selectValueByIndex,
 ##                  'selectvaluebytext':self.table_keywords_obj.selectValueByText,
@@ -118,7 +120,7 @@ class SAPDispatcher:
 
             keyword=keyword.lower()
             if keyword in dict.keys():
-                if keyword=='serverconnect'  or keyword=='launchapplication' or keyword=='starttransaction' :
+                if keyword=='serverconnect' or keyword=='launchapplication' or keyword=='starttransaction' :
                     result= dict[keyword](input,output)
                 else:
                     result= dict[keyword](objectname,url,input,output)

@@ -99,22 +99,30 @@ class Launch_Keywords():
         except Exception as e:
             logger.print_on_console( 'no instance open error :',e)
 
-##    def enter_keyword(self,*args):
-##        status=sap_constants.TEST_RESULT_FAIL
-##        result=sap_constants.TEST_RESULT_FALSE
-##        err_msg=None
-##        value=OUTPUT_CONSTANT
-##        try:
-##            handle = win32gui.FindWindow(None, 'SAP')
-##            win32gui.SetForegroundWindow(handle)
-##            keyboard.SendKeys('{ENTER}')
-##            status=sap_constants.TEST_RESULT_PASS
-##            result=sap_constants.TEST_RESULT_TRUE
-##        except Exception as e:
-##            err_msg='Failed to press ENTER'
-##            log.error(err_msg,e)
-##            #logger.print_on_console('Failed to press ENTER',e)
-##        return status,result,value,err_msg
+    def getErrorMessage(self,*args):
+        #sbar is the id of statusbar
+        #Eg - /app/con[0]/ses[0]/wnd[0]/sbar
+        time.sleep(2)
+        ses,wnd=self.getSessWindow()
+        wndId =  wnd.__getattr__('id')
+        sbarId = wndId + '/sbar'
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
+        err_msg=None
+        value=OUTPUT_CONSTANT
+        try:
+            sbar = ses.FindById(sbarId)
+            value = sbar.FindByName("pane[0]", "GuiStatusPane").text
+            if value=='' or value==None:
+                logger.print_on_console('No error message')
+            status=sap_constants.TEST_RESULT_PASS
+            result=sap_constants.TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg='Failed to start transaction'
+            log.error(err_msg,e)
+            logger.print_on_console('Failed to start transaction reason being :',e)
+        return status,result,value,err_msg
+
 
 
     def startTransaction(self,input_val,*args):
@@ -235,6 +243,7 @@ class Launch_Keywords():
         except Exception as e:
             log.error(e)
             logger.print_on_console("Could not find specified window name")
+        return status,result,value,err_msg
 
     def getPageTitle(self,*args):
         ses=self.getSession()
@@ -287,12 +296,12 @@ class Launch_Keywords():
                 app.Close()
             except:
                 try:
-                    time.sleep(2)
-                    app = Application(backend="win32").connect(path = r"C:\Program Files (x86)\SAP\FrontEnd\SAPgui\saplogon.exe").window(title="SAP Logon 740")
-                    time.sleep(2)
-                    app.Close()
+                     time.sleep(2)
+                     app = Application(backend="win32").connect(path = r"C:\Program Files (x86)\SAP\FrontEnd\SAPgui\saplogon.exe").window(title="SAP Logon 740")
+                     time.sleep(2)
+                     app.Close()
                 except:
-                    logger.print_on_console("SAP Logon 740 has connection problem  ")
+                     logger.print_on_console("SAP Logon 740 has is not able to close,please close manually.")
                 logger.print_on_console("SAP Logon 740 has encountered a problem . Please close manually ")
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
@@ -379,7 +388,7 @@ class Launch_Keywords():
 ##            return status,result,verb,err_msg
 
 
-    def captureScreenshot(self, SapGui, data):
+    def captureScreenshot(self,screen_name):
 
         """
         name: captureScreenshot
@@ -387,42 +396,28 @@ class Launch_Keywords():
         parameters: List of scraped elements
         returns: Nothing
         """
-        screen_name = ""
-        for obj in data:
-            if(obj['custname'] == 'titl'):
-                screen_name = obj['text']
-                break
-
-        if(screen_name == ""):
-            name = ""
-            name = data[0]['xpath']
-            i = name.index('/')
-            screen_name = name[:i]
-            print screen_name
-
-        handle = win32gui.FindWindow(None, screen_name)
+        img = None
         try:
+            handle = win32gui.FindWindow(None, screen_name)
+            bbox = win32gui.GetWindowRect(handle)
+            img = ImageGrab.grab(bbox)
             #win32gui.SetForegroundWindow(handle)
-            foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
-            appThread = win32api.GetCurrentThreadId()
-            if( foreThread != appThread ):
-                win32process.AttachThreadInput(foreThread[0], appThread, True)
-                win32gui.BringWindowToTop(handle)
-                win32gui.ShowWindow(handle,3)
-                win32process.AttachThreadInput(foreThread[0], appThread, False)
-            else:
-                win32gui.BringWindowToTop(handle)
-                win32gui.ShowWindow(handle,3)
-            time.sleep(2)
+##            foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
+##            appThread = win32api.GetCurrentThreadId()
+##            if( foreThread != appThread ):
+##                win32process.AttachThreadInput(foreThread[0], appThread, True)
+##                win32gui.BringWindowToTop(handle)
+##                win32gui.ShowWindow(handle,3)
+##                win32process.AttachThreadInput(foreThread[0], appThread, False)
+##            else:
+##                win32gui.BringWindowToTop(handle)
+##                win32gui.ShowWindow(handle,3)
+##            time.sleep(2)
+
         except Exception as e:
-            print e
-        bbox = win32gui.GetWindowRect(handle)
-        img = ImageGrab.grab(bbox)
-        try:
-            img.save(r'.\screenshot.png')
-            return img
-        except Exception as e:
-            print e
+            logger.print_on_console("Error has occured while capturing screenshot ",e)
+        #img.save(r'.\screenshot.png')
+        return img
 
     def capture_window(self,handle):
         toplist, winlist = [], []
@@ -437,49 +432,49 @@ class Launch_Keywords():
 
 
 
-    def getProcessWindows(self,windowName):
-        EnumWindows = ctypes.windll.user32.EnumWindows
-        EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
-        GetWindowText = ctypes.windll.user32.GetWindowTextW
-        GetWindowTextLength = ctypes.windll.user32.GetWindowTextLengthW
-        IsWindowVisible = ctypes.windll.user32.IsWindowVisible
-
-        handles = []
-        def foreach_window(hwnd, lParam):
-            if IsWindowVisible(hwnd):
-                length = GetWindowTextLength(hwnd)
-                buff = ctypes.create_unicode_buffer(length + 1)
-                GetWindowText(hwnd, buff, length + 1)
-    ##                titles.append(buff.value)
-                if self.patternMatching(windowName,buff.value):
-                    handles.append(hwnd)
-            return True
-        win32gui.EnumWindows(foreach_window, None)
-        return handles
-
-    def patternMatching(self,toMatch,matchIn):
-        regex=None
-        pattern=None
-        status=None
-        toMatch=toMatch.strip().replace('*','.*')
-        matchIn=matchIn.strip()
-        if toMatch.endswith('*'):
-            regex=toMatch+"([^a-zA-Z0-9-#.()%@!:;\"'?><,$+=()|{}&\\s]|$).*"
-        elif toMatch.startswith('.'):
-            regex=".*([^a-zA-Z0-9-#.()%@!:;\"'?><,$+=()|{}&\\s]|^)" + toMatch
-        elif '*' in toMatch and toMatch.index('*')>0 and toMatch.index('*')<len(toMatch):
-            toMatch = toMatch.replaceAll("[^a-zA-Z0-9*.]", ".*")
-            regex=toMatch.replace(".*",".*([a-zA-Z0-9-#.()%@!:;\"'?><,$+=()|{}&\\s]|^)")
-        else :
-            return toMatch==matchIn
-        status= re.match(regex,matchIn)
-
-        try:
-            if status.group()!=None:
-                return True
-        except Exception as e:
-                return False
-        return False
+##    def getProcessWindows(self,windowName):
+##        EnumWindows = ctypes.windll.user32.EnumWindows
+##        EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
+##        GetWindowText = ctypes.windll.user32.GetWindowTextW
+##        GetWindowTextLength = ctypes.windll.user32.GetWindowTextLengthW
+##        IsWindowVisible = ctypes.windll.user32.IsWindowVisible
+##
+##        handles = []
+##        def foreach_window(hwnd, lParam):
+##            if IsWindowVisible(hwnd):
+##                length = GetWindowTextLength(hwnd)
+##                buff = ctypes.create_unicode_buffer(length + 1)
+##                GetWindowText(hwnd, buff, length + 1)
+##    ##                titles.append(buff.value)
+##                if self.patternMatching(windowName,buff.value):
+##                    handles.append(hwnd)
+##            return True
+##        win32gui.EnumWindows(foreach_window, None)
+##        return handles
+##
+##    def patternMatching(self,toMatch,matchIn):
+##        regex=None
+##        pattern=None
+##        status=None
+##        toMatch=toMatch.strip().replace('*','.*')
+##        matchIn=matchIn.strip()
+##        if toMatch.endswith('*'):
+##            regex=toMatch+"([^a-zA-Z0-9-#.()%@!:;\"'?><,$+=()|{}&\\s]|$).*"
+##        elif toMatch.startswith('.'):
+##            regex=".*([^a-zA-Z0-9-#.()%@!:;\"'?><,$+=()|{}&\\s]|^)" + toMatch
+##        elif '*' in toMatch and toMatch.index('*')>0 and toMatch.index('*')<len(toMatch):
+##            toMatch = toMatch.replaceAll("[^a-zA-Z0-9*.]", ".*")
+##            regex=toMatch.replace(".*",".*([a-zA-Z0-9-#.()%@!:;\"'?><,$+=()|{}&\\s]|^)")
+##        else :
+##            return toMatch==matchIn
+##        status= re.match(regex,matchIn)
+##
+##        try:
+##            if status.group()!=None:
+##                return True
+##        except Exception as e:
+##                return False
+##        return False
 
 
     def set_to_foreground(self):

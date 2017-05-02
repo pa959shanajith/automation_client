@@ -31,7 +31,7 @@ class Table_keywords():
     def __init__(self):
         self.uk = SapUtilKeywords()
 
-    def getXpath(elem,row,col):
+    def getXpath(self,sap_id,elem,row,col):
         try:
             cell = elem.GetCell(row, col)
             cell_id = cell.id.split('/')
@@ -98,8 +98,8 @@ class Table_keywords():
 
 
     def mouseHover(self, sap_id,url, input_val,*args):
-        row=input_val[0]
-        col=input_val[1]
+        row=int(input_val[0])-1
+        col=int(input_val[1])-1
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -118,7 +118,7 @@ class Table_keywords():
 
 
     def getColNumByText(self, sap_id,url, input_val,*args):
-        colName=input_val[0]
+        colText=input_val[0]
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -126,13 +126,21 @@ class Table_keywords():
         err_msg=None
         try:
             elem=ses.FindById(id)
-            cols = elem.Columns
-            for i in range(0, cols.Count):
-                if (cols(i).Title == colName):
-                    value = i
-                    status=sap_constants.TEST_RESULT_PASS
-                    result=sap_constants.TEST_RESULT_TRUE
+            no_of_cols = elem.Columns.Length
+            no_of_rows = elem.RowCount
+            for i in range(0, no_of_rows):
+                for j in range(0, no_of_cols):
+                    if(colText in elem.GetCell(i,j).text):
+                        value = j+1
+                        break
+                    else:
+                        value =''
+                if(value != ''):
                     break
+            if(value == ''):
+                logger.print_on_console('No matching text found in the table')
+            status=sap_constants.TEST_RESULT_PASS
+            result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
@@ -153,13 +161,17 @@ class Table_keywords():
             no_of_rows = elem.RowCount
             for i in range(0, no_of_rows):
                 for j in range(0, no_of_cols):
-                    if(id.GetCell(i,j).text == rowText):
-                        value = i
-                        status=sap_constants.TEST_RESULT_PASS
-                        result=sap_constants.TEST_RESULT_TRUE
+                    if(rowText in elem.GetCell(i,j).text):
+                        value = i+1
                         break
-                if(result != None):
+                    else:
+                        value =''
+                if(value != ''):
                     break
+            if(value==''):
+                logger.print_on_console('No matching text found in the table')
+            status=sap_constants.TEST_RESULT_PASS
+            result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
@@ -168,8 +180,8 @@ class Table_keywords():
 
 
     def getCellValue(self, sap_id,url, input_val,*args):
-        row=input_val[0]
-        col=input_val[1]
+        row=int(input_val[0])-1
+        col=int(input_val[1])-1
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -188,8 +200,8 @@ class Table_keywords():
 
 
     def verifyCellValue(self, sap_id,url, input_val,*args):
-        row=input_val[0]
-        col=input_val[1]
+        row=int(input_val[0])-1
+        col=int(input_val[1])-1
         cell_value=input_val[2]
 
         id,ses=self.uk.getSapElement(sap_id)
@@ -239,8 +251,8 @@ class Table_keywords():
 
 
     def cellClick(self, sap_id,url, input_val,*args):
-        row=input_val[0]
-        col=input_val[1]
+        row=int(input_val[0])-1
+        col=int(input_val[1])-1
         text=input_val[2]
         id,ses=self.uk.getSapElement(sap_id)
         rk=Radio_Checkbox_keywords()
@@ -254,7 +266,7 @@ class Table_keywords():
         try:
             object_type_input = ses.FindById(id).type
             elem=ses.FindById(id)
-            cell ,cell_xpath =self.getXpath(elem,row,col)
+            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
             if(cell.__getattr__("type") != object_type_input):
                 print "Error: Type Mismatch"
             else:
@@ -287,8 +299,8 @@ class Table_keywords():
 
 
     def selectValueByIndex(self, sap_id,url, input_val,*args):
-        row=input_val[0]
-        col=input_val[1]
+        row=int(input_val[0])-1
+        col=int(input_val[1])-1
         index=input_val[2]
         id,ses=self.uk.getSapElement(sap_id)
         dk = Dropdown_Keywords()
@@ -301,7 +313,7 @@ class Table_keywords():
         try:
             object_type_input = ses.FindById(id).type
             elem=ses.FindById(id)
-            cell ,cell_xpath =self.getXpath(elem,row,col)
+            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
             if(cell.__getattr__("type") != object_type_input):
                 print "Error: Type Mismatch"
             else:
@@ -316,8 +328,8 @@ class Table_keywords():
 
 
     def selectValueByText(self, sap_id, url,input_val,*args):
-        row=input_val[0]
-        col=input_val[1]
+        row=int(input_val[0])-1
+        col=int(input_val[1])-1
         text= input_val[2]
         id,ses=self.uk.getSapElement(sap_id)
         dk = Dropdown_Keywords()
@@ -329,7 +341,7 @@ class Table_keywords():
         try:
             object_type_input = ses.FindById(id).type
             elem=ses.FindById(id)
-            cell ,cell_xpath =self.getXpath(elem,row,col)
+            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
             if(cell.__getattr__("type") != object_type_input):
                 print "Error: Type Mismatch"
             else:
@@ -344,8 +356,8 @@ class Table_keywords():
 
 
     def getSelected(self, sap_id,url, input_val,*args):
-        row=input_val[0]
-        col=input_val[1]
+        row=int(input_val[0])-1
+        col=int(input_val[1])-1
         id,ses=self.uk.getSapElement(sap_id)
         dk = Dropdown_Keywords()
         status = sap_constants.TEST_RESULT_FAIL
@@ -356,7 +368,7 @@ class Table_keywords():
         try:
             object_type_input = ses.FindById(id).type
             elem=ses.FindById(id)
-            cell ,cell_xpath =self.getXpath(elem,row,col)
+            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
             if(cell.__getattr__("type") != object_type_input):
                 print "Error: Type Mismatch"
             else:
@@ -371,8 +383,8 @@ class Table_keywords():
 
 
     def getStatus(self, sap_id, url,input_val,*args):
-        row=input_val[0]
-        col=input_val[1]
+        row=int(input_val[0])-1
+        col=int(input_val[1])-1
         id,ses=self.uk.getSapElement(sap_id)
         rk=Radio_Checkbox_keywords()
         status = sap_constants.TEST_RESULT_FAIL
@@ -382,7 +394,7 @@ class Table_keywords():
         try:
             object_type_input = ses.FindById(id).type
             elem=ses.FindById(id)
-            cell ,cell_xpath =self.getXpath(elem,row,col)
+            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
             if(cell.__getattr__("type") != object_type_input):
                 print "Error: Type Mismatch"
             else:
@@ -404,8 +416,8 @@ class Table_keywords():
 
 
     def getCellToolTip(self, sap_id, url,input_val,*args):
-        row=input_val[0]
-        col=input_val[1]
+        row=int(input_val[0])-1
+        col=int(input_val[1])-1
         ek=ElementKeywords()
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
@@ -415,7 +427,7 @@ class Table_keywords():
         err_msg=None
         try:
             elem=ses.FindById(id)
-            cell ,cell_xpath =self.getXpath(elem,row,col)
+            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
             value = ek.getTooltipText(cell_xpath)
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
@@ -426,7 +438,9 @@ class Table_keywords():
 
 
 
-    def tableCell_click(self, sap_id,*args):
+    def tableCell_click(self, sap_id, url,input_val,*args):
+        row=int(input_val[0])-1
+        col=int(input_val[1])-1
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -434,17 +448,22 @@ class Table_keywords():
         err_msg=None
         try:
             elem=ses.FindById(id)
-            elem.SetFocus()
+            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
+            cell.SetFocus()
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
             log.error('Error occured',e)
+            import traceback
+            traceback.print_exc()
             err_msg = sap_constants.ERROR_MSG
         return status,result,value,err_msg
 
 
 
-    def tableCell_doubleClick(self, sap_id,*args):
+    def tableCell_doubleClick(self, sap_id, url,input_val,*args):
+        row=int(input_val[0])-1
+        col=int(input_val[1])-1
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -452,22 +471,26 @@ class Table_keywords():
         err_msg=None
         try:
             elem=ses.FindById(id)
-            elem.SetFocus()
-            i = elem.index('wnd')
-            wndId = elem[:i+6]
-            element = ses.FindById(wndId)
-            value = ok.Object_Keywords().sendFunctionKeys(ses, element, "F2")
+            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
+            cell.SetFocus()
+            i = sap_id.index("/")
+            window = sap_id[0:i]
+            shell = win32com.client.Dispatch("WScript.Shell")
+            shell.AppActivate(window)
+            shell.SendKeys("{F2}")
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
             log.error('Error occured',e)
+            import traceback
+            traceback.print_exc()
             err_msg = sap_constants.ERROR_MSG
         return status,result,value,err_msg
 
 
 
     def selectRow(self, sap_id,url, input_val,*args):
-        rowNum=input_val[0]
+        rowNum=int(input_val[0])-1
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -492,7 +515,7 @@ class Table_keywords():
 
 
     def unselectRow(self, sap_id,url, input_val,*args):
-        rowNum=input_val[0]
+        rowNum=int(input_val[0])-1
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
