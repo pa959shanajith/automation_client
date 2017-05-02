@@ -289,9 +289,10 @@ class Dispatcher:
                         self.webelement_map[output]=result[2]
 
                     elif keyword not in [OPEN_BROWSER,OPEN_NEW_BROWSER,CLOSE_BROWSER,GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
-                        res,value=self.check_url_error_code()
-                        if res:
-                            result=TERMINATE
+                        if result[0].lower() == 'Fail':
+                            res,value=self.check_url_error_code()
+                            if res:
+                                result=TERMINATE
 
                     elif keyword==OPEN_BROWSER:
                         find_browser_info(reporting_obj)
