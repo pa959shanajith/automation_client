@@ -29,18 +29,18 @@ import constants
 
 class SAPDispatcher:
 
-
+    launch_keywords_obj = launch_keywords.Launch_Keywords()
+    editable_text_obj = text_keywords_sap.Text_Keywords()
+    button_link_obj =button_link_keywords_sap.ButtonLinkKeyword()
+    dropdown_keywords_obj = dropdown_keywords.Dropdown_Keywords()
+    radiocheckbox_keywords_obj= radio_checkbox_keywords_sap.Radio_Checkbox_keywords()
+    element_keywords_obj=element_keywords.ElementKeywords()
+    saputil_keywords_obj=saputil_operations.SapUtilKeywords()
+    table_keywords_obj=table_keywords.Table_keywords()
 
 
     def __init__(self):
-        self.launch_keywords_obj = launch_keywords.Launch_Keywords()
-        self.editable_text_obj = text_keywords_sap.Text_Keywords()
-        self.button_link_obj =button_link_keywords_sap.ButtonLinkKeyword()
-        self.dropdown_keywords_obj = dropdown_keywords.Dropdown_Keywords()
-        self.radiocheckbox_keywords_obj= radio_checkbox_keywords_sap.Radio_Checkbox_keywords()
-        self.element_keywords_obj=element_keywords.ElementKeywords()
-        self.saputil_keywords_obj=saputil_operations.SapUtilKeywords()
-        self.table_keywords_obj=table_keywords.Table_keywords()
+
         self.exception_flag=''
 
 
