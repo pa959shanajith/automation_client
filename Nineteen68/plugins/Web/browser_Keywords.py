@@ -419,7 +419,8 @@ class BrowserKeywords():
         err_msg=None
         try:
             if (len(args) > 1):
-                inp = str(args[1])
+                inp = args[1]
+                inp = str(inp[0])
             winHandles = driver_obj.window_handles
             winHandles = driver_obj.window_handles
             if len(winHandles) > 1:

@@ -94,13 +94,14 @@ class ScrapeWindow(wx.Frame):
         SapGui=self.uk.getSapObject()
         wndname=sap_scraping_obj.getWindow(SapGui)
         wnd_title = wndname.__getattr__("Text")
+        wnd_id = wndname.__getattr__("Id")
         data={}
         scraped_data = sap_scraping_obj.full_scrape(wndname,wnd_title)
         obj=launch_keywords.Launch_Keywords()
         self.Hide()
         time.sleep(1)
         try:
-            img=obj.captureScreenshot(wnd_title)
+            img=obj.captureScreenshot(wnd_title,wnd_id)
             img.save('out.png')
             with open("out.png", "rb") as image_file:
                       encoded_string = base64.b64encode(image_file.read())
