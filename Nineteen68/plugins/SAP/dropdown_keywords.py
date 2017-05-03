@@ -28,16 +28,17 @@ class Dropdown_Keywords():
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         err_msg=None
-        value = ''
+        value = OUTPUT_CONSTANT
         try:
             if(id != None):
                 if(ses.FindById(id).Changeable == True):
                     value = ses.FindById(id).Text.strip()
                     status=sap_constants.TEST_RESULT_PASS
                     result=sap_constants.TEST_RESULT_TRUE
-            else:
-                log.error('Error occured')
-                err_msg = sap_constants.ERROR_MSG
+                else:
+                    logger.print_on_console( "Element is not changeable")
+                    err_msg = "Element is not changeable"
+                    log.info(err_msg)
 
         except Exception as e:
             log.error('Error occured',e)
@@ -52,27 +53,32 @@ class Dropdown_Keywords():
         result = sap_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
         index=int(input_val[0])
-        index=index+1
+        #index=index+1
         err_msg=None
         i = 0
         result = None
+        arr = []
         try:
             if(id != None):
                 if(ses.FindById(id).Changeable == True):
                     entries = ses.FindById(id).Entries
                     while True:
                         try:
-                            #print entries(i).key
-                            if(int(entries(i).key) == index):
-                                ses.FindById(id).value = entries(i).value
-                                status=sap_constants.TEST_RESULT_PASS
-                                result=sap_constants.TEST_RESULT_TRUE
-                        except Exception as e:
-                            err_msg = sap_constants.ERROR_MSG
-                            log.info(err_msg)
+                            arr.append(entries(i).value)
+                        except :
                             break
                         i = i + 1
-
+                    try:
+                        ses.FindById(id).value = arr[index]
+                        status=sap_constants.TEST_RESULT_PASS
+                        result=sap_constants.TEST_RESULT_TRUE
+                    except Exception as e:
+                         err_msg=e
+                         logger.print_on_console( 'index out of bound:',e)
+                else:
+                    logger.print_on_console( "Element is not changeable")
+                    err_msg = "Element is not changeable"
+                    log.info(err_msg)
         except Exception as e:
              log.error('Error occured',e)
         return status,result,verb,err_msg
@@ -82,30 +88,33 @@ class Dropdown_Keywords():
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         #verb = OUTPUT_CONSTANT
-        value=''
+        value=OUTPUT_CONSTANT
         index=int(input_val[0])
-        index=index+1
+        #index=index+1
         err_msg=None
         i = 0
         result = None
+        arr = []
         try:
             if(id != None):
                 if(ses.FindById(id).Changeable == True):
                     entries = ses.FindById(id).Entries
                     while True:
                         try:
-                            #print entries(i).key
-                            if(int(entries(i).key) == index):
-                                value = entries(i).value
-                                status=sap_constants.TEST_RESULT_PASS
-                                result=sap_constants.TEST_RESULT_TRUE
-                        except Exception as e:
-                            err_msg = sap_constants.ERROR_MSG
-                            log.error(err_msg,e)
+                            arr.append(entries(i).value)
+                        except :
                             break
                         i = i + 1
+                    try:
+                        value = arr[index]
+                        status=sap_constants.TEST_RESULT_PASS
+                        result=sap_constants.TEST_RESULT_TRUE
+                    except Exception as e:
+                        err_msg=e
+                        logger.print_on_console( 'index out of bound:',e)
                 else:
-                    err_msg = sap_constants.ERROR_MSG
+                    logger.print_on_console( "Element is not changeable")
+                    err_msg = "Element is not changeable"
                     log.info(err_msg)
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
@@ -139,6 +148,10 @@ class Dropdown_Keywords():
                             log.error(err_msg)
                             break
                         i = i + 1
+                else:
+                    logger.print_on_console( "Element is not changeable")
+                    err_msg = "Element is not changeable"
+                    log.info(err_msg)
         except Exception as e:
               log.error('Error occured',e)
         return status,result,value,err_msg
@@ -164,6 +177,10 @@ class Dropdown_Keywords():
                     else:
                         err_msg = sap_constants.ERROR_MSG
                         log.info(err_msg)
+                else:
+                    logger.print_on_console( "Element is not changeable")
+                    err_msg = "Element is not changeable"
+                    log.info(err_msg)
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
@@ -174,7 +191,7 @@ class Dropdown_Keywords():
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
-        value=''
+        value=OUTPUT_CONSTANT
         err_msg=None
         count = 0
         try:
@@ -191,6 +208,10 @@ class Dropdown_Keywords():
                         except Exception as e:
                             log.error('Error occured',e)
                             break
+                else:
+                    logger.print_on_console( "Element is not changeable")
+                    err_msg = "Element is not changeable"
+                    log.info(err_msg)
         except Exception as e:
               log.error('Error occured',e)
         return status,result,value,err_msg
@@ -199,7 +220,7 @@ class Dropdown_Keywords():
         id,ses=self.uk.getSapElement(sap_id)
         length = int(input_val[0])
         verb = OUTPUT_CONSTANT
-        value=''
+        value=OUTPUT_CONSTANT
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         count = 0
@@ -214,12 +235,17 @@ class Dropdown_Keywords():
                         except Exception as e:
                             err_msg = sap_constants.ERROR_MSG
                             break
-                if(length == count):
+                    if(length == count):
                      status=sap_constants.TEST_RESULT_PASS
                      result=sap_constants.TEST_RESULT_TRUE
+                    else:
+                        err_msg = sap_constants.ERROR_MSG
+                        log.info('Count Verify has failed ')
                 else:
-                    err_msg = sap_constants.ERROR_MSG
-                    log.info('Count Verify has failed ')
+                    logger.print_on_console( "Element is not changeable")
+                    err_msg = "Element is not changeable"
+                    log.info(err_msg)
+
         except Exception as e:
               log.error('Error occured',e)
         return status,result,verb,err_msg
@@ -250,7 +276,9 @@ class Dropdown_Keywords():
                             err_msg = sap_constants.ERROR_MSG
                             break
                 else:
-                     err_msg = sap_constants.ERROR_MSG
+                    logger.print_on_console( "Element is not changeable")
+                    err_msg = "Element is not changeable"
+                    log.info(err_msg)
 
         except Exception as e:
               log.error('Error occured',e)
@@ -278,12 +306,16 @@ class Dropdown_Keywords():
                         except Exception as e:
                             #print e
                             break
-                if(cmp(dd_entries,val) == 0):
+                    if(cmp(dd_entries,val) == 0):
 
-                    result =sap_constants.TEST_RESULT_PASS
-                    status =sap_constants.TEST_RESULT_TRUE
+                        result =sap_constants.TEST_RESULT_PASS
+                        status =sap_constants.TEST_RESULT_TRUE
+                    else:
+                      err_msg = sap_constants.ERROR_MSG
                 else:
-                  err_msg = sap_constants.ERROR_MSG
+                    logger.print_on_console( "Element is not changeable")
+                    err_msg = "Element is not changeable"
+                    log.info(err_msg)
 
         except Exception as e:
               log.error('Error occured',e)
