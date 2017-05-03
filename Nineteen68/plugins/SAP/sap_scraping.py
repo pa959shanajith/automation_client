@@ -30,7 +30,7 @@ from threading import Thread
 ctrldownflag = False
 stopumpingmsgs = False
 view = []
-data = {}
+#data = {}
 obj_ref = None
 window_id = None
 
@@ -66,18 +66,28 @@ class Scrape:
 
                     if(elem.__getattr__("Type") == "GuiButton"):
                         custname = elem.__getattr__("Name") + "_btn"
-                    elif(elem.__getattr__("Type") == "GuiTextField"):
+                        tag="button"
+                    elif(elem.__getattr__("Type") == "GuiTextField" or elem.__getattr__("Type") == "GuiCTextField" or elem.__getattr__("Type") == "GuiPasswordField") :
                         custname = elem.__getattr__("Name") + "_txt"
-                    elif(elem.__getattr__("Type") == "GuiComboBox"):
+                        tag="input"
+                    elif(elem.__getattr__("Type") == "GuiComboBox" or elem.__getattr__("Type") == "GuiBox"):
                         custname = elem.__getattr__("Name") + "_select"
+                        tag="select"
                     elif(elem.__getattr__("Type") == "GuiLabel"):
                         custname = elem.__getattr__("Name") + "_lbl"
+                        tag="a"
                     elif(elem.__getattr__("Type") == "GuiRadioButton"):
                         custname = elem.__getattr__("Name") + "_radiobtn"
+                        tag="radiobutton"
                     elif(elem.__getattr__("Type") == "GuiCheckBox"):
                         custname = elem.__getattr__("Name") + "_chkbox"
+                        tag="checkbox"
+                    elif(elem.__getattr__("Type") == "GuiTableControl"):
+                        custname = elem.__getattr__("Name") + "_tbl"
+                        tag="table"
                     else:
                         custname = elem.__getattr__("Name")
+                        tag=elem.__getattr__("Type")
 
                     """ Python dictionary to store the properties associated with the objects."""
                     dict = {
@@ -179,18 +189,28 @@ class Scrape:
 
                             if(elem.__getattr__("Type") == "GuiButton"):
                                 custname = elem.__getattr__("Name") + "_btn"
-                            elif(elem.__getattr__("Type") == "GuiTextField"):
+                                tag="button"
+                            elif(elem.__getattr__("Type") == "GuiTextField" or elem.__getattr__("Type") == "GuiCTextField" or elem.__getattr__("Type") == "GuiPasswordField") :
                                 custname = elem.__getattr__("Name") + "_txt"
-                            elif(elem.__getattr__("Type") == "GuiComboBox"):
+                                tag="input"
+                            elif(elem.__getattr__("Type") == "GuiComboBox" or elem.__getattr__("Type") == "GuiBox"):
                                 custname = elem.__getattr__("Name") + "_select"
+                                tag="select"
                             elif(elem.__getattr__("Type") == "GuiLabel"):
                                 custname = elem.__getattr__("Name") + "_lbl"
+                                tag="a"
                             elif(elem.__getattr__("Type") == "GuiRadioButton"):
                                 custname = elem.__getattr__("Name") + "_radiobtn"
+                                tag="radiobutton"
                             elif(elem.__getattr__("Type") == "GuiCheckBox"):
                                 custname = elem.__getattr__("Name") + "_chkbox"
+                                tag="checkbox"
+                            elif(elem.__getattr__("Type") == "GuiTableControl"):
+                                custname = elem.__getattr__("Name") + "_tbl"
+                                tag="table"
                             else:
                                 custname = elem.__getattr__("Name")
+                                tag=elem.__getattr__("Type")
                             dict = {
                                     'xpath': path,
                                     'id': elem.__getattr__("Id"),
@@ -268,9 +288,9 @@ class Scrape:
                                 data['scrapetype'] = 'cna'
                                 data['scrapedin'] = ''
                                 data['view'] = view
-                                with open('domelements.json', 'w') as outfile:
-                                    json.dump(data, outfile, indent=4, sort_keys=False)
-                                    outfile.close()
+##                                with open('domelements.json', 'w') as outfile:
+##                                    json.dump(data, outfile, indent=4, sort_keys=False)
+##                                    outfile.close()
 
                             except Exception as e:
                                 print e
@@ -330,6 +350,6 @@ class Scrape:
         elif operation == 'STOPCLICKANDADD':
             try:
                 obj_ref.StopPump()
-                return data
+                return view
             except Exception as exception:
                 pass
