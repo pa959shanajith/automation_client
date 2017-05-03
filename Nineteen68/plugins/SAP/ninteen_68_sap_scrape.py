@@ -82,11 +82,27 @@ class ScrapeWindow(wx.Frame):
             sap_scraping_obj.clickandadd('STARTCLICKANDADD')
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
         else:
+            data={}
             d = sap_scraping_obj.clickandadd('STOPCLICKANDADD')
             event.GetEventObject().SetLabel("Start ClickAndAdd")
-
-            self.socketIO.emit('scrape',d)
-
+            SapGui=self.uk.getSapObject()
+            obj=launch_keywords.Launch_Keywords()
+            wndname=sap_scraping_obj.getWindow(SapGui)
+            wnd_title = wndname.__getattr__("Text")
+            wnd_id = wndname.__getattr__("Id")
+            try:
+                self.Hide()
+                time.sleep(1)
+                img=obj.captureScreenshot(wnd_title, wnd_id)
+                img.save('out.png')
+                with open("out.png", "rb") as image_file:
+                          encoded_string = base64.b64encode(image_file.read())
+            except Exception as e:
+                logger.print_on_console('Error occured while capturing Screenshot ')
+                log.error(e)
+            data['mirror'] =encoded_string.encode('UTF-8').strip()
+            data['view'] = d
+            self.socketIO.emit('scrape',data)
             self.Close()
 
     def fullscrape(self,event):
