@@ -178,9 +178,12 @@ class Launch_Keywords():
                     logger.print_on_console('The given window name is not found')
                     term = TERMINATE
             elif start_window>1:
-                logger.print_on_console('SAP Logon window already exists ,Please close the window')
+                logger.print_on_console('SAP Logon window already exists will proceed further')
                 err_msg='SAP Logon window already exists'
-                term =TERMINATE
+                #term =TERMINATE
+                status=sap_constants.TEST_RESULT_PASS
+                result = sap_constants.TEST_RESULT_TRUE
+                # made changes : launch will not terminate if window already exists
             else :
                 error_code=int(win32api.GetLastError())
                 if error_code in sap_constants.SAP_ERROR_CODES.keys():
