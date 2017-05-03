@@ -56,7 +56,6 @@ class Dropdown_Keywords():
         #index=index+1
         err_msg=None
         i = 0
-        result = None
         arr = []
         try:
             if(id != None):
@@ -93,7 +92,6 @@ class Dropdown_Keywords():
         #index=index+1
         err_msg=None
         i = 0
-        result = None
         arr = []
         try:
             if(id != None):
