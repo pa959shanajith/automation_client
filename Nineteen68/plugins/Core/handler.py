@@ -490,16 +490,23 @@ class Handler():
         """
         #popping the comments key in testcase json before parsing if it has
 
+        #To fix the UAT defect #3390:
+        #If We are giving the start loop in one script and end loop in another script it?s not working.
+        #In First for loop, complete json data is parsed to build info_dict of getparam,for,if and in second for loop creation of
+        #each step is done
+        #Earlier the whole process was done for single testcase at a time, now it's done for entire scenario at once
+        testcase_copy=[]
         for i in range(len(testcase)):
             try:
                 d=eval(testcase[i])
             except Exception as e:
                 d=testcase[i]
-
             if len(d)>0 and d[len(d)-1].has_key('comments'):
                 d.pop()
-
+            testcase_copy.append(d)
             flag=self.parse_condition(d)
+
+        for d in testcase_copy:
             for x in d:
                 step=self.extract_field(x,tspIndex2,testscript_name,i+1)
                 if step is not None and step != False:

@@ -313,6 +313,7 @@ class Controller():
             if pause_flag:
                 self.pause_execution()
 
+            start_time = datetime.now()
             if(self.check_dangling(tsp,index)):
 
                 input = tsp.inputval[0]
@@ -348,6 +349,7 @@ class Controller():
                 logger.print_on_console('Step number is : ',tsp.stepnum)
                 log.info('Step number is : '+str(tsp.stepnum))
 
+
                 if tsp != None and isinstance(tsp,TestStepProperty) :
                     log.info( "----Keyword :"+str(tsp.name)+' execution Started----')
                     start_time = datetime.now()
@@ -357,6 +359,7 @@ class Controller():
                     index,result = self.keywordinvocation(index,inpval,self.reporting_obj,*args)
                 else:
                     keyword_flag=False
+                    start_time = datetime.now()
                     if tsp != None and isinstance(tsp,if_step.If):
                         index = tsp.invoke_condtional_keyword(inpval,self.reporting_obj)
                     elif tsp != None and isinstance(tsp,for_step.For):
@@ -838,12 +841,12 @@ class Controller():
                             print( '=======================================================================================================')
                             log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
                         #Iterating through each test case in the scenario
-                        for d in eval(scenario[scenario_id]):
+                        for d in [eval(scenario[scenario_id])]:
 
                             #check for temrinate flag before parsing tsp list
                             if terminate_flag:
                                 break
-                            flag,browser_temp,last_tc_num=obj.parse_json([d])
+                            flag,browser_temp,last_tc_num=obj.parse_json(d)
 
                             if flag == False:
                                 break
