@@ -337,11 +337,11 @@ class Scrape:
                         if( foreThread != appThread ):
                             win32process.AttachThreadInput(foreThread[0], appThread, True)
                             win32gui.BringWindowToTop(handle)
-                            win32gui.ShowWindow(handle,3)
+                            win32gui.ShowWindow(handle,5)
                             win32process.AttachThreadInput(foreThread[0], appThread, False)
                         else:
                             win32gui.BringWindowToTop(handle)
-                            win32gui.ShowWindow(handle,3)
+                            win32gui.ShowWindow(handle,5)
                         return wndId
 
                 global obj_ref
