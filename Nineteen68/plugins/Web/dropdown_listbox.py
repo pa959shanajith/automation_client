@@ -46,7 +46,7 @@ class DropdownKeywords():
                         webelement=self.radioKeywordsObj.getActualElement(webelement,input)
                         index = input[4]
 
-                if ((webelement.is_enabled()) and webelement.is_displayed()):
+                if ((webelement.is_enabled()) or webelement.is_displayed()):
                     log.debug(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
                     log.debug(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                     if (input is not None) :
@@ -146,7 +146,7 @@ class DropdownKeywords():
             if webelement.tag_name=='table':
                     if len(input)==5:
                         webelement=self.radioKeywordsObj.getActualElement(webelement,input)
-            if ((webelement.is_enabled()) and webelement.is_displayed()):
+            if ((webelement.is_enabled()) or webelement.is_displayed()):
                 try:
                     if (input is not None) :
 ##                        if not(visibilityFlag and isvisble):
