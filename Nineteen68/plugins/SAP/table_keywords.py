@@ -19,6 +19,7 @@ import logging
 import logging.config
 log = logging.getLogger('table_keywords.py')
 #-----------------------------------------------------Module Imports
+from pyrobot import Robot
 from launch_keywords import Launch_Keywords
 from button_link_keywords_sap import ButtonLinkKeyword
 from dropdown_keywords import Dropdown_Keywords
@@ -100,8 +101,6 @@ class Table_keywords():
     def mouseHover(self, sap_id,url, input_val,*args):
         row=int(input_val[0])-1
         col=int(input_val[1])-1
-        from pyrobot import Robot
-
         id,ses=self.uk.getSapElement(sap_id)
         lk=Launch_Keywords()
         w1,w2,wndname,w3=lk.getPageTitle()
@@ -110,25 +109,16 @@ class Table_keywords():
         value = OUTPUT_CONSTANT
         err_msg=None
         try:
-
             elem=ses.FindById(id)
-            #elem.GetCell(row, col).SetFocus()
             cell = elem.GetCell(row, col)
             left =  cell.__getattr__("ScreenLeft")
             width = cell.__getattr__("Width")
             x = left + width/2
-            #logger.print_on_console("2---------x",x)
             top =  cell.__getattr__("ScreenTop")
             height = cell.__getattr__("Height")
             y= top + height/2
-            #logger.print_on_console("3---------y",y)
             rob =Robot(str(wndname))
-            #osx,posy=rob.get_mouse_pos()
-            #logger.print_on_console("4----------posx",posx)
-            #logger.print_on_console("4----------posy",posy)
-            #time.sleep(3)
-            hover= rob.set_mouse_pos( int(x), int(y))
-            #logger.print_on_console("4----------hover",hover)
+            rob.set_mouse_pos( int(x), int(y))
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
@@ -465,12 +455,21 @@ class Table_keywords():
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
+        lk=Launch_Keywords()
+        w1,w2,wndname,w3=lk.getPageTitle()
         value = OUTPUT_CONSTANT
         err_msg=None
         try:
             elem=ses.FindById(id)
             cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            cell.SetFocus()
+            left =  cell.__getattr__("ScreenLeft")
+            width = cell.__getattr__("Width")
+            x = left + width/2
+            top =  cell.__getattr__("ScreenTop")
+            height = cell.__getattr__("Height")
+            y= top + height/2
+            rob =Robot(str(wndname))
+            rob.move_and_click( int(x), int(y),"Left")
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
@@ -486,6 +485,8 @@ class Table_keywords():
         row=int(input_val[0])-1
         col=int(input_val[1])-1
         id,ses=self.uk.getSapElement(sap_id)
+        lk=Launch_Keywords()
+        w1,w2,wndname,w3=lk.getPageTitle()
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
@@ -493,12 +494,15 @@ class Table_keywords():
         try:
             elem=ses.FindById(id)
             cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            cell.SetFocus()
-            i = sap_id.index("/")
-            window = sap_id[0:i]
-            shell = win32com.client.Dispatch("WScript.Shell")
-            shell.AppActivate(window)
-            shell.SendKeys("{F2}")
+            left =  cell.__getattr__("ScreenLeft")
+            width = cell.__getattr__("Width")
+            x = left + width/2
+            top =  cell.__getattr__("ScreenTop")
+            height = cell.__getattr__("Height")
+            y= top + height/2
+            rob =Robot(str(wndname))
+            rob.set_mouse_pos( int(x), int(y))
+            rob.double_click_mouse("Left")
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:

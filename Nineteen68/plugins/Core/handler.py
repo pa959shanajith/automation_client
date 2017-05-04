@@ -76,7 +76,7 @@ start_end_dict={constants.ENDFOR:[constants.FOR],
                 constants.STARTLOOP:[constants.ENDLOOP]}
 
 ws_template=''
-
+ws_templates_dict={}
 testcasename = ''
 
 ##dynamic_variable_map=OrderedDict()
@@ -94,6 +94,7 @@ class Handler():
 
         """
         global ws_template
+        global ws_templates_dict
         log.debug('Parsing')
         log.debug('-------------------------')
         log.debug('TSP list')
@@ -104,18 +105,27 @@ class Handler():
         browser_type=[]
         #Iterating through json array
         for json_data in new_obj:
-            if json_data.has_key('template'):
-                ws_template=json_data['template']
+            #if json_data.has_key('template'):
+                #ws_template=json_data['template']
             if json_data.has_key('testcase'):
                 testcase=json_data['testcase']
                 script.append(testcase)
             if json_data.has_key('comments'):
                 comments=json_data['comments']
             #Checking if the testcase has key 'testscript_name' or 'testcasename'
+            #adding the template to dict if available
             if json_data.has_key('testscript_name'):
                 testscript_name=json_data['testscript_name']
+                if json_data.has_key('template'):
+                    ws_templates_dict[testscript_name]=json_data['template']
+                else:
+                    ws_templates_dict[testscript_name]=""
             elif json_data.has_key('testcasename'):
                 testscript_name=json_data['testcasename']
+                if json_data.has_key('template'):
+                    ws_templates_dict[testscript_name]=json_data['template']
+                else:
+                    ws_templates_dict[testscript_name]=""
             global testcasename
             testcasename =testscript_name
             if json_data.has_key('browsertype'):
@@ -490,16 +500,23 @@ class Handler():
         """
         #popping the comments key in testcase json before parsing if it has
 
+        #To fix the UAT defect #3390:
+        #If We are giving the start loop in one script and end loop in another script it?s not working.
+        #In First for loop, complete json data is parsed to build info_dict of getparam,for,if and in second for loop creation of
+        #each step is done
+        #Earlier the whole process was done for single testcase at a time, now it's done for entire scenario at once
+        testcase_copy=[]
         for i in range(len(testcase)):
             try:
                 d=eval(testcase[i])
             except Exception as e:
                 d=testcase[i]
-
             if len(d)>0 and d[len(d)-1].has_key('comments'):
                 d.pop()
-
+            testcase_copy.append(d)
             flag=self.parse_condition(d)
+
+        for d in testcase_copy:
             for x in d:
                 step=self.extract_field(x,tspIndex2,testscript_name,i+1)
                 if step is not None and step != False:
@@ -565,6 +582,8 @@ class Handler():
         if_info.clear()
         get_param_info.clear()
         ws_template=''
+        global ws_templates_dict
+        ws_templates_dict.clear();
         dynamic_variable_handler.dynamic_variable_map.clear()
         if con.oebs_dispatcher_obj != None:
             con.oebs_dispatcher_obj.clear_oebs_window_name()

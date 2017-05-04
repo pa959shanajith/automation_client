@@ -516,13 +516,13 @@ class WSkeywords:
             if len(args) == 1:
                 key=args[0]
                 if key!= None and key != '':
-                    logger.print_on_console(ws_constants.RESULT,str(self.baseResHeader[key]))
+##                    logger.print_on_console(ws_constants.RESULT,str(self.baseResHeader[key]))
                     log.debug(STATUS_METHODOUTPUT_UPDATE)
                     status = ws_constants.TEST_RESULT_PASS
                     methodoutput = ws_constants.TEST_RESULT_TRUE
                     output=self.baseResHeader[key]
                 else:
-                    logger.print_on_console(ws_constants.RESULT,str(self.baseResHeader))
+##                    logger.print_on_console(ws_constants.RESULT,str(self.baseResHeader))
                     log.debug(STATUS_METHODOUTPUT_UPDATE)
                     if self.baseResHeader != None:
                         status = ws_constants.TEST_RESULT_PASS
@@ -544,7 +544,7 @@ class WSkeywords:
         output=None
         try:
             if len(args) == 1:
-                    logger.print_on_console(ws_constants.RESULT,self.baseResBody)
+##                    logger.print_on_console(ws_constants.RESULT,self.baseResBody)
                     log.debug(STATUS_METHODOUTPUT_UPDATE)
                     if self.baseResBody != None:
                         status = ws_constants.TEST_RESULT_PASS
@@ -559,7 +559,7 @@ class WSkeywords:
                         start=response_body.find(args[0])+len(args[0])
                         end=response_body.find(args[1])
                         response_body=response_body[start:end]
-                        logger.print_on_console(ws_constants.RESULT,response_body)
+##                        logger.print_on_console(ws_constants.RESULT,response_body)
                         log.debug(STATUS_METHODOUTPUT_UPDATE)
                         status = ws_constants.TEST_RESULT_PASS
                         methodoutput = ws_constants.TEST_RESULT_TRUE

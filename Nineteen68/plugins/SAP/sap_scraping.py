@@ -29,7 +29,7 @@ import win32process
 from threading import Thread
 ctrldownflag = False
 stopumpingmsgs = False
-view = []
+#view = []
 #data = {}
 obj_ref = None
 window_id = None
@@ -94,7 +94,7 @@ class Scrape:
                             'xpath': path,
                             'id': elem.__getattr__("Id"),
                             'text': elem.__getattr__("Text"),
-                            'tag': elem.__getattr__("Type"),
+                            'tag': tag,
                             'custname': custname,
                             #'screenleft': elem.__getattr__("ScreenLeft"),
                             #'screentop': elem.__getattr__("ScreenTop"),
@@ -166,6 +166,8 @@ class Scrape:
 
     def clickandadd(self,operation):
         if operation == 'STARTCLICKANDADD':
+            global view
+            view = []
             try:
                 class OutlookThread(Thread):
                     def __init__(self, coordX, coordY, window_id):
@@ -215,7 +217,7 @@ class Scrape:
                                     'xpath': path,
                                     'id': elem.__getattr__("Id"),
                                     'text': elem.__getattr__("Text"),
-                                    'tag': elem.__getattr__("Type"),
+                                    'tag': tag,
                                     'custname': custname,
                                     #'screenleft': elem.__getattr__("ScreenLeft"),
                                     #'screentop': elem.__getattr__("ScreenTop"),
@@ -281,19 +283,19 @@ class Scrape:
                             self.ctrldownflag = False
                             return True
 
-                        def dumpToJson():
-                            """ Storing scraped elements in json """
-                            try:
-
-                                data['scrapetype'] = 'cna'
-                                data['scrapedin'] = ''
-                                data['view'] = view
-##                                with open('domelements.json', 'w') as outfile:
-##                                    json.dump(data, outfile, indent=4, sort_keys=False)
-##                                    outfile.close()
-
-                            except Exception as e:
-                                print e
+##                        def dumpToJson():
+##                            """ Storing scraped elements in json """
+##                            try:
+##
+##                                data['scrapetype'] = 'cna'
+##                                data['scrapedin'] = ''
+##                                data['view'] = view
+####                                with open('domelements.json', 'w') as outfile:
+####                                    json.dump(data, outfile, indent=4, sort_keys=False)
+####                                    outfile.close()
+##
+##                            except Exception as e:
+##                                print e
 
                         global window_id
                         get_obj = GetObject()
@@ -305,7 +307,7 @@ class Scrape:
                         self.hm.HookKeyboard()
                         self.hm.HookMouse()
                         pythoncom.PumpMessages()
-                        dumpToJson()
+##                        dumpToJson()
 
                 class GetObject():
                     def __init__(self):
@@ -335,11 +337,11 @@ class Scrape:
                         if( foreThread != appThread ):
                             win32process.AttachThreadInput(foreThread[0], appThread, True)
                             win32gui.BringWindowToTop(handle)
-                            win32gui.ShowWindow(handle,3)
+                            win32gui.ShowWindow(handle,5)
                             win32process.AttachThreadInput(foreThread[0], appThread, False)
                         else:
                             win32gui.BringWindowToTop(handle)
-                            win32gui.ShowWindow(handle,3)
+                            win32gui.ShowWindow(handle,5)
                         return wndId
 
                 global obj_ref

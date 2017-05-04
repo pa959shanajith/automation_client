@@ -128,7 +128,6 @@ class Dropdown_Keywords():
         value=OUTPUT_CONSTANT
         err_msg=None
         i = 0
-        result = None
         try:
             if(id != None):
                 if(ses.FindById(id).Changeable == True):
@@ -257,7 +256,6 @@ class Dropdown_Keywords():
         #value=OUTPUT_CONSTANT
         val=input_val[0]
         i = 0
-        result = None
         try:
 
             if(id != None):
@@ -292,7 +290,6 @@ class Dropdown_Keywords():
         verb = OUTPUT_CONSTANT
         i = 0
         dd_entries = []
-        result = None
         try:
             if(id != None):
                 if(ses.FindById(id).Changeable == True):
@@ -306,8 +303,8 @@ class Dropdown_Keywords():
                             break
                     if(cmp(dd_entries,val) == 0):
 
-                        result =sap_constants.TEST_RESULT_PASS
-                        status =sap_constants.TEST_RESULT_TRUE
+                        status =sap_constants.TEST_RESULT_PASS
+                        result =sap_constants.TEST_RESULT_TRUE
                     else:
                       err_msg = sap_constants.ERROR_MSG
                 else:

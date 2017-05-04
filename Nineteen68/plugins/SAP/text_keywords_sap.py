@@ -68,8 +68,8 @@ class Text_Keywords():
                          status = sap_constants.TEST_RESULT_PASS
                          result = sap_constants.TEST_RESULT_TRUE
                         except Exception as e:
-                            err_msg = sap_constants.ERROR_MSG
-                            logger.print_on_console('error in set text:  :',e)
+                            logger.print_on_console("Entered value is incorrect")
+                            err_msg = "Entered value is incorrect"
                 else:
                     logger.print_on_console( "Element is not changeable")
                     err_msg = "Element is not changeable"

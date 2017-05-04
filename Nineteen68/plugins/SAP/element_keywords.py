@@ -28,26 +28,32 @@ class ElementKeywords():
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
-        #verb = OUTPUT_CONSTANT
+        from pyrobot import Robot
+        lk=Launch_Keywords()
+        w1,w2,wndname,w3=lk.getPageTitle()
+        button='Left'
         value=OUTPUT_CONSTANT
         err_msg=None
         result = None
         try:
             if(id != None):
-                if(ses.FindById(id).Changeable == True):
-                    ses.FindById(id).SetFocus()
+                    elem=ses.FindById(id)
+                    left =  elem.__getattr__("ScreenLeft")
+                    width = elem.__getattr__("Width")
+                    x = left + width/2
+                    top =  elem.__getattr__("ScreenTop")
+                    height = elem.__getattr__("Height")
+                    y= top + height/2
+                    rob =Robot(str(wndname))
+                    rob.move_and_click(x, y, button)
                     status=sap_constants.TEST_RESULT_PASS
                     result=sap_constants.TEST_RESULT_TRUE
-                else:
-                        log.info('Element state does not allow to perform the operation')
-                        err_msg='element not present on the page where operation is trying to be performed'
             else:
                 log.info('element not present on the page where operation is trying to be performed')
                 err_msg='element not present on the page where operation is trying to be performed'
         except Exception as e:
             log.error(e)
             logger.print_on_console("Exception has occured :",e)
-        #log.info(RETURN_RESULT)
         return status,result,value,err_msg
 
     def get_element_text(self, sap_id, *args):
