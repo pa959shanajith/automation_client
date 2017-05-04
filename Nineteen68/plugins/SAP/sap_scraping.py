@@ -29,7 +29,7 @@ import win32process
 from threading import Thread
 ctrldownflag = False
 stopumpingmsgs = False
-view = []
+#view = []
 #data = {}
 obj_ref = None
 window_id = None
@@ -166,6 +166,8 @@ class Scrape:
 
     def clickandadd(self,operation):
         if operation == 'STARTCLICKANDADD':
+            global view
+            view = []
             try:
                 class OutlookThread(Thread):
                     def __init__(self, coordX, coordY, window_id):
@@ -281,19 +283,19 @@ class Scrape:
                             self.ctrldownflag = False
                             return True
 
-                        def dumpToJson():
-                            """ Storing scraped elements in json """
-                            try:
-
-                                data['scrapetype'] = 'cna'
-                                data['scrapedin'] = ''
-                                data['view'] = view
-##                                with open('domelements.json', 'w') as outfile:
-##                                    json.dump(data, outfile, indent=4, sort_keys=False)
-##                                    outfile.close()
-
-                            except Exception as e:
-                                print e
+##                        def dumpToJson():
+##                            """ Storing scraped elements in json """
+##                            try:
+##
+##                                data['scrapetype'] = 'cna'
+##                                data['scrapedin'] = ''
+##                                data['view'] = view
+####                                with open('domelements.json', 'w') as outfile:
+####                                    json.dump(data, outfile, indent=4, sort_keys=False)
+####                                    outfile.close()
+##
+##                            except Exception as e:
+##                                print e
 
                         global window_id
                         get_obj = GetObject()
@@ -305,7 +307,7 @@ class Scrape:
                         self.hm.HookKeyboard()
                         self.hm.HookMouse()
                         pythoncom.PumpMessages()
-                        dumpToJson()
+##                        dumpToJson()
 
                 class GetObject():
                     def __init__(self):
