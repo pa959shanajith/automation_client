@@ -306,8 +306,8 @@ class Dropdown_Keywords():
                             break
                     if(cmp(dd_entries,val) == 0):
 
-                        result =sap_constants.TEST_RESULT_PASS
-                        status =sap_constants.TEST_RESULT_TRUE
+                        status =sap_constants.TEST_RESULT_PASS
+                        result =sap_constants.TEST_RESULT_TRUE
                     else:
                       err_msg = sap_constants.ERROR_MSG
                 else:
