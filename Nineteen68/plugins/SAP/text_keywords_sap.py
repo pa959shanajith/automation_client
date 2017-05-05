@@ -204,7 +204,7 @@ class Text_Keywords():
             if(id != None):
               if(ses.FindById(id).Changeable == True):
                     if(ses.FindById(id).MaxLength == length):
-                        value = ses.FindById(id).MaxLength
+                        #value = ses.FindById(id).MaxLength
                         status=sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
                     else:
