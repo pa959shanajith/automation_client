@@ -217,8 +217,12 @@ class Launch_Keywords():
             if(start_window>1):
                 try:
                     app = Application(backend="win32").connect(path =self.filePath).window(title=self.windowName)
-                    app.FilterEdit.set_edit_text(u'')
-                    app.FilterEdit.type_keys(server, with_spaces = True)
+                    try:
+                        app.Edit2.set_edit_text(u'')
+                        app.Edit2.type_keys(server, with_spaces = True)
+                    except:
+                        app.FilterEdit.set_edit_text(u'')
+                        app.FilterEdit.type_keys(server, with_spaces = True)
                     keyboard.SendKeys('{ENTER}')
                     time.sleep(5)
                     if app!=None and app!='':
