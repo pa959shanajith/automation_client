@@ -75,7 +75,7 @@ class Scrape:
                         tag="select"
                     elif(elem.__getattr__("Type") == "GuiLabel"):
                         custname = elem.__getattr__("Name") + "_lbl"
-                        tag="a"
+                        tag=elem.__getattr__("Type")
                     elif(elem.__getattr__("Type") == "GuiRadioButton"):
                         custname = elem.__getattr__("Name") + "_radiobtn"
                         tag="radiobutton"
@@ -200,7 +200,7 @@ class Scrape:
                                 tag="select"
                             elif(elem.__getattr__("Type") == "GuiLabel"):
                                 custname = elem.__getattr__("Name") + "_lbl"
-                                tag="a"
+                                tag=elem.__getattr__("Type")
                             elif(elem.__getattr__("Type") == "GuiRadioButton"):
                                 custname = elem.__getattr__("Name") + "_radiobtn"
                                 tag="radiobutton"
