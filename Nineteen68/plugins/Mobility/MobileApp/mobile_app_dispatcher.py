@@ -132,7 +132,7 @@ class MobileDispatcher:
                 except Exception as Ex:
                     log.debug('Webelement not found')
                     err_msg=str(Ex)
-                    logger.print_on_console(err_msg)
+##                    logger.print_on_console(err_msg)
                     log.error(err_msg)
         if mobileElement==None:
             ELEMENT_FOUND=False
