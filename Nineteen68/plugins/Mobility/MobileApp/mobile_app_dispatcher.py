@@ -21,6 +21,7 @@ import logging
 import logger
 from mobile_app_constants import *
 import constants
+import action_keyowrds
 
 log = logging.getLogger('mobile_app_dispatcher.py')
 class MobileDispatcher:
@@ -32,6 +33,7 @@ class MobileDispatcher:
     swipe_keywords_object = swipe_keywords.SliderKeywords()
     toggle_keywords_object = toggle_keywords.ToggleKeywords()
     device_keywords_object = device_keywords.Device_Keywords()
+    action_keyowrds_object=action_keyowrds.Action_Key()
 
     def __init__(self):
         self.exception_flag=''
@@ -89,7 +91,8 @@ class MobileDispatcher:
                     'GetElementText':self.textbox_keywords_object.get_text,
                     'VerifyElementExists':self.slider_util_keywords_object.verify_exists,
                     'VerifyElementEnabled':self.slider_util_keywords_object.verify_exists,
-                    'VerifyElementText':self.textbox_keywords_object.verify_text
+                    'VerifyElementText':self.textbox_keywords_object.verify_text,
+                    'ActionKey':self.action_keyowrds_object.action_key
 
                 }
             ELEMENT_FOUND=True
