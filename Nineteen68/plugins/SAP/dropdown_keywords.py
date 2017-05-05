@@ -47,77 +47,77 @@ class Dropdown_Keywords():
 
 
 
-    def selectValueByIndex(self,sap_id,url,input_val, *args):
-        id,ses=self.uk.getSapElement(sap_id)
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        verb = OUTPUT_CONSTANT
-        index=int(input_val[0])
-        #index=index+1
-        err_msg=None
-        i = 0
-        arr = []
-        try:
-            if(id != None):
-                if(ses.FindById(id).Changeable == True):
-                    entries = ses.FindById(id).Entries
-                    while True:
-                        try:
-                            arr.append(entries(i).value)
-                        except :
-                            break
-                        i = i + 1
-                    try:
-                        ses.FindById(id).value = arr[index]
-                        status=sap_constants.TEST_RESULT_PASS
-                        result=sap_constants.TEST_RESULT_TRUE
-                    except Exception as e:
-                         err_msg=e
-                         logger.print_on_console( 'index out of bound:',e)
-                else:
-                    logger.print_on_console( "Element is not changeable")
-                    err_msg = "Element is not changeable"
-                    log.info(err_msg)
-        except Exception as e:
-             log.error('Error occured',e)
-        return status,result,verb,err_msg
+##    def selectValueByIndex(self,sap_id,url,input_val, *args):
+##        id,ses=self.uk.getSapElement(sap_id)
+##        status = sap_constants.TEST_RESULT_FAIL
+##        result = sap_constants.TEST_RESULT_FALSE
+##        verb = OUTPUT_CONSTANT
+##        index=int(input_val[0])
+##        #index=index+1
+##        err_msg=None
+##        i = 0
+##        arr = []
+##        try:
+##            if(id != None):
+##                if(ses.FindById(id).Changeable == True):
+##                    entries = ses.FindById(id).Entries
+##                    while True:
+##                        try:
+##                            arr.append(entries(i).value)
+##                        except :
+##                            break
+##                        i = i + 1
+##                    try:
+##                        ses.FindById(id).value = arr[index]
+##                        status=sap_constants.TEST_RESULT_PASS
+##                        result=sap_constants.TEST_RESULT_TRUE
+##                    except Exception as e:
+##                         err_msg=e
+##                         logger.print_on_console( 'index out of bound:',e)
+##                else:
+##                    logger.print_on_console( "Element is not changeable")
+##                    err_msg = "Element is not changeable"
+##                    log.info(err_msg)
+##        except Exception as e:
+##             log.error('Error occured',e)
+##        return status,result,verb,err_msg
 
-    def getValueByIndex(self, sap_id, url,input_val,*args):
-        id,ses=self.uk.getSapElement(sap_id)
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        #verb = OUTPUT_CONSTANT
-        value=OUTPUT_CONSTANT
-        index=int(input_val[0])
-        #index=index+1
-        err_msg=None
-        i = 0
-        arr = []
-        try:
-            if(id != None):
-                if(ses.FindById(id).Changeable == True):
-                    entries = ses.FindById(id).Entries
-                    while True:
-                        try:
-                            arr.append(entries(i).value)
-                        except :
-                            break
-                        i = i + 1
-                    try:
-                        value = arr[index]
-                        status=sap_constants.TEST_RESULT_PASS
-                        result=sap_constants.TEST_RESULT_TRUE
-                    except Exception as e:
-                        err_msg=e
-                        logger.print_on_console( 'index out of bound:',e)
-                else:
-                    logger.print_on_console( "Element is not changeable")
-                    err_msg = "Element is not changeable"
-                    log.info(err_msg)
-        except Exception as e:
-            err_msg = sap_constants.ERROR_MSG
-            log.error(err_msg,e)
-        return status,result,value,err_msg
+##    def getValueByIndex(self, sap_id, url,input_val,*args):
+##        id,ses=self.uk.getSapElement(sap_id)
+##        status = sap_constants.TEST_RESULT_FAIL
+##        result = sap_constants.TEST_RESULT_FALSE
+##        #verb = OUTPUT_CONSTANT
+##        value=OUTPUT_CONSTANT
+##        index=int(input_val[0])
+##        #index=index+1
+##        err_msg=None
+##        i = 0
+##        arr = []
+##        try:
+##            if(id != None):
+##                if(ses.FindById(id).Changeable == True):
+##                    entries = ses.FindById(id).Entries
+##                    while True:
+##                        try:
+##                            arr.append(entries(i).value)
+##                        except :
+##                            break
+##                        i = i + 1
+##                    try:
+##                        value = arr[index]
+##                        status=sap_constants.TEST_RESULT_PASS
+##                        result=sap_constants.TEST_RESULT_TRUE
+##                    except Exception as e:
+##                        err_msg=e
+##                        logger.print_on_console( 'index out of bound:',e)
+##                else:
+##                    logger.print_on_console( "Element is not changeable")
+##                    err_msg = "Element is not changeable"
+##                    log.info(err_msg)
+##        except Exception as e:
+##            err_msg = sap_constants.ERROR_MSG
+##            log.error(err_msg,e)
+##        return status,result,value,err_msg
 
     def selectValueByText(self,sap_id,url,input_val, *args):
         id,ses=self.uk.getSapElement(sap_id)
