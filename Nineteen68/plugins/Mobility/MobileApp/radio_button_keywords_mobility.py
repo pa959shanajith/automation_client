@@ -77,8 +77,10 @@ class Radio_Button_Keywords():
                     if enable:
                         log.debug('performing the action')
                         status=webelement.get_attribute("checked")
-                        log.info(status)
-                        methodoutput=TEST_RESULT_TRUE
+                        if status!=None:
+                            log.info(status)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')

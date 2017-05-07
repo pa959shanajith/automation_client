@@ -102,6 +102,7 @@ class Handler():
         json_string = json.dumps(test_data)
         new_obj = json.loads(json_string)
         script=[]
+        testcasename_list=[]
         browser_type=[]
         #Iterating through json array
         for json_data in new_obj:
@@ -128,11 +129,12 @@ class Handler():
                     ws_templates_dict[testscript_name]=""
             global testcasename
             testcasename =testscript_name
+            testcasename_list.append(testscript_name)
             if json_data.has_key('browsertype'):
                 browser_type=json_data['browsertype']
             elif json_data.has_key('browserType'):
                 browser_type=json_data['browserType']
-        flag=self.create_list(script,testscript_name)
+        flag=self.create_list(script,testcasename_list)
         return flag,browser_type,len(script)
 
 
@@ -516,9 +518,9 @@ class Handler():
             testcase_copy.append(d)
             flag=self.parse_condition(d)
 
-        for d in testcase_copy:
-            for x in d:
-                step=self.extract_field(x,tspIndex2,testscript_name,i+1)
+        for i in range(len(testcase_copy)):
+            for x in testcase_copy[i]:
+                step=self.extract_field(x,tspIndex2,testscript_name[i],i+1)
                 if step is not None and step != False:
                     tspList.append(step)
                 elif step == False:

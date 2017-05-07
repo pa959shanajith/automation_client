@@ -288,8 +288,8 @@ class StepDescription:
         #Dropdown keywords
         def GetSelected():
             return 'Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save value ' + output + ' in '+ tsp.outputval+ '.'
-        def GetValueByIndex():
-            return 'Get value with index ' + input + ' in the '+ "'" + tsp.custname + "'" + ' and save the value ' + output + ' in '+ tsp.outputval+'.'
+##        def GetValueByIndex():
+##            return 'Get value with index ' + input + ' in the '+ "'" + tsp.custname + "'" + ' and save the value ' + output + ' in '+ tsp.outputval+'.'
         def VerifyValuesExists():
             return 'Verify values ' + input + ' exists in the '+ "'" + tsp.custname + "'"+'.'
         def SelectValueByText():
@@ -300,8 +300,8 @@ class StepDescription:
             return 'Verify values ' + input + ' are present in the '+ "'" + tsp.custname + "'"+'.'
         def VerifyCount():
             return 'Verify ' + input + ' is the list count of the ' +"'" + tsp.custname + "'"+'.'
-        def SelectValueByIndex():
-            return 'Select the value '+ input+' of the '+"'" + tsp.custname + "'"+' with the index '+input+' present in the table cell  '+"'" + tsp.custname + "'"+'-['+input+']['+input+']'+'.'
+##        def SelectValueByIndex():
+##            return 'Select the value '+ input+' of the '+"'" + tsp.custname + "'"+' with the index '+input+' present in the table cell  '+"'" + tsp.custname + "'"+'-['+input+']['+input+']'+'.'
         def GetCount():
             return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' + output + ' in ' +tsp.outputval+'.'
         #Element Keywords
