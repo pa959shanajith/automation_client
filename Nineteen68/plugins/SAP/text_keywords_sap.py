@@ -149,17 +149,12 @@ class Text_Keywords():
         value=OUTPUT_CONSTANT
         try:
             if(id != None):
-                if(ses.FindById(id).Changeable == True):
                     if(ses.FindById(id).text == text):
                         status = sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
                         logger.print_on_console('The text obtained is ',result)
                     else:
                         logger.print_on_console('Element state does not allow to perform the operation')
-                else:
-                    logger.print_on_console( "Element is not changeable")
-                    err_msg = "Element is not changeable"
-                    log.info(err_msg)
             else:
                   logger.print_on_console('element not present on the page where operation is trying to be performed')
         except Exception as e:
