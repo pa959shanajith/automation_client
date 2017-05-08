@@ -64,6 +64,7 @@ class SAPDispatcher:
                   'starttransaction':self.launch_keywords_obj.startTransaction,
                   'serverconnect':self.launch_keywords_obj.serverConnect,
                   'geterrormessage':self.launch_keywords_obj.getErrorMessage,
+                  'toolbaraction':self.launch_keywords_obj.toolbar_actions,
                   'settext' : self.editable_text_obj.setText,
                   'setsecuretext':self.editable_text_obj.setSecureText,
                   'gettext':self.editable_text_obj.getText,
@@ -120,7 +121,7 @@ class SAPDispatcher:
 
             keyword=keyword.lower()
             if keyword in dict.keys():
-                if keyword=='serverconnect' or keyword=='launchapplication' or keyword=='starttransaction' :
+                if keyword=='serverconnect' or keyword=='launchapplication' or keyword=='starttransaction' or keyword=='toolbaraction' :
                     result= dict[keyword](input,output)
                 else:
                     result= dict[keyword](objectname,url,input,output)
