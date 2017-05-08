@@ -242,6 +242,7 @@ class Scrape:
                         self._want_continue = 1
                         self.stopumpingmsgs = False
                         self.ctrldownflag = False
+
                         self.start()
 
                     def StopPump(self):
@@ -251,22 +252,48 @@ class Scrape:
 
                     def run(self):
                         def OnMouseLeftDown(evnt):
-                            if (self.stopumpingmsgs == True):
+                            try:
+                                wndNames=evnt.WindowName
+                                if wndNames is not 'Running applications':
+                                        clicked_handle=evnt.Window
+                                        while True:
+                                            if clicked_handle==0L:   #comparing wether parent window is same as clicked window
+                                                break
+                                            else:
+                                                if not(clicked_handle == self.handle ):    #recursivelt getting the parent handle
+                                                    clicked_handle=win32gui.GetParent(clicked_handle)
+                                                else:
+                                                    if (self.ctrldownflag is True):
+                                                        self.ctrldownflag = False       #if control flag is clicked
+                                                        return True
+                                                    else:
+                                                        pos = evnt.Position
+                                                        coordX = pos[0]
+                                                        coordY = pos[1]
+                                                        obj = OutlookThread(coordX, coordY, window_id)
+                                                        return False
+
+                            except Exception as e:
+                                print e
+                                import traceback
+                                traceback.print_exc()
+
+                            if (self.stopumpingmsgs is True):
                                 self.hm.UnhookKeyboard()
                                 self.hm.UnhookMouse()
                                 ctypes.windll.user32.PostQuitMessage(0)
                                 return True
-                            if (self.ctrldownflag is True):
-                                return True
-                            else:
-                                pos = evnt.Position
-                                coordX = pos[0]
-                                coordY = pos[1]
-                                obj = OutlookThread(coordX, coordY, window_id)
-                                return False
+##                            if (self.ctrldownflag is True):
+##                                return True
+##                            else:
+##                                pos = evnt.Position
+##                                coordX = pos[0]
+##                                coordY = pos[1]
+##                                obj = OutlookThread(coordX, coordY, window_id)
+##                                return False
 
                         def OnKeyDown(event):
-                            if (self.stopumpingmsgs == True):
+                            if (self.stopumpingmsgs is True):
                                 self.hm.UnhookKeyboard()
                                 self.hm.UnhookMouse()
                                 ctypes.windll.user32.PostQuitMessage(0)
@@ -299,7 +326,7 @@ class Scrape:
 
                         global window_id
                         get_obj = GetObject()
-                        window_id = get_obj.GetWindow()
+                        window_id, self.handle = get_obj.GetWindow()
                         self.hm = pyHook.HookManager()
                         self.hm.KeyDown = OnKeyDown
                         self.hm.KeyUp = OnKeyUp
@@ -329,8 +356,6 @@ class Scrape:
                         wnd = scrape.getWindow(SapGui)
                         wndId = wnd.Id
                         wndName = wnd.Text
-                        print wndName
-
                         handle = win32gui.FindWindow(None, wndName)
                         foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
                         appThread = win32api.GetCurrentThreadId()
@@ -342,7 +367,7 @@ class Scrape:
                         else:
                             win32gui.BringWindowToTop(handle)
                             win32gui.ShowWindow(handle,5)
-                        return wndId
+                        return wndId, handle
 
                 global obj_ref
                 obj_ref = StartPump()
