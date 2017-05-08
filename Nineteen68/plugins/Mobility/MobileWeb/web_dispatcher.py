@@ -25,6 +25,7 @@ from webconstants import *
 import custom_keyword
 from collections import OrderedDict
 from constants import *
+import action_keyowrds
 import requests
 import re
 
@@ -43,6 +44,7 @@ class Dispatcher:
     textbox_object = textbox_operations.TextboxKeywords()
     dropdown_list_object = dropdown_listbox.DropdownKeywords()
     util_object = utilweb_operations.UtilWebKeywords()
+    action_keyowrds_object=action_keyowrds.Action_Key()
     statict_text_object = static_text_keywords.StaticTextKeywords()
     custom_object=custom_keyword.CustomKeyword()
     webelement_map=OrderedDict()
@@ -235,7 +237,7 @@ class Dispatcher:
                   'setFocus':self.util_object.setfocus,
                   'mouseHover':self.util_object.mouse_hover,
                   'tab':self.util_object.tab,
-                  'sendFunctionKeys':self.util_object.sendfunction_keys,
+                  'ActionKey':self.action_keyowrds_object.action_key,
                   'rightClick':self.util_object.rightclick,
                   'mouseClick':self.util_object.mouse_click,
                   'verifyWebImages':self.util_object.verify_web_images,
