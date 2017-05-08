@@ -23,23 +23,53 @@ log = logging.getLogger('element_operations.py')
 class ElementKeywords:
 
     def __getelement_text(self,webelement):
+        # Fixed issue #311
         text=''
-       # Fixed issue #311
-        text=str(webelement.text)
-        if text is None or text is '':
-            text=str(webelement.get_attribute('value'))
-        if text is None or text is '':
-            text=str(webelement.get_attribute('name'))
-        if text is None or text is '':
-            text=self.__get_tooltip(webelement)
-        if text is None or text is '':
-            text=str(webelement.get_attribute('placeholder'))
-        if text is None or text is '':
-            text=str(webelement.get_attribute('href'))
+        try:
+            text=str(webelement.text)
+            if text is None or text is '':
+                text=str(webelement.get_attribute('value'))
+            if text is None or text is '':
+                text=str(webelement.get_attribute('name'))
+            if text is None or text is '':
+                text=self.__get_tooltip(webelement)
+            if text is None or text is '':
+                text=str(webelement.get_attribute('placeholder'))
+            if text is None or text is '':
+                text=str(webelement.get_attribute('href'))
+        except Exception as e:
+            import ftfy
+            temp_txt = ''
+            temp_txt = webelement.text
+            if temp_txt is not None or temp_txt is not '':
+                text = ftfy.fix_text(temp_txt)
+            if temp_txt is None or temp_txt is '':
+                temp_txt = webelement.get_attribute('value')
+                text = ftfy.fix_text(temp_txt)
+            if temp_txt is None or temp_txt is '':
+                temp_txt = webelement.get_attribute('name')
+                text = ftfy.fix_text(temp_txt)
+            if temp_txt is None or temp_txt is '':
+                text=self.__get_tooltip(webelement)
+            if temp_txt is None or temp_txt is '':
+                temp_txt = webelement.get_attribute('placeholder')
+                text = ftfy.fix_text(temp_txt)
+            if temp_txt is None or temp_txt is '':
+                temp_txt = webelement.get_attribute('href')
+                text = ftfy.fix_text(temp_txt)
+
         return text
 
     def __get_tooltip(self,webelement):
-        return str(webelement.get_attribute('title'))
+        text=''
+        try:
+            text = str(webelement.get_attribute('title'))
+        except Exception as e:
+            import ftfy
+            temp_txt = webelement.get_attribute('title')
+            text = ftfy.fix_text(temp_txt)
+        return text
+
 
 
     def get_element_text(self,webelement,*args):
@@ -59,7 +89,6 @@ class ElementKeywords:
                methodoutput=TEST_RESULT_TRUE
             except Exception as e:
                 log.error(e)
-
                 logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         log.info(RETURN_RESULT)
