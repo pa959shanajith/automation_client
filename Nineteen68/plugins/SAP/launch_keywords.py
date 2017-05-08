@@ -142,6 +142,40 @@ class Launch_Keywords():
             logger.print_on_console('Failed to start transaction reason being :',e)
         return status,result,value,err_msg
 
+    def toolbar_actions(self,input_val,*args):
+        """ Enter, Save, Back, Exit, Cancel, Log off, Print, Find, Find next, First Page, Previous Page, Next Page, Last Page, Creates new session,Generates shortcut, Help, Customize Local Layout """
+        """ All of the above commands are case insensitive. """
+        button = input_val[0]
+        ses,wnd=self.getSessWindow()
+        wndId =  wnd.__getattr__('id')
+        tbar_action = wndId +'/tbar[0]'
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
+        err_msg=None
+        value=OUTPUT_CONSTANT
+        tbar = ses.FindById(tbar_action) #get the window id from getSessWindow and append /tbar[0]
+        i = 0
+        while True:
+            try:
+                tooltip = tbar.Children(i).tooltip.split("(")[0]
+                if(tooltip.strip().lower() == button.strip().lower()):
+                    id = tbar.Children(i).Id
+                    btn = ses.FindById(id)
+                    if(btn.Changeable == True):
+                        btn.Press()
+                        status=sap_constants.TEST_RESULT_PASS
+                        result=sap_constants.TEST_RESULT_TRUE
+                    else:
+                        logger.print_on_console("Button is disabled")
+                        err_msg='Button is disabled'
+                    break
+            except Exception as e:
+                logger.print_on_console("Could not find the specified button")
+                err_msg='Could not find the specified button'
+                break
+            i = i + 1
+        return status,result,value,err_msg
+
     def launch_application(self,input_val,*args):
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
