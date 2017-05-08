@@ -137,8 +137,6 @@ class SliderKeywords():
             status=TEST_RESULT_PASS
             result=TEST_RESULT_TRUE
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             err_msg='Error thrown be android driver'
             log.error(e)
             logger.print_on_console(err_msg)
@@ -153,14 +151,12 @@ class SliderKeywords():
         try:
 ##            startx,starty,endx=self.find_coordinates_vertical()
             #Swipe from up to bottom
-            print 'performing the back press'
+
             install_and_launch.driver.keyevent(4)
             time.sleep(3)
             status=TEST_RESULT_PASS
-            result=TEST_RESULT_TRUE
+            methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             err_msg='Error thrown be android driver'
             log.error(e)
             logger.print_on_console(err_msg)
