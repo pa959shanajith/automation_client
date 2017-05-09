@@ -153,7 +153,6 @@ class UtilOperations:
         try:
             log.debug('reading the inputs')
             if input1 != None and input2 != None and input1 != '' and input2 != '' :
-                from PIL import Image
                 input1=str(input1).replace('\n','').replace('\r','')
                 input2=str(input2).replace('\n','').replace('\r','')
                 if input1==input2:
