@@ -462,39 +462,70 @@ class ClickAndAdd:
                             wsh.SendKeys("^")
                     def run(self):
                         def OnMouseLeftDown(event):
-                            global ctrldownflag
-                            if (self.stopumpingmsgs == True):
+##                            global ctrldownflag
+                            try:
+                                wndNames=event.WindowName
+                                if wndNames is not 'Running applications':
+                                    clicked_handle=event.Window
+                                    while True:
+                                        if clicked_handle==0L:   #comparing wether parent window is same as clicked window
+                                            break
+                                        else:
+                                            if not(clicked_handle == self.handle ):    #recursivelt getting the parent handle
+                                                clicked_handle=win32gui.GetParent(clicked_handle)
+                                            else:
+                                                if (self.ctrldownflag is True):
+                                                    self.ctrldownflag = False       #if control flag is clicked
+                                                    return True
+                                                else:
+                                                    obj = OutlookThread()
+                                                    return False
+
+                            except Exception as e:
+                                print e
+                                import traceback
+                                traceback.print_exc()
+
+                            if (self.stopumpingmsgs is True):
                                 self.hm.UnhookKeyboard()
                                 self.hm.UnhookMouse()
                                 ctypes.windll.user32.PostQuitMessage(0)
                                 return True
-                            if (ctrldownflag is True):
-                                return True
-                            else:
-                                obj = OutlookThread()
-                                return False
+##                            if (self.stopumpingmsgs == True):
+##                                self.hm.UnhookKeyboard()
+##                                self.hm.UnhookMouse()
+##                                ctypes.windll.user32.PostQuitMessage(0)
+##                                return True
+##                            if (ctrldownflag is True):
+##                                return True
+##                            else:
+##                                obj = OutlookThread()
+##                                return False
 
 
                         def OnKeyDown(event):
-                            global ctrldownflag
-                            if (self.stopumpingmsgs == True):
+##                            global ctrldownflag
+                            if (self.stopumpingmsgs is True):
                                 self.hm.UnhookKeyboard()
                                 self.hm.UnhookMouse()
                                 ctypes.windll.user32.PostQuitMessage(0)
                                 return True
                             else:
                                 if (event.Key == 'Lcontrol'):
-                                    ctrldownflag = True
+                                    self.ctrldownflag = True
                                     return True
                                 else:
-                                    ctrldownflag = False
+                                    self.ctrldownflag = False
                                     return True
 
                         def OnKeyUp(event):
-                            global ctrldownflag
-                            ctrldownflag = False
+##                            global ctrldownflag
+                            self.ctrldownflag = False
                             return True
-
+                        #getting parent window handle
+                        self.utils_obj=utils.Utils()
+                        isjavares, hwnd =self.utils_obj.isjavawindow(windowname)
+                        self.handle = hwnd
 
                         self.hm = pyHook.HookManager()
                         self.hm.KeyDown = OnKeyDown
