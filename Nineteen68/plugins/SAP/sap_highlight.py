@@ -27,23 +27,26 @@ log = logging.getLogger('sap_highlight.py')
 class highLight():
 
     def highlight_element(self, elem):
-        launch = launch_keywords.Launch_Keywords()
-        ses, window = launch.getSessWindow()
-        i = elem.index("/")
-        elemId = window.Id + elem[i:]
-        elem_to_highlight = ses.FindById(elemId)
-        screen_name = elem[:i]
-        top_left_x = elem_to_highlight.ScreenLeft
-        top_left_y = elem_to_highlight.ScreenTop
-        bottom_right_x = elem_to_highlight.ScreenLeft + elem_to_highlight.Width
-        bottom_right_y = elem_to_highlight.ScreenTop + elem_to_highlight.Height
-        toplist, winlist = [], []
-        def enum_cb(hwnd, results):
-            winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
-        win32gui.EnumWindows(enum_cb, toplist)
-        app = [(hwnd, title) for hwnd, title in winlist if screen_name == title]
-        app = app[0]
-        hwnd = app[0]
+        try:
+            launch = launch_keywords.Launch_Keywords()
+            ses, window = launch.getSessWindow()
+            i = elem.index("/")
+            elemId = window.Id + elem[i:]
+            elem_to_highlight = ses.FindById(elemId)
+            screen_name = elem[:i]
+            top_left_x = elem_to_highlight.ScreenLeft
+            top_left_y = elem_to_highlight.ScreenTop
+            bottom_right_x = elem_to_highlight.ScreenLeft + elem_to_highlight.Width
+            bottom_right_y = elem_to_highlight.ScreenTop + elem_to_highlight.Height
+            toplist, winlist = [], []
+            def enum_cb(hwnd, results):
+                winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
+            win32gui.EnumWindows(enum_cb, toplist)
+            app = [(hwnd, title) for hwnd, title in winlist if screen_name == title]
+            app = app[0]
+            hwnd = app[0]
+        except Exception as e:
+            logger.print_on_console("Could not highlight the element as it was not present in the current SAP window.")
         try:
             foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
             appThread = win32api.GetCurrentThreadId()
