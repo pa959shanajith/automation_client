@@ -695,11 +695,11 @@ class Controller():
 
     def invokewebservicekeyword(self,teststepproperty,dispatcher_obj,inputval,socket_object):
         keyword = teststepproperty.name
-        if keyword == 'setTagValue' or keyword == 'setTagAttibute':
+        if keyword == 'setTagValue' or keyword == 'setTagAttribute':
             if handler.ws_templates_dict.has_key(teststepproperty.testscript_name):
                 handler.ws_template=handler.ws_templates_dict[teststepproperty.testscript_name]
             else:
-                handler.ws_template=""
+                handler.ws_template=''
         res = dispatcher_obj.dispatcher(teststepproperty,socket_object,*inputval)
         return res
 
