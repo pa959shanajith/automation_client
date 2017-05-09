@@ -17,6 +17,5 @@ Keywords Functionality:
 9. getHeader      : Returns the complete Response header or the header value of a particular field based on number of inputs.
 10. getBody       : Returns the complete Response body or the content between the given start and end tag based on number of inputs.
 11. setTagValue   : Sets the tag value of the given tag in Request body 
-
-        
+12. setTagAttribute : sets the attribute value for the given attribute which is having a tag value  
         

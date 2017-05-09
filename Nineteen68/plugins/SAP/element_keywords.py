@@ -64,14 +64,10 @@ class ElementKeywords():
         err_msg=None
         try:
             if(id != None):
-                    if(ses.FindById(id).type == 'GuiLabel' or ses.FindById(id).type == 'GuiTitlebar'):
+
                         value = ses.FindById(id).text
                         status=sap_constants.TEST_RESULT_PASS
                         result=sap_constants.TEST_RESULT_TRUE
-                    else:
-                        logger.print_on_console('Element does have an associated text')
-                        log.info('Element does have an associated text')
-                        err_msg='Element does have an associated text'
             else:
                 log.info('element not present on the page where operation is trying to be performed')
                 err_msg='element not present on the page where operation is trying to be performed'

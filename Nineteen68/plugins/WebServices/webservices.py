@@ -199,7 +199,7 @@ class WSkeywords:
                 header=header.strip()
                 log.debug('Setting the input header template to Header ')
                 self.setHeader(header)
-                logger.print_on_console('Header has been set to :',self.baseReqHeader)
+##                logger.print_on_console('Header has been set to :',self.baseReqHeader)
                 log.info('Input header template has been set ')
                 log.debug(STATUS_METHODOUTPUT_UPDATE)
 ##                output=self.baseReqHeader
@@ -601,29 +601,28 @@ class WSkeywords:
         element_to_change=new_path[len(new_path)-1]
         if element_to_change.startswith('ns',0,2):
             element_to_change=element_to_change.split(":")[1]
-        self.actual_parser(element_to_change,value,template,index,flag)
+        self.actual_parser(element_to_change,value,template,index,attribute_name,flag)
         result=etree.tostring(template)
         return result
 
-     def actual_parser(self,element_to_change,value,obj,index,flag):
+     def actual_parser(self,element_to_change,value,obj,index,attribute_name,flag):
         index+=1
         for body_object in obj:
-            ##if(type(body_object))
-            body_tag = body_object.tag
             if flag == 'tagname':
                 actual_tag=str(body_object.tag).split('}')[1]
                 if element_to_change == actual_tag:
-##                    print 'tag to change: \'',element_to_change,'\' equals available tag : \'',actual_tag,'\' \'',element_to_change == actual_tag,'\''
                     body_object.text = value
                     break
             if flag == 'attribute':
-                if len(body_object.attrib) > 0:
-                    if element_to_change in body_object.attrib:
-                        body_object.attrib[element_to_change]=value
-                        break
-            self.actual_parser(element_to_change,value,body_object,index,flag)
+                actual_tag=str(body_object.tag).split('}')[1]
+                if element_to_change == actual_tag:
+                    if len(body_object.attrib) > 0:
+                        if attribute_name in body_object.attrib:
+                            body_object.attrib[attribute_name]=value
+                            break
+            self.actual_parser(element_to_change,value,body_object,index,attribute_name,flag)
 
-     def setTagAttribute(self,attribute_name,attribute_value,element_path):
+     def setTagAttribute(self,attribute_value,element_path):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -633,7 +632,10 @@ class WSkeywords:
         if self.baseReqBody == '':
             self.baseReqBody=handler.ws_template
         try:
-            if value != None and value != '' and element_path != None and element_path != '':
+            splitattr=element_path.split('/')
+            attribute_name=splitattr[len(splitattr)-1]
+            element_path=element_path.rsplit('/',1)[0]
+            if attribute_name != None and attribute_name != '' and element_path != None and element_path != '':
                 if self.baseReqBody != None and self.baseReqBody != '':
                     result=self.parse_xml(self.baseReqBody,element_path,attribute_value,attribute_name,'attribute')
                     if result != None:
