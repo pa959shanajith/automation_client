@@ -38,6 +38,8 @@ class ElementKeywords():
         try:
             if(id != None):
                     elem=ses.FindById(id)
+                    if(elem.Type == "GuiTab"):
+                        elem.Select()
                     left =  elem.__getattr__("ScreenLeft")
                     width = elem.__getattr__("Width")
                     x = left + width/2
