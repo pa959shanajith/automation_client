@@ -137,7 +137,7 @@ class Text_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
 ##            Exceptions.error(e)
-            logger.print_on_console('Error cooured in getText and is a :',e)
+            logger.print_on_console('Error occurred in getText and is a :',e)
         return status,result,value,err_msg
 
     def verifyText(self, sap_id,url,input_val, *args):

@@ -30,10 +30,16 @@ class highLight():
         try:
             launch = launch_keywords.Launch_Keywords()
             ses, window = launch.getSessWindow()
-            i = elem.index("/")
-            elemId = window.Id + elem[i:]
+            try:
+                i = elem.index("/")
+                elemId = window.Id + elem[i:]
+                screen_name = elem[:i]
+            except:
+                elemId = window.Id
+                screen_name = elem
+            #elemId = window.Id + elem[i:]
             elem_to_highlight = ses.FindById(elemId)
-            screen_name = elem[:i]
+            #screen_name = elem[:i]
             top_left_x = elem_to_highlight.ScreenLeft
             top_left_y = elem_to_highlight.ScreenTop
             bottom_right_x = elem_to_highlight.ScreenLeft + elem_to_highlight.Width
@@ -58,7 +64,7 @@ class highLight():
             else:
                 win32gui.BringWindowToTop(hwnd)
                 win32gui.ShowWindow(hwnd,3)
-            time.sleep(2)
+            time.sleep(1)
             #win32gui.BringWindowToTop(hwnd)
             #win32gui.ShowWindow(hwnd,1)
 

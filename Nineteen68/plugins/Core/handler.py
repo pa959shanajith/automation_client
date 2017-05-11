@@ -20,6 +20,7 @@ from collections import OrderedDict
 import constants
 import logger
 import logging
+import  ftfy
 
 
 
@@ -110,7 +111,9 @@ class Handler():
                 #ws_template=json_data['template']
             if json_data.has_key('testcase'):
                 testcase=json_data['testcase']
-                script.append(testcase)
+                #passing test case value to ftfy module to handle special charcter
+                temp_testcase = ftfy.fix_text(testcase)
+                script.append(temp_testcase)
             if json_data.has_key('comments'):
                 comments=json_data['comments']
             #Checking if the testcase has key 'testscript_name' or 'testcasename'
