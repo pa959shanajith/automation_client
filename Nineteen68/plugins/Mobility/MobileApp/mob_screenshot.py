@@ -67,10 +67,10 @@ class Screenshot():
             if install_and_launch.driver==None:
                 img=ImageGrab.grab()
                 img.save(filePath+'.png')
-                logger.print_on_console('screenshot captured')
+##                logger.print_on_console('screenshot captured')
             else:
                 img=install_and_launch.driver.save_screenshot(filePath+'.png')
-                logger.print_on_console('screenshot captured')
+##                logger.print_on_console('screenshot captured')
 
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
