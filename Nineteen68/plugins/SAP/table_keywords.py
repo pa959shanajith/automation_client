@@ -70,7 +70,7 @@ class Table_keywords():
         err_msg=None
         try:
             elem=ses.FindById(id)
-            value = elem.RowCount
+            value = elem.RowCount+1
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
@@ -88,7 +88,7 @@ class Table_keywords():
         err_msg=None
         try:
             elem=ses.FindById(id)
-            value = elem.Columns.Length
+            value = elem.Columns.Length+1
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
@@ -99,8 +99,8 @@ class Table_keywords():
 
 
     def mouseHover(self, sap_id,url, input_val,*args):
-        row=int(input_val[0])-1
-        col=int(input_val[1])-1
+        row=int(input_val[0])-2
+        col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
         lk=Launch_Keywords()
         w1,w2,wndname,w3=lk.getPageTitle()
@@ -142,7 +142,7 @@ class Table_keywords():
             for i in range(0, no_of_rows):
                 for j in range(0, no_of_cols):
                     if(colText in elem.GetCell(i,j).text):
-                        value = j+1
+                        value = j+2
                         break
                     else:
                         value =''
@@ -173,7 +173,7 @@ class Table_keywords():
             for i in range(0, no_of_rows):
                 for j in range(0, no_of_cols):
                     if(rowText in elem.GetCell(i,j).text):
-                        value = i+1
+                        value = i+2
                         break
                     else:
                         value =''
@@ -191,8 +191,8 @@ class Table_keywords():
 
 
     def getCellValue(self, sap_id,url, input_val,*args):
-        row=int(input_val[0])-1
-        col=int(input_val[1])-1
+        row=int(input_val[0])-2
+        col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -211,8 +211,8 @@ class Table_keywords():
 
 
     def verifyCellValue(self, sap_id,url, input_val,*args):
-        row=int(input_val[0])-1
-        col=int(input_val[1])-1
+        row=int(input_val[0])-2
+        col=int(input_val[1])-2
         cell_value=input_val[2]
 
         id,ses=self.uk.getSapElement(sap_id)
@@ -262,8 +262,8 @@ class Table_keywords():
 
 
     def cellClick(self, sap_id,url, input_val,*args):
-        row=int(input_val[0])-1
-        col=int(input_val[1])-1
+        row=int(input_val[0])-2
+        col=int(input_val[1])-2
         text=input_val[2]
         id,ses=self.uk.getSapElement(sap_id)
         rk=Radio_Checkbox_keywords()
@@ -310,8 +310,8 @@ class Table_keywords():
 
 
     def selectValueByIndex(self, sap_id,url, input_val,*args):
-        row=int(input_val[0])-1
-        col=int(input_val[1])-1
+        row=int(input_val[0])-2
+        col=int(input_val[1])-2
         index=input_val[2]
         id,ses=self.uk.getSapElement(sap_id)
         dk = Dropdown_Keywords()
@@ -339,8 +339,8 @@ class Table_keywords():
 
 
     def selectValueByText(self, sap_id, url,input_val,*args):
-        row=int(input_val[0])-1
-        col=int(input_val[1])-1
+        row=int(input_val[0])-2
+        col=int(input_val[1])-2
         text= input_val[2]
         id,ses=self.uk.getSapElement(sap_id)
         dk = Dropdown_Keywords()
@@ -367,8 +367,8 @@ class Table_keywords():
 
 
     def getSelected(self, sap_id,url, input_val,*args):
-        row=int(input_val[0])-1
-        col=int(input_val[1])-1
+        row=int(input_val[0])-2
+        col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
         dk = Dropdown_Keywords()
         status = sap_constants.TEST_RESULT_FAIL
@@ -394,8 +394,8 @@ class Table_keywords():
 
 
     def getStatus(self, sap_id, url,input_val,*args):
-        row=int(input_val[0])-1
-        col=int(input_val[1])-1
+        row=int(input_val[0])-2
+        col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
         rk=Radio_Checkbox_keywords()
         status = sap_constants.TEST_RESULT_FAIL
@@ -427,8 +427,8 @@ class Table_keywords():
 
 
     def getCellToolTip(self, sap_id, url,input_val,*args):
-        row=int(input_val[0])-1
-        col=int(input_val[1])-1
+        row=int(input_val[0])-2
+        col=int(input_val[1])-2
         ek=ElementKeywords()
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
@@ -450,8 +450,8 @@ class Table_keywords():
 
 
     def tableCell_click(self, sap_id, url,input_val,*args):
-        row=int(input_val[0])-1
-        col=int(input_val[1])-1
+        row=int(input_val[0])-2
+        col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -482,8 +482,8 @@ class Table_keywords():
 
 
     def tableCell_doubleClick(self, sap_id, url,input_val,*args):
-        row=int(input_val[0])-1
-        col=int(input_val[1])-1
+        row=int(input_val[0])-2
+        col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
         lk=Launch_Keywords()
         w1,w2,wndname,w3=lk.getPageTitle()
@@ -515,7 +515,7 @@ class Table_keywords():
 
 
     def selectRow(self, sap_id,url, input_val,*args):
-        rowNum=int(input_val[0])-1
+        rowNum=int(input_val[0])-2
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -540,7 +540,7 @@ class Table_keywords():
 
 
     def unselectRow(self, sap_id,url, input_val,*args):
-        rowNum=int(input_val[0])-1
+        rowNum=int(input_val[0])-2
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE

@@ -92,6 +92,7 @@ class SAPDispatcher:
                   'clickelement':self.element_keywords_obj.click_element,
                   'getelementtext':self.element_keywords_obj.get_element_text,
                   'gettooltiptext':self.element_keywords_obj.getTooltipText,
+                  'getinputhelp':self.element_keywords_obj.getInputHelp,
                   'verifyenabled':self.saputil_keywords_obj.verifyEnabled,
                   'verifydisabled':self.saputil_keywords_obj.verifyDisabled,
                   'verifyexists':self.saputil_keywords_obj.VerifyExists,
