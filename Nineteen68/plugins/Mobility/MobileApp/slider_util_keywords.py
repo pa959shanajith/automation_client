@@ -15,6 +15,8 @@ from appium.webdriver.common.touch_action import TouchAction
 import install_and_launch
 import logging
 import logger
+import time
+import mobile_app_dispatcher
 
 log = logging.getLogger('slider_util_keywords.py')
 
@@ -154,6 +156,36 @@ class SliderKeywords():
 
         except Exception as e:
             err_msg=ANDROID_ERROR
+            log.error(e)
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output,err_msg
+
+
+    def waitforelement_exists(self, object_name,input_val,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            dispatcher=mobile_app_dispatcher.MobileDispatcher()
+            timeout=input_val[0]
+            if timeout!=None:
+                start_time = time.time()
+                while True:
+                    element=dispatcher.getMobileElement(install_and_launch.driver,object_name)
+                    later=time.time()
+                    if int(later-start_time)>=int(timeout):
+                        break
+                    if element!=None:
+                        logger.print_on_console('Element not found')
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                        break
+            else:
+                err_msg='Invalid Input'
+        except Exception as e:
+            err_msg='error occured'
             log.error(e)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg

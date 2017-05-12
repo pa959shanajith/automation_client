@@ -92,14 +92,18 @@ class MobileDispatcher:
                     'VerifyElementExists':self.slider_util_keywords_object.verify_exists,
                     'VerifyElementEnabled':self.slider_util_keywords_object.verify_exists,
                     'VerifyElementText':self.textbox_keywords_object.verify_text,
-                    'ActionKey':self.action_keyowrds_object.action_key
+                    'ActionKey':self.action_keyowrds_object.action_key,
+                    'WaitForElementExists':self.slider_util_keywords_object.waitforelement_exists
 
                 }
             ELEMENT_FOUND=True
             if keyword in dict.keys():
                 driver = install_and_launch.driver
-                webelement=self.getMobileElement(driver,objectname)
-                result=dict[keyword](webelement,input)
+                if keyword==WAIT_FOR_ELEMENT_EXISTS:
+                    result=dict[keyword](objectname,input)
+                else:
+                    webelement=self.getMobileElement(driver,objectname)
+                    result=dict[keyword](webelement,input)
                 if not(ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE
             else:
