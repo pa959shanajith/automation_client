@@ -138,12 +138,12 @@ class MobileDispatcher:
             log.debug(identifiers)
             try:
                 log.debug('trying to find mobileElement by Id')
-                mobileElement = driver.find_element_by_id(identifiers[0])
+                mobileElement = driver.find_element_by_xpath(identifiers[1])
             except Exception as Ex:
                 try:
                     log.debug('Webelement not found by Id')
                     log.debug('trying to find mobileElement by xpath')
-                    mobileElement = driver.find_element_by_xpath(identifiers[1])
+                    mobileElement = driver.find_element_by_id(identifiers[0])
                 except Exception as Ex:
                     log.debug('Webelement not found')
                     err_msg=str(Ex)
