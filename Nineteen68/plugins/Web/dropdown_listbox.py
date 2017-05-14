@@ -145,7 +145,17 @@ class DropdownKeywords():
         if webelement is not None:
             if webelement.tag_name=='table':
                     if len(input)==5:
-                        webelement=self.radioKeywordsObj.getActualElement(webelement,input)
+                        dropVal=input[2]
+                        ##webelement=self.radioKeywordsObj.getActualElement(webelement,input)
+                        """
+                        author :arpitha
+                        changes made for multiple dropdowns present in the table.
+                        Date :12-05-2017
+                        """
+                        if dropVal.lower()=='dropdown':
+                            webelement=self.jsExecutorForMultipleDropdown(webelement,input)
+                        else:
+                            webelement=self.radioKeywordsObj.getActualElement(webelement,input)
             if ((webelement.is_enabled()) or webelement.is_displayed()):
                 try:
                     if (input is not None) :
@@ -182,7 +192,7 @@ class DropdownKeywords():
                         logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                except Exception as e:
+                except Exception as e:                    
                     log.error(e)
                     from selenium.common.exceptions import NoSuchElementException
                     if type(e) == NoSuchElementException:
@@ -195,6 +205,23 @@ class DropdownKeywords():
                 log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
         return status,result,verb,err_msg
+
+    """
+    author :arpitha
+    changes made for multiple dropdowns present in the table.
+    Date :12-05-2017
+    """
+    def jsExecutorForMultipleDropdown(self,webElement,input):
+        remoteWebElement=None
+        row_num=input[0]
+        col_num=input[1]
+        try:
+            js="""var temp = fun(arguments[0], arguments[2], arguments[1]); return temp; function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy,sVal;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;			             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }			             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan)              if(cell.children[0].type=='select-one'){                 sVal=cell.children[0]; 				return sVal; 		} 		else{               return cell; 		}         }     }     return null; };"""
+            remoteWebElement=browser_Keywords.driver_obj.execute_script(js,webElement,row_num,col_num)
+        except Exception as e:
+            log.error(e)
+        return remoteWebElement
+
 
     def verifySelectedValue(self,webelement,input,*args):
         """

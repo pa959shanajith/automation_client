@@ -22,6 +22,8 @@ import logger
 from mobile_app_constants import *
 import constants
 import action_keyowrds
+import mob_screenshot
+import readconfig
 
 log = logging.getLogger('mobile_app_dispatcher.py')
 class MobileDispatcher:
@@ -92,25 +94,35 @@ class MobileDispatcher:
                     'VerifyElementExists':self.slider_util_keywords_object.verify_exists,
                     'VerifyElementEnabled':self.slider_util_keywords_object.verify_exists,
                     'VerifyElementText':self.textbox_keywords_object.verify_text,
-                    'ActionKey':self.action_keyowrds_object.action_key
+                    'ActionKey':self.action_keyowrds_object.action_key,
+                    'WaitForElementExists':self.slider_util_keywords_object.waitforelement_exists
 
                 }
             ELEMENT_FOUND=True
             if keyword in dict.keys():
                 driver = install_and_launch.driver
-                webelement=self.getMobileElement(driver,objectname)
-                result=dict[keyword](webelement,input)
+                if keyword==WAIT_FOR_ELEMENT_EXISTS:
+                    result=dict[keyword](objectname,input)
+                else:
+                    webelement=self.getMobileElement(driver,objectname)
+                    result=dict[keyword](webelement,input)
                 if not(ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE
             else:
                 err_msg=INVALID_KEYWORD
                 result[3]=err_msg
+            screen_shot_obj = mob_screenshot.Screenshot()
+            configobj = readconfig.readConfig()
+            configvalues = configobj.readJson()
+            if configvalues['screenShot_Flag'].lower() == 'fail':
+                if result[0].lower() == 'fail':
+                    screen_shot_obj.captureScreenshot()
+            elif configvalues['screenShot_Flag'].lower() == 'all':
+                screen_shot_obj.captureScreenshot()
         except TypeError as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             log.error(e)
             logger.print_on_console('Exception at dispatcher')
         return result
@@ -126,12 +138,12 @@ class MobileDispatcher:
             log.debug(identifiers)
             try:
                 log.debug('trying to find mobileElement by Id')
-                mobileElement = driver.find_element_by_id(identifiers[0])
+                mobileElement = driver.find_element_by_xpath(identifiers[1])
             except Exception as Ex:
                 try:
                     log.debug('Webelement not found by Id')
                     log.debug('trying to find mobileElement by xpath')
-                    mobileElement = driver.find_element_by_xpath(identifiers[1])
+                    mobileElement = driver.find_element_by_id(identifiers[0])
                 except Exception as Ex:
                     log.debug('Webelement not found')
                     err_msg=str(Ex)
