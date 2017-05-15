@@ -220,6 +220,11 @@ class Dispatcher:
                   'selectMultipleValuesByText':self.dropdown_list_object.selectMultipleValuesByText,
                   'getMultipleValuesByIndexes':self.dropdown_list_object.getMultipleValuesByIndexes,
                   'verifyAllValues':self.dropdown_list_object.verifyAllValues,
+
+                  #author :arpitha.b.v
+                #Added mapping of "getAllValues" keyword values to dropdown's object
+
+                  'getAllValues':self.dropdown_list_object.getAllValues,
                   'getValueByIndex':self.dropdown_list_object.getValueByIndex,
                   'verifyValuesExists':self.dropdown_list_object.verifyValuesExists,
                   'deselectAll':self.dropdown_list_object.deselectAll,
