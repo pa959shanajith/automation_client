@@ -268,10 +268,10 @@ class ButtonLinkKeyword():
                         linktext = webelement.text
                         log.info('Link text: ' +linktext)
                         if linktext == input:
-                            err_msg='Link Text mismatched'
-                            logger.print_on_console(err_msg)
-                            log.info(err_msg)
-                            log.info(STATUS_METHODOUTPUT_UPDATE)
+##                            err_msg='Link Text mismatched'
+                            logger.print_on_console('Link Text matched')
+##                            log.info(err_msg)
+##                            log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
                         else:
@@ -299,7 +299,7 @@ class ButtonLinkKeyword():
 
         #return status and methodoutput
         log.info(RETURN_RESULT)
-        return status,methodoutput,output,
+        return status,methodoutput,output,err_msg
 
     #Below keyword specifically written for to support mnt CBU
     def press(self,webelement,input,*args):

@@ -18,6 +18,9 @@ import logging
 from constants import *
 import logger
 log = logging.getLogger('outlook.py')
+import pythoncom
+
+pythoncom.CoInitialize()
 
 ## This class will have the methods to automate Outlook Application
 class OutlookKeywords:
