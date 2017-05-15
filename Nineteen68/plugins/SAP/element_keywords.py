@@ -15,7 +15,7 @@ from launch_keywords import Launch_Keywords
 from constants import *
 import logger
 from saputil_operations import SapUtilKeywords
-
+from sendfunction_keys import SendFunctionKeys
 import logging
 import logging.config
 log = logging.getLogger('element_keywords.py')
@@ -90,6 +90,8 @@ class ElementKeywords():
             if(id != None):
                 if(ses.FindById(id).Changeable == True):
                     value = ses.FindById(id).tooltip
+                    if value== '':
+                        value = ses.FindById(id).DefaultTooltip
                     if(value != None):
                         status=sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
