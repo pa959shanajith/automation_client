@@ -192,7 +192,7 @@ class DropdownKeywords():
                         logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                except Exception as e:                    
+                except Exception as e:
                     log.error(e)
                     from selenium.common.exceptions import NoSuchElementException
                     if type(e) == NoSuchElementException:
@@ -384,6 +384,65 @@ class DropdownKeywords():
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
                 err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
         return status,result,verb,err_msg
+    def getAllValues(self,webelement,input,*args):
+        """
+        author : arpitha.b.v
+        def :getAllValues
+        purpose: to get All values present in the dropdown.
+        param: webelement,list
+        return : All dropdown values
+        """
+        status=webconstants.TEST_RESULT_FAIL
+        result=webconstants.TEST_RESULT_FALSE
+        visibilityFlag=True
+        ##verb = OUTPUT_CONSTANT
+        output = None
+        err_msg=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if input is not None:
+                log.info('Input is not none')
+                if webelement is not None:
+                    log.info('Recieved web element from the web dispatcher')
+                    if webelement.is_displayed():
+                        log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
+                        select = Select(webelement)
+                        option_len = select.options
+                        opt_len = len(option_len)
+                        inp_val_len = len(input)
+                        log.info('inp_val_len')
+                        log.info(inp_val_len)
+                        temp = []
+                        flag = True
+                        for x in range(0,opt_len):
+                            internal_val = select.options[x].text
+                            temp.append(internal_val)
+                        log.info('temp value')
+                        log.info(temp)
+                        output=temp
+                        if(len(temp) != 0 ):
+                            status=webconstants.TEST_RESULT_PASS
+                            result=webconstants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                        else:
+                            err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                            logger.print_on_console(err_msg)
+                            log.error(err_msg)
+
+                    else:
+                        err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
+                        logger.print_on_console(err_msg)
+                        log.error(err_msg)
+
+            else:
+                err_msg='Provided input not present in element'
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
+
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+        return status,result,output,err_msg
 
     def verifyAllValues(self,webelement,input,*args):
         """
