@@ -9,7 +9,6 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import sap_constants
-import launch_keywords
 import win32com.client
 from constants import *
 from sap_scraping import Scrape
@@ -17,12 +16,15 @@ import logger
 import time
 from encryption_utility import AESCipher
 from saputil_operations import SapUtilKeywords
+from launch_keywords import Launch_Keywords
 class Text_Keywords():
 
     def __init__(self):
         self.uk = SapUtilKeywords()
+        self.lk =Launch_Keywords()
 
     def getText(self, sap_id,url, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
@@ -53,6 +55,7 @@ class Text_Keywords():
         return status,result,value,err_msg
 
     def setText(self, sap_id,url,val, *args):
+        self.lk.setWindowToForeground(sap_id)
         input_val=val[0]
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
@@ -84,6 +87,7 @@ class Text_Keywords():
         return status,result,value,err_msg
 
     def setSecureText(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         text=input_val[0]
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
@@ -114,6 +118,7 @@ class Text_Keywords():
         return status,result,value,err_msg
 
     def clearText(self, sap_id,url, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
@@ -141,6 +146,7 @@ class Text_Keywords():
         return status,result,value,err_msg
 
     def verifyText(self, sap_id,url,input_val, *args):
+        self.lk.setWindowToForeground(sap_id)
         text=input_val[0]
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
@@ -162,6 +168,7 @@ class Text_Keywords():
         return status,result,value,err_msg
 
     def getTextboxLength(self, sap_id, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
@@ -189,6 +196,7 @@ class Text_Keywords():
 
 
     def verifyTextboxLength(self, sap_id,url,input_val, *args):
+        self.lk.setWindowToForeground(sap_id)
         length=int(input_val[0])
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
