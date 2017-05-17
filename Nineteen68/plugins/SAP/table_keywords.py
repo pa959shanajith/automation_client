@@ -31,6 +31,7 @@ class Table_keywords():
 
     def __init__(self):
         self.uk = SapUtilKeywords()
+        self.lk = Launch_Keywords()
 
     def getXpath(self,sap_id,elem,row,col):
         try:
@@ -45,6 +46,7 @@ class Table_keywords():
 
 
     def setFocus(self, sap_id, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -63,6 +65,7 @@ class Table_keywords():
 
 
     def getRowCount(self, sap_id, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -81,6 +84,7 @@ class Table_keywords():
 
 
     def getColumnCount(self, sap_id, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -99,11 +103,11 @@ class Table_keywords():
 
 
     def mouseHover(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
-        lk=Launch_Keywords()
-        w1,w2,wndname,w3=lk.getPageTitle()
+        w1,w2,wndname,w3=self.lk.getPageTitle()
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
@@ -129,6 +133,7 @@ class Table_keywords():
 
 
     def getColNumByText(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         colText=input_val[0]
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
@@ -160,6 +165,7 @@ class Table_keywords():
 
 
     def getRowNumByText(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         rowText=input_val[0]
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
@@ -191,6 +197,7 @@ class Table_keywords():
 
 
     def getCellValue(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
@@ -211,6 +218,7 @@ class Table_keywords():
 
 
     def verifyCellValue(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         cell_value=input_val[2]
@@ -235,6 +243,7 @@ class Table_keywords():
 
 
     def verifyTextExists(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         text=input_val[0]
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
@@ -262,6 +271,7 @@ class Table_keywords():
 
 
     def cellClick(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         text=input_val[2]
@@ -310,6 +320,7 @@ class Table_keywords():
 
 
     def selectValueByIndex(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         index=input_val[2]
@@ -339,6 +350,7 @@ class Table_keywords():
 
 
     def selectValueByText(self, sap_id, url,input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         text= input_val[2]
@@ -367,6 +379,7 @@ class Table_keywords():
 
 
     def getSelected(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
@@ -394,6 +407,7 @@ class Table_keywords():
 
 
     def getStatus(self, sap_id, url,input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
@@ -427,6 +441,7 @@ class Table_keywords():
 
 
     def getCellToolTip(self, sap_id, url,input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         ek=ElementKeywords()
@@ -450,13 +465,13 @@ class Table_keywords():
 
 
     def tableCell_click(self, sap_id, url,input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
-        lk=Launch_Keywords()
-        w1,w2,wndname,w3=lk.getPageTitle()
+        w1,w2,wndname,w3=self.lk.getPageTitle()
         value = OUTPUT_CONSTANT
         err_msg=None
         try:
@@ -482,11 +497,11 @@ class Table_keywords():
 
 
     def tableCell_doubleClick(self, sap_id, url,input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
-        lk=Launch_Keywords()
-        w1,w2,wndname,w3=lk.getPageTitle()
+        w1,w2,wndname,w3=self.lk.getPageTitle()
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
@@ -515,6 +530,7 @@ class Table_keywords():
 
 
     def selectRow(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         rowNum=int(input_val[0])-2
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
@@ -540,6 +556,7 @@ class Table_keywords():
 
 
     def unselectRow(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         rowNum=int(input_val[0])-2
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
