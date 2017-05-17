@@ -8,7 +8,7 @@
 # Copyright:   (c) anas.ahmed1 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-
+import pywinauto
 import sap_constants
 import launch_keywords
 from launch_keywords import Launch_Keywords
@@ -30,7 +30,6 @@ class ElementKeywords():
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
-        from pyrobot import Robot
         w1,w2,wndname,w3=self.lk.getPageTitle()
         button='Left'
         value=OUTPUT_CONSTANT
@@ -47,8 +46,7 @@ class ElementKeywords():
                     top =  elem.__getattr__("ScreenTop")
                     height = elem.__getattr__("Height")
                     y= top + height/2
-                    rob =Robot(str(wndname))
-                    rob.move_and_click(x, y, button)
+                    pywinauto.mouse.click(button='left', coords=(int(x), int(y)))
                     status=sap_constants.TEST_RESULT_PASS
                     result=sap_constants.TEST_RESULT_TRUE
             else:

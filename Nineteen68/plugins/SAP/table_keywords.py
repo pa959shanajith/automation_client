@@ -19,7 +19,7 @@ import logging
 import logging.config
 log = logging.getLogger('table_keywords.py')
 #-----------------------------------------------------Module Imports
-from pyrobot import Robot
+import pywinauto
 from launch_keywords import Launch_Keywords
 from button_link_keywords_sap import ButtonLinkKeyword
 from dropdown_keywords import Dropdown_Keywords
@@ -121,8 +121,7 @@ class Table_keywords():
             top =  cell.__getattr__("ScreenTop")
             height = cell.__getattr__("Height")
             y= top + height/2
-            rob =Robot(str(wndname))
-            rob.set_mouse_pos( int(x), int(y))
+            pywinauto.mouse.move(coords=(int(x), int(y)))
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
@@ -487,8 +486,7 @@ class Table_keywords():
             top =  cell.__getattr__("ScreenTop")
             height = cell.__getattr__("Height")
             y= top + height/2
-            rob =Robot(str(wndname))
-            rob.move_and_click( int(x), int(y),"Left")
+            pywinauto.mouse.click(button='left', coords=(int(x), int(y)))
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
@@ -513,15 +511,13 @@ class Table_keywords():
         try:
             elem=ses.FindById(id)
             cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            left =  cell.__getattr__("ScreenLeft")
-            width = cell.__getattr__("Width")
+            left =  cell.ScreenLeft
+            width = cell.Width
             x = left + width/2
-            top =  cell.__getattr__("ScreenTop")
-            height = cell.__getattr__("Height")
+            top =  cell.ScreenTop
+            height = cell.Height
             y= top + height/2
-            rob =Robot(str(wndname))
-            rob.set_mouse_pos( int(x), int(y))
-            rob.double_click_mouse("Left")
+            pywinauto.mouse.double_click(button="left", coords = (int(x), int(y)))
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
