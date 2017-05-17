@@ -454,9 +454,13 @@ class Table_keywords():
         try:
             elem=ses.FindById(id)
             cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            value = ek.getTooltipText(cell_xpath)
-            status=sap_constants.TEST_RESULT_PASS
-            result=sap_constants.TEST_RESULT_TRUE
+            d1,d2,value,d3 = ek.getTooltipText(cell_xpath)
+            if(value!=None or value!=Null):
+                status=sap_constants.TEST_RESULT_PASS
+                result=sap_constants.TEST_RESULT_TRUE
+            else:
+                logger.print_on_console('ToolTipText not avaliable for the element ')
+                err_msg = sap_constants.ERROR_MSG
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
