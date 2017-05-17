@@ -81,6 +81,36 @@ class ElementKeywords():
         #log.info(RETURN_RESULT)
         return status,result,value,err_msg
 
+    def verify_element_text(self, sap_id,url,input_val, *args):
+        self.lk.setWindowToForeground(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
+        value=OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            if(id != None):
+                    if(len(input_val)==1):
+                        if(ses.FindById(id).text== input_val):
+                            status=sap_constants.TEST_RESULT_PASS
+                            result=sap_constants.TEST_RESULT_TRUE
+                    elif(len(input_val)==0):
+                        log.info('entered text is empty')
+                        err_msg='entered text is empty'
+                        logger.print_on_console('entered text is empty')
+                    else:
+                        log.info('more than one element text entered')
+                        err_msg='more than one element text entered'
+                        logger.print_on_console('more than one element text entered')
+            else:
+                log.info('element not present on the page where operation is trying to be performed')
+                err_msg='element not present on the page where operation is trying to be performed'
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console("Exception has occured :",e)
+        #log.info(RETURN_RESULT)
+        return status,result,value,err_msg
+
     def getTooltipText(self, sap_id,*args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
