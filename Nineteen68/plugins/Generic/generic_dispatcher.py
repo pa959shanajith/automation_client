@@ -80,6 +80,8 @@ class GenericKeywordDispatcher:
                   'getCurrentDateAndTime': self.generic_date.getCurrentDateAndTime,
                   'dateDifference' : self.generic_date.dateDifference,
                   'dateAddition'    : self.generic_date.dateAddition,
+                  'monthAddition'  :self.generic_date.monthAddition,
+                  'yearAddition' : self.generic_date.yearAddition,
                   'changeDateFormat'     : self.generic_date.changeDateFormat,
                   'dateCompare'  : self.generic_date.dateCompare,
                   'saveFile':self.generic_file.save_file,

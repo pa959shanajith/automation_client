@@ -32,6 +32,7 @@ checked=[]
 label=[]
 name=[]
 ScrapeList=[]
+counter=0
 driver=None
 
 
@@ -128,12 +129,34 @@ class BuildJson:
 
     def xmltojson(self,driver):
         import re
+        global ScrapeList
+        global XpathList
+        global label
+        global content_desc
+        global class_name
+        global resource_id
+        global enabled
+        global rectangle
+
+        ScrapeList=[]
+        custnamelist=[]
+        global counter
         for i in range(len(XpathList)):
-            text=class_name[i]
+            text=''
             if label[i] != '':
                 text=label[i]
-            elif content_desc[i] != '':
+            elif content_desc[i]  != '':
                 text=content_desc[i]
+
+            if text=='' or text==None:
+                 text=class_name[i]
+            if text not in custnamelist:
+                custnamelist.append(text)
+            else:
+                text=text+str(counter)
+                custnamelist.append(text)
+                counter=counter+1
+
             ele_bounds=re.findall('\d+',rectangle[i])
 ##            bounds={'x':ele_bounds[0],
 ##            'y':ele_bounds[1],
@@ -143,15 +166,24 @@ class BuildJson:
             height=int(ele_bounds[3])-int(ele_bounds[1])
             xpath=resource_id[i]+';'+XpathList[i]
             ScrapeList.append({'xpath': xpath, 'tag': class_name[i],
-                                                    'text': text,
+                                                        'text': text,
                                                     'id': resource_id[i], 'custname': text,
                                                     'reference': str(uuid.uuid4()),'enabled':enabled[i],'left':ele_bounds[0],'top':ele_bounds[1],'width':width,'height':height})
+
+        XpathList=[]
+        label=[]
+        content_desc=[]
+        class_name=[]
+        resource_id=[]
+        enabled=[]
+        rectangle=[]
 
         return self.save_json(ScrapeList,driver)
 
     def save_json(self,scrape_data,driver):
         from collections import OrderedDict
         jsonArray=OrderedDict()
+
         jsonArray['view']= scrape_data
 ##        jsonArray['mirror']='IMAGEEEEE'
         jsonArray['mirror']=driver.get_screenshot_as_base64()
@@ -198,13 +230,10 @@ class Exact(xml.sax.handler.ContentHandler):
         value=attrs.getValue(x)
 
         if x.lower()=='text':
-            if(value == ''):
-		      label.append(qName)
-            else:
-                if value in label:
-                    label.append(qName)
-                else:
-                	label.append(value)
+##            if(value == ''):
+##		      label.append(qName)
+##            else:
+            label.append(value)
 
             name.append(qName)
 

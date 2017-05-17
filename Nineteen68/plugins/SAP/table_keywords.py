@@ -19,7 +19,7 @@ import logging
 import logging.config
 log = logging.getLogger('table_keywords.py')
 #-----------------------------------------------------Module Imports
-from pyrobot import Robot
+import pywinauto
 from launch_keywords import Launch_Keywords
 from button_link_keywords_sap import ButtonLinkKeyword
 from dropdown_keywords import Dropdown_Keywords
@@ -31,6 +31,7 @@ class Table_keywords():
 
     def __init__(self):
         self.uk = SapUtilKeywords()
+        self.lk = Launch_Keywords()
 
     def getXpath(self,sap_id,elem,row,col):
         try:
@@ -45,6 +46,7 @@ class Table_keywords():
 
 
     def setFocus(self, sap_id, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -63,6 +65,7 @@ class Table_keywords():
 
 
     def getRowCount(self, sap_id, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -81,6 +84,7 @@ class Table_keywords():
 
 
     def getColumnCount(self, sap_id, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -99,11 +103,11 @@ class Table_keywords():
 
 
     def mouseHover(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
-        lk=Launch_Keywords()
-        w1,w2,wndname,w3=lk.getPageTitle()
+        w1,w2,wndname,w3=self.lk.getPageTitle()
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
@@ -117,8 +121,7 @@ class Table_keywords():
             top =  cell.__getattr__("ScreenTop")
             height = cell.__getattr__("Height")
             y= top + height/2
-            rob =Robot(str(wndname))
-            rob.set_mouse_pos( int(x), int(y))
+            pywinauto.mouse.move(coords=(int(x), int(y)))
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
@@ -129,6 +132,7 @@ class Table_keywords():
 
 
     def getColNumByText(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         colText=input_val[0]
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
@@ -139,8 +143,8 @@ class Table_keywords():
             elem=ses.FindById(id)
             no_of_cols = elem.Columns.Length
             no_of_rows = elem.RowCount
-            for i in range(0, no_of_rows):
-                for j in range(0, no_of_cols):
+            for i in range(-1, no_of_rows):
+                for j in range(-1, no_of_cols):
                     if(colText in elem.GetCell(i,j).text):
                         value = j+2
                         break
@@ -160,6 +164,7 @@ class Table_keywords():
 
 
     def getRowNumByText(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         rowText=input_val[0]
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
@@ -191,6 +196,7 @@ class Table_keywords():
 
 
     def getCellValue(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
@@ -211,6 +217,7 @@ class Table_keywords():
 
 
     def verifyCellValue(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         cell_value=input_val[2]
@@ -235,6 +242,7 @@ class Table_keywords():
 
 
     def verifyTextExists(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         text=input_val[0]
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
@@ -261,55 +269,57 @@ class Table_keywords():
 
 
 
-    def cellClick(self, sap_id,url, input_val,*args):
-        row=int(input_val[0])-2
-        col=int(input_val[1])-2
-        text=input_val[2]
-        id,ses=self.uk.getSapElement(sap_id)
-        rk=Radio_Checkbox_keywords()
-        bk =ButtonLinkKeyword()
-        dk = Dropdown_Keywords()
-        url=''#dummy variable
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        value = OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            object_type_input = ses.FindById(id).type
-            elem=ses.FindById(id)
-            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            if(cell.__getattr__("type") != object_type_input):
-                print "Error: Type Mismatch"
-            else:
-                if(object_type_input == "GuiTextField" or object_type_input == "GuiCTextField"):
-                    cell.setFocus()
-                    result = True
-                if(object_type_input == "GuiCheckBox"):
-                    status,result,isSelected,err_msg = rk.checkbox_getStatus(cell_xpath)
-                    if(isSelected == sap_constants.CHECKED_CHECK):
-                        status,result,value,err_msg = rk.select_checkbox(cell_xpath)
-                    else:
-                        status,result,value,err_msg = rk.unselect_checkbox(cell_xpath)
-
-                if(object_type_input == "GuiRadioButton"):
-                    status,result,value,err_msg = rk.select_radiobutton(cell_xpath)
-
-                if(object_type_input == "GuiButton"):
-                    status,result,value,err_msg = bk.click(cell_xpath)
-
-                if(object_type_input == "GuiComboBox"):
-                    if( text != None or text != ''):
-                        status,result,value,err_msg = dk.selectValueByText(cell_xpath,url, text)
-                    else:
-                        logger.print_on_console('Text is not Entered to perform this action')
-        except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-        return status,result,value,err_msg
+##    def cellClick(self, sap_id,url, input_val,*args):
+##        self.lk.setWindowToForeground(sap_id)
+##        row=int(input_val[0])-2
+##        col=int(input_val[1])-2
+##        text=input_val[2]
+##        id,ses=self.uk.getSapElement(sap_id)
+##        rk=Radio_Checkbox_keywords()
+##        bk =ButtonLinkKeyword()
+##        dk = Dropdown_Keywords()
+##        url=''#dummy variable
+##        status = sap_constants.TEST_RESULT_FAIL
+##        result = sap_constants.TEST_RESULT_FALSE
+##        value = OUTPUT_CONSTANT
+##        err_msg=None
+##        try:
+##            object_type_input = ses.FindById(id).type
+##            elem=ses.FindById(id)
+##            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
+##            if(cell.__getattr__("type") != object_type_input):
+##                print "Error: Type Mismatch"
+##            else:
+##                if(object_type_input == "GuiTextField" or object_type_input == "GuiCTextField"):
+##                    cell.setFocus()
+##                    result = True
+##                if(object_type_input == "GuiCheckBox"):
+##                    status,result,isSelected,err_msg = rk.checkbox_getStatus(cell_xpath)
+##                    if(isSelected == sap_constants.CHECKED_CHECK):
+##                        status,result,value,err_msg = rk.select_checkbox(cell_xpath)
+##                    else:
+##                        status,result,value,err_msg = rk.unselect_checkbox(cell_xpath)
+##
+##                if(object_type_input == "GuiRadioButton"):
+##                    status,result,value,err_msg = rk.select_radiobutton(cell_xpath)
+##
+##                if(object_type_input == "GuiButton"):
+##                    status,result,value,err_msg = bk.click(cell_xpath)
+##
+##                if(object_type_input == "GuiComboBox"):
+##                    if( text != None or text != ''):
+##                        status,result,value,err_msg = dk.selectValueByText(cell_xpath,url, text)
+##                    else:
+##                        logger.print_on_console('Text is not Entered to perform this action')
+##        except Exception as e:
+##            log.error('Error occured',e)
+##            err_msg = sap_constants.ERROR_MSG
+##        return status,result,value,err_msg
 
 
 
     def selectValueByIndex(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         index=input_val[2]
@@ -339,6 +349,7 @@ class Table_keywords():
 
 
     def selectValueByText(self, sap_id, url,input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         text= input_val[2]
@@ -367,6 +378,7 @@ class Table_keywords():
 
 
     def getSelected(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
@@ -394,6 +406,7 @@ class Table_keywords():
 
 
     def getStatus(self, sap_id, url,input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
@@ -427,6 +440,7 @@ class Table_keywords():
 
 
     def getCellToolTip(self, sap_id, url,input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         ek=ElementKeywords()
@@ -439,9 +453,13 @@ class Table_keywords():
         try:
             elem=ses.FindById(id)
             cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            value = ek.getTooltipText(cell_xpath)
-            status=sap_constants.TEST_RESULT_PASS
-            result=sap_constants.TEST_RESULT_TRUE
+            d1,d2,value,d3 = ek.getTooltipText(cell_xpath)
+            if(value!=None or value!=Null):
+                status=sap_constants.TEST_RESULT_PASS
+                result=sap_constants.TEST_RESULT_TRUE
+            else:
+                logger.print_on_console('ToolTipText not avaliable for the element ')
+                err_msg = sap_constants.ERROR_MSG
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
@@ -450,13 +468,13 @@ class Table_keywords():
 
 
     def tableCell_click(self, sap_id, url,input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
-        lk=Launch_Keywords()
-        w1,w2,wndname,w3=lk.getPageTitle()
+        w1,w2,wndname,w3=self.lk.getPageTitle()
         value = OUTPUT_CONSTANT
         err_msg=None
         try:
@@ -468,8 +486,7 @@ class Table_keywords():
             top =  cell.__getattr__("ScreenTop")
             height = cell.__getattr__("Height")
             y= top + height/2
-            rob =Robot(str(wndname))
-            rob.move_and_click( int(x), int(y),"Left")
+            pywinauto.mouse.click(button='left', coords=(int(x), int(y)))
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
@@ -482,11 +499,11 @@ class Table_keywords():
 
 
     def tableCell_doubleClick(self, sap_id, url,input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
-        lk=Launch_Keywords()
-        w1,w2,wndname,w3=lk.getPageTitle()
+        w1,w2,wndname,w3=self.lk.getPageTitle()
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
@@ -494,15 +511,13 @@ class Table_keywords():
         try:
             elem=ses.FindById(id)
             cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            left =  cell.__getattr__("ScreenLeft")
-            width = cell.__getattr__("Width")
+            left =  cell.ScreenLeft
+            width = cell.Width
             x = left + width/2
-            top =  cell.__getattr__("ScreenTop")
-            height = cell.__getattr__("Height")
+            top =  cell.ScreenTop
+            height = cell.Height
             y= top + height/2
-            rob =Robot(str(wndname))
-            rob.set_mouse_pos( int(x), int(y))
-            rob.double_click_mouse("Left")
+            pywinauto.mouse.double_click(button="left", coords = (int(x), int(y)))
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
@@ -515,6 +530,7 @@ class Table_keywords():
 
 
     def selectRow(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         rowNum=int(input_val[0])-2
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
@@ -540,6 +556,7 @@ class Table_keywords():
 
 
     def unselectRow(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
         rowNum=int(input_val[0])-2
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL

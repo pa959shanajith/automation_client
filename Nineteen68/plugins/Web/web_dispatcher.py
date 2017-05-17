@@ -189,6 +189,9 @@ class Dispatcher:
                   'getRowNumByText' : self.table_object.getRowNumByText,
                   'getColNumByText' : self.table_object.getColNumByText,
                   'getInnerTable' : self.table_object.getInnerTable,
+                  #author : arpitha.b.v
+                  #added mapping of 'getCellToolTip' to table object
+                  'getCellToolTip' : self.table_object.getCellToolTip,
 
 
                   'getElementText' : self.element_object.get_element_text,

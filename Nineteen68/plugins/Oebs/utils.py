@@ -19,6 +19,7 @@ from oebs_msg import *
 import logger
 import logging
 import json
+from PIL import ImageGrab
 import ctypes
 from ctypes import wintypes
 
@@ -323,6 +324,46 @@ class Utils:
             log.debug('MSG: Window Handle Fetch Fail')
             hwnd = None
         return hwnd
+
+
+    def captureScreenshot(self,applicationname):
+##        time.sleep(0.120)
+        image=None
+        isjavares, hwnd = self.isjavawindow(applicationname)
+        window_handle=hwnd
+        if(hwnd!=None):
+            mainhandle=hwnd
+            hdc=win32gui.GetDC(win32gui.GetDesktopWindow())
+            hdcMemDc=win32gui.CreateCompatibleDC(hdc)
+            parent=win32gui.GetWindow(window_handle,4)
+            ancestor=win32gui.GetWindow(mainhandle,3)
+            foreground=win32gui.GetForegroundWindow()
+            if foreground!=mainhandle:
+                fg_thread, fg_process_id = win32process.GetWindowThreadProcessId(foreground)
+                aut_thread, aut_process_id = win32process.GetWindowThreadProcessId(mainhandle)
+                if fg_process_id==aut_process_id:
+                    image=self.capture_window(win32gui.GetDesktopWindow())
+            else:
+                if  self.getWindowText(ancestor)!=None and len(self.getWindowText(ancestor))>0:
+                    image=self.capture_window( ancestor)
+                elif self.getWindowText(parent)!=None and len(self.getWindowText(parent))>0:
+                    image=self.capture_window(parent)
+            if image==None:
+                win32gui.SetForegroundWindow(window_handle)
+                image=self.capture_window(window_handle)
+        return image
+
+
+    def capture_window(self,handle):
+        toplist, winlist = [], []
+        def enum_cb(hwnd, results):
+            winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
+        win32gui.EnumWindows(enum_cb, toplist)
+        hwnd=win32gui.GetForegroundWindow()
+        win32gui.SetForegroundWindow(handle)
+        bbox = win32gui.GetWindowRect(handle)
+        img = ImageGrab.grab(bbox)
+        return img
 
 
 

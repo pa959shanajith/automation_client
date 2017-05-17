@@ -15,6 +15,7 @@ import sap_constants
 import time
 from constants import *
 from saputil_operations import SapUtilKeywords
+from launch_keywords import Launch_Keywords
 import logging
 import logging.config
 log = logging.getLogger('dropdown_keywords.py')
@@ -22,8 +23,10 @@ log = logging.getLogger('dropdown_keywords.py')
 class Dropdown_Keywords():
     def __init__(self):
         self.uk = SapUtilKeywords()
+        self.lk = Launch_Keywords()
 
     def getSelected(self,sap_id, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -120,6 +123,7 @@ class Dropdown_Keywords():
 ##        return status,result,value,err_msg
 
     def selectValueByText(self,sap_id,url,input_val, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -156,6 +160,7 @@ class Dropdown_Keywords():
 
 
     def verifySelectedValue(self,sap_id,url,input_val ,*args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         val=input_val[0]
         status = sap_constants.TEST_RESULT_FAIL
@@ -185,6 +190,7 @@ class Dropdown_Keywords():
 
 
     def getCount(self,sap_id, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -214,6 +220,7 @@ class Dropdown_Keywords():
         return status,result,value,err_msg
 
     def verifyCount(self,sap_id,url,input_val, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         length = int(input_val[0])
         verb = OUTPUT_CONSTANT
@@ -248,6 +255,7 @@ class Dropdown_Keywords():
         return status,result,verb,err_msg
 
     def verifyValuesExists(self,sap_id,url,input_val, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -282,6 +290,7 @@ class Dropdown_Keywords():
 
 
     def verifyAllValues(self,sap_id,url,input_val, *args):
+        self.lk.setWindowToForeground(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         id,ses=self.uk.getSapElement(sap_id)

@@ -20,7 +20,6 @@ from collections import OrderedDict
 import constants
 import logger
 import logging
-import  ftfy
 
 
 
@@ -94,6 +93,7 @@ class Handler():
         return : None
 
         """
+        import  ftfy
         global ws_template
         global ws_templates_dict
         log.debug('Parsing')

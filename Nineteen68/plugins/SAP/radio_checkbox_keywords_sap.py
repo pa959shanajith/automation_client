@@ -12,6 +12,7 @@ import sap_constants
 import logger
 from constants import *
 from saputil_operations import SapUtilKeywords
+from launch_keywords import Launch_Keywords
 import logging
 import logging.config
 log = logging.getLogger('radio_checkbox_keywords_sap.py')
@@ -19,8 +20,10 @@ log = logging.getLogger('radio_checkbox_keywords_sap.py')
 class Radio_Checkbox_keywords():
     def __init__(self):
         self.uk = SapUtilKeywords()
+        self.lk = Launch_Keywords()
 
     def select_radiobutton(self, sap_id, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
@@ -49,6 +52,7 @@ class Radio_Checkbox_keywords():
         return status,result,value,err_msg
 
     def select_checkbox(self, sap_id , *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
@@ -78,6 +82,7 @@ class Radio_Checkbox_keywords():
         return status,result,value,err_msg
 
     def unselect_checkbox(self, sap_id, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
@@ -107,6 +112,7 @@ class Radio_Checkbox_keywords():
         return status,result,value,err_msg
 
     def get_status(self, sap_id, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
