@@ -10,9 +10,11 @@
 #-------------------------------------------------------------------------------
 
 import datetime
+import calendar
 import logger
 import generic_constants
 from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 import logging
 
 from constants import *
@@ -225,7 +227,107 @@ class DateOperation:
         return status,result,output,err_msg
 
 
+    def monthAddition(self,input_date, date_or_count ,date_format):
+        """
+        author : arpitha.b.v
+        def : monthAddition
+        purpose : addition of months
+        param  : string,string,string
+        return : string
+        """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
+        err_msg = None
+        try:
+            if not (input_date is None or input_date is ''):
+                if not (date_or_count is None or date_or_count is ''):
+                    if not (date_format is None or date_format is ''):
+                        ret_inp_format = self.validate(date_format)
+                        if ret_inp_format != -1:
+                                count = datetime.datetime.strptime(input_date, ret_inp_format)
+                                temp = count+relativedelta(months=+int(date_or_count))
+                                count = datetime.datetime.strptime(input_date, ret_inp_format)
+                                monthVal=int(date_or_count)
+                                temp = count + relativedelta(months = + monthVal)
+                                output = temp.strftime(ret_inp_format)
+                                logger.print_on_console('Output is :' ,output)
+                                log.info('output is')
+                                log.info(output)
+                                status=generic_constants.TEST_RESULT_PASS
+                                result=generic_constants.TEST_RESULT_TRUE
+                        else:
+                            #logger.print_on_console('Format not supported')
+                    #err_msg = 'Format not supported'
+                             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                    else:
+                        #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                else:
+                   # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+            else:
+                #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
 
+        except Exception as e:
+            log.error(e)
+            err_msg=generic_constants.ERR_MSG1+' monthAddition'
+        if err_msg!=None:
+            import traceback
+            traceback.print_exc()
+            logger.print_on_console(err_msg)
+        return status,result,output,err_msg
+
+    def yearAddition(self,input_date, date_or_count ,date_format):
+        """
+        author : arpitha.b.v
+        def : yearAddition
+        purpose : addition of years
+        param  : string,string,string
+        return : string
+        """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
+        err_msg = None
+        try:
+            if not (input_date is None or input_date is ''):
+                if not (date_or_count is None or date_or_count is ''):
+                    if not (date_format is None or date_format is ''):
+                        ret_inp_format = self.validate(date_format)
+                        if ret_inp_format != -1:
+                                count = datetime.datetime.strptime(input_date, ret_inp_format)
+                                temp = count+relativedelta(months=+int(date_or_count))
+                                count = datetime.datetime.strptime(input_date, ret_inp_format)
+                                yearVal=int(date_or_count)
+                                temp = count + relativedelta(years = + yearVal)
+                                output = temp.strftime(ret_inp_format)
+                                logger.print_on_console('Output is :' ,output)
+                                log.info('output is')
+                                log.info(output)
+                                status=generic_constants.TEST_RESULT_PASS
+                                result=generic_constants.TEST_RESULT_TRUE
+                        else:
+                            #logger.print_on_console('Format not supported')
+                    #err_msg = 'Format not supported'
+                             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                    else:
+                        #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                else:
+                   # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+            else:
+                #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+
+        except Exception as e:
+            log.error(e)
+            err_msg=generic_constants.ERR_MSG1+' yearAddition'
+        if err_msg!=None:
+            import traceback
+            traceback.print_exc()
+            logger.print_on_console(err_msg)
+        return status,result,output,err_msg
 
     def changeDateFormat(self,inp_date,inp_date_format,out_format):
         """
