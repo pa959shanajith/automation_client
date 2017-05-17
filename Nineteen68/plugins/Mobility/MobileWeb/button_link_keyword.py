@@ -117,7 +117,7 @@ class ButtonLinkKeyword():
                     buttonname = webelement.get_attribute(webconstants.VALUE)
                     log.info('Button name fetched from the AUT using value attribute')
                     log.info(buttonname)
-                    logger.print_on_console('Button name : ' , buttonname)
+##                    logger.print_on_console('Button name : ' , buttonname)
                     status = webconstants.TEST_RESULT_PASS
                     methodoutput = webconstants.TEST_RESULT_TRUE
                     output = buttonname
@@ -127,7 +127,17 @@ class ButtonLinkKeyword():
                     buttonname = webelement.get_attribute(webconstants.NAME)
                     log.info('Button name fetched from the AUT using name attribute')
                     log.info(buttonname)
-                    logger.print_on_console('Button name : ' , buttonname)
+##                    logger.print_on_console('Button name : ' , buttonname)
+                    status = webconstants.TEST_RESULT_PASS
+                    methodoutput = webconstants.TEST_RESULT_TRUE
+                    output = buttonname
+                if buttonname == None or len(buttonname) == 0:
+                    log.debug('Button name not recieved using selenium text method/ value attribute, Getting name attribute')
+                    #if value is empty search for the name attribute
+                    buttonname = webelement.get_attribute(webconstants.ALT)
+                    log.info('Button name fetched from the AUT using name attribute')
+                    log.info(buttonname)
+##                    logger.print_on_console('Button name : ' , buttonname)
                     status = webconstants.TEST_RESULT_PASS
                     methodoutput = webconstants.TEST_RESULT_TRUE
                     output = buttonname
@@ -154,7 +164,7 @@ class ButtonLinkKeyword():
                 log.debug('Going to fetch the button name')
                 buttonname = webelement.text
                 log.info('Button name fetched from the AUT using selenium')
-                logger.print_on_console('Button name : ' , buttonname)
+##                logger.print_on_console('Button name : ' , buttonname)
 
                 if buttonname == None or len(buttonname) == 0:
                     log.debug('Button name not recieved using selenium text method, Getting value attribute')
@@ -162,19 +172,29 @@ class ButtonLinkKeyword():
                     buttonname = webelement.get_attribute(webconstants.VALUE)
                     log.info('Button name fetched from the AUT using value attribute')
                     log.info(buttonname)
-                    logger.print_on_console('Button name : ' , buttonname)
+##                    logger.print_on_console('Button name : ' , buttonname)
                 if buttonname == None or len(buttonname) == 0:
                     log.debug('Button name not recieved using selenium text method/ value attribute, Getting name attribute')
                     #if value is empty search for the name attribute
                     buttonname = webelement.get_attribute(webconstants.NAME)
                     log.info('Button name fetched from the AUT using name attribute')
                     log.info(buttonname)
-                    logger.print_on_console('Button name : ' , buttonname)
+##                    logger.print_on_console('Button name : ' , buttonname)
+                if buttonname == None or len(buttonname) == 0:
+                    log.debug('Button name not recieved using selenium text method/ value attribute, Getting name attribute')
+                    #if value is empty search for the name attribute
+                    buttonname = webelement.get_attribute(webconstants.ALT)
+                    log.info('Button name fetched from the AUT using name attribute')
+                    log.info(buttonname)
+##                    logger.print_on_console('Button name : ' , buttonname)
+                    status = webconstants.TEST_RESULT_PASS
+                    methodoutput = webconstants.TEST_RESULT_TRUE
+                    output = buttonname
 
                 #Remove the leading and trailing spaces
                 input = inputs[0]
                 input = input.strip()
-                logger.print_on_console('Input text : ' , input)
+##                logger.print_on_console('Input text : ' , input)
                 #Check for the input
                 if input != None and len(input) != 0:
                     log.info('Input is valid, Continue..')
