@@ -143,8 +143,8 @@ class Table_keywords():
             elem=ses.FindById(id)
             no_of_cols = elem.Columns.Length
             no_of_rows = elem.RowCount
-            for i in range(0, no_of_rows):
-                for j in range(0, no_of_cols):
+            for i in range(-1, no_of_rows):
+                for j in range(-1, no_of_cols):
                     if(colText in elem.GetCell(i,j).text):
                         value = j+2
                         break
