@@ -20,7 +20,8 @@ import oebs_keyboardops
 import oebs_serverUtilities
 from oebs_utilops import UtilOperations
 import time
-
+import pythoncom
+pythoncom.CoInitialize()
 shell = win32com.client.Dispatch("WScript.Shell")
 
 log = logging.getLogger('oebs_textops.py')
