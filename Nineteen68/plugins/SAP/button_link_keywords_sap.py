@@ -25,9 +25,10 @@ log = logging.getLogger('button_link_keywords_sap.py')
 class ButtonLinkKeyword():
     def __init__(self):
         self.uk = SapUtilKeywords()
+        self.lk = Launch_Keywords()
 
     def click(self, sap_id, *args):
-
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
@@ -55,6 +56,7 @@ class ButtonLinkKeyword():
         return status,result,value,err_msg
 
     def get_button_name(self,  sap_id ,url, input_val, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
@@ -86,6 +88,7 @@ class ButtonLinkKeyword():
         return status,result,value,err_msg
 
     def verify_button_name(self,  sap_id ,url, input_val, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
@@ -116,6 +119,7 @@ class ButtonLinkKeyword():
         return status,result,value,err_msg
 
     def button_uploadFile(self,sap_id, url, input_val, *args):
+        self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE

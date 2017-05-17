@@ -468,6 +468,26 @@ class Launch_Keywords():
         #img.save(r'.\screenshot.png')
         return img
 
+    def setWindowToForeground(self,sap_id):
+        try:
+            i=sap_id.index("/")
+            wndNAME=sap_id[:i]
+            handle = win32gui.FindWindow(None, wndNAME)
+            foreground_handle = win32gui.GetForegroundWindow()
+            if(handle != foreground_handle):
+                foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
+                appThread = win32api.GetCurrentThreadId()
+                if( foreThread != appThread ):
+                    win32process.AttachThreadInput(foreThread[0], appThread, True)
+                    win32gui.BringWindowToTop(handle)
+                    win32gui.ShowWindow(handle,5)
+                    win32process.AttachThreadInput(foreThread[0], appThread, False)
+                else:
+                    win32gui.BringWindowToTop(handle)
+                    win32gui.ShowWindow(handle,5)
+        except Exception as e:
+            logger.print_on_console("The following error has occoured while bringing window to foreground",e)
+
     def capture_window(self,handle):
         toplist, winlist = [], []
         def enum_cb(hwnd, results):

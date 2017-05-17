@@ -103,6 +103,7 @@ class ScrapeWindow(wx.Frame):
             data['mirror'] =encoded_string.encode('UTF-8').strip()
             data['view'] = d
             self.socketIO.emit('scrape',data)
+            os.remove("out.png")
             self.Close()
 
     def fullscrape(self,event):
@@ -132,6 +133,7 @@ class ScrapeWindow(wx.Frame):
 ##                json.dump(data, outfile, indent=4, sort_keys=False)
 ##                outfile.close()
         self.socketIO.emit('scrape',data)
+        os.remove("out.png")
         self.Close()
 
 
