@@ -270,52 +270,52 @@ class Table_keywords():
 
 
 
-    def cellClick(self, sap_id,url, input_val,*args):
-        self.lk.setWindowToForeground(sap_id)
-        row=int(input_val[0])-2
-        col=int(input_val[1])-2
-        text=input_val[2]
-        id,ses=self.uk.getSapElement(sap_id)
-        rk=Radio_Checkbox_keywords()
-        bk =ButtonLinkKeyword()
-        dk = Dropdown_Keywords()
-        url=''#dummy variable
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        value = OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            object_type_input = ses.FindById(id).type
-            elem=ses.FindById(id)
-            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            if(cell.__getattr__("type") != object_type_input):
-                print "Error: Type Mismatch"
-            else:
-                if(object_type_input == "GuiTextField" or object_type_input == "GuiCTextField"):
-                    cell.setFocus()
-                    result = True
-                if(object_type_input == "GuiCheckBox"):
-                    status,result,isSelected,err_msg = rk.checkbox_getStatus(cell_xpath)
-                    if(isSelected == sap_constants.CHECKED_CHECK):
-                        status,result,value,err_msg = rk.select_checkbox(cell_xpath)
-                    else:
-                        status,result,value,err_msg = rk.unselect_checkbox(cell_xpath)
-
-                if(object_type_input == "GuiRadioButton"):
-                    status,result,value,err_msg = rk.select_radiobutton(cell_xpath)
-
-                if(object_type_input == "GuiButton"):
-                    status,result,value,err_msg = bk.click(cell_xpath)
-
-                if(object_type_input == "GuiComboBox"):
-                    if( text != None or text != ''):
-                        status,result,value,err_msg = dk.selectValueByText(cell_xpath,url, text)
-                    else:
-                        logger.print_on_console('Text is not Entered to perform this action')
-        except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-        return status,result,value,err_msg
+##    def cellClick(self, sap_id,url, input_val,*args):
+##        self.lk.setWindowToForeground(sap_id)
+##        row=int(input_val[0])-2
+##        col=int(input_val[1])-2
+##        text=input_val[2]
+##        id,ses=self.uk.getSapElement(sap_id)
+##        rk=Radio_Checkbox_keywords()
+##        bk =ButtonLinkKeyword()
+##        dk = Dropdown_Keywords()
+##        url=''#dummy variable
+##        status = sap_constants.TEST_RESULT_FAIL
+##        result = sap_constants.TEST_RESULT_FALSE
+##        value = OUTPUT_CONSTANT
+##        err_msg=None
+##        try:
+##            object_type_input = ses.FindById(id).type
+##            elem=ses.FindById(id)
+##            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
+##            if(cell.__getattr__("type") != object_type_input):
+##                print "Error: Type Mismatch"
+##            else:
+##                if(object_type_input == "GuiTextField" or object_type_input == "GuiCTextField"):
+##                    cell.setFocus()
+##                    result = True
+##                if(object_type_input == "GuiCheckBox"):
+##                    status,result,isSelected,err_msg = rk.checkbox_getStatus(cell_xpath)
+##                    if(isSelected == sap_constants.CHECKED_CHECK):
+##                        status,result,value,err_msg = rk.select_checkbox(cell_xpath)
+##                    else:
+##                        status,result,value,err_msg = rk.unselect_checkbox(cell_xpath)
+##
+##                if(object_type_input == "GuiRadioButton"):
+##                    status,result,value,err_msg = rk.select_radiobutton(cell_xpath)
+##
+##                if(object_type_input == "GuiButton"):
+##                    status,result,value,err_msg = bk.click(cell_xpath)
+##
+##                if(object_type_input == "GuiComboBox"):
+##                    if( text != None or text != ''):
+##                        status,result,value,err_msg = dk.selectValueByText(cell_xpath,url, text)
+##                    else:
+##                        logger.print_on_console('Text is not Entered to perform this action')
+##        except Exception as e:
+##            log.error('Error occured',e)
+##            err_msg = sap_constants.ERROR_MSG
+##        return status,result,value,err_msg
 
 
 
