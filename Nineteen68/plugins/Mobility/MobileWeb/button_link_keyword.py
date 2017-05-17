@@ -117,6 +117,7 @@ class ButtonLinkKeyword():
                     buttonname = webelement.get_attribute(webconstants.VALUE)
                     log.info('Button name fetched from the AUT using value attribute')
                     log.info(buttonname)
+                    
 ##                    logger.print_on_console('Button name : ' , buttonname)
                     status = webconstants.TEST_RESULT_PASS
                     methodoutput = webconstants.TEST_RESULT_TRUE
