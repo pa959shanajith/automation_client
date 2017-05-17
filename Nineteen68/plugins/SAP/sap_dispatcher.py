@@ -107,7 +107,7 @@ class SAPDispatcher:
                   'verifycellvalue':self.table_keywords_obj.verifyCellValue,
                   #commenting dropdown code inside table cell
                   'verifytextexists':self.table_keywords_obj.verifyTextExists,
-                  'cellclick':self.table_keywords_obj.cellClick,
+##                  'cellclick':self.table_keywords_obj.cellClick,
 ##                  'selectvaluebyindex':self.table_keywords_obj.selectValueByIndex,
 ##                  'selectvaluebytext':self.table_keywords_obj.selectValueByText,
 ##                  'getselected':self.table_keywords_obj.getSelected,
