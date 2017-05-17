@@ -125,7 +125,9 @@ class ElementKeywords():
                     value = ses.FindById(id).tooltip
                     if value== '':
                         value = ses.FindById(id).DefaultTooltip
-                    if(value != None):
+                        if value =='':
+                            value =Null
+                    if(value != None or value !=Null):
                         status=sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
                     else:
