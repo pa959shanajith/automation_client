@@ -144,7 +144,7 @@ CLOSE_BROWSER='closeBrowser'
 
 
 NON_WEBELEMENT_KEYWORDS=['openBrowser','openNewBrowser','navigateToURL','getPageTitle','verifyPageTitle','getCurrentURL','verifyCurrentURL','closeBrowser',
-'switchToWindow','closeSubWindows','verifyTextExists','waitForElementVisible','refresh','maximizeBrowser','getCurrentURL','acceptPopUp','dismissPopUp',
+'switchToWindow','closeSubWindows','verifyTextExists','waitForElementVisible','ActionKey','refresh','maximizeBrowser','getCurrentURL','acceptPopUp','dismissPopUp',
 'getPopUpText','verifyPopUpText','clearCache','navigateWithAuthenticate']
 
 FOUND='found'
