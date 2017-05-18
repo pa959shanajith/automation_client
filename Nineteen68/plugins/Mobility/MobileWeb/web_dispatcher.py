@@ -20,6 +20,7 @@ import textbox_operations
 import dropdown_listbox
 import utilweb_operations
 import static_text_keywords
+import mob_screenshot_web
 import logger
 from webconstants import *
 import custom_keyword
@@ -27,6 +28,7 @@ from collections import OrderedDict
 from constants import *
 import action_keyowrds
 import requests
+import readconfig
 import re
 
 import logging
@@ -300,6 +302,19 @@ class Dispatcher:
             else:
                 err_msg=INVALID_KEYWORD
                 result[3]=err_msg
+            screen_shot_obj = mob_screenshot_web.Screenshot()
+
+            configobj = readconfig.readConfig()
+
+            configvalues = configobj.readJson()
+
+            if configvalues['screenShot_Flag'].lower() == 'fail':
+
+                if result[0].lower() == 'fail':
+
+                    screen_shot_obj.captureScreenshot()
+            elif configvalues['screenShot_Flag'].lower() == 'all':
+                screen_shot_obj.captureScreenshot()
         except TypeError as e:
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
