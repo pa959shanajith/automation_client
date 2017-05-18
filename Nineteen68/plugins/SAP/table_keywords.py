@@ -44,26 +44,6 @@ class Table_keywords():
         return cell,cell_xpath
 
 
-
-    def setFocus(self, sap_id, *args):
-        self.lk.setWindowToForeground(sap_id)
-        id,ses=self.uk.getSapElement(sap_id)
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        value = OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            elem=ses.FindById(id)
-            elem.SetFocus()
-            status=sap_constants.TEST_RESULT_PASS
-            result=sap_constants.TEST_RESULT_TRUE
-        except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-        return status,result,value,err_msg
-
-
-
     def getRowCount(self, sap_id, *args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
@@ -99,36 +79,6 @@ class Table_keywords():
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
         return status,result,value,err_msg
-
-
-
-    def mouseHover(self, sap_id,url, input_val,*args):
-        self.lk.setWindowToForeground(sap_id)
-        row=int(input_val[0])-2
-        col=int(input_val[1])-2
-        id,ses=self.uk.getSapElement(sap_id)
-        w1,w2,wndname,w3=self.lk.getPageTitle()
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        value = OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            elem=ses.FindById(id)
-            cell = elem.GetCell(row, col)
-            left =  cell.__getattr__("ScreenLeft")
-            width = cell.__getattr__("Width")
-            x = left + width/2
-            top =  cell.__getattr__("ScreenTop")
-            height = cell.__getattr__("Height")
-            y= top + height/2
-            pywinauto.mouse.move(coords=(int(x), int(y)))
-            status=sap_constants.TEST_RESULT_PASS
-            result=sap_constants.TEST_RESULT_TRUE
-        except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-        return status,result,value,err_msg
-
 
 
     def getColNumByText(self, sap_id,url, input_val,*args):
@@ -436,97 +386,6 @@ class Table_keywords():
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
         return status,result,value,err_msg
-
-
-
-    def getCellToolTip(self, sap_id, url,input_val,*args):
-        self.lk.setWindowToForeground(sap_id)
-        row=int(input_val[0])-2
-        col=int(input_val[1])-2
-        ek=ElementKeywords()
-        id,ses=self.uk.getSapElement(sap_id)
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        """Object type is dropdown and lists. For SAP, we only have dropdowns."""
-        value = OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            elem=ses.FindById(id)
-            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            d1,d2,value,d3 = ek.getTooltipText(cell_xpath)
-            if(value!=None or value!=Null):
-                status=sap_constants.TEST_RESULT_PASS
-                result=sap_constants.TEST_RESULT_TRUE
-            else:
-                logger.print_on_console('ToolTipText not avaliable for the element ')
-                err_msg = sap_constants.ERROR_MSG
-        except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-        return status,result,value,err_msg
-
-
-
-    def tableCell_click(self, sap_id, url,input_val,*args):
-        self.lk.setWindowToForeground(sap_id)
-        row=int(input_val[0])-2
-        col=int(input_val[1])-2
-        id,ses=self.uk.getSapElement(sap_id)
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        w1,w2,wndname,w3=self.lk.getPageTitle()
-        value = OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            elem=ses.FindById(id)
-            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            left =  cell.__getattr__("ScreenLeft")
-            width = cell.__getattr__("Width")
-            x = left + width/2
-            top =  cell.__getattr__("ScreenTop")
-            height = cell.__getattr__("Height")
-            y= top + height/2
-            pywinauto.mouse.click(button='left', coords=(int(x), int(y)))
-            status=sap_constants.TEST_RESULT_PASS
-            result=sap_constants.TEST_RESULT_TRUE
-        except Exception as e:
-            log.error('Error occured',e)
-            import traceback
-            traceback.print_exc()
-            err_msg = sap_constants.ERROR_MSG
-        return status,result,value,err_msg
-
-
-
-    def tableCell_doubleClick(self, sap_id, url,input_val,*args):
-        self.lk.setWindowToForeground(sap_id)
-        row=int(input_val[0])-2
-        col=int(input_val[1])-2
-        id,ses=self.uk.getSapElement(sap_id)
-        w1,w2,wndname,w3=self.lk.getPageTitle()
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        value = OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            elem=ses.FindById(id)
-            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            left =  cell.ScreenLeft
-            width = cell.Width
-            x = left + width/2
-            top =  cell.ScreenTop
-            height = cell.Height
-            y= top + height/2
-            pywinauto.mouse.double_click(button="left", coords = (int(x), int(y)))
-            status=sap_constants.TEST_RESULT_PASS
-            result=sap_constants.TEST_RESULT_TRUE
-        except Exception as e:
-            log.error('Error occured',e)
-            import traceback
-            traceback.print_exc()
-            err_msg = sap_constants.ERROR_MSG
-        return status,result,value,err_msg
-
 
 
     def selectRow(self, sap_id,url, input_val,*args):

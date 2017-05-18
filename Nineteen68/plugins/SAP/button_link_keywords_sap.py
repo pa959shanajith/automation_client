@@ -27,33 +27,33 @@ class ButtonLinkKeyword():
         self.uk = SapUtilKeywords()
         self.lk = Launch_Keywords()
 
-    def click(self, sap_id, *args):
-        self.lk.setWindowToForeground(sap_id)
-        id,ses=self.uk.getSapElement(sap_id)
-        status=sap_constants.TEST_RESULT_FAIL
-        result=sap_constants.TEST_RESULT_FALSE
-        #log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        #verb = OUTPUT_CONSTANT
-        value=OUTPUT_CONSTANT
-        err_msg=None
-        try:
-                if(id != None):
-                 if(ses.FindById(id).Changeable == True):
-                    ses.FindById(id).Press()
-                    status =sap_constants.TEST_RESULT_PASS
-                    result = sap_constants.TEST_RESULT_TRUE
-                 else:
-                        log.info('Element state does not allow to perform the operation')
-                        err_msg = 'Element state does not allow to perform the operation'
-                else:
-                    log.info('element not present on the page where operation is trying to be performed')
-                    err_msg = 'element not present on the page where operation is trying to be performed'
-        except Exception as e:
-            import traceback
-            traceback.getexc()
-##            logger.print_on_console('Error has occured',e)
-            log.error(e)
-        return status,result,value,err_msg
+##    def click(self, sap_id, *args):
+##        self.lk.setWindowToForeground(sap_id)
+##        id,ses=self.uk.getSapElement(sap_id)
+##        status=sap_constants.TEST_RESULT_FAIL
+##        result=sap_constants.TEST_RESULT_FALSE
+##        #log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+##        #verb = OUTPUT_CONSTANT
+##        value=OUTPUT_CONSTANT
+##        err_msg=None
+##        try:
+##                if(id != None):
+##                 if(ses.FindById(id).Changeable == True):
+##                    ses.FindById(id).Press()
+##                    status =sap_constants.TEST_RESULT_PASS
+##                    result = sap_constants.TEST_RESULT_TRUE
+##                 else:
+##                        log.info('Element state does not allow to perform the operation')
+##                        err_msg = 'Element state does not allow to perform the operation'
+##                else:
+##                    log.info('element not present on the page where operation is trying to be performed')
+##                    err_msg = 'element not present on the page where operation is trying to be performed'
+##        except Exception as e:
+##            import traceback
+##            traceback.getexc()
+####            logger.print_on_console('Error has occured',e)
+##            log.error(e)
+##        return status,result,value,err_msg
 
     def get_button_name(self,  sap_id ,url, input_val, *args):
         self.lk.setWindowToForeground(sap_id)
