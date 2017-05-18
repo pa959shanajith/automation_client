@@ -8,7 +8,6 @@
 # Copyright:   (c) sushma.p 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-
 import sap_constants
 #import launch_keywords
 import win32com.client
@@ -19,7 +18,6 @@ import time
 import logging
 import logging.config
 log = logging.getLogger('saputil_operations.py')
-from pyrobot import Robot
 class SapUtilKeywords:
 
 
@@ -118,28 +116,3 @@ class SapUtilKeywords:
              log.error('Error occured',e)
         return status,result,value,err_msg
 
-    def setFocus(self, sap_id, *args):
-        id,ses=self.getSapElement(sap_id)
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        wndname = ses.ActiveWindow.Text
-        value = OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            if(id != None):
-                elem=ses.FindById(id)
-                left =  elem.__getattr__("ScreenLeft")
-                width = elem.__getattr__("Width")
-                x = left + width/2
-                top =  elem.__getattr__("ScreenTop")
-                height = elem.__getattr__("Height")
-                y= top + height/2
-                rob =Robot(str(wndname))
-                rob.set_mouse_pos( int(x), int(y))
-                elem.SetFocus()
-                status=sap_constants.TEST_RESULT_PASS
-                result=sap_constants.TEST_RESULT_TRUE
-        except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-        return status,result,value,err_msg

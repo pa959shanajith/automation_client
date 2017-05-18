@@ -18,6 +18,7 @@ import wx
 import os
 import base64
 import json
+import time
 from constants import *
 from socketIO_client import SocketIO,BaseNamespace
 
@@ -84,13 +85,19 @@ class ScrapeDispatcher(wx.Frame):
     ##            print desktop_scraping.finalJson
             logger.print_on_console('Stopped click and add')
             logger.print_on_console( 'Scrapped data saved successfully in domelements.json file')
-            img = self.utils_obj.captureScreenshot(windownametoscrape)
-            img.save('oebs_form.png')
-            with open("oebs_form.png", "rb") as image_file:
-                      encoded_string = base64.b64encode(image_file.read())
+            try:
+                self.Iconize(True)
+                #providing 1 sec delay to minimize wx scrape window to hide in screenshot
+                time.sleep(1)
+                img = self.utils_obj.captureScreenshot(windownametoscrape)
+                img.save('oebs_form.png')
+                with open("oebs_form.png", "rb") as image_file:
+                          encoded_string = base64.b64encode(image_file.read())
 
-            d = json.loads(d);
-            d['mirror'] =encoded_string.encode('UTF-8').strip()
+                d = json.loads(d);
+                d['mirror'] =encoded_string.encode('UTF-8').strip()
+            except Exception as e:
+                logger.print_on_console('Error occured while capturing Screenshot',e)
             self.socketIO.emit('scrape',d)
     ##            wx.MessageBox('CLICKANDADD: Scrape completed', 'Info',wx.OK | wx.ICON_INFORMATION)
             self.Close()
@@ -106,13 +113,19 @@ class ScrapeDispatcher(wx.Frame):
         scrape_obj=oebs_fullscrape.FullScrape()
         print("windowname to scrape : ",windownametoscrape)
         d = scrape_obj.getentireobjectlist(windownametoscrape)
-        img = self.utils_obj.captureScreenshot(windownametoscrape)
-        img.save('oebs_form.png')
-        with open("oebs_form.png", "rb") as image_file:
-                  encoded_string = base64.b64encode(image_file.read())
-        d = json.loads(d);
+        try:
+            self.Iconize(True)
+            #providing 1 sec delay to minimize wx scrape window to hide in screenshot
+            time.sleep(1)
+            img = self.utils_obj.captureScreenshot(windownametoscrape)
+            img.save('oebs_form.png')
+            with open("oebs_form.png", "rb") as image_file:
+                      encoded_string = base64.b64encode(image_file.read())
+            d = json.loads(d);
 
-        d['mirror'] =encoded_string.encode('UTF-8').strip()
+            d['mirror'] =encoded_string.encode('UTF-8').strip()
+        except Exception as e:
+            logger.print_on_console('Error occured while capturing Screenshot ',e)
         self.socketIO.emit('scrape',d)
         self.Close()
         logger.print_on_console('Full scrape  completed')

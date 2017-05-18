@@ -28,6 +28,7 @@ import socket
 import logging
 import utils
 import ast
+import pythoncom
 access=''
 index=0
 states = []
@@ -54,7 +55,7 @@ a = None
 ##objects = []
 
 log = logging.getLogger('oebsclickandadd.py')
-
+win_rect = ''
 class ClickAndAdd:
 
     def __init__(self):
@@ -71,6 +72,9 @@ class ClickAndAdd:
             map = {}
             if(operation == 'STARTCLICKANDADD'):
                 map = self.createObjectMap(windowname)
+            #Getting window rectangle coordinates based on handle
+            global win_rect
+            win_rect= win32gui.GetWindowRect(hwnd)
             result = self.perform_clickandadd(oebs_api.JABContext(hwnd),map,windowname,operation)
             return result
         else:
@@ -317,6 +321,16 @@ class ClickAndAdd:
                             y_coor=curaccinfo.y
                             width=curaccinfo.width
                             height=curaccinfo.height
+                            #Calculating co ordinates for embedded screenshots
+                            x1_win = win_rect[0]
+                            y1_win = win_rect[1]
+                            x2_win = win_rect[2]
+                            y2_win = win_rect[3]
+                            width_win = x2_win - x1_win
+                            height_win = y2_win - y1_win
+                            left_need = x_coor - x1_win
+                            top_need =  y_coor - y1_win
+
                             description = 'null'
                             xpathwithindex = ''
                             if xpath == '':
@@ -403,8 +417,8 @@ class ClickAndAdd:
                                                 "id":'null',
                                                 "text":text,
                                                 "url":window,
-                                                "x_coor":x_coor,
-                                                "y_coor":y_coor,
+                                                "left":left_need,
+                                                "top":top_need,
                                                 "width":width,
                                                 "height":height})
                             for i in range(curaccinfo.childrenCount):
@@ -458,6 +472,7 @@ class ClickAndAdd:
                         global counter;
                         counter += 1
                         if counter > 1:
+                            pythoncom.CoInitialize()
                             wsh = win32com.client.Dispatch("WScript.Shell")
                             wsh.SendKeys("^")
                     def run(self):
@@ -539,6 +554,7 @@ class ClickAndAdd:
                     def StopPump(self):
     ##                    print 'STOP pump'
                         self.stopumpingmsgs = True
+                        pythoncom.CoInitialize()
                         wsh = win32com.client.Dispatch("WScript.Shell")
                         wsh.SendKeys("^")
                 global a

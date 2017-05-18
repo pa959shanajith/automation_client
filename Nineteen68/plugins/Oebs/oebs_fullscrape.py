@@ -18,6 +18,7 @@ from oebs_msg import *
 import ast
 import json
 import re
+import win32gui
 access=''
 index=0
 k = 0
@@ -141,6 +142,25 @@ class FullScrape:
             text = text.encode('utf-8').strip()
             text = str(text)
             text = text.strip()
+            #Calculating co ordinates for embedded screenshots
+            utils_obj=utils.Utils()
+            isjavares, hwnd = utils_obj.isjavawindow(window)
+            win_rect= win32gui.GetWindowRect(hwnd)
+            x1_win = win_rect[0]
+            y1_win = win_rect[1]
+            x2_win = win_rect[2]
+            y2_win = win_rect[3]
+            width_win = x2_win - x1_win
+            height_win = y2_win - y1_win
+
+            x_coor=curaccinfo.x
+            y_coor=curaccinfo.y
+            width=curaccinfo.width
+            height=curaccinfo.height
+
+            left_need = x_coor - x1_win
+            top_need =  y_coor - y1_win
+
             if len(text) == 0:
                 text = tagname
             text = text.replace('<','')
@@ -151,7 +171,11 @@ class FullScrape:
                     'hiddentag':'No',
                     'id':'null',
                     "text":text.strip(),
-                    "url":window})
+                    "url":window,
+                    "left":left_need,
+                    "top":top_need,
+                    "width":width,
+                    "height":height})
         for i in range(curaccinfo.childrenCount):
             childacc = acc.getAccessibleChildFromContext(i)
             self.acccontext(childacc, tempne,path,i,window)

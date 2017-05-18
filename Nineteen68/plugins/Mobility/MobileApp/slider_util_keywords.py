@@ -176,9 +176,10 @@ class SliderKeywords():
                     element=dispatcher.getMobileElement(install_and_launch.driver,object_name)
                     later=time.time()
                     if int(later-start_time)>=int(timeout):
+                        logger.print_on_console('Delay timeout')
                         break
                     if element!=None:
-                        logger.print_on_console('Element not found')
+                        logger.print_on_console('Element Exists')
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                         break
