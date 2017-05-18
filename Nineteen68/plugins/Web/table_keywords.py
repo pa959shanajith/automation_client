@@ -252,6 +252,73 @@ class TableOperationKeywords():
                 logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
             return status,methodoutput,tooltip,err_msg
 
+
+
+            """
+            author : arpitha.b.v
+            def : verifyCellToolTip
+            purpose : checking the toolTipvalue
+            param  : webelement,list
+            return : bool
+            """
+
+        def verifyCellToolTip(self,webElement,input_val,*args):
+            logger.print_on_console('Executing keyword : verifyCellToolTip')
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
+            verifytooltip=None
+            driver=browser_Keywords.driver_obj
+            err_msg=None
+            log.debug('got the driver instance from browser keyword')
+            visibleFlag=True
+            if visibleFlag==True:
+                try:
+                    log.debug('reading the inputs')
+                    if(len(input_val) > 1):
+                        row_number=int(input_val[0])
+                        col_number=int(input_val[1])
+                        row_count=self.getRowCountJs(webElement)
+                        col_count=self.getColoumnCountJs(webElement)
+                        if row_number>row_count or col_number>col_count:
+                            log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        else:
+                            log.debug('perfoming java script on element')
+                            contents = self.getTooltip(webElement, row_number,
+        							col_number);
+                            if contents !=None:
+                                verifytooltip=contents
+                                expected_value=input_val[2].strip()
+
+                            if(verifytooltip == expected_value):
+                                log.info('Got the result : %s', verifytooltip)
+                                logger.print_on_console('Got the result : ',verifytooltip)
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                            else:
+                                log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                logger.print_on_console('Actual value is : ',verifytooltip)
+                                logger.print_on_console('Expected value is : ',expected_value)
+                    else:
+                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+
+                except Exception as e:
+                    log.error(e)
+
+                    logger.print_on_console(e)
+                    err_msg=E
+            else:
+                log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
+                err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+                logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
+            return status,methodoutput,err_msg
+
+
 #   lclicks on the given cell, if the table found with the given xpath
         def cellClick(self,webElement,input_arr,*args):
 
