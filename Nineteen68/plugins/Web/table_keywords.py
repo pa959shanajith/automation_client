@@ -261,7 +261,6 @@ class TableOperationKeywords():
             param  : webelement,list
             return : bool
             """
-
         def verifyCellToolTip(self,webElement,input_val,*args):
             logger.print_on_console('Executing keyword : verifyCellToolTip')
             status=TEST_RESULT_FAIL

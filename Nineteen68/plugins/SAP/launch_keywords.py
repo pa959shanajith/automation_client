@@ -38,6 +38,8 @@ from saputil_operations import SapUtilKeywords
 
 from pywinauto.application import Application
 from pywinauto import keyboard
+from pywinauto.findwindows    import find_window
+from pywinauto.win32functions import SetForegroundWindow
 import win32com.client
 import json
 import pywinauto
@@ -212,6 +214,7 @@ class Launch_Keywords():
                     logger.print_on_console('The given window name is not found')
                     term = TERMINATE
             elif start_window>1:
+                SetForegroundWindow(find_window(title=self.windowName))
                 logger.print_on_console('SAP Logon window already exists will proceed further')
                 err_msg='SAP Logon window already exists'
                 #term =TERMINATE
@@ -251,6 +254,7 @@ class Launch_Keywords():
             if(start_window>1):
                 try:
                     app = Application(backend="win32").connect(path =self.filePath).window(title=self.windowName)
+                    SetForegroundWindow(find_window(title=self.windowName))
                     try:
                         app.Edit2.set_edit_text(u'')
                         app.Edit2.type_keys(server, with_spaces = True)

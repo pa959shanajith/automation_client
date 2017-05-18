@@ -193,8 +193,6 @@ class Dispatcher:
                   #added mapping of 'getCellToolTip' and 'verifyCellToolTip' to table object
                   'getCellToolTip' : self.table_object.getCellToolTip,
                   'verifyCellToolTip' : self.table_object.verifyCellToolTip,
-
-
                   'getElementText' : self.element_object.get_element_text,
                   'verifyElementText' : self.element_object.verify_element_text,
                   'clickElement' : self.element_object.click_element,
