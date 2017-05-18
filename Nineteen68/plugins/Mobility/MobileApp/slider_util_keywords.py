@@ -169,7 +169,7 @@ class SliderKeywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             dispatcher=mobile_app_dispatcher.MobileDispatcher()
-            timeout=input_val[0]
+            timeout='120'
             if timeout!=None:
                 start_time = time.time()
                 while True:
@@ -185,6 +185,8 @@ class SliderKeywords():
             else:
                 err_msg='Invalid Input'
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             err_msg='error occured'
             log.error(e)
             logger.print_on_console(err_msg)
