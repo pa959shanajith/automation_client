@@ -34,6 +34,7 @@ if args.NINETEEN68_HOME < 1:
 
 os.environ["NINETEEN68_HOME"] = args.NINETEEN68_HOME
 IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "\\Nineteen68\\plugins\\Core\\Images"
+CERTIFICATE_PATH = os.environ["NINETEEN68_HOME"] + "\\Scripts\\CA_BUNDLE"
 
 configobj = readconfig.readConfig()
 configvalues = configobj.readJson()
@@ -285,8 +286,8 @@ class SocketThread(threading.Thread):
         global socketIO
         server_IP = configvalues['server_ip']
         temp_server_IP = 'https://' + server_IP
-        socketIO = SocketIO(temp_server_IP,int(configvalues['server_port']),MainNamespace,verify = False)
-
+        socketIO = SocketIO(temp_server_IP,int(configvalues['server_port']),MainNamespace,verify= CERTIFICATE_PATH +'\\server.crt',cert=(CERTIFICATE_PATH + '\\client.crt', CERTIFICATE_PATH + '\\client.key'))
+##        socketIO = SocketIO(temp_server_IP,int(configvalues['server_port']),MainNamespace,verify='D:\\CA_BUNDLE\\server.crt',cert=('D:\\CA_BUNDLE\\client.crt', 'D:\\CA_BUNDLE\\client.key'))
         ##socketIO = SocketIO('localhost',8124)
 ##        socketIO.send('I am ready to process the request')
         socketIO.emit('news')
@@ -901,9 +902,9 @@ class ClientWindow(wx.Frame):
 
     def OnNodeConnect(self,event):
         try:
-            url = configvalues['server_ip'] + ':' + configvalues['server_port']
-            url = str(url)
-            conn  = httplib.HTTPConnection(url)
+            port = int(configvalues['server_port'])
+            conn  = httplib.HTTPConnection(configvalues['server_ip'],port)
+            print conn
             conn.connect()
             conn.close()
             self.mythread = SocketThread(self)
