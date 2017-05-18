@@ -904,7 +904,6 @@ class ClientWindow(wx.Frame):
         try:
             port = int(configvalues['server_port'])
             conn  = httplib.HTTPConnection(configvalues['server_ip'],port)
-            print conn
             conn.connect()
             conn.close()
             self.mythread = SocketThread(self)
