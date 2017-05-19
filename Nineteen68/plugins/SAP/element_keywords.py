@@ -363,3 +363,94 @@ class ElementKeywords():
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
         return status,result,value,err_msg
+#-----------------------------------------------------------------Scroll_Bar_related_keywords
+    def scrollUp(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            elem = ses.FindById(id)
+            elem.VerticalScrollbar.Position = elem.VerticalScrollbar.Minimum
+            status=sap_constants.TEST_RESULT_PASS
+            result=sap_constants.TEST_RESULT_TRUE
+        except Exception as e:
+            logger.print_on_console('Scrollbar not found')
+            log.error('Error occured',e)
+            err_msg = sap_constants.ERROR_MSG
+        return status,result,value,err_msg
+
+    def scrollDown(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            elem = ses.FindById(id)
+            elem.VerticalScrollbar.Position = elem.VerticalScrollbar.Maximum
+            status=sap_constants.TEST_RESULT_PASS
+            result=sap_constants.TEST_RESULT_TRUE
+        except Exception as e:
+            logger.print_on_console('Scrollbar not found')
+            log.error('Error occured',e)
+            err_msg = sap_constants.ERROR_MSG
+        return status,result,value,err_msg
+
+    def scrollLeft(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            elem = ses.FindById(id)
+            elem.HorizontalScrollbar.Position = elem.HorizontalScrollbar.Minimum
+            status=sap_constants.TEST_RESULT_PASS
+            result=sap_constants.TEST_RESULT_TRUE
+        except Exception as e:
+            logger.print_on_console('Scrollbar not found')
+            log.error('Error occured',e)
+            err_msg = sap_constants.ERROR_MSG
+        return status,result,value,err_msg
+
+    def scrollRight(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            elem = ses.FindById(id)
+            elem.HorizontalScrollbar.Position = elem.HorizontalScrollbar.Maximum
+            status=sap_constants.TEST_RESULT_PASS
+            result=sap_constants.TEST_RESULT_TRUE
+        except Exception as e:
+            logger.print_on_console('Scrollbar not found')
+            log.error('Error occured',e)
+            err_msg = sap_constants.ERROR_MSG
+        return status,result,value,err_msg
+#-----------------------------------------------------------------Tabs_Related_related_keywords
+    def moveTabs(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            elem = ses.FindById(id)
+            elem.ScrollToLeft()
+            status=sap_constants.TEST_RESULT_PASS
+            result=sap_constants.TEST_RESULT_TRUE
+        except Exception as e:
+            log.error('Error occured',e)
+            err_msg = sap_constants.ERROR_MSG
+        return status,result,value,err_msg
+
+
