@@ -85,6 +85,12 @@ class Scrape:
                     elif(elem.__getattr__("Type") == "GuiTableControl"):
                         custname = elem.__getattr__("Name") + "_tbl"
                         tag="table"
+                    elif(elem.__getattr__("Type") == "GuiScrollContainer"):
+                        custname = elem.__getattr__("Name") + "_scroll"
+                        tag=elem.__getattr__("Type")
+                    elif(elem.__getattr__("Type") == "GuiTab"):
+                        custname = elem.__getattr__("Name") + "_tab"
+                        tag=elem.__getattr__("Type")
                     else:
                         custname = elem.__getattr__("Name")
                         tag=elem.__getattr__("Type")
@@ -210,6 +216,12 @@ class Scrape:
                             elif(elem.__getattr__("Type") == "GuiTableControl"):
                                 custname = elem.__getattr__("Name") + "_tbl"
                                 tag="table"
+                            elif(elem.__getattr__("Type") == "GuiScrollContainer"):
+                                custname = elem.__getattr__("Name") + "_scroll"
+                                tag=elem.__getattr__("Type")
+                            elif(elem.__getattr__("Type") == "GuiTab"):
+                                custname = elem.__getattr__("Name") + "_tab"
+                                tag=elem.__getattr__("Type")
                             else:
                                 custname = elem.__getattr__("Name")
                                 tag=elem.__getattr__("Type")
