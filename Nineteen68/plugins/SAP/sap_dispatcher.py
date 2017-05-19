@@ -94,6 +94,7 @@ class SAPDispatcher:
                   'getelementtext':self.element_keywords_obj.get_element_text,
                   'verifyelementtext':self.element_keywords_obj.verify_element_text,
                   'gettooltiptext':self.element_keywords_obj.getTooltipText,
+                  'verifytooltiptext':self.element_keywords_obj.verifyTooltipText,
                   'getinputhelp':self.element_keywords_obj.getInputHelp,
                   'setfocus':self.element_keywords_obj.setFocus,
                   'verifyenabled':self.saputil_keywords_obj.verifyEnabled,
