@@ -112,8 +112,11 @@ class Handler():
             if json_data.has_key('testcase'):
                 testcase=json_data['testcase']
                 #passing test case value to ftfy module to handle special charcter
-                temp_testcase = ftfy.fix_text(testcase)
-                script.append(temp_testcase)
+                if(type(testcase) == 'unicode'):
+                    temp_testcase = ftfy.fix_text(testcase)
+                    script.append(temp_testcase)
+                else:
+                    script.append(testcase)
             if json_data.has_key('comments'):
                 comments=json_data['comments']
             #Checking if the testcase has key 'testscript_name' or 'testcasename'
