@@ -101,7 +101,7 @@ class SAPDispatcher:
                   'scrollDown':self.element_keywords_obj.scrollDown,
                   'scrollLeft':self.element_keywords_obj.scrollLeft,
                   'scrollRight':self.element_keywords_obj.scrollRight,
-                  'moveTabs':self.element_keywords_obj.moveTabs,
+                  'movetabs':self.element_keywords_obj.moveTabs,
                   'verifyenabled':self.saputil_keywords_obj.verifyEnabled,
                   'verifydisabled':self.saputil_keywords_obj.verifyDisabled,
                   'verifyexists':self.saputil_keywords_obj.VerifyExists,
