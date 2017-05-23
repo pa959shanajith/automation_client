@@ -431,10 +431,8 @@ class ElementKeywords():
             elem = ses.FindById(id)
             maximum = elem.HorizontalScrollbar.Maximum
             element = elem
-            print "Before if",maximum, element
             if(elem.HorizontalScrollbar.Maximum==0):
                maximum, element = self.getHorizontalScrollbarMax(elem)
-            print maximum, element
             if maximum!=0:
                 element.HorizontalScrollbar.Position = element.HorizontalScrollbar.Minimum
                 status=sap_constants.TEST_RESULT_PASS
@@ -460,7 +458,6 @@ class ElementKeywords():
             element = elem
             if(elem.HorizontalScrollbar.Maximum==0):
                 maximum, element = self.getHorizontalScrollbarMax(elem)
-            print maximum, element
             if maximum!=0:
                 element.HorizontalScrollbar.Position = maximum
                 status=sap_constants.TEST_RESULT_PASS
