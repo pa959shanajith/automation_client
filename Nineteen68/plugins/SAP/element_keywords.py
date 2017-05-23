@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+k#-------------------------------------------------------------------------------
 # Name:        Element_Keywords
 # Purpose:      contains click and get element text
 #
@@ -373,9 +373,16 @@ class ElementKeywords():
         err_msg=None
         try:
             elem = ses.FindById(id)
-            elem.VerticalScrollbar.Position = elem.VerticalScrollbar.Minimum
-            status=sap_constants.TEST_RESULT_PASS
-            result=sap_constants.TEST_RESULT_TRUE
+            maximum = elem.VerticalScrollbar.Maximum
+            element = elem
+            if(elem.VerticalScrollbar.Maximum==0):
+                maximum, element = self.getVerticalScrollbarMax(elem)
+            if maximum!=0:
+                element.VerticalScrollbar.Position = element.VerticalScrollbar.Minimum
+                status=sap_constants.TEST_RESULT_PASS
+                result=sap_constants.TEST_RESULT_TRUE
+            else:
+                logger.print_on_console('Scrollbar cannot be moved')
         except Exception as e:
             logger.print_on_console('Scrollbar not found')
             log.error('Error occured',e)
@@ -391,9 +398,22 @@ class ElementKeywords():
         err_msg=None
         try:
             elem = ses.FindById(id)
-            elem.VerticalScrollbar.Position = elem.VerticalScrollbar.Maximum
-            status=sap_constants.TEST_RESULT_PASS
-            result=sap_constants.TEST_RESULT_TRUE
+            maximum = elem.VerticalScrollbar.Maximum
+            element = elem
+            if(elem.VerticalScrollbar.Maximum==0):
+                try:
+                    maximum, element = self.getVerticalScrollbarMax(elem)
+                    element.VerticalScrollbar.Position = maximum
+                    status=sap_constants.TEST_RESULT_PASS
+                    result=sap_constants.TEST_RESULT_TRUE
+                except:
+                    logger.print_on_console('Scrollbar cannot be moved')
+##            if maximum!=0:
+##                element.VerticalScrollbar.Position = maximum
+##                status=sap_constants.TEST_RESULT_PASS
+##                result=sap_constants.TEST_RESULT_TRUE
+##            else:
+##                logger.print_on_console('Scrollbar cannot be moved')
         except Exception as e:
             logger.print_on_console('Scrollbar not found')
             log.error('Error occured',e)
@@ -409,9 +429,18 @@ class ElementKeywords():
         err_msg=None
         try:
             elem = ses.FindById(id)
-            elem.HorizontalScrollbar.Position = elem.HorizontalScrollbar.Minimum
-            status=sap_constants.TEST_RESULT_PASS
-            result=sap_constants.TEST_RESULT_TRUE
+            maximum = elem.HorizontalScrollbar.Maximum
+            element = elem
+            print "Before if",maximum, element
+            if(elem.HorizontalScrollbar.Maximum==0):
+               maximum, element = self.getHorizontalScrollbarMax(elem)
+            print maximum, element
+            if maximum!=0:
+                element.HorizontalScrollbar.Position = element.HorizontalScrollbar.Minimum
+                status=sap_constants.TEST_RESULT_PASS
+                result=sap_constants.TEST_RESULT_TRUE
+            else:
+                logger.print_on_console('Scrollbar cannot be moved')
         except Exception as e:
             logger.print_on_console('Scrollbar not found')
             log.error('Error occured',e)
@@ -427,14 +456,64 @@ class ElementKeywords():
         err_msg=None
         try:
             elem = ses.FindById(id)
-            elem.HorizontalScrollbar.Position = elem.HorizontalScrollbar.Maximum
-            status=sap_constants.TEST_RESULT_PASS
-            result=sap_constants.TEST_RESULT_TRUE
+            maximum = elem.HorizontalScrollbar.Maximum
+            element = elem
+            if(elem.HorizontalScrollbar.Maximum==0):
+                maximum, element = self.getHorizontalScrollbarMax(elem)
+            print maximum, element
+            if maximum!=0:
+                element.HorizontalScrollbar.Position = maximum
+                status=sap_constants.TEST_RESULT_PASS
+                result=sap_constants.TEST_RESULT_TRUE
+            else:
+                logger.print_on_console('Scrollbar cannot be moved')
         except Exception as e:
             logger.print_on_console('Scrollbar not found')
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
         return status,result,value,err_msg
+
+#----------------------------------------------------------Scroll bar operations to recursively call elements
+#----------------------------------------------------------to find out if the max scroll bar length exists
+    def getVerticalScrollbarMax(self,elem):
+            i = 0
+            while True:
+                try:
+                    child = elem.Children(i)
+                    try:
+                        if(child.VerticalScrollbar.Maximum != 0):
+                            maximum = child.VerticalScrollbar.Maximum
+                            element = child
+                            break
+                    except:
+                        pass
+                    i = i + 1
+                    maximum, element = self.getVerticalScrollbarMax(child)
+                except Exception as e:
+                    break
+            return maximum, element
+
+
+    def getHorizontalScrollbarMax(self,elem):
+            i = 0
+            while True:
+                try:
+                    child = elem.Children(i)
+                    try:
+                        if(child.HorizontalScrollbar.Maximum != 0):
+                            maximum = child.HorizontalScrollbar.Maximum
+                            element = child
+                            break
+                    except:
+                        pass
+                    i = i + 1
+                    maximum, element = self.getHorizontalScrollbarMax(child)
+                except Exception as e:
+                    break
+            return maximum, element
+
+#----------------------------------------------------------Scroll bar operations
+
 #-----------------------------------------------------------------Tabs_Related_related_keywords
     def moveTabs(self, sap_id,url, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
