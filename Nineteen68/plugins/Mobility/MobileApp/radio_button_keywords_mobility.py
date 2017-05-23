@@ -63,7 +63,7 @@ class Radio_Button_Keywords():
         visibilityFlag=True
         output=OUTPUT_CONSTANT
         err_msg=None
-        status=None
+
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
 
         try:
@@ -71,15 +71,32 @@ class Radio_Button_Keywords():
             if webelement is not None:
                 visibility=webelement.is_displayed()
                 log.debug('element is visible')
+
                 if visibility:
                     enable=webelement.is_enabled()
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
+
                         log.debug('performing the action')
-                        status=webelement.get_attribute("checked")
+                        classname= webelement.get_attribute("className")
+
+                        if 'Switch' in classname:
+                            status=webelement.text
+                            status=status.upper()
+                        elif 'Radio' in classname:
+                            status=webelement.get_attribute("checked")
+                            if status=='true':
+                                status='Selected'
+                            else:
+                                status="UnSelected"
+                        elif 'CheckBox' in classname:
+                            status=webelement.get_attribute("checked")
+                            if status=='true':
+                                status='Checked'
+                            else:
+                                status="UnChecked"
                         if status!=None:
                             log.info(status)
-                            status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
@@ -94,6 +111,7 @@ class Radio_Button_Keywords():
 
         except Exception as e:
                 err_msg='error occured'
+
         return status,methodoutput,output,err_msg
 
     def select_checkbox(self, element,input_val,*args):
