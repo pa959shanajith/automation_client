@@ -78,7 +78,10 @@ class Delay_keywords:
                 for x, y in zip(variables, values):
                     if type(x)==unicode or type(x)==str:
                         x=str(x)
-                    if y == 'None' or y == None:
+                    ##changes to fix issue:304-Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
+                    ##changes done by jayashree.r
+##                    if y == 'None' or y == None:
+                    if y == None:
                         y = 'null'
                     if type(y)==unicode or type(y)==str:
                         y=str(y)

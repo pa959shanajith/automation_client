@@ -142,11 +142,16 @@ class BodyGenarator():
             if self.soap_type == 0:
                 self.client_obj.soaptype = 0
                 log.info('soap type is 0 i.e is soap 11')
-                self.client_obj.service._binding.create_message(self.operation_name)
+                obt_body_base = self.client_obj.service._binding.create_message(self.operation_name)
+                obt_body_base = etree.tostring(obt_body_base,pretty_print=True)
                 inp_count = zeep.xsd.indicators.inputParameterCount
                 args=self.get_string(inp_count)
-                obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
-                obt_request_body_soap11 = etree.tostring(obt_body,pretty_print=True)
+                try:
+                    obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
+                    obt_request_body_soap11 = etree.tostring(obt_body,pretty_print=True)
+                except:
+                    print 'No Request data to Enter'
+                    obt_request_body_soap11 = obt_body_base
                 log.info('request body of soap11')
                 log.info(obt_request_body_soap11)
                 return obt_request_body_soap11
@@ -154,28 +159,44 @@ class BodyGenarator():
             elif self.soap_type == 1:
                 self.client_obj.soaptype = 1
                 log.info('soap type is 1 i.e is soap 12')
-                self.client_obj.service._binding.create_message(self.operation_name)
+                obt_body_base = self.client_obj.service._binding.create_message(self.operation_name)
+                obt_body_base = etree.tostring(obt_body_base,pretty_print=True)
                 inp_count = zeep.xsd.indicators.inputParameterCount
                 args=self.get_string(inp_count)
-                obt_body_soap12 = self.client_obj.service._binding.create_message(self.operation_name,*args)
-                obt_request_body_soap12 = etree.tostring(obt_body_soap12,pretty_print=True)
+                try:
+                    obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
+                    obt_request_body_soap12 = etree.tostring(obt_body,pretty_print=True)
+                except:
+                    print 'No Request data to Enter'
+                    obt_request_body_soap12 = obt_body_base
                 log.info('request body of soap12')
                 log.info(obt_request_body_soap12)
                 return obt_request_body_soap12
 
             elif self.soap_type == 2:
                 self.client_obj.soaptype = 0
-                self.client_obj.service._binding.create_message(self.operation_name)
+                obt_body_base1 = self.client_obj.service._binding.create_message(self.operation_name)
+                obt_body_base1 = etree.tostring(obt_body_base1,pretty_print=True)
                 inp_count = zeep.xsd.indicators.inputParameterCount
                 args=self.get_string(inp_count)
                 obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
-                obt_request_body_soap11 = etree.tostring(obt_body,pretty_print=True)
+                try:
+                    obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
+                    obt_request_body_soap11 = etree.tostring(obt_body,pretty_print=True)
+                except:
+                    print 'No Request data to Enter'
+                    obt_request_body_soap11 = obt_body_base1
                 log.info('request body of soap11')
                 log.info(obt_request_body_soap11)
+
                 self.client_obj.soaptype = 1
-                self.client_obj.service._binding.create_message(self.operation_name)
-                obt_body_soap12 = self.client_obj.service._binding.create_message(self.operation_name,*args)
-                obt_request_body_soap12 = etree.tostring(obt_body_soap12,pretty_print=True)
+                obt_body_base2 = self.client_obj.service._binding.create_message(self.operation_name)
+                try:
+                    obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
+                    obt_request_body_soap12 = etree.tostring(obt_body,pretty_print=True)
+                except:
+                    print 'No Request data to Enter'
+                    obt_request_body_soap12 = obt_body_base2
                 log.info('request body of soap12')
                 log.info(obt_request_body_soap12)
                 return obt_request_body_soap11,obt_request_body_soap12

@@ -44,6 +44,7 @@ class ToggleKeywords():
                         log.debug('performing the action')
                         res=element.text
                         log.debug('Result is '+res)
+
                         if res.upper()=='OFF':
                             action = TouchAction(install_and_launch.driver)
                             action.tap(element).perform()
@@ -86,7 +87,8 @@ class ToggleKeywords():
                         if enable:
                             log.debug(WEB_ELEMENT_ENABLED)
                             log.debug('performing the action')
-                            res=element.get_attribute("checked")
+                            res=webelement.text
+
                             if res.upper()=='ON':
                                 action = TouchAction(install_and_launch.driver)
                                 action.tap(webelement).perform()

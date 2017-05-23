@@ -155,6 +155,10 @@ class DatabaseOperation():
                 cursor.execute(input_val[5])
                 rows = cursor.fetchall()
                 value = rows[row_no][col_no]
+                ##if condition added to fix issue:304-Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
+                ##changes done by jayashree.r
+                if value == None:
+                    value = 'None'
                 log.info('Value obtained :')
                 log.info(value)
             except Exception as e:

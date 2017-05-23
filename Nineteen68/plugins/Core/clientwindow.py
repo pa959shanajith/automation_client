@@ -506,7 +506,7 @@ class ClientWindow(wx.Frame):
     #----------------------------------------------------------------------
     def __init__(self):
         wx.Frame.__init__(self, parent=None,id=-1, title="ICE Engine",
-                   pos=(300, 150),  size=(800, 730),style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.RESIZE_BOX |wx.MAXIMIZE_BOX)  )
+                   pos=(300, 150),  size=(800, 730),style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  |wx.MAXIMIZE_BOX)  )
 ##        self.SetBackgroundColour(   (245,222,179))
         self.SetBackgroundColour('#e6e7e8')
 ##        self.ShowFullScreen(True,wx.ALL)
@@ -973,7 +973,7 @@ class DebugWindow(wx.Frame):
     #----------------------------------------------------------------------
     def __init__(self, parent,id, title):
         wx.Frame.__init__(self, parent, title=title,
-                   pos=(300, 150),  size=(200, 75) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.RESIZE_BOX |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
+                   pos=(300, 150),  size=(200, 75) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
 ##        style = wx.CAPTION|wx.CLIP_CHILDREN
         curdir = os.getcwd()

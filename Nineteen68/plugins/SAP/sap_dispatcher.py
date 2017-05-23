@@ -42,17 +42,55 @@ class SAPDispatcher:
     def __init__(self):
 
         self.exception_flag=''
+#-----------------------------------------------------------------for custom objects
+    custom_dict = {
+                    "click":['radiobutton','checkbox','input','button','select','table'],
+                    "GetElementText":['radiobutton','checkbox','input','button','select','table'],
+                    "GetStatus":['radiobutton','checkbox'],
+                    "GetText":['input'],
+                    "SelectCheckbox":['checkbox'],
+                    "SelectRadioButton":['radiobutton'],
+                    "SetSecureText":['input'],
+                    "SelectValueByText ":['select'],
+                    "SetText":['input'],
+                    "UnSelectCheckbox":['checkbox'],
+                    "VerifyElementText":['radiobutton','checkbox','input','button','select','table'],
+                    "verifyExists":['radiobutton','checkbox','input','button','select','table']
+                  }
 
+    get_ele_type={
+                'radio': 'radiobutton',
+                'checkbox':'checkbox',
+                'dropdown':'select',
+                'textbox':'input',
+                'button':'button',
+                'table':'table',
+                }
+#-----------------------------------------------------------------for custom objects
 
 
     def dispatcher(self,teststepproperty,input):
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
-        keyword = teststepproperty.name
+        keyword = teststepproperty.name.lower()
         url = teststepproperty.url
         err_msg=None
         result=[sap_constants.TEST_RESULT_FAIL,sap_constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
+#-----------------------------------------------------------------for custom objects
+        try:
+            if objectname==sap_constants.CUSTOM and teststepproperty.custom_flag:
+                ele_type=input[0].lower()
+                if ele_type in self.get_ele_type:
+                    ele_type=self.get_ele_type[ele_type]
+                parent_xpath=teststepproperty.parent_xpath
+                if (keyword in self.custom_dict and ele_type in self.custom_dict[keyword]):
+                    custom_sap_element=self.saputil_keywords_obj.getobjectforcustom(parent_xpath,ele_type,input[1])
+                    if(custom_sap_element != '' or None):
+                        objectname = custom_sap_element
+        except Exception as e:
+            print e
+#-----------------------------------------------------------------for custom objects
 
         try:
 
@@ -89,6 +127,7 @@ class SAPDispatcher:
                   'verifyvaluesexists':self.dropdown_keywords_obj.verifyValuesExists,
                   'verifyallvalues':self.dropdown_keywords_obj.verifyAllValues,
                   'click':self.element_keywords_obj.click,
+                  'rightclick':self.element_keywords_obj.rightClick,
                   'doubleclick':self.element_keywords_obj.doubleClick,
                   'mousehover':self.element_keywords_obj.mouseHover,
                   'getelementtext':self.element_keywords_obj.get_element_text,
@@ -97,14 +136,14 @@ class SAPDispatcher:
                   'verifytooltiptext':self.element_keywords_obj.verifyTooltipText,
                   'getinputhelp':self.element_keywords_obj.getInputHelp,
                   'setfocus':self.element_keywords_obj.setFocus,
-                  'scrollUp':self.element_keywords_obj.scrollUp,
-                  'scrollDown':self.element_keywords_obj.scrollDown,
-                  'scrollLeft':self.element_keywords_obj.scrollLeft,
-                  'scrollRight':self.element_keywords_obj.scrollRight,
-                  'moveTabs':self.element_keywords_obj.moveTabs,
+                  'scrollup':self.element_keywords_obj.scrollUp,
+                  'scrolldown':self.element_keywords_obj.scrollDown,
+                  'scrollleft':self.element_keywords_obj.scrollLeft,
+                  'scrollright':self.element_keywords_obj.scrollRight,
+                  'movetabs':self.element_keywords_obj.moveTabs,
                   'verifyenabled':self.saputil_keywords_obj.verifyEnabled,
                   'verifydisabled':self.saputil_keywords_obj.verifyDisabled,
-                  'verifyexists':self.saputil_keywords_obj.VerifyExists,
+                  'verifyexists':self.saputil_keywords_obj.verifyExists,
                   'getrowcount':self.table_keywords_obj.getRowCount,
                   'getcolumncount':self.table_keywords_obj.getColumnCount,
                   'getcolnumbytext':self.table_keywords_obj.getColNumByText,

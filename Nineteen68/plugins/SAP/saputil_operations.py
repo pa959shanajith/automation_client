@@ -101,7 +101,7 @@ class SapUtilKeywords:
             log.error('Error occured',e)
         return status,result,value,err_msg
 
-    def VerifyExists(self, sap_id, *args):
+    def verifyExists(self, sap_id, *args):
         time.sleep(2)
         id,ses=self.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
@@ -115,4 +115,24 @@ class SapUtilKeywords:
         except Exception as e:
              log.error('Error occured',e)
         return status,result,value,err_msg
+
+    def getobjectforcustom(self, sap_id, eleType, eleIndex):
+        data = []
+        xpath = None
+        try:
+            id,ses=self.getSapElement(sap_id)
+            reference_elem = ses.FindById(id)
+            wnd_id = id[:26]
+            wnd = ses.FindById(wnd_id)
+            wnd_title = wnd.__getattr__("Text")
+            scrappingObj=Scrape()
+            data = scrappingObj.full_scrape(reference_elem, wnd_title)
+            for elem in data:
+                if elem['tag'].lower() == eleType.strip().lower():
+                    eleIndex = int(eleIndex) - 1
+                    if(eleIndex == 0):
+                        xpath = elem['xpath']
+        except Exception as e:
+            print e
+        return xpath
 

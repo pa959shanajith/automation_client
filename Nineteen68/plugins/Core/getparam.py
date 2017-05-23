@@ -441,7 +441,13 @@ class GetParam():
                         for var in static_var_list:
                             arr.append('|'+var+'|')
                     else:
-                        arr = inputvalstring.split(';')
+                        #changes made to fix issue 337: Generic - dateCompare keyword is not working for all the supported format.
+                        #changes done by jayashree.r
+##                        arr = inputvalstring.split(';')
+                        import re
+                        static_var_list=re.findall("\|(.*?)\|", inputvalstring)
+                        for var in static_var_list:
+                            arr.append('|'+var+'|')
                     for item in arr:
                         if self.checkforstaticvariable(item.strip()):
                             p = 0
