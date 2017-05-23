@@ -296,11 +296,7 @@ class ElementKeywords():
 ##                    elem.Press()
 ##                    status =sap_constants.TEST_RESULT_PASS
 ##                    result = sap_constants.TEST_RESULT_TRUE
-##                else:
-##                    log.info('Radio Button is not clickable')
-##                    err_msg = 'Radio Button is not clickable'
-##                    logger.print_on_console('Radio Button is not clickable')
-##            else:
+
             #------------------------------Condition to check if its a table element
                 if(elem.type=='GuiTableControl'):
                     arg=args[1]
@@ -328,6 +324,47 @@ class ElementKeywords():
             traceback.print_exc()
             err_msg = sap_constants.ERROR_MSG
         return status,result,value,err_msg
+
+    def rightClick(self, sap_id,*args):
+            self.lk.setWindowToForeground(sap_id)
+            status = sap_constants.TEST_RESULT_FAIL
+            result = sap_constants.TEST_RESULT_FALSE
+            value = OUTPUT_CONSTANT
+            err_msg=None
+            id,ses=self.uk.getSapElement(sap_id)
+            elem=ses.FindById(id)
+            try:
+
+                #------------------------------Condition to check if its a table element
+                    if(elem.type=='GuiTableControl'):
+                        arg=args[1]
+                        if len(arg) > 0 and len(arg)==2:
+                            row=int(arg[0])-2
+                            col=int(arg[1])-2
+                            elem = elem.GetCell(row, col)
+                        else:
+                            elem=None
+                            logger.print_on_console('Invalid Arguments Passed')
+                #--------------------------------Check if element is a tab and select that element
+
+                    if(elem.Type == "GuiTab"):
+                            elem.Select()
+                #--------------------------------mouse will move over to the middle of the element and click
+                    left =  elem.__getattr__("ScreenLeft")
+                    width = elem.__getattr__("Width")
+                    x = left + width/2
+                    top =  elem.__getattr__("ScreenTop")
+                    height = elem.__getattr__("Height")
+                    y= top + height/2
+                    pywinauto.mouse.right_click(coords=(int(x), int(y)))
+                    status=sap_constants.TEST_RESULT_PASS
+                    result=sap_constants.TEST_RESULT_TRUE
+            except Exception as e:
+                log.error('Error occured',e)
+                import traceback
+                traceback.print_exc()
+                err_msg = sap_constants.ERROR_MSG
+            return status,result,value,err_msg
 
     def setFocus(self, sap_id, *args):
         self.lk.setWindowToForeground(sap_id)
