@@ -61,7 +61,7 @@ class Radio_Button_Keywords():
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         visibilityFlag=True
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg=None
 
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -81,22 +81,23 @@ class Radio_Button_Keywords():
                         classname= webelement.get_attribute("className")
 
                         if 'Switch' in classname:
-                            status=webelement.text
-                            status=status.upper()
+                            output=webelement.text
+                            output=output.upper()
                         elif 'Radio' in classname:
-                            status=webelement.get_attribute("checked")
-                            if status=='true':
-                                status='Selected'
+                            output=webelement.get_attribute("checked")
+                            if output=='true':
+                                output='Selected'
                             else:
-                                status="UnSelected"
+                                output="UnSelected"
                         elif 'CheckBox' in classname:
-                            status=webelement.get_attribute("checked")
-                            if status=='true':
-                                status='Checked'
+                            output=webelement.get_attribute("checked")
+                            if output=='true':
+                                output='Checked'
                             else:
-                                status="UnChecked"
-                        if status!=None:
-                            log.info(status)
+                                output="UnChecked"
+                        if output!=None:
+                            log.info(output)
+                            status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
