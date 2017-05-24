@@ -45,17 +45,17 @@ class SAPDispatcher:
 #-----------------------------------------------------------------for custom objects
     custom_dict = {
                     "click":['radiobutton','checkbox','input','button','select','table'],
-                    "GetElementText":['radiobutton','checkbox','input','button','select','table'],
-                    "GetStatus":['radiobutton','checkbox'],
-                    "GetText":['input'],
-                    "SelectCheckbox":['checkbox'],
-                    "SelectRadioButton":['radiobutton'],
-                    "SetSecureText":['input'],
-                    "SelectValueByText ":['select'],
-                    "SetText":['input'],
-                    "UnSelectCheckbox":['checkbox'],
-                    "VerifyElementText":['radiobutton','checkbox','input','button','select','table'],
-                    "verifyExists":['radiobutton','checkbox','input','button','select','table']
+                    "getelementtext":['radiobutton','checkbox','input','button','select','table'],
+                    "getstatus":['radiobutton','checkbox'],
+                    "gettext":['input'],
+                    "selectcheckbox":['checkbox'],
+                    "selectradiobutton":['radiobutton'],
+                    "setsecuretext":['input'],
+                    "selectvaluebytext ":['select'],
+                    "settext":['input'],
+                    "unselectcheckbox":['checkbox'],
+                    "verifyelementtext":['radiobutton','checkbox','input','button','select','table'],
+                    "verifyexists":['radiobutton','checkbox','input','button','select','table']
                   }
 
     get_ele_type={
