@@ -56,7 +56,10 @@ class Text_Keywords():
 
     def setText(self, sap_id,url,val, *args):
         self.lk.setWindowToForeground(sap_id)
-        input_val=val[0]
+        if(len(input_val)>1):
+            text = input_val[2]
+        else:
+            text=input_val[0]
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
@@ -88,7 +91,10 @@ class Text_Keywords():
 
     def setSecureText(self, sap_id,url, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
-        text=input_val[0]
+        if(len(input_val)>1):
+            text = input_val[2]
+        else:
+            text=input_val[0]
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE

@@ -127,7 +127,10 @@ class Dropdown_Keywords():
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
-        text=input_val[0]
+        if(len(input_val)>1):
+            text = input_val[2]
+        else:
+            text=input_val[0]
         #verb = OUTPUT_CONSTANT
         value=OUTPUT_CONSTANT
         err_msg=None

@@ -57,8 +57,13 @@ class ElementKeywords():
         err_msg=None
         try:
             if(id != None):
-                    if(len(input_val)==1):
-                        if(ses.FindById(id).text== input_val):
+                    if(len(input_val)!=0):
+                        if(len(input_val)>1):
+                            input = input_val[2]
+                        else:
+                            input=input_val[0]
+
+                        if(ses.FindById(id).text== input):
                             status=sap_constants.TEST_RESULT_PASS
                             result=sap_constants.TEST_RESULT_TRUE
                     elif(len(input_val)==0):
@@ -66,9 +71,9 @@ class ElementKeywords():
                         err_msg='entered text is empty'
                         logger.print_on_console('entered text is empty')
                     else:
-                        log.info('more than one element text entered')
-                        err_msg='more than one element text entered'
-                        logger.print_on_console('more than one element text entered')
+                        log.info('Incorrect syntax')
+                        err_msg='Incorrect syntax'
+                        logger.print_on_console('Incorrect syntax')
             else:
                 log.info('element not present on the page where operation is trying to be performed')
                 err_msg='element not present on the page where operation is trying to be performed'
