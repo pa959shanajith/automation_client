@@ -32,7 +32,7 @@ class Text_Keywords():
         value=''
         try:
             if(id != None):
-                if(ses.FindById(id).Changeable == True):
+##                if(ses.FindById(id).Changeable == True):
                     if(ses.FindById(id).type == 'GuiCTextField' or 'GuiTextField'):
                         status = sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
@@ -41,10 +41,10 @@ class Text_Keywords():
                     else:
                         logger.print_on_console('Element state does not allow to perform the operation')
                         err_msg = sap_constants.ERROR_MSG
-                else:
-                    logger.print_on_console( "Element is not changeable")
-                    err_msg = "Element is not changeable"
-                    log.info(err_msg)
+##                else:
+##                    logger.print_on_console( "Element is not changeable")
+##                    err_msg = "Element is not changeable"
+##                    log.info(err_msg)
             else:
                   logger.print_on_console('element not present on the page where operation is trying to be performed')
                   err_msg = sap_constants.ERROR_MSG
@@ -56,7 +56,10 @@ class Text_Keywords():
 
     def setText(self, sap_id,url,val, *args):
         self.lk.setWindowToForeground(sap_id)
-        input_val=val[0]
+        if(len(input_val)>1):
+            text = input_val[2]
+        else:
+            text=input_val[0]
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
@@ -88,7 +91,10 @@ class Text_Keywords():
 
     def setSecureText(self, sap_id,url, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
-        text=input_val[0]
+        if(len(input_val)>1):
+            text = input_val[2]
+        else:
+            text=input_val[0]
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
@@ -176,17 +182,17 @@ class Text_Keywords():
         value=''
         try:
             if(id != None):
-                if(ses.FindById(id).Changeable == True):
+##                if(ses.FindById(id).Changeable == True):
                     if(ses.FindById(id).type == "GuiTextField" or "GuiCTextField"):
                         value= ses.FindById(id).MaxLength#1:40
                         status = sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
                     else:
                         logger.print_on_console('Element state does not allow to perform the operation')
-                else:
-                    logger.print_on_console( "Element is not changeable")
-                    err_msg = "Element is not changeable"
-                    log.info(err_msg)
+##                else:
+##                    logger.print_on_console( "Element is not changeable")
+##                    err_msg = "Element is not changeable"
+##                    log.info(err_msg)
             else:
                   logger.print_on_console('element not present on the page where operation is trying to be performed')
         except Exception as e:
@@ -205,7 +211,7 @@ class Text_Keywords():
         value=OUTPUT_CONSTANT
         try:
             if(id != None):
-              if(ses.FindById(id).Changeable == True):
+##              if(ses.FindById(id).Changeable == True):
                     if(ses.FindById(id).MaxLength == length):
                         #value = ses.FindById(id).MaxLength
                         status=sap_constants.TEST_RESULT_PASS
@@ -213,10 +219,10 @@ class Text_Keywords():
                     else:
                         err_msg = sap_constants.ERROR_MSG
                         logger.print_on_console('Given Length Does not match')
-              else:
-                logger.print_on_console( "Element is not changeable")
-                err_msg = "Element is not changeable"
-                log.info(err_msg)
+##              else:
+##                logger.print_on_console( "Element is not changeable")
+##                err_msg = "Element is not changeable"
+##                log.info(err_msg)
             else:
                   logger.print_on_console('element not present on the page where operation is trying to be performed')
         except Exception as e:

@@ -69,7 +69,7 @@ class ButtonLinkKeyword():
         err_msg=None
         try:
             if(id != None):
-                if(ses.FindById(id).Changeable == True):
+##                if(ses.FindById(id).Changeable == True):
                    if(ses.FindById(id).Text != None):
                      value=ses.FindById(id).Text
                      status =sap_constants.TEST_RESULT_PASS
@@ -101,7 +101,7 @@ class ButtonLinkKeyword():
         err_msg=None
         try:
             if(id != None):
-                if(ses.FindById(id).Changeable == True):
+##                if(ses.FindById(id).Changeable == True):
                     if(ses.FindById(id).Text != None and ses.FindById(id).Text == name):
                         status =sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE

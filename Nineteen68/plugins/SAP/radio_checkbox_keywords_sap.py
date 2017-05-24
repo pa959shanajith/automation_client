@@ -120,7 +120,7 @@ class Radio_Checkbox_keywords():
         err_msg=None
         try:
             if(id != None):
-                if(ses.FindById(id).Changeable == True):
+##                if(ses.FindById(id).Changeable == True):
                     #----------------------------------------------------------Check for radio
                     if(ses.FindById(id).type == "GuiRadioButton"):
                         value = ses.FindById(id).selected
@@ -140,14 +140,14 @@ class Radio_Checkbox_keywords():
                             value=sap_constants.UNCHECKED_CHECK
                         status=sap_constants.TEST_RESULT_PASS
                         result=sap_constants.TEST_RESULT_TRUE
-                    else:
-                        logger.print_on_console('Element state does not allow to perform the operation')
-                        err_msg = sap_constants.ERROR_MSG
-                        log.info(err_msg)
-                else:
-                    logger.print_on_console('element not present on the page where operation is trying to be performed')
-                    err_msg = sap_constants.ERROR_MSG
-                    log.info(err_msg)
+##                else:
+##                    logger.print_on_console('Element state does not allow to perform the operation')
+##                    err_msg = sap_constants.ERROR_MSG
+##                    log.info(err_msg)
+            else:
+                logger.print_on_console('element not present on the page where operation is trying to be performed')
+                err_msg = sap_constants.ERROR_MSG
+                log.info(err_msg)
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
             logger.print_on_console(err_msg,e)

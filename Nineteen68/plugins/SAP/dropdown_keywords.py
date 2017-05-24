@@ -127,7 +127,10 @@ class Dropdown_Keywords():
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
-        text=input_val[0]
+        if(len(input_val)>1):
+            text = input_val[2]
+        else:
+            text=input_val[0]
         #verb = OUTPUT_CONSTANT
         value=OUTPUT_CONSTANT
         err_msg=None
@@ -199,7 +202,7 @@ class Dropdown_Keywords():
         count = 0
         try:
             if(id != None):
-                if(ses.FindById(id).Changeable == True):
+##                if(ses.FindById(id).Changeable == True):
                     entries = ses.FindById(id).Entries
                     while True:
                         try:
@@ -211,10 +214,10 @@ class Dropdown_Keywords():
                         except Exception as e:
                             log.error('Error occured',e)
                             break
-                else:
-                    logger.print_on_console( "Element is not changeable")
-                    err_msg = "Element is not changeable"
-                    log.info(err_msg)
+##                else:
+##                    logger.print_on_console( "Element is not changeable")
+##                    err_msg = "Element is not changeable"
+##                    log.info(err_msg)
         except Exception as e:
               log.error('Error occured',e)
         return status,result,value,err_msg
@@ -230,7 +233,7 @@ class Dropdown_Keywords():
         count = 0
         try:
             if(id != None):
-                if(ses.FindById(id).Changeable == True):
+##                if(ses.FindById(id).Changeable == True):
                     entries = ses.FindById(id).Entries
                     while True:
                         try:
@@ -245,10 +248,10 @@ class Dropdown_Keywords():
                     else:
                         err_msg = sap_constants.ERROR_MSG
                         log.info('Count Verify has failed ')
-                else:
-                    logger.print_on_console( "Element is not changeable")
-                    err_msg = "Element is not changeable"
-                    log.info(err_msg)
+##                else:
+##                    logger.print_on_console( "Element is not changeable")
+##                    err_msg = "Element is not changeable"
+##                    log.info(err_msg)
 
         except Exception as e:
               log.error('Error occured',e)
@@ -267,7 +270,7 @@ class Dropdown_Keywords():
         try:
 
             if(id != None):
-                if(ses.FindById(id).Changeable == True):
+##                if(ses.FindById(id).Changeable == True):
                     entries = ses.FindById(id).Entries
                     while True:
                         try:
@@ -279,10 +282,10 @@ class Dropdown_Keywords():
                         except Exception as e:
                             err_msg = sap_constants.ERROR_MSG
                             break
-                else:
-                    logger.print_on_console( "Element is not changeable")
-                    err_msg = "Element is not changeable"
-                    log.info(err_msg)
+##                else:
+##                    logger.print_on_console( "Element is not changeable")
+##                    err_msg = "Element is not changeable"
+##                    log.info(err_msg)
 
         except Exception as e:
               log.error('Error occured',e)
@@ -301,7 +304,7 @@ class Dropdown_Keywords():
         dd_entries = []
         try:
             if(id != None):
-                if(ses.FindById(id).Changeable == True):
+##                if(ses.FindById(id).Changeable == True):
                     entries = ses.FindById(id).Entries
                     while True:
                         try:
@@ -316,10 +319,10 @@ class Dropdown_Keywords():
                         result =sap_constants.TEST_RESULT_TRUE
                     else:
                       err_msg = sap_constants.ERROR_MSG
-                else:
-                    logger.print_on_console( "Element is not changeable")
-                    err_msg = "Element is not changeable"
-                    log.info(err_msg)
+##                else:
+##                    logger.print_on_console( "Element is not changeable")
+##                    err_msg = "Element is not changeable"
+##                    log.info(err_msg)
 
         except Exception as e:
               log.error('Error occured',e)
