@@ -89,7 +89,7 @@ class SAPDispatcher:
                     if(custom_sap_element != '' or None):
                         objectname = custom_sap_element
         except Exception as e:
-            print e
+            logger.print_on_console(e)
 #-----------------------------------------------------------------for custom objects
 
         try:

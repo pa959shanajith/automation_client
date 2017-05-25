@@ -24,6 +24,7 @@ index=0
 k = 0
 cordinates = []
 states = []
+win_rect = ''
 
 log = logging.getLogger('oebs_fullscrape.py')
 
@@ -37,6 +38,8 @@ class FullScrape:
         isjavares, hwnd = utils_obj.isjavawindow(windowname)
         log.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',str(isjavares))
         if (isjavares):
+            global win_rect
+            win_rect= win32gui.GetWindowRect(hwnd)
             self.acccontext(oebs_api.JABContext(hwnd), tempne,'',0,windowname)
             log.debug('MSG:\nThe Scraped Data is:\n %s',tempne)
             vie = {'view': tempne}
@@ -143,9 +146,9 @@ class FullScrape:
             text = str(text)
             text = text.strip()
             #Calculating co ordinates for embedded screenshots
-            utils_obj=utils.Utils()
-            isjavares, hwnd = utils_obj.isjavawindow(window)
-            win_rect= win32gui.GetWindowRect(hwnd)
+##            utils_obj=utils.Utils()
+##            isjavares, hwnd = utils_obj.isjavawindow(window)
+##            win_rect= win32gui.GetWindowRect(hwnd)
             x1_win = win_rect[0]
             y1_win = win_rect[1]
             x2_win = win_rect[2]
@@ -165,8 +168,32 @@ class FullScrape:
                 text = tagname
             text = text.replace('<','')
             text = text.replace('>','')
+            tagname = ''
+            if(curaccinfo.role =='push button' or curaccinfo.role =='toggle button'):
+                tagname = "button"
+            elif(curaccinfo.role == 'edit'or curaccinfo.role == 'Edit Box' or curaccinfo.role =='text' or curaccinfo.role =='password text'):
+            	tagname = "input"
+            elif(curaccinfo.role == 'combo box'):
+            	tagname = "select";
+            elif(curaccinfo.role =='list item' or curaccinfo.role =='list' ):
+            	tagname = "list"
+            elif(curaccinfo.role =='hyperlink' or curaccinfo.role =='Static'):
+            	tagname = "a"
+            elif(curaccinfo.role =='check box'):
+            	tagname = "checkbox"
+            elif(curaccinfo.role =='radio button'):
+            	tagname = "radiobutton"
+            elif(curaccinfo.role == 'table'):
+            	tagname = "table"
+            elif(curaccinfo.role == 'scroll bar'):
+            	tagname = "scrollbar"
+            elif(curaccinfo.role == 'internal frame'):
+            	tagname = "internalframe"
+            else:
+            	tagname = "element";
+
             tempne.append({"custname":text.strip(),
-                    "tag":curaccinfo.role,
+                    "tag":tagname,
                     "xpath":path + ';' + name.strip() + ';' + str(indexInParent)  + ';' + str(childrencount) + ';'+ str(parentname).strip() + ';' + str(parentxpath) + ';' + str(parentchildcount) + ';' + str(parentindex)+ ';' + str(parenttag)+ ';' + str(curaccinfo.role) + ';' + description,
                     'hiddentag':'No',
                     'id':'null',
