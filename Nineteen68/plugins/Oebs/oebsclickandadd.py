@@ -413,13 +413,13 @@ class ClickAndAdd:
                                         if(curaccinfo.role =='push button' or curaccinfo.role =='toggle button'):
                             			    tagname = "button"
                                         elif(curaccinfo.role == 'edit'or curaccinfo.role == 'Edit Box' or curaccinfo.role =='text' or curaccinfo.role =='password text'):
-                            				tagname = "textbox"
+                            				tagname = "input"
                                         elif(curaccinfo.role == 'combo box'):
                             				tagname = "select";
                                         elif(curaccinfo.role =='list item' or curaccinfo.role =='list' ):
                             				tagname = "list"
-                                        elif(curaccinfo.role =='hyperlink' or curaccinfo.role =='Static' or curaccinfo.role == 'text'):
-                            				tagname = "link"
+                                        elif(curaccinfo.role =='hyperlink' or curaccinfo.role =='Static'):
+                            				tagname = "a"
                                         elif(curaccinfo.role =='check box'):
                             				tagname = "checkbox"
                                         elif(curaccinfo.role =='radio button'):
