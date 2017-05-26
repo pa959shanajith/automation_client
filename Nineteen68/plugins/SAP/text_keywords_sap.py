@@ -54,7 +54,7 @@ class Text_Keywords():
             logger.print_on_console('Error cooured in getText and is a :',e)
         return status,result,value,err_msg
 
-    def setText(self, sap_id,url,val, *args):
+    def setText(self, sap_id,url,input_val, *args):
         self.lk.setWindowToForeground(sap_id)
         if(len(input_val)>1):
             text = input_val[2]
@@ -70,7 +70,7 @@ class Text_Keywords():
                 if(ses.FindById(id).Changeable == True):
                     if(ses.FindById(id).type == 'GuiCTextField' or 'GuiTextField'  or 'GuiPasswordField'):
                         try:
-                         ses.FindById(id).text = input_val
+                         ses.FindById(id).text = text
                          status = sap_constants.TEST_RESULT_PASS
                          result = sap_constants.TEST_RESULT_TRUE
                         except Exception as e:
