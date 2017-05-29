@@ -85,7 +85,7 @@ log = logging.getLogger('handler.py')
 
 class Handler():
 
-    def parse_json(self,test_data):
+    def parse_json(self,test_data,data_param_path=None):
         """
         def : parse_json
         purpose : parses the given json and passes it to create list
@@ -105,6 +105,10 @@ class Handler():
         script=[]
         testcasename_list=[]
         browser_type=[]
+         extract_path = []
+        if(data_param_path is not None and data_param_path != ''):
+            data_param_path_temp = str(data_param_path)
+            extract_path.append(data_param_path_temp)
         #Iterating through json array
         for json_data in new_obj:
             #if json_data.has_key('template'):
@@ -140,7 +144,10 @@ class Handler():
                 browser_type=json_data['browsertype']
             elif json_data.has_key('browserType'):
                 browser_type=json_data['browserType']
-        flag=self.create_list(script,testcasename_list)
+        if(data_param_path is None or data_param_path == ''):
+            flag=self.create_list(script,testcasename_list)
+        else:
+            flag=self.create_list(script,testcasename_list,extract_path)
         return flag,browser_type,len(script)
 
 
@@ -425,7 +432,7 @@ class Handler():
 
 
 
-    def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i):
+    def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,extract_path=None):
         """
         def : create_step
         purpose : creates an object of each step
@@ -457,7 +464,10 @@ class Handler():
                 self.insert_into_getParamdict(index,key_lower,None)
                 logger.print_on_console(key_lower+' keyword missing in script:'+str(testscript_name))
 
-            tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i)
+            if(extract_path==None):
+                tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i)
+            else:
+                tsp_step=getparam.GetParam(index,keyword,extract_path,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i)
 
         #block which creates the step of instances of (jumpBy)
         elif key_lower == constants.JUMP_BY:
@@ -472,7 +482,7 @@ class Handler():
             tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i)
         return tsp_step
 
-    def extract_field(self,step,index,testscript_name,i):
+    def extract_field(self,step,index,testscript_name,i,extract_path = None):
         """
         def : extract_field
         purpose : extracts the value of each key present in test step json
@@ -494,11 +504,14 @@ class Handler():
         if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
             global tspIndex2
             tspIndex2+=1
-            return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i)
+             if(extract_path== None):
+                return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i)
+            else:
+                return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,extract_path)
         return None
 
 
-    def create_list(self,testcase,testscript_name):
+    def create_list(self,testcase,testscript_name,extract_path= None):
         """
         def : create_list
         purpose : appends each test case step into gloabl tsplist
@@ -526,7 +539,10 @@ class Handler():
 
         for i in range(len(testcase_copy)):
             for x in testcase_copy[i]:
-                step=self.extract_field(x,tspIndex2,testscript_name[i],i+1)
+                if extract_path == None:
+                    step=self.extract_field(x,tspIndex2,testscript_name[i],i+1)
+                else:
+                    step=self.extract_field(x,tspIndex2,testscript_name[i],i+1,extract_path)
                 if step is not None and step != False:
                     tspList.append(step)
                 elif step == False:
