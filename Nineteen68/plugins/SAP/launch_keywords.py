@@ -305,6 +305,29 @@ class Launch_Keywords():
             err_msg = sap_constants.ERROR_MSG
         return status,result,value,err_msg
 
+    def getPopUpText(self, *args):
+        ses, wnd = self.getSessWindow()
+        wnd_title = wnd.Text
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
+        err_msg=None
+        value=OUTPUT_CONSTANT
+        from sap_scraping import Scrape
+        scrappingObj=Scrape()
+        data = scrappingObj.full_scrape(wnd, wnd_title)
+        try:
+            for elem in data:
+                if elem['tag'] == "input":
+                    if(elem['text'] != ""):
+                        value = elem['text']
+                        break
+            status=sap_constants.TEST_RESULT_PASS
+            result = sap_constants.TEST_RESULT_TRUE
+        except Exception as e:
+            logger.print_on_console('Not able to find text')
+            err_msg = sap_constants.ERROR_MSG
+        return status,result,value,err_msg
+
     def closeApplication(self, *args):
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
