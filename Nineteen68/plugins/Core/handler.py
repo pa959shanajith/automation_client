@@ -105,7 +105,7 @@ class Handler():
         script=[]
         testcasename_list=[]
         browser_type=[]
-         extract_path = []
+        extract_path = []
         if(data_param_path is not None and data_param_path != ''):
             data_param_path_temp = str(data_param_path)
             extract_path.append(data_param_path_temp)
@@ -504,7 +504,7 @@ class Handler():
         if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
             global tspIndex2
             tspIndex2+=1
-             if(extract_path== None):
+            if(extract_path== None):
                 return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i)
             else:
                 return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,extract_path)
