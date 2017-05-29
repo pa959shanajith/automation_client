@@ -101,6 +101,7 @@ class SAPDispatcher:
                   'getpagetitle':self.launch_keywords_obj.getPageTitle,
                   'starttransaction':self.launch_keywords_obj.startTransaction,
                   'serverconnect':self.launch_keywords_obj.serverConnect,
+                  'getpopuptext':self.launch_keywords_obj.getPopUpText,
                   'geterrormessage':self.launch_keywords_obj.getErrorMessage,
                   'toolbaraction':self.launch_keywords_obj.toolbar_actions,
                   'settext' : self.editable_text_obj.setText,

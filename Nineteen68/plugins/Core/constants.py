@@ -380,4 +380,6 @@ MULTIPLE_OUTPUT_KEYWORDS=['getSelected','split']
 
 GENERIC_KEYWORD='displayVariableValue'
 
+DATE_COMPARE='dateCompare'
+
 

@@ -434,7 +434,9 @@ class GetParam():
                     temp = ''
                     columnname = ''
                     arr=[]
-                    keywordList=[IF,FOR,JUMP_BY,JUMP_TO]
+                    #added keyword constant DATE_COMPARE to fix issue 304:'Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
+                    #changes done by jayashree.r
+                    keywordList=[IF,FOR,JUMP_BY,JUMP_TO,DATE_COMPARE]
                     if teststepproperty.name in keywordList :
                         import re
                         static_var_list=re.findall("\|(.*?)\|", inputvalstring)

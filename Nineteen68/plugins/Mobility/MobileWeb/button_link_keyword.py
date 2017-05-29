@@ -190,7 +190,7 @@ class ButtonLinkKeyword():
 ##                    logger.print_on_console('Button name : ' , buttonname)
                     status = webconstants.TEST_RESULT_PASS
                     methodoutput = webconstants.TEST_RESULT_TRUE
-                    output = buttonname
+                    ##output = buttonname
 
                 #Remove the leading and trailing spaces
                 input = inputs[0]

@@ -2,7 +2,7 @@
 # Name:        controller.py
 # Purpose:
 #
-# Author:      wasimakram.sutar
+# Author:      wasimakram.sutar,sushma.p,rakesh.v
 #
 # Created:     02-11-2016
 # Copyright:   (c) wasimakram.sutar 2016
@@ -834,7 +834,7 @@ class Controller():
                  #Logic to Execute each suite for each of the browser
                 for browser in browser_type[suite_id]:
                     #Logic to iterate through each scenario in the suite
-                    for scenario,scenario_id,condition_check_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id]):
+                    for scenario,scenario_id,condition_check_value,dataparam_path_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id],dataparam_path[suite_id]):
                         con =Controller()
                         con.configvalues=configvalues
                         con.wx_object=wxObject
@@ -851,7 +851,7 @@ class Controller():
                             #check for temrinate flag before parsing tsp list
                             if terminate_flag:
                                 break
-                            flag,browser_temp,last_tc_num=obj.parse_json(d)
+                            flag,browser_temp,last_tc_num=obj.parse_json(d,dataparam_path_value)
 
                             if flag == False:
                                 break
