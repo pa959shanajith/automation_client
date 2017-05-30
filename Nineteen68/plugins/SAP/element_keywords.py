@@ -482,9 +482,7 @@ class ElementKeywords():
                maximum, element = self.getHorizontalScrollbarMax(elem)
             if maximum!=0:
                 if(pos>=0):
-                    print '------------------------------------position',pos
                     element.HorizontalScrollbar.Position = element.HorizontalScrollbar.Position - pos
-                    print '---------------------------------when down'
                     status=sap_constants.TEST_RESULT_PASS
                     result=sap_constants.TEST_RESULT_TRUE
                 else:
