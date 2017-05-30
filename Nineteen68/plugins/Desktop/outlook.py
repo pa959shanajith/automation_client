@@ -17,10 +17,13 @@ import desktop_constants
 import logging
 from constants import *
 import logger
-log = logging.getLogger('outlook.py')
 import pythoncom
+import threading
+log = logging.getLogger('outlook.py')
+##from  cherrypy import engine
 
-pythoncom.CoInitialize()
+count=0
+
 
 ## This class will have the methods to automate Outlook Application
 class OutlookKeywords:
@@ -42,6 +45,7 @@ class OutlookKeywords:
             self.store=None
 
 
+
 #To support seperate accounts and  subFolders this method is implemented , Input should be the folder path in properties of outlook folder
         def switchToFolder(self,input,*args):
             status=desktop_constants.TEST_RESULT_FAIL
@@ -51,9 +55,12 @@ class OutlookKeywords:
             try:
                 logger.print_on_console('switching to the folder')
                 folderPath=input[0]
-                folderPath=folderPath.strip('\\')
-                folders=folderPath.split('\\')
+                folderPath=folderPath.strip('//')
+                folders=folderPath.split('//')
+
                 accountname=folders[0]
+                import pythoncom
+                pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
                 self.outlook = Dispatch('Outlook.Application').GetNamespace('MAPI')
 #               get the message stores in outlook
                 stores=self.outlook.Stores
@@ -61,7 +68,9 @@ class OutlookKeywords:
                     for store in stores:
                         if store.DisplayName==accountname:
                             self.store=store
+
                             if folders[1]=='Inbox':
+
                                 inbox_folder = store.GetDefaultFolder(outlook_constants.INBOX_FOLDER)
                                 index=0;
                                 folder=None
@@ -110,11 +119,23 @@ class OutlookKeywords:
                 self.senderEmail=input[0]
                 self.subject=input[2]
                 self.toMail=input[1]
+
+##                pythoncom.CoInitialize()
+##                engine.subscribe('start_thread', onThreadStart)
+
+                import pythoncom
+                pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
                 if (self.outlook==None):
-                    self.outlook = Dispatch('Outlook.Application').GetNamespace('MAPI')
-                    inbox = self.outlook.GetDefaultFolder(outlook_constants.INBOX_FOLDER)
+
+                     from win32com.client.gencache import EnsureDispatch
+                     self.outlook = EnsureDispatch('Outlook.Application').GetNamespace('MAPI')
+                     inbox = self.outlook.GetDefaultFolder(outlook_constants.INBOX_FOLDER)
                 else:
                     inbox=self.targetFolder
+                if inbox==None:
+                    from win32com.client.gencache import EnsureDispatch
+                    self.outlook = EnsureDispatch('Outlook.Application').GetNamespace('MAPI')
+                    inbox = self.outlook.GetDefaultFolder(outlook_constants.INBOX_FOLDER)
                 all_inbox = inbox.Items
                 folders = inbox.Folders
                 all_inbox=reversed(list(all_inbox))
@@ -138,6 +159,7 @@ class OutlookKeywords:
                                         self.AttachmentStatus=outlook_constants.ATTACH_STATUS_YES
 ##                                    message="From : "+msg.SenderName+" <"+self.FromMailId+">"+"\n"+ "To: "+ self.ToMailID + "\n"+ "Date: "+str(msg.SentOn)+ "\n"+ "Subject: "+ msg.Subject+ "\n"+ str(msg.Attachments.Count)+ " attachments." + "\n"+ msg.Body
                                     self.Flag=True
+
                                     msg.Display(False)
                                     status=desktop_constants.TEST_RESULT_PASS
                                     method_output=desktop_constants.TEST_RESULT_TRUE
@@ -148,12 +170,16 @@ class OutlookKeywords:
                                 continue
                         else :
                             continue
+                pythoncom.CoUninitialize ()
                 if self.Flag!=True:
                     logger.print_on_console('Error: No such mail found')
                     error_msg='Error: No such mail found'
             except Exception as e:
-               log.error(e)
-               logger.print_on_console(e)
+                pythoncom.CoUninitialize ()
+                import traceback
+                traceback.print_exc()
+                log.error(e)
+                logger.print_on_console(e)
             return status,method_output,result,error_msg
 
         def GetFromMailId(self,input,*args):
