@@ -185,7 +185,7 @@ class Controller():
 
     def __load_desktop(self):
         try:
-            self.get_all_the_imports('Desktop')
+            self.get_all_the_imports('Desktop2')
             import desktop_dispatcher
             self.desktop_dispatcher_obj = desktop_dispatcher.DesktopDispatcher()
             self.desktop_dispatcher_obj.exception_flag=exception_flag
