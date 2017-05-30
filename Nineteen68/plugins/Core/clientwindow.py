@@ -102,7 +102,7 @@ class MainNamespace(BaseNamespace):
             print 'Highlight result: ',res
         elif appType==APPTYPE_DESKTOP.lower():
             con =controller.Controller()
-            con.get_all_the_imports('Desktop')
+            con.get_all_the_imports('Desktop2')
             import desktop_highlight
             highlightObj=desktop_highlight.highLight()
             highlightObj.highLiht_element(args[0].split(',')[0],args[0].split(',')[1])
@@ -150,7 +150,7 @@ class MainNamespace(BaseNamespace):
         global browsername
         browsername = args[0]
         con =controller.Controller()
-        con.get_all_the_imports('Desktop')
+        con.get_all_the_imports('Desktop2')
         import ninteen_68_desktop_scrape
         global desktopScrapeObj
         desktopScrapeObj=ninteen_68_desktop_scrape

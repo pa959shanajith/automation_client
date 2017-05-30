@@ -164,7 +164,20 @@ class Launch_Keywords():
                     id = tbar.Children(i).Id
                     btn = ses.FindById(id)
                     if(btn.Changeable == True):
-                        btn.Press()
+                        if(button.strip().lower() == "creates new session"):
+                            shell = win32com.client.Dispatch("WScript.Shell")
+                            shell.AppActivate(wnd.Text)
+                            shell.SendKeys("^{+}")
+                        elif(button.strip().lower() == "generates shortcut"):
+                            shell = win32com.client.Dispatch("WScript.Shell")
+                            shell.AppActivate(wnd.Text)
+                            shell.SendKeys("^{;}")
+                        elif(button.strip().lower() == "customize local layout"):
+                            shell = win32com.client.Dispatch("WScript.Shell")
+                            shell.AppActivate(wnd.Text)
+                            shell.SendKeys("%{F12}")
+                        else:
+                            btn.Press()
                         status=sap_constants.TEST_RESULT_PASS
                         result=sap_constants.TEST_RESULT_TRUE
                     else:
