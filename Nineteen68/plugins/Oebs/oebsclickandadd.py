@@ -408,10 +408,34 @@ class ClickAndAdd:
                                             text = tagname
                                         text = text.replace('<','')
                                         text = text.replace('>','')
+
+                                        tagname = ''
+                                        if(curaccinfo.role =='push button' or curaccinfo.role =='toggle button'):
+                            			    tagname = "button"
+                                        elif(curaccinfo.role == 'edit'or curaccinfo.role == 'Edit Box' or curaccinfo.role =='text' or curaccinfo.role =='password text'):
+                            				tagname = "input"
+                                        elif(curaccinfo.role == 'combo box'):
+                            				tagname = "select";
+                                        elif(curaccinfo.role =='list item' or curaccinfo.role =='list' ):
+                            				tagname = "list"
+                                        elif(curaccinfo.role =='hyperlink' or curaccinfo.role =='Static'):
+                            				tagname = "a"
+                                        elif(curaccinfo.role =='check box'):
+                            				tagname = "checkbox"
+                                        elif(curaccinfo.role =='radio button'):
+                            				tagname = "radiobutton"
+                                        elif(curaccinfo.role == 'table'):
+                            				tagname = "table"
+                                        elif(curaccinfo.role == 'scroll bar'):
+                            				tagname = "scrollbar"
+                                        elif(curaccinfo.role == 'internal frame'):
+                            				tagname = "internalframe"
+                                        else:
+                            				tagname = "element";
                                         global e
 
                                         e.append({"custname":text,
-                                                "tag":curaccinfo.role,
+                                                "tag":tagname,
                                                 "xpath":key + ';' + name.strip() + ';' + str(indexInParent)  + ';' + str(childrencount) + ';'+ str(parentname).strip() + ';' + str(parentxpath) + ';' + str(parentchildcount) + ';' + str(parentindex)+ ';' + str(parenttag)+ ';' + str(curaccinfo.role) + ';' + description ,
                                                 "hiddentag":'No',
                                                 "id":'null',
