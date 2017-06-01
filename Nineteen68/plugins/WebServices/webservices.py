@@ -711,7 +711,7 @@ class WSkeywords:
                 port=m.group('port')
                 if str(port) is '':
                     port=443
-                cert = ssl.get_server_certificate((hostname, int(str(port))))
+                cert = ssl.get_server_certificate((hostname, int(str(port))),ssl_version=ssl.PROTOCOL_TLSv1)
                 cert=str(cert)
                 cert=cert.replace('\n','')
                 with open(filepath, 'w') as text_file:
