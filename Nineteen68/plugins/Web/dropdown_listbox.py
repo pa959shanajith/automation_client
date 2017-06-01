@@ -153,7 +153,9 @@ class DropdownKeywords():
                         Date :12-05-2017
                         """
                         if dropVal.lower()=='dropdown':
-                            webelement=self.jsExecutorForMultipleDropdown(webelement,input)
+                            ## webelement1=self.jsExecutorForMultipleDropdown(webelement,input)
+##New javascript was not providing the accurate element still keeping the if else condition for future checks if any
+                            webelement=self.radioKeywordsObj.getActualElement(webelement,input)
                         else:
                             webelement=self.radioKeywordsObj.getActualElement(webelement,input)
             if ((webelement.is_enabled()) or webelement.is_displayed()):
