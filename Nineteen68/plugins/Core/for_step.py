@@ -103,7 +103,7 @@ class For():
             endForNum = self.info_dict[0].keys()[0]
             inputval=input[0]
             try:
-                if(int(input[0])==0):
+                if(int(input[0]) <= 0):
                     forIndex=self.invalid_for_input(endForNum,inputval,reporting_obj)
                     iteration_count=0
                     return forIndex
