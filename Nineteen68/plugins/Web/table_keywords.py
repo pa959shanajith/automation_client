@@ -387,7 +387,7 @@ class TableOperationKeywords():
                         elif len(input_arr)>2:
                             log.info('click on an element inside a cell')
                             logger.print_on_console('click on an element inside a cell')
-                            tag=input_arr[2]
+                            tag=input_arr[2].lower()
                             index=int(input_arr[3])
                             eleStatus=False
                             counter = 1
