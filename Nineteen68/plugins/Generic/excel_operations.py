@@ -625,6 +625,7 @@ class ExcelXLS:
         """
         status=False
         err_msg=None
+        x = False
         log.debug('Comparing content of .xls files')
         try:
 ##            import pandas as pd
@@ -649,8 +650,12 @@ class ExcelXLS:
                     for colnum, (c1, c2) in enumerate(izip_longest(row_rb1, row_rb2)):
                         if c1 != c2:
                             log.debug('Row ',str(rownum+1),' Col ',str(colnum+1),' cell value 1 ',c1,' cell value 2 ',c2)
+                            x = True
                             break
-                    status=True
+                    if(x):
+                        status = False
+                    else:
+                        status=True
                 else:
                     log.error('Row ',str(rownum+1),' is missing')
                     err_msg='File contents are not same'
@@ -659,8 +664,6 @@ class ExcelXLS:
 
 
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             err_msg='Error occured in compare content of .xls files'
             log.error(e)
         log.info('Status is '+str(status))

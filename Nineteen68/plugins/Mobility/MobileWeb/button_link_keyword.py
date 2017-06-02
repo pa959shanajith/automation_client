@@ -277,7 +277,6 @@ class ButtonLinkKeyword():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement != None:
-                text = webelement.text
                 input = inputs[0]
                 input = input.strip()
                 if input != None and len(input) != 0:
@@ -289,10 +288,10 @@ class ButtonLinkKeyword():
                         linktext = webelement.text
                         log.info('Link text: ' +linktext)
                         if linktext == input:
-##                            err_msg='Link Text mismatched'
+                            err_msg='Link Text matched'
                             logger.print_on_console('Link Text matched')
-##                            log.info(err_msg)
-##                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                            log.info(err_msg)
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
                         else:
@@ -302,9 +301,9 @@ class ButtonLinkKeyword():
                             logger.print_on_console(EXPECTED,input)
                             log.info(EXPECTED)
                             log.info(input)
-                            logger.print_on_console(ACTUAL,text)
+                            logger.print_on_console(ACTUAL,linktext)
                             log.info(ACTUAL)
-                            log.info(text)
+                            log.info(linktext)
 
 
                 else:

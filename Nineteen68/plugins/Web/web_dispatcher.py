@@ -277,6 +277,10 @@ class Dispatcher:
                         result=TERMINATE
 
                 elif keyword==WAIT_FOR_ELEMENT_VISIBLE:
+                    if objectname==CUSTOM:
+                        webelement=send_webelement_to_keyword(driver,objectname,url)
+                        objectname=self.custom_object.getElementXPath(webelement)
+
                     identifiers = objectname.split(';')
                     input=identifiers[0]
 

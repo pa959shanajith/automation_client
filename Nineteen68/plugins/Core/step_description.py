@@ -557,7 +557,7 @@ class StepDescription:
         def navigateBack():
             return 'Navigate back in the browser'
         def verifyTextExists():
-            return 'Verify static text ' + input + ' exists'
+            return 'Verify ' + input + ' exist and Number of occurance of the text ' + input + ' is'+ tsp.outputval +' time(s).'
         def getCurrentURL():
             return 'Get current url of the web page and save the URL '+ output + ' in '+ tsp.outputval
         def verifyCurrentURL():
