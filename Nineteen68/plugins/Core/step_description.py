@@ -192,7 +192,7 @@ class StepDescription:
         def split():
             return "Split the string '"+ input+ "' with split character '"+ inputval[1]+ "' and save the value:"+ inputval[2] + " in '"+ tsp.outputval + "'"
         def stop():
-            return "Stop the Exceution"
+            return "Stop the Execution"
         def stringGeneration():
             return "Generate a charecter string having a length '"+ input + "'."
         def toLowerCase():
