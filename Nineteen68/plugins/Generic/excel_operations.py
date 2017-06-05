@@ -1127,6 +1127,8 @@ class ExcelXLSX:
             book.remove(sheet)
             book.active=len(book.sheetnames)-1
             book.save(inputpath)
+            book.create_sheet(sheetname)
+            book.save(inputpath)
             status=True
         except Exception as e:
             err_msg='Error occured in clearing the content of excel sheet'
