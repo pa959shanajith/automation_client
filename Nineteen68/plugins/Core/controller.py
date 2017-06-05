@@ -793,6 +793,7 @@ class Controller():
         global terminate_flag
         obj = handler.Handler()
         status=COMPLETED
+        condition_check_flag = False
 ##        t = test.Test()
 ##        suites_list,flag = t.gettsplist()
         #Getting all the details by parsing the json_data
@@ -839,63 +840,78 @@ class Controller():
                         con.configvalues=configvalues
                         con.wx_object=wxObject
                         handler.tspList=[]
-                         #check for temrinate flag before printing loggers
-                        if not(terminate_flag):
-                            print( '=======================================================================================================')
-                            logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
-                            print( '=======================================================================================================')
-                            log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
-                        #Iterating through each test case in the scenario
-                        for d in [eval(scenario[scenario_id])]:
-
-                            #check for temrinate flag before parsing tsp list
-                            if terminate_flag:
-                                break
-                            flag,browser_temp,last_tc_num=obj.parse_json(d,dataparam_path_value)
-
-                            if flag == False:
-                                break
-                            print '\n'
-                            tsplist = handler.tspList
-                            for k in range(len(tsplist)):
-                                if tsplist[k].name.lower() == 'openbrowser':
-                                    if tsplist[k].apptype.lower()=='web':
-                                        tsplist[k].inputval = [browser]
-
-                        if flag:
-                            #check for temrinate flag before execution
-                            tsplist = obj.read_step()
+                        #condition check for scenario execution and reporting for condition check
+                        if not(condition_check_flag):
+                             #check for temrinate flag before printing loggers
                             if not(terminate_flag):
-                                con.action=EXECUTE
-                                con.conthread=mythread
-                                status = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
                                 print( '=======================================================================================================')
-                                logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
+                                logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
                                 print( '=======================================================================================================')
+                                log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
+                            #Iterating through each test case in the scenario
+                            for d in [eval(scenario[scenario_id])]:
+
+                                #check for temrinate flag before parsing tsp list
+                                if terminate_flag:
+                                    break
+                                flag,browser_temp,last_tc_num=obj.parse_json(d,dataparam_path_value)
+
+                                if flag == False:
+                                    break
+                                print '\n'
+                                tsplist = handler.tspList
+                                for k in range(len(tsplist)):
+                                    if tsplist[k].name.lower() == 'openbrowser':
+                                        if tsplist[k].apptype.lower()=='web':
+                                            tsplist[k].inputval = [browser]
+
+
+                            if flag :
+                                #check for temrinate flag before execution
+                                tsplist = obj.read_step()
+                                if not(terminate_flag):
+                                    con.action=EXECUTE
+                                    con.conthread=mythread
+                                    status = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
+                                    print( '=======================================================================================================')
+                                    logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
+                                    print( '=======================================================================================================')
+
+                            else:
+                                print 'Invalid script'
+                            #Saving the report for the scenario
+                            logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
+                            log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
+                            os.chdir(self.cur_dir)
+                            filename='Scenario'+str(i  + 1)+'.json'
+                            con.reporting_obj.save_report_json(filename)
+                            socketIO.emit('result_executeTestSuite',self.getreport_data(suite_id,scenario_id,con,execution_id))
+                            obj.clearList(con)
+                            i+=1
+                            #logic for condition check
+                            report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+                            #Check is made to fix issue #401
+                            if len(report_json)>0:
+                                overall_status=report_json[0]['overallstatus']
+                                if(condition_check_value==1):
+                                    if(overall_status==TEST_RESULT_PASS):
+                                        continue
+                                    else:
+                                        condition_check_flag = True
+                                        logger.print_on_console('Condition Check: Terminated by program ')
 
                         else:
-                            print 'Invalid script'
+                            logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
+                            log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
+                            os.chdir(self.cur_dir)
+                            filename='Scenario'+str(i  + 1)+'.json'
+                            con.reporting_obj.save_report_json_conditioncheck(filename)
+                            socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck(suite_id,scenario_id,con,execution_id))
+                            obj.clearList(con)
+                            i+=1
+                            #logic for condition check
+                            report_json=con.reporting_obj.report_json[OVERALLSTATUS]
 
-                        #Saving the report for the scenario
-                        logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
-                        log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
-                        os.chdir(self.cur_dir)
-                        filename='Scenario'+str(i  + 1)+'.json'
-                        con.reporting_obj.save_report_json(filename)
-                        socketIO.emit('result_executeTestSuite',self.getreport_data(suite_id,scenario_id,con,execution_id))
-                        obj.clearList(con)
-                        i+=1
-                        #logic for condition check
-                        report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-                        #Check is made to fix issue #401
-                        if len(report_json)>0:
-                            overall_status=report_json[0]['overallstatus']
-                            if(condition_check_value==1):
-                                if(overall_status==TEST_RESULT_PASS):
-                                    continue
-                                else:
-                                    logger.print_on_console('Condition Check: Terminated by program ')
-                                    break
 
             log.info('---------------------------------------------------------------------')
             print( '=======================================================================================================')
@@ -915,6 +931,14 @@ class Controller():
         obj={'testsuiteId':testsuite_id,
         'scenarioId':scenario_id,
         'reportData':con.reporting_obj.report_json,
+        'executionId':execution_id}
+        return obj
+
+    #Building of Dictionary to send back toserver to save the data for condition check
+    def getreport_data_conditioncheck(self,testsuite_id,scenario_id,con,execution_id):
+        obj={'testsuiteId':testsuite_id,
+        'scenarioId':scenario_id,
+        'reportData':con.reporting_obj.report_json_condition_check,
         'executionId':execution_id}
         return obj
 
