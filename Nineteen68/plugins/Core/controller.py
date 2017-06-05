@@ -451,8 +451,24 @@ class Controller():
             if keyword_response != []:
                 display_keyword_response='DB data fetched'
 
-
-        logger.print_on_console('Result obtained is ',display_keyword_response)
+        if(tsp.apptype.lower() == 'webservice' and tsp.testscript_name == '' and tsp.name == 'executeRequest'):
+            logger.print_on_console('Keys ',type(display_keyword_response))
+            if len(display_keyword_response) == 2:
+                logger.print_on_console('Response Header: \n',display_keyword_response[0])
+                if 'soap:Envelope' in display_keyword_response[1]:
+                    from lxml import etree
+                    root = etree.fromstring(display_keyword_response[1])
+                    respBody = etree.tostring(root,pretty_print=True)
+                    logger.print_on_console('Response Body: \n',respBody)
+                else:
+                    logger.print_on_console('NON SOAP-XML')
+                    logger.print_on_console('Response Body: \n',display_keyword_response[1])
+            elif(len(display_keyword_response) == 1):
+                logger.print_on_console('Response Header: ',display_keyword_response[0])
+            else:
+                logger.print_on_console('Result obtained is ',display_keyword_response)
+        else:
+            logger.print_on_console('Result obtained is ',display_keyword_response)
         log.info('Result obtained is: ')
         log.info(display_keyword_response)
 
@@ -1188,9 +1204,3 @@ if __name__ == '__main__':
 ##    json_data={u'executionId': u'7d0eea8c-c8d2-4f81-b9ff-04abeb14444e', u'suitedetails': [{u'13bbacaf-82c7-4c4a-9f91-0933462b10d4': [{u'72bcc08e-15a7-4de6-ad59-389aee2230cb': u'[{"template":"","testcase":"[{\\"stepNo\\":1,\\"objectName\\":\\" \\",\\"custname\\":\\"@Browser\\",\\"keywordVal\\":\\"openBrowser\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarksStatus\\":\\"<img src=\\\\\\"imgs/ic-remarks-inactive.png\\\\\\" class=\\\\\\"remarksIcon\\\\\\">\\",\\"remarks\\":\\"\xa0\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\"},{\\"stepNo\\":2,\\"objectName\\":\\" \\",\\"custname\\":\\"@Browser\\",\\"keywordVal\\":\\"navigateToURL\\",\\"inputVal\\":[\\"https://www.google.co.in/?gfe_rd=cr&ei=etWhWMOVMeKK8Qey0r2oAg\\"],\\"outputVal\\":\\"\\",\\"remarksStatus\\":\\"<img src=\\\\\\"imgs/ic-remarks-inactive.png\\\\\\" class=\\\\\\"remarksIcon\\\\\\">\\",\\"remarks\\":\\"\xa0\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\"},{\\"stepNo\\":3,\\"objectName\\":\\"//*[@id=\\\\\\"lst-ib\\\\\\"];lst-ib;/html/body/div[1]/div[3]/form/div[2]/div[2]/div[1]/div[1]/div[3]/div/div/div[3]/div/input[1];null;null;null\\",\\"custname\\":\\"q_txtbox\\",\\"keywordVal\\":\\"verifyExists\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"{a}\\",\\"remarksStatus\\":\\"<img src=\\\\\\"imgs/ic-remarks-inactive.png\\\\\\" class=\\\\\\"remarksIcon\\\\\\">\\",\\"remarks\\":\\"\xa0\\",\\"url\\":\\"https://www.google.co.in/?gfe_rd=cr&ei=GyKHWLHOJM2L8Qflo7bwCw&gws_rd=ssl\\",\\"appType\\":\\"Web\\"},{\\"stepNo\\":4,\\"objectName\\":\\"//*[@id=\\\\\\"lst-ib\\\\\\"];lst-ib;/html/body/div[1]/div[3]/form/div[2]/div[2]/div[1]/div[1]/div[3]/div/div/div[3]/div/input[1];null;null;null\\",\\"custname\\":\\"q_txtbox\\",\\"keywordVal\\":\\"setSecureText\\",\\"inputVal\\":[\\"selenium\\"],\\"outputVal\\":\\"\\",\\"remarksStatus\\":\\"<img src=\\\\\\"imgs/ic-remarks-inactive.png\\\\\\" class=\\\\\\"remarksIcon\\\\\\">\\",\\"remarks\\":\\"\xa0\\",\\"url\\":\\"https://www.google.co.in/?gfe_rd=cr&ei=GyKHWLHOJM2L8Qflo7bwCw&gws_rd=ssl\\",\\"appType\\":\\"Web\\"},{\\"stepNo\\":5,\\"objectName\\":\\" \\",\\"custname\\":\\"@Generic\\",\\"keywordVal\\":\\"displayVariableValue\\",\\"inputVal\\":[\\"{a}\\"],\\"outputVal\\":\\"\\",\\"remarksStatus\\":\\"<img src=\\\\\\"imgs/ic-remarks-inactive.png\\\\\\" class=\\\\\\"remarksIcon\\\\\\">\\",\\"remarks\\":\\"\xa0\\",\\"url\\":\\" \\",\\"appType\\":\\"Generic\\"}]","testcasename":"Dev_Testing"}]'}], u'dataparampath': [None], u'browserType': [u'1',u'3'], u'condition': ['0'], u'scenarioIds': [u'72bcc08e-15a7-4de6-ad59-389aee2230cb']}], u'testsuiteIds': [u'13bbacaf-82c7-4c4a-9f91-0933462b10d4']}
 ##    obj.invoke_execution('',json_data,'')
 ##    kill_process()
-
-
-
-
-
-
