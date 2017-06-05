@@ -226,7 +226,7 @@ class TextFile:
         return status,err_msg
 
 
-    def get_content(self,input_path):
+    def get_content(self,input_path,linenumber):
         """
         def : get_content
         purpose : returns the content of given text file
@@ -240,10 +240,17 @@ class TextFile:
         log.debug('Get the content of Text file '+str(input_path))
         try:
             with open(input_path) as myFile:
-                content=myFile.read()
-##                logger.print_on_console('Content is:'+content)
-                log.info('Content is '+str(content))
-                status=True
+                content = myFile.read()
+                if int(linenumber) >= 0:
+                    linenumber = int(linenumber) - 1
+                if (int(linenumber) <= len(content.splitlines())) and (int(linenumber) >= 0):
+                    content = content.splitlines()[int(linenumber)]
+                    log.info('Content is '+str(content))
+                    status=True
+                else:
+                    content = ''
+                    err_msg=constants.ERROR_CODE_DICT['ERR_INVALID_INPUT']
+
         except IOError:
             err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
