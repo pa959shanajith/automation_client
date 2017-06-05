@@ -819,16 +819,10 @@ class Controller():
             logger.print_on_console('***SUITE ', j ,' EXECUTION STARTED***')
             log.info('-----------------------------------------------')
             print( '=======================================================================================================')
-            #Iterate through each suite
-##            for i in range( len(suite)):
-##            condition_check=False
+
             do_not_execute = False
-            #create a object of controller for each scenario
-##            con =Controller()
-##            handler.tspList=[]
+
             #Check for the disabled scenario
-
-
 
             if not (do_not_execute) :
                 i=0
@@ -836,6 +830,7 @@ class Controller():
                 for browser in browser_type[suite_id]:
                     #Logic to iterate through each scenario in the suite
                     for scenario,scenario_id,condition_check_value,dataparam_path_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id],dataparam_path[suite_id]):
+                        execute_flag=True
                         con =Controller()
                         con.configvalues=configvalues
                         con.wx_object=wxObject
@@ -860,13 +855,22 @@ class Controller():
                                     break
                                 print '\n'
                                 tsplist = handler.tspList
+
+                                if len(tsplist)==0:
+                                    continue
                                 for k in range(len(tsplist)):
                                     if tsplist[k].name.lower() == 'openbrowser':
                                         if tsplist[k].apptype.lower()=='web':
                                             tsplist[k].inputval = [browser]
 
 
-                            if flag :
+                            if len(handler.tspList)==0:
+                                execute_flag=False
+                                logger.print_on_console('Scenario '+str((i  + 1 ) )+' is empty')
+                                log.info('Scenario '+str((i  + 1 ) )+' is empty')
+
+
+                            if flag and execute_flag :
                                 #check for temrinate flag before execution
                                 tsplist = obj.read_step()
                                 if not(terminate_flag):
@@ -877,28 +881,31 @@ class Controller():
                                     logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
                                     print( '=======================================================================================================')
 
+##                            else:
+##                                print 'Invalid script'
+                            if execute_flag:
+                                #Saving the report for the scenario
+                                logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
+                                log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
+                                os.chdir(self.cur_dir)
+                                filename='Scenario'+str(i  + 1)+'.json'
+                                con.reporting_obj.save_report_json(filename)
+                                socketIO.emit('result_executeTestSuite',self.getreport_data(suite_id,scenario_id,con,execution_id))
+                                obj.clearList(con)
+                                i+=1
+                                #logic for condition check
+                                report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+                                #Check is made to fix issue #401
+                                if len(report_json)>0:
+                                    overall_status=report_json[0]['overallstatus']
+                                    if(condition_check_value==1):
+                                        if(overall_status==TEST_RESULT_PASS):
+                                            continue
+                                        else:
+                                            condition_check_flag = True
+                                            logger.print_on_console('Condition Check: Terminated by program ')
                             else:
-                                print 'Invalid script'
-                            #Saving the report for the scenario
-                            logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
-                            log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
-                            os.chdir(self.cur_dir)
-                            filename='Scenario'+str(i  + 1)+'.json'
-                            con.reporting_obj.save_report_json(filename)
-                            socketIO.emit('result_executeTestSuite',self.getreport_data(suite_id,scenario_id,con,execution_id))
-                            obj.clearList(con)
-                            i+=1
-                            #logic for condition check
-                            report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-                            #Check is made to fix issue #401
-                            if len(report_json)>0:
-                                overall_status=report_json[0]['overallstatus']
-                                if(condition_check_value==1):
-                                    if(overall_status==TEST_RESULT_PASS):
-                                        continue
-                                    else:
-                                        condition_check_flag = True
-                                        logger.print_on_console('Condition Check: Terminated by program ')
+                                i+=1
 
                         else:
                             logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
