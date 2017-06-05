@@ -448,7 +448,8 @@ class WSkeywords:
                 prep=req.prepare()
                 response=s.send(prep)
                 self.baseResHeader=response.headers
-                logger.print_on_console(ws_constants.RESPONSE_HEADER,str(self.baseResHeader))
+                self.baseResHeader['StatusCode']=response.status_code
+##                logger.print_on_console(ws_constants.RESPONSE_HEADER,str(self.baseResHeader))
                 output= self.baseResHeader
                 log.info(STATUS_METHODOUTPUT_UPDATE)
                 status = ws_constants.TEST_RESULT_PASS
@@ -503,6 +504,7 @@ class WSkeywords:
         if response == '':
             response = 'fail'
         if testcasename == '':
+            response = unicode(response, "utf-8")
             socketIO.emit('result_debugTestCaseWS',response)
         return result
 
