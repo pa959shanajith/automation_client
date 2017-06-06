@@ -19,6 +19,8 @@ import oebs_constants
 windowname=None
 import constants
 import oebs_msg
+import screenshot_keywords
+import readconfig
 
 log = logging.getLogger('oebs_dispatcher.py')
 
@@ -196,6 +198,15 @@ class OebsDispatcher:
             else:
                 err_msg=constants.INVALID_KEYWORD
                 result[3]=err_msg
+            #capture screenshot feature has been implemented for OEBS
+            screen_shot_obj = screenshot_keywords.Screenshot()
+            configobj = readconfig.readConfig()
+            configvalues = configobj.readJson()
+            if configvalues['screenShot_Flag'].lower() == 'fail':
+                if result[0].lower() == 'fail':
+                    screen_shot_obj.captureScreenshot()
+            elif configvalues['screenShot_Flag'].lower() == 'all':
+                screen_shot_obj.captureScreenshot()
          except TypeError as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
