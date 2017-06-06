@@ -66,6 +66,7 @@ class DropdownListboxOperations:
                         keywordresponse = keywordresponse + ';'
                     else:
                         keywordresponse=selectedvalue[i]
+                        selectedvalue = keywordresponse
                 else:
                     keywordresponse=keywordresponse + selectedvalue[i]
                     if i < outputsize - 1:
