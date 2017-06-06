@@ -451,7 +451,7 @@ class Controller():
             if keyword_response != []:
                 display_keyword_response='DB data fetched'
 
-        if(tsp.apptype.lower() == 'webservice' and tsp.testscript_name == '' and tsp.name == 'executeRequest'):
+        if(tsp.apptype.lower() == 'webservice' and tsp.name == 'executeRequest'):
             logger.print_on_console('Keys ',type(display_keyword_response))
             if len(display_keyword_response) == 2:
                 logger.print_on_console('Response Header: \n',display_keyword_response[0])
@@ -459,10 +459,10 @@ class Controller():
                     from lxml import etree
                     root = etree.fromstring(display_keyword_response[1])
                     respBody = etree.tostring(root,pretty_print=True)
-                    logger.print_on_console('Response Body: \n',respBody)
+                    logger.print_on_console('Response Body: \n',respBody,'\n')
                 else:
                     logger.print_on_console('NON SOAP-XML')
-                    logger.print_on_console('Response Body: \n',display_keyword_response[1])
+                    logger.print_on_console('Response Body: \n',display_keyword_response[1],'\n')
             elif(len(display_keyword_response) == 1):
                 logger.print_on_console('Response Header: ',display_keyword_response[0])
             else:
