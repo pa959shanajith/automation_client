@@ -115,6 +115,14 @@ class Handler():
                 #ws_template=json_data['template']
             if json_data.has_key('testcase'):
                 testcase=json_data['testcase']
+                try:
+                    if len(testcase)==0:
+                        logger.print_on_console('Testcase is empty')
+                        log.info('Testcase is empty')
+                        continue
+                except Exception as e:
+                    log.error(e)
+
                 #passing test case value to ftfy module to handle special charcter
                 if(type(testcase) == 'unicode'):
                     temp_testcase = ftfy.fix_text(testcase)

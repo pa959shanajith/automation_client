@@ -14,6 +14,7 @@ import reporting_pojo
 import logger
 import logging
 import step_description
+from datetime import datetime
 
 log = logging.getLogger("reporting.py")
 
@@ -28,7 +29,9 @@ class Reporting:
     def __init__(self):
         self.report_string=[]
         self.overallstatus_array=[]
+        self.overallstatus_array_incomplete = []
         self.report_json={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_array}
+        self.report_json_condition_check={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_array_incomplete}
         self.nested_flag=False
         self.pid_list=[]
         self.parent_id=0
@@ -104,6 +107,24 @@ class Reporting:
         obj[OVERALLSTATUS]=self.overallstatus
         obj[BROWSER_TYPE]=self.browser_type
         self.overallstatus_array.append(obj)
+
+    def build_overallstatus_conditionCheck(self):
+            """
+            def : build_overallstatus_conditionCheck
+            purpose : builds the overallstatus field of condition check report_json
+
+            """
+            self.start_time = datetime.now()
+            self.end_time = datetime.now()
+            self.ellapsed_time = self.end_time - self.start_time
+            obj={}
+            obj[ELLAPSED_TIME]=str(self.ellapsed_time)
+            obj[END_TIME]=str(self.end_time)
+            obj[BROWSER_VERSION]=""
+            obj[START_TIME]=str(self.start_time)
+            obj[OVERALLSTATUS]=INCOMPLETE
+            obj[BROWSER_TYPE]=""
+            self.overallstatus_array_incomplete.append(obj)
 
     def get_pid(self):
         """
@@ -262,6 +283,14 @@ class Reporting:
         with open(filename, 'w') as outfile:
                 log.info('Writing report data to the file '+filename)
                 json.dump(self.report_json, outfile, indent=4, sort_keys=False)
+        outfile.close()
+
+    def save_report_json_conditioncheck(self,filename):
+        log.debug('Saving report json to a file')
+        self.build_overallstatus_conditionCheck()
+        with open(filename, 'w') as outfile:
+                log.info('Writing report data to the file '+filename)
+                json.dump(self.report_json_condition_check, outfile, indent=4, sort_keys=False)
         outfile.close()
 
 

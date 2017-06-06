@@ -449,10 +449,7 @@ class DropdownKeywords():
 ##                                                else:
                                                     select.select_by_index(input_val)
                                             else:
-
-                                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                                m=1
 
                                     else:
                                         flag = True
