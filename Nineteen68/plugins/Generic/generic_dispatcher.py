@@ -153,6 +153,8 @@ class GenericKeywordDispatcher:
                 elif keyword in generic_constants.DATA_BASE_KEYWORDS:
                     message=list(message)
                     output=[tsp.outputval]
+                    if ';' in tsp.outputval:
+                        output=tsp.outputval.split(';')
                     message.extend(output)
                 result= dict[keyword](*message)
             else:
