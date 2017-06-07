@@ -36,7 +36,19 @@ class XMLOperations():
         try:
             root = ET.fromstring(str(input_string))
             log.debug('Root object created with input string')
-            items = root.getiterator(str(input_tag))
+            items=[]
+            ##vishvas.a 17/06/06 Defect #578 ALM
+            #this condition checks if the XML type received is SOAP type
+            #if true then "items" tag names are added using looping
+            #else the regular flow continues
+            if 'Envelope' in root.tag and root.tag.split('}')[1] == 'Envelope':
+                for elem in root.iter():
+                    tag = elem.tag.split('}')[1]
+                    if tag == input_tag:
+                        items.append(tag)
+            else:
+                items = root.getiterator(str(input_tag))
+##            items = root.getiterator(str(input_tag))
             log.debug('Getting children node from the root')
             if len(items) > 0:
                 log.debug('There are children in the root node, get the total number of children')
@@ -76,7 +88,19 @@ class XMLOperations():
         try:
             root = ET.fromstring(str(input_string))
             log.debug('Root object created with input string')
-            items = root.getiterator(str(input_tag))
+            items=[]
+            ##vishvas.a 17/06/06 Defect #578 ALM
+            #this condition checks if the XML type received is SOAP type
+            #if true then "items" are added using looping
+            #else the regular flow continues
+            if 'Envelope' in root.tag and root.tag.split('}')[1] == 'Envelope':
+                for elem in root.iter():
+                    tag = elem.tag.split('}')[1]
+                    if tag == input_tag:
+                        items.append(elem)
+            else:
+                items = root.getiterator(str(input_tag))
+##            items = root.getiterator(str(input_tag))
             log.debug('Getting children node from the root')
             if len(items) > 0:
                 log.debug('There are children in the root node, get the total number of children')
@@ -86,7 +110,9 @@ class XMLOperations():
                 log.info('Block number: ' + str(block_number))
                 for child in block:
                     log.info('Iterating child in the block')
-                    if child.tag == str(child_tag):
+                    # added condition in 'or' for SOAP types
+                    if child.tag == str(child_tag) or ('}' in child.tag
+                                and child.tag.split('}')[1] == str(child_tag)):
                         log.info('Child mathed with the input child tag')
                         tagvalue =  child.text
                         logger.print_on_console('Tag : ',input_tag, 'Tag Value : ',tagvalue)
@@ -131,7 +157,19 @@ class XMLOperations():
         try:
             root = ET.fromstring(str(input_string))
             log.debug('Root object created with input string')
-            blocks = root.getiterator(str(input_tag))
+            blocks=[]
+            ##vishvas.a 17/06/06 Defect #578 ALM
+            #this condition checks if the XML type received is SOAP type
+            #if true then "blocks" are added using looping
+            #else the regular flow continues
+            if 'Envelope' in root.tag and root.tag.split('}')[1] == 'Envelope':
+                for elem in root.iter():
+                    tag = elem.tag.split('}')[1]
+                    if tag == input_tag:
+                        blocks.append(elem)
+            else:
+                blocks = root.getiterator(str(input_tag))
+##            blocks = root.getiterator(str(input_tag))
             log.debug('Getting children node from the root')
             if len(blocks) > 0:
                 log.debug('There are children in the root node, get the total number of children')
@@ -142,7 +180,10 @@ class XMLOperations():
                 log.info('Iterating child in the block')
                 for child in block:
                     log.info('Child text :' + str(child.text))
-                    blockvalue.append(  '<' + child.tag + '>' + child.text +  '</' + child.tag + '>')
+                    if '}' in child.tag:
+                        blockvalue.append(  '<' + child.tag.split('}')[1]  + '>' + child.text +  '</' + child.tag.split('}')[1]  + '>')
+                    else:
+                        blockvalue.append(  '<' + child.tag + '>' + child.text +  '</' + child.tag + '>')
                 status = TEST_RESULT_PASS
                 methodoutput = TEST_RESULT_TRUE
                 log.info(STATUS_METHODOUTPUT_UPDATE)

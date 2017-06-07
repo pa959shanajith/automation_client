@@ -22,7 +22,7 @@ import radio_checkbox_keywords_desktop
 import outlook
 import constants
 import logging
-
+import threading
 log = logging.getLogger('desktop_dispatcher.py')
 
 class DesktopDispatcher:
@@ -33,10 +33,11 @@ class DesktopDispatcher:
     util_keywords_obj = util_keywords.Util_Keywords()
     dropdown_keywords_obj=dropdown_keywords.Dropdown_Keywords()
     radio_checkbox_keywords_obj = radio_checkbox_keywords_desktop.Radio_Checkbox_keywords()
-    outook_obj=outlook.OutlookKeywords()
+##    outook_obj=outlook.OutlookKeywords()
 
     def __init__(self):
         self.exception_flag=''
+        self.outook_obj=outlook.OutlookKeywords()
 
 
 
@@ -134,8 +135,6 @@ class DesktopDispatcher:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             log.error(e)
             logger.print_on_console('Exception at dispatcher')
         if err_msg!=None:

@@ -291,9 +291,9 @@ class DatabaseOperation():
             fields = out_tuple[0]
             inp_sheet = None
             path=None
-            if ';' in fields:
-                inp_sheet=fields.split(';')[1]
-                fields=fields.split(';')[0]
+##            if ';' in fields:
+##                inp_sheet=fields.split(';')[1]
+##                fields=fields.split(';')[0]
 ##            verify = os.path.isfile(fields)
 ##            if (verify == True):
             ext = self.get_ext(fields)

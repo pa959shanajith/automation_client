@@ -20,6 +20,7 @@ import logger
 import pythoncom
 import threading
 log = logging.getLogger('outlook.py')
+import ftfy
 ##from  cherrypy import engine
 
 count=0
@@ -55,9 +56,8 @@ class OutlookKeywords:
             try:
                 logger.print_on_console('switching to the folder')
                 folderPath=input[0]
-                folderPath=folderPath.strip('//')
-                folders=folderPath.split('//')
-
+                folderPath=folderPath.strip('\\')
+                folders=folderPath.split('\\')
                 accountname=folders[0]
                 import pythoncom
                 pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
@@ -263,7 +263,7 @@ class OutlookKeywords:
             error_msg=None
             try:
                 if self.Flag==True:
-                    res= self.Body
+                    res= ftfy.fix_text(self.Body)
                     status=desktop_constants.TEST_RESULT_PASS
                     method_output=desktop_constants.TEST_RESULT_TRUE
                 else:
@@ -272,7 +272,7 @@ class OutlookKeywords:
             except Exception as  e:
                     log.error(e)
                     logger.print_on_console(e)
-            return status,method_output,str(res),error_msg
+            return status,method_output,res,error_msg
 
 
         def VerifyEmail(self,input,*args):
