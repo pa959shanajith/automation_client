@@ -84,4 +84,4 @@ ELEMENT_FOUND=True
 
 ERROR_MSG = 'Error occured'
 
-APPLICATION_KEYWORDS = ['launchapplication','findwindowandattach','closeapplication']
+APPLICATION_KEYWORDS = ['launchapplication','findwindowandattach','closeapplication','switchtofolder','getemail','getfrommailid','getattachmentstatus','getsubject','gettomailid','getbody','verifyemail']

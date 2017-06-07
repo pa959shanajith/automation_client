@@ -33,7 +33,6 @@ class ScrapeWindow(wx.Frame):
         self.socketIO = socketIO
 ##        fileLoc=filePath.split(';')[0]
         windowname=filePath.split(';')[0]
-        print 'Window name ::::::::::::::',windowname
         input_val=[]
 ##        input_val.append(fileLoc)
         input_val.append(windowname)
@@ -66,16 +65,18 @@ class ScrapeWindow(wx.Frame):
     #----------------------------------------------------------------------
     def clickandadd(self,event):
         state = event.GetEventObject().GetValue()
+        app_uia = launch_keywords.app_uia
+        window_name = launch_keywords.window_name
         if state == True:
             self.fullscrapebutton.Disable()
 ##        self.comparebutton.Disable()
-            desktop_scraping_obj.clickandadd('STARTCLICKANDADD')
+            desktop_scraping_obj.clickandadd('STARTCLICKANDADD',app_uia,window_name)
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
 ##            wx.MessageBox('CLICKANDADD: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
             logger.print_on_console( 'click and add initiated, select the elements from AUT')
 
         else:
-            d = desktop_scraping_obj.clickandadd('STOPCLICKANDADD')
+            d = desktop_scraping_obj.clickandadd('STOPCLICKANDADD',app_uia,window_name)
             event.GetEventObject().SetLabel("Start ClickAndAdd")
 
 
@@ -99,6 +100,7 @@ class ScrapeWindow(wx.Frame):
 ##        print 'desktop_scraping_obj:',desktop_scraping_obj
 ####        self.comparebutton.Disable()
         app_uia = launch_keywords.app_uia
+        print 'App uia ::',app_uia
         d = desktop_scraping_obj.full_scrape(app_uia)
 
         self.socketIO.emit('scrape',d)

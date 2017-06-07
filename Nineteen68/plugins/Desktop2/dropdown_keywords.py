@@ -215,7 +215,8 @@ class Dropdown_Keywords():
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                             elif element.friendly_class_name() == 'ComboBox':
-                                verb = element.item_count()
+                                verb1 = element.item_count()
+                                verb=int(verb1)
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
