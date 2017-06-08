@@ -489,23 +489,37 @@ class WSkeywords:
             logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_METHOD'])
         response=''
         socketIO = args[1]
-        if(result[2] != None):
-            res = result[2]
-            headerresp = ''
-            if type(res) == tuple:
-                for key in res[0]:
-                    headerresp = headerresp +str(key) + ":" + str (res[0][key]) + "##"
-                response=headerresp+'rEsPONseBOdY:'+res[1]
-            else:
-                for key in res:
-                    headerresp = headerresp +str(key) + ":" + str (res[key]) + "##"
-                response=headerresp+'rEsPONseBOdY: '
-        response = str(response)
-        if response == '':
-            response = 'fail'
-        if testcasename == '':
-            response = unicode(response, "utf-8")
-            socketIO.emit('result_debugTestCaseWS',response)
+
+        #data size verification
+        import sys
+        try:
+            if(result[2] != None):
+                headerresp = ''
+                res = result[2]
+                if type(res) == tuple:
+                    for key in res[0]:
+                        headerresp = headerresp +str(key) + ":" + str (res[0][key]) + "##"
+                    datasize = sys.getsizeof(res[1])
+                    kilobytes = datasize/1024
+                    megabytes = kilobytes/1024
+                    if megabytes > 5:
+                        response = headerresp+'rEsPONseBOdY: Response Body exceeds max. Limit., please use writeToFile keyword.'
+##                        res[1]='Data length is '+str(megabytes)+', please use writeToFile'
+##                        result[2]=headerresp+res[1]
+                    else:
+                        response=headerresp+'rEsPONseBOdY:'+res[1]
+                else:
+                    for key in res:
+                        headerresp = headerresp +str(key) + ":" + str (res[key]) + "##"
+                    response=headerresp+'rEsPONseBOdY: '
+            response = str(response)
+            if response == '':
+                response = 'fail'
+            if testcasename == '':
+                response = unicode(response, "utf-8")
+                socketIO.emit('result_debugTestCaseWS',response)
+        except Exception as e:
+            logger.print_on_console(e)
         return result
 
      def getHeader(self,*args):

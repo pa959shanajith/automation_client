@@ -16,6 +16,8 @@ from socketIO_client import SocketIO,BaseNamespace
 import os
 import logger
 obj=None
+import core_utils
+
 class ScrapeWindow(wx.Frame):
     def __init__(self, parent,id, title,filePath,socketIO):
         wx.Frame.__init__(self, parent, title=title,
@@ -23,6 +25,7 @@ class ScrapeWindow(wx.Frame):
         self.SetBackgroundColour('#e6e7e8')
         self.iconpath = os.environ["NINETEEN68_HOME"] + "\\Nineteen68\\plugins\\Core\\Images" + "\\slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
+        self.core_utilsobject = core_utils.CoreUtils()
         global obj
         obj = android_scrapping.InstallAndLaunch()
 
@@ -133,7 +136,12 @@ class ScrapeWindow(wx.Frame):
     def fullscrape(self,event):
         logger.print_on_console('Performing full scrape')
         d = obj.scrape()
-        self.socketIO.emit('scrape',d)
+        # 10 is the limit of MB set as per Nineteen68 standards
+        if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
+            self.socketIO.emit('scrape',d)
+        else:
+            print 'Scraped data exceeds max. Limit.'
+            self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
         self.Close()
         logger.print_on_console('Full scrape  completed')
 

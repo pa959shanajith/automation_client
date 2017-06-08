@@ -19,6 +19,7 @@ desktop_scraping_obj = desktop_scraping.Scrape()
 import os
 from constants import *
 import logger
+import core_utils
 
 obj=None
 class ScrapeWindow(wx.Frame):
@@ -31,6 +32,8 @@ class ScrapeWindow(wx.Frame):
         global obj
         obj = launch_keywords.Launch_Keywords()
         self.socketIO = socketIO
+        self.core_utilsobject = core_utils.CoreUtils()
+
 ##        fileLoc=filePath.split(';')[0]
         windowname=filePath.split(';')[0]
         input_val=[]
@@ -83,7 +86,13 @@ class ScrapeWindow(wx.Frame):
 ##            print desktop_scraping.finalJson
             logger.print_on_console('Stopped click and add')
             logger.print_on_console( 'Scrapped data saved successfully in domelements.json file')
-            self.socketIO.emit('scrape',d)
+            # 5 is the limit of MB set as per Nineteen68 standards
+            if self.core_utilsobject.getdatasize(str(d),'mb') < 5:
+                self.socketIO.emit('scrape',d)
+            else:
+                print 'Scraped data exceeds max. Limit.'
+                self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
+
 ##            wx.MessageBox('CLICKANDADD: Scrape completed', 'Info',wx.OK | wx.ICON_INFORMATION)
             self.Close()
 ##            event.GetEventObject().SetLabel("Start ClickAndAdd")
@@ -103,7 +112,13 @@ class ScrapeWindow(wx.Frame):
         print 'App uia ::',app_uia
         d = desktop_scraping_obj.full_scrape(app_uia)
 
-        self.socketIO.emit('scrape',d)
+        # 5 is the limit of MB set as per Nineteen68 standards
+        if self.core_utilsobject.getdatasize(str(d),'mb') < 5:
+            self.socketIO.emit('scrape',d)
+        else:
+            print 'Scraped data exceeds max. Limit.'
+            self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
+
         self.Close()
         logger.print_on_console('Full scrape  completed')
 

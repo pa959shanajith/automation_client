@@ -25,6 +25,7 @@ from constants import *
 import pause_execution
 import dynamic_variable_handler
 import reporting
+import core_utils
 import readconfig
 from values_from_ui import *
 from concurrent.futures import ThreadPoolExecutor
@@ -122,6 +123,7 @@ class Controller():
         self.last_tc_num=1
         self.debugfrom_step=1
         self.configvalues={}
+        self.core_utilsobject = core_utils.CoreUtils()
 
 
     def __load_generic(self):
@@ -452,23 +454,36 @@ class Controller():
                 display_keyword_response='DB data fetched'
 
         if(tsp.apptype.lower() == 'webservice' and tsp.name == 'executeRequest'):
-            logger.print_on_console('Keys ',type(display_keyword_response))
             if len(display_keyword_response) == 2:
                 logger.print_on_console('Response Header: \n',display_keyword_response[0])
-                if 'soap:Envelope' in display_keyword_response[1]:
-                    from lxml import etree
-                    root = etree.fromstring(display_keyword_response[1])
-                    respBody = etree.tostring(root,pretty_print=True)
-                    logger.print_on_console('Response Body: \n',respBody,'\n')
+                #data size check
+                if self.core_utilsobject.getdatasize(display_keyword_response[1],'mb') < 5:
+                    if 'soap:Envelope' in display_keyword_response[1]:
+                        from lxml import etree
+                        root = etree.fromstring(display_keyword_response[1])
+                        respBody = etree.tostring(root,pretty_print=True)
+                        logger.print_on_console('Response Body: \n',respBody,'\n')
+                    else:
+                        logger.print_on_console('NON SOAP XML')
+                        logger.print_on_console('Response Body: \n',display_keyword_response[1],'\n')
                 else:
-                    logger.print_on_console('NON SOAP-XML')
-                    logger.print_on_console('Response Body: \n',display_keyword_response[1],'\n')
+                    logger.print_on_console('Response Body exceeds max. Limit, please use writeToFile keyword.')
+                    log.info('Result obtained is: ')
+                    log.info(display_keyword_response)
             elif(len(display_keyword_response) == 1):
                 logger.print_on_console('Response Header: ',display_keyword_response[0])
             else:
-                logger.print_on_console('Result obtained is ',display_keyword_response)
+                #data size check
+                if self.core_utilsobject.getdatasize(display_keyword_response,'mb') < 5:
+                    logger.print_on_console('Result obtained is ',display_keyword_response)
+                else:
+                    logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         else:
-            logger.print_on_console('Result obtained is ',display_keyword_response)
+            #data size check
+            if self.core_utilsobject.getdatasize(display_keyword_response,'mb') < 5:
+                logger.print_on_console('Result obtained is ',display_keyword_response)
+            else:
+                logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         log.info('Result obtained is: ')
         log.info(display_keyword_response)
 

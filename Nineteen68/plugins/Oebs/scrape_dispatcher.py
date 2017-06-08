@@ -21,6 +21,7 @@ import json
 import time
 from constants import *
 from socketIO_client import SocketIO,BaseNamespace
+import core_utils
 
 log = logging.getLogger('scrape_dispatcher.py')
 windownametoscrape = ''
@@ -36,6 +37,7 @@ class ScrapeDispatcher(wx.Frame):
         obj = utils.Utils()
         self.utils_obj=utils.Utils()
         self.scrape_obj=oebs_fullscrape.FullScrape()
+        self.core_utilsobject = core_utils.CoreUtils()
         global windownametoscrape
         windownametoscrape = filePath
         self.socketIO = socketIO
@@ -98,7 +100,14 @@ class ScrapeDispatcher(wx.Frame):
                 d['mirror'] =encoded_string.encode('UTF-8').strip()
             except Exception as e:
                 logger.print_on_console('Error occured while capturing Screenshot',e)
-            self.socketIO.emit('scrape',d)
+
+            # 5 is the limit of MB set as per Nineteen68 standards
+            if self.core_utilsobject.getdatasize(str(d),'mb') < 5:
+                self.socketIO.emit('scrape',d)
+            else:
+                print 'Scraped data exceeds max. Limit.'
+                self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
+
     ##            wx.MessageBox('CLICKANDADD: Scrape completed', 'Info',wx.OK | wx.ICON_INFORMATION)
             self.Close()
     ##            event.GetEventObject().SetLabel("Start ClickAndAdd")
@@ -126,7 +135,14 @@ class ScrapeDispatcher(wx.Frame):
             d['mirror'] =encoded_string.encode('UTF-8').strip()
         except Exception as e:
             logger.print_on_console('Error occured while capturing Screenshot ',e)
-        self.socketIO.emit('scrape',d)
+
+        # 5 is the limit of MB set as per Nineteen68 standards
+        if self.core_utilsobject.getdatasize(str(d),'mb') < 5:
+            self.socketIO.emit('scrape',d)
+        else:
+            print 'Scraped data exceeds max. Limit.'
+            self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
+
         self.Close()
         logger.print_on_console('Full scrape  completed')
 
