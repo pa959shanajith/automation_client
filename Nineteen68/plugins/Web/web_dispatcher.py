@@ -79,7 +79,8 @@ class Dispatcher:
                     'setText': ['textbox','textarea','password','number','email','url'],
                     'sendValue':['textbox','textarea','password','number','email','url'],
                     'getText': ['textbox','textarea','password','number','email','url'],
-                    'setSecureText':['textbox','password']
+                    'setSecureText':['textbox','password'],
+                    'sendSecureValue':['textbox','password']
 
                     }
         custom_dict_element={'element':['clickElement','doubleClick','rightClick','getElementText','verifyElementText','drag', 'drop','getToolTipText','verifyToolTipText','verifyExists', 'verifyDoesNotExists', 'verifyHidden','verifyVisible', 'switchToTab','switchToWindow','setFocus','sendFunctionKeys',
@@ -209,6 +210,7 @@ class Dispatcher:
                   'getTextboxLength':self.textbox_object.gettextbox_length,
                   'verifyTextboxLength':self.textbox_object.verifytextbox_length,
                   'setSecureText':self.textbox_object.setsecuretext,
+                  'sendSecureValue':self.textbox_object.sendSecureValue,
 
                   'selectValueByIndex':self.dropdown_list_object.selectValueByIndex,
                   'getCount':self.dropdown_list_object.getCount,
