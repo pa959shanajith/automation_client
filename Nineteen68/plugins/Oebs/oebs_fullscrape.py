@@ -24,7 +24,7 @@ index=0
 k = 0
 cordinates = []
 states = []
-win_rect = ''
+##win_rect = ''
 
 log = logging.getLogger('oebs_fullscrape.py')
 
@@ -38,8 +38,8 @@ class FullScrape:
         isjavares, hwnd = utils_obj.isjavawindow(windowname)
         log.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',str(isjavares))
         if (isjavares):
-            global win_rect
-            win_rect= win32gui.GetWindowRect(hwnd)
+##            global win_rect
+##            win_rect= win32gui.GetWindowRect(hwnd)
             self.acccontext(oebs_api.JABContext(hwnd), tempne,'',0,windowname)
             log.debug('MSG:\nThe Scraped Data is:\n %s',tempne)
             vie = {'view': tempne}
@@ -146,9 +146,9 @@ class FullScrape:
             text = str(text)
             text = text.strip()
             #Calculating co ordinates for embedded screenshots
-##            utils_obj=utils.Utils()
-##            isjavares, hwnd = utils_obj.isjavawindow(window)
-##            win_rect= win32gui.GetWindowRect(hwnd)
+            utils_obj=utils.Utils()
+            isjavares, hwnd = utils_obj.isjavawindow(window)
+            win_rect= win32gui.GetWindowRect(hwnd)
             x1_win = win_rect[0]
             y1_win = win_rect[1]
             x2_win = win_rect[2]
