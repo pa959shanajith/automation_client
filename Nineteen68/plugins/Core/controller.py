@@ -168,6 +168,7 @@ class Controller():
             import oebs_dispatcher
             self.oebs_dispatcher_obj = oebs_dispatcher.OebsDispatcher()
             self.oebs_dispatcher_obj.exception_flag=exception_flag
+            self.oebs_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading OEBS plugin')
 
@@ -191,6 +192,7 @@ class Controller():
             import desktop_dispatcher
             self.desktop_dispatcher_obj = desktop_dispatcher.DesktopDispatcher()
             self.desktop_dispatcher_obj.exception_flag=exception_flag
+            self.desktop_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading Desktop plugin')
             #--------------------------------------------------------------------------------SAP change

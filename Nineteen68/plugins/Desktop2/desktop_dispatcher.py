@@ -39,6 +39,7 @@ class DesktopDispatcher:
 
     def __init__(self):
         self.exception_flag=''
+        self.action = None
         self.outook_obj=outlook.OutlookKeywords()
 
 
@@ -141,13 +142,14 @@ class DesktopDispatcher:
                 result[3]=err_msg
             configobj = readconfig.readConfig()
             configvalues = configobj.readJson()
-            if configvalues['screenShot_Flag'].lower() == 'fail':
-                if result[0].lower() == 'fail':
+            if self.action == constants.EXECUTE:
+                if configvalues['screenShot_Flag'].lower() == 'fail':
+                    if result[0].lower() == 'fail':
+                        if keyword not in desktop_constants.APPLICATION_KEYWORDS:
+                            self.launch_keywords_obj.save_screeenshot()
+                elif configvalues['screenShot_Flag'].lower() == 'all':
                     if keyword not in desktop_constants.APPLICATION_KEYWORDS:
                         self.launch_keywords_obj.save_screeenshot()
-            elif configvalues['screenShot_Flag'].lower() == 'all':
-                if keyword not in desktop_constants.APPLICATION_KEYWORDS:
-                    self.launch_keywords_obj.save_screeenshot()
         except TypeError as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
