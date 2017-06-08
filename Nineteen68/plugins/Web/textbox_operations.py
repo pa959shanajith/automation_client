@@ -352,6 +352,54 @@ class TextboxKeywords:
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
+        
+    def sendSecureValue(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        visibilityFlag=True
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        if webelement is not None:
+            try:
+                if webelement.is_enabled():
+                    log.debug(WEB_ELEMENT_ENABLED)
+                    utilobj=UtilWebKeywords()
+                    isvisble=utilobj.is_visible(webelement)
+                    if len(args)>0 and args[0] != '':
+                        visibilityFlag=args[0]
+                    input=input[0]
+                    logger.print_on_console(INPUT_IS+input)
+                    log.info(INPUT_IS)
+                    log.info(input)
+                    if input is not None:
+                        readonly_value=webelement.get_attribute("readonly")
+                        if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
+                            user_input=self.validate_input(webelement,input)
+                            if user_input is not None:
+                                input=user_input
+                            if not(visibilityFlag and isvisble):
+                                encryption_obj = AESCipher()
+                                input_val = encryption_obj.decrypt(input)
+                                self.clear_text(webelement)
+                                log.debug('Sending the value via part 1')
+                                browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
+                            else:
+                                encryption_obj = AESCipher()
+                                input_val = encryption_obj.decrypt(input)
+                                webelement.clear()
+                                webelement.send_keys(input_val)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                        else:
+                            err_msg=self.__read_only()
+                else:
+                    err_msg=self.__element_disabled()
+            except InvalidElementStateException as e:
+                err_msg=self.__invalid_element_state(e)
+            except Exception as e:
+                err_msg=self.__web_driver_exception(e)
+        return status,methodoutput,output,err_msg
 
 
 
