@@ -486,6 +486,8 @@ class StepDescription:
             return 'Verify ' + input + ' is the length of textbox '+ "'" + tsp.custname + "'"
         def setSecureText():
             return 'Enter secure text ' +inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"
+        def sendSecureValue():
+            return 'Enter secure value ' +inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"
 
 
 
