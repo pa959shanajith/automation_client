@@ -562,10 +562,19 @@ class WSkeywords:
             if len(args) == 1:
 ##                    logger.print_on_console(ws_constants.RESULT,self.baseResBody)
                     log.debug(STATUS_METHODOUTPUT_UPDATE)
-                    if self.baseResBody != None:
-                        status = ws_constants.TEST_RESULT_PASS
-                        methodoutput = ws_constants.TEST_RESULT_TRUE
-                    output= self.baseResBody
+                    try:
+                        if self.baseResBody != None:
+                            status = ws_constants.TEST_RESULT_PASS
+                            methodoutput = ws_constants.TEST_RESULT_TRUE
+                            if 'soap:Envelope' in self.baseResBody:
+                                from lxml import etree as et
+                                root = et.fromstring(self.baseResBody)
+                                respBody = et.tostring(root,pretty_print=True)
+                                self.baseResBody = respBody
+                        output= self.baseResBody
+                    except Exception as e:
+                        log.error(e)
+                        output= self.baseResBody
             elif len(args) == 2:
                 key=args[0]
                 print 'args[2]',args
