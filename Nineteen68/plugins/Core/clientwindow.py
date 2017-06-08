@@ -506,7 +506,7 @@ class ClientWindow(wx.Frame):
     #----------------------------------------------------------------------
     def __init__(self):
         wx.Frame.__init__(self, parent=None,id=-1, title="ICE Engine",
-                   pos=(300, 150),  size=(800, 730),style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  |wx.MAXIMIZE_BOX)  )
+                   pos=(300, 150),  size=(800, 730),style=wx.DEFAULT_FRAME_STYLE & ~ (wx.MAXIMIZE_BOX)  )
 ##        self.SetBackgroundColour(   (245,222,179))
         self.SetBackgroundColour('#e6e7e8')
 ##        self.ShowFullScreen(True,wx.ALL)

@@ -9,6 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 from pywinauto.application import Application
+import desktop_dispatcher
 import pywinauto
 import pyHook
 import pythoncom
@@ -24,174 +25,196 @@ from constants import *
 import launch_keywords
 import ninteen_68_desktop_scrape
 import base64
+import logger
 ctrldownflag = False
 stopumpingmsgs = False
-pressedescape = False
-counter = 0;
-objNameArr = []
-xpath = []
-url = []
-text = []
-hiddentag = []
-custname = []
-tag = []
-ids = []
-ne = []
-jsonArray = []
-obj_ref = None
 
 
+actualobjects = []
+allobjects = []
 class Scrape:
+    def clickandadd(self,operation,app_uia,window_name):
+        obj = launch_keywords.Launch_Keywords()
+        obj.set_to_foreground()
+        data={}
+        if operation == 'STARTCLICKANDADD':
+            global view
+            view = []
+            try:
+                class OutlookThread(Thread):
+                    def __init__(self, coordX, coordY, window_id):
+                        Thread.__init__(self)
+                        self.coordX = coordX
+                        self.coordY = coordY
+                        self.window_id = window_id
+                        self._want_continue = 1
+                        self.start()
 
-##    def clickandadd(self,operation):
-##        if operation == 'STARTCLICKANDADD':
-##            try:
-##                class OutlookThread(Thread):
-##                    def __init__(self):
-##                        """Init Worker Thread Class."""
-##                        Thread.__init__(self)
-##                        self._want_continue = 1
-##                        self.start()    # start the thread
-##
-##                    def run(self):
-##                        """Run Worker Thread."""
-##                        self.DataToInt = int(launch_keywords.window_pid)
-##                        self.currForeWin = win32gui.GetForegroundWindow()
-##                        self.PidToCheck = win32process.GetWindowThreadProcessId(self.currForeWin)
-##                        if self.PidToCheck[1] == self.DataToInt:
-##                            self.objNameArr =  ldtp.getobjectnameatcoords()
-##                            print 'object name',self.objNameArr
-##                            try:
-##                                if self.objNameArr[0] != 'None' and self.objNameArr[1] != 'None':
-##                                    self.infoArray =  ldtp.getobjectinfo(self.objNameArr[0], self.objNameArr[1])
-##                                    for k in self.infoArray:
-##                                        self.objProp = ldtp.getobjectproperty(self.objNameArr[0], self.objNameArr[1],k)
-##                                        if 'key' in k:
-##                                            custname.append(self.objNameArr[1])
-##                                        elif 'class' in k:
-##                                            tag.append(self.objProp)
-##                                        elif 'obj_index' in k:
-##                                            xpath.append(self.objNameArr[1] + ';' + self.objProp )
-##                                        elif 'parent' in k:
-##                                            url.append(self.objProp)
-##                                        elif 'children' in k:
-##                                            ids.append(self.objProp)
-##                                        elif 'label' in k:
-##                                            text.append(self.objProp)
-##                                        elif 'window_id' in k:
-##                                            rakesh = 1
-##                            except LdtpExecutionError as msg:
-##                                pass
-##                        else:
-##                            return True
-##
-##                    def abort(self):
-##                        self._want_continue = 0
-##                class StartPump(Thread):
-##                    def __init__(self):
-##                        """Init Worker Thread Class."""
-##                        Thread.__init__(self)
-##                        self._want_continue = 1
-##                        self.stopumpingmsgs = False
-##                        self.ctrldownflag = False
-##                        self.start()
-##
-##                    def run(self):
-##
-##                        def OnMouseLeftDown(event):
-##                            global ctrldownflag
-##                            if (self.stopumpingmsgs == True):
-##                                self.hm.UnhookKeyboard()
-##                                self.hm.UnhookMouse()
-##                                ctypes.windll.user32.PostQuitMessage(0)
-##                                return True
-##                            if (ctrldownflag is True):
-##                                return True
-##                            else:
-##                                obj = OutlookThread()
-##                                return False
-##
-##
-##                        def OnKeyDown(event):
-##                            global ctrldownflag
-##                            if (self.stopumpingmsgs == True):
-##                                self.hm.UnhookKeyboard()
-##                                self.hm.UnhookMouse()
-##                                ctypes.windll.user32.PostQuitMessage(0)
-##                                return True
-##                            else:
-##                                if (event.Key == 'Lcontrol'):
-##                                    ctrldownflag = True
-##                                    return True
-##                                else:
-##                                    ctrldownflag = False
-##                                    return True
-##
-##                        def OnKeyUp(event):
-##                            global ctrldownflag
-##                            ctrldownflag = False
-##                            return True
-##                        def FinalJson():
-##                            global objNameArr
-##                            global ne
-##                            global jsonArray
-##                            global custname
-##                            global tag
-##                            global xpath
-##                            global url
-##                            global ids
-##                            global text
-##                            try:
-##                                for i in range(0,len(custname)):
-##                                    ne.append({'xpath': xpath[i], 'tag': tag[i],
-##                                                'url': url[i], 'text': text[i],
-##                                                'id': ids[i], 'custname': custname[i],
-##                                                'hiddentag': 'No'})
-##                                jsonArray = {"view": ne}
-##                                print 'json array',jsonArray
-##                                with open('domelements.json', 'w') as outfile:
-##                                    json.dump(jsonArray, outfile, indent=4, sort_keys=False)
-##                                outfile.close()
-##                                ne = []
-##                                jsonArray = []
-##                                custname =[]
-##                                tag = []
-##                                xpath = []
-##                                url = []
-##                                ids = []
-##                                text = []
-##                            except IndexError as esxception:
-##                                ctypes.windll.user32.PostQuitMessage(0)
-##
-##                        self.hm = pyHook.HookManager()
-##                        self.hm.KeyDown = OnKeyDown
-##                        self.hm.KeyUp = OnKeyUp
-##                        self.hm.MouseLeftDown = OnMouseLeftDown
-##                        self.hm.HookKeyboard()
-##                        self.hm.HookMouse()
-##                        pythoncom.PumpMessages()
-##                        FinalJson()
-##
-##                    def StopPump(self):
-##                        self.stopumpingmsgs = True
-##                        wsh = win32com.client.Dispatch("WScript.Shell")
-##                        wsh.SendKeys("^")
-##                global obj_ref
-##                obj_ref = StartPump()
-##
-##            except Exception as exception:
-##                pass
-##        elif operation == 'STOPCLICKANDADD':
-##            try:
-##                global obj_ref
-##                obj_ref.StopPump()
-####                print jsonArray
-##                return jsonArray
-##            except Exception as exception:
-##                pass
-####        except Exception as esxception:
-####            c.send("FAIL" + "\n")
-####            pass
+                    def run(self):
+                        pythoncom.CoInitialize()
+                        #method returns 1 if the coordinates passed of any xpath, is near to the curson postion coordinates
+                        #returns 0 if if coordinates doesnot fit into the condition
+                        def match(x,y,width,height,coord_x,coord_y):
+                            expectedx=int(x)+int(width)
+                            expectedy=int(y)+int(height)
+
+                            if((coord_x>= x and coord_x<=expectedx) and (coord_y >= y and coord_y<=expectedy)):
+                                return 1
+                            else:
+                                return 0
+                        try:
+                            obj = Scrape()
+                            global allobjects
+                            allobjects = obj.full_scrape(app_uia)
+                            objects = allobjects['view']
+                            print 'Full scrape objects :',objects
+                            tempobjects = []
+                            for i in objects:
+                                res = match(i['x_screen'],i['y_screen'],i['width'],i['height'],self.coordX,self.coordY)
+                                if res == 1:
+                                    tempobjects.append(i)
+                            actualelement = ''
+                            print 'temp objects:',tempobjects
+                            for i in range (len(tempobjects)):
+                                try:
+                                    first_ele = tempobjects[i]
+                                    actualelement = first_ele
+                                    next_ele = tempobjects[i+1]
+                                    if ((first_ele['x_screen'] < next_ele['x_screen']) and (first_ele['y_screen'] < next_ele['y_screen'])):
+                                        actualelement = first_ele
+                                except Exception as e:
+                                    break
+
+                            disp_obj = desktop_dispatcher.DesktopDispatcher()
+                            print 'actual element : ',actualelement
+                            ele = disp_obj.get_desktop_element(actualelement['xpath'],actualelement['url'],app_uia)
+                            global actualobjects
+                            actualobjects.append(actualelement)
+                        except Exception as e:
+                            import traceback
+                            traceback.print_exc()
+                            logger.print_on_console('Clicked option is not a part of DesktopGUI')
+                        return True
+
+                    def abort(self):
+                        self._want_continue = 0
+
+                class StartPump(Thread):
+                    def __init__(self):
+                        Thread.__init__(self)
+                        self._want_continue = 1
+                        self.stopumpingmsgs = False
+                        self.ctrldownflag = False
+
+                        self.start()
+
+                    def StopPump(self):
+                        self.stopumpingmsgs = True
+                        wsh = win32com.client.Dispatch("WScript.Shell")
+                        wsh.SendKeys("^")
+
+                    def run(self):
+                        def OnMouseLeftDown(evnt):
+                            try:
+                                wndNames=evnt.WindowName
+                                if wndNames is not 'Running applications':
+                                        clicked_handle=evnt.Window
+                                        while True:
+                                            if clicked_handle==0L:   #comparing wether parent window is same as clicked window
+                                                break
+                                            else:
+                                                if not(clicked_handle == self.handle ):    #recursivelt getting the parent handle
+                                                    clicked_handle=win32gui.GetParent(clicked_handle)
+                                                else:
+                                                    if (self.ctrldownflag is True):
+                                                        self.ctrldownflag = False       #if control flag is clicked
+                                                        return True
+                                                    else:
+                                                        pos = evnt.Position
+                                                        coordX = pos[0]
+                                                        coordY = pos[1]
+                                                        obj = OutlookThread(coordX, coordY, window_id)
+                                                        return False
+
+                            except Exception as e:
+                                print e
+                                import traceback
+                                traceback.print_exc()
+
+                            if (self.stopumpingmsgs is True):
+                                self.hm.UnhookKeyboard()
+                                self.hm.UnhookMouse()
+                                ctypes.windll.user32.PostQuitMessage(0)
+                                return True
+
+                        def OnKeyDown(event):
+                            if (self.stopumpingmsgs is True):
+                                self.hm.UnhookKeyboard()
+                                self.hm.UnhookMouse()
+                                ctypes.windll.user32.PostQuitMessage(0)
+                                return True
+                            else:
+                                if (event.Key == 'Lcontrol'):
+                                    self.ctrldownflag = True
+                                    return True
+                                else:
+                                    self.ctrldownflag = False
+                                    return True
+
+                        def OnKeyUp(evnt):
+                            self.ctrldownflag = False
+                            return True
+
+                        global window_id
+                        get_obj = GetObject()
+                        window_id, self.handle = get_obj.GetWindow()
+                        self.hm = pyHook.HookManager()
+                        self.hm.KeyDown = OnKeyDown
+                        self.hm.KeyUp = OnKeyUp
+                        self.hm.MouseLeftDown = OnMouseLeftDown
+                        self.hm.HookKeyboard()
+                        self.hm.HookMouse()
+                        pythoncom.PumpMessages()
+    ##                        dumpToJson()
+
+                class GetObject():
+    ##
+                    def GetWindow(self):
+                        """ Returns the id of window to scrape and brings the window to foreground """
+                        wndId = 0
+                        wndName = window_name
+                        handle = win32gui.FindWindow(None, wndName)
+                        foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
+                        appThread = win32api.GetCurrentThreadId()
+                        if( foreThread != appThread ):
+                            win32process.AttachThreadInput(foreThread[0], appThread, True)
+                            win32gui.BringWindowToTop(handle)
+                            win32gui.ShowWindow(handle,5)
+                            win32process.AttachThreadInput(foreThread[0], appThread, False)
+                        else:
+                            win32gui.BringWindowToTop(handle)
+                            win32gui.ShowWindow(handle,5)
+                        return wndId, handle
+
+                global obj_ref
+                obj_ref = StartPump()
+            except Exception as exception:
+                pass
+
+        elif operation == 'STOPCLICKANDADD':
+            try:
+                obj_ref.StopPump()
+                with open('domelements.json', 'w') as outfile:
+                    allobjects["view"] = actualobjects
+                    json.dump(allobjects, outfile, indent=4, sort_keys=False)
+                    outfile.close()
+##                return view
+                global actualobjects
+                actualobjects = []
+            except Exception as exception:
+                pass
+            return allobjects
+
 
     def get_all_children(self,ch,ne,i,path,win,winrect):
         try:
@@ -202,10 +225,16 @@ class Scrape:
                  coordinates = ''
                  children = ch[i]
                  tag = children.friendly_class_name()
-                 if tag == 'Button' or tag =='RadioButton' or tag == 'Edit' or tag == 'ComboBox' or tag == 'Static' or tag == 'GroupBox' or tag == 'CheckBox' or tag== 'ListView' or tag == 'ListBox'or tag == 'TreeView':
+                 print 'tag ::::: ',tag
+                 if tag == 'Button' or tag =='RadioButton' or tag == 'Edit' or tag == 'ComboBox' or tag == 'Static' or tag == 'GroupBox' or tag == 'CheckBox' or tag== 'ListView' or tag == 'ListBox'or tag == 'TreeView'or tag == 'TabControl':
                      coordinates = children.client_rect()
                      cor = children.rectangle()
-                     properties = json.loads(json.dumps(children.get_properties(    ), default=lambda x: str(x)))
+                     properties = ''
+                     try:
+                        properties = json.loads(json.dumps(children.get_properties(    ), default=lambda x: str(x)))
+                     except Exception as e:
+                        import traceback
+                        traceback.print_exc()
                      if properties['is_visible'] == True :
                          properties["url"] =  win.texts()[0] if len(win.texts())>0 else ""
                          properties['control_id'] = children.element_info.control_id
@@ -241,6 +270,9 @@ class Scrape:
                          elif tag == 'ListView':
                             tag = 'list'
                             text= str(text) + '_list'
+                         elif tag == 'TabControl':
+                            tag = 'tab'
+                            text= str(text) + '_tab'
                          else:
                             tag = 'label'
                             text= str(text) + '_lbl'
@@ -249,6 +281,8 @@ class Scrape:
                          top = 0
                          width = coordinates.width()
                          height = coordinates.height()
+                         x_screen = cor.left
+                         y_screen = cor.top
                          left = cor.left - winrect[0]
                          top = cor.top - winrect[1]
                          if top < 0:
@@ -275,7 +309,9 @@ class Scrape:
                                         'top': top,
                                         'left': left,
                                         'height': height,
-                                        'width': width
+                                        'width': width,
+                                        'x_screen':x_screen,
+                                        'y_screen':y_screen
                                         })
                             else:
                                 print 'This element is duplicate'
@@ -288,6 +324,8 @@ class Scrape:
 ##             for i in range(len(ch)):
 ##                self.get_all_children(ch[i],ne,i,path,win,winrect)
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             print e
         return ne
 
@@ -317,6 +355,8 @@ class Scrape:
                 json.dump(allobjects, outfile, indent=4, sort_keys=False)
                 outfile.close()
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             print e
         return allobjects
 

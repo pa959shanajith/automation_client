@@ -35,10 +35,11 @@ class DesktopDispatcher:
     util_keywords_obj = util_keywords.Util_Keywords()
     dropdown_keywords_obj=dropdown_keywords.Dropdown_Keywords()
     radio_checkbox_keywords_obj = radio_checkbox_keywords_desktop.Radio_Checkbox_keywords()
-    outook_obj=outlook.OutlookKeywords()
+##    outook_obj=outlook.OutlookKeywords()
 
     def __init__(self):
         self.exception_flag=''
+        self.outook_obj=outlook.OutlookKeywords()
 
 
 

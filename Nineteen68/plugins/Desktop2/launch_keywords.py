@@ -121,7 +121,7 @@ class Launch_Keywords():
             if self.windowname!='':
                 status=desktop_constants.TEST_RESULT_PASS
                 result = desktop_constants.TEST_RESULT_TRUE
-                return status,self.windowname
+                return status,result,self.windowname,err_msg
         except Exception as e:
 ##            Exceptions.error(e)
             err_msg = desktop_constants.ERROR_MSG
@@ -355,12 +355,54 @@ class Launch_Keywords():
             elif len(input_val) == 1:
                 windowname=input_val[0]
             title_matched_windows=self.getProcessWindows(windowname)
-            print 'Title macthed :',title_matched_windows
+            hwnd = win32gui.FindWindow(None, windowname)
+            threadid,temp_pid = win32process.GetWindowThreadProcessId(hwnd)
+            flag = False
             if len(title_matched_windows)>1:
-                self.multiInstance=title_matched_windows[0]
-                logger.print_on_console('please close the existing application instnace with the given window name and try again')
-                logger.print_on_console('Terminate the execution')
-                term = TERMINATE
+                for i in title_matched_windows:
+##                    hwnd = win32gui.FindWindow(None, windowname)
+                    threadid,pid = win32process.GetWindowThreadProcessId(i)
+                    if pid == temp_pid:
+                        flag = True
+                    else:
+                        flag = False
+                if flag:
+                    logger.print_on_console('Given windowname is '+windowname)
+                    if not(windowname is None and windowname is ''):
+                        start_time = time.time()
+                        var = 1
+                        while var==1:
+
+    ##                        if int(time.time()-start_time) >= launch_time_out:
+    ##                            break
+                            title_matched_windows=self.getProcessWindows(windowname)
+
+                            if len(title_matched_windows)>1:
+                                self.windowHandle=title_matched_windows[0]
+                                self.windowname=self.getWindowText(self.windowHandle)
+
+            ##                    self.set_to_foreground()
+            ##                    time.sleep(0.5)
+                                logger.print_on_console('Application handle found')
+            ##                        tempTitle = windowTitle.replaceAll("[^a-zA-Z0-9]", "*")
+                                # need  to create a ldtp object here
+                                global window_name
+                                window_name=self.windowname
+                                global window_handle
+                                window_handle=title_matched_windows[0]
+                                global window_pid
+                                window_pid=self.get_window_pid(self.windowname)
+                                self.windowHandle=title_matched_windows[0]
+                                global app_uia
+                                app_uia = Application().connect(process = window_pid)
+                                status=desktop_constants.TEST_RESULT_PASS
+                                result = desktop_constants.TEST_RESULT_TRUE
+                                break
+                else:
+                    self.multiInstance=title_matched_windows[0]
+                    logger.print_on_console('please close the existing application instnace with the given window name and try again')
+                    logger.print_on_console('Terminate the execution')
+                    term = TERMINATE
             if len(title_matched_windows)==1:
                 logger.print_on_console('Given windowname is '+windowname)
                 if not(windowname is None and windowname is ''):
@@ -471,10 +513,7 @@ class Launch_Keywords():
         input_val = ''
         try:
             input_val = input[0]
-            print  'inp : ',input_val
-            print  'Type: ',type(input_val)
             if len(input_val) > 0:
-                print 'input value : ', input_val
                 win = app_uia.top_window()
                 win.menu_select(input_val)
                 log.info(STATUS_METHODOUTPUT_UPDATE)

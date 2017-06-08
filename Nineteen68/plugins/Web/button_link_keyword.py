@@ -107,6 +107,7 @@ class ButtonLinkKeyword():
                 log.info('Button name fetched from the AUT using selenium')
 
                 if buttonname != None and len(buttonname)>0:
+                    output = buttonname
                     logger.print_on_console('Button name : ' , buttonname)
                     status = webconstants.TEST_RESULT_PASS
                     methodoutput = webconstants.TEST_RESULT_TRUE
