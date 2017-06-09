@@ -167,12 +167,65 @@ class StaticTextKeywords:
         text=''
         text_count = 0
         countflag = False
-        try:
-            if actualtext is not None or len(actualtext) > 0:
-                elements = browser_Keywords.driver_obj.find_elements_by_tag_name("*")
-                for element in elements:
-                    if element.tag_name.lower()  not in tags:
-                        try:
+        if webelement == None:
+            try:
+                if actualtext is not None or len(actualtext) > 0:
+                    elements = browser_Keywords.driver_obj.find_elements_by_tag_name("*")
+                    for element in elements:
+                        if element.tag_name.lower()  not in tags:
+                            try:
+                                text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
+                                import ftfy
+                                text = ftfy.fix_text(text)
+                                text = text.replace('\n','')
+                                text = text.strip()
+                                if len(text) != 0:
+                                    sourcetext = sourcetext + separator + text
+                            except Exception as e:
+                                print e
+                    browser_Keywords.driver_obj.switch_to.default_content()
+                    self.get_source1('')
+                    browser_Keywords.driver_obj.switch_to.default_content()
+                    self.get_source2('')
+                    browser_Keywords.driver_obj.switch_to.default_content()
+
+    ##                sourcetext = ftfy.fix_text(sourcetext)
+                    texts = sourcetext.split('~@~')
+                    log.info('texts array :',texts)
+                    for i in texts:
+                        if actualtext in i:
+                            countflag = True
+                            cnt = i.count(actualtext)
+                            text_count = text_count + cnt
+
+                    sourcetext = ''
+
+                    if countflag:
+                        logger.print_on_console('Text  present')
+                        log.info('Text  present')
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                        output = text_count
+                        logger.print_on_console('No. of occurance of the text ',actualtext , ' is ',text_count ,' time(s).')
+                    else:
+                        output = 0
+                        logger.print_on_console('Text not present')
+                        log.error('Text not present')
+                else:
+                    log.error(INVALID_INPUT)
+                    err_msg=INVALID_INPUT
+                    logger.print_on_console(INVALID_INPUT)
+            except Exception as e:
+                    import traceback
+                    traceback.print_exc()
+                    log.error(e)
+                    logger.print_on_console(e)
+        else:
+            try:
+                if actualtext is not None or len(actualtext) > 0:
+                    elements = webelement.find_elements_by_tag_name("*")
+                    for element in elements:
+                        if element.tag_name.lower()  not in tags:
                             text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
                             import ftfy
                             text = ftfy.fix_text(text)
@@ -180,43 +233,31 @@ class StaticTextKeywords:
                             text = text.strip()
                             if len(text) != 0:
                                 sourcetext = sourcetext + separator + text
-                        except Exception as e:
-                            print e
-                browser_Keywords.driver_obj.switch_to.default_content()
-                self.get_source1('')
-                browser_Keywords.driver_obj.switch_to.default_content()
-                self.get_source2('')
-                browser_Keywords.driver_obj.switch_to.default_content()
+                            texts = sourcetext.split('~@~')
+                            log.info('texts array :',texts)
+                            for i in texts:
+                                if actualtext in i:
+                                    countflag = True
+                                    cnt = i.count(actualtext)
+                                    text_count = text_count + cnt
 
-##                sourcetext = ftfy.fix_text(sourcetext)
-                texts = sourcetext.split('~@~')
-                log.info('texts array :',texts)
-                for i in texts:
-                    if i == actualtext:
-                        countflag = True
-                        text_count = text_count + 1
-
-                sourcetext = ''
-
-                if countflag:
-                    logger.print_on_console('Text  present')
-                    log.info('Text  present')
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
-                    output = text_count
-                    logger.print_on_console('No. of occurance of the text ',actualtext , ' is ',text_count ,' time(s).')
+                            sourcetext = ''
+                    if countflag:
+                        logger.print_on_console('Text  present')
+                        log.info('Text  present')
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                        output = text_count
+                        logger.print_on_console('No. of occurance of the text ',actualtext , ' is ',text_count ,' time(s).')
+                    else:
+                        output = 0
+                        logger.print_on_console('Text not present')
+                        log.error('Text not present')
                 else:
-                    output = 0
-                    logger.print_on_console('Text not present')
-                    log.error('Text not present')
-            else:
-                log.error(INVALID_INPUT)
-                err_msg=INVALID_INPUT
-                logger.print_on_console(INVALID_INPUT)
-        except Exception as e:
-                import traceback
-                traceback.print_exc()
-                log.error(e)
-                logger.print_on_console(e)
+                    log.error(INVALID_INPUT)
+                    err_msg=INVALID_INPUT
+                    logger.print_on_console(INVALID_INPUT)
+            except Exception as e:
+                print e
         return status,methodoutput,output,err_msg
 
