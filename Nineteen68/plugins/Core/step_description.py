@@ -462,6 +462,35 @@ class StepDescription:
         #text box
         return locals()[keyword]()
 
+    def mobileapp(self,keyword,tsp,inputval,input,output,con,reporting_obj):
+        #dropdown keywords
+
+
+        def getValueByIndex():
+            return 'Get value with index ' + input + ' in the '+ "'" + tsp.custname + "'" + ' and save the value ' + output + ' in '+ tsp.outputval,
+
+        def selectValueByText():
+            return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']',
+        def getMultipleValuesByIndexes():
+            return 'Get values with indexes ' + inputValsb.toString() + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + TestAutomationController.multipleOutputResult + ' in  '+ tsp.outputval
+
+        def getAllValues():
+            return 'getAllValues ' + output + ' are present in the' + "'" + tsp.custname + "'"
+        def verifyAllValues():
+            return 'Verify values ' + input + ' are present in the '+ "'" + tsp.custname + "'"
+
+
+        def verifyCount():
+            return 'Verify ' + input + ' is the list count of the ' +"'" + tsp.custname + "'"
+
+        def selectValueByIndex():
+            return 'Select the value '+ input+' of the '+"'" + tsp.custname + "'"+' with the index '+input+' present in the table cell  '+"'" + tsp.custname + "'"+'-['+input+']['+input+']'
+        def getCount():
+            return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' + output + ' in ' +tsp.outputval
+
+        #text box
+        return locals()[keyword]()
+
     def web(self,keyword,tsp,inputval,input,output,con,reporting_obj):
 
         #Popup keywords
