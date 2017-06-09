@@ -59,9 +59,13 @@ class OutlookKeywords:
                 folderPath=folderPath.strip('\\')
                 folders=folderPath.split('\\')
                 accountname=folders[0]
-                import pythoncom
-                pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
+                global count
+                if count>0:
+                    import pythoncom
+                    pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
+                count=count+1
                 self.outlook = Dispatch('Outlook.Application').GetNamespace('MAPI')
+
 #               get the message stores in outlook
                 stores=self.outlook.Stores
                 if accountname!='':
@@ -122,9 +126,11 @@ class OutlookKeywords:
 
 ##                pythoncom.CoInitialize()
 ##                engine.subscribe('start_thread', onThreadStart)
-
-                import pythoncom
-                pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
+                global count
+                if count>1:
+                    import pythoncom
+                    pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
+                count=count+1
                 if (self.outlook==None):
 
                      from win32com.client.gencache import EnsureDispatch
@@ -170,14 +176,10 @@ class OutlookKeywords:
                                 continue
                         else :
                             continue
-                pythoncom.CoUninitialize ()
                 if self.Flag!=True:
                     logger.print_on_console('Error: No such mail found')
                     error_msg='Error: No such mail found'
             except Exception as e:
-                pythoncom.CoUninitialize ()
-                import traceback
-                traceback.print_exc()
                 log.error(e)
                 logger.print_on_console(e)
             return status,method_output,result,error_msg
