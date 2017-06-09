@@ -191,7 +191,8 @@ class StaticTextKeywords:
 
     ##                sourcetext = ftfy.fix_text(sourcetext)
                     texts = sourcetext.split('~@~')
-                    log.info('texts array :',texts)
+                    log.info('texts array :')
+                    log.info(texts)
                     for i in texts:
                         if actualtext in i:
                             countflag = True
@@ -234,7 +235,8 @@ class StaticTextKeywords:
                             if len(text) != 0:
                                 sourcetext = sourcetext + separator + text
                             texts = sourcetext.split('~@~')
-                            log.info('texts array :',texts)
+                            log.info('texts array :')
+                            log.info(texts)
                             for i in texts:
                                 if actualtext in i:
                                     countflag = True
