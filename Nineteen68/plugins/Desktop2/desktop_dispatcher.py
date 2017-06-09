@@ -15,6 +15,7 @@ import element_keywords
 import launch_keywords
 import util_keywords
 import dropdown_keywords
+import tab_control_keywords
 
 import logger
 import desktop_constants
@@ -35,6 +36,7 @@ class DesktopDispatcher:
     util_keywords_obj = util_keywords.Util_Keywords()
     dropdown_keywords_obj=dropdown_keywords.Dropdown_Keywords()
     radio_checkbox_keywords_obj = radio_checkbox_keywords_desktop.Radio_Checkbox_keywords()
+    tab_control_keywords_obj = tab_control_keywords.Tab_Control_Keywords()
 ##    outook_obj=outlook.OutlookKeywords()
 
     def __init__(self):
@@ -103,6 +105,10 @@ class DesktopDispatcher:
                     'selectcheckbox' : self.radio_checkbox_keywords_obj.select_checkbox,
                     'unselectcheckbox' : self.radio_checkbox_keywords_obj.unselect_checkbox,
                     'getstatus' : self.radio_checkbox_keywords_obj.get_status,
+                    'selecttabbyindex': self.tab_control_keywords_obj.selectTabByIndex,
+                    'selecttabbytext' : self.tab_control_keywords_obj.selectTabByText,
+                    'getselectedtab' : self.tab_control_keywords_obj.getSelectedTab,
+                    'verifyselectedtab' : self.tab_control_keywords_obj.verifySelectedTab,
                     'getemail': self.outook_obj.GetEmail,
                     'getfrommailid' : self.outook_obj.GetFromMailId,
                     'getattachmentstatus'    : self.outook_obj.GetAttachmentStatus,

@@ -437,6 +437,16 @@ class StepDescription:
         def VerifyAllValues():
             return 'Verify the values from the '+ "'" + tsp.custname + "'" +' with '+ input
 
+        #Tab control keywords
+        def VerifySelectedTab():
+            return 'Verify the selected value from the ' + "'" + tsp.custname + "'"+ ' with the '+ input
+        def GetSelectedTab():
+            return 'Get selected value from the '+ "'" + tsp.custname + "'"+ ' and save the value ' + output+ ' in '+ tsp.outputval
+        def SelectTabByText():
+            return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname
+        def SelectTabByIndex():
+            return 'Select value by index '+input+' of the '+ 'type '+ "'" + tsp.custname
+
         #Radio checkbox keywords
         def SelectRadioButton():
             return 'Select '+ "'" + tsp.custname + "'"
