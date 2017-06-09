@@ -24,6 +24,7 @@ import constants
 import action_keyowrds
 import mob_screenshot
 import readconfig
+import spinner_keywords
 
 log = logging.getLogger('mobile_app_dispatcher.py')
 class MobileDispatcher:
@@ -36,6 +37,7 @@ class MobileDispatcher:
     toggle_keywords_object = toggle_keywords.ToggleKeywords()
     device_keywords_object = device_keywords.Device_Keywords()
     action_keyowrds_object=action_keyowrds.Action_Key()
+    spinner_keywords_object=spinner_keywords.Spinner_Keywords()
 
     def __init__(self):
         self.exception_flag=''
@@ -95,7 +97,15 @@ class MobileDispatcher:
                     'VerifyElementEnabled':self.slider_util_keywords_object.verify_exists,
                     'VerifyElementText':self.textbox_keywords_object.verify_text,
                     'ActionKey':self.action_keyowrds_object.action_key,
-                    'WaitForElementExists':self.slider_util_keywords_object.waitforelement_exists
+                    'WaitForElementExists':self.slider_util_keywords_object.waitforelement_exists,
+                    'GetCount':self.spinner_keywords_object.get_count,
+                    'VerifyCount':self.spinner_keywords_object.verify_count,
+                    'SelectValueByIndex':self.spinner_keywords_object.select_value_by_index,
+                    'SelectValueByText':self.spinner_keywords_object.select_value_by_text,
+                    'GetMultipleValuesByIndexs':self.spinner_keywords_object.get_multiple_values_by_indexs,
+                    'GetValueByIndex':self.spinner_keywords_object.get_value_by_index,
+                    'GetAllValues':self.spinner_keywords_object.get_all_values,
+                    'VerifyAllValues':self.spinner_keywords_object.verify_all_values
 
                 }
             ELEMENT_FOUND=True
