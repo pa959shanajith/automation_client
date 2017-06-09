@@ -48,7 +48,7 @@ class ScrapeDispatcher(wx.Frame):
         input_val.append(windowname)
         input_val.append(10)
         status = obj.set_to_foreground(windowname)
-        if status!=TERMINATE:
+        if status!=TERMINATE and status:
             self.panel = wx.Panel(self)
             self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd",pos=(12,8 ), size=(175, 28))
             self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)   # need to implement OnExtract()
@@ -63,7 +63,7 @@ class ScrapeDispatcher(wx.Frame):
             self.Show()
         else:
 
-            self.socketIO.emit('scrape','Fail')
+            self.socketIO.emit('scrape','wrongWindowName')
 
 
     def clickandadd(self,event):

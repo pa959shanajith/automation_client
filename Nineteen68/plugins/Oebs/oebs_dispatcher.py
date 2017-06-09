@@ -194,6 +194,9 @@ class OebsDispatcher:
             keyword=keyword.lower()
             if keyword in dict.keys():
                 result=dict[keyword](*message)
+                if keyword == 'findwindowandattach':
+                    if result[0] == "Fail":
+                        result=constants.TERMINATE
                 if not(oebs_msg.ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE
             else:
