@@ -98,6 +98,7 @@ class BrowserKeywords():
             desired_caps['platformName'] = 'Android'
                 ##            desired_caps['platformVersion'] =input_list[1]
             desired_caps['deviceName'] = input_list[0]
+            desired_caps['udid'] = input_list[0]
             desired_caps['browserName'] = 'Chrome'
                 ##            desired_caps['appium-version'] = '1.4.0'
             desired_caps['newCommandTimeout'] = '36000'
