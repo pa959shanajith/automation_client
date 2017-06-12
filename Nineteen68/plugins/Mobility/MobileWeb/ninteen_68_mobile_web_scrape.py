@@ -9,6 +9,7 @@ import fullscrape
 from socketIO_client import SocketIO,BaseNamespace
 import time
 import objectspy
+import core_utils
 
 browserobj = browserops.BrowserOperations()
 clickandaddoj = clickandadd.Clickandadd()
@@ -28,6 +29,7 @@ class ScrapeWindow(wx.Frame):
         self.socketIO = socketIO
         status = obj.openBrowser(browser)
         self.panel = wx.Panel(self)
+        self.core_utilsobject = core_utils.CoreUtils()
 
         self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd",pos=(12,8 ), size=(175, 28))
         self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)   # need to implement OnExtract()
@@ -65,7 +67,14 @@ class ScrapeWindow(wx.Frame):
         else:
             d = clickandaddoj.stopclickandadd()
             print 'Scrapped data saved successfully in domelements.json file'
-            self.socketIO.emit('scrape',d)
+
+            # 5 is the limit of MB set as per Nineteen68 standards
+            if self.core_utilsobject.getdatasize(str(d),'mb') < 5:
+                self.socketIO.emit('scrape',d)
+            else:
+                print 'Scraped data exceeds max. Limit.'
+                self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
+
 ##            wx.MessageBox('CLICKANDADD: Scrape completed', 'Info',wx.OK | wx.ICON_INFORMATION)
             self.Close()
             event.GetEventObject().SetLabel("Start ClickAndAdd")
@@ -97,7 +106,14 @@ class ScrapeWindow(wx.Frame):
 ##        wx.MessageBox('FULLSCRAPE: Scrape completed', 'Info', wx.OK | wx.ICON_INFORMATION)
 ##        print 'self.socketIO : ',self.socketIO
 ##        print 'Acknoledgement id : ',self.socketIO._ack_id
-        self.socketIO.emit('scrape',d)
+
+        # 5 is the limit of MB set as per Nineteen68 standards
+        if self.core_utilsobject.getdatasize(str(d),'mb') < 5:
+            self.socketIO.emit('scrape',d)
+        else:
+            print 'Scraped data exceeds max. Limit.'
+            self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
+
         self.Close()
         print 'Full scrape  completed'
 

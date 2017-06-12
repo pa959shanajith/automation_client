@@ -437,6 +437,16 @@ class StepDescription:
         def VerifyAllValues():
             return 'Verify the values from the '+ "'" + tsp.custname + "'" +' with '+ input
 
+        #Tab control keywords
+        def VerifySelectedTab():
+            return 'Verify the selected value from the ' + "'" + tsp.custname + "'"+ ' with the '+ input
+        def GetSelectedTab():
+            return 'Get selected value from the '+ "'" + tsp.custname + "'"+ ' and save the value ' + output+ ' in '+ tsp.outputval
+        def SelectTabByText():
+            return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname
+        def SelectTabByIndex():
+            return 'Select value by index '+input+' of the '+ 'type '+ "'" + tsp.custname
+
         #Radio checkbox keywords
         def SelectRadioButton():
             return 'Select '+ "'" + tsp.custname + "'"
@@ -458,6 +468,36 @@ class StepDescription:
             return 'Verify '+ "'" + tsp.custname + "'" + ' does not exists '
         def ClickElement():
             return 'Click on ' +"'" + tsp.custname + "'"
+
+        #text box
+        return locals()[keyword]()
+
+    def mobileapp(self,keyword,tsp,inputval,input,output,con,reporting_obj):
+        #dropdown keywords
+
+
+
+        def getValueByIndex():
+            return 'Get value with index ' + input + ' in the '+ "'" + tsp.custname + "'" + ' and save the value ' + output + ' in '+ tsp.outputval,
+
+        def selectValueByText():
+            return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']',
+        def getMultipleValuesByIndexes():
+            return 'Get values with indexes ' + inputValsb.toString() + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + TestAutomationController.multipleOutputResult + ' in  '+ tsp.outputval
+
+        def getAllValues():
+            return 'getAllValues ' + output + ' are present in the' + "'" + tsp.custname + "'"
+        def verifyAllValues():
+            return 'Verify values ' + input + ' are present in the '+ "'" + tsp.custname + "'"
+
+
+        def verifyCount():
+            return 'Verify ' + input + ' is the list count of the ' +"'" + tsp.custname + "'"
+
+        def selectValueByIndex():
+            return 'Select the value '+ input+' of the '+"'" + tsp.custname + "'"+' with the index '+input+' present in the table cell  '+"'" + tsp.custname + "'"+'-['+input+']['+input+']'
+        def getCount():
+            return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' + output + ' in ' +tsp.outputval
 
         #text box
         return locals()[keyword]()
@@ -486,6 +526,8 @@ class StepDescription:
             return 'Verify ' + input + ' is the length of textbox '+ "'" + tsp.custname + "'"
         def setSecureText():
             return 'Enter secure text ' +inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"
+        def sendSecureValue():
+            return 'Enter secure value ' +inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"
 
 
 

@@ -181,7 +181,10 @@ class XMLOperations():
                 for child in block:
                     log.info('Child text :' + str(child.text))
                     if '}' in child.tag:
-                        blockvalue.append(  '<' + child.tag.split('}')[1]  + '>' + child.text +  '</' + child.tag.split('}')[1]  + '>')
+                        if child.text != None:
+                            blockvalue.append(  '<' + child.tag.split('}')[1]  + '>' + child.text +  '</' + child.tag.split('}')[1]  + '>')
+                        else:
+                            blockvalue.append(  '<' + child.tag.split('}')[1]  + '/>')
                     else:
                         blockvalue.append(  '<' + child.tag + '>' + child.text +  '</' + child.tag + '>')
                 status = TEST_RESULT_PASS

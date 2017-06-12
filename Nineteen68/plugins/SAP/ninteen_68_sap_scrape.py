@@ -35,6 +35,7 @@ import win32api
 from ctypes import windll
 from PIL import Image
 import base64
+import core_utils
 
 obj=None
 class ScrapeWindow(wx.Frame):
@@ -45,6 +46,8 @@ class ScrapeWindow(wx.Frame):
         self.SetBackgroundColour('#e6e7e8')
         self.iconpath = os.environ["NINETEEN68_HOME"] + "\\Nineteen68\\plugins\\Core\\Images" + "\\slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
+        self.core_utilsobject = core_utils.CoreUtils()
+
         global obj
         #logger.print_on_console("going to launch_keywords")
         obj = launch_keywords.Launch_Keywords()
@@ -102,7 +105,13 @@ class ScrapeWindow(wx.Frame):
                 log.error(e)
             data['mirror'] =encoded_string.encode('UTF-8').strip()
             data['view'] = d
-            self.socketIO.emit('scrape',data)
+            # 5 is the limit of MB set as per Nineteen68 standards
+            if self.core_utilsobject.getdatasize(str(data),'mb') < 5:
+                self.socketIO.emit('scrape',data)
+            else:
+                print 'Scraped data exceeds max. Limit.'
+                self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
+
             os.remove("out.png")
             self.Close()
 
@@ -132,7 +141,14 @@ class ScrapeWindow(wx.Frame):
 ##        with open('domelements.json', 'w') as outfile:
 ##                json.dump(data, outfile, indent=4, sort_keys=False)
 ##                outfile.close()
-        self.socketIO.emit('scrape',data)
+
+        # 5 is the limit of MB set as per Nineteen68 standards
+        if self.core_utilsobject.getdatasize(str(data),'mb') < 5:
+            self.socketIO.emit('scrape',data)
+        else:
+            print 'Scraped data exceeds max. Limit.'
+            self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
+
         os.remove("out.png")
         self.Close()
 

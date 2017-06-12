@@ -15,6 +15,7 @@ import element_keywords
 import launch_keywords
 import util_keywords
 import dropdown_keywords
+import tab_control_keywords
 
 import logger
 import desktop_constants
@@ -35,10 +36,12 @@ class DesktopDispatcher:
     util_keywords_obj = util_keywords.Util_Keywords()
     dropdown_keywords_obj=dropdown_keywords.Dropdown_Keywords()
     radio_checkbox_keywords_obj = radio_checkbox_keywords_desktop.Radio_Checkbox_keywords()
+    tab_control_keywords_obj = tab_control_keywords.Tab_Control_Keywords()
 ##    outook_obj=outlook.OutlookKeywords()
 
     def __init__(self):
         self.exception_flag=''
+        self.action = None
         self.outook_obj=outlook.OutlookKeywords()
 
 
@@ -102,6 +105,10 @@ class DesktopDispatcher:
                     'selectcheckbox' : self.radio_checkbox_keywords_obj.select_checkbox,
                     'unselectcheckbox' : self.radio_checkbox_keywords_obj.unselect_checkbox,
                     'getstatus' : self.radio_checkbox_keywords_obj.get_status,
+                    'selecttabbyindex': self.tab_control_keywords_obj.selectTabByIndex,
+                    'selecttabbytext' : self.tab_control_keywords_obj.selectTabByText,
+                    'getselectedtab' : self.tab_control_keywords_obj.getSelectedTab,
+                    'verifyselectedtab' : self.tab_control_keywords_obj.verifySelectedTab,
                     'getemail': self.outook_obj.GetEmail,
                     'getfrommailid' : self.outook_obj.GetFromMailId,
                     'getattachmentstatus'    : self.outook_obj.GetAttachmentStatus,
@@ -141,13 +148,14 @@ class DesktopDispatcher:
                 result[3]=err_msg
             configobj = readconfig.readConfig()
             configvalues = configobj.readJson()
-            if configvalues['screenShot_Flag'].lower() == 'fail':
-                if result[0].lower() == 'fail':
+            if self.action == constants.EXECUTE:
+                if configvalues['screenShot_Flag'].lower() == 'fail':
+                    if result[0].lower() == 'fail':
+                        if keyword not in desktop_constants.APPLICATION_KEYWORDS:
+                            self.launch_keywords_obj.save_screeenshot()
+                elif configvalues['screenShot_Flag'].lower() == 'all':
                     if keyword not in desktop_constants.APPLICATION_KEYWORDS:
                         self.launch_keywords_obj.save_screeenshot()
-            elif configvalues['screenShot_Flag'].lower() == 'all':
-                if keyword not in desktop_constants.APPLICATION_KEYWORDS:
-                    self.launch_keywords_obj.save_screeenshot()
         except TypeError as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg

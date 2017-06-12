@@ -47,6 +47,7 @@ class Utils:
 
     def set_to_foreground(self,windowname):
         self.windowname=windowname
+        flag = True
         aut_handle = win32gui.FindWindow(None,windowname)
         if aut_handle> 0:
             foreground=win32gui.GetForegroundWindow()
@@ -65,7 +66,9 @@ class Utils:
                     self.bring_to_top(aut_handle,5)
             else:
                 self.bring_to_top(aut_handle,1)
-        return False
+        else:
+            flag = False
+        return flag
 
     def bring_to_top(self,aut_handle,value):
         win32gui.BringWindowToTop(aut_handle)

@@ -33,6 +33,7 @@ class OebsDispatcher:
 
     def __init__(self):
         self.exception_flag=''
+        self.action = None
 
 
     custom_dict={
@@ -193,6 +194,9 @@ class OebsDispatcher:
             keyword=keyword.lower()
             if keyword in dict.keys():
                 result=dict[keyword](*message)
+                if keyword == 'findwindowandattach':
+                    if result[0] == "Fail":
+                        result=constants.TERMINATE
                 if not(oebs_msg.ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE
             else:
@@ -202,11 +206,12 @@ class OebsDispatcher:
             screen_shot_obj = screenshot_keywords.Screenshot()
             configobj = readconfig.readConfig()
             configvalues = configobj.readJson()
-            if configvalues['screenShot_Flag'].lower() == 'fail':
-                if result[0].lower() == 'fail':
+            if self.action == constants.EXECUTE:
+                if configvalues['screenShot_Flag'].lower() == 'fail':
+                    if result[0].lower() == 'fail':
+                        screen_shot_obj.captureScreenshot()
+                elif configvalues['screenShot_Flag'].lower() == 'all':
                     screen_shot_obj.captureScreenshot()
-            elif configvalues['screenShot_Flag'].lower() == 'all':
-                screen_shot_obj.captureScreenshot()
          except TypeError as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg

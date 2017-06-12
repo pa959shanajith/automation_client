@@ -378,7 +378,7 @@ class Dropdown_Keywords():
                                     verb=selected
                                     item_list=input_val
                                     for item in item_list:
-                                     if item in verb:
+                                     if item == verb:
                                        status=desktop_constants.TEST_RESULT_PASS
                                        result=desktop_constants.TEST_RESULT_TRUE
                                      else:

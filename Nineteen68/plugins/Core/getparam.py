@@ -333,6 +333,9 @@ class GetParam():
                             for col in range(s.ncols):
                                 data = s.cell(0,col).value
                                 colname = data
+                                if isinstance(colname,float):
+                                    if colname % 1 == 0.0:
+                                        colname = int(colname)
                                 sdata [colname] = []
 
                             for row in range(s.nrows):

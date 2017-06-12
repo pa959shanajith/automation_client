@@ -79,7 +79,8 @@ class Dispatcher:
                     'setText': ['textbox','textarea','password','number','email','url'],
                     'sendValue':['textbox','textarea','password','number','email','url'],
                     'getText': ['textbox','textarea','password','number','email','url'],
-                    'setSecureText':['textbox','password']
+                    'setSecureText':['textbox','password'],
+                    'sendSecureValue':['textbox','password']
 
                     }
         custom_dict_element={'element':['clickElement','doubleClick','rightClick','getElementText','verifyElementText','drag', 'drop','getToolTipText','verifyToolTipText','verifyExists', 'verifyDoesNotExists', 'verifyHidden','verifyVisible', 'switchToTab','switchToWindow','setFocus','sendFunctionKeys',
@@ -209,6 +210,7 @@ class Dispatcher:
                   'getTextboxLength':self.textbox_object.gettextbox_length,
                   'verifyTextboxLength':self.textbox_object.verifytextbox_length,
                   'setSecureText':self.textbox_object.setsecuretext,
+                  'sendSecureValue':self.textbox_object.sendSecureValue,
 
                   'selectValueByIndex':self.dropdown_list_object.selectValueByIndex,
                   'getCount':self.dropdown_list_object.getCount,
@@ -316,11 +318,12 @@ class Dispatcher:
             screen_shot_obj = screenshot_keywords.Screenshot()
             configobj = readconfig.readConfig()
             configvalues = configobj.readJson()
-            if configvalues['screenShot_Flag'].lower() == 'fail':
-                if result[0].lower() == 'fail':
+            if self.action == 'execute':
+                if configvalues['screenShot_Flag'].lower() == 'fail':
+                    if result[0].lower() == 'fail':
+                        screen_shot_obj.captureScreenshot()
+                elif configvalues['screenShot_Flag'].lower() == 'all':
                     screen_shot_obj.captureScreenshot()
-            elif configvalues['screenShot_Flag'].lower() == 'all':
-                screen_shot_obj.captureScreenshot()
         except TypeError as e:
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result=list(result)

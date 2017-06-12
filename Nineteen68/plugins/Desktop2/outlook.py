@@ -20,6 +20,7 @@ import logger
 import pythoncom
 import threading
 log = logging.getLogger('outlook.py')
+import ftfy
 ##from  cherrypy import engine
 
 count=0
@@ -55,13 +56,16 @@ class OutlookKeywords:
             try:
                 logger.print_on_console('switching to the folder')
                 folderPath=input[0]
-                folderPath=folderPath.strip('//')
-                folders=folderPath.split('//')
-
+                folderPath=folderPath.strip('\\')
+                folders=folderPath.split('\\')
                 accountname=folders[0]
-                import pythoncom
-                pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
+                global count
+                if count>0:
+                    import pythoncom
+                    pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
+                count=count+1
                 self.outlook = Dispatch('Outlook.Application').GetNamespace('MAPI')
+
 #               get the message stores in outlook
                 stores=self.outlook.Stores
                 if accountname!='':
@@ -70,6 +74,7 @@ class OutlookKeywords:
                             self.store=store
 
                             if folders[1]=='Inbox':
+
                                 inbox_folder = store.GetDefaultFolder(outlook_constants.INBOX_FOLDER)
                                 index=0;
                                 folder=None
@@ -121,9 +126,11 @@ class OutlookKeywords:
 
 ##                pythoncom.CoInitialize()
 ##                engine.subscribe('start_thread', onThreadStart)
-
-                import pythoncom
-                pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
+                global count
+                if count>1:
+                    import pythoncom
+                    pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
+                count=count+1
                 if (self.outlook==None):
 
                      from win32com.client.gencache import EnsureDispatch
@@ -169,14 +176,10 @@ class OutlookKeywords:
                                 continue
                         else :
                             continue
-                pythoncom.CoUninitialize ()
                 if self.Flag!=True:
                     logger.print_on_console('Error: No such mail found')
                     error_msg='Error: No such mail found'
             except Exception as e:
-                pythoncom.CoUninitialize ()
-                import traceback
-                traceback.print_exc()
                 log.error(e)
                 logger.print_on_console(e)
             return status,method_output,result,error_msg
@@ -262,7 +265,7 @@ class OutlookKeywords:
             error_msg=None
             try:
                 if self.Flag==True:
-                    res= self.Body
+                    res= ftfy.fix_text(self.Body)
                     status=desktop_constants.TEST_RESULT_PASS
                     method_output=desktop_constants.TEST_RESULT_TRUE
                 else:
@@ -271,7 +274,7 @@ class OutlookKeywords:
             except Exception as  e:
                     log.error(e)
                     logger.print_on_console(e)
-            return status,method_output,str(res),error_msg
+            return status,method_output,res,error_msg
 
 
         def VerifyEmail(self,input,*args):
