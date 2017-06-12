@@ -153,6 +153,8 @@ class Dispatcher:
                 log.info('Finding the browser information')
                 browser_info=browser_Keywords.driver_obj.capabilities
                 reporting_obj.browser_version=browser_info.get('version')
+                if(reporting_obj.browser_version == '' or reporting_obj.browser_version == None):
+                    reporting_obj.browser_version= browser_info['browserVersion']
                 reporting_obj.browser_type=browser_info.get('browserName')
                 log.info(reporting_obj.browser_version)
                 log.info(reporting_obj.browser_type)
