@@ -130,7 +130,8 @@ STATUS_CODE_DICT={520: 'Unknown Error',
             507: 'Insufficient Storage',
             508: 'Loop Detected',
             510: 'Not Extended',
-            511: 'Network Authentication Required'}
+            511: 'Network Authentication Required',
+            111 : 'Connection Refused'}
 
 GET_OBJECT_COUNT='getObjectCount'
 
