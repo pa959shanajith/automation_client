@@ -206,7 +206,6 @@ class Spinner_Keywords():
                                     scrollele1=obj[length1-1]
                                     scrollele2=obj[length1-2]
                                     driver.scroll(scrollele1,scrollele2)
-                        driver.back()
 
                     else:
                         err_msg='element is disabled'
@@ -270,7 +269,6 @@ class Spinner_Keywords():
                                     scrollele1=obj[length1-1]
                                     scrollele2=obj[length1-2]
                                     driver.scroll(scrollele1,scrollele2)
-                        driver.back()
 
                     else:
                         err_msg='element is disabled'
