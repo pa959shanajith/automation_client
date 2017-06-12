@@ -344,6 +344,14 @@ class Dispatcher:
                     log.error('Error code ',status_code,' : ',value)
                     status=True
             except Exception as e:
+                status_code = 111
+                if status_code in STATUS_CODE_DICT: 
+                    value=STATUS_CODE_DICT[status_code] 
+                    logger.print_on_console('Error code ',status_code,' : ',value) 
+                    log.error('Error code and value ') 
+                    log.error(status_code) 
+                    log.error(value) 
+                    status=True
                 log.error(e)
         return status,value
 
