@@ -248,6 +248,138 @@ class StepDescription:
             return 'Execute the request.'
         return locals()[key](keyword)
 
+    def oebs(self,keyword,tsp,inputval,input,output,con,reporting_obj):
+
+        def LaunchApplication():
+        	return 'The application present in the path'+ inputval[0]	+  'is launched'
+        def FindWindowAndAttach():
+       	    return 'Find window and attach is executed'
+        def CloseApplication():
+        	return 'The application is closed'
+        def SwitchToFrame():
+        	return 'Control switched to Frame():'+ input
+        def setFocus():
+        	return 'Set focus on'+ "'" + tsp.custname + "'"
+        def waitForElementVisible():
+        	return 'Wait until the element'  + "'" + tsp.custname + "'"+  'is visible'
+        def verifyHidden():
+        	return 'Verify'	+ tsp.getCustName() +  'is hidden'
+        def verifyDisabled():
+        	return 'Verify'	+ "'" + tsp.custname + "'" +  'is disabled'
+        def verifyEnabled():
+        	return 'Verify'	+ "'" + tsp.custname + "'" +  'is enabled'
+        def verifyVisible():
+        	return 'Verify' + "'" + tsp.custname + "'" +  'is visible'
+        def verifyReadOnly():
+        	return 'Verify'	+ "'" + tsp.custname + "'" +  'is read-only'
+        def verifyToolTipText():
+        	return 'Verify' + input + ' is the tooltip of '+ "'" + tsp.custname + "'"
+        def getToolTipText():
+        	return 'Get the tool tip from the '	+ "'" + tsp.custname + "'" + ' and save the tool tip text ' + output + ' in ' + tsp.output
+        def verifyExists():
+        	return 'Verify ' + "'" + tsp.custname + "'"() + ' exists'
+        def verifyDoesNotExists():
+        	return 'Verify ' + "'" + tsp.custname + "'"() + ' does not exists'
+        def rightClick():
+        	return 'Perform right click on element'	+ "'" + tsp.custname + "'"()
+        def drag():
+        	return 'Perform drag on element' + "'" + tsp.custname + "'"
+        def drop():
+        	return'Perform drop on element'	+ "'" + tsp.custname + "'"
+        def setText():
+        	return 'Enter text ' + input + ' in the '+ "'" + tsp.custname + "'"
+        def getText():
+        	return 'Get text from the '	+ "'" + tsp.custname + "'" + ' and save the text ' + output + ' in ' + tsp.outputval
+        def getTextboxLength():
+        	return 'Get length from the ' + "'" + tsp.custname + "'" + ' and save the length ' + output + ' in ' + tsp.outputval
+        def verifyTextboxLength():
+        	return 'Verify ' + input + ' is the length of textbox ' + "'" + tsp.custname + "'"
+        def verifyText():
+        	return 'Verify ' + input + ' is the text in the ' + "'" + tsp.custname + "'"
+        def clearText():
+        	return 'Clear text from the ' + "'" + tsp.custname + "'"
+        def click():
+        	return 'Click on the ' + "'" + tsp.custname + "'"
+        def doubleClick():
+        	return 'DoubleClick on the ' + "'" + tsp.custname + "'"
+        def verifyButtonName():
+        	return 'Verify ' + input +  'is the name of ' + "'" + tsp.custname + "'"
+        def getButtonName():
+        	return 'Get the name of the ' + "'" + tsp.custname + "'" + 'and save the +output+ in ' + tsp.outputval
+        def getLinkText():
+        	return 'Get Text From '	+ "'" + tsp.custname + "'" + ' and save the text ' + output + ' in ' + tsp.outputval
+        def verifyLinkText():
+        	return 'Verify text ' + input + ' is the name of the ' + "'" + tsp.custname + "'"
+        def selectRadioButton():
+        	return 'Select ' + "'" + tsp.custname + "'"
+        def getStatus():
+        	return 'Get the status of the ' + "'" + tsp.custname + "'"	+ ' and save the status ' + output + ' in '	+ tsp.outputval
+        def selectCheckbox():
+        	return 'Select ' + "'" + tsp.custname + "'"
+        def unselectCheckbox():
+        	return 'Unselect '+ "'" + tsp.custname + "'"
+        def selectValueByIndex():
+        	return 'Select value with index value ' + input + ' in the ' + "'" + tsp.custname + "'"
+        def getCount():
+        	return'Get the count of values in the '	+ "'" + tsp.custname + "'"	+ ' and save the count ' + output + ' in ' + tsp.outputval
+        def selectValueByText():
+        	return 'Select value ' + input + ' in the ' + "'" + tsp.custname + "'"
+        def verifySelectedValue():
+        	return 'Verify value ' + input + ' is selected in the '	+ "'" + tsp.custname + "'"
+        def verifyCount():
+        	return 'Verify ' + input + ' is the count of the ' + "'" + tsp.custname + "'"
+        def verifyAllValues():
+            return 'Verify values ' + input + ' are present in the ' + "'" + tsp.custname + "'"
+        def verifySelectedValues():
+        	return 'Verify values ' + input + ' are selected in the ' + "'" + tsp.custname + "'"
+        def getSelected():
+            return 'Get Selected value of '+  "'" + tsp.custname + "'" + ' and save value ' + output + ' in '+ tsp.outputval
+        def verifyValuesExists():
+            return 'Verify values ' + input + ' exists in the '+  "'" + tsp.custname + "'"
+        def getValueByIndex():
+        	return 'Get value with index ' + input + ' in the '	+ "'" + tsp.custname + "'" + ' and save the value ' + output + ' in ' + tsp.outputval
+        def selectMultipleValuesByIndexes():
+            return 'Select values ' + mulInputValin.toString() + ' in the '+ "'" + "'" + tsp.custname + "'" + "'"
+        def selectMultipleValuesByText():
+            return 'Select values ' + mulInputValin.toString() + ' in the '+ "'" + "'" + tsp.custname + "'" + "'"
+        def getMultipleValuesByIndexes():
+            return 'Get values with indexes ' + inputValsb.toString() + ' in the ' + "'" + tsp.custname + "'" +  ' and save the value ' + TestAutomationController.multipleOutputResult + ' in  '+ tsp.outputval
+        def selectAllValues():
+        	return 'Select all values in the ' + "'" + tsp.custname + "'"
+        def deselectAll():
+        	return'Deselect all values in the '	+ "'" + tsp.custname + "'"
+        def getRowCount():
+        	return 'Get row count of the ' + "'" + tsp.custname + "'" + ' and save the count ' + output + ' in ' + tsp.outputval
+        def getColumnCount():
+        	return'Get column count of the ' + "'" + tsp.custname + "'"	+ ' and save the count ' + output + ' in ' + tsp.outputval
+        def getCellValue():
+        	return 'Get cell value of '+ "'" + tsp.custname + "'" + ' in the table and save the value ' + output + ' in ' + tsp.outputval
+        def verifyCellValue():
+            return 'Verify cell value ' + input[2] + ' is present in the '	+ "'" + tsp.custname + "'" + '  table'
+        def clickElement():
+       	    return 'Click '	+ "'" + tsp.custname + "'"
+        def getElementText():
+        	return'Get the text of the element ' + "'" + tsp.custname + "'" + ' and save the value  ' + output + ' in '	+ tsp.outputval
+        def verifyElementText():
+        	return 'Verify ' + input + ' is the the text of the ' + "'" + tsp.custname + "'"
+        def sendFunctionKeys():
+        	return 'Press '	+ tsp.inputval[0] + ' key'
+        def right():
+        	return 'Right button clicked ' + input + ' times'
+        def left():
+        	return 'Left button clicked ' + input + ' times'
+        def up():
+        	return 'Up button clicked '	+ input + ' times'
+        def down():
+        	return 'Down button clicked ' + input + ' times'
+        def closeFrame():
+        	return 'Close frame ' + "'" + tsp.custname + "'"
+        def toggleMaximize():
+        	return 'Perform toggle maximize operation on '	+ "'" + tsp.custname + "'"
+        def toggleMinimize():
+        	return 'Perform toggle minimize operation on '	+ "'" + tsp.custname + "'"
+        return locals()[keyword]()
+
     def sap(self,keyword,tsp,inputval,input,output,con,reporting_obj):
         print 'keyword',keyword
         #Launch keywords
