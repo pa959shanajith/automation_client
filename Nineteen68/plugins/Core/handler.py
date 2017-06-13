@@ -93,7 +93,7 @@ class Handler():
         return : None
 
         """
-        import  ftfy
+##        import  ftfy
         global ws_template
         global ws_templates_dict
         log.debug('Parsing')
@@ -124,11 +124,12 @@ class Handler():
                     log.error(e)
 
                 #passing test case value to ftfy module to handle special charcter
-                if(type(testcase) == 'unicode'):
-                    temp_testcase = ftfy.fix_text(testcase)
-                    script.append(temp_testcase)
-                else:
-                    script.append(testcase)
+##                if(type(testcase) == 'unicode'):
+##                    temp_testcase = ftfy.fix_text(testcase)
+##                    script.append(temp_testcase)
+##                else:
+##                script.append(testcase)
+                script.append(testcase)
             if json_data.has_key('comments'):
                 comments=json_data['comments']
             #Checking if the testcase has key 'testscript_name' or 'testcasename'

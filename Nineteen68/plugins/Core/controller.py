@@ -477,13 +477,19 @@ class Controller():
             else:
                 #data size check
                 if self.core_utilsobject.getdatasize(display_keyword_response,'mb') < 5:
-                    logger.print_on_console('Result obtained is ',display_keyword_response)
+                    if not isinstance(display_keyword_response,list):
+                        logger.print_on_console('Result obtained is ',display_keyword_response)
+                    else:
+                        logger.print_on_console('Result obtained is ',",".join([display_keyword_response[i] for i in range(len(display_keyword_response))]))
                 else:
                     logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         else:
             #data size check
             if self.core_utilsobject.getdatasize(display_keyword_response,'mb') < 5:
-                logger.print_on_console('Result obtained is ',display_keyword_response)
+                if not isinstance(display_keyword_response,list):
+                    logger.print_on_console('Result obtained is ',display_keyword_response)
+                else:
+                    logger.print_on_console('Result obtained is ',",".join([display_keyword_response[i] for i in range(len(display_keyword_response))]))
             else:
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         log.info('Result obtained is: ')

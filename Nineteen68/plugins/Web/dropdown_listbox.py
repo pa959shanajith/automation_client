@@ -16,6 +16,7 @@ import webconstants
 from utilweb_operations import UtilWebKeywords
 import logger
 import radio_checkbox_operations
+import core_utils
 import logging
 
 from constants import *
@@ -170,6 +171,8 @@ class DropdownKeywords():
                             inp_val = input[4]
                             log.info('Input value obtained')
                             log.info(inp_val)
+                        coreutilsobj=core_utils.CoreUtils()
+                        inp_val=coreutilsobj.get_UTF_8(inp_val)
                         if len(inp_val.strip()) != 0:
                             select = Select(webelement)
                             iList = select.options
@@ -248,6 +251,8 @@ class DropdownKeywords():
                         select = Select(webelement)
                         first_value = select.first_selected_option.text
                         inp_val = input[0]
+                        coreutilsobj=core_utils.CoreUtils()
+                        inp_val=coreutilsobj.get_UTF_8(inp_val)
                         if (first_value == inp_val):
                             status=webconstants.TEST_RESULT_PASS
                             result=webconstants.TEST_RESULT_TRUE
@@ -303,6 +308,8 @@ class DropdownKeywords():
                         log.info(temp)
                         for y in range(0,inp_val_len):
                             input_val = input[y]
+                            coreutilsobj=core_utils.CoreUtils()
+                            input_val=coreutilsobj.get_UTF_8(input_val)
                             if (input_val in temp):
                                 temp.remove(input_val)
                             else:
@@ -386,6 +393,7 @@ class DropdownKeywords():
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
                 err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
         return status,result,verb,err_msg
+
     def getAllValues(self,webelement,input,*args):
         """
         author : arpitha.b.v
@@ -482,6 +490,8 @@ class DropdownKeywords():
                         log.info(temp)
                         for y in range(0,inp_val_len):
                             input_val = input[y]
+                            coreutilsobj=core_utils.CoreUtils()
+                            input_val=coreutilsobj.get_UTF_8(input_val)
                             if (input_val in temp):
                                 temp.remove(input_val)
                             else:
@@ -650,7 +660,7 @@ class DropdownKeywords():
                     log.info(index)
                     if (len(index) == '1'):
                         output = select.all_selected_options[i].text
-                        str(output)
+##                        str(output)
                         logger.print_on_console(output)
                         status=webconstants.TEST_RESULT_PASS
                         result=webconstants.TEST_RESULT_TRUE
@@ -658,8 +668,8 @@ class DropdownKeywords():
                     else:
                         temp = []
                         for x in range(0,len(index)):
-                            out = select.all_selected_options[x].text
-                            value = str(out)
+                            value = select.all_selected_options[x].text
+##                            value = str(out)
                             temp.append(value)
                         output = ';'.join(temp)
                         logger.print_on_console(output)
@@ -713,6 +723,8 @@ class DropdownKeywords():
                                     input_val = input[x]
                                     log.info('Input value obtained')
                                     log.info(input_val)
+                                    coreutilsobj=core_utils.CoreUtils()
+                                    input_val=coreutilsobj.get_UTF_8(input_val)
                                     select.select_by_visible_text(input_val)
                                     counter = counter + 1
 
@@ -985,7 +997,7 @@ class DropdownKeywords():
                         flag = True
                         for x in range(0,opt_len):
                             internal_val = select.options[x].text
-                            str(internal_val)
+##                            str(internal_val)
                             temp.append(internal_val)
                         log.debug('temp value obtained')
                         log.debug(temp)

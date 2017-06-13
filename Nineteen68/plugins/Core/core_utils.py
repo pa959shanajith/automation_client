@@ -17,8 +17,8 @@ class CoreUtils():
 
     #definition to fetch the data size in bytes/kilobytes/megabytes
     # sends data length in bytes if memoryformat not provided
-    try:
-        def getdatasize(self,inputdata,memoryformat):
+    def getdatasize(self,inputdata,memoryformat):
+        try:
             datalength = sys.getsizeof(inputdata)
             log.info('Data size in bytes:')
             log.info(datalength)
@@ -32,5 +32,24 @@ class CoreUtils():
             else:
                 log.info('Data size is: %s',str(datalength))
             return datalength
-    except Exception as e:
-        log.info(e)
+        except Exception as e:
+            log.info(e)
+
+    #definition to convert to UTF-8 format when input is not within ascii 128
+    def get_UTF_8(self,value):
+        try:
+            if isinstance(value, list):
+                for eachvalue in value:
+                    if not isinstance(eachvalue,unicode):
+                        if not all(ord(c) < 128 for c in eachvalue):
+                            value.append(eachvalue.decode('utf-8'))
+                            print value
+            else:
+                if not isinstance(value,unicode):
+                    if not all(ord(c) < 128 for c in value):
+                        value = value.decode('utf-8')
+            return value
+        except Exception as e:
+            log.info(e)
+
+
