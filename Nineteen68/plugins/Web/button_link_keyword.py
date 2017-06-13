@@ -23,6 +23,7 @@ from constants import *
 ##driver = browser_Keywords.driver_obj
 ##driver = None
 log = logging.getLogger('button_link_keyword.py')
+text_javascript = """function stext_content(f) {     var sfirstText = '';     var stextdisplay = '';     for (var z = 0; z < f.childNodes.length; z++) {         var scurNode = f.childNodes[z];         swhitespace = /^\s*$/;         if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {             sfirstText = scurNode.nodeValue;             stextdisplay = stextdisplay + sfirstText;         }     }     return (stextdisplay); }; return stext_content(arguments[0])"""
 class ButtonLinkKeyword():
 ##    def __init__(self):
 ##        driver = webdriver.Ie(executable_path = 'D:\Drivers\iedriverserver64')
@@ -221,19 +222,33 @@ class ButtonLinkKeyword():
                 log.info('Recieved web element from the web dispatcher')
                 log.debug(webelement)
                 log.debug('Getting href attribute')
-                text = webelement.get_attribute(webconstants.HREF)
-                if text != None:
-                    log.info('Web element is a valid link and it has href attribute')
+                linktext = browser_Keywords.driver_obj.execute_script(text_javascript,webelement)
+                import ftfy
+                linktext = ftfy.fix_text(linktext)
+                linktext = linktext.replace('\n','')
+                linktext = linktext.strip()
+                if linktext == None or linktext == '':
+                    linktext = webelement.get_attribute(webconstants.HREF)
+##                    log.info('Link text: ' +text)
+                if linktext == None or linktext == '':
+##                    log.info('Web element is a valid link and it has href attribute')
                     linktext = webelement.text
-                    if linktext == None:
-                        linktext = ''
+##                    log.info('Link text: ' +linktext)
+                logger.print_on_console('Link text: ' )
+                logger.print_on_console(linktext)
+                if linktext != None and linktext !='':
+##                    log.info('Web element is a valid link and it has href attribute')
+##                    linktext = webelement.text
+##                    if linktext == None:
+##                        linktext = ''
                     log.info('Link text: ' +linktext)
                     log.info(STATUS_METHODOUTPUT_UPDATE)
                     status = webconstants.TEST_RESULT_PASS
                     methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
-                    log.error('Web element is not a link')
-                    logger.print_on_console('Web element is not a link')
+                    err_msg='There is no link text for the given element'
+                    logger.print_on_console(err_msg)
+                    log.info(err_msg)
 ##            else:
 ##                logger.print_on_console('Element not found')
 ##            print 'Keyword result: ',status
@@ -261,11 +276,19 @@ class ButtonLinkKeyword():
                 if input != None and len(input) != 0:
                     log.debug('Input is valid, Continue..')
                     log.debug('Getting href attribute')
-                    text = webelement.get_attribute(webconstants.HREF)
-                    if text != None:
+                    linktext = browser_Keywords.driver_obj.execute_script(text_javascript,webelement)
+                    import ftfy
+                    linktext = ftfy.fix_text(linktext)
+                    linktext = linktext.replace('\n','')
+                    linktext = linktext.strip()
+                    if linktext == None or linktext == '':
+                        linktext = webelement.get_attribute(webconstants.HREF)
+                        log.info('Link text: ' +linktext)
+                    if linktext == None or linktext == '':
                         log.info('Web element is a valid link and it has href attribute')
                         linktext = webelement.text
                         log.info('Link text: ' +linktext)
+                    if linktext != None and linktext !='':
                         if linktext == input:
                             err_msg='Link Text matched'
                             logger.print_on_console(err_msg)
@@ -283,6 +306,11 @@ class ButtonLinkKeyword():
                             logger.print_on_console(ACTUAL,linktext)
                             log.info(ACTUAL)
                             log.info(linktext)
+                    else:
+                        err_msg='There is no link text for the given element'
+                        logger.print_on_console(err_msg)
+                        log.info(err_msg)
+
 
 
                 else:

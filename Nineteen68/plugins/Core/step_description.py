@@ -457,7 +457,7 @@ class StepDescription:
         def LaunchApplication():
             return ' The application present in the path  '+ inputval[0]+ 'is launched'
         def GetPageTitle():
-            return ' The page title is '+ output +' and  is saved  in the variable ' +tsp.outputval
+            return ' Get the title of Application and  save the title in ' +tsp.outputval
         def CloseApplication():
             return ' The application is closed'
 

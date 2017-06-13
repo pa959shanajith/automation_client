@@ -51,6 +51,7 @@ class readConfig():
         configvalues['timeOut']=params['timeOut']
         configvalues['stepExecutionWait']=params['stepExecutionWait']
         configvalues['displayVariableTimeOut'] = params['displayVariableTimeOut']
+        configvalues['retrieveURL']=params['retrieveURL']
         return configvalues
 ##        Config=readConfig(node_ip,node_port,screenShot_PathName,ignore_certificate,chrome_path,bit_64,logFile_Path,screenShot_Flag,queryTimeOut,timeOut,stepExecutionWait)
 

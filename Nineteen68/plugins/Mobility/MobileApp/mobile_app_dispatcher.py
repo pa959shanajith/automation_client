@@ -102,7 +102,7 @@ class MobileDispatcher:
                     'VerifyCount':self.spinner_keywords_object.verify_count,
                     'SelectValueByIndex':self.spinner_keywords_object.select_value_by_index,
                     'SelectValueByText':self.spinner_keywords_object.select_value_by_text,
-                    'GetMultipleValuesByIndexs':self.spinner_keywords_object.get_multiple_values_by_indexs,
+                    'GetMultipleValuesByIndexes':self.spinner_keywords_object.get_multiple_values_by_indexs,
                     'GetValueByIndex':self.spinner_keywords_object.get_value_by_index,
                     'GetAllValues':self.spinner_keywords_object.get_all_values,
                     'VerifyAllValues':self.spinner_keywords_object.verify_all_values

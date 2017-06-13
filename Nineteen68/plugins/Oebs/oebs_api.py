@@ -39,7 +39,9 @@ except WindowsError:
     try:
 ##      os.chdir("C:\Program Files\Java Access Bridge\installerFiles")
 ##      bridgeDll=cdll.LoadLibrary("WindowsAccessBridge.dll")
-        bridgeDll=cdll.windowsaccessbridge
+##        bridgeDll=cdll.windowsaccessbridge
+        bridgeDll=getattr(cdll,'windowsAccessBridge-32')
+        legacyAccessBridge=False
         print "LOADED"
     except WindowsError:
         bridgeDll=None

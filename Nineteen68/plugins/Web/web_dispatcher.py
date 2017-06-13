@@ -62,7 +62,8 @@ class Dispatcher:
         webelement = None
         element = None
         err_msg=None
-
+        configobj = readconfig.readConfig()
+        configvalues = configobj.readJson()
 
         log.info('In Web dispatcher')
         custom_dict={
@@ -153,6 +154,8 @@ class Dispatcher:
                 log.info('Finding the browser information')
                 browser_info=browser_Keywords.driver_obj.capabilities
                 reporting_obj.browser_version=browser_info.get('version')
+                if(reporting_obj.browser_version == '' or reporting_obj.browser_version == None):
+                    reporting_obj.browser_version= browser_info['browserVersion']
                 reporting_obj.browser_type=browser_info.get('browserName')
                 log.info(reporting_obj.browser_version)
                 log.info(reporting_obj.browser_type)
@@ -302,10 +305,11 @@ class Dispatcher:
                         self.webelement_map[output]=result[2]
 
                     elif keyword not in [OPEN_BROWSER,OPEN_NEW_BROWSER,CLOSE_BROWSER,GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
-                        if result[0].lower() == 'Fail':
-                            res,value=self.check_url_error_code()
-                            if res:
-                                result=TERMINATE
+                        if configvalues['retrieveURL'].lower() == 'yes':
+                            if result[0].lower() == 'fail':
+                                res,value=self.check_url_error_code()
+                                if res:
+                                    result=TERMINATE
 
                     elif keyword==OPEN_BROWSER:
                         find_browser_info(reporting_obj)
@@ -316,8 +320,6 @@ class Dispatcher:
                 result=list(result)
                 result[3]=err_msg
             screen_shot_obj = screenshot_keywords.Screenshot()
-            configobj = readconfig.readConfig()
-            configvalues = configobj.readJson()
             if self.action == 'execute':
                 if configvalues['screenShot_Flag'].lower() == 'fail':
                     if result[0].lower() == 'fail':
@@ -350,9 +352,19 @@ class Dispatcher:
                 if status_code in STATUS_CODE_DICT:
                     value=STATUS_CODE_DICT[status_code]
                     logger.print_on_console('Error code ',status_code,' : ',value)
-                    log.error('Error code ',status_code,' : ',value)
+                    log.error('Error code and value ')
+                    log.error(status_code)
+                    log.error(value)
                     status=True
             except Exception as e:
+                status_code=111
+                if status_code in STATUS_CODE_DICT:
+                    value=STATUS_CODE_DICT[status_code]
+                    logger.print_on_console('Error code ',status_code,' : ',value)
+                    log.error('Error code and value ')
+                    log.error(status_code)
+                    log.error(value)
+                    status=True
                 log.error(e)
         return status,value
 
