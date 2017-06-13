@@ -102,7 +102,7 @@ class ButtonLinkKeyword():
         try:
             if(id != None):
 ##                if(ses.FindById(id).Changeable == True):
-                    if(ses.FindById(id).Text != None and ses.FindById(id).Text == name):
+                    if(ses.FindById(id).Text != None and ses.FindById(id).Text.lstrip() == name.lstrip()):
                         status =sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
                     else:
