@@ -105,7 +105,9 @@ class MobileDispatcher:
                     'GetMultipleValuesByIndexes':self.spinner_keywords_object.get_multiple_values_by_indexs,
                     'GetValueByIndex':self.spinner_keywords_object.get_value_by_index,
                     'GetAllValues':self.spinner_keywords_object.get_all_values,
-                    'VerifyAllValues':self.spinner_keywords_object.verify_all_values
+                    'VerifyAllValues':self.spinner_keywords_object.verify_all_values,
+                    'GetSelectedValue':self.spinner_keywords_object.get_selected_value,
+                    'VerifySelectedValue':self.spinner_keywords_object.verify_selected_value
 
                 }
             ELEMENT_FOUND=True
@@ -133,6 +135,8 @@ class MobileDispatcher:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
         except Exception as e:
+            import traceback
+            traceback.print_exc
             log.error(e)
             logger.print_on_console('Exception at dispatcher')
         return result

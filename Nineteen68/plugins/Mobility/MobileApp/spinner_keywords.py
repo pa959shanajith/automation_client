@@ -183,7 +183,7 @@ class Spinner_Keywords():
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                             for i in element:
-                                if i.text not in text :
+                                if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
                             for j in obj:
@@ -198,14 +198,134 @@ class Spinner_Keywords():
                                     err_msg='invalid input'
                                     log.error('invalid input')
                                     logger.print_on_console(err_msg)
-                            if flag :
+                            length1=len(text)
+                            if length1 >4 :
+                                scrollele1=obj[length1-1]
+                                scrollele2=obj[length1-2]
+                                import time
+                                time.sleep(3)
+                                driver.scroll(scrollele1,scrollele2)
+                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in element:
+                                if i.text not in text:
+                                    text.append(i.text)
+                                    obj.append(i)
+                            if flag == False:
+                                if input is not None:
+                                    if input == j.text :
+                                        j.click()
+                                        status=TEST_RESULT_PASS
+                                        result=TEST_RESULT_TRUE
+                                        global flag
+                                        flag=True
+                                else :
+                                    err_msg='invalid input'
+                                    log.error('invalid input')
+                                    logger.print_on_console(err_msg)
+                            length2=len(text)
+                            time.sleep(3)
+                            driver.scroll(scrollele1,scrollele2)
+
+                            if (length1==length2):
+                                if flag == False:
+                                    err_msg='invalid input'
+                                    log.error('invalid input')
+                                    logger.print_on_console(err_msg)
+                                    driver.back()
                                 break
-                            else :
-                                length1=len(text)
-                                if length1 >4 :
-                                    scrollele1=obj[length1-1]
-                                    scrollele2=obj[length1-2]
-                                    driver.scroll(scrollele1,scrollele2)
+
+
+                    else:
+                        err_msg='element is disabled'
+                        log.error('element is disabled')
+                        logger.print_on_console(err_msg)
+                else:
+                    err_msg='element is not visible'
+                    log.error('element is not visible')
+                    logger.print_on_console(err_msg)
+        except Exception as e:
+                log.error(e)
+
+        return status,result,output,err_msg
+
+    def verify_selected_value(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        result=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        input=input[0]
+        text=[]
+        obj=[]
+        flag=False
+
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if webelement is not None:
+                visibility=webelement.is_displayed()
+                log.debug('element is visible')
+                if visibility:
+                    enable=webelement.is_enabled()
+                    log.debug(WEB_ELEMENT_ENABLED)
+                    if enable:
+                        log.debug('performing the action')
+                        driver=install_and_launch.driver
+                        action = TouchAction(driver)
+                        action.tap(webelement).perform()
+                        while(True):
+                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in element:
+                                if i.text not in text:
+                                    text.append(i.text)
+                                    obj.append(i)
+                            for j in obj:
+                                if input is not None:
+                                    selected=j.get_attribute("checked")
+                                    if str(selected)== 'true':
+                                        if input == j.text :
+                                            status=TEST_RESULT_PASS
+                                            result=TEST_RESULT_TRUE
+                                            global flag
+                                            flag=True
+                                else :
+                                    err_msg='invalid input'
+                                    log.error('invalid input')
+                                    logger.print_on_console(err_msg)
+                            length1=len(text)
+                            if length1 >4 :
+                                scrollele1=obj[length1-1]
+                                scrollele2=obj[length1-2]
+                                import time
+                                time.sleep(3)
+                                driver.scroll(scrollele1,scrollele2)
+                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in element:
+                                if i.text not in text:
+                                    text.append(i.text)
+                                    obj.append(i)
+                            if flag == False:
+                                if input is not None:
+                                    selected=j.get_attribute("checked")
+                                    if str(selected)== 'true':
+                                        if input == j.text :
+                                            status=TEST_RESULT_PASS
+                                            result=TEST_RESULT_TRUE
+                                            global flag
+                                            flag=True
+                                else :
+                                    err_msg='invalid input'
+                                    log.error('invalid input')
+                                    logger.print_on_console(err_msg)
+                            length2=len(text)
+                            time.sleep(3)
+                            driver.scroll(scrollele1,scrollele2)
+
+                            if (length1==length2):
+                                if flag == False:
+                                    err_msg='invalid input'
+                                    log.error('invalid input')
+                                    logger.print_on_console(err_msg)
+                                    driver.back()
+                                break
 
                     else:
                         err_msg='element is disabled'
@@ -246,10 +366,10 @@ class Spinner_Keywords():
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                             for i in element:
-                                if i.text not in text :
+                                if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
-
+                            for j in obj:
                                 if input is not None:
                                     if input<len(obj) :
                                         obj[input].click()
@@ -261,15 +381,41 @@ class Spinner_Keywords():
                                     err_msg='invalid input'
                                     log.error('invalid input')
                                     logger.print_on_console(err_msg)
-                            if flag :
-                                break
-                            else :
-                                length1=len(text)
-                                if length1 >4 :
-                                    scrollele1=obj[length1-1]
-                                    scrollele2=obj[length1-2]
-                                    driver.scroll(scrollele1,scrollele2)
+                            length1=len(text)
+                            if length1 >4 :
+                                scrollele1=obj[length1-1]
+                                scrollele2=obj[length1-2]
+                                import time
+                                time.sleep(3)
+                                driver.scroll(scrollele1,scrollele2)
+                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in element:
+                                if i.text not in text:
+                                    text.append(i.text)
+                                    obj.append(i)
+                            if flag == False:
+                                if input is not None:
+                                   if input<len(obj) :
+                                        obj[input].click()
+                                        status=TEST_RESULT_PASS
+                                        result=TEST_RESULT_TRUE
+                                        global flag
+                                        flag=True
+                                else :
+                                    err_msg='invalid input'
+                                    log.error('invalid input')
+                                    logger.print_on_console(err_msg)
+                            length2=len(text)
+                            time.sleep(3)
+                            driver.scroll(scrollele1,scrollele2)
 
+                            if (length1==length2):
+                                if flag == False:
+                                    err_msg='invalid input'
+                                    log.error('invalid input')
+                                    logger.print_on_console(err_msg)
+                                    driver.back()
+                                break
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
@@ -480,9 +626,80 @@ class Spinner_Keywords():
         return status,result,output,err_msg
 
 
+    def get_selected_value(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        result=TEST_RESULT_FALSE
+        output=None
+        err_msg=None
+        text=[]
+        obj=[]
+##        input=int(input[0])
+        flag=False
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if webelement is not None:
+                visibility=webelement.is_displayed()
+                log.debug('element is visible')
+                if visibility:
+                    enable=webelement.is_enabled()
+                    log.debug(WEB_ELEMENT_ENABLED)
+                    if enable:
+                        log.debug('performing the action')
+                        driver=install_and_launch.driver
+                        action = TouchAction(driver)
+                        action.tap(webelement).perform()
+                        while(True):
+                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in element:
+                                if i.text not in text :
+                                    text.append(i.text)
+                                    obj.append(i)
+
+                            for j in obj:
+                                    selected=j.get_attribute("checked")
+
+
+                                    if str(selected) == 'true' :
+
+                                        output=j.text
+                                        status=TEST_RESULT_PASS
+                                        result=TEST_RESULT_TRUE
+                                        global flag
+                                        flag=True
+
+                                    else :
+
+                                        continue
+
+                            if flag :
+                                break
+                            else :
+                                length1=len(text)
+                                if length1 >4 :
+                                    scrollele1=obj[length1-1]
+                                    scrollele2=obj[length1-2]
+                                    driver.scroll(scrollele1,scrollele2)
+                        driver.back()
+
+                    else:
+                        err_msg='element is disabled'
+                        log.error('element is disabled')
+                        logger.print_on_console(err_msg)
+                else:
+                    err_msg='element is not visible'
+                    log.error('element is not visible')
+                    logger.print_on_console(err_msg)
+        except Exception as e:
+                log.error(e)
+
+        return status,result,output,err_msg
+
+
+
+
 
     def get_multiple_values_by_indexs(self,webelement,input,*args):
-        print '1111111'
+
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=None
