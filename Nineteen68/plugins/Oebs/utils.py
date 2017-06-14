@@ -105,24 +105,29 @@ class Utils:
         log.info('windowname is '+windowname)
         status=False
         err_msg=None
+        self.aut_handle=None
         try:
             import oebs_dispatcher
+            oebs_dispatcher.windowname=None
             import time
             load_timeout=1
             if len(args)>0:
                 load_timeout=args[0]
-
+            flag=False
             if not(windowname is None and windowname is ''):
                 start_time = time.time()
                 while (time.time() - start_time) < load_timeout:
                     handle=self.find_window(windowname)
                     if handle is not None:
+                        flag=True
                         self.aut_handle=handle
                         logger.print_on_console('Application handle found')
                         break;
+            if not(flag):
+                self.aut_handle=None
             if self.aut_handle is not None:
                 oebs_dispatcher.windowname=windowname
-    ##            self.set_to_foreground(windowname)
+                self.set_to_foreground(windowname)
                 status=True
         except Exception as e:
             log.error(e)
@@ -287,6 +292,7 @@ class Utils:
         windowname=windowname[0]
         output=OUTPUT_CONSTANT
         res,err_msg=self.find_oebswindow_and_attach(windowname)
+        print ("res is :",res)
         if res:
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE

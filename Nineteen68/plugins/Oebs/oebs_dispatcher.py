@@ -109,7 +109,7 @@ class OebsDispatcher:
          keyword=tsp.name
          err_msg=None
          result=[constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
-         if windowname is not None:
+         if windowname is not None and tsp.name.lower()!='findwindowandattach':
             self.utils_obj.set_to_foreground(windowname)
          message=self.assign_url_objectname(tsp,input)
 
