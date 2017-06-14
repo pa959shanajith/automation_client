@@ -179,6 +179,15 @@ class BrowserKeywords():
                 if url[0:4].lower()!='http' and url[0:4].lower()!='file':
                     url='http://'+url
                 driver_obj.get(url)
+                #ignore certificate implementation
+                try:
+                    configobj = readconfig.readConfig()
+                    configvalues = configobj.readJson()
+                    ignore_certificate = configvalues['ignore_certificate']
+                    if ((ignore_certificate.lower() == 'yes') and ((driver_obj.title !=None) and ('Certificate' in driver_obj.title))):
+                        driver_obj.execute_script("""document.getElementById('overridelink').click();""")
+                except Exception as k:
+                    logger.print_on_console('Exception while ignoring the certificate')
                 logger.print_on_console('Navigated to URL')
                 log.info('Navigated to URL')
                 status=webconstants.TEST_RESULT_PASS
@@ -643,8 +652,12 @@ class Singleton_DriverUtil():
                 version = ver[0]
 
                 # opening firefox browser through selenium if the version 47 and less than 47
+                ignore_certificate = configvalues['ignore_certificate']
+                profile = webdriver.FirefoxProfile()
+                if ignore_certificate.lower() == 'yes':
+                    profile.accept_untrusted_certs = True
                 if int(version) < 48:
-                    driver = webdriver.Firefox()
+                    driver = webdriver.Firefox(firefox_profile=profile)
                     drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('Firefox browser started')
@@ -652,7 +665,7 @@ class Singleton_DriverUtil():
                 else:
                     caps=webdriver.DesiredCapabilities.FIREFOX
                     caps['marionette'] = True
-                    driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH)
+                    driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH,firefox_profile=profile)
                     drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('Firefox browser started using geckodriver')
