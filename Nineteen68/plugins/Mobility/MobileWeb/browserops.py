@@ -102,7 +102,7 @@ class BrowserOperations():
     def openBrowser(self,inputs):
        try:
             self.start_server()
-            input_list = inputs
+            input_list = inputs.split(';')
             time.sleep(5)
             desired_caps = {}
             desired_caps['platformName'] = 'Android'

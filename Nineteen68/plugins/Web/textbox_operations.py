@@ -18,6 +18,7 @@ from encryption_utility import AESCipher
 from selenium.common.exceptions import *
 import logging
 from constants import *
+import core_utils
 
 
 log = logging.getLogger('textbox_operations.py')
@@ -84,6 +85,8 @@ class TextboxKeywords:
                     if len(args)>0 and args[0] != '':
                         visibilityFlag=args[0]
                     input=input[0]
+                    coreutilsobj=core_utils.CoreUtils()
+                    input=coreutilsobj.get_UTF_8(input)
                     logger.print_on_console(INPUT_IS+input)
                     log.info(INPUT_IS)
                     log.info(input)
@@ -129,6 +132,8 @@ class TextboxKeywords:
                     if len(args)>0 and args[0] != '':
                         visibilityFlag=args[0]
                     input=input[0]
+                    coreutilsobj=core_utils.CoreUtils()
+                    input=coreutilsobj.get_UTF_8(input)
                     logger.print_on_console(INPUT_IS+input)
                     log.info(INPUT_IS)
                     log.info(input)
@@ -187,8 +192,7 @@ class TextboxKeywords:
                methodoutput=TEST_RESULT_TRUE
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
-
-        logger.print_on_console(METHOD_OUTPUT+str(text))
+        logger.print_on_console(METHOD_OUTPUT+text)
         return status,methodoutput,text,err_msg
 
     def verify_text(self,webelement,input,*args):
@@ -202,6 +206,8 @@ class TextboxKeywords:
                text=self.__get_text(webelement)
                log.debug('Text is '+text)
                input=input[0]
+               coreutilsobj=core_utils.CoreUtils()
+               input=coreutilsobj.get_UTF_8(input)
                if text==input:
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
@@ -400,15 +406,3 @@ class TextboxKeywords:
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
-
-
-
-
-
-
-
-
-
-
-
-

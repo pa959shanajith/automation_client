@@ -83,9 +83,11 @@ class Delay_keywords:
 ##                    if y == 'None' or y == None:
                     if y == None:
                         y = 'null'
-                    if type(y)==unicode or type(y)==str:
+                    if not isinstance(y,unicode):
+##                        print str(y)
                         y=str(y)
-                    display_input+=x+' = '+(y if type(y)==str else repr(y))+'\n'
+##                    display_input+=x+' = '+(y if type(y)==str else repr(y))+'\n'
+                    display_input+=x+' = '+y+'\n'
                 o = pause_display_operation.PauseAndDisplay()
                 o.display_value(display_input,args[-2],args[-1])
                 status=TEST_RESULT_PASS

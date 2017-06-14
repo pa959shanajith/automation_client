@@ -61,23 +61,25 @@ class Reporting:
             inputVal=[]
             outputval=[]
             input=[]
-            for x in tsp.inputval:
+            inputVal=tsp.inputval[0].split(';')
+            for x in inputVal:
                 x=con.dynamic_var_handler_obj.replace_dynamic_variable(x,tsp.name,con)
                 input.append(x)
-            input=','.join(tsp.inputval)
+            input=','.join(input)
             output=tsp.outputval
             output=con.dynamic_var_handler_obj.replace_dynamic_variable(x,tsp.name,con)
             if (tsp.name in MULTIPLE_OUTPUT_KEYWORDS and output != '' and output != None) or tsp.name==GENERIC_KEYWORD  :
                 output=tsp.additionalinfo
             apptype=tsp.apptype
-            inputVal=tsp.inputval[0].split(';')
+##            inputVal=tsp.inputval[0].split(';')
             outputval=tsp.outputval.split(';')[0]
             params=tsp.name,tsp,inputVal,input,output,con,self
             apptype_description={'generic':self.step_description_obj.generic,
             'web':self.step_description_obj.web,
             'webservices':self.step_description_obj.webservices,
             'desktop':self.step_description_obj.desktop,
-            'sap':self.step_description_obj.sap}
+            'sap':self.step_description_obj.sap,
+            'desktopjava':self.step_description_obj.oebs}
             description=apptype_description[apptype.lower()](*params)
             description=description.encode('utf-8')
 

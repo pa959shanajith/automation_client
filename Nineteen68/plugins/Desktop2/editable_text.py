@@ -40,6 +40,7 @@ class Text_Box:
                 if (check):
                     log.info('Parent matched')
                     if(element.is_enabled):
+                        input_val = input_val[0]
                         element.type_keys(input_val,with_spaces = True)
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
@@ -77,6 +78,7 @@ class Text_Box:
                 if (check):
                     log.info('Parent matched')
                     if(element.is_enabled):
+                        input_val = input_val[0]
                         log.info('Element state is enabled')
                         encryption_obj = AESCipher()
                         input_val_temp = encryption_obj.decrypt(input_val)
