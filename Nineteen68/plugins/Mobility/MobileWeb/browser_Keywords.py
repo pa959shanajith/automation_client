@@ -97,6 +97,7 @@ class BrowserKeywords():
             desired_caps = {}
             desired_caps['platformName'] = 'Android'
                 ##            desired_caps['platformVersion'] =input_list[1]
+            global input_list
             desired_caps['deviceName'] = input_list[0]
             desired_caps['udid'] = input_list[0]
             desired_caps['browserName'] = 'Chrome'
