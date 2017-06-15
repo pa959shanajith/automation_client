@@ -27,6 +27,7 @@ import psutil
 import win32gui
 import win32api
 import readconfig
+pid_set = set()
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
 class TestThread(threading.Thread):
     """Test Worker Thread Class."""
@@ -69,6 +70,7 @@ class BrowserKeywords():
             global driver_obj
             global webdriver_list
             global parent_handle
+            global pid_set
             obj = Singleton_DriverUtil()
 ##            if driver_obj == None:
 ##                driver_obj = driver.check_available_driver(self.browser_num)
@@ -105,6 +107,7 @@ class BrowserKeywords():
                 p = psutil.Process(driver_obj.service.process.pid)
                 pidchrome = p.children()[0]
                 pid = pidchrome.pid
+                pid_set.add(pid)
             elif(self.browser_num == '2'):
                 #logic to get the pid of the firefox window
                 try:
@@ -113,11 +116,13 @@ class BrowserKeywords():
                     p = psutil.Process(driver_obj.service.process.pid)
                     pidchrome = p.children()[0]
                     pid = pidchrome.pid
+                    pid_set.add(pid)
             elif(self.browser_num == '3'):
                 #Logic to get the pid of the ie window
                 p = psutil.Process(driver_obj.iedriver.process.pid)
                 pidie = p.children()[0]
                 pid = pidie.pid
+                pid_set.add(pid)
             hwndg = utilobject.bring_Window_Front(pid)
             webdriver_list.append(driver_obj)
             parent_handle = driver_obj.current_window_handle
