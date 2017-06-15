@@ -327,6 +327,7 @@ class Spinner_Keywords():
                                     logger.print_on_console(err_msg)
                                     driver.back()
                                 break
+                        driver.back()
 
                     else:
                         err_msg='element is disabled'
@@ -567,10 +568,12 @@ class Spinner_Keywords():
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=None
+        temp=[]
         err_msg=None
         text=[]
         obj=[]
-        input=int(input[0])
+##        input=int(input)
+        count=0
         flag=False
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
@@ -583,35 +586,58 @@ class Spinner_Keywords():
                     if enable:
                         log.debug('performing the action')
                         driver=install_and_launch.driver
-                        action = TouchAction(driver)
-                        action.tap(webelement).perform()
+
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                             for i in element:
-                                if i.text not in text :
-                                    text.append(i.text)
+                                if i.text not in text:
+                                    text.append(str(i.text))
                                     obj.append(i)
 
-                            if input is not None:
-                                    if input < len(obj) :
-                                        output=text[input]
-                                        status=TEST_RESULT_PASS
-                                        result=TEST_RESULT_TRUE
-                                        global flag
-                                        flag=True
-                            else :
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
-                                    logger.print_on_console(err_msg)
-                            if flag :
-                                break
-                            else :
-                                length1=len(text)
-                                if length1 >4 :
-                                    scrollele1=obj[length1-1]
-                                    scrollele2=obj[length1-2]
-                                    driver.scroll(scrollele1,scrollele2)
-                        driver.back()
+                                k=int(input[0])
+                                if k<len(obj) :
+                                    if text[k] not in temp:
+                                        temp.append(text[k])
+                                        count=count+1
+
+                            length1=len(text)
+                            if length1 >4 :
+                                scrollele1=obj[length1-1]
+                                scrollele2=obj[length1-2]
+                                time.sleep(3)
+                                driver.scroll(scrollele1,scrollele2)
+                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in element:
+                                if i.text not in text:
+                                    text.append(str(i.text))
+                                    obj.append(i)
+
+                                k=int(input[0])
+                                if k<len(obj) :
+                                    if text[k] not in temp:
+                                        temp.append(text[k])
+                                        count=count+1
+                            length2=len(text)
+                            time.sleep(3)
+                            driver.scroll(scrollele1,scrollele2)
+
+                            if (length1==length2):
+                                if len(input) == count:
+                                    output=temp[0]
+                                    status=TEST_RESULT_PASS
+                                    result=TEST_RESULT_TRUE
+                                    break
+
+
+                                else :
+                                        err_msg='invalid input'
+                                        log.error('invalid input')
+                                        logger.print_on_console(err_msg)
+                                        break
+
+
+
+
 
                     else:
                         err_msg='element is disabled'
@@ -622,6 +648,8 @@ class Spinner_Keywords():
                     log.error('element is not visible')
                     logger.print_on_console(err_msg)
         except Exception as e:
+
+
                 log.error(e)
 
         return status,result,output,err_msg

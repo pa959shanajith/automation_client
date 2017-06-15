@@ -26,6 +26,7 @@ import action_keyowrds
 import mob_screenshot
 import readconfig
 import spinner_keywords
+import list_view_mobility
 
 log = logging.getLogger('mobile_app_dispatcher.py')
 class MobileDispatcher:
@@ -39,7 +40,7 @@ class MobileDispatcher:
     device_keywords_object = device_keywords.Device_Keywords()
     action_keyowrds_object=action_keyowrds.Action_Key()
     spinner_keywords_object=spinner_keywords.Spinner_Keywords()
-
+    list_view_keywords_object=list_view_mobility.List_Keywords()
     def __init__(self):
         self.exception_flag=''
 
@@ -108,7 +109,21 @@ class MobileDispatcher:
                     'GetAllValues':self.spinner_keywords_object.get_all_values,
                     'VerifyAllValues':self.spinner_keywords_object.verify_all_values,
                     'GetSelectedValue':self.spinner_keywords_object.get_selected_value,
-                    'VerifySelectedValue':self.spinner_keywords_object.verify_selected_value
+                    'VerifySelectedValue':self.spinner_keywords_object.verify_selected_value,
+                    'GetListCount':self.list_view_keywords_object.get_list_count,
+                    'VerifyListCount':self.list_view_keywords_object.verify_list_count,
+                    'SelectViewByIndex':self.list_view_keywords_object.select_view_by_index,
+                    'SelectViewByText':self.list_view_keywords_object.select_view_by_text,
+                    'GetMultipleViewsByIndexes':self.list_view_keywords_object.get_multiple_views_by_indexs,
+                    'GetViewByIndex':self.list_view_keywords_object.get_list_view_by_index,
+                    'GetAllViews':self.list_view_keywords_object.get_all_views,
+                    'VerifyAllViews':self.list_view_keywords_object.verify_all_views,
+                    'GetSelectedViews':self.list_view_keywords_object.get_selected_views,
+                    'VerifySelectedViews':self.list_view_keywords_object.verify_selected_views,
+                    'SelectMultipleViewsByIndexes':self.list_view_keywords_object.select_multiple_views_by_indexes,
+                    'SelectMultipleViewsByText':self.list_view_keywords_object.select_multiple_views_by_text
+
+
 
                 }
             ELEMENT_FOUND=True
