@@ -159,7 +159,13 @@ class SAPDispatcher:
 ##                  'getselected':self.table_keywords_obj.getSelected,
                   'gettablestatus':self.table_keywords_obj.getStatus,
                   'selectrow':self.table_keywords_obj.selectRow,
-                  'unselectrow':self.table_keywords_obj.unselectRow
+                  'unselectrow':self.table_keywords_obj.unselectRow,
+                  'getchildren':self.shell_keywords_obj.get_children,
+                  'getrowcount':self.shell_keywords_obj.get_rowCount,
+                  'getcolumncount':self.shell_keywords_obj.get_colCount,
+                  'selectrows':self.shell_keywords_obj.selectRows,
+                  'readgridcells':self.shell_keywords_obj.readGridCells,
+                  'toolbaractionkeys':self.shell_keywords_obj.toolBarActionKeys
                    }
 
 
