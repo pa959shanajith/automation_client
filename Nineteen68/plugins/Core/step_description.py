@@ -579,6 +579,12 @@ class StepDescription:
         def SelectTabByIndex():
             return 'Select value by index '+input+' of the '+ 'type '+ "'" + tsp.custname
 
+        #Date control keywords
+        def GetDate():
+        	return 'Get the date from '	+ "'" + tsp.custname + "'" + ' and save the date  in ' + tsp.outputval
+        def SetDate():
+            return 'Set the date, with the format  '+ input + ' in '+ tsp.custname
+
         #Radio checkbox keywords
         def SelectRadioButton():
             return 'Select '+ "'" + tsp.custname + "'"
