@@ -14,7 +14,8 @@ import logger
 import browser_Keywords
 from webconstants import *
 from constants import *
-import ftfy
+##import ftfy
+import core_utils
 sourcetext= ''
 separator = '~@~'
 import logging
@@ -55,8 +56,8 @@ class StaticTextKeywords:
                     if element.tag_name.lower() not in tags:
                         try:
                             text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
-                            import ftfy
-                            text = ftfy.fix_text(text)
+##                            import ftfy
+##                            text = ftfy.fix_text(text)
                             text = text.replace('\n','')
                             text = text.strip()
                             if len(text) != 0:
@@ -71,8 +72,8 @@ class StaticTextKeywords:
                             if element.tag_name.lower() not in tags:
                                 try:
                                     text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
-                                    import ftfy
-                                    text = ftfy.fix_text(text)
+##                                    import ftfy
+##                                    text = ftfy.fix_text(text)
                                     text = text.replace('\n','')
                                     text = text.strip()
                                     if len(text) != 0:
@@ -88,8 +89,8 @@ class StaticTextKeywords:
                             if element.tag_name.lower() not in tags:
                                 try:
                                     text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
-                                    import ftfy
-                                    text = ftfy.fix_text(text)
+##                                    import ftfy
+##                                    text = ftfy.fix_text(text)
                                     text = text.replace('\n','')
                                     text = text.strip()
                                     if len(text) != 0:
@@ -111,8 +112,8 @@ class StaticTextKeywords:
                     if element.tag_name.lower() not in tags:
                         try:
                             text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
-                            import ftfy
-                            text = ftfy.fix_text(text)
+##                            import ftfy
+##                            text = ftfy.fix_text(text)
                             text = text.replace('\n','')
                             text = text.strip()
                             if len(text) != 0:
@@ -127,8 +128,8 @@ class StaticTextKeywords:
                             if element.tag_name.lower() not in tags:
                                 try:
                                     text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
-                                    import ftfy
-                                    text = ftfy.fix_text(text)
+##                                    import ftfy
+##                                    text = ftfy.fix_text(text)
                                     text = text.replace('\n','')
                                     text = text.strip()
                                     if len(text) != 0:
@@ -144,8 +145,8 @@ class StaticTextKeywords:
                             if element.tag_name.lower() not in tags:
                                 try:
                                     text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
-                                    import ftfy
-                                    text = ftfy.fix_text(text)
+##                                    import ftfy
+##                                    text = ftfy.fix_text(text)
                                     text = text.replace('\n','')
                                     text = text.strip()
                                     if len(text) != 0:
@@ -161,7 +162,10 @@ class StaticTextKeywords:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         global sourcetext
-        actualtext = str(input[0])
+##        actualtext = str(input[0])
+        actualtext=input[0]
+        coreutilsobj=core_utils.CoreUtils()
+        actualtext=coreutilsobj.get_UTF_8(actualtext)
         err_msg=None
         output=OUTPUT_CONSTANT
         text=''
@@ -175,8 +179,8 @@ class StaticTextKeywords:
                         if element.tag_name.lower()  not in tags:
                             try:
                                 text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
-                                import ftfy
-                                text = ftfy.fix_text(text)
+##                                import ftfy
+##                                text = ftfy.fix_text(text)
                                 text = text.replace('\n','')
                                 text = text.strip()
                                 if len(text) != 0:
@@ -228,8 +232,8 @@ class StaticTextKeywords:
                     for element in elements:
                         if element.tag_name.lower()  not in tags:
                             text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
-                            import ftfy
-                            text = ftfy.fix_text(text)
+##                            import ftfy
+##                            text = ftfy.fix_text(text)
                             text = text.replace('\n','')
                             text = text.strip()
                             if len(text) != 0:

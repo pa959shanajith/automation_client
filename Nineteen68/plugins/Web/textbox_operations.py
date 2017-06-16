@@ -328,7 +328,10 @@ class TextboxKeywords:
                     if len(args)>0 and args[0] != '':
                         visibilityFlag=args[0]
                     input=input[0]
-                    logger.print_on_console(INPUT_IS+str(input))
+##                    logger.print_on_console(INPUT_IS+str(input))
+                    coreutilsobj=core_utils.CoreUtils()
+                    input=coreutilsobj.get_UTF_8(input)
+                    logger.print_on_console(INPUT_IS,input)
                     log.info(INPUT_IS)
                     log.info(input)
                     if input is not None:
@@ -358,7 +361,7 @@ class TextboxKeywords:
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
-        
+
     def sendSecureValue(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
@@ -375,7 +378,9 @@ class TextboxKeywords:
                     if len(args)>0 and args[0] != '':
                         visibilityFlag=args[0]
                     input=input[0]
-                    logger.print_on_console(INPUT_IS+input)
+                    coreutilsobj=core_utils.CoreUtils()
+                    input=coreutilsobj.get_UTF_8(input)
+                    logger.print_on_console(INPUT_IS,input)
                     log.info(INPUT_IS)
                     log.info(input)
                     if input is not None:

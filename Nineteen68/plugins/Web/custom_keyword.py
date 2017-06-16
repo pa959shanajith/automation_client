@@ -14,6 +14,7 @@ import browser_Keywords
 from webconstants import *
 from constants import *
 from selenium.common.exceptions import *
+import core_utils
 
 import logging
 
@@ -116,7 +117,10 @@ class CustomKeyword:
     def getCustomobject(self,reference_ele,ele_type,visible_text,ele_index,url):
         custom_element=None
         msg1='Element type is '+str(ele_type)
-        msg2='Visible text is '+str(visible_text)
+        coreutilsobj=core_utils.CoreUtils()
+        visible_text=coreutilsobj.get_UTF_8(visible_text)
+        msg2='Visible text is '+visible_text
+##        msg2='Visible text is '+str(visible_text)
         msg3='Index is '+str(ele_index)
 
         logger.print_on_console(msg1)
