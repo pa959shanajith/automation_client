@@ -18,6 +18,7 @@ from pyrobot import Robot,Keys
 import browser_Keywords
 import logging
 from constants import *
+import core_utils
 
 
 ##driver = browser_Keywords.driver_obj
@@ -223,8 +224,10 @@ class ButtonLinkKeyword():
                 log.debug(webelement)
                 log.debug('Getting href attribute')
                 linktext = browser_Keywords.driver_obj.execute_script(text_javascript,webelement)
-                import ftfy
-                linktext = ftfy.fix_text(linktext)
+##                import ftfy
+##                linktext = ftfy.fix_text(linktext)
+                coreutilsobj=core_utils.CoreUtils()
+                linktext=coreutilsobj.get_UTF_8(linktext)
                 linktext = linktext.replace('\n','')
                 linktext = linktext.strip()
                 if linktext == None or linktext == '':
@@ -273,12 +276,15 @@ class ButtonLinkKeyword():
             if webelement != None:
                 input = inputs[0]
                 input = input.strip()
+                coreutilsobj=core_utils.CoreUtils()
+                input=coreutilsobj.get_UTF_8(input)
                 if input != None and len(input) != 0:
                     log.debug('Input is valid, Continue..')
                     log.debug('Getting href attribute')
                     linktext = browser_Keywords.driver_obj.execute_script(text_javascript,webelement)
-                    import ftfy
-                    linktext = ftfy.fix_text(linktext)
+##                    import ftfy
+##                    linktext = ftfy.fix_text(linktext)
+                    linktext=coreutilsobj.get_UTF_8(linktext)
                     linktext = linktext.replace('\n','')
                     linktext = linktext.strip()
                     if linktext == None or linktext == '':
@@ -310,9 +316,7 @@ class ButtonLinkKeyword():
                         err_msg='There is no link text for the given element'
                         logger.print_on_console(err_msg)
                         log.info(err_msg)
-
-
-
+                        
                 else:
                     log.error(INVALID_INPUT)
                     err_msg=INVALID_INPUT

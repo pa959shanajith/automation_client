@@ -23,51 +23,58 @@ log = logging.getLogger('element_operations.py')
 class ElementKeywords:
 
     def __getelement_text(self,webelement):
-        # Fixed issue #311
+##        # Fixed issue #311
         text=''
         try:
-            text=str(webelement.text)
+##            text=str(webelement.text)
+            text = webelement.text
             if text is None or text is '':
-                text=str(webelement.get_attribute('value'))
+##                text=str(webelement.get_attribute('value'))
+                text=webelement.get_attribute('value')
             if text is None or text is '':
-                text=str(webelement.get_attribute('name'))
+##                text=str(webelement.get_attribute('name'))
+                text=webelement.get_attribute('name')
             if text is None or text is '':
                 text=self.__get_tooltip(webelement)
             if text is None or text is '':
-                text=str(webelement.get_attribute('placeholder'))
+##                text=str(webelement.get_attribute('placeholder'))
+                text=webelement.get_attribute('placeholder')
             if text is None or text is '':
-                text=str(webelement.get_attribute('href'))
+##                text=str(webelement.get_attribute('href'))
+                text=webelement.get_attribute('href')
         except Exception as e:
-            import ftfy
-            temp_txt = ''
-            temp_txt = webelement.text
-            if temp_txt is not None or temp_txt is not '':
-                text = ftfy.fix_text(temp_txt)
-            if temp_txt is None or temp_txt is '':
-                temp_txt = webelement.get_attribute('value')
-                text = ftfy.fix_text(temp_txt)
-            if temp_txt is None or temp_txt is '':
-                temp_txt = webelement.get_attribute('name')
-                text = ftfy.fix_text(temp_txt)
-            if temp_txt is None or temp_txt is '':
-                text=self.__get_tooltip(webelement)
-            if temp_txt is None or temp_txt is '':
-                temp_txt = webelement.get_attribute('placeholder')
-                text = ftfy.fix_text(temp_txt)
-            if temp_txt is None or temp_txt is '':
-                temp_txt = webelement.get_attribute('href')
-                text = ftfy.fix_text(temp_txt)
+            log.error(e)
+            logger.print_on_console(e)
 
+##            import ftfy
+##            temp_txt = ''
+##            temp_txt = webelement.text
+##            if temp_txt is not None or temp_txt is not '':
+##                text = ftfy.fix_text(temp_txt)
+##            if temp_txt is None or temp_txt is '':
+##                temp_txt = webelement.get_attribute('value')
+##                text = ftfy.fix_text(temp_txt)
+##            if temp_txt is None or temp_txt is '':
+##                temp_txt = webelement.get_attribute('name')
+##                text = ftfy.fix_text(temp_txt)
+##            if temp_txt is None or temp_txt is '':
+##                text=self.__get_tooltip(webelement)
+##            if temp_txt is None or temp_txt is '':
+##                temp_txt = webelement.get_attribute('placeholder')
+##                text = ftfy.fix_text(temp_txt)
+##            if temp_txt is None or temp_txt is '':
+##                temp_txt = webelement.get_attribute('href')
+##                text = ftfy.fix_text(temp_txt)
         return text
 
     def __get_tooltip(self,webelement):
         text=''
         try:
-            text = str(webelement.get_attribute('title'))
+##            text = str(webelement.get_attribute('title'))
+            text = webelement.get_attribute('title')
         except Exception as e:
-            import ftfy
-            temp_txt = webelement.get_attribute('title')
-            text = ftfy.fix_text(temp_txt)
+            log.error(e)
+            logger.print_on_console(e)
         return text
 
 
@@ -276,7 +283,8 @@ class ElementKeywords:
                     tool_tip=None
                log.info('Tool tip text is : ')
                log.info(tool_tip)
-               logger.print_on_console('Tool tip text: '+str(tool_tip))
+##               logger.print_on_console('Tool tip text: '+str(tool_tip))
+               logger.print_on_console('Tool tip text: ',tool_tip)
             except Exception as e:
                 log.error(e)
 
