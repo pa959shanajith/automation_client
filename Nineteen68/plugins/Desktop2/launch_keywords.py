@@ -367,7 +367,6 @@ class Launch_Keywords():
                 for i in title_matched_windows:
 ##                    hwnd = win32gui.FindWindow(None, windowname)
                     threadid,pid = win32process.GetWindowThreadProcessId(i)
-                    print 'pid in for ---',pid
                     pidset.add(pid)
                 if len(pidset) == 1:
                     flag = True
@@ -412,7 +411,6 @@ class Launch_Keywords():
                 else:
                     self.multiInstance=title_matched_windows[0]
                     logger.print_on_console('please close the existing application instnace with the given window name and try again')
-                    logger.print_on_console('Terminate the execution')
                     term = TERMINATE
             if len(title_matched_windows)==1:
                 logger.print_on_console('Given windowname is '+windowname)
