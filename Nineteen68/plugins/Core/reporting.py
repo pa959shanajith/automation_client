@@ -76,6 +76,8 @@ class Reporting:
             params=tsp.name,tsp,inputVal,input,output,con,self
             apptype_description={'generic':self.step_description_obj.generic,
             'web':self.step_description_obj.web,
+            'mobileapp':self.step_description_obj.mobileapp,
+            'mobileweb':self.step_description_obj.web,
             'webservices':self.step_description_obj.webservices,
             'desktop':self.step_description_obj.desktop,
             'sap':self.step_description_obj.sap,

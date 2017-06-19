@@ -611,33 +611,154 @@ class StepDescription:
         return locals()[keyword]()
 
     def mobileapp(self,keyword,tsp,inputval,input,output,con,reporting_obj):
+        output_list=tsp.outputval
+        if len(output_list) > 1 :
+            output_list = output_list.split(';')
+            output_list=output_list[0]
+        else:
+            output_list=output_list
+        def InstallApplication():
+        	return 'The application present in the path '+ inputval[0]	+  ' is installed'
+        def UnInstallApplication():
+        	return 'The application present in the path '+ inputval[0]	+  ' is uninstalled'
+        def LaunchApplication():
+        	return 'The application present in the path '+ inputval[0]	+  ' is launched'
+        def CloseApplication():
+        	return 'The application is closed'
+        def SwipeUp():
+        	return 'Performed swipe up operation'
+        def SwipeDown():
+        	return 'Performed swipe down operation'
+        def SwipeLeft():
+        	return 'Performed swipe left operation'
+        def HideSoftKeyBoard():
+        	return 'Performed HideSoftKeyBoard operation'
+        def BackPress():
+        	return 'Performed Back Press operation'
+        def SwipeRight():
+        	return 'Performed swipe right operation'
+        def ToggleOn():
+       	    return 'Performed toggle on operation on  '	+ "'" + tsp.custname + "'"
+        def ToggleOff():
+       	    return 'Performed toggle off operation on  '	+ "'" + tsp.custname + "'"
+        def InvokeDevice():
+       	    return 'Invoking  '	+ "'" + input + "'"
+        def GetDevices():
+            return 'Get all the connected devices ' + ' and save the result  '+ output + ' in ' + output_list+ '.'
+        def PressElement():
+       	    return 'Press '	+ "'" + tsp.custname + "'"
+        def LongPressElement():
+       	    return 'Long Press '	+ "'" + tsp.custname + "'"
+        def GetElementText():
+        	return'Get the text of the element ' + "'" + tsp.custname + "'" + ' and save the value  ' + output + ' in '	+ output_list
+        def VerifyElementText():
+        	return 'Verify ' + input + ' is the the text of the ' + "'" + tsp.custname + "'"
+        def WaitForElementExists():
+        	return 'Wait until the element'  + "'" + tsp.custname + "'"+  'is exists'
+        def VerifyEnabled():
+            return ' Verify '+ "'" + tsp.custname + "'" + ' is enabled '
+        def VerifyElementEnabled():
+            return ' Verify '+ "'" + tsp.custname + "'" + ' is enabled '
+        def VerifyDisabled():
+            return 'Verify '+ "'" + tsp.custname + "'" + ' is disabled '
+        def VerifyExists():
+            return ' Verify '+ "'" + tsp.custname + "'" + '  exists '
+        def VerifyElementExists():
+            return ' Verify '+ "'" + tsp.custname + "'" + '  exists '
+        def VerifyHidden():
+            return ' Verify '+ "'" + tsp.custname + "'" + ' is Hidden '
+        def VerifyVisible():
+            return 'Verify '+ "'" + tsp.custname + "'" + ' is Visible '
+        def GetButtonName():
+            return ' Get ButtonName From '+ "'" + tsp.custname + "'" + ' and save the text '+ output + ' in ' + output_list
+        def VerifyButtonName():
+            return 'Verify text ' + input + ' is the name of the '+ "'" + tsp.custname + "'"
+        def Press():
+            return 'Press on the '+ "'" + tsp.custname + "'"
+        def LongPress():
+            return 'Long press on the '+ "'" + tsp.custname + "'"
+        #Radio checkbox keywords
+        def SelectRadioButton():
+            return 'Select '+ "'" + tsp.custname + "'"
+        def GetStatus():
+            return 'Get the status of the ' + "'" + tsp.custname + "'"+ ' and save the status ' + output + ' in '+ output_list
+        def SelectCheckbox():
+            return 'Select '+ "'" + tsp.custname + "'"
+        def UnSelectCheckbox():
+            return 'Unselect '+ "'" + tsp.custname + "'"
+
+        #textbox keywords
+        def SendValue():
+            return ' Enter value ' + input+ ' in the '+ "'" + tsp.custname + "'"
+        def GetText():
+            return 'Get Text From '+ "'" +tsp.custname + "'" + ' and save the text '+ output + ' in ' + output_list+ '.'
+        def SetSecureText():
+             return 'Enter secure text ' +inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
+        def ClearText():
+             return 'Clear text from the '+ "'" + tsp.custname + "'"+ '.'
+        def SetText():
+            return 'Enter text '+ inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
+        def VerifyText():
+            return 'Verify ' + input + ' is the the text in the '+ "'" + tsp.custname + "'"+ '.'
+        def GetTextboxLength():
+            return 'Get length from the '+ "'" + tsp.custname + "'"+ ' and save the length '+output+'in'+output_list+ '.'
+        def VerifyTextboxLength():
+            return 'Verify ' + input + ' is the length of textbox '+ "'" + tsp.custname + "'"+ '.'
+
         #dropdown keywords
-
-
-
-        def getValueByIndex():
-            return 'Get value with index ' + input + ' in the '+ "'" + tsp.custname + "'" + ' and save the value ' + output + ' in '+ tsp.outputval,
-
-        def selectValueByText():
+        def GetValueByIndex():
+            return 'Get value with index ' + input + ' in the '+ "'" + tsp.custname + "'" + ' and save the value ' + output + ' in '+ output_list,
+        def GetSelectedValue():
+            return 'Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save value ' + output + ' in '+ output_list+ '.'
+        def VerifySelectedValue():
+            return 'Verify value ' + input + ' are selected in the '+ "'" + tsp.custname + "'"+'.'
+        def SelectValueByText():
             return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']',
-        def getMultipleValuesByIndexes():
-            return 'Get values with indexes ' + inputValsb.toString() + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + TestAutomationController.multipleOutputResult + ' in  '+ tsp.outputval
+        def GetMultipleValuesByIndexes():
+            return 'Get values with indexes ' + inputValsb.toString() + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + TestAutomationController.multipleOutputResult + ' in  '+ output_list
 
-        def getAllValues():
+        def GetAllValues():
             return 'getAllValues ' + output + ' are present in the' + "'" + tsp.custname + "'"
-        def verifyAllValues():
+        def VerifyAllValues():
             return 'Verify values ' + input + ' are present in the '+ "'" + tsp.custname + "'"
 
 
-        def verifyCount():
+        def VerifyCount():
             return 'Verify ' + input + ' is the list count of the ' +"'" + tsp.custname + "'"
 
-        def selectValueByIndex():
+        def SelectValueByIndex():
             return 'Select the value '+ input+' of the '+"'" + tsp.custname + "'"+' with the index '+input+' present in the table cell  '+"'" + tsp.custname + "'"+'-['+input+']['+input+']'
-        def getCount():
-            return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' + output + ' in ' +tsp.outputval
+        def GetCount():
+            return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' + output + ' in ' +output_list
+        def GetViewByIndex():
+            return 'Get View with index ' + input + ' in the '+ "'" + tsp.custname + "'" + ' and save the value ' + output + ' in '+ output_list,
+        def GetSelectedViews():
+            return 'Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save value ' + output + ' in '+output_list+ '.'
+        def VerifySelectedViews():
+            return 'Verify value ' + input + ' are selected in the '+ "'" + tsp.custname + "'"+'.'
+        def SelectViewByText():
+            return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']',
+        def GetMultipleViewsByIndexes():
+            return 'Get values with indexes ' + inputValsb.toString() + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + TestAutomationController.multipleOutputResult + ' in  '+ output_list
 
-        #text box
+        def GetAllViews():
+            return 'getAllValues ' + output + ' are present in the' + "'" + tsp.custname + "'"
+        def VerifyAllViews():
+            return 'Verify values ' + input + ' are present in the '+ "'" + tsp.custname + "'"
+        def SelectMultipleViewsByIndexes():
+            return 'Select values ' + mulInputValin.toString() + ' in the '+ "'" + "'" + tsp.custname + "'" + "'"
+
+        def VerifyListCount():
+            return 'Verify ' + input + ' is the list count of the ' +"'" + tsp.custname + "'"
+
+        def SelectViewByIndex():
+            return 'Select the value '+ input+' of the '+"'" + tsp.custname + "'"+' with the index '+input+' present in the table cell  '+"'" + tsp.custname + "'"+'-['+input+']['+input+']'
+        def GetListCount():
+            return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' + output + ' in ' +output_list
+        def SelectMultipleViewsByText():
+            return 'Select values ' + input + 'in the '+ "'" + tsp.custname + "'"
+
+
         return locals()[keyword]()
 
     def web(self,keyword,tsp,inputval,input,output,con,reporting_obj):
