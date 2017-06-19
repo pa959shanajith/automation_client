@@ -91,6 +91,9 @@ class Scrape:
                     elif(elem.__getattr__("Type") == "GuiTab"):
                         custname = elem.__getattr__("Name") + "_tab"
                         tag=elem.__getattr__("Type")
+                    elif(elem.__getattr__("Type") == "GuiShell"):
+                        custname = elem.__getattr__("Name") + "_shl"
+                        tag="shell"
                     else:
                         custname = elem.__getattr__("Name")
                         tag=elem.__getattr__("Type")
@@ -222,6 +225,9 @@ class Scrape:
                             elif(elem.__getattr__("Type") == "GuiTab"):
                                 custname = elem.__getattr__("Name") + "_tab"
                                 tag=elem.__getattr__("Type")
+                            elif(elem.__getattr__("Type") == "GuiShell"):
+                                custname = elem.__getattr__("Name") + "_shl"
+                                tag="shell"
                             else:
                                 custname = elem.__getattr__("Name")
                                 tag=elem.__getattr__("Type")

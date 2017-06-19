@@ -226,7 +226,7 @@ class Scrape:
                  children = ch[i]
                  tag = children.friendly_class_name()
                  print 'tag ::::: ',tag
-                 if tag == 'Button' or tag =='RadioButton' or tag == 'Edit' or tag == 'ComboBox' or tag == 'Static' or tag == 'GroupBox' or tag == 'CheckBox' or tag== 'ListView' or tag == 'ListBox'or tag == 'TreeView'or tag == 'TabControl':
+                 if tag == 'Button' or tag =='RadioButton' or tag == 'Edit' or tag == 'ComboBox' or tag == 'Static' or tag == 'GroupBox' or tag == 'CheckBox' or tag== 'ListView' or tag == 'ListBox'or tag == 'TreeView'or tag == 'TabControl' or tag == 'DateTimePicker'  or tag == 'Toolbar':
                      coordinates = children.client_rect()
                      cor = children.rectangle()
                      properties = ''
@@ -241,6 +241,11 @@ class Scrape:
                          properties['parent'] = children.element_info.parent.class_name
                          handle = children.handle
                          text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
+                         if text =='':
+                            t = children.texts()
+                            print t
+                            if len(t) >= 2:
+                                text = t[1]
                          if text == '':
                             text = children.friendly_class_name()
                          text = text.strip()
@@ -273,9 +278,13 @@ class Scrape:
                          elif tag == 'TabControl':
                             tag = 'tab'
                             text= str(text) + '_tab'
+                         elif tag == 'DateTimePicker':
+                            tag = 'datepicker'
+                            text= str(text) + '_dtp'
                          else:
                             tag = 'label'
                             text= str(text) + '_lbl'
+
 
                          left = 0
                          top = 0
