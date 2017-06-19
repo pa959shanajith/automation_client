@@ -80,6 +80,8 @@ class DesktopDispatcher:
                     'launchapplication' : self.launch_keywords_obj.launch_application,
                     'findwindowandattach' : self.launch_keywords_obj.find_window_and_attach,
                     'selectmenu': self.launch_keywords_obj.select_menu,
+                    'maximizewindow' : self.launch_keywords_obj.maximize_window,
+                    'minimizewindow' : self.launch_keywords_obj.minimize_window,
                     'getpagetitle' : self.launch_keywords_obj.getPageTitle,
                     'closeapplication' : self.launch_keywords_obj.closeApplication,
                     'verifyenabled' : self.util_keywords_obj.verifyEnabled,

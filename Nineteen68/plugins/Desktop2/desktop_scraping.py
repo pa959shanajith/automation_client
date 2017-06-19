@@ -67,14 +67,12 @@ class Scrape:
                             global allobjects
                             allobjects = obj.full_scrape(app_uia)
                             objects = allobjects['view']
-                            print 'Full scrape objects :',objects
                             tempobjects = []
                             for i in objects:
                                 res = match(i['x_screen'],i['y_screen'],i['width'],i['height'],self.coordX,self.coordY)
                                 if res == 1:
                                     tempobjects.append(i)
                             actualelement = ''
-                            print 'temp objects:',tempobjects
                             for i in range (len(tempobjects)):
                                 try:
                                     first_ele = tempobjects[i]
@@ -86,7 +84,6 @@ class Scrape:
                                     break
 
                             disp_obj = desktop_dispatcher.DesktopDispatcher()
-                            print 'actual element : ',actualelement
                             ele = disp_obj.get_desktop_element(actualelement['xpath'],actualelement['url'],app_uia)
                             global actualobjects
                             actualobjects.append(actualelement)
@@ -363,6 +360,7 @@ class Scrape:
                 allobjects["view"] = a
                 json.dump(allobjects, outfile, indent=4, sort_keys=False)
                 outfile.close()
+
         except Exception as e:
             import traceback
             traceback.print_exc()

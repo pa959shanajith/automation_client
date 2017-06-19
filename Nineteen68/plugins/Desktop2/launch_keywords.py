@@ -342,6 +342,10 @@ class Launch_Keywords():
 ##        return status
 
     def find_window_and_attach(self,input_val,*args):
+        global window_name
+        global window_handle
+        global window_pid
+        global app_uia
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
@@ -359,13 +363,20 @@ class Launch_Keywords():
             threadid,temp_pid = win32process.GetWindowThreadProcessId(hwnd)
             flag = False
             if len(title_matched_windows)>1:
+                pidset = set()
                 for i in title_matched_windows:
 ##                    hwnd = win32gui.FindWindow(None, windowname)
                     threadid,pid = win32process.GetWindowThreadProcessId(i)
-                    if pid == temp_pid:
-                        flag = True
-                    else:
-                        flag = False
+                    print 'pid in for ---',pid
+                    pidset.add(pid)
+                if len(pidset) == 1:
+                    flag = True
+                else:
+                    for i in range(0,len(pidset)):
+                        if pidset.pop() == temp_pid:
+                            flag = True
+                        else:
+                            flag = False
                 if flag:
                     logger.print_on_console('Given windowname is '+windowname)
                     if not(windowname is None and windowname is ''):
@@ -386,14 +397,14 @@ class Launch_Keywords():
                                 logger.print_on_console('Application handle found')
             ##                        tempTitle = windowTitle.replaceAll("[^a-zA-Z0-9]", "*")
                                 # need  to create a ldtp object here
-                                global window_name
+
                                 window_name=self.windowname
-                                global window_handle
+
                                 window_handle=title_matched_windows[0]
-                                global window_pid
+
                                 window_pid=self.get_window_pid(self.windowname)
                                 self.windowHandle=title_matched_windows[0]
-                                global app_uia
+
                                 app_uia = Application().connect(process = window_pid)
                                 status=desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
@@ -426,15 +437,15 @@ class Launch_Keywords():
                             logger.print_on_console('Application handle found')
         ##                        tempTitle = windowTitle.replaceAll("[^a-zA-Z0-9]", "*")
                             # need  to create a ldtp object here
-                            global window_name
+##                            global window_name
                             window_name=self.windowname
-                            global window_handle
+##                            global window_handle
                             window_handle=title_matched_windows[0]
-                            global window_pid
+##                            global window_pid
                             window_pid=self.get_window_pid(self.windowname)
                             self.windowHandle=title_matched_windows[0]
 ##                            break
-                            global app_uia
+##                            global app_uia
                             app_uia = Application().connect(process = window_pid)
                             status=desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
@@ -520,7 +531,48 @@ class Launch_Keywords():
                 status = desktop_constants.TEST_RESULT_PASS
                 result = desktop_constants.TEST_RESULT_TRUE
         except Exception as exception:
-            print  'Exception : Please give -> for separating the menu item/menu item not present '
+            logger.print_on_console ('Exception : Please give -> for separating the menu item/menu item not present ')
+            log.error(exception)
+            logger.print_on_console(exception)
+        log.info(RETURN_RESULT)
+        return status, result, verb, err_msg
+
+    def maximize_window(self, input,*args):
+        status = desktop_constants.TEST_RESULT_FAIL
+        result = desktop_constants.TEST_RESULT_FALSE
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        verb = OUTPUT_CONSTANT
+        err_msg = None
+        input_val = ''
+        try:
+            win = app_uia.top_window()
+            win.Maximize()
+            log.info(STATUS_METHODOUTPUT_UPDATE)
+            status = desktop_constants.TEST_RESULT_PASS
+            result = desktop_constants.TEST_RESULT_TRUE
+        except Exception as exception:
+            logger.print_on_console ('Exception : Maximize window error ')
+            log.error(exception)
+            logger.print_on_console(exception)
+        log.info(RETURN_RESULT)
+        return status, result, verb, err_msg
+
+
+    def minimize_window(self, input,*args):
+        status = desktop_constants.TEST_RESULT_FAIL
+        result = desktop_constants.TEST_RESULT_FALSE
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        verb = OUTPUT_CONSTANT
+        err_msg = None
+        input_val = ''
+        try:
+            win = app_uia.top_window()
+            win.Minimize()
+            log.info(STATUS_METHODOUTPUT_UPDATE)
+            status = desktop_constants.TEST_RESULT_PASS
+            result = desktop_constants.TEST_RESULT_TRUE
+        except Exception as exception:
+            logger.print_on_console (  'Exception : Minimize  window error ')
             log.error(exception)
             logger.print_on_console(exception)
         log.info(RETURN_RESULT)
