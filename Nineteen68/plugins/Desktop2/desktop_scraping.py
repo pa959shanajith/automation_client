@@ -88,8 +88,6 @@ class Scrape:
                             global actualobjects
                             actualobjects.append(actualelement)
                         except Exception as e:
-                            import traceback
-                            traceback.print_exc()
                             logger.print_on_console('Clicked option is not a part of DesktopGUI')
                         return True
 
@@ -135,8 +133,6 @@ class Scrape:
 
                             except Exception as e:
                                 print e
-                                import traceback
-                                traceback.print_exc()
 
                             if (self.stopumpingmsgs is True):
                                 self.hm.UnhookKeyboard()
@@ -230,8 +226,7 @@ class Scrape:
                      try:
                         properties = json.loads(json.dumps(children.get_properties(    ), default=lambda x: str(x)))
                      except Exception as e:
-                        import traceback
-                        traceback.print_exc()
+                        print e
                      if properties['is_visible'] == True :
                          properties["url"] =  win.texts()[0] if len(win.texts())>0 else ""
                          properties['control_id'] = children.element_info.control_id
@@ -240,7 +235,6 @@ class Scrape:
                          text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
                          if text =='':
                             t = children.texts()
-                            print t
                             if len(t) >= 2:
                                 text = t[1]
                          if text == '':
@@ -270,6 +264,9 @@ class Scrape:
                             tag ='checkbox'
                             text= str(text) + '_chkbox'
                          elif tag == 'ListView':
+                            tag = 'list'
+                            text= str(text) + '_list'
+                         elif tag == 'ListBox':
                             tag = 'list'
                             text= str(text) + '_list'
                          elif tag == 'TabControl':
@@ -330,8 +327,6 @@ class Scrape:
 ##             for i in range(len(ch)):
 ##                self.get_all_children(ch[i],ne,i,path,win,winrect)
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             print e
         return ne
 
@@ -345,25 +340,23 @@ class Scrape:
             obj = launch_keywords.Launch_Keywords()
             obj.set_to_foreground()
             winrect = launch_keywords.win_rect;
-##            for i in range (len(ch)):
-##                path =ch[i].element_info.parent.class_name
-##                path = path + '[' + str(i) + ']'
             a =  self.get_all_children(ch,ne,0,'',win,winrect)
             import json
 ##            scraped_object=ldtp.getentireobjectlist(launch_keywords.window_name)
-            img=ninteen_68_desktop_scrape.obj.captureScreenshot()
-            img.save('out.png')
-            with open("out.png", "rb") as image_file:
-                encoded_string = base64.b64encode(image_file.read())
-            allobjects['mirror'] =encoded_string.encode('UTF-8').strip()
+            try:
+                img=ninteen_68_desktop_scrape.obj.captureScreenshot()
+                img.save('out.png')
+                with open("out.png", "rb") as image_file:
+                    encoded_string = base64.b64encode(image_file.read())
+                allobjects['mirror'] =encoded_string.encode('UTF-8').strip()
+            except Exception as e:
+                print 'Unable to capture the screenshot'
             with open('domelements.json', 'w') as outfile:
                 allobjects["view"] = a
                 json.dump(allobjects, outfile, indent=4, sort_keys=False)
                 outfile.close()
 
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             print e
         return allobjects
 
