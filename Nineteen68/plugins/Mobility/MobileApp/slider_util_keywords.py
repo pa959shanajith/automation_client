@@ -17,6 +17,7 @@ import logging
 import logger
 import time
 import mobile_app_dispatcher
+import readconfig
 
 log = logging.getLogger('slider_util_keywords.py')
 
@@ -169,7 +170,10 @@ class SliderKeywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             dispatcher=mobile_app_dispatcher.MobileDispatcher()
-            timeout='120'
+            configobj = readconfig.readConfig()
+            configvalues = configobj.readJson()
+            timeout= configvalues['timeOut']
+##            timeout='120'
             if timeout!=None:
                 start_time = time.time()
                 while True:

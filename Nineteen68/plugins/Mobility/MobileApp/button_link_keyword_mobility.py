@@ -58,7 +58,7 @@ class Button_Keywords():
 
 
     def long_press(self, element,input_val,*args):
-        print 'inside the long ores'
+
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -108,13 +108,12 @@ class Button_Keywords():
             if type(webelement) is list:
                    webelement=webelement[0]
             if webelement is not None:
-                    if webelement.is_enabled():
+
                         log.debug(WEB_ELEMENT_ENABLED)
                         output=webelement.text
                         status=TEST_RESULT_PASS
                         result=TEST_RESULT_TRUE
-                    else:
-                        err_msg='ERR_DISABLED_OBJECT'
+
         except Exception as e:
                 log.error(e)
                 logger.print_on_console(err_msg)
@@ -132,15 +131,13 @@ class Button_Keywords():
                 if type(webelement) is list:
                        webelement=webelement[0]
                 if webelement is not None:
-                        if webelement.is_enabled():
+
                             log.debug(WEB_ELEMENT_ENABLED)
                             if webelement.text==input_val:
                                 log.debug('text matched')
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
-                        else:
-                            err_msg='ERR_DISABLED_OBJECT'
-                            logger.print_on_console(err_msg)
+
         except Exception as e:
                 log.error(e)
                 logger.print_on_console(err_msg)

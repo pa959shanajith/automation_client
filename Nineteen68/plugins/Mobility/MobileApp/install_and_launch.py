@@ -127,7 +127,7 @@ class LaunchAndInstall():
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            err_msg = 'Exception in closing application'
+            ##err_msg = 'Exception in closing application'
         return status,result,output,err_msg
 
 

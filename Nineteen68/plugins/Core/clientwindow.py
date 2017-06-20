@@ -933,6 +933,7 @@ class ClientWindow(wx.Frame):
 ##            global socketIO
             self.new = desktopScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO)
             desktopScrapeFlag=False
+            browsername = ''
         elif sapScrapeFlag==True:
 ##            global socketIO
             self.new = sapScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO)

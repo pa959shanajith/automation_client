@@ -263,10 +263,8 @@ class StringOperation:
                 if not (to_find is None or to_find is ''):
                     output_val = actual_string.find(to_find)
                     if(output_val == -1):
-                        status=generic_constants.TEST_RESULT_PASS
-                        result=generic_constants.TEST_RESULT_TRUE
-                    else:
                         logger.print_on_console('The Original String is:',actual_string ,'and' , actual_string , 'does not Contain', to_find )
+                    else:
                         log.info('Result : ')
                         log.info(output_val)
                         status=generic_constants.TEST_RESULT_PASS
