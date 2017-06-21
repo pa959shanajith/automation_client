@@ -167,7 +167,8 @@ class SAPDispatcher:
                   'getcolumncount':self.shell_keywords_obj.get_colCount,
                   'selectrows':self.shell_keywords_obj.selectRows,
                   'readgridcells':self.shell_keywords_obj.readGridCells,
-                  'toolbaractionkeys':self.shell_keywords_obj.toolBarActionKeys
+                  'toolbaractionkeys':self.shell_keywords_obj.toolBarActionKeys,
+                  'getcelltext': self.shell_keywords_obj.getCellText
                    }
 
 

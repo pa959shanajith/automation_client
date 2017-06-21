@@ -227,3 +227,34 @@ class Shell_Keywords():
                 traceback.print_exc()
 
             return status,result,value,err_msg
+
+    def getCellText(self, sap_id,url,input_val,*args):
+            self.lk.setWindowToForeground(sap_id)
+            id,ses=self.uk.getSapElement(sap_id)
+            status=sap_constants.TEST_RESULT_FAIL
+            result=sap_constants.TEST_RESULT_FALSE
+            err_msg=None
+            row=long(input_val[0])
+            column=str(input_val[1])
+            value=OUTPUT_CONSTANT
+            elem = ses.FindById(id)
+            try:
+                if(id != None):
+                    if(elem.type == 'GuiShell'):
+                        if elem.rowCount!=0:
+                            value=elem.getCellValue(row,column)
+                            status = sap_constants.TEST_RESULT_PASS
+                            result = sap_constants.TEST_RESULT_TRUE
+                    else:
+                        logger.print_on_console('Element is not a shell object')
+                        err_msg = sap_constants.ERROR_MSG
+                else:
+                      logger.print_on_console('element not present on the page where operation is trying to be performed')
+                      err_msg = sap_constants.ERROR_MSG
+            except Exception as e:
+                err_msg = sap_constants.ERROR_MSG
+                Exceptions.error(e)
+                logger.print_on_console('Error occured in GetCellText and is a :',e)
+                import traceback
+                traceback.print_exc()
+            return status,result,value,err_msg
