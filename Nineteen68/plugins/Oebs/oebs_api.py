@@ -44,7 +44,10 @@ except WindowsError:
         legacyAccessBridge=False
         print "LOADED"
     except WindowsError:
-        bridgeDll=None
+        try:
+            bridgeDll=cdll.windowsaccessbridge
+        except WindowsError:
+            bridgeDll=None
 
 #Definitions of access bridge types, structs and prototypes
 
