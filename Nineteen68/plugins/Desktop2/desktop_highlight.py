@@ -9,13 +9,11 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import ninteen_68_desktop_scrape
+import launch_keywords
 from pywinauto.application import Application
 import logger
-
-launchobj=ninteen_68_desktop_scrape.obj
 import time
-import launch_keywords
+
 
 class highLight():
 

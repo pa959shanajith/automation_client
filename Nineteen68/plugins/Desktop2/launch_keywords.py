@@ -165,9 +165,9 @@ class Launch_Keywords():
                     image=self.capture_window( ancestor)
                 elif self.getWindowText(parent)!=None and len(self.getWindowText(parent))>0:
                     image=self.capture_window( parent)
-            if image==None:
-                win32gui.SetForegroundWindow(window_handle)
-                image=self.capture_window( window_handle)
+##            if image==None:
+##                win32gui.SetForegroundWindow(window_handle)
+##                image=self.capture_window( window_handle)
 
 
         return image
@@ -289,6 +289,10 @@ class Launch_Keywords():
        try:
             win32gui.BringWindowToTop(aut_handle)
             win32gui.ShowWindow(aut_handle,value)
+            parent=win32gui.GetWindow(window_handle,4)
+            i= win32gui.GetWindowRect(parent)
+            global win_rect
+            win_rect = i
             #win32gui.SetForegroundWindow(aut_handle)
        except Exception as e:
 ##            Exceptions.error(e)

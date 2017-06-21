@@ -102,7 +102,7 @@ class ScrapeWindow(wx.Frame):
                 self.Close()
     ##            event.GetEventObject().SetLabel("Start ClickAndAdd")
                 logger.print_on_console('Click and add scrape  completed')
-                launch_keywords.app_uia = None
+##                launch_keywords.app_uia = None
         else:
             logger.print_on_console('Click and add Scrape Failed')
 
@@ -129,7 +129,7 @@ class ScrapeWindow(wx.Frame):
 
             self.Close()
             logger.print_on_console('Full scrape  completed')
-            launch_keywords.app_uia = None
+##            launch_keywords.app_uia = None
         else:
             logger.print_on_console('Full scrape Failed..')
 

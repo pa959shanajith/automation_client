@@ -88,8 +88,6 @@ class Scrape:
                             global actualobjects
                             actualobjects.append(actualelement)
                         except Exception as e:
-                            import traceback
-                            traceback.print_exc()
                             logger.print_on_console('Clicked option is not a part of DesktopGUI')
                         return True
 
@@ -135,8 +133,6 @@ class Scrape:
 
                             except Exception as e:
                                 print e
-                                import traceback
-                                traceback.print_exc()
 
                             if (self.stopumpingmsgs is True):
                                 self.hm.UnhookKeyboard()
@@ -223,104 +219,105 @@ class Scrape:
                  children = ch[i]
                  tag = children.friendly_class_name()
                  print 'tag ::::: ',tag
-                 if tag == 'Button' or tag =='RadioButton' or tag == 'Edit' or tag == 'ComboBox' or tag == 'Static' or tag == 'GroupBox' or tag == 'CheckBox' or tag== 'ListView' or tag == 'ListBox'or tag == 'TreeView'or tag == 'TabControl' or tag == 'DateTimePicker'  or tag == 'Toolbar':
-                     coordinates = children.client_rect()
-                     cor = children.rectangle()
-                     properties = ''
-                     try:
-                        properties = json.loads(json.dumps(children.get_properties(    ), default=lambda x: str(x)))
-                     except Exception as e:
-                        import traceback
-                        traceback.print_exc()
-                     if properties['is_visible'] == True :
-                         properties["url"] =  win.texts()[0] if len(win.texts())>0 else ""
-                         properties['control_id'] = children.element_info.control_id
-                         properties['parent'] = children.element_info.parent.class_name
-                         handle = children.handle
-                         text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
-                         if text =='':
-                            t = children.texts()
-                            print t
-                            if len(t) >= 2:
-                                text = t[1]
-                         if text == '':
-                            text = children.friendly_class_name()
-                         text = text.strip()
-                         url = properties['url']
-                         parent = properties['parent']
-                         rectangle = properties['rectangle']
-                         path = str (parent) + '[' + str(i) + ']'
+##                 if tag == 'Button' or tag =='RadioButton' or tag == 'Edit' or tag == 'ComboBox' or tag == 'Static' or tag == 'GroupBox' or tag == 'CheckBox' or tag== 'ListView' or tag == 'ListBox'or tag == 'TreeView'or tag == 'TabControl' or tag == 'DateTimePicker'  or tag == 'Toolbar':
+                 coordinates = children.client_rect()
+                 cor = children.rectangle()
+                 properties = ''
+                 try:
+                    properties = json.loads(json.dumps(children.get_properties(    ), default=lambda x: str(x)))
+                 except Exception as e:
+                    print e
+                 if properties['is_visible'] == True :
+                     properties["url"] =  win.texts()[0] if len(win.texts())>0 else ""
+                     properties['control_id'] = children.element_info.control_id
+                     properties['parent'] = children.element_info.parent.class_name
+                     handle = children.handle
+                     text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
+                     if text =='':
+                        t = children.texts()
+                        if len(t) >= 2:
+                            text = t[1]
+                     if text == '':
+                        text = children.friendly_class_name()
+                     text = text.strip()
+                     url = properties['url']
+                     parent = properties['parent']
+                     rectangle = properties['rectangle']
+                     path = str (parent) + '[' + str(i) + ']'
 ##                         if path == '':
 ##                            path = str (parent) + '[' + str(i) + ']'
 ##                         else:
 ##                            path = path + '/' + children.friendly_class_name() + '[' + str(i) + ']'
-                         if tag == 'Button':
-                            tag = 'button'
-                            text=  str(text) + '_btn'
-                         elif tag == 'Edit':
-                            tag = 'input'
-                            text=  str(text) + '_txtbox'
-                         elif tag == 'RadioButton':
-                            tag = 'radiobutton'
-                            text= str(text) + '_radiobtn'
-                         elif tag == 'ComboBox':
-                            tag = 'select'
-                            text= str(text) + '_dropdown'
-                         elif tag == 'CheckBox':
-                            tag ='checkbox'
-                            text= str(text) + '_chkbox'
-                         elif tag == 'ListView':
-                            tag = 'list'
-                            text= str(text) + '_list'
-                         elif tag == 'TabControl':
-                            tag = 'tab'
-                            text= str(text) + '_tab'
-                         elif tag == 'DateTimePicker':
-                            tag = 'datepicker'
-                            text= str(text) + '_dtp'
-                         else:
-                            tag = 'label'
-                            text= str(text) + '_lbl'
+                     if tag == 'Button':
+                        tag = 'button'
+                        text=  str(text) + '_btn'
+                     elif tag == 'Edit':
+                        tag = 'input'
+                        text=  str(text) + '_txtbox'
+                     elif tag == 'RadioButton':
+                        tag = 'radiobutton'
+                        text= str(text) + '_radiobtn'
+                     elif tag == 'ComboBox':
+                        tag = 'select'
+                        text= str(text) + '_dropdown'
+                     elif tag == 'CheckBox':
+                        tag ='checkbox'
+                        text= str(text) + '_chkbox'
+                     elif tag == 'ListView':
+                        tag = 'list'
+                        text= str(text) + '_list'
+                     elif tag == 'ListBox':
+                        tag = 'list'
+                        text= str(text) + '_list'
+                     elif tag == 'TabControl':
+                        tag = 'tab'
+                        text= str(text) + '_tab'
+                     elif tag == 'DateTimePicker':
+                        tag = 'datepicker'
+                        text= str(text) + '_dtp'
+                     else:
+                        tag = 'label'
+                        text= str(text) + '_lbl'
 
 
-                         left = 0
-                         top = 0
-                         width = coordinates.width()
-                         height = coordinates.height()
-                         x_screen = cor.left
-                         y_screen = cor.top
-                         left = cor.left - winrect[0]
-                         top = cor.top - winrect[1]
-                         if top < 0:
-                            top = -top
-                         if left < 0:
-                            left = -left
-                         control_id = properties['control_id']
-                         if control_id == None:
-                            control_id ='null'
-                         if properties['is_visible'] == True :
-                            hiddentag = 'No'
-                            flag = False
-                            for k in range(len(ne)):
-                                if ne[k]['xpath'] == path:
-                                    flag = True
-                            if not flag:
-                                ne.append({"custname":text,
-                                        "tag":tag,
-                                        "url":url,
-                                        'control_id':control_id,
-                                        'parent':parent,
-                                        'xpath' : path,
-                                        'hiddentag':hiddentag,
-                                        'top': top,
-                                        'left': left,
-                                        'height': height,
-                                        'width': width,
-                                        'x_screen':x_screen,
-                                        'y_screen':y_screen
-                                        })
-                            else:
-                                print 'This element is duplicate'
+                     left = 0
+                     top = 0
+                     width = coordinates.width()
+                     height = coordinates.height()
+                     x_screen = cor.left
+                     y_screen = cor.top
+                     left = cor.left - winrect[0]
+                     top = cor.top - winrect[1]
+                     if top < 0:
+                        top = -top
+                     if left < 0:
+                        left = -left
+                     control_id = properties['control_id']
+                     if control_id == None:
+                        control_id ='null'
+                     if properties['is_visible'] == True :
+                        hiddentag = 'No'
+                        flag = False
+                        for k in range(len(ne)):
+                            if ne[k]['xpath'] == path:
+                                flag = True
+                        if not flag:
+                            ne.append({"custname":text,
+                                    "tag":tag,
+                                    "url":url,
+                                    'control_id':control_id,
+                                    'parent':parent,
+                                    'xpath' : path,
+                                    'hiddentag':hiddentag,
+                                    'top': top,
+                                    'left': left,
+                                    'height': height,
+                                    'width': width,
+                                    'x_screen':x_screen,
+                                    'y_screen':y_screen
+                                    })
+                        else:
+                            print 'This element is duplicate'
                  else:
                     text = ''
                     handle = children.handle
@@ -330,8 +327,6 @@ class Scrape:
 ##             for i in range(len(ch)):
 ##                self.get_all_children(ch[i],ne,i,path,win,winrect)
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             print e
         return ne
 
@@ -345,25 +340,23 @@ class Scrape:
             obj = launch_keywords.Launch_Keywords()
             obj.set_to_foreground()
             winrect = launch_keywords.win_rect;
-##            for i in range (len(ch)):
-##                path =ch[i].element_info.parent.class_name
-##                path = path + '[' + str(i) + ']'
             a =  self.get_all_children(ch,ne,0,'',win,winrect)
             import json
 ##            scraped_object=ldtp.getentireobjectlist(launch_keywords.window_name)
-            img=ninteen_68_desktop_scrape.obj.captureScreenshot()
-            img.save('out.png')
-            with open("out.png", "rb") as image_file:
-                encoded_string = base64.b64encode(image_file.read())
-            allobjects['mirror'] =encoded_string.encode('UTF-8').strip()
+            try:
+                img=ninteen_68_desktop_scrape.obj.captureScreenshot()
+                img.save('out.png')
+                with open("out.png", "rb") as image_file:
+                    encoded_string = base64.b64encode(image_file.read())
+                allobjects['mirror'] =encoded_string.encode('UTF-8').strip()
+            except Exception as e:
+                print 'Unable to capture the screenshot'
             with open('domelements.json', 'w') as outfile:
                 allobjects["view"] = a
                 json.dump(allobjects, outfile, indent=4, sort_keys=False)
                 outfile.close()
 
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             print e
         return allobjects
 
