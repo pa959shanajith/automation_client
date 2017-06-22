@@ -225,7 +225,6 @@ class Shell_Keywords():
                 logger.print_on_console('Error occured in SELECTROWS and is a :',e)
                 import traceback
                 traceback.print_exc()
-
             return status,result,value,err_msg
 
     def getCellText(self, sap_id,url,input_val,*args):
@@ -234,17 +233,32 @@ class Shell_Keywords():
             status=sap_constants.TEST_RESULT_FAIL
             result=sap_constants.TEST_RESULT_FALSE
             err_msg=None
-            row=long(input_val[0])
-            column=str(input_val[1])
+            r_int=long(input_val[0])
+            i_int=int(input_val[1])
+            row=r_int-1
+            index=i_int-1
             value=OUTPUT_CONSTANT
             elem = ses.FindById(id)
+            d1,d2,imax,d3=self.get_colCount(sap_id)
+            bList=[]
             try:
                 if(id != None):
                     if(elem.type == 'GuiShell'):
                         if elem.rowCount!=0:
-                            value=elem.getCellValue(row,column)
-                            status = sap_constants.TEST_RESULT_PASS
-                            result = sap_constants.TEST_RESULT_TRUE
+                            #----------------------------------function to append columnorder
+                            for i in range(0,imax-1):
+                                        b=elem.columnorder(i)
+                                        bList.append(b)
+                            #----------------------------------function to append columnorder
+                            if index>=0 and row >=0:
+                                column=str(bList[index])
+                                value=elem.getCellValue(row,column)
+                                status = sap_constants.TEST_RESULT_PASS
+                                result = sap_constants.TEST_RESULT_TRUE
+                            else:
+                                logger.print_on_console('Row and column values are incorrect')
+                                err_msg = sap_constants.ERROR_MSG
+
                     else:
                         logger.print_on_console('Element is not a shell object')
                         err_msg = sap_constants.ERROR_MSG
