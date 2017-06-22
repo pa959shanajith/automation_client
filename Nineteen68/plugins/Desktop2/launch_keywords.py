@@ -344,7 +344,6 @@ class Launch_Keywords():
                                 break
                 else:
                     self.multiInstance=title_matched_windows[0]
-                    logger.print_on_console('please close the existing application instnace with the given window name and try again')
                     term = TERMINATE
             if len(title_matched_windows)==1:
                 if not(windowname is None and windowname is ''):
@@ -358,7 +357,6 @@ class Launch_Keywords():
                             logger.print_on_console('Application handle found')
                             window_name=self.windowname
                             logger.print_on_console('Given windowname is '+windowname)
-                            logger.print_on_console('Select the type of scrape (Full scrape/Click and Add) from scrape window')
                             window_handle=title_matched_windows[0]
                             window_pid=self.get_window_pid(self.windowname)
                             self.windowHandle=title_matched_windows[0]
