@@ -33,11 +33,8 @@ class ScrapeWindow(wx.Frame):
         obj = launch_keywords.Launch_Keywords()
         self.socketIO = socketIO
         self.core_utilsobject = core_utils.CoreUtils()
-
-##        fileLoc=filePath.split(';')[0]
         windowname=filePath.split(';')[0]
         input_val=[]
-##        input_val.append(fileLoc)
         input_val.append(windowname)
         input_val.append(5)
         status = obj.find_window_and_attach(input_val)
@@ -64,10 +61,6 @@ class ScrapeWindow(wx.Frame):
 
 
      #----------------------------------------------------------------------
-##    def OnExit(self, event):
-##        self.Close()
-##        driver = browserops.driver
-##        driver.close()
 
     #----------------------------------------------------------------------
     def clickandadd(self,event):
@@ -80,15 +73,11 @@ class ScrapeWindow(wx.Frame):
     ##        self.comparebutton.Disable()
                 desktop_scraping_obj.clickandadd('STARTCLICKANDADD',app_uia,window_name)
                 event.GetEventObject().SetLabel("Stop ClickAndAdd")
-    ##            wx.MessageBox('CLICKANDADD: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
                 logger.print_on_console( 'click and add initiated, select the elements from AUT')
 
             else:
-                d = desktop_scraping_obj.clickandadd('STOPCLICKANDADD',app_uia,window_name)
+                d = desktop_scraping_obj.clickandadd('STOPCLICKANDADD',app_uia,window_name,self)
                 event.GetEventObject().SetLabel("Start ClickAndAdd")
-
-
-    ##            print desktop_scraping.finalJson
                 logger.print_on_console('Stopped click and add')
                 logger.print_on_console( 'Scrapped data saved successfully in domelements.json file')
                 # 5 is the limit of MB set as per Nineteen68 standards
@@ -97,17 +86,10 @@ class ScrapeWindow(wx.Frame):
                 else:
                     logger.print_on_console( 'Scraped data exceeds max. Limit.')
                     self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
-
-    ##            wx.MessageBox('CLICKANDADD: Scrape completed', 'Info',wx.OK | wx.ICON_INFORMATION)
                 self.Close()
-    ##            event.GetEventObject().SetLabel("Start ClickAndAdd")
-                logger.print_on_console('Click and add scrape  completed')
-##                launch_keywords.app_uia = None
+                logger.print_on_console('Click and add scrape  completed successfully...')
         else:
             logger.print_on_console('Click and add Scrape Failed')
-
-
-
 
 
     #----------------------------------------------------------------------
@@ -118,7 +100,7 @@ class ScrapeWindow(wx.Frame):
 ####        self.comparebutton.Disable()
         app_uia = launch_keywords.app_uia
         if app_uia != None:
-            d = desktop_scraping_obj.full_scrape(app_uia)
+            d = desktop_scraping_obj.full_scrape(app_uia,self)
 
             # 5 is the limit of MB set as per Nineteen68 standards
             if self.core_utilsobject.getdatasize(str(d),'mb') < 5:
@@ -128,8 +110,7 @@ class ScrapeWindow(wx.Frame):
                 self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
 
             self.Close()
-            logger.print_on_console('Full scrape  completed')
-##            launch_keywords.app_uia = None
+            logger.print_on_console('Full scrape  completed successfully...')
         else:
             logger.print_on_console('Full scrape Failed..')
 
