@@ -321,6 +321,7 @@ class Dispatcher:
                 result[3]=err_msg
             screen_shot_obj = screenshot_keywords.Screenshot()
             if self.action == 'execute':
+                result=list(result)
                 if configvalues['screenShot_Flag'].lower() == 'fail':
                     if result[0].lower() == 'fail':
                         file_path = screen_shot_obj.captureScreenshot()
