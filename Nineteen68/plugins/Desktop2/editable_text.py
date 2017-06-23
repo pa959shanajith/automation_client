@@ -218,7 +218,7 @@ class Text_Box:
             app_uia = launch_keywords.app_uia
             win = app_uia.top_window()
             real_parent = win.texts()[0]
-            if(real_parent == parent):
+            if(parent in real_parent ):
                 status= True
             else:
                 logger.log('verify parent is false')
