@@ -261,7 +261,10 @@ class Reporting:
             if args[0] != None:
                 result_tuple=args[0]
                 comments= result_tuple[3]
-                screenshot_path = result_tuple[4]
+                if(len(result_tuple) == 5):
+                    screenshot_path = result_tuple[4]
+                else:
+                    screenshot_path = None
 
         reporting_pojo_obj=reporting_pojo.ReportingStep(self.id_counter,name,parent_id,status,STEP+str(tsp.stepnum),comments,step_description,str(ellapsedtime),tsp.testscript_name,screenshot_path)
 
