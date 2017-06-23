@@ -323,9 +323,11 @@ class Dispatcher:
             if self.action == 'execute':
                 if configvalues['screenShot_Flag'].lower() == 'fail':
                     if result[0].lower() == 'fail':
-                        screen_shot_obj.captureScreenshot()
+                        file_path = screen_shot_obj.captureScreenshot()
+                        result.append(file_path[2])
                 elif configvalues['screenShot_Flag'].lower() == 'all':
-                    screen_shot_obj.captureScreenshot()
+                    file_path = screen_shot_obj.captureScreenshot()
+                    result.append(file_path[2])
         except TypeError as e:
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result=list(result)
