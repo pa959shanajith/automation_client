@@ -1,11 +1,11 @@
 #-------------------------------------------------------------------------------
 # Name:        desktop_highlight.py
-# Purpose:
+# Purpose:     Highlight the selected element from the elements tree in Scrape screen, this feature is basically used to identify the right object
 #
-# Author:
+# Author:      wasimakram.sutar
 #
-# Created:     22-02-2017
-# Copyright:   (c) prudhvi.gujjuboyina 2017
+# Created:     22/06/2017
+# Copyright:   (c) wasimakram.sutar 2017
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
@@ -13,6 +13,7 @@ import launch_keywords
 from pywinauto.application import Application
 import logger
 import time
+from editable_text import Text_Box
 
 
 class highLight():
@@ -33,30 +34,33 @@ class highLight():
                 ch = ele.children()
                 ele = ch[int(index)]
         except Exception as e:
-            print e
+            logger.print_on_console( e)
         return ele
 
     def highlight_desktop_element(self,ele):
         try:
             ele.draw_outline(thickness=5)
             time.sleep(2)
-            logger.print_on_console('Element highlighted')
+            logger.print_on_console('Element highlight completed successfully...')
         except Exception as e:
-            print e
+            logger.print_on_console( e)
 
     def highLiht_element(self,objname,parent,*args):
-        app_uia = launch_keywords.app_uia
-##        obj = launch_keywords.Launch_Keywords()
-##        obj.set_to_foreground()
-        time.sleep(1)
-        ele = self.get_desktop_element(objname,parent,app_uia)
-        self.highlight_desktop_element(ele)
-
-##        logger.print_on_console('Highlight Object: ' +objname)
-##        print launchobj
-##        status=launchobj.higlight(objname,parent,*args)
-##        logger.print_on_console(objname+"  Highlight Status "+str(status))
-
+        try:
+            app_uia = launch_keywords.app_uia
+            obj = launch_keywords.Launch_Keywords()
+            obj.set_to_foreground()
+            obj.bring_Window_Front()
+            time.sleep(1)
+            element = self.get_desktop_element(objname,parent,app_uia)
+            verify_obj = Text_Box()
+            check = verify_obj.verify_parent(element,parent)
+            if check:
+                self.highlight_desktop_element(element)
+            else:
+                logger.print_on_console('Element highlight failed...')
+        except Exception as e:
+            logger.print_on_console('Element highlight failed...')
 
 
 

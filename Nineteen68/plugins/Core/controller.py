@@ -401,7 +401,7 @@ class Controller():
 
        	if self.action==EXECUTE:
 ##            self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
-            self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result[3])
+            self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result)
 
         if len(self.counter)>0 and self.counter[-1]>-1 and self.counter[-1]-index==0:
             return JUMP_TO

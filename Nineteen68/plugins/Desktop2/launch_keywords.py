@@ -28,7 +28,7 @@ import struct
 from ctypes import wintypes
 from constants import *
 win_rect = 0
-
+large = (0,0,0,0)
 window_name=None
 window_handle=None
 window_pid=None
@@ -56,18 +56,9 @@ class Launch_Keywords():
             if len(input_val)==1:
                 filePath=input_val[0]
                 timeout=5
-##            elif len(input_val)==2:
-##                windowName,timeout=input_val[0],input_val[1]
             if(os.path.isfile(filePath)):
                 directory = os.path.dirname(filePath)
                 #check for any existing instance of app by window name
-##                title_matched_windows=self.getProcessWindows(windowName)
-##                if len(title_matched_windows)>=1:
-##                    self.multiInstance=title_matched_windows[0]
-##                    logger.print_on_console('please close the existing application instnace with the given window name and try again')
-##                    logger.print_on_console('Terminate the execution')
-##                    term = TERMINATE
-##                if len(title_matched_windows)==0:
                 filename,file_ext=os.path.splitext(filePath)
                 if file_ext == '.bat':
                     log.debug('executing .bat file')
@@ -79,34 +70,13 @@ class Launch_Keywords():
                     value=win32api.ShellExecute(0,'open',filePath,None,directory,1)
                     time.sleep(3)
                     if int(value)>32:
-    ##                    logger.print_on_console('The specified application is launched')
-    ##                    res=self.find_window_and_attach(windowName,int(timeout))
-    ##                    global app_uia
-    ##                    global window_pid
-    ##                    app_uia = Application().connect(process = window_pid)
-    ##                    if res!=None and res!='':
                         status=desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
-    ##                            return status,self.windowname
-    ##                    else:
-    ##                        logger.print_on_console('The given window name is not found')
-    ##                        term = TERMINATE
-    ##                else :
-    ##                    error_code=int(win32api.GetLastError())
-    ##                    if error_code in desktop_constants.DESKTOP_ERROR_CODES.keys():
-    ##                        logger.print_on_console(desktop_constants.DESKTOP_ERROR_CODES.get(error_code))
-    ##                        term =TERMINATE
-    ##                    else:
-    ##                        logger.print_on_console('unable to launch the application')
-    ##                        term =TERMINATE
             else:
                 term =TERMINATE
                 logger.print_on_console('The file does not exists')
 
         except Exception as e:
-##            Exceptions.error(e)
-            import traceback
-            traceback.print_exc()
             err_msg = desktop_constants.ERROR_MSG
             term =TERMINATE
         if term!=None:
@@ -138,39 +108,44 @@ class Launch_Keywords():
                 status=desktop_constants.TEST_RESULT_PASS
                 result = desktop_constants.TEST_RESULT_TRUE
         except Exception as e:
-##            Exceptions.error(e)
             err_msg = desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
 
     def captureScreenshot(self):
-##        time.sleep(0.120)
         image=None
         hwnd=window_handle
-        if(hwnd!=None):
-            mainhandle=hwnd
-            hdc=win32gui.GetDC(win32gui.GetDesktopWindow())
-            hdcMemDc=win32gui.CreateCompatibleDC(hdc)
+        try:
+            if(hwnd!=None):
+                mainhandle=hwnd
+                hdc=win32gui.GetDC(win32gui.GetDesktopWindow())
+                hdcMemDc=win32gui.CreateCompatibleDC(hdc)
 
-            parent=win32gui.GetWindow(window_handle,4)
-            ancestor=win32gui.GetWindow(mainhandle,3)
-            foreground=win32gui.GetForegroundWindow()
-            if foreground!=mainhandle:
-                fg_thread, fg_process_id = win32process.GetWindowThreadProcessId(foreground)
-                aut_thread, aut_process_id = win32process.GetWindowThreadProcessId(mainhandle)
-                if fg_process_id==aut_process_id:
-                    image=self.capture_window( win32gui.GetDesktopWindow())
-            else:
-                if  self.getWindowText(ancestor)!=None and len(self.getWindowText(ancestor))>0:
-                    image=self.capture_window( ancestor)
-                elif self.getWindowText(parent)!=None and len(self.getWindowText(parent))>0:
-                    image=self.capture_window( parent)
-##            if image==None:
-##                win32gui.SetForegroundWindow(window_handle)
-##                image=self.capture_window( window_handle)
-
+                parent=win32gui.GetWindow(window_handle,4)
+                ancestor=win32gui.GetWindow(mainhandle,3)
+                foreground=win32gui.GetForegroundWindow()
+                if foreground!=mainhandle:
+                    fg_thread, fg_process_id = win32process.GetWindowThreadProcessId(foreground)
+                    aut_thread, aut_process_id = win32process.GetWindowThreadProcessId(mainhandle)
+                    if fg_process_id==aut_process_id:
+                        image=self.capture_window( win32gui.GetDesktopWindow())
+                else:
+                    if  self.getWindowText(ancestor)!=None and len(self.getWindowText(ancestor))>0:
+                        image=self.capture_window( ancestor)
+                    elif self.getWindowText(parent)!=None and len(self.getWindowText(parent))>0:
+                        image=self.capture_window( parent)
+                if image==None:
+                    win32gui.SetForegroundWindow(window_handle)
+                    image=self.capture_window( window_handle)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            if image==None:
+                win32gui.SetForegroundWindow(window_handle)
+                image=self.capture_window( window_handle)
 
         return image
+
 
 
 
@@ -234,8 +209,6 @@ class Launch_Keywords():
 
     def set_to_foreground(self):
         try:
-##            windowname=window_name
-##            aut_handle = win32gui.FindWindow(None,windowname)
             aut_handle=window_handle
             if aut_handle> 0:
                 foreground=win32gui.GetForegroundWindow()
@@ -244,9 +217,8 @@ class Launch_Keywords():
                 if application_pid!=foreground_pid:
                     process_id=    win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
                     i= win32gui.GetWindowRect(aut_handle)
-                    global win_rect
-                    win_rect = i
-
+                    pid = self.get_window_pid(window_name)
+                    rect = self.getParentRectangle(pid)
                     if i[0] <= -32000:
                         fg_thread, fg_process = win32process.GetWindowThreadProcessId(foreground)
                         aut_thread, aut_process = win32process.GetWindowThreadProcessId(aut_handle)
@@ -254,8 +226,7 @@ class Launch_Keywords():
                         self.bring_to_top(aut_handle,4)
                         return True
                     else:
-##                        self.bring_to_top(aut_handle,4)
-##                        self.bring_to_top(aut_handle,5)
+                        self.bring_to_top(aut_handle,4)
                         self.hide_always_on_top_windows()
                         win32gui.SetForegroundWindow(aut_handle)
                         return True
@@ -289,61 +260,34 @@ class Launch_Keywords():
        try:
             win32gui.BringWindowToTop(aut_handle)
             win32gui.ShowWindow(aut_handle,value)
-            parent=win32gui.GetWindow(window_handle,4)
-            i= win32gui.GetWindowRect(parent)
-            global win_rect
-            win_rect = i
             #win32gui.SetForegroundWindow(aut_handle)
        except Exception as e:
 ##            Exceptions.error(e)
             err_msg = desktop_constants.ERROR_MSG
 
-##    def higlight(self,objectname,parent,*args):
-##        status=desktop_constants.TEST_RESULT_FAIL
-##        try:
-##            method_input=objectname.split(';')
-##            actual_obj=method_input[0]
-##            index=method_input[1]
-##
-##            self.set_to_foreground()
-####            self.bring_to_top(window_handle,4)
-##            time.sleep(1)
-###           for menu buttons click and highlight
-##            if actual_obj[:3]=='mnu':
-##                    if parent=='mnuApplication':
-##                        size=ldtp.getobjectsize(self.windowname,parent)
-##                        ldtp.generatemouseevent(size[0] + (size[2]) / 2, size[1]+ (size[3] / 2), "b1c")
-##                        time.sleep(1)
-##                        if actual_obj.endswith('1'):
-##                            obj_index=ldtp.getobjectproperty(self.windowname,actual_obj,'obj_index')
-##                            if obj_index==None:
-##                                actual_obj=actual_obj[0:-1]
-##                                index=ldtp.getObjectProperty(self,windowname,actual_obj, "obj_index")
-##            states=ldtp.getallstates(self.windowname,actual_obj)
-##
-##            if desktop_constants.VISIBLE_CHECK in states:
-##                size=ldtp.getobjectsize(self.windowname,actual_obj)
-##                logger.print_on_console( 'object size '+str(size))
-##                rgn1=win32gui.CreateRectRgnIndirect((size[0] + 1, size[1] + 1,
-##        							size[0] + size[2] - 1, size[1] + size[3] - 1))
-##                rgn2=win32gui.CreateRectRgnIndirect((size[0] + 4, size[1] + 4,
-##        							size[0] + size[2] - 4, size[1] + size[3] - 4))
-##                hdc=win32gui.CreateDC("DISPLAY", None, None)
-##                brush=win32gui.GetSysColorBrush(13)
-##                win32gui.CombineRgn(rgn1,rgn1,rgn2,3)
-##                win32gui.FillRgn(hdc,rgn1,brush)
-##                win32gui.SystemParametersInfo(win32con.SPI_SETFOREGROUNDLOCKTIMEOUT,5,win32con.SPIF_SENDWININICHANGE or win32con.SPIF_UPDATEINIFILE)
-##                win32gui.DeleteObject(rgn1)
-##                win32gui.DeleteObject(rgn2)
-##                win32gui.DeleteDC(hdc)
-##                status=desktop_constants.TEST_RESULT_PASS
-##        except Exception as e:
-##            status=False
-####            Exceptions.error(e)
-####            import traceback
-####            traceback.print_exc()
-##            err_msg = desktop_constants.ERROR_MSG
-##        return status
+    def getParentRectangle(self,pid):
+        EnumWindows = ctypes.windll.user32.EnumWindows
+        EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
+        GetWindowText = ctypes.windll.user32.GetWindowTextW
+        GetWindowTextLength = ctypes.windll.user32.GetWindowTextLengthW
+        IsWindowVisible = ctypes.windll.user32.IsWindowVisible
+        i = []
+        tup_list = []
+        def foreach_window(hwnd, lParam):
+            if IsWindowVisible(hwnd):
+                fg_thread, fg_process_id = win32process.GetWindowThreadProcessId(hwnd)
+                if fg_process_id == pid:
+                    i = win32gui.GetWindowRect(hwnd)
+                    global win_rect
+                    tup_list.append(i)
+                    min_val = min(x[1] for x in tup_list)
+                    max_val = max(b for b in tup_list if b[1] == min_val)
+                    global win_rect
+                    win_rect = max_val
+            return True
+        win32gui.EnumWindows(foreach_window, None)
+
+        return i
 
     def find_window_and_attach(self,input_val,*args):
         global window_name
@@ -369,7 +313,6 @@ class Launch_Keywords():
             if len(title_matched_windows)>1:
                 pidset = set()
                 for i in title_matched_windows:
-##                    hwnd = win32gui.FindWindow(None, windowname)
                     threadid,pid = win32process.GetWindowThreadProcessId(i)
                     pidset.add(pid)
                 if len(pidset) == 1:
@@ -381,73 +324,42 @@ class Launch_Keywords():
                         else:
                             flag = False
                 if flag:
-                    logger.print_on_console('Given windowname is '+windowname)
                     if not(windowname is None and windowname is ''):
                         start_time = time.time()
                         var = 1
                         while var==1:
-
-    ##                        if int(time.time()-start_time) >= launch_time_out:
-    ##                            break
                             title_matched_windows=self.getProcessWindows(windowname)
-
                             if len(title_matched_windows)>1:
                                 self.windowHandle=title_matched_windows[0]
                                 self.windowname=self.getWindowText(self.windowHandle)
-
-            ##                    self.set_to_foreground()
-            ##                    time.sleep(0.5)
-                                logger.print_on_console('Application handle found')
-            ##                        tempTitle = windowTitle.replaceAll("[^a-zA-Z0-9]", "*")
-                                # need  to create a ldtp object here
-
                                 window_name=self.windowname
-
+                                logger.print_on_console('Given windowname is '+windowname)
+                                logger.print_on_console('Select the type of scrape (Full scrape/Click and Add) from scrape window')
                                 window_handle=title_matched_windows[0]
-
                                 window_pid=self.get_window_pid(self.windowname)
                                 self.windowHandle=title_matched_windows[0]
-
                                 app_uia = Application().connect(process = window_pid)
                                 status=desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 break
                 else:
                     self.multiInstance=title_matched_windows[0]
-                    logger.print_on_console('please close the existing application instnace with the given window name and try again')
                     term = TERMINATE
             if len(title_matched_windows)==1:
-                logger.print_on_console('Given windowname is '+windowname)
                 if not(windowname is None and windowname is ''):
                     start_time = time.time()
                     var = 1
                     while var==1:
-
-##                        if int(time.time()-start_time) >= launch_time_out:
-##                            break
                         title_matched_windows=self.getProcessWindows(windowname)
-
-                        if len(title_matched_windows)>1:
-                            break
-                        elif len(title_matched_windows)==1:
-
+                        if len(title_matched_windows)==1:
                             self.windowHandle=title_matched_windows[0]
                             self.windowname=self.getWindowText(self.windowHandle)
-
-        ##                    self.set_to_foreground()
-        ##                    time.sleep(0.5)
                             logger.print_on_console('Application handle found')
-        ##                        tempTitle = windowTitle.replaceAll("[^a-zA-Z0-9]", "*")
-                            # need  to create a ldtp object here
-##                            global window_name
                             window_name=self.windowname
-##                            global window_handle
+                            logger.print_on_console('Given windowname is '+windowname)
                             window_handle=title_matched_windows[0]
-##                            global window_pid
                             window_pid=self.get_window_pid(self.windowname)
                             self.windowHandle=title_matched_windows[0]
-##                            break
-##                            global app_uia
                             app_uia = Application().connect(process = window_pid)
                             status=desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
@@ -455,12 +367,8 @@ class Launch_Keywords():
                 elif len(title_matched_windows)==0:
                     logger.print_on_console('The given window name is not found')
                     term = TERMINATE
-
-##                    if(self.windowname!=''):
-##                        break
         except Exception as e:
-            import traceback
-            traceback.print_exc()
+            logger.print_on_console(e)
 
         return status,result,self.windowname,err_msg
 
@@ -488,7 +396,6 @@ class Launch_Keywords():
                 self.windowname=newWindowName
                 window_name=newWindowName
         except Exception as e:
-##            Exceptions.error(e)
             err_msg = desktop_constants.ERROR_MSG
 
     def find_window(self,windowname):
@@ -579,7 +486,31 @@ class Launch_Keywords():
             logger.print_on_console(exception)
         log.info(RETURN_RESULT)
         return status, result, verb, err_msg
-##
-##Launch_Keywords=Launch_Keywords()
-##Launch_Keywords.launch_application(['C:\Windows\system32\calc.exe','Calculator'])
-##print Launch_Keywords.captureScreenshot()
+
+    def get_hwnds_for_pid(self,pid):
+        def callback(hwnd, hwnds):
+
+            if win32gui.IsWindowVisible(hwnd):
+                # logging.warning('inside 2nd def function')
+                _, found_pid = win32process.GetWindowThreadProcessId(hwnd)
+                # logging.warning('found id is == %s ', found_pid)
+                if found_pid == pid:
+                    # logging.warning('found pid %s ', pid)
+
+                    hwnds.append(hwnd)
+            return True
+        hwnds = []
+        win32gui.EnumWindows(callback, hwnds)
+        return hwnds
+
+    def bring_Window_Front(self):
+        try:
+            pid = self.get_window_pid(window_name)
+            hwnd =self.get_hwnds_for_pid(pid)
+            winSize = len(hwnd)
+            win32gui.SetWindowPos(hwnd[winSize - 1], win32con.HWND_NOTOPMOST, 0, 0, 0, 0, win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
+            win32gui.SetWindowPos(hwnd[winSize - 1], win32con.HWND_TOPMOST, 0, 0, 0, 0, win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
+            win32gui.SetWindowPos(hwnd[winSize - 1], win32con.HWND_NOTOPMOST, 0, 0, 0, 0, win32con.SWP_SHOWWINDOW + win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
+            return hwnd[winSize - 1]
+        except Exception as e:
+            logger.print_on_console ('AUT closed')

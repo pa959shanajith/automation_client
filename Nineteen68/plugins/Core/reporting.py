@@ -229,6 +229,7 @@ class Reporting:
         obj[STEP]=report_obj.step
         obj[COMMENTS]=report_obj.comments
         obj[STEP_DESCRIPTION]=report_obj.step_description
+        obj[SCREENSHOT_PATH]= report_obj.screenshot_path
         obj[ELLAPSED_TIME]=report_obj.ellapsedtime
         self.report_string.append(obj)
 
@@ -258,9 +259,14 @@ class Reporting:
             status = ''
         if len(args)>0:
             if args[0] != None:
-                comments=args[0]
+                result_tuple=args[0]
+                comments= result_tuple[3]
+                if(len(result_tuple) == 5):
+                    screenshot_path = result_tuple[4]
+                else:
+                    screenshot_path = None
 
-        reporting_pojo_obj=reporting_pojo.ReportingStep(self.id_counter,name,parent_id,status,STEP+str(tsp.stepnum),comments,step_description,str(ellapsedtime),tsp.testscript_name)
+        reporting_pojo_obj=reporting_pojo.ReportingStep(self.id_counter,name,parent_id,status,STEP+str(tsp.stepnum),comments,step_description,str(ellapsedtime),tsp.testscript_name,screenshot_path)
 
         self.generate_keyword_step(reporting_pojo_obj)
         self.id_counter+=1

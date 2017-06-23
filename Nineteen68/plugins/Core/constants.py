@@ -286,6 +286,8 @@ STEP='Step'
 
 COMMENTS='Comments'
 
+SCREENSHOT_PATH = 'screenshot_path'
+
 STEP_DESCRIPTION='StepDescription'
 
 ELLAPSED_TIME='EllapsedTime'

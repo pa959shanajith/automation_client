@@ -106,7 +106,6 @@ class MainNamespace(BaseNamespace):
             import desktop_highlight
             highlightObj=desktop_highlight.highLight()
             highlightObj.highLiht_element(args[0].split(',')[0],args[0].split(',')[1])
-            print 'highlight called'
 
   #--------------------------------------------------------------------------------------------------sap change
         elif appType==APPTYPE_SAP.lower():
