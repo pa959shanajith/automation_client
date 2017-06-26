@@ -23,7 +23,7 @@ class ScrapeWindow(wx.Frame):
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(200, 150) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
-        self.iconpath = os.environ["NINETEEN68_HOME"] + "\\Nineteen68\\plugins\\Core\\Images" + "\\slk.ico"
+        self.iconpath = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images" + "/slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.core_utilsobject = core_utils.CoreUtils()
         global obj
@@ -32,12 +32,19 @@ class ScrapeWindow(wx.Frame):
         self.socketIO = socketIO
         apk_path=filePath.split(';')[0]
         serial=filePath.split(';')[1]
-
+        if str(apk_path).endswith("ipa"):
+            platform_version = filePath.split(';')[2]
+            device_udid = filePath.split(';')[3]
+            status = obj.installApplication(apk_path,platform_version,serial,device_udid)
+        elif str(apk_path).endswith("app"):
+            platform_version = filePath.split(';')[2]
+            status = obj.installApplication(apk_path, platform_version, serial, None)
+        elif str(apk_path).endswith("apk"):
+            status = obj.installApplication(apk_path, None, serial, None)
 ##        input_val=[]
 ##        input_val.append(fileLoc)
 ##        input_val.append(windowname)
 ##        input_val.append(5)
-        status = obj.installApplication(apk_path,None,serial)
         if status!=None:
             self.panel = wx.Panel(self)
     ##            self.sizer = wx.GridBagSizer(6, 5)
