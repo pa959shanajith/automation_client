@@ -23,6 +23,79 @@ log = logging.getLogger('slider_util_keywords.py')
 
 class SliderKeywords():
 
+    def set_slide_value(self, element,input_val,*args):
+        print 'in slider'
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if element is not None:
+                visibility=element.is_displayed()
+                log.debug('element is visible')
+                if visibility:
+                    enable=element.is_enabled()
+                    log.debug(WEB_ELEMENT_ENABLED)
+                    if enable:
+                        log.debug('performing the action')
+                        print 'set value pass',input_val
+                        # for set value
+                        element.set_value(input_val[0])
+
+                        # print element.text
+                        methodoutput=TEST_RESULT_TRUE
+                    else:
+                        err_msg='element is disabled'
+                        print 'element is disabled'
+                        log.error('element is disabled')
+                        logger.print_on_console(err_msg)
+                else:
+                    err_msg='element is not visible'
+                    log.error('element is not visible')
+                    logger.print_on_console(err_msg)
+
+        except Exception as e:
+            import  traceback
+            traceback.print_exc()
+            log.error(e)
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output,err_msg
+
+    def get_slide_value(self, element,input_val,*args):
+
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if element is not None:
+                visibility=element.is_displayed()
+                log.debug('element is visible')
+                if visibility:
+                    enable=element.is_enabled()
+                    log.debug(WEB_ELEMENT_ENABLED)
+                    if enable:
+                        log.debug('performing the action')
+                        # for set value
+                        output= x=str(float(element.get_attribute('value').replace('%',''))/100)[:3]
+                        # print element.text
+                        methodoutput=TEST_RESULT_TRUE
+                    else:
+                        err_msg='element is disabled'
+                        print 'element is disabled'
+                        log.error('element is disabled')
+                        logger.print_on_console(err_msg)
+                else:
+                    err_msg='element is not visible'
+                    log.error('element is not visible')
+                    logger.print_on_console(err_msg)
+
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output,err_msg
 
     def verify_enabled(self, element,input_val,*args):
         status=TEST_RESULT_FAIL
