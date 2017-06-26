@@ -78,11 +78,20 @@ class Radio_Button_Keywords():
                     if enable:
 
                         log.debug('performing the action')
-                        classname= webelement.get_attribute("className")
-
+                        import platform
+                        if platform.system() == 'Darwin':
+                           classname= webelement.get_attribute("type")
+                        else:
+                           classname= webelement.get_attribute("className")
                         if 'Switch' in classname:
                             output=webelement.text
-                            output=output.upper()
+                            output=str(output).upper()
+                            import platform
+                            if platform.system() == 'Darwin':
+                                if output == 'TRUE':
+                                    output = 'On'
+                                else:
+                                    output = "Off"
                         elif 'Radio' in classname:
                             output=webelement.get_attribute("checked")
                             if output=='true':
