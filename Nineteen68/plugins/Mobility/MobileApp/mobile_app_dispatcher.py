@@ -27,6 +27,7 @@ import mob_screenshot
 import readconfig
 import spinner_keywords
 import list_view_mobility
+import picker_wheel_ios
 
 log = logging.getLogger('mobile_app_dispatcher.py')
 class MobileDispatcher:
@@ -41,6 +42,7 @@ class MobileDispatcher:
     action_keyowrds_object=action_keyowrds.Action_Key()
     spinner_keywords_object=spinner_keywords.Spinner_Keywords()
     list_view_keywords_object=list_view_mobility.List_Keywords()
+    picker_wheel_keywords_object = picker_wheel_ios.Picker_Wheel_Keywords()
     def __init__(self):
         self.exception_flag=''
 
@@ -95,6 +97,8 @@ class MobileDispatcher:
                     'PressElement':self.button_link_object.press,
                     'LongPressElement':self.button_link_object.long_press,
                     'GetElementText':self.textbox_keywords_object.get_text,
+                    'SetSlideValue': self.slider_util_keywords_object.set_slide_value,
+                    'GetSlideValue': self.slider_util_keywords_object.get_slide_value,
                     'VerifyElementExists':self.slider_util_keywords_object.verify_exists,
                     'VerifyElementEnabled':self.slider_util_keywords_object.verify_exists,
                     'VerifyElementText':self.textbox_keywords_object.verify_text,
@@ -121,7 +125,9 @@ class MobileDispatcher:
                     'GetSelectedViews':self.list_view_keywords_object.get_selected_views,
                     'VerifySelectedViews':self.list_view_keywords_object.verify_selected_views,
                     'SelectMultipleViewsByIndexes':self.list_view_keywords_object.select_multiple_views_by_indexes,
-                    'SelectMultipleViewsByText':self.list_view_keywords_object.select_multiple_views_by_text
+                    'SelectMultipleViewsByText':self.list_view_keywords_object.select_multiple_views_by_text,
+                    'SetValue': self.picker_wheel_keywords_object.set_value,
+                    'GetValue': self.picker_wheel_keywords_object.get_value
 
 
 
@@ -162,13 +168,20 @@ class MobileDispatcher:
         mobileElement = None
         global ELEMENT_FOUND
         if objectname.strip() != '':
-
+            import platform
+            if platform.system()=='Darwin':
+                objectname = objectname.replace("/AppiumAUT[1]/", "/")
+                print objectname
             identifiers = objectname.split(';')
             log.debug('Identifiers are ')
             log.debug(identifiers)
             try:
                 log.debug('trying to find mobileElement by Id')
-                mobileElement = driver.find_element_by_xpath(identifiers[1])
+                import platform
+                if platform.system()=='Darwin':
+                    mobileElement = driver.find_element_by_xpath(objectname)
+                else:
+                    mobileElement = driver.find_element_by_xpath(identifiers[1])
             except Exception as Ex:
                 try:
                     log.debug('Webelement not found by Id')
