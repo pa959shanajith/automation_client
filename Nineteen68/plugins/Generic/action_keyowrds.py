@@ -13,7 +13,10 @@
 from constants import *
 from mobile_app_constants import *
 from appium.webdriver.common.touch_action import TouchAction
-import browser_Keywords
+import platform
+if platform.system()!='Darwin':
+    import browser_Keywords
+
 import logging
 import logger
 import time
