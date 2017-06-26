@@ -38,7 +38,7 @@ class Pause(wx.Frame):
         self.SetBackgroundColour('#e6e7e8')
         self.panel = wx.Panel(self)
         self.sizer = wx.GridBagSizer(1, 2)
-        self.iconpath = os.environ["NINETEEN68_HOME"] + "\\Nineteen68\\plugins\\Core\\Images" + "\\slk.ico"
+        self.iconpath = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images" + "/slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
 
