@@ -42,10 +42,12 @@ class ToggleKeywords():
                     if enable:
                         log.debug(WEB_ELEMENT_ENABLED)
                         log.debug('performing the action')
-                        res=element.text
-                        log.debug('Result is '+res)
+                        res = element.text
+                        log.debug('Result is ' + str(res))
+                        ios = str(res)
 
-                        if res.upper()=='OFF':
+                        if ios == 'False' or res.upper() == 'OFF':
+
                             action = TouchAction(install_and_launch.driver)
                             action.tap(element).perform()
                             status=TEST_RESULT_PASS
@@ -88,8 +90,8 @@ class ToggleKeywords():
                             log.debug(WEB_ELEMENT_ENABLED)
                             log.debug('performing the action')
                             res=webelement.text
-
-                            if res.upper()=='ON':
+                            ios = str(res)
+                            if ios == 'True' or res.upper()=='ON':
                                 action = TouchAction(install_and_launch.driver)
                                 action.tap(webelement).perform()
                                 status=TEST_RESULT_PASS

@@ -15,7 +15,7 @@ from appium.webdriver.common.touch_action import TouchAction
 import install_and_launch
 import logging
 import logger
-
+import  platform
 log = logging.getLogger('swipe_keywords.py')
 import time
 
@@ -91,7 +91,10 @@ class SliderKeywords():
         try:
             startx,starty,endy=self.find_coordinates_vertical()
             #Swipe from down to up
-            install_and_launch.driver.swipe(startx, starty, startx, endy, 3000)
+            if platform.system() == 'Darwin':
+                install_and_launch.driver.execute_script('mobile: scroll', {'direction': 'down'})
+            else:
+                install_and_launch.driver.swipe(startx, starty, startx, endy, 3000)
             time.sleep(3)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
@@ -151,8 +154,11 @@ class SliderKeywords():
         try:
 ##            startx,starty,endx=self.find_coordinates_vertical()
             #Swipe from up to bottom
-
-            install_and_launch.driver.keyevent(4)
+            import platform
+            if platform.system() == 'Darwin':
+                install_and_launch.driver.back()
+            else:
+                install_and_launch.driver.keyevent(4)
             time.sleep(3)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE

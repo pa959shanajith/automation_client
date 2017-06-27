@@ -43,7 +43,11 @@ class Textbox_keywords():
                             log.debug('clearing  the existing text')
                             element.clear()
                         log.debug('Setting the text')
-                        element.send_keys(text)
+                        import platform
+                        if platform.system() == 'Darwin':
+                            element.set_value(text)
+                        else:
+                            element.send_keys(text)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
@@ -162,7 +166,11 @@ class Textbox_keywords():
                             log.debug('clearing  the existing text')
                             element.clear()
                         log.debug('Sending the keys')
-                        element.send_keys(text)
+                        import platform
+                        if platform.system() == 'Darwin':
+                            element.set_value(text)
+                        else:
+                            element.send_keys(text)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:

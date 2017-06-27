@@ -242,6 +242,7 @@ class Reporting:
 
         """
         comments=''
+        screenshot_path = None
         parent_id=0
         name=tsp.name
         step_description=''

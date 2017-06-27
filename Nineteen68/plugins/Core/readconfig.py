@@ -35,7 +35,7 @@ class readConfig():
 
     def readJson(self):
 ##        global configvalues
-        config_path = os.environ["NINETEEN68_HOME"] + '\\config.json'
+        config_path = os.environ["NINETEEN68_HOME"] + '/config.json'
         configvalues={}
         config = json.loads(open(config_path).read())
         params=config['configuration']

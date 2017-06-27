@@ -147,7 +147,11 @@ class Controller():
     def __load_mobile_app(self):
         try:
             if self.mobile_app_dispatcher_obj==None:
-                self.get_all_the_imports('Mobility')
+                import platform
+                if platform.system()=='Darwin':
+                    self.get_all_the_imports('Mobility/MobileApp')
+                else:
+                    self.get_all_the_imports('Mobility')
                 import mobile_app_dispatcher
                 self.mobile_app_dispatcher_obj = mobile_app_dispatcher.MobileDispatcher()
 

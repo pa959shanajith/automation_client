@@ -8,7 +8,9 @@
 # Copyright:   (c) sushma.p 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-from pyrobot import Robot
+import platform
+if platform.system() != 'Darwin':
+    from pyrobot import Robot
 from generic_constants import *
 from constants import *
 import logger
