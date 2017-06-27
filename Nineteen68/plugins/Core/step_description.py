@@ -627,6 +627,8 @@ class StepDescription:
         	return 'The application is closed'
         def SwipeUp():
         	return 'Performed swipe up operation'
+        def VerifyDoesNotExists():
+            return ' Verify '+ "'" + tsp.custname + "'" + '  does not exists '
         def SwipeDown():
         	return 'Performed swipe down operation'
         def SwipeLeft():
@@ -659,6 +661,8 @@ class StepDescription:
             return ' Verify '+ "'" + tsp.custname + "'" + ' is enabled '
         def VerifyElementEnabled():
             return ' Verify '+ "'" + tsp.custname + "'" + ' is enabled '
+        def VerifyElementDisabled():
+            return ' Verify '+ "'" + tsp.custname + "'" + ' is Disabled '
         def VerifyDisabled():
             return 'Verify '+ "'" + tsp.custname + "'" + ' is disabled '
         def VerifyExists():
