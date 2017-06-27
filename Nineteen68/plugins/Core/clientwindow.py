@@ -271,6 +271,19 @@ class MainNamespace(BaseNamespace):
         response=str(response)
         print response
         socketIO.emit('result_wsdl_ServiceGenerator',response)
+        
+    def on_render_screenshot(self,*args):
+        try:
+            global socketIO
+            filepath = args[0]
+            encoded_string = ''
+            with open(filepath, "rb") as image_file:
+                encoded_string = base64.b64encode(image_file.read())
+            base64_data =encoded_string.encode('UTF-8').strip()
+            socketIO.emit('render_screenshot',base64_data)
+        except Exception as e:
+            print 'Eror while sending screenshot data'
+            socketIO.emit('render_screenshot','fail')
 
 
 socketIO = None
