@@ -222,6 +222,7 @@ ERROR_CODE_DICT ={
                     'ERR_TEXTBOX_SIZE_UNDEFINED':'Textbox size is not defined.',
                     'MSG_ELEMENT_EXISTS':'Element exists.',
                     'ERR_ELEMENT_NOT_EXISTS':'Element does not exists.',
+                    'ERR_ELEMENT_EXISTS':'Element exists.',
                     'ERR_GET_COLUMN_COUNT_EXCEPTION':'Exception occured in getColumnCount.',
                     'ERR_ROW_COLUMN':'Row number and Column nunber shoud be greater than 0.',
                     'ERR_SAFARI_EXCEPTION':'This action cannot be performed in safari for encoded elements.',
@@ -333,6 +334,8 @@ WEB_ELEMENT_FOUND = 'Web Element found'
 WEB_ELEMENT_NOT_FOUND = 'Web Element not found'
 
 WEB_ELEMENT_ENABLED = 'Web Element Enabled'
+
+ELEMENT_ENABLED = 'Element Enabled'
 
 WEB_ELEMENT_DISABLED = 'Web Element is disabled, hence cannot perform operation'
 

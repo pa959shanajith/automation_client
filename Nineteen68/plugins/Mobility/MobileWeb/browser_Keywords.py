@@ -390,9 +390,9 @@ class BrowserKeywords():
 
         except Exception as e:
                 err_msg=self.__web_driver_exception(e)
-        else:
-            logger.print_on_console('For this close browser open browser or open new browser is not present')
-            log.error('For this close browser open browser or open new browser is not present')
+##        else:
+##            logger.print_on_console('For this close browser open browser or open new browser is not present')
+##            log.error('For this close browser open browser or open new browser is not present')
         return status,result,output,err_msg
 
 

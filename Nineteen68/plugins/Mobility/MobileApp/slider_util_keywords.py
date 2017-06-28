@@ -148,7 +148,7 @@ class SliderKeywords():
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg=WEB_ELEMENT_ENABLED
+                        err_msg=ELEMENT_ENABLED
                         log.error(err_msg)
                         logger.print_on_console(err_msg)
                 else:
@@ -227,6 +227,30 @@ class SliderKeywords():
                 err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
+
+        except Exception as e:
+            err_msg=ANDROID_ERROR
+            log.error(e)
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output,err_msg
+
+    def verify_does_not_exists(self, element,input_val,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if element is not None:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_EXISTS']
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
+
+            else:
+                log.info(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+
 
         except Exception as e:
             err_msg=ANDROID_ERROR

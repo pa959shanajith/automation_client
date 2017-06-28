@@ -11,6 +11,7 @@
 
 
 from constants import *
+import constants
 from mobile_app_constants import *
 from appium.webdriver.common.touch_action import TouchAction
 import platform
@@ -62,6 +63,8 @@ class Action_Key():
                                 break
                     else :
                         logger.print_on_console('Invalid Input')
+                        status=constants.TEST_RESULT_FAIL
+                        methodoutput=constants.TEST_RESULT_FALSE
                 elif inputs[0].lower() == 'keydown' :
                     input=int(inputs[1])
                     if input > 0 :
@@ -77,6 +80,8 @@ class Action_Key():
                                 break
                     else :
                         logger.print_on_console('Invalid Input')
+                        status=constants.TEST_RESULT_FAIL
+                        methodoutput=constants.TEST_RESULT_FALSE
                 elif inputs[0].lower() == 'keyup' :
                     input=int(inputs[1])
                     if input > 0 :
@@ -91,6 +96,8 @@ class Action_Key():
                                 break
                     else :
                        logger.print_on_console('Invalid Input')
+                       status=constants.TEST_RESULT_FAIL
+                       methodoutput=constants.TEST_RESULT_FALSE
                 elif inputs[0].lower() == 'tab' :
                     input=int(inputs[1])
                     if input > 0 :
@@ -106,10 +113,16 @@ class Action_Key():
                                 break
                     else :
                         logger.print_on_console('Invalid Input')
+                        status=constants.TEST_RESULT_FAIL
+                        methodoutput=constants.TEST_RESULT_FALSE
                 else :
                     logger.print_on_console('Invalid Input')
+                    status=constants.TEST_RESULT_FAIL
+                    methodoutput=constants.TEST_RESULT_FALSE
             else :
                     logger.print_on_console('Invalid Input')
+                    status=constants.TEST_RESULT_FAIL
+                    methodoutput=constants.TEST_RESULT_FALSE
 
 
 

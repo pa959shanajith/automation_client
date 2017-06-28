@@ -138,7 +138,7 @@ class SliderKeywords():
             install_and_launch.driver.hide_keyboard(inputval[0])
             time.sleep(3)
             status=TEST_RESULT_PASS
-            result=TEST_RESULT_TRUE
+            methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             err_msg='Error thrown be android driver'
             log.error(e)

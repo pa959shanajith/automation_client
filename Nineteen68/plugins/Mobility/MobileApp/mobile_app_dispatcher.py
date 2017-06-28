@@ -100,6 +100,8 @@ class MobileDispatcher:
                     'SetSlideValue': self.slider_util_keywords_object.set_slide_value,
                     'GetSlideValue': self.slider_util_keywords_object.get_slide_value,
                     'VerifyElementExists':self.slider_util_keywords_object.verify_exists,
+                    'VerifyElementDisabled':self.slider_util_keywords_object.verify_disabled,
+                    'VerifyElementDoesNotExists':self.slider_util_keywords_object.verify_does_not_exists,
                     'VerifyElementEnabled':self.slider_util_keywords_object.verify_exists,
                     'VerifyElementText':self.textbox_keywords_object.verify_text,
                     'ActionKey':self.action_keyowrds_object.action_key,

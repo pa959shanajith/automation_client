@@ -17,7 +17,7 @@ import util_keywords
 import dropdown_keywords
 import tab_control_keywords
 import date_control_keywords
-
+import screenshot_keywords
 import logger
 import desktop_constants
 import radio_checkbox_keywords_desktop
@@ -152,19 +152,25 @@ class DesktopDispatcher:
                     result=constants.TERMINATE
             else:
                 err_msg=desktop_constants.INVALID_KEYWORD
+                result=list(result)
                 result[3]=err_msg
             configobj = readconfig.readConfig()
             configvalues = configobj.readJson()
+            screen_shot_obj = screenshot_keywords.Screenshot()
             if self.action == constants.EXECUTE:
+                result=list(result)
                 if configvalues['screenShot_Flag'].lower() == 'fail':
                     if result[0].lower() == 'fail':
                         if keyword not in desktop_constants.APPLICATION_KEYWORDS:
-                            self.launch_keywords_obj.save_screeenshot()
+                            file_path = screen_shot_obj.captureScreenshot()
+                            result.append(file_path[2])
                 elif configvalues['screenShot_Flag'].lower() == 'all':
                     if keyword not in desktop_constants.APPLICATION_KEYWORDS:
-                        self.launch_keywords_obj.save_screeenshot()
+                        file_path = screen_shot_obj.captureScreenshot()
+                        result.append(file_path[2])
         except TypeError as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
+            result=list(result)
             result[3]=err_msg
         except Exception as e:
             import traceback
