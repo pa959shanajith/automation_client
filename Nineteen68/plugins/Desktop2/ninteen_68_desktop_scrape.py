@@ -38,8 +38,7 @@ class ScrapeWindow(wx.Frame):
         input_val.append(windowname)
         input_val.append(5)
         status = obj.find_window_and_attach(input_val)
-        windowname = ''
-        if launch_keywords.app_uia != None:
+        if launch_keywords.app_uia != None and status[0].lower() != 'fail':
             if status!=TERMINATE:
                 self.panel = wx.Panel(self)
                 self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd",pos=(12,8 ), size=(175, 28))
@@ -59,7 +58,7 @@ class ScrapeWindow(wx.Frame):
             self.socketIO.emit('scrape','Fail')
             logger.print_on_console('Wrong window name, Please check the window name and provide valid one')
 
-
+        windowname = ''
      #----------------------------------------------------------------------
 
     #----------------------------------------------------------------------
