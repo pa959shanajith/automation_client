@@ -536,6 +536,17 @@ class StepDescription:
         #Tab Keywords
         def moveTabs():
             return ' Move tab '+ "'" + tsp.custname + "'"+'to left and store the output as '+output+'.'
+        #Shell(Grid) Keywords
+        def PressToolbarButton():
+            return 'Pressing Toolbar Button '+input[0]+' and the store the output as '+output+'.'
+        def SelectRows():
+            return 'Selecting Row/Rows'+input[0]+'and store the output as '+output+'.'
+        def GetRowCount():
+            return 'Get Row Count and save the output as '+output+'.'
+        def GetColumnCount():
+            return 'Get Column Count and store the outpus as '+output+'.'
+        def GetCellText():
+            return 'Get Cell Text of row : '+input[0]+'and column :'+input[1]+'and store the output as '+output+'.'
 
 
     def desktop(self,keyword,tsp,inputval,input,output,con,reporting_obj):
