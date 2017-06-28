@@ -34,7 +34,7 @@ class Radio_Checkbox_keywords():
                 log.debug(check)
                 if (check):
                     log.info('Parent matched')
-                    if(element.is_enabled):
+                    if(element.is_enabled()):
                         state = self.get_status(element,parent)
                         if state[2] == 'Selected':
                             log.info( 'Radio button already selected')
@@ -50,10 +50,13 @@ class Radio_Checkbox_keywords():
                         result = desktop_constants.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
-                        log.info('Element state does not allow to perform the operation')
+                      log.info('Element state does not allow to perform the operation')
+                      logger.print_on_console('Element state does not allow to perform the operation')
+                      err_msg= 'Element state does not allow to perform the operation'
                 else:
-                    log.info('element not present on the page where operation is trying to be performed')
-                    err_msg='element not present on the page where operation is trying to be performed'
+                   log.info('Element not present on the page where operation is trying to be performed')
+                   err_msg='Element not present on the page where operation is trying to be performed'
+                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
@@ -77,7 +80,7 @@ class Radio_Checkbox_keywords():
                 log.debug(check)
                 if (check):
                     log.info('Parent matched')
-                    if(element.is_enabled):
+                    if(element.is_enabled()):
                         state = self.get_status(element,parent)
                         if state[2] == 'Checked':
                             log.info( 'Check box is already checked')
@@ -90,10 +93,13 @@ class Radio_Checkbox_keywords():
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
-                        log.info('Element state does not allow to perform the operation')
+                      log.info('Element state does not allow to perform the operation')
+                      logger.print_on_console('Element state does not allow to perform the operation')
+                      err_msg= 'Element state does not allow to perform the operation'
                 else:
-                    log.info('element not present on the page where operation is trying to be performed')
-                    err_msg='element not present on the page where operation is trying to be performed'
+                   log.info('Element not present on the page where operation is trying to be performed')
+                   err_msg='Element not present on the page where operation is trying to be performed'
+                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
@@ -117,7 +123,7 @@ class Radio_Checkbox_keywords():
                 log.debug(check)
                 if (check):
                     log.info('Parent matched')
-                    if(element.is_enabled):
+                    if(element.is_enabled()):
                         state = self.get_status(element,parent)
                         if state[2] == 'UnChecked':
                             log.info( 'Check box is already unchecked')
@@ -129,10 +135,13 @@ class Radio_Checkbox_keywords():
                             result = desktop_constants.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
-                        log.info('Element state does not allow to perform the operation')
+                      log.info('Element state does not allow to perform the operation')
+                      logger.print_on_console('Element state does not allow to perform the operation')
+                      err_msg= 'Element state does not allow to perform the operation'
                 else:
-                    log.info('element not present on the page where operation is trying to be performed')
-                    err_msg='element not present on the page where operation is trying to be performed'
+                   log.info('Element not present on the page where operation is trying to be performed')
+                   err_msg='Element not present on the page where operation is trying to be performed'
+                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
@@ -150,7 +159,7 @@ class Radio_Checkbox_keywords():
                 check = verify_obj.verify_parent(element,parent)
                 if (check):
                     tag = element.friendly_class_name()
-                    if(element.is_enabled):
+                    if(element.is_enabled()):
                         status = element.get_check_state()
                         if(tag == 'CheckBox'):
                             if(status == 1):
@@ -171,9 +180,13 @@ class Radio_Checkbox_keywords():
                                 status=desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                     else:
-                        logger.print_on_console('Element state does not allow to perform the operation')
+                      log.info('Element state does not allow to perform the operation')
+                      logger.print_on_console('Element state does not allow to perform the operation')
+                      err_msg= 'Element state does not allow to perform the operation'
                 else:
-                    logger.print_on_console('element not present on the page where operation is trying to be performed')
+                   log.info('Element not present on the page where operation is trying to be performed')
+                   err_msg='Element not present on the page where operation is trying to be performed'
+                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
 
         except Exception as exception:
             Exceptions.error(exception)

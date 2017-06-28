@@ -38,7 +38,7 @@ class Dropdown_Keywords():
                     log.debug(check)
                     if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled):
+                        if(element.is_enabled()):
                             item_index=int(input_val[0])
                             if element.friendly_class_name() == 'ListView':
                                 item_count = element.item_count()
@@ -89,16 +89,17 @@ class Dropdown_Keywords():
                                                 result = desktop_constants.TEST_RESULT_TRUE
                                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                                     else:
-                                        log.info('Combobox state does not allow to perform the operation')
-                                        logger.print_on_console('Combobox state does not allow to perform the operation')
-                                        err_msg = 'Combobox state does not allow to perform the operation'
+                                        log.info('Element state does not allow to perform the operation')
+                                        logger.print_on_console('Element state does not allow to perform the operation')
+                                        err_msg = 'Element state does not allow to perform the operation'
                                 else:
                                     log.info('There is no item in Combobox with the given index')
                                     logger.print_on_console('There is no item in Combobox with the given index')
                                     err_msg = 'There is no item in Combobox with the given index'
                         else:
-                            log.info('element not present on the page where operation is trying to be performed')
-                            err_msg='element not present on the page where operation is trying to be performed'
+                            log.info('Element not present on the page where operation is trying to be performed')
+                            err_msg='Element not present on the page where operation is trying to be performed'
+                            logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
                 log.error(exception)
                 logger.print_on_console(exception)
@@ -120,7 +121,7 @@ class Dropdown_Keywords():
                log.debug(check)
                if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled):
+                        if(element.is_enabled()):
                             if element.friendly_class_name() == 'ListView':
                                 print 'inside list check'
                                 if element.is_active() == False:
@@ -174,9 +175,12 @@ class Dropdown_Keywords():
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
                           log.info('Element state does not allow to perform the operation')
+                          logger.print_on_console('Element state does not allow to perform the operation')
+                          err_msg = 'Element state does not allow to perform the operation'
                else:
-                   log.info('element not present on the page where operation is trying to be performed')
-                   err_msg='element not present on the page where operation is trying to be performed'
+                   log.info('Element not present on the page where operation is trying to be performed')
+                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
+                   err_msg='Element not present on the page where operation is trying to be performed'
             except Exception as exception:
                 import traceback
                 traceback.print_exc()
@@ -204,7 +208,7 @@ class Dropdown_Keywords():
                     log.debug(check)
                     if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled):
+                        if(element.is_enabled()):
                             if element.friendly_class_name() == 'ListView':
                                 if element.is_active() == False:
                                    element.click()
@@ -222,9 +226,12 @@ class Dropdown_Keywords():
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
                           log.info('Element state does not allow to perform the operation')
+                          logger.print_on_console('Element state does not allow to perform the operation')
+                          err_msg = 'Element state does not allow to perform the operation'
                     else:
-                      log.info('element not present on the page where operation is trying to be performed')
-                      err_msg='element not present on the page where operation is trying to be performed'
+                      log.info('Element not present on the page where operation is trying to be performed')
+                      err_msg='Element not present on the page where operation is trying to be performed'
+                      print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
                 log.error(exception)
                 logger.print_on_console(exception)
@@ -249,7 +256,7 @@ class Dropdown_Keywords():
                     log.debug(check)
                     if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled):
+                        if(element.is_enabled()):
                             if element.friendly_class_name() == 'ListView':
                                 if element.is_active() == False:
                                    element.click()
@@ -267,9 +274,12 @@ class Dropdown_Keywords():
                                  log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
                           log.info('Element state does not allow to perform the operation')
+                          logger.print_on_console('Element state does not allow to perform the operation')
+                          err_msg= 'Element state does not allow to perform the operation'
                     else:
-                      log.info('element not present on the page where operation is trying to be performed')
-                      err_msg='element not present on the page where operation is trying to be performed'
+                      log.info('Element not present on the page where operation is trying to be performed')
+                      err_msg='Element not present on the page where operation is trying to be performed'
+                      print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
                 log.error(exception)
                 logger.print_on_console(exception)
@@ -293,7 +303,7 @@ class Dropdown_Keywords():
                log.debug(check)
                if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled):
+                        if(element.is_enabled()):
                             if element.friendly_class_name() == 'ListView':
                                 if element.is_active() == False:
                                   element.click()
@@ -320,9 +330,12 @@ class Dropdown_Keywords():
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
                           log.info('Element state does not allow to perform the operation')
+                          logger.print_on_console('Element state does not allow to perform the operation')
+                          err_msg= 'Element state does not allow to perform the operation'
                else:
-                   log.info('element not present on the page where operation is trying to be performed')
-                   err_msg='element not present on the page where operation is trying to be performed'
+                   log.info('Element not present on the page where operation is trying to be performed')
+                   err_msg='Element not present on the page where operation is trying to be performed'
+                   print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
                 import traceback
                 traceback.print_exc()
@@ -347,7 +360,7 @@ class Dropdown_Keywords():
                    log.debug(check)
                    if (check):
                             log.info('Parent matched')
-                            if(element.is_enabled):
+                            if(element.is_enabled()):
                                 if element.friendly_class_name() == 'ListView':
                                     if element.is_active() == False:
                                       element.click()
@@ -386,9 +399,12 @@ class Dropdown_Keywords():
                                       result = desktop_constants.TEST_RESULT_FALSE
                             else:
                               log.info('Element state does not allow to perform the operation')
+                              logger.print_on_console('Element state does not allow to perform the operation')
+                              err_msg= 'Element state does not allow to perform the operation'
                    else:
-                       log.info('element not present on the page where operation is trying to be performed')
-                       err_msg='element not present on the page where operation is trying to be performed'
+                       log.info('Element not present on the page where operation is trying to be performed')
+                       err_msg='Element not present on the page where operation is trying to be performed'
+                       logger.print_on_console('Element not present on the page where operation is trying to be performed')
                 except Exception as exception:
                     import traceback
                     traceback.print_exc()
@@ -415,7 +431,7 @@ class Dropdown_Keywords():
                     log.debug(check)
                     if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled):
+                        if(element.is_enabled()):
                             item_text=str(input_val[0])
                             if element.friendly_class_name() == 'ListView':
                                 if item_text != '' or item_text != None:
@@ -469,16 +485,17 @@ class Dropdown_Keywords():
 
 
                                     else:
-                                        log.info('Combobox state does not allow to perform the operation')
-                                        logger.print_on_console('Combobox state does not allow to perform the operation')
-                                        err_msg = 'Combobox state does not allow to perform the operation'
+                                        log.info('Element state does not allow to perform the operation')
+                                        logger.print_on_console('Element state does not allow to perform the operation')
+                                        err_msg = 'Element state does not allow to perform the operation'
                                 else:
                                     log.info('There is no item in Combobox with the given text')
                                     logger.print_on_console('There is no item in Combobox with the given text')
                                     err_msg = 'There is no item in Combobox with the given text'
                         else:
-                            log.info('element not present on the page where operation is trying to be performed')
-                            err_msg='element not present on the page where operation is trying to be performed'
+                            log.info('Element not present on the page where operation is trying to be performed')
+                            err_msg='Element not present on the page where operation is trying to be performed'
+                            logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
                 log.error(exception)
                 logger.print_on_console(exception)
@@ -501,7 +518,7 @@ class Dropdown_Keywords():
                log.debug(check)
                if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled):
+                        if(element.is_enabled()):
                             if element.friendly_class_name() == 'ListView':
                                  items=element.items()
                                  items.pop(0)
@@ -531,9 +548,12 @@ class Dropdown_Keywords():
                                             result = desktop_constants.TEST_RESULT_FALSE
                         else:
                           log.info('Element state does not allow to perform the operation')
+                          logger.print_on_console('Element state does not allow to perform the operation')
+                          err_msg= 'Element state does not allow to perform the operation'
                else:
-                   log.info('element not present on the page where operation is trying to be performed')
-                   err_msg='element not present on the page where operation is trying to be performed'
+                   log.info('Element not present on the page where operation is trying to be performed')
+                   err_msg='Element not present on the page where operation is trying to be performed'
+                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
                 import traceback
                 traceback.print_exc()
@@ -560,7 +580,7 @@ class Dropdown_Keywords():
                log.debug(check)
                if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled):
+                        if(element.is_enabled()):
                             if element.friendly_class_name() == 'ListView':
                                  items=element.items()
                                  elelist=element.texts()
@@ -593,9 +613,12 @@ class Dropdown_Keywords():
                                                 result = desktop_constants.TEST_RESULT_FALSE
                         else:
                           log.info('Element state does not allow to perform the operation')
+                          logger.print_on_console('Element state does not allow to perform the operation')
+                          err_msg= 'Element state does not allow to perform the operation'
                else:
-                   log.info('element not present on the page where operation is trying to be performed')
-                   err_msg='element not present on the page where operation is trying to be performed'
+                   log.info('Element not present on the page where operation is trying to be performed')
+                   err_msg='Element not present on the page where operation is trying to be performed'
+                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
                 import traceback
                 traceback.print_exc()
@@ -618,7 +641,7 @@ class Dropdown_Keywords():
                log.debug(check)
                if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled):
+                        if(element.is_enabled()):
                             if element.friendly_class_name() == 'ListView':
                                  if element.is_active() == False:
                                    element.click()
@@ -630,9 +653,12 @@ class Dropdown_Keywords():
 
                         else:
                           log.info('Element state does not allow to perform the operation')
+                          logger.print_on_console('Element state does not allow to perform the operation')
+                          err_msg= 'Element state does not allow to perform the operation'
                else:
-                   log.info('element not present on the page where operation is trying to be performed')
-                   err_msg='element not present on the page where operation is trying to be performed'
+                   log.info('Element not present on the page where operation is trying to be performed')
+                   err_msg='Element not present on the page where operation is trying to be performed'
+                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
                 import traceback
                 traceback.print_exc()
@@ -656,7 +682,7 @@ class Dropdown_Keywords():
                log.debug(check)
                if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled):
+                        if(element.is_enabled()):
                             if element.friendly_class_name() == 'ListView':
                                  if element.is_active() == False:
                                    element.click()
@@ -668,9 +694,12 @@ class Dropdown_Keywords():
 
                         else:
                           log.info('Element state does not allow to perform the operation')
+                          logger.print_on_console('Element state does not allow to perform the operation')
+                          err_msg= 'Element state does not allow to perform the operation'
                else:
-                   log.info('element not present on the page where operation is trying to be performed')
-                   err_msg='element not present on the page where operation is trying to be performed'
+                   log.info('Element not present on the page where operation is trying to be performed')
+                   err_msg='Element not present on the page where operation is trying to be performed'
+                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
                 import traceback
                 traceback.print_exc()
@@ -697,7 +726,7 @@ class Dropdown_Keywords():
                log.debug(check)
                if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled):
+                        if(element.is_enabled()):
                             if element.friendly_class_name() == 'ListView':
                                 if element.is_active() == False:
                                   element.click()
@@ -741,9 +770,12 @@ class Dropdown_Keywords():
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
                           log.info('Element state does not allow to perform the operation')
+                          logger.print_on_console('Element state does not allow to perform the operation')
+                          err_msg= 'Element state does not allow to perform the operation'
                else:
-                   log.info('element not present on the page where operation is trying to be performed')
-                   err_msg='element not present on the page where operation is trying to be performed'
+                   log.info('Element not present on the page where operation is trying to be performed')
+                   err_msg='Element not present on the page where operation is trying to be performed'
+                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
                 import traceback
                 traceback.print_exc()
@@ -773,7 +805,7 @@ class Dropdown_Keywords():
                     log.debug(check)
                     if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled):
+                        if(element.is_enabled()):
                             item_index=input_val
 
                             if element.friendly_class_name() == 'ListView':
@@ -809,13 +841,14 @@ class Dropdown_Keywords():
 
 
                         else:
-                            log.info('Combobox state does not allow to perform the operation')
-                            logger.print_on_console('Combobox state does not allow to perform the operation')
-                            err_msg = 'Combobox state does not allow to perform the operation'
+                            log.info('Element state does not allow to perform the operation')
+                            logger.print_on_console('Element state does not allow to perform the operation')
+                            err_msg = 'Element state does not allow to perform the operation'
 
                     else:
-                        log.info('element not present on the page where operation is trying to be performed')
-                        err_msg='element not present on the page where operation is trying to be performed'
+                        log.info('Element not present on the page where operation is trying to be performed')
+                        err_msg='Element not present on the page where operation is trying to be performed'
+                        logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
                 log.error(exception)
                 logger.print_on_console(exception)
@@ -840,7 +873,7 @@ class Dropdown_Keywords():
                     log.debug(check)
                     if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled):
+                        if(element.is_enabled()):
                             item_text=input_val
                             items=element.items()
                             elelist=element.texts()
@@ -869,12 +902,13 @@ class Dropdown_Keywords():
                                         err_msg = 'List item is already selected'
 
                         else:
-                            log.info('Combobox state does not allow to perform the operation')
-                            logger.print_on_console('Combobox state does not allow to perform the operation')
-                            err_msg = 'Combobox state does not allow to perform the operation'
+                            log.info('Element state does not allow to perform the operation')
+                            logger.print_on_console('Element state does not allow to perform the operation')
+                            err_msg = 'Element state does not allow to perform the operation'
                     else:
-                        log.info('element not present on the page where operation is trying to be performed')
-                        err_msg='element not present on the page where operation is trying to be performed'
+                        log.info('Element not present on the page where operation is trying to be performed')
+                        err_msg='Element not present on the page where operation is trying to be performed'
+                        logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
                 log.error(exception)
                 logger.print_on_console(exception)

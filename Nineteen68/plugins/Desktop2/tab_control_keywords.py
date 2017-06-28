@@ -38,7 +38,7 @@ class Tab_Control_Keywords():
                     log.debug(check)
                     if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled):
+                        if(element.is_enabled()):
                             item_index=int(input_val[0])
                             item_count = element.TabCount()
                             if item_index <= item_count:
@@ -72,6 +72,7 @@ class Tab_Control_Keywords():
                         else:
                             log.info('Tab control not present on the page where operation is trying to be performed')
                             err_msg='Tab control not present on the page where operation is trying to be performed'
+                            logger.print_on_console('Tab not present on the page where operation is trying to be performed')
             except Exception as exception:
                 log.error(exception)
                 logger.print_on_console(exception)
@@ -94,7 +95,7 @@ class Tab_Control_Keywords():
                log.debug(check)
                if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled):
+                        if(element.is_enabled()):
                             selected_tab_index=element.GetSelectedTab()
                             selected_tab_index = int(selected_tab_index)
                             selected = element.GetTabText(selected_tab_index)
@@ -134,7 +135,7 @@ class Tab_Control_Keywords():
                    log.debug(check)
                    if (check):
                             log.info('Parent matched')
-                            if(element.is_enabled):
+                            if(element.is_enabled()):
                                 selected_tab_index=element.GetSelectedTab()
                                 selected_tab_index = int(selected_tab_index)
                                 selected = element.GetTabText(selected_tab_index)
@@ -151,6 +152,7 @@ class Tab_Control_Keywords():
                    else:
                        log.info('Tab control not present on the page where operation is trying to be performed')
                        err_msg='Tab control not present on the page where operation is trying to be performed'
+                       logger.print_on_console('Tab control not present on the page where operation is trying to be performed')
                 except Exception as exception:
                     import traceback
                     traceback.print_exc()
@@ -177,7 +179,7 @@ class Tab_Control_Keywords():
                     log.debug(check)
                     if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled):
+                        if(element.is_enabled()):
                             item_text=str(input_val[0])
                             if item_text != '' or item_text != None:
                                 if element.is_enabled():
@@ -200,8 +202,6 @@ class Tab_Control_Keywords():
                                             log.info('There is no tab in Tab control with the given text')
                                             logger.print_on_console('There is no tab in Tab control with the given text')
                                             err_msg = 'There is no tab in Tab control with the given text'
-
-
                                 else:
                                     log.info('Tab control state does not allow to perform the operation')
                                     logger.print_on_console('Tab control state does not allow to perform the operation')
@@ -213,6 +213,7 @@ class Tab_Control_Keywords():
                         else:
                             log.info('Tab control not present on the page where operation is trying to be performed')
                             err_msg='Tab control not present on the page where operation is trying to be performed'
+                            logger.print_on_console('Tab control not present on the page where operation is trying to be performed')
             except Exception as exception:
                 log.error(exception)
                 logger.print_on_console(exception)
