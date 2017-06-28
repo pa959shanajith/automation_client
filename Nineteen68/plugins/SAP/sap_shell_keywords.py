@@ -79,7 +79,16 @@ class Shell_Keywords():
             status=sap_constants.TEST_RESULT_FAIL
             result=sap_constants.TEST_RESULT_FALSE
             err_msg=None
-            rowpos=input_val[0]
+            #-------to handle multiple inputs
+            if len(input_val)>1:
+               for i in range(0,len(input_val)):
+                    rows =int(input_val[i])-1
+                    row.append(rows)
+               rowpos= ','.join(map(str,row))
+            else:
+                row=int(input_val[0])-1
+                rowpos=str(row)
+            #-------to handle multiple inputs
             value=OUTPUT_CONSTANT
             elem = ses.FindById(id)
             try:
