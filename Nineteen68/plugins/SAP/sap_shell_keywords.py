@@ -79,6 +79,7 @@ class Shell_Keywords():
             status=sap_constants.TEST_RESULT_FAIL
             result=sap_constants.TEST_RESULT_FALSE
             err_msg=None
+            row=[]
             #-------to handle multiple inputs
             if len(input_val)>1:
                for i in range(0,len(input_val)):
