@@ -63,7 +63,8 @@ class Radio_Checkbox_keywords():
 
             if(id != None):
                 if(ses.FindById(id).Changeable == True):
-                    ses.FindById(id).Selected = 1
+                    b=ses.FindById(id)
+                    b.selected =1
                     status=sap_constants.TEST_RESULT_PASS
                     result=sap_constants.TEST_RESULT_TRUE
                 else:
@@ -93,7 +94,8 @@ class Radio_Checkbox_keywords():
 
             if(id != None):
                 if(ses.FindById(id).Changeable == True):
-                    ses.FindById(id).Selected = 0
+                    b=ses.FindById(id)
+                    b.selected =0
                     status=sap_constants.TEST_RESULT_PASS
                     result=sap_constants.TEST_RESULT_TRUE
                 else:
