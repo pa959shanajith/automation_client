@@ -105,6 +105,8 @@ class Launch_Keywords():
         try:
             if self.windowHandle!=None:
                 win32gui.PostMessage(self.windowHandle,win32con.WM_CLOSE,0,0)
+                global window_pid
+                os.system("TASKKILL /F /PID " + str(window_pid))
                 status=desktop_constants.TEST_RESULT_PASS
                 result = desktop_constants.TEST_RESULT_TRUE
         except Exception as e:

@@ -172,6 +172,8 @@ class Fullscrape():
             data['scrapedin'] = scrapedin
             data['view'] = tempne
             data['mirror'] = screen
+            data['mirrorwidth'] = driver.execute_script("return window.innerWidth")
+            data['mirrorheight'] = driver.execute_script("return window.innerHeight")
             log.info('Creating a json object with key vie with value as return data')
             with open('domelements.json', 'w') as outfile:
                 log.info('Opening domelements.json file to write vie object')
