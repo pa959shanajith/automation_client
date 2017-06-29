@@ -194,7 +194,7 @@ class ElementKeywords():
                             elem.SetFocus()
                             sendfnt.sendfunction_keys("F4")
                             d1,d2,error,d3=self.lk.getErrorMessage()
-                            if(error=="No input help is available"):
+                            if(error=="No input help is available" or error=="No error message" or error ==""):
                                 logger.print_on_console('No input help is available')
                                 err_msg='No input help is available'
                             else:

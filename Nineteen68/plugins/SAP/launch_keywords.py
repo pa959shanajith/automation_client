@@ -116,7 +116,8 @@ class Launch_Keywords():
             sbar = ses.FindById(sbarId)
             value = sbar.FindByName("pane[0]", "GuiStatusPane").text
             if value=='' or value==None:
-                logger.print_on_console('No error message')
+                err_msg='No error message'
+                #logger.print_on_console('No error message')
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
