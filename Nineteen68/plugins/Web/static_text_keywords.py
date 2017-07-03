@@ -198,6 +198,7 @@ class StaticTextKeywords:
                     log.info('texts array :')
                     log.info(texts)
                     for i in texts:
+                        i=coreutilsobj.get_UTF_8(i)
                         if actualtext in i:
                             countflag = True
                             cnt = i.count(actualtext)
@@ -242,6 +243,7 @@ class StaticTextKeywords:
                             log.info('texts array :')
                             log.info(texts)
                             for i in texts:
+                                i=coreutilsobj.get_UTF_8(i)
                                 if actualtext in i:
                                     countflag = True
                                     cnt = i.count(actualtext)
