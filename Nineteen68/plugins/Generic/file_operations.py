@@ -523,7 +523,7 @@ class FileOperations:
                 if res == True:
                     res,linenumbers,err_msg= self.dict[file_ext+'_get_line_number'](*params)
 ##                    logger.print_on_console(linenumbers)
-                    if linenumbers is not None:
+                    if linenumbers is not None and len(linenumbers) > 0:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
             else:

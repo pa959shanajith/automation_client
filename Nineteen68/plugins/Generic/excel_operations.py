@@ -513,7 +513,7 @@ class ExcelXLS:
 
         """
         status=False
-        line_number=None
+        line_number=[]
         err_msg=None
         try:
             logger.print_on_console(generic_constants.INPUT_IS+input_path+' '+sheetname)
@@ -522,16 +522,22 @@ class ExcelXLS:
             sheet = book.sheet_by_name(sheetname)
             for col in range(sheet.ncols):
                 indices = [i for i, x in enumerate(sheet.col_values(col)) if x == content]
-                line_number=indices
-                if line_number != None:
-                    log.debug('line numbers are '+''.join(str(line_number)))
-                log.debug(line_number)
-                status=True
+##                line_number=indices
+                if indices != None:
+                    for i in indices:
+                        i = i+1
+                        line_number.append(i)
+##                    log.debug('line numbers are '+''.join(str(line_number)))
+                    log.debug(line_number)
+                    status=True
+                    logger.print_on_console('Line numbers:')
+                    logger.print_on_console(line_number)
+                    break
         except Exception as e:
            err_msg='Error getting line number in .xlsx'
            log.error(e)
            logger.print_on_console(err_msg)
-        log.info('Status is '+str(status))
+##        log.info('Status is '+str(status))
         return status,line_number,err_msg
 
     def replace_content_xls(self,input_path,sheetname,existingcontent,replacecontent,*args):
