@@ -21,6 +21,7 @@ import time
 import browser_Keywords
 driver=''
 import logging
+import core_utils
 
 log = logging.getLogger('table_keywords.py')
 class TableOperationKeywords():
@@ -173,6 +174,8 @@ class TableOperationKeywords():
                             cellVal=self.getChildNodes(remoteWebElement)
                             cellVal=cellVal.strip()
                             expected_value=input_val[2].strip()
+                            coreutilsobj=core_utils.CoreUtils()
+                            expected_value=coreutilsobj.get_UTF_8(expected_value)
                             if(cellVal == expected_value):
                                 log.info('Got the result : %s', 'PASS')
                                 logger.print_on_console('Got the result : ','PASS')
@@ -289,6 +292,8 @@ class TableOperationKeywords():
                             if contents !=None:
                                 verifytooltip=contents
                                 expected_value=input_val[2].strip()
+                                coreutilsobj=core_utils.CoreUtils()
+                                expected_value=coreutilsobj.get_UTF_8(expected_value)
 
                             if(verifytooltip == expected_value):
                                 log.info('Got the result : %s', verifytooltip)
@@ -562,6 +567,8 @@ class TableOperationKeywords():
             err_msg=None
             log.debug('reading the inputs')
             text=text[0].strip()
+            coreutilsobj=core_utils.CoreUtils()
+            text=coreutilsobj.get_UTF_8(text)
             driver=browser_Keywords.driver_obj
             log.debug('got the driver instance from browser keyword')
             visibleFlag=True
@@ -596,6 +603,8 @@ class TableOperationKeywords():
             visibleFlag=True
             log.debug('reading the inputs')
             text=text[0].strip()
+            coreutilsobj=core_utils.CoreUtils()
+            text=coreutilsobj.get_UTF_8(text)
             if visibleFlag==True:
                 try:
                     js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return xx + cell.colSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return xx + cell.colSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return xx + cell.colSpan; 					}	 				}			 					                 }             }         }     }     return null; };'

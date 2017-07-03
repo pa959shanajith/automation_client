@@ -12,6 +12,7 @@ import string
 import random
 import logger
 import generic_constants
+import core_utils
 
 import logging
 from constants import *
@@ -31,8 +32,20 @@ class StringOperation:
         output=OUTPUT_CONSTANT
         try:
             if  not (input is None or input is ''):
-                output = input.lower()
-                logger.print_on_console('Result : ',output)
+                output=''
+                for char in input:
+                    notenglish=False
+                    if not (ord(char) >= 65 and ord(char) <= 122):
+                        notenglish = True
+                    if not (notenglish):
+                        output = output+char.lower()
+                    else:
+                        output=output+char
+    ##                logger.print_on_console('Result : ',output)
+                coreutilsobj=core_utils.CoreUtils()
+                output=coreutilsobj.get_UTF_8(output)
+##                output = input.lower()
+##                logger.print_on_console('Result : ',output)
                 log.info('Result : ')
                 log.info(output)
                 status=generic_constants.TEST_RESULT_PASS
@@ -61,8 +74,18 @@ class StringOperation:
         output=OUTPUT_CONSTANT
         try:
             if not (input is None or input is ''):
-                output = input.upper()
-                logger.print_on_console('Result : ',output)
+                output=''
+                for char in input:
+                    notenglish=False
+                    if not (ord(char) >= 65 and ord(char) <= 122):
+                        notenglish = True
+                    if not (notenglish):
+                        output = output+char.upper()
+                    else:
+                        output=output+char
+##                logger.print_on_console('Result : ',output)
+                coreutilsobj=core_utils.CoreUtils()
+                output=coreutilsobj.get_UTF_8(output)
                 log.info('Result : ')
                 log.info(output)
                 status=generic_constants.TEST_RESULT_PASS
@@ -91,7 +114,7 @@ class StringOperation:
         try:
             if not (input is None or input is ''):
                 output = input.strip()
-                logger.print_on_console('Result : ',output)
+##                logger.print_on_console('Result : ',output)
                 log.info('Result : ')
                 log.info(output)
                 status=generic_constants.TEST_RESULT_PASS
@@ -121,9 +144,12 @@ class StringOperation:
         try:
             if not (actual_string is None or actual_string is ''):
                 if not (index is None or index is ''):
+                    coreutilsobj=core_utils.CoreUtils()
+                    actual_string=coreutilsobj.get_UTF_8(actual_string)
                     index_toint = int(index)
                     output = actual_string[:index_toint]
-                    logger.print_on_console('Result : ',output)
+##                    logger.print_on_console('Result : ',output)
+                    output=coreutilsobj.get_UTF_8(output)
                     log.info('Result : ')
                     log.info(output)
                     status=generic_constants.TEST_RESULT_PASS
@@ -153,10 +179,13 @@ class StringOperation:
         try:
             if not (actual_string is None or actual_string is ''):
                 if not (index is None or index is ''):
+                    coreutilsobj=core_utils.CoreUtils()
                     index_toint = int(index)
                     if index_toint > 0:
+                        actual_string=coreutilsobj.get_UTF_8(actual_string)
                         output = actual_string[-index_toint:]
-                        logger.print_on_console('Result : ',output)
+##                        logger.print_on_console('Result : ',output)
+                        output=coreutilsobj.get_UTF_8(output)
                         log.info('Result : ')
                         log.info(output)
                         status=generic_constants.TEST_RESULT_PASS
@@ -189,11 +218,14 @@ class StringOperation:
         output=OUTPUT_CONSTANT
         try:
             if not (input is None or input is ''):
+                coreutilsobj=core_utils.CoreUtils()
+                input=coreutilsobj.get_UTF_8(input)
                 input_len = len(input)
                 if (input_len % 2 == 0):
                     even_inp = input_len/2
                     output = input[even_inp]
-                    logger.print_on_console('Result : ',output)
+                    output=coreutilsobj.get_UTF_8(output)
+##                    logger.print_on_console('Result : ',output)
                     log.info('Result : ')
                     log.info(output)
                     status=generic_constants.TEST_RESULT_PASS
@@ -201,7 +233,8 @@ class StringOperation:
                 else:
                     odd_inp = input_len/2
                     output = input[odd_inp]
-                    logger.print_on_console('Result : ',output)
+##                    logger.print_on_console('Result : ',output)
+                    output=coreutilsobj.get_UTF_8(output)
                     log.info('Result : ')
                     log.info(output)
                     status=TEST_RESULT_PASS
@@ -231,7 +264,7 @@ class StringOperation:
         try:
             if not (input is None or input is ''):
                 output = len(input)
-                logger.print_on_console('Result : ',output)
+##                logger.print_on_console('Result : ',output)
                 log.info('Result : ')
                 log.info(output)
                 status=generic_constants.TEST_RESULT_PASS
@@ -261,6 +294,9 @@ class StringOperation:
         try:
             if not (actual_string is None or actual_string is ''):
                 if not (to_find is None or to_find is ''):
+                    coreutilsobj=core_utils.CoreUtils()
+                    actual_string=coreutilsobj.get_UTF_8(actual_string)
+                    to_find=coreutilsobj.get_UTF_8(to_find)
                     output_val = actual_string.find(to_find)
                     if(output_val == -1):
                         logger.print_on_console('The Original String is:',actual_string ,'and' , actual_string , 'does not Contain', to_find )
@@ -295,15 +331,19 @@ class StringOperation:
             if not (actual_string is None or actual_string is ''):
                 if not (to_be_replaced is None):
                     if not (value is None):
+                        coreutilsobj=core_utils.CoreUtils()
+                        actual_string=coreutilsobj.get_UTF_8(actual_string)
+                        to_be_replaced=coreutilsobj.get_UTF_8(to_be_replaced)
+                        value=coreutilsobj.get_UTF_8(value)
                         if (actual_string not in to_be_replaced):
                             output =  actual_string.replace(to_be_replaced,value)
-                            logger.print_on_console('Result : ',output)
+##                            logger.print_on_console('Result : ',output)
                             log.info('Result : ')
                             log.info(output)
                             status=generic_constants.TEST_RESULT_PASS
                             result=generic_constants.TEST_RESULT_TRUE
                         else:
-                            logger.print_on_console("Input Value " + actual_string+ " does not contain " + to_be_replaced);
+                            logger.print_on_console("Input Value ",actual_string," does not contain ",to_be_replaced);
                     else:
                         #log.error(INVALID_INPUT)
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -338,8 +378,11 @@ class StringOperation:
         try:
             if not (input is None or input is ''):
                 if not (character is None):
+                    coreutilsobj=core_utils.CoreUtils()
+                    input=coreutilsobj.get_UTF_8(input)
+                    character=coreutilsobj.get_UTF_8(character)
                     output = input.split(character)
-                    logger.print_on_console('Result : ',output)
+##                    logger.print_on_console('Result : ',output)
                     log.info('Result : ')
                     log.info(output)
                     status=generic_constants.TEST_RESULT_PASS
@@ -374,7 +417,12 @@ class StringOperation:
             input_vals = args
             len_input_val = len(input_vals)
             if len_input_val >= 2:
-                output = ''.join(input_vals)
+##                output = ''.join(input_vals)
+                output=''
+                coreutilsobj=core_utils.CoreUtils()
+                for eachvalue in input_vals:
+                    eachvalue=coreutilsobj.get_UTF_8(eachvalue)
+                    output=output+eachvalue
                 logger.print_on_console('Result : ',output)
                 log.info('Output is')
                 log.info(output)
@@ -404,6 +452,8 @@ class StringOperation:
         output=OUTPUT_CONSTANT
         try:
             if not (actual_string is None or actual_string is ''):
+                coreutilsobj=core_utils.CoreUtils()
+                actual_string=coreutilsobj.get_UTF_8(actual_string)
                 if not (index is None or index is ''):
                     ran = '-'
                     if(ran in index):
@@ -461,14 +511,14 @@ class StringOperation:
                         data_type=data_type.lower()
                         if (data_type == 'char'):
                             output = ''.join(random.choice(string.lowercase + string.uppercase) for i in range(data_length_int))
-                            logger.print_on_console('Result : ',output)
+##                            logger.print_on_console('Result : ',output)
                             log.info('Result : ')
                             log.info(output)
                             status=generic_constants.TEST_RESULT_PASS
                             result=generic_constants.TEST_RESULT_TRUE
                         elif (data_type == 'num'):
                             output = ''.join(random.choice(string.digits) for i in range(data_length_int))
-                            logger.print_on_console('Result : ',output)
+##                            logger.print_on_console('Result : ',output)
                             log.info('Result : ')
                             log.info(output)
                             status=generic_constants.TEST_RESULT_PASS

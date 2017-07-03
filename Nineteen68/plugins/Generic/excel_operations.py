@@ -25,6 +25,7 @@ from constants import *
 import logging
 from constants import *
 log = logging.getLogger('excel_operations.py')
+import core_utils
 
 
 class ExcelFile:
@@ -425,7 +426,8 @@ class ExcelXLS:
         return : list
 
         """
-        book = open_workbook(inputpath,formatting_info=True)
+##        book = open_workbook(inputpath,formatting_info=True)
+        book = open_workbook(inputpath)
         sheet=book.sheet_by_name(sheetname)
         last_row=-1
         last_col=-1
@@ -446,6 +448,11 @@ class ExcelXLS:
         return : bool
 
         """
+
+        coreutilsobj=core_utils.CoreUtils()
+        value=coreutilsobj.get_UTF_8(value)
+        input_path=coreutilsobj.get_UTF_8(input_path)
+        sheetname=coreutilsobj.get_UTF_8(sheetname)
         from xlutils.copy import copy
         from xlwt import easyxf,XFStyle
         workbook = copy(book)
@@ -476,9 +483,8 @@ class ExcelXLS:
                         s.write(int(row),int(col),value)
                     else:
                         flag=True
-                        value=str(value)
+##                        value=str(value)
                         s.write(int(row),int(col),value)
-
                     workbook.save(input_path)
                     status= True
                 else:
@@ -487,7 +493,7 @@ class ExcelXLS:
             else:
                 flag=True
                 status= True
-                value=str(value)
+##                value=str(value)
                 s.write(int(row),int(col),value)
 
 
@@ -866,6 +872,9 @@ class ExcelXLS:
         self.excel_obj=ExcelFile()
         status=False
         err_msg=None
+        coreutilsobj=core_utils.CoreUtils()
+        input_path=coreutilsobj.get_UTF_8(input_path)
+        sheetname=coreutilsobj.get_UTF_8(sheetname)
         log.debug(generic_constants.INPUT_IS+input_path+' '+sheetname)
         try:
             #loads the xls workbook
@@ -976,7 +985,7 @@ class ExcelXLSX:
                     value='='+value
                 else:
                     flag=True
-                    value=str(value)
+##                    value=str(value)
                 cell.value=value
                 status=True
             else:
@@ -1294,6 +1303,9 @@ class ExcelXLSX:
 
         status=False
         err_msg=None
+        coreutilsobj=core_utils.CoreUtils()
+        input_path=coreutilsobj.get_UTF_8(input_path)
+        sheetname=coreutilsobj.get_UTF_8(sheetname)
         log.debug(generic_constants.INPUT_IS+input_path+' '+sheetname)
         try:
             #loads the xls workbook

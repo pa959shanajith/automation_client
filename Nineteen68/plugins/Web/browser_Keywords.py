@@ -27,6 +27,7 @@ import psutil
 import win32gui
 import win32api
 import readconfig
+import core_utils
 pid_set = set()
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
 class TestThread(threading.Thread):
@@ -268,8 +269,8 @@ class BrowserKeywords():
                 if (page_title is ''):
                     page_title= driver_obj.current_url
                 page_title.strip()
-                logger.print_on_console('Page title is ',page_title)
-                log.info('Page title is ' + str(page_title))
+##                logger.print_on_console('Page title is ',page_title)
+                log.info('Page title is ' + page_title)
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             else:
@@ -291,16 +292,18 @@ class BrowserKeywords():
                 if (page_title is ''):
                     page_title= driver_obj.current_url
                 page_title.strip()
-                if(page_title == input_val[0]):
+                coreutilsobj=core_utils.CoreUtils()
+                userinput=coreutilsobj.get_UTF_8(input_val[0])
+                if(page_title == userinput):
                     logger.print_on_console('Page title matched')
                     log.info('Page title matched')
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
                 else:
                     logger.print_on_console('Page title mismatched')
-                    logger.print_on_console(EXPECTED,input_val[0])
+                    logger.print_on_console(EXPECTED,userinput)
                     log.info(EXPECTED)
-                    log.info(input_val[0])
+                    log.info(userinput)
                     logger.print_on_console(ACTUAL,page_title)
                     log.info(ACTUAL)
                     log.info(page_title)
@@ -323,7 +326,7 @@ class BrowserKeywords():
                 url= driver_obj.current_url
                 url.strip()
                 logger.print_on_console('URL: ',url)
-                log.info('URL: '+ str(url))
+                log.info('URL: '+ url)
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             else:

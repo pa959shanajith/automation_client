@@ -17,6 +17,7 @@ from constants import *
 import folder_operations
 from file_comparison_operations import TextFile,PdfFile,XML
 import excel_operations
+import core_utils
 
 
 
@@ -116,6 +117,9 @@ class FileOperations:
 
         """
         try:
+            coreutilsobj=core_utils.CoreUtils()
+            inputpath=coreutilsobj.get_UTF_8(inputpath)
+            file_name=coreutilsobj.get_UTF_8(file_name)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             err_msg=None
