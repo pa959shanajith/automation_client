@@ -28,7 +28,7 @@ import readconfig
 import spinner_keywords
 import list_view_mobility
 import picker_wheel_ios
-apptype = None
+apptypes = None
 
 log = logging.getLogger('mobile_app_dispatcher.py')
 class MobileDispatcher:
@@ -55,8 +55,8 @@ class MobileDispatcher:
         output = teststepproperty.outputval
         objectname = objectname.strip()
         keyword = teststepproperty.name
-        global apptype
-        apptype=teststepproperty.apptype
+        global apptypes
+        apptypes=teststepproperty.apptype
         err_msg=None
         result=[constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
 
