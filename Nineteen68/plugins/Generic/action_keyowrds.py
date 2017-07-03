@@ -45,7 +45,7 @@ class Action_Key():
         output=OUTPUT_CONSTANT
         err_msg=None
         status=None
-        if mobile_app_dispatcher.apptype=='MobileApp':
+        if mobile_app_dispatcher.apptypes=='MobileApp':
             device=install_and_launch.input_list
         else:
             device=browser_Keywords.input_list[0]
