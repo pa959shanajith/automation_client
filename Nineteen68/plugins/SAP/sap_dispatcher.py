@@ -53,7 +53,7 @@ class SAPDispatcher:
                     "selectcheckbox":['checkbox'],
                     "selectradiobutton":['radiobutton'],
                     "setsecuretext":['input'],
-                    "selectvaluebytext ":['select'],
+                    "selectvaluebytext":['select'],
                     "settext":['input'],
                     "unselectcheckbox":['checkbox'],
                     "verifyelementtext":['radiobutton','checkbox','input','button','select','table'],
