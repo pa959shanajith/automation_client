@@ -26,7 +26,7 @@ from webconstants import *
 import custom_keyword
 from collections import OrderedDict
 from constants import *
-import action_keyowrds
+import action_keyowrds_web
 import requests
 import readconfig
 import re
@@ -46,7 +46,7 @@ class Dispatcher:
     textbox_object = textbox_operations.TextboxKeywords()
     dropdown_list_object = dropdown_listbox.DropdownKeywords()
     util_object = utilweb_operations.UtilWebKeywords()
-    action_keyowrds_object=action_keyowrds.Action_Key()
+    action_keyowrds_object=action_keyowrds_web.Action_Key_App()
     statict_text_object = static_text_keywords.StaticTextKeywords()
     custom_object=custom_keyword.CustomKeyword()
     webelement_map=OrderedDict()
@@ -278,6 +278,10 @@ class Dispatcher:
                 elif keyword==WAIT_FOR_ELEMENT_VISIBLE:
                     identifiers = objectname.split(';')
                     input=identifiers[0]
+                    if url !=  '' and self.custom_object.is_int(url):
+                        log.debug('Encountered iframe/frame url')
+                        self.custom_object.switch_to_iframe(url,driver.current_window_handle)
+                        driver = browser_Keywords.driver_obj
 
                 if result != TERMINATE:
 

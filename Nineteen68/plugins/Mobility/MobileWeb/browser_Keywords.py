@@ -91,8 +91,9 @@ class BrowserKeywords():
 ##
             #Logic to make sure that logic of usage of existing driver is not applicable to execution
 
-
+            global device_id
             input_list = inputs
+            device_id=input_list[0]
             time.sleep(5)
             desired_caps = {}
             desired_caps['platformName'] = 'Android'
