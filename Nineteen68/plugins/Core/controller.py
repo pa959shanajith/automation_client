@@ -394,6 +394,7 @@ class Controller():
 
 
         ellapsed_time=''
+        statusflag = self.step_execution_status(tsp)
         if keyword_flag:
             end_time = datetime.now()
             end_time_string=end_time.strftime(TIME_FORMAT)
@@ -402,12 +403,18 @@ class Controller():
             ellapsed_time=end_time-start_time
             logger.print_on_console('Step Elapsed time is : ',str(ellapsed_time)+'\n')
             #Changing the overallstatus of the scenario if it's Fail or Terminate
-            if self.status != TEST_RESULT_PASS:
+            if self.status == TEST_RESULT_FAIL :
+                if not statusflag:
+                    self.reporting_obj.overallstatus=self.status
+            elif self.status == TERMINATE:
                 self.reporting_obj.overallstatus=self.status
 
        	if self.action==EXECUTE:
 ##            self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
-            self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result)
+            if statusflag:
+                self.reporting_obj.generate_report_step(tsp,'',self,ellapsed_time,keyword_flag,result)
+            else:
+                self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result)
 
         if len(self.counter)>0 and self.counter[-1]>-1 and self.counter[-1]-index==0:
             return JUMP_TO
@@ -1052,6 +1059,23 @@ class Controller():
                 break
 
         logger.print_on_console ('Parallel execution completed')
+
+    def step_execution_status(self,teststepproperty):
+        #325 : Report - Skip status in report by providing value 0 in the output column in testcase grid is not handled.
+        outputstring = teststepproperty.outputval
+        nostatusflag = False
+        if len(outputstring) > 0  and outputstring != None:
+            if (outputstring.find(';') > 0):
+                index = outputstring.rfind(';')
+                print outputstring[index + 1:]
+                if outputstring[index + 1:] == STEPSTATUS_INREPORTS_ZERO:
+                    nostatusflag = True
+            elif outputstring== STEPSTATUS_INREPORTS_ZERO:
+                nostatusflag = True
+        return nostatusflag
+
+
+
 
 
 def kill_process():

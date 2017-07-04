@@ -389,4 +389,6 @@ GENERIC_KEYWORD='displayVariableValue'
 
 DATE_COMPARE='dateCompare'
 
+STEPSTATUS_INREPORTS_ZERO = '0'
+
 
