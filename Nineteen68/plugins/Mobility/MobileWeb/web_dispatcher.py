@@ -156,7 +156,7 @@ class Dispatcher:
             if browser_Keywords.driver_obj is not None:
                 log.info('Finding the browser information')
                 browser_info=browser_Keywords.driver_obj.capabilities
-                reporting_obj.browser_version=browser_info.get('version')
+                reporting_obj.browser_version=browser_Keywords.driver_obj.execute_script("""x = navigator.userAgent.indexOf("Chrome");y = navigator.userAgent;z = y.substring(x + 7);ver = z.slice(0, 4);return ver;""")
                 reporting_obj.browser_type=browser_info.get('browserName')
                 log.info(reporting_obj.browser_version)
                 log.info(reporting_obj.browser_type)
