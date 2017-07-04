@@ -17,6 +17,7 @@ from selenium import webdriver
 import browser_Keywords
 import logging
 from constants import *
+import core_utils
 
 log = logging.getLogger('popup_keywords.py')
 class PopupKeywords():
@@ -86,7 +87,8 @@ class PopupKeywords():
             logger.print_on_console('Switched to Alert and retrieved the text')
             log.info('Switched to Alert and retrieved the text')
             logger.print_on_console('Alert text= ', text)
-            log.info('Alert text= '+ str( text))
+            log.info('Alert text= ',text)
+##            log.info('Alert text= '+ str( text))
             log.info(STATUS_METHODOUTPUT_UPDATE)
             status = webconstants.TEST_RESULT_PASS
             methodoutput = webconstants.TEST_RESULT_TRUE
@@ -114,11 +116,15 @@ class PopupKeywords():
             logger.print_on_console('Switched to Alert and retrieved the text')
             log.info('Switched to Alert and retrieved the text')
             logger.print_on_console('Alert text : ' , text)
-            log.info('Alert text= '+ str( text))
+            log.info('Alert text= ',text)
+##            log.info('Alert text= '+ str( text))
             input = inputs[0]
+            coreutilsobj=core_utils.CoreUtils()
+            input=coreutilsobj.get_UTF_8(input)
             input = input.strip()
             logger.print_on_console('Input text : ' , input)
-            log.info('Input text= '+ str( input))
+            log.info('Input text= ',input)
+##            log.info('Input text= '+ str( input))
             if text == input:
                 logger.print_on_console('Alert Text matched')
                 log.info('Alert Text matched')
@@ -140,7 +146,6 @@ class PopupKeywords():
             err_msg = "EXCEPTION OCCURED"
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
-
 
 
 

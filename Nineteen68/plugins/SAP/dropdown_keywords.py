@@ -142,7 +142,7 @@ class Dropdown_Keywords():
                     while True:
                         try:
                             #print entries(i).value
-                            if(entries(i).value == text):
+                            if(entries(i).value.strip() == text.strip()):
                                 ses.FindById(id).value = text
                                 status=sap_constants.TEST_RESULT_PASS
                                 result=sap_constants.TEST_RESULT_TRUE

@@ -28,6 +28,7 @@ import readconfig
 import spinner_keywords
 import list_view_mobility
 import picker_wheel_ios
+apptypes = None
 
 log = logging.getLogger('mobile_app_dispatcher.py')
 class MobileDispatcher:
@@ -54,6 +55,8 @@ class MobileDispatcher:
         output = teststepproperty.outputval
         objectname = objectname.strip()
         keyword = teststepproperty.name
+        global apptypes
+        apptypes=teststepproperty.apptype
         err_msg=None
         result=[constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
 
@@ -160,7 +163,7 @@ class MobileDispatcher:
             result[3]=err_msg
         except Exception as e:
             import traceback
-            traceback.print_exc
+            traceback.print_exc()
             log.error(e)
             logger.print_on_console('Exception at dispatcher')
         return result

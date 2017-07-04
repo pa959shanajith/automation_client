@@ -34,7 +34,7 @@ class SliderKeywords():
         size=install_and_launch.driver.get_window_size()
         log.debug('Window size is '+str(size))
         starty=(size['width']*0.80)
-        endy=(size['width']*0.20)
+        endy=(size['width']*0.30)
         startx=(size['height']/2)
         log.debug(startx,starty,endy)
         return startx,starty,endy

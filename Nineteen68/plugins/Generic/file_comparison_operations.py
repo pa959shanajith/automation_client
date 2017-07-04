@@ -13,6 +13,7 @@ import logger
 import generic_constants
 import logging
 import constants
+import core_utils
 
 log = logging.getLogger('file_comparison_operations.py')
 
@@ -338,7 +339,10 @@ class TextFile:
         status=False
         err_msg=None
 ##        logger.print_on_console('Writing '+str(content)+' to text file '+str(input_path))
-        log.info('Writing '+str(content)+' to text file '+str(input_path))
+##        log.info('Writing '+str(content)+' to text file '+str(input_path))
+        coreutilsobj=core_utils.CoreUtils()
+        input_path=coreutilsobj.get_UTF_8(input_path)
+        log.info('Writing ',content,' to text file ',input_path)
         try:
             if len(args)>0:
                 content+=' '.join(args)
@@ -352,7 +356,7 @@ class TextFile:
         except Exception as e:
             err_msg=generic_constants.ERR_MSG1+'Writing to text '+generic_constants.ERR_MSG2
             log.error(e)
-        log.info('Status is '+str(status))
+        log.info('Status is ',status)
         if err_msg!=None:
             logger.print_on_console(err_msg)
         return status,err_msg
@@ -371,17 +375,20 @@ class XML:
         status=False
         err_msg=None
 ##        logger.print_on_console('Writing '+str(content)+' to XML file '+str(input_path))
-        log.info('Writing '+str(content)+' to XML file '+str(input_path))
+##        log.info('Writing '+str(content)+' to XML file '+str(input_path))
+        log.info('Writing '+content+' to XML file '+input_path)
+        coreutilsobj=core_utils.CoreUtils()
+        input_path=coreutilsobj.get_UTF_8(input_path)
         import xml.dom.minidom as minidom
         from xml.etree import ElementTree as ET
         from xml.etree import ElementTree
         try:
             tree = ET.XML(content)
-            rough_string = ElementTree.tostring(tree)
+            rough_string = ElementTree.tostring(tree,'utf-8')
             reparsed = minidom.parseString(rough_string)
             val=reparsed.toprettyxml(indent="\t")
-##            logger.print_on_console(val)
             with open(input_path, 'a') as file:
+                val=val.encode('utf-8')
                 file.write(val)
                 file.close()
                 log.debug('Content is written successfully')

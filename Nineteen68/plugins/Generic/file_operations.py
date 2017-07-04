@@ -17,6 +17,7 @@ from constants import *
 import folder_operations
 from file_comparison_operations import TextFile,PdfFile,XML
 import excel_operations
+import core_utils
 
 
 
@@ -116,6 +117,9 @@ class FileOperations:
 
         """
         try:
+            coreutilsobj=core_utils.CoreUtils()
+            inputpath=coreutilsobj.get_UTF_8(inputpath)
+            file_name=coreutilsobj.get_UTF_8(file_name)
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             err_msg=None
@@ -523,7 +527,7 @@ class FileOperations:
                 if res == True:
                     res,linenumbers,err_msg= self.dict[file_ext+'_get_line_number'](*params)
 ##                    logger.print_on_console(linenumbers)
-                    if linenumbers is not None:
+                    if linenumbers is not None and len(linenumbers) > 0:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
             else:

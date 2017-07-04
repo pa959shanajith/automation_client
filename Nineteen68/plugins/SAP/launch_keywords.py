@@ -121,11 +121,10 @@ class Launch_Keywords():
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
-            err_msg='Failed to start transaction'
+            err_msg='Failed to get error message'
             log.error(err_msg,e)
-            logger.print_on_console('Failed to start transaction reason being :',e)
+            #logger.print_on_console('Failed to get error message reason being :',e)
         return status,result,value,err_msg
-
 
 
     def startTransaction(self,input_val,*args):

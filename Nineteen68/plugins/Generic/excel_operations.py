@@ -25,6 +25,7 @@ from constants import *
 import logging
 from constants import *
 log = logging.getLogger('excel_operations.py')
+import core_utils
 
 
 class ExcelFile:
@@ -425,7 +426,8 @@ class ExcelXLS:
         return : list
 
         """
-        book = open_workbook(inputpath,formatting_info=True)
+##        book = open_workbook(inputpath,formatting_info=True)
+        book = open_workbook(inputpath)
         sheet=book.sheet_by_name(sheetname)
         last_row=-1
         last_col=-1
@@ -446,6 +448,11 @@ class ExcelXLS:
         return : bool
 
         """
+
+        coreutilsobj=core_utils.CoreUtils()
+        value=coreutilsobj.get_UTF_8(value)
+        input_path=coreutilsobj.get_UTF_8(input_path)
+        sheetname=coreutilsobj.get_UTF_8(sheetname)
         from xlutils.copy import copy
         from xlwt import easyxf,XFStyle
         workbook = copy(book)
@@ -476,9 +483,8 @@ class ExcelXLS:
                         s.write(int(row),int(col),value)
                     else:
                         flag=True
-                        value=str(value)
+##                        value=str(value)
                         s.write(int(row),int(col),value)
-
                     workbook.save(input_path)
                     status= True
                 else:
@@ -487,7 +493,7 @@ class ExcelXLS:
             else:
                 flag=True
                 status= True
-                value=str(value)
+##                value=str(value)
                 s.write(int(row),int(col),value)
 
 
@@ -513,7 +519,7 @@ class ExcelXLS:
 
         """
         status=False
-        line_number=None
+        line_number=[]
         err_msg=None
         try:
             logger.print_on_console(generic_constants.INPUT_IS+input_path+' '+sheetname)
@@ -522,16 +528,22 @@ class ExcelXLS:
             sheet = book.sheet_by_name(sheetname)
             for col in range(sheet.ncols):
                 indices = [i for i, x in enumerate(sheet.col_values(col)) if x == content]
-                line_number=indices
-                if line_number != None:
-                    log.debug('line numbers are '+''.join(str(line_number)))
-                log.debug(line_number)
-                status=True
+##                line_number=indices
+                if indices != None:
+                    for i in indices:
+                        i = i+1
+                        line_number.append(i)
+##                    log.debug('line numbers are '+''.join(str(line_number)))
+                    log.debug(line_number)
+                    status=True
+                    logger.print_on_console('Line numbers:')
+                    logger.print_on_console(line_number)
+                    break
         except Exception as e:
            err_msg='Error getting line number in .xlsx'
            log.error(e)
            logger.print_on_console(err_msg)
-        log.info('Status is '+str(status))
+##        log.info('Status is '+str(status))
         return status,line_number,err_msg
 
     def replace_content_xls(self,input_path,sheetname,existingcontent,replacecontent,*args):
@@ -860,6 +872,9 @@ class ExcelXLS:
         self.excel_obj=ExcelFile()
         status=False
         err_msg=None
+        coreutilsobj=core_utils.CoreUtils()
+        input_path=coreutilsobj.get_UTF_8(input_path)
+        sheetname=coreutilsobj.get_UTF_8(sheetname)
         log.debug(generic_constants.INPUT_IS+input_path+' '+sheetname)
         try:
             #loads the xls workbook
@@ -970,7 +985,7 @@ class ExcelXLSX:
                     value='='+value
                 else:
                     flag=True
-                    value=str(value)
+##                    value=str(value)
                 cell.value=value
                 status=True
             else:
@@ -1288,6 +1303,9 @@ class ExcelXLSX:
 
         status=False
         err_msg=None
+        coreutilsobj=core_utils.CoreUtils()
+        input_path=coreutilsobj.get_UTF_8(input_path)
+        sheetname=coreutilsobj.get_UTF_8(sheetname)
         log.debug(generic_constants.INPUT_IS+input_path+' '+sheetname)
         try:
             #loads the xls workbook

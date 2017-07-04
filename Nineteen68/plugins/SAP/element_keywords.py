@@ -83,90 +83,90 @@ class ElementKeywords():
         #log.info(RETURN_RESULT)
         return status,result,value,err_msg
 
-    def getTooltipText(self, sap_id,*args):
-        self.lk.setWindowToForeground(sap_id)
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        value = OUTPUT_CONSTANT
-        err_msg=None
-        id,ses=self.uk.getSapElement(sap_id)
-        elem = ses.FindById(id)
-
-        try:
-            #------------------------------Condition to check if its a table element
-            if(elem.type=='GuiTableControl'):
-                arg=args[1]
-                if len(arg) > 0 and len(arg)==2 :
-                    row=int(arg[0])-2
-                    col=int(arg[1])-2
-                    elem = elem.GetCell(row, col)
-                else:
-                    elem=None
-                    logger.print_on_console('Invalid Arguments Passed')
-            #------------------------------Condition to check if its a table element
-            if(id != None):
-                    value = elem.tooltip
-                    if value== '':
-                        value = elem.DefaultTooltip
-                        if value =='':
-                            value ="Null"
-                    if(value != None or value =="Null"):
-                        status=sap_constants.TEST_RESULT_PASS
-                        result = sap_constants.TEST_RESULT_TRUE
-                    else:
-                        value=OUTPUT_CONSTANT
-                        logger.print_on_console('ToolTipText not avaliable for the element ')
-            else:
-                err_msg = sap_constants.ERROR_MSG
-                logger.print_on_console('Element does not exist')
-
-        except Exception as e:
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console('Error cooured in getTooltipText and is :',e)
-        return status,result,value,err_msg
-
-    def verifyTooltipText(self, sap_id,*args):
-        self.lk.setWindowToForeground(sap_id)
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        value = OUTPUT_CONSTANT
-        err_msg=None
-        id,ses=self.uk.getSapElement(sap_id)
-        elem = ses.FindById(id)
-        input_val=args[1]
-        try:
-            #------------------------------Condition to check if its a table element
-            if(elem.type=='GuiTableControl'):
-                arg=args[1]
-                if len(arg) > 0 and len(arg)==2 :
-                    row=int(arg[0])-2
-                    col=int(arg[1])-2
-                    input_val=arg[2]
-                    elem = elem.GetCell(row, col)
-                else:
-                    elem=None
-                    logger.print_on_console('Invalid Arguments Passed')
-            #------------------------------Condition to check if its a table element
-            if(id != None):
-                    value = elem.tooltip
-                    if value== '':
-                        value = elem.DefaultTooltip
-                        if value =='':
-                            value ="Null"
-                    if(value ==input_val):
-                        status=sap_constants.TEST_RESULT_PASS
-                        result = sap_constants.TEST_RESULT_TRUE
-                    else:
-                        value=OUTPUT_CONSTANT
-                        logger.print_on_console('ToolTipText does not match verify text ')
-            else:
-                err_msg = sap_constants.ERROR_MSG
-                logger.print_on_console('Element does not exist')
-
-        except Exception as e:
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console('Error cooured in getTooltipText and is :',e)
-        return status,result,value,err_msg
+##    def getTooltipText(self, sap_id,*args):
+##        self.lk.setWindowToForeground(sap_id)
+##        status = sap_constants.TEST_RESULT_FAIL
+##        result = sap_constants.TEST_RESULT_FALSE
+##        value = OUTPUT_CONSTANT
+##        err_msg=None
+##        id,ses=self.uk.getSapElement(sap_id)
+##        elem = ses.FindById(id)
+##
+##        try:
+##            #------------------------------Condition to check if its a table element
+##            if(elem.type=='GuiTableControl'):
+##                arg=args[1]
+##                if len(arg) > 0 and len(arg)==2 :
+##                    row=int(arg[0])-2
+##                    col=int(arg[1])-2
+##                    elem = elem.GetCell(row, col)
+##                else:
+##                    elem=None
+##                    logger.print_on_console('Invalid Arguments Passed')
+##            #------------------------------Condition to check if its a table element
+##            if(id != None):
+##                    value = elem.tooltip
+##                    if value== '':
+##                        value = elem.DefaultTooltip
+##                        if value =='':
+##                            value ="Null"
+##                    if(value != None or value =="Null"):
+##                        status=sap_constants.TEST_RESULT_PASS
+##                        result = sap_constants.TEST_RESULT_TRUE
+##                    else:
+##                        value=OUTPUT_CONSTANT
+##                        logger.print_on_console('ToolTipText not avaliable for the element ')
+##            else:
+##                err_msg = sap_constants.ERROR_MSG
+##                logger.print_on_console('Element does not exist')
+##
+##        except Exception as e:
+##            err_msg = sap_constants.ERROR_MSG
+##            logger.print_on_console('Error cooured in getTooltipText and is :',e)
+##        return status,result,value,err_msg
+##
+##    def verifyTooltipText(self, sap_id,*args):
+##        self.lk.setWindowToForeground(sap_id)
+##        status = sap_constants.TEST_RESULT_FAIL
+##        result = sap_constants.TEST_RESULT_FALSE
+##        value = OUTPUT_CONSTANT
+##        err_msg=None
+##        id,ses=self.uk.getSapElement(sap_id)
+##        elem = ses.FindById(id)
+##        input_val=args[1]
+##        try:
+##            #------------------------------Condition to check if its a table element
+##            if(elem.type=='GuiTableControl'):
+##                arg=args[1]
+##                if len(arg) > 0 and len(arg)==2 :
+##                    row=int(arg[0])-2
+##                    col=int(arg[1])-2
+##                    input_val=arg[2]
+##                    elem = elem.GetCell(row, col)
+##                else:
+##                    elem=None
+##                    logger.print_on_console('Invalid Arguments Passed')
+##            #------------------------------Condition to check if its a table element
+##            if(id != None):
+##                    value = elem.tooltip
+##                    if value== '':
+##                        value = elem.DefaultTooltip
+##                        if value =='':
+##                            value ="Null"
+##                    if(value==input_val):
+##                        status=sap_constants.TEST_RESULT_PASS
+##                        result = sap_constants.TEST_RESULT_TRUE
+##                    else:
+##                        value=OUTPUT_CONSTANT
+##                        logger.print_on_console('ToolTipText does not match verify text ')
+##            else:
+##                err_msg = sap_constants.ERROR_MSG
+##                logger.print_on_console('Element does not exist')
+##
+##        except Exception as e:
+##            err_msg = sap_constants.ERROR_MSG
+##            logger.print_on_console('Error cooured in getTooltipText and is :',e)
+##        return status,result,value,err_msg
 
     def getInputHelp(self, sap_id,*args):
         self.lk.setWindowToForeground(sap_id)
@@ -409,121 +409,136 @@ class ElementKeywords():
     def scrollUp(self, sap_id,url, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
-        pos=int(input_val[0])
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
         err_msg=None
         try:
-            elem = ses.FindById(id)
-            maximum = elem.VerticalScrollbar.Maximum
-            element = elem
-            if(elem.VerticalScrollbar.Maximum==0):
-                maximum, element = self.getVerticalScrollbarMax(elem)
-            if maximum!=0:
-                if(pos>=0):
-                    element.VerticalScrollbar.Position = element.VerticalScrollbar.Position - pos
-                    status=sap_constants.TEST_RESULT_PASS
-                    result=sap_constants.TEST_RESULT_TRUE
+            pos=int(input_val[0])
+            try:
+                elem = ses.FindById(id)
+                maximum = elem.VerticalScrollbar.Maximum
+                element = elem
+                if(elem.VerticalScrollbar.Maximum==0):
+                    maximum, element = self.getVerticalScrollbarMax(elem)
+                if maximum!=0:
+                    if(pos>=0):
+                        element.VerticalScrollbar.position = element.VerticalScrollbar.Position - pos
+                        status=sap_constants.TEST_RESULT_PASS
+                        result=sap_constants.TEST_RESULT_TRUE
+                    else:
+                        logger.print_on_console('Invalid input')
                 else:
-                    logger.print_on_console('Invalid input')
-            else:
-                logger.print_on_console('Scrollbar cannot be moved')
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
-            logger.print_on_console('Scrollbar not found    ',e)
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
+                    logger.print_on_console('Scrollbar cannot be moved')
+            except Exception as e:
+                #import traceback
+                #traceback.print_exc()
+                logger.print_on_console('Scrollbar not found    ',e)
+                log.error('Error occured',e)
+                err_msg = sap_constants.ERROR_MSG
+        except:
+            logger.print_on_console(sap_constants.INVALID_INPUT)
+            err_msg=sap_constants.INVALID_INPUT
         return status,result,value,err_msg
 
     def scrollDown(self, sap_id,url, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
-        pos=int(input_val[0])
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
         err_msg=None
         try:
-            elem = ses.FindById(id)
-            maximum = elem.VerticalScrollbar.Maximum
-            element = elem
-            if(elem.VerticalScrollbar.Maximum==0):
-                maximum, element = self.getVerticalScrollbarMax(elem)
-            if maximum!=0:
-                if(pos>=0):
-                    element.VerticalScrollbar.Position = element.VerticalScrollbar.Position + pos
-                    status=sap_constants.TEST_RESULT_PASS
-                    result=sap_constants.TEST_RESULT_TRUE
+            pos=int(input_val[0])
+            try:
+                elem = ses.FindById(id)
+                maximum = elem.VerticalScrollbar.Maximum
+                element = elem
+                if(elem.VerticalScrollbar.Maximum==0):
+                    maximum, element = self.getVerticalScrollbarMax(elem)
+                if maximum!=0:
+                    if(pos>=0):
+                        element.VerticalScrollbar.position = element.VerticalScrollbar.Position + pos
+                        status=sap_constants.TEST_RESULT_PASS
+                        result=sap_constants.TEST_RESULT_TRUE
+                    else:
+                        logger.print_on_console('Invalid input')
                 else:
-                    logger.print_on_console('Invalid input')
-            else:
-                logger.print_on_console('Scrollbar cannot be moved')
-        except Exception as e:
-            logger.print_on_console('Scrollbar not found')
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
+                    logger.print_on_console('Scrollbar cannot be moved')
+            except Exception as e:
+                logger.print_on_console('Scrollbar not found')
+                log.error('Error occured',e)
+                err_msg = sap_constants.ERROR_MSG
+        except:
+            logger.print_on_console(sap_constants.INVALID_INPUT)
+            err_msg=sap_constants.INVALID_INPUT
         return status,result,value,err_msg
 
     def scrollLeft(self, sap_id,url, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
-        pos=int(input_val[0])
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
         err_msg=None
         try:
-            elem = ses.FindById(id)
-            maximum = elem.HorizontalScrollbar.Maximum
-            element = elem
-            if(elem.HorizontalScrollbar.Maximum==0):
-               maximum, element = self.getHorizontalScrollbarMax(elem)
-            if maximum!=0:
-                if(pos>=0):
-                    element.HorizontalScrollbar.Position = element.HorizontalScrollbar.Position - pos
-                    status=sap_constants.TEST_RESULT_PASS
-                    result=sap_constants.TEST_RESULT_TRUE
+            pos=int(input_val[0])
+            try:
+                elem = ses.FindById(id)
+                maximum = elem.HorizontalScrollbar.Maximum
+                element = elem
+                if(elem.HorizontalScrollbar.Maximum==0):
+                   maximum, element = self.getHorizontalScrollbarMax(elem)
+                if maximum!=0:
+                    if(pos>=0):
+                        element.HorizontalScrollbar.position = element.HorizontalScrollbar.Position - pos
+                        status=sap_constants.TEST_RESULT_PASS
+                        result=sap_constants.TEST_RESULT_TRUE
+                    else:
+                        logger.print_on_console('Invalid input')
                 else:
-                    logger.print_on_console('Invalid input')
-            else:
-                logger.print_on_console('Scrollbar cannot be moved')
-        except Exception as e:
-            logger.print_on_console('Scrollbar not found')
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
+                    logger.print_on_console('Scrollbar cannot be moved')
+            except Exception as e:
+                logger.print_on_console('Scrollbar not found')
+                log.error('Error occured',e)
+                err_msg = sap_constants.ERROR_MSG
+        except:
+            logger.print_on_console(sap_constants.INVALID_INPUT)
+            err_msg=sap_constants.INVALID_INPUT
         return status,result,value,err_msg
 
     def scrollRight(self, sap_id,url, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
-        pos=int(input_val[0])
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
         err_msg=None
         try:
-            elem = ses.FindById(id)
-            maximum = elem.HorizontalScrollbar.Maximum
-            element = elem
-            if(elem.HorizontalScrollbar.Maximum==0):
-                maximum, element = self.getHorizontalScrollbarMax(elem)
-            if maximum!=0:
-                if(pos>=0):
-                    element.HorizontalScrollbar.Position = element.HorizontalScrollbar.Position + pos
-                    status=sap_constants.TEST_RESULT_PASS
-                    result=sap_constants.TEST_RESULT_TRUE
+            pos=int(input_val[0])
+            try:
+                elem = ses.FindById(id)
+                maximum = elem.HorizontalScrollbar.Maximum
+                element = elem
+                if(elem.HorizontalScrollbar.Maximum==0):
+                    maximum, element = self.getHorizontalScrollbarMax(elem)
+                if maximum!=0:
+                    if(pos>=0):
+                        element.HorizontalScrollbar.position = element.HorizontalScrollbar.Position + pos
+                        status=sap_constants.TEST_RESULT_PASS
+                        result=sap_constants.TEST_RESULT_TRUE
+                    else:
+                        logger.print_on_console('Invalid input')
                 else:
-                    logger.print_on_console('Invalid input')
-            else:
-                logger.print_on_console('Scrollbar cannot be moved')
-        except Exception as e:
-            logger.print_on_console('Scrollbar not found')
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
+                    logger.print_on_console('Scrollbar cannot be moved')
+            except Exception as e:
+                logger.print_on_console('Scrollbar not found')
+                log.error('Error occured',e)
+                err_msg = sap_constants.ERROR_MSG
+        except:
+            logger.print_on_console(sap_constants.INVALID_INPUT)
+            err_msg=sap_constants.INVALID_INPUT
         return status,result,value,err_msg
-
 #----------------------------------------------------------Scroll bar operations to recursively call elements
 #----------------------------------------------------------to find out if the max scroll bar length exists
     def getVerticalScrollbarMax(self,elem):

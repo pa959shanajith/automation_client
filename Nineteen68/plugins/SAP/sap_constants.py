@@ -51,6 +51,8 @@ SAP_SCRAPE_KEYWORDS=['clickandadd','fullscrape']
 
 INVALID_KEYWORD='Invalid keyword'
 
+INVALID_INPUT='Input value is Invalid,Please provide a valid input'
+
 TEST_RESULT_PASS = "Pass"
 
 TEST_RESULT_FAIL = "Fail"

@@ -180,6 +180,8 @@ class ButtonLinkKeyword():
                 #Check for the input
                 if input != None and len(input) != 0:
                     log.info('Input is valid, Continue..')
+                    coreutilsobj=core_utils.CoreUtils()
+                    input=coreutilsobj.get_UTF_8(input)
                     if buttonname == input:
                         log.info('Button name matched with the input, set the status to Pass')
                         logger.print_on_console('Button name  matched')

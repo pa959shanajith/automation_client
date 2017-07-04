@@ -14,6 +14,7 @@ import logger
 from collections import OrderedDict
 from constants import *
 import re
+import core_utils
 dynamic_variable_map=OrderedDict()
 
 class DynamicVariables:
@@ -40,6 +41,8 @@ class DynamicVariables:
 
     #To replace the dynamic vraiable by it's actual value
     def replace_dynamic_variable(self,input_var,keyword,con_obj):
+        coreutilsobj=core_utils.CoreUtils()
+        input_var=coreutilsobj.get_UTF_8(input_var)
         actual_value=input_var
         if not(keyword in DYNAMIC_KEYWORDS):
             status,nested_var=self.check_dynamic_inside_dynamic(input_var)

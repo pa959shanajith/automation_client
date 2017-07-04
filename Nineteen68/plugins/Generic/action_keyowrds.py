@@ -14,12 +14,15 @@ from constants import *
 import constants
 from mobile_app_constants import *
 from appium.webdriver.common.touch_action import TouchAction
-import platform
-if platform.system()!='Darwin':
-    import browser_Keywords
+
 
 import logging
 import logger
+import platform
+if platform.system()!='Darwin':
+    import mobile_app_dispatcher
+    import browser_Keywords
+    import install_and_launch
 import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -42,7 +45,10 @@ class Action_Key():
         output=OUTPUT_CONSTANT
         err_msg=None
         status=None
-        device=browser_Keywords.input_list[0]
+        if mobile_app_dispatcher.apptypes=='MobileApp':
+            device=install_and_launch.input_list
+        else:
+            device=browser_Keywords.input_list[0]
 ##        print '123456789'
 ##        print 'device is',device
 
@@ -53,7 +59,7 @@ class Action_Key():
                     input=int(inputs[1])
                     if input > 0 :
                         while True:
-                            cmd = adb + ' -s '+ device+' shell input keyevent 20'
+                            cmd = adb + ' -s '+ device+' shell input keyevent 66'
                             s = subprocess.check_output(cmd.split())
                             time.sleep(1)
                             status=TEST_RESULT_PASS
@@ -86,7 +92,7 @@ class Action_Key():
                     input=int(inputs[1])
                     if input > 0 :
                         while True:
-                            cmd = adb + ' -s '+ device+' shell input keyevent 20'
+                            cmd = adb + ' -s '+ device+' shell input keyevent 19'
                             s = subprocess.check_output(cmd.split())
                             time.sleep(1)
                             status=TEST_RESULT_PASS
@@ -103,7 +109,7 @@ class Action_Key():
                     if input > 0 :
                         while True:
     ##                        actions = ActionChains(install_and_launch.driver)
-                            cmd = adb + ' -s '+ device+' shell input keyevent 20'
+                            cmd = adb + ' -s '+ device+' shell input keyevent 61'
                             s = subprocess.check_output(cmd.split())
                             time.sleep(1)
                             status=TEST_RESULT_PASS

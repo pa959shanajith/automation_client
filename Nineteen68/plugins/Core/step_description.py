@@ -263,7 +263,7 @@ class StepDescription:
         def waitForElementVisible():
         	return 'Wait until the element'  + "'" + tsp.custname + "'"+  'is visible'
         def verifyHidden():
-        	return 'Verify'	+ tsp.getCustName() +  'is hidden'
+        	return 'Verify'	+ tsp.custname +  'is hidden'
         def verifyDisabled():
         	return 'Verify'	+ "'" + tsp.custname + "'" +  'is disabled'
         def verifyEnabled():
@@ -277,11 +277,11 @@ class StepDescription:
         def getToolTipText():
         	return 'Get the tool tip from the '	+ "'" + tsp.custname + "'" + ' and save the tool tip text ' + output + ' in ' + tsp.output
         def verifyExists():
-        	return 'Verify ' + "'" + tsp.custname + "'"() + ' exists'
+        	return 'Verify ' + "'" + tsp.custname + "'" + ' exists'
         def verifyDoesNotExists():
-        	return 'Verify ' + "'" + tsp.custname + "'"() + ' does not exists'
+        	return 'Verify ' + "'" + tsp.custname + "'" + ' does not exists'
         def rightClick():
-        	return 'Perform right click on element'	+ "'" + tsp.custname + "'"()
+        	return 'Perform right click on element'	+ "'" + tsp.custname + "'"
         def drag():
         	return 'Perform drag on element' + "'" + tsp.custname + "'"
         def drop():
@@ -349,13 +349,15 @@ class StepDescription:
         def deselectAll():
         	return'Deselect all values in the '	+ "'" + tsp.custname + "'"
         def getRowCount():
-        	return 'Get row count of the ' + "'" + tsp.custname + "'" + ' and save the count ' + output + ' in ' + tsp.outputval
+        	return 'Get row count of the ' + "'" + tsp.custname  + "'" + ' and save the count ' + output + ' in ' + tsp.outputval
         def getColumnCount():
         	return'Get column count of the ' + "'" + tsp.custname + "'"	+ ' and save the count ' + output + ' in ' + tsp.outputval
         def getCellValue():
-        	return 'Get cell value of '+ "'" + tsp.custname + "'" + ' in the table and save the value ' + output + ' in ' + tsp.outputval
+        	return 'Get cell value of '+ "'" + tsp.custname + '['+input[1] +']['+ input[2] + "]'" + ' in the table and save the value ' + output + ' in ' + tsp.outputval
         def verifyCellValue():
-            return 'Verify cell value ' + input[2] + ' is present in the '	+ "'" + tsp.custname + "'" + '  table'
+            return 'Verify cell value ' + input[2] + ' is present in the '	+ "'" + tsp.custname + '['+input[1] +']['+ input[2] + "]'" +  '  table'
+        def cellClick():
+            return 'Click ' + "'" + tsp.custname + '['+input[1] +']['+ input[2] + "]'"
         def clickElement():
        	    return 'Click '	+ "'" + tsp.custname + "'"
         def getElementText():
@@ -965,8 +967,7 @@ class StepDescription:
             return 'Get column count of the '+ "'" + tsp.custname + "'"+ ' and save the count '+ output + ' in '+ tsp.outputval
         def verifyCellValue():
             return 'Verify cell value [Null] is present in the '+ "'" + tsp.custname + "'" + ' Invalid input'
-        def cellClick():
-            return 'Click ' + "'" + tsp.custname + "'"
+
         def getColNumByText():
             return 'Get column number of ' + "'" + tsp.custname + "'" + ' by text '+input +' and save the column number ' + output + ' in '+ tsp.outputval
         def getRowNumByText():

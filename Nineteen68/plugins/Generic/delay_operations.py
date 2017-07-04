@@ -12,7 +12,7 @@ import logger
 import pause_display_operation
 import logging
 from constants import *
-
+import core_utils
 log = logging.getLogger('delay_operations.py')
 
 class Delay_keywords:
@@ -76,16 +76,19 @@ class Delay_keywords:
                 values=input_list[0:index]
                 variables=input_list[index+1:len(input_list)]
                 for x, y in zip(variables, values):
-                    if type(x)==unicode or type(x)==str:
-                        x=str(x)
+                    coreutilsobj=core_utils.CoreUtils()
+                    y=coreutilsobj.get_UTF_8(y)
+                    x=coreutilsobj.get_UTF_8(x)
+##                    if type(x)==unicode or type(x)==str:
+##                        x=str(x)
                     ##changes to fix issue:304-Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
                     ##changes done by jayashree.r
 ##                    if y == 'None' or y == None:
                     if y == None:
                         y = 'null'
-                    if not isinstance(y,unicode):
+##                    if not isinstance(y,unicode):
 ##                        print str(y)
-                        y=str(y)
+##                        y=str(y)
 ##                    display_input+=x+' = '+(y if type(y)==str else repr(y))+'\n'
                     display_input+=x+' = '+y+'\n'
                 o = pause_display_operation.PauseAndDisplay()
