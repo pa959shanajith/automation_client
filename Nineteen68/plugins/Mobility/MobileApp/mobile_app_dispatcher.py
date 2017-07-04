@@ -150,20 +150,24 @@ class MobileDispatcher:
             else:
                 err_msg=INVALID_KEYWORD
                 result[3]=err_msg
-            screen_shot_obj = mob_screenshot.Screenshot()
-            configobj = readconfig.readConfig()
-            configvalues = configobj.readJson()
-            if configvalues['screenShot_Flag'].lower() == 'fail':
-                if result[0].lower() == 'fail':
-                    screen_shot_obj.captureScreenshot()
-            elif configvalues['screenShot_Flag'].lower() == 'all':
-                screen_shot_obj.captureScreenshot()
+            if keyword not in NON_WEBELEMENT_KEYWORDS:
+                if self.action == 'execute':
+                    result=list(result)
+                    screen_shot_obj = mob_screenshot.Screenshot()
+                    configobj = readconfig.readConfig()
+                    configvalues = configobj.readJson()
+
+                    if configvalues['screenShot_Flag'].lower() == 'fail':
+                        if result[0].lower() == 'fail':
+                            file_path =screen_shot_obj.captureScreenshot()
+                            result.append(file_path[2])
+                    elif configvalues['screenShot_Flag'].lower() == 'all':
+                        file_path = screen_shot_obj.captureScreenshot()
+                        result.append(file_path[2])
         except TypeError as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             log.error(e)
             logger.print_on_console('Exception at dispatcher')
         return result

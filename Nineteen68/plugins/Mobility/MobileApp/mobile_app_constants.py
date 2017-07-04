@@ -28,3 +28,6 @@ INVALID_KEYWORD = 'Invalid keyword'
 ELEMENT_FOUND=True
 
 WAIT_FOR_ELEMENT_EXISTS='WaitForElementExists'
+
+
+NON_WEBELEMENT_KEYWORDS=['GetDevices','InvokeDevice','ActionKey','CloseApplication','InstallApplication','UnInstallApplication','WaitForElementExists']

@@ -141,6 +141,7 @@ class Controller():
                 self.get_all_the_imports('Mobility')
                 import web_dispatcher
                 self.mobile_web_dispatcher_obj = web_dispatcher.Dispatcher()
+                self.mobile_web_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading MobileWeb plugin')
 
@@ -154,6 +155,7 @@ class Controller():
                     self.get_all_the_imports('Mobility')
                 import mobile_app_dispatcher
                 self.mobile_app_dispatcher_obj = mobile_app_dispatcher.MobileDispatcher()
+                self.mobile_app_dispatcher_obj.action=self.action
 
         except Exception as e:
             logger.print_on_console('Error loading MobileApp plugin')
