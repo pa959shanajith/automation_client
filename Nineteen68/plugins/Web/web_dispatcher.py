@@ -285,7 +285,10 @@ class Dispatcher:
                     if objectname==CUSTOM:
                         webelement=send_webelement_to_keyword(driver,objectname,url)
                         objectname=self.custom_object.getElementXPath(webelement)
-
+                    if url !=  '' and self.custom_object.is_int(url):
+                        log.debug('Encountered iframe/frame url')
+                        self.custom_object.switch_to_iframe(url,driver.current_window_handle)
+                        driver = browser_Keywords.driver_obj
                     identifiers = objectname.split(';')
                     input=identifiers[0]
 

@@ -26,7 +26,7 @@ from webconstants import *
 import custom_keyword
 from collections import OrderedDict
 from constants import *
-import action_keyowrds
+import action_keyowrds_web
 import requests
 import readconfig
 import re
@@ -46,7 +46,7 @@ class Dispatcher:
     textbox_object = textbox_operations.TextboxKeywords()
     dropdown_list_object = dropdown_listbox.DropdownKeywords()
     util_object = utilweb_operations.UtilWebKeywords()
-    action_keyowrds_object=action_keyowrds.Action_Key()
+    action_keyowrds_object=action_keyowrds_web.Action_Key_App()
     statict_text_object = static_text_keywords.StaticTextKeywords()
     custom_object=custom_keyword.CustomKeyword()
     webelement_map=OrderedDict()
@@ -156,7 +156,7 @@ class Dispatcher:
             if browser_Keywords.driver_obj is not None:
                 log.info('Finding the browser information')
                 browser_info=browser_Keywords.driver_obj.capabilities
-                reporting_obj.browser_version=browser_info.get('version')
+                reporting_obj.browser_version=browser_Keywords.driver_obj.execute_script("""x = navigator.userAgent.indexOf("Chrome");y = navigator.userAgent;z = y.substring(x + 7);ver = z.slice(0, 4);return ver;""")
                 reporting_obj.browser_type=browser_info.get('browserName')
                 log.info(reporting_obj.browser_version)
                 log.info(reporting_obj.browser_type)
@@ -278,6 +278,10 @@ class Dispatcher:
                 elif keyword==WAIT_FOR_ELEMENT_VISIBLE:
                     identifiers = objectname.split(';')
                     input=identifiers[0]
+                    if url !=  '' and self.custom_object.is_int(url):
+                        log.debug('Encountered iframe/frame url')
+                        self.custom_object.switch_to_iframe(url,driver.current_window_handle)
+                        driver = browser_Keywords.driver_obj
 
                 if result != TERMINATE:
 
@@ -305,20 +309,21 @@ class Dispatcher:
             else:
                 err_msg=INVALID_KEYWORD
                 result[3]=err_msg
-            screen_shot_obj = mob_screenshot_web.Screenshot()
-            if configvalues['screenShot_Flag'].lower() == 'fail':
-
-                if result[0].lower() == 'fail':
-
-                    screen_shot_obj.captureScreenshot()
-            elif configvalues['screenShot_Flag'].lower() == 'all':
-                screen_shot_obj.captureScreenshot()
+            if keyword not in NON_WEBELEMENT_KEYWORDS:
+                screen_shot_obj = mob_screenshot_web.Screenshot()
+                if self.action == 'execute':
+                    result=list(result)
+                    if configvalues['screenShot_Flag'].lower() == 'fail':
+                        if result[0].lower() == 'fail':
+                            file_path = screen_shot_obj.captureScreenshot()
+                            result.append(file_path[2])
+                    elif configvalues['screenShot_Flag'].lower() == 'all':
+                        file_path = screen_shot_obj.captureScreenshot()
+                        result.append(file_path[2])
         except TypeError as e:
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             log.error(e)
             logger.print_on_console('Exception at dispatcher')
 

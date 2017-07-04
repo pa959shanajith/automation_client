@@ -434,15 +434,20 @@ class Launch_Keywords():
         err_msg = None
         input_val = ''
         try:
-            input_val = input[0]
-            if len(input_val) > 0:
+            input_val = ''
+            if len(input) > 0:
+                for i in input:
+                    if input_val != '':
+                        input_val = input_val + '->' + i
+                    else:
+                        input_val = i
                 win = app_uia.top_window()
                 win.menu_select(input_val)
                 log.info(STATUS_METHODOUTPUT_UPDATE)
                 status = desktop_constants.TEST_RESULT_PASS
                 result = desktop_constants.TEST_RESULT_TRUE
         except Exception as exception:
-            logger.print_on_console ('Exception : Please give -> for separating the menu item/menu item not present ')
+            logger.print_on_console ('Exception : menu item not present use send function keys (Ex: For Help - About :  ALT , H, A)')
             log.error(exception)
             logger.print_on_console(exception)
         log.info(RETURN_RESULT)

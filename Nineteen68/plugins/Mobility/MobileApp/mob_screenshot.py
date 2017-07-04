@@ -58,6 +58,7 @@ class Screenshot():
                         os.makedirs(path)
                     filename=self.generateUniqueFileName()
                     filePath = path + filename
+                    output = filePath+'.png'
                 except Exception as e:
                     logger.print_on_console( e)
 

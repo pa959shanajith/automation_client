@@ -275,7 +275,7 @@ class StepDescription:
         def verifyToolTipText():
         	return 'Verify' + input + ' is the tooltip of '+ "'" + tsp.custname + "'"
         def getToolTipText():
-        	return 'Get the tool tip from the '	+ "'" + tsp.custname + "'" + ' and save the tool tip text ' + output + ' in ' + tsp.output
+        	return 'Get the tool tip from the '	+ "'" + tsp.custname + "'" + ' and save the tool tip text \'' + output + '\' in ' + tsp.output
         def verifyExists():
         	return 'Verify ' + "'" + tsp.custname + "'" + ' exists'
         def verifyDoesNotExists():
@@ -289,9 +289,9 @@ class StepDescription:
         def setText():
         	return 'Enter text ' + input + ' in the '+ "'" + tsp.custname + "'"
         def getText():
-        	return 'Get text from the '	+ "'" + tsp.custname + "'" + ' and save the text ' + output + ' in ' + tsp.outputval
+        	return 'Get text from the '	+ "'" + tsp.custname + "'" + ' and save the text \'' + output + '\' in ' + tsp.outputval
         def getTextboxLength():
-        	return 'Get length from the ' + "'" + tsp.custname + "'" + ' and save the length ' + output + ' in ' + tsp.outputval
+        	return 'Get length from the ' + "'" + tsp.custname + "'" + ' and save the length \'' + output + '\' in ' + tsp.outputval
         def verifyTextboxLength():
         	return 'Verify ' + input + ' is the length of textbox ' + "'" + tsp.custname + "'"
         def verifyText():
@@ -307,13 +307,13 @@ class StepDescription:
         def getButtonName():
         	return 'Get the name of the ' + "'" + tsp.custname + "'" + 'and save the +output+ in ' + tsp.outputval
         def getLinkText():
-        	return 'Get Text From '	+ "'" + tsp.custname + "'" + ' and save the text ' + output + ' in ' + tsp.outputval
+        	return 'Get Text From '	+ "'" + tsp.custname + "'" + ' and save the text \'' + output + '\' in ' + tsp.outputval
         def verifyLinkText():
         	return 'Verify text ' + input + ' is the name of the ' + "'" + tsp.custname + "'"
         def selectRadioButton():
         	return 'Select ' + "'" + tsp.custname + "'"
         def getStatus():
-        	return 'Get the status of the ' + "'" + tsp.custname + "'"	+ ' and save the status ' + output + ' in '	+ tsp.outputval
+        	return 'Get the status of the ' + "'" + tsp.custname + "'"	+ ' and save the status \'' + output + '\' in '	+ tsp.outputval
         def selectCheckbox():
         	return 'Select ' + "'" + tsp.custname + "'"
         def unselectCheckbox():
@@ -321,7 +321,7 @@ class StepDescription:
         def selectValueByIndex():
         	return 'Select value with index value ' + input + ' in the ' + "'" + tsp.custname + "'"
         def getCount():
-        	return'Get the count of values in the '	+ "'" + tsp.custname + "'"	+ ' and save the count ' + output + ' in ' + tsp.outputval
+        	return'Get the count of values in the '	+ "'" + tsp.custname + "'"	+ ' and save the count \'' + output + '\' in ' + tsp.outputval
         def selectValueByText():
         	return 'Select value ' + input + ' in the ' + "'" + tsp.custname + "'"
         def verifySelectedValue():
@@ -333,11 +333,11 @@ class StepDescription:
         def verifySelectedValues():
         	return 'Verify values ' + input + ' are selected in the ' + "'" + tsp.custname + "'"
         def getSelected():
-            return 'Get Selected value of '+  "'" + tsp.custname + "'" + ' and save value ' + output + ' in '+ tsp.outputval
+            return 'Get Selected value of '+  "'" + tsp.custname + "'" + ' and save value \'' + output + '\' in '+ tsp.outputval
         def verifyValuesExists():
             return 'Verify values ' + input + ' exists in the '+  "'" + tsp.custname + "'"
         def getValueByIndex():
-        	return 'Get value with index ' + input + ' in the '	+ "'" + tsp.custname + "'" + ' and save the value ' + output + ' in ' + tsp.outputval
+        	return 'Get value with index ' + input + ' in the '	+ "'" + tsp.custname + "'" + ' and save the value \'' + output + '\' in ' + tsp.outputval
         def selectMultipleValuesByIndexes():
             return 'Select values ' + mulInputValin.toString() + ' in the '+ "'" + "'" + tsp.custname + "'" + "'"
         def selectMultipleValuesByText():
@@ -349,9 +349,9 @@ class StepDescription:
         def deselectAll():
         	return'Deselect all values in the '	+ "'" + tsp.custname + "'"
         def getRowCount():
-        	return 'Get row count of the ' + "'" + tsp.custname  + "'" + ' and save the count ' + output + ' in ' + tsp.outputval
+        	return 'Get row count of the ' + "'" + tsp.custname  + "'" + ' and save the count \'' + output + '\' in ' + tsp.outputval
         def getColumnCount():
-        	return'Get column count of the ' + "'" + tsp.custname + "'"	+ ' and save the count ' + output + ' in ' + tsp.outputval
+        	return'Get column count of the ' + "'" + tsp.custname + "'"	+ ' and save the count \'' + output + '\' in ' + tsp.outputval
         def getCellValue():
         	return 'Get cell value of '+ "'" + tsp.custname + '['+input[1] +']['+ input[2] + "]'" + ' in the table and save the value ' + output + ' in ' + tsp.outputval
         def verifyCellValue():
@@ -361,7 +361,7 @@ class StepDescription:
         def clickElement():
        	    return 'Click '	+ "'" + tsp.custname + "'"
         def getElementText():
-        	return'Get the text of the element ' + "'" + tsp.custname + "'" + ' and save the value  ' + output + ' in '	+ tsp.outputval
+        	return'Get the text of the element ' + "'" + tsp.custname + "'" + ' and save the value  \'' + output + '\' in '	+ tsp.outputval
         def verifyElementText():
         	return 'Verify ' + input + ' is the the text of the ' + "'" + tsp.custname + "'"
         def sendFunctionKeys():

@@ -20,9 +20,7 @@ import logging
 import logger
 import platform
 if platform.system()!='Darwin':
-    import mobile_app_dispatcher
     import browser_Keywords
-    import install_and_launch
 import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -33,7 +31,7 @@ import subprocess
 
 
 
-class Action_Key():
+class Action_Key_App():
 
 
 
@@ -45,10 +43,9 @@ class Action_Key():
         output=OUTPUT_CONSTANT
         err_msg=None
         status=None
-        if mobile_app_dispatcher.apptypes=='MobileApp':
-            device=install_and_launch.input_list
-        else:
-            device=browser_Keywords.input_list[0]
+        device=browser_Keywords.device_id
+        print device,'android web'
+
 ##        print '123456789'
 ##        print 'device is',device
 

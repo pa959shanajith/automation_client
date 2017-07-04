@@ -11,11 +11,16 @@
 
 
 from constants import *
+import constants
 from mobile_app_constants import *
 from appium.webdriver.common.touch_action import TouchAction
-import browser_Keywords
+
+
 import logging
 import logger
+import platform
+if platform.system()!='Darwin':
+    import install_and_launch
 import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -26,84 +31,100 @@ import subprocess
 
 
 
-class Action_Key():
+class Action_Key_App():
 
 
 
 
     def action_key(self,webelement,inputs,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
+        status=constants.TEST_RESULT_FAIL
+        methodoutput=constants.TEST_RESULT_FALSE
         visibilityFlag=True
         output=OUTPUT_CONSTANT
         err_msg=None
         status=None
-        device=browser_Keywords.input_list[0]
+        device=install_and_launch.device_id
+
 ##        print '123456789'
 ##        print 'device is',device
 
         try:
             adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
-            if inputs[0].lower()== 'enter' :
-                input=int(inputs[1])
-                if input > 0 :
-                    while True:
-                        cmd = adb + ' -s '+ device+' shell input keyevent 20'
-                        s = subprocess.check_output(cmd.split())
-                        time.sleep(1)
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
-                        input=input-1
-                        if input < 1 :
-                            break
+            if(len(inputs)==2):
+                if inputs[0].lower()== 'enter' :
+                    input=int(inputs[1])
+                    if input > 0 :
+                        while True:
+                            cmd = adb + ' -s '+ device+' shell input keyevent 66'
+                            s = subprocess.check_output(cmd.split())
+                            time.sleep(1)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                            input=input-1
+                            if input < 1 :
+                                break
+                    else :
+                        logger.print_on_console('Invalid Input')
+                        status=constants.TEST_RESULT_FAIL
+                        methodoutput=constants.TEST_RESULT_FALSE
+                elif inputs[0].lower() == 'keydown' :
+                    input=int(inputs[1])
+                    if input > 0 :
+                        while True:
+    ##                               adb -s F7AZFG04V017 shell input keyevent 61
+                            cmd = adb + ' -s '+ device +' shell input keyevent 20'
+                            s = subprocess.check_output(cmd.split())
+                            time.sleep(1)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                            input=input-1
+                            if input < 1 :
+                                break
+                    else :
+                        logger.print_on_console('Invalid Input')
+                        status=constants.TEST_RESULT_FAIL
+                        methodoutput=constants.TEST_RESULT_FALSE
+                elif inputs[0].lower() == 'keyup' :
+                    input=int(inputs[1])
+                    if input > 0 :
+                        while True:
+                            cmd = adb + ' -s '+ device+' shell input keyevent 19'
+                            s = subprocess.check_output(cmd.split())
+                            time.sleep(1)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                            input=input-1
+                            if input < 1 :
+                                break
+                    else :
+                       logger.print_on_console('Invalid Input')
+                       status=constants.TEST_RESULT_FAIL
+                       methodoutput=constants.TEST_RESULT_FALSE
+                elif inputs[0].lower() == 'tab' :
+                    input=int(inputs[1])
+                    if input > 0 :
+                        while True:
+    ##                        actions = ActionChains(install_and_launch.driver)
+                            cmd = adb + ' -s '+ device+' shell input keyevent 61'
+                            s = subprocess.check_output(cmd.split())
+                            time.sleep(1)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                            input=input-1
+                            if input < 1 :
+                                break
+                    else :
+                        logger.print_on_console('Invalid Input')
+                        status=constants.TEST_RESULT_FAIL
+                        methodoutput=constants.TEST_RESULT_FALSE
                 else :
                     logger.print_on_console('Invalid Input')
-            elif inputs[0].lower() == 'keydown' :
-                input=int(inputs[1])
-                if input > 0 :
-                    while True:
-##                               adb -s F7AZFG04V017 shell input keyevent 61
-                        cmd = adb + ' -s '+ device +' shell input keyevent 20'
-                        s = subprocess.check_output(cmd.split())
-                        time.sleep(1)
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
-                        input=input-1
-                        if input < 1 :
-                            break
-                else :
-                    logger.print_on_console('Invalid Input')
-            elif inputs[0].lower() == 'keyup' :
-                input=int(inputs[1])
-                if input > 0 :
-                    while True:
-                        cmd = adb + ' -s '+ device+' shell input keyevent 20'
-                        s = subprocess.check_output(cmd.split())
-                        time.sleep(1)
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
-                        input=input-1
-                        if input < 1 :
-                            break
-                else :
-                   logger.print_on_console('Invalid Input')
-            elif inputs[0].lower() == 'tab' :
-                input=int(inputs[1])
-                if input > 0 :
-                    while True:
-##                        actions = ActionChains(install_and_launch.driver)
-                        cmd = adb + ' -s '+ device+' shell input keyevent 20'
-                        s = subprocess.check_output(cmd.split())
-                        time.sleep(1)
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
-                        input=input-1
-                        if input < 1 :
-                            break
-                else :
-                    logger.print_on_console('Invalid Input')
+                    status=constants.TEST_RESULT_FAIL
+                    methodoutput=constants.TEST_RESULT_FALSE
             else :
-                logger.print_on_console('Invalid Input')
+                    logger.print_on_console('Invalid Input')
+                    status=constants.TEST_RESULT_FAIL
+                    methodoutput=constants.TEST_RESULT_FALSE
 
 
 

@@ -24,7 +24,7 @@ index=0
 k = 0
 cordinates = []
 states = []
-##win_rect = ''
+win_rect = ''
 
 log = logging.getLogger('oebs_fullscrape.py')
 
@@ -38,8 +38,8 @@ class FullScrape:
         isjavares, hwnd = utils_obj.isjavawindow(windowname)
         log.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',str(isjavares))
         if (isjavares):
-##            global win_rect
-##            win_rect= win32gui.GetWindowRect(hwnd)
+            global win_rect
+            win_rect= win32gui.GetWindowRect(hwnd)
             self.acccontext(oebs_api.JABContext(hwnd), tempne,'',0,windowname)
             log.debug('MSG:\nThe Scraped Data is:\n %s',tempne)
             vie = {'view': tempne}
@@ -48,7 +48,17 @@ class FullScrape:
         else:
             log.debug('MSG: %s',MSG_NOT_JAVA_WINDOW_INFO)
             return 'fail'
-
+    #method to find window rectangle for custom objects
+    def custom_winrect(self,windowname):
+        utils_obj=utils.Utils()
+        tempne = []
+        utils_obj.windowsrun()
+        log.debug('MSG:\nWindows Run Executed.',"custom_winrect")
+        isjavares, hwnd = utils_obj.isjavawindow(windowname)
+        log.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',str(isjavares))
+        if (isjavares):
+            global win_rect
+            win_rect= win32gui.GetWindowRect(hwnd)
     #Method accontext called by getentireobjectlist
     #contains full scrape logic
     def acccontext(self,acc, tempne,xpath,i,window):
@@ -146,9 +156,9 @@ class FullScrape:
             text = str(text)
             text = text.strip()
             #Calculating co ordinates for embedded screenshots
-            utils_obj=utils.Utils()
-            isjavares, hwnd = utils_obj.isjavawindow(window)
-            win_rect= win32gui.GetWindowRect(hwnd)
+##            utils_obj=utils.Utils()
+##            isjavares, hwnd = utils_obj.isjavawindow(window)
+##            win_rect= win32gui.GetWindowRect(hwnd)
             x1_win = win_rect[0]
             y1_win = win_rect[1]
             x2_win = win_rect[2]

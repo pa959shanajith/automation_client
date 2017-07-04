@@ -17,8 +17,10 @@ from constants import *
 driver = None
 import mobile_app_constants
 import platform
+device_id=None
 class LaunchAndInstall():
     def installApplication(self, ele, input_val, *args):
+
         status = mobile_app_constants.TEST_RESULT_FAIL
         result = mobile_app_constants.TEST_RESULT_FALSE
         err_msg = None
@@ -56,6 +58,8 @@ class LaunchAndInstall():
                 # driver.close_app()
             else:
 ##                print 'android',input_val[0]
+                global device_id
+                device_id=input_val[2]
                 import appium
                 import time
                 from appium import webdriver
