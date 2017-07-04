@@ -500,6 +500,7 @@ class Utilities:
         if(int(eleIndex) < 0):
             return eleproperties
         descriptiongiven=xpathsplitarr[10]
+        fullscrape_obj.custom_winrect(window)
         fullscrape_obj.acccontext(acc,tempne,xpath,0,window)
         verifyflag=False
         for i in range(len(tempne)):
