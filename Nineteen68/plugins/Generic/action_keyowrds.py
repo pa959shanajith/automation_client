@@ -59,7 +59,7 @@ class Action_Key():
                     input=int(inputs[1])
                     if input > 0 :
                         while True:
-                            cmd = adb + ' -s '+ device+' shell input keyevent 20'
+                            cmd = adb + ' -s '+ device+' shell input keyevent 66'
                             s = subprocess.check_output(cmd.split())
                             time.sleep(1)
                             status=TEST_RESULT_PASS
@@ -92,7 +92,7 @@ class Action_Key():
                     input=int(inputs[1])
                     if input > 0 :
                         while True:
-                            cmd = adb + ' -s '+ device+' shell input keyevent 20'
+                            cmd = adb + ' -s '+ device+' shell input keyevent 19'
                             s = subprocess.check_output(cmd.split())
                             time.sleep(1)
                             status=TEST_RESULT_PASS
@@ -109,7 +109,7 @@ class Action_Key():
                     if input > 0 :
                         while True:
     ##                        actions = ActionChains(install_and_launch.driver)
-                            cmd = adb + ' -s '+ device+' shell input keyevent 20'
+                            cmd = adb + ' -s '+ device+' shell input keyevent 61'
                             s = subprocess.check_output(cmd.split())
                             time.sleep(1)
                             status=TEST_RESULT_PASS
