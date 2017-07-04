@@ -47,7 +47,7 @@ class Highlight():
 
             #Split the string with delimiter ','
 ##            print 'DATA :::::::::::::',data
-            highele = data.split(',')
+            highele = data
             # find out if the highele[1] has id or name attrib
             if  highele[0] == 'OBJECTMAPPER':
                 action='OBJECTMAPPER'

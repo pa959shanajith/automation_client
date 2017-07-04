@@ -82,31 +82,31 @@ class MainNamespace(BaseNamespace):
 
     def on_focus(self, *args):
 
-        appType=args[1]
+        appType=args[2]
         appType=appType.lower()
         if appType==APPTYPE_WEB:
             import highlight
             light =highlight.Highlight()
-            res = light.highlight(args[0],None,None)
+            res = light.highlight(args,None,None)
             print 'Highlight result: ',res
         if appType==APPTYPE_MOBILE.lower():
             import highlight
             light =highlight.Highlight()
-            res = light.highlight(args[0],None,None)
+            res = light.highlight(args,None,None)
             print 'Highlight result: ',res
         if appType==APPTYPE_DESKTOP_JAVA.lower():
             con =controller.Controller()
             con.get_all_the_imports('Oebs')
             import utils
             light =utils.Utils()
-            res = light.highlight(args[0].split(',')[0],args[0].split(',')[1])
+            res = light.highlight(args[0],args[1])
             print 'Highlight result: ',res
         elif appType==APPTYPE_DESKTOP.lower():
             con =controller.Controller()
             con.get_all_the_imports('Desktop2')
             import desktop_highlight
             highlightObj=desktop_highlight.highLight()
-            highlightObj.highLiht_element(args[0].split(',')[0],args[0].split(',')[1])
+            highlightObj.highLiht_element(args[0],args[1])
 
   #--------------------------------------------------------------------------------------------------sap change
         elif appType==APPTYPE_SAP.lower():
@@ -115,9 +115,9 @@ class MainNamespace(BaseNamespace):
             import sap_highlight
             highlightObj=sap_highlight.highLight()
             print 'calling highlight'
-            i = args[0].rfind(",")
-            var = args[0][:i]
-            highlightObj.highlight_element(var)
+##            i = args[0].rfind(",")
+##            var = args[0][:i]
+            highlightObj.highlight_element(args[0])
             print 'highlight called'
 #--------------------------------------------------------------------------------------------------sap change
 
