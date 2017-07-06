@@ -165,59 +165,55 @@ class DateControlKeywords():
                 log.debug(check)
                 if (check and element.friendly_class_name() == 'DateTimePicker'):
                     log.info('Parent matched')
-                    if(element.is_enabled()):
-                        date_format = input_val[0]
-                        valid_date_format = self.validate(date_format)
-                        if valid_date_format != -1:
-                            date_obj = element.GetTime()
-                            res = ''
-                            try:
-                                if date_obj is not None:
-                                    if valid_date_format== 1:
-                                        day = date_obj.wDay
-                                        month = date_obj.wMonth
-                                        year = date_obj.wYear
-                                        res = str(day) + '/' + str(month) + '/' + str(year)
-                                        flag = True
-                                    elif valid_date_format== 2:
-                                        month = date_obj.wMonth
-                                        day = date_obj.wDay
-                                        year = date_obj.wYear
-                                        res = str(month) + '/' + str(day) + '/' + str(year)
-                                        flag = True
-                                    elif valid_date_format== 3:
-                                        day = date_obj.wDay
-                                        month = month_dict2[date_obj.wMonth]
-                                        year = date_obj.wYear
-                                        res = str(day) + '/' + str(month) + '/' + str(year)
-                                        flag = True
-                                    elif valid_date_format== 4:
-                                        month = month_dict2[date_obj.wMonth]
-                                        day = date_obj.wDay
-                                        year = date_obj.wYear
-                                        res = str(month) + '/' + str(day) + '/' + str(year)
-                                        flag = True
+                    date_format = input_val[0]
+                    valid_date_format = self.validate(date_format)
+                    if valid_date_format != -1:
+                        date_obj = element.GetTime()
+                        res = ''
+                        try:
+                            if date_obj is not None:
+                                if valid_date_format== 1:
+                                    day = date_obj.wDay
+                                    month = date_obj.wMonth
+                                    year = date_obj.wYear
+                                    res = str(day) + '/' + str(month) + '/' + str(year)
+                                    flag = True
+                                elif valid_date_format== 2:
+                                    month = date_obj.wMonth
+                                    day = date_obj.wDay
+                                    year = date_obj.wYear
+                                    res = str(month) + '/' + str(day) + '/' + str(year)
+                                    flag = True
+                                elif valid_date_format== 3:
+                                    day = date_obj.wDay
+                                    month = month_dict2[date_obj.wMonth]
+                                    year = date_obj.wYear
+                                    res = str(day) + '/' + str(month) + '/' + str(year)
+                                    flag = True
+                                elif valid_date_format== 4:
+                                    month = month_dict2[date_obj.wMonth]
+                                    day = date_obj.wDay
+                                    year = date_obj.wYear
+                                    res = str(month) + '/' + str(day) + '/' + str(year)
+                                    flag = True
 
 
-                                    if flag:
-                                        verb = res
-                                        status = desktop_constants.TEST_RESULT_PASS
-                                        result = desktop_constants.TEST_RESULT_TRUE
-                                        log.info(STATUS_METHODOUTPUT_UPDATE)
-                            except Exception as e:
-                                print e
-                                import traceback
-                                traceback.print_exc()
-                                log.error(e)
-                                logger.print_on_console(e)
-                        else:
-                            log.info('Invalid Date format: Please provide the valid date format')
-                            logger.print_on_console('Invalid Date format: Please provide the valid date format')
-                            err_msg = 'Invalid Date format: Please provide the valid date format'
+                                if flag:
+                                    verb = res
+                                    status = desktop_constants.TEST_RESULT_PASS
+                                    result = desktop_constants.TEST_RESULT_TRUE
+                                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                        except Exception as e:
+                            print e
+                            import traceback
+                            traceback.print_exc()
+                            log.error(e)
+                            logger.print_on_console(e)
                     else:
-                        log.info('Date picker control state does not allow to perform the operation')
-                        logger.print_on_console('Date picker control  state does not allow to perform the operation')
-                        err_msg = 'Date picker control state does not allow to perform the operation'
+                        log.info('Invalid Date format: Please provide the valid date format')
+                        logger.print_on_console('Invalid Date format: Please provide the valid date format')
+                        err_msg = 'Invalid Date format: Please provide the valid date format'
+
                 else:
                    log.info('Date picker control  not present on the Application where operation is trying to be performed')
                    logger.print_on_console('Date picker control  not present on the Application where operation is trying to be performed')

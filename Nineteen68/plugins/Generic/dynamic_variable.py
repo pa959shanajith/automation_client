@@ -48,7 +48,10 @@ class DynamicVariables:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
 ##                        log.info('Variable created is '+str(variable)+'='+str(value))
-                        log.info('Variable created is ',variable,'=',value)
+                        log.info('Variable created is: ')
+                        log.info(variable)
+                        log.info('Value : ')
+                        log.info(value)
                         logger.print_on_console('Variable created is ',variable,' = ',value)
 ##                        logger.print_on_console('Variable created is '+str(variable)+'='+str(value))
                     else:

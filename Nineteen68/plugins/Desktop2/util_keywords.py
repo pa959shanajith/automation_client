@@ -183,14 +183,11 @@ class Util_Keywords():
                         log.debug(check)
                         if (check):
                             log.info('Parent matched')
-                            if(not element.is_enabled()):
+                            if(element == None):
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
-                            else:
-                              log.info('Element state does not allow to perform the operation')
-                              logger.print_on_console('Element state does not allow to perform the operation')
-                              err_msg= 'Element state does not allow to perform the operation'
+
                         else:
                            log.info('Element not present on the page where operation is trying to be performed')
                            err_msg='Element not present on the page where operation is trying to be performed'

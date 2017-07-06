@@ -121,62 +121,58 @@ class Dropdown_Keywords():
                log.debug(check)
                if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled()):
-                            if element.friendly_class_name() == 'ListView':
-                                print 'inside list check'
-                                if element.is_active() == False:
-                                  element.click()
-                                items=element.items()
-                                cols=element.column_count()
-                                elelist=element.texts()
-                                elelist.pop(0)
-                                oldlist=len(items)
-                                itemcount=element.item_count()
-                                newlist=[]
-                                list = input_val
-                                item_list=[]
-                                for item in list:
-                                    logger.print_on_console(item)
-                                    item_new = (int(item)-1)*2
-                                    logger.print_on_console(item_new)
-                                    item_list.append(item_new)
-                                val,res=0
-                                for i in range(0,len(item_list)):
-                                    if(cols==1):
-                                     val=item_list[i]
-                                     res=elelist[int(val)]
-                                    else:
+                        if element.friendly_class_name() == 'ListView':
+                            print 'inside list check'
+                            if element.is_active() == False:
+                              element.click()
+                            items=element.items()
+                            cols=element.column_count()
+                            elelist=element.texts()
+                            elelist.pop(0)
+                            oldlist=len(items)
+                            itemcount=element.item_count()
+                            newlist=[]
+                            list = input_val
+                            item_list=[]
+                            for item in list:
+                                logger.print_on_console(item)
+                                item_new = (int(item)-1)*2
+                                logger.print_on_console(item_new)
+                                item_list.append(item_new)
+                            val,res=0
+                            for i in range(0,len(item_list)):
+                                if(cols==1):
+                                 val=item_list[i]
+                                 res=elelist[int(val)]
+                                else:
 
-                                     val=item_list[i]
-                                     res1=elelist[int(val)]
-                                     res2=elelist[int(val) + 1]
-                                     newlist.append(res1.encode("utf-8"))
-                                     newlist.append(res2.encode("utf-8"))
-                                verb=newlist
+                                 val=item_list[i]
+                                 res1=elelist[int(val)]
+                                 res2=elelist[int(val) + 1]
+                                 newlist.append(res1.encode("utf-8"))
+                                 newlist.append(res2.encode("utf-8"))
+                            verb=newlist
+                            status = desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                        elif element.friendly_class_name() == 'ComboBox':
+                            elelist=element.texts()
+                            elelist.pop(0)
+                            newlist=[]
+                            index=input_val
+                            res1=[]
+                            if int(index[0])<0:
+                                log.info('Combobox index starts with 1')
+                                logger.print_on_console('Combobox index starts with 1')
+                                err_msg = 'Combobox index starts with 1'
+                            else:
+                                res1=elelist[int(index[0])-1]
+                                verb=res1
+                                logger.print_on_console('Value obtained is',verb)
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
-                            elif element.friendly_class_name() == 'ComboBox':
-                                elelist=element.texts()
-                                elelist.pop(0)
-                                newlist=[]
-                                index=input_val
-                                res1=[]
-                                if int(index[0])<0:
-                                    log.info('Combobox index starts with 1')
-                                    logger.print_on_console('Combobox index starts with 1')
-                                    err_msg = 'Combobox index starts with 1'
-                                else:
-                                    res1=elelist[int(index[0])-1]
-                                    verb=res1
-                                    logger.print_on_console('Value obtained is',verb)
-                                    status = desktop_constants.TEST_RESULT_PASS
-                                    result = desktop_constants.TEST_RESULT_TRUE
-                                    log.info(STATUS_METHODOUTPUT_UPDATE)
-                        else:
-                          log.info('Element state does not allow to perform the operation')
-                          logger.print_on_console('Element state does not allow to perform the operation')
-                          err_msg = 'Element state does not allow to perform the operation'
+
                else:
                    log.info('Element not present on the page where operation is trying to be performed')
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
@@ -208,26 +204,22 @@ class Dropdown_Keywords():
                     log.debug(check)
                     if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled()):
-                            if element.friendly_class_name() == 'ListView':
-                                if element.is_active() == False:
-                                   element.click()
-                                val=element.texts()
-                                verb1 = element.item_count()
-                                verb=int(verb1)
-                                status = desktop_constants.TEST_RESULT_PASS
-                                result = desktop_constants.TEST_RESULT_TRUE
-                                log.info(STATUS_METHODOUTPUT_UPDATE)
-                            elif element.friendly_class_name() == 'ComboBox':
-                                verb1 = element.item_count()
-                                verb=int(verb1)
-                                status = desktop_constants.TEST_RESULT_PASS
-                                result = desktop_constants.TEST_RESULT_TRUE
-                                log.info(STATUS_METHODOUTPUT_UPDATE)
-                        else:
-                          log.info('Element state does not allow to perform the operation')
-                          logger.print_on_console('Element state does not allow to perform the operation')
-                          err_msg = 'Element state does not allow to perform the operation'
+                        if element.friendly_class_name() == 'ListView':
+                            if element.is_active() == False:
+                               element.click()
+                            val=element.texts()
+                            verb1 = element.item_count()
+                            verb=int(verb1)
+                            status = desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                        elif element.friendly_class_name() == 'ComboBox':
+                            verb1 = element.item_count()
+                            verb=int(verb1)
+                            status = desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+
                     else:
                       log.info('Element not present on the page where operation is trying to be performed')
                       err_msg='Element not present on the page where operation is trying to be performed'
@@ -256,26 +248,22 @@ class Dropdown_Keywords():
                     log.debug(check)
                     if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled()):
-                            if element.friendly_class_name() == 'ListView':
-                                if element.is_active() == False:
-                                   element.click()
-                                val=element.texts()
-                                count = element.item_count()
-                                if(count == input_val[0]):
-                                 status = desktop_constants.TEST_RESULT_PASS
-                                 result = desktop_constants.TEST_RESULT_TRUE
-                                 log.info(STATUS_METHODOUTPUT_UPDATE)
-                            elif element.friendly_class_name() == 'ComboBox':
-                                count = element.item_count()
-                                if(count == input_val[0]):
-                                 status = desktop_constants.TEST_RESULT_PASS
-                                 result = desktop_constants.TEST_RESULT_TRUE
-                                 log.info(STATUS_METHODOUTPUT_UPDATE)
-                        else:
-                          log.info('Element state does not allow to perform the operation')
-                          logger.print_on_console('Element state does not allow to perform the operation')
-                          err_msg= 'Element state does not allow to perform the operation'
+                        if element.friendly_class_name() == 'ListView':
+                            if element.is_active() == False:
+                               element.click()
+                            val=element.texts()
+                            count = element.item_count()
+                            if(count == input_val[0]):
+                             status = desktop_constants.TEST_RESULT_PASS
+                             result = desktop_constants.TEST_RESULT_TRUE
+                             log.info(STATUS_METHODOUTPUT_UPDATE)
+                        elif element.friendly_class_name() == 'ComboBox':
+                            count = element.item_count()
+                            if(count == input_val[0]):
+                             status = desktop_constants.TEST_RESULT_PASS
+                             result = desktop_constants.TEST_RESULT_TRUE
+                             log.info(STATUS_METHODOUTPUT_UPDATE)
+
                     else:
                       log.info('Element not present on the page where operation is trying to be performed')
                       err_msg='Element not present on the page where operation is trying to be performed'
@@ -303,35 +291,31 @@ class Dropdown_Keywords():
                log.debug(check)
                if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled()):
-                            if element.friendly_class_name() == 'ListView':
-                                if element.is_active() == False:
-                                  element.click()
-                                items=element.items()
-                                elelist=element.texts()
-                                elelist.pop(0)
-                                oldlist=len(items)
-                                itemcount=element.item_count()
-                                newlist=[]
-                                for i in range(0,len(items)):
-                                     if (items[i].is_selected()):
-                                       newlist.append(elelist[i].encode("utf-8"))
-                                verb=newlist
-                                status = desktop_constants.TEST_RESULT_PASS
-                                result = desktop_constants.TEST_RESULT_TRUE
-                                log.info(STATUS_METHODOUTPUT_UPDATE)
+                        if element.friendly_class_name() == 'ListView':
+                            if element.is_active() == False:
+                              element.click()
+                            items=element.items()
+                            elelist=element.texts()
+                            elelist.pop(0)
+                            oldlist=len(items)
+                            itemcount=element.item_count()
+                            newlist=[]
+                            for i in range(0,len(items)):
+                                 if (items[i].is_selected()):
+                                   newlist.append(elelist[i].encode("utf-8"))
+                            verb=newlist
+                            status = desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
 
-                            elif element.friendly_class_name() == 'ComboBox':
-                                selected=element.selected_text()
-                                verb=selected
-                                logger.print_on_console('selected values are:',verb)
-                                status = desktop_constants.TEST_RESULT_PASS
-                                result = desktop_constants.TEST_RESULT_TRUE
-                                log.info(STATUS_METHODOUTPUT_UPDATE)
-                        else:
-                          log.info('Element state does not allow to perform the operation')
-                          logger.print_on_console('Element state does not allow to perform the operation')
-                          err_msg= 'Element state does not allow to perform the operation'
+                        elif element.friendly_class_name() == 'ComboBox':
+                            selected=element.selected_text()
+                            verb=selected
+                            logger.print_on_console('selected values are:',verb)
+                            status = desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+
                else:
                    log.info('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'
@@ -360,47 +344,43 @@ class Dropdown_Keywords():
                    log.debug(check)
                    if (check):
                             log.info('Parent matched')
-                            if(element.is_enabled()):
-                                if element.friendly_class_name() == 'ListView':
-                                    if element.is_active() == False:
-                                      element.click()
-                                    items=element.items()
-                                    elelist=element.texts()
-                                    poplist=elelist.pop(0)
-                                    oldlist=len(elelist)
-                                    cols=element.column_count()
-                                    res=oldlist/cols
-                                    itemcount=element.item_count()
-                                    newlist=[]
-                                    for i in range(0,len(items)):
-                                         if (items[i].is_selected()):
-                                           selected=element.item(i, subitem_index=0)
-                                           newlist.append(elelist[i].encode("utf-8"))
-                                    verb=newlist
-                                    item_list=input_val
-                                    for item in item_list:
-                                     if item in verb:
-                                       status=desktop_constants.TEST_RESULT_PASS
-                                       result=desktop_constants.TEST_RESULT_TRUE
-                                     else:
-                                      status = desktop_constants.TEST_RESULT_FAIL
-                                      result = desktop_constants.TEST_RESULT_FALSE
+                            if element.friendly_class_name() == 'ListView':
+                                if element.is_active() == False:
+                                  element.click()
+                                items=element.items()
+                                elelist=element.texts()
+                                poplist=elelist.pop(0)
+                                oldlist=len(elelist)
+                                cols=element.column_count()
+                                res=oldlist/cols
+                                itemcount=element.item_count()
+                                newlist=[]
+                                for i in range(0,len(items)):
+                                     if (items[i].is_selected()):
+                                       selected=element.item(i, subitem_index=0)
+                                       newlist.append(elelist[i].encode("utf-8"))
+                                verb=newlist
+                                item_list=input_val
+                                for item in item_list:
+                                 if item in verb:
+                                   status=desktop_constants.TEST_RESULT_PASS
+                                   result=desktop_constants.TEST_RESULT_TRUE
+                                 else:
+                                  status = desktop_constants.TEST_RESULT_FAIL
+                                  result = desktop_constants.TEST_RESULT_FALSE
 
-                                elif element.friendly_class_name() == 'ComboBox':
-                                    selected=element.selected_text()
-                                    verb=selected
-                                    item_list=input_val
-                                    for item in item_list:
-                                     if item == verb:
-                                       status=desktop_constants.TEST_RESULT_PASS
-                                       result=desktop_constants.TEST_RESULT_TRUE
-                                     else:
-                                      status = desktop_constants.TEST_RESULT_FAIL
-                                      result = desktop_constants.TEST_RESULT_FALSE
-                            else:
-                              log.info('Element state does not allow to perform the operation')
-                              logger.print_on_console('Element state does not allow to perform the operation')
-                              err_msg= 'Element state does not allow to perform the operation'
+                            elif element.friendly_class_name() == 'ComboBox':
+                                selected=element.selected_text()
+                                verb=selected
+                                item_list=input_val
+                                for item in item_list:
+                                 if item == verb:
+                                   status=desktop_constants.TEST_RESULT_PASS
+                                   result=desktop_constants.TEST_RESULT_TRUE
+                                 else:
+                                  status = desktop_constants.TEST_RESULT_FAIL
+                                  result = desktop_constants.TEST_RESULT_FALSE
+
                    else:
                        log.info('Element not present on the page where operation is trying to be performed')
                        err_msg='Element not present on the page where operation is trying to be performed'
@@ -518,38 +498,34 @@ class Dropdown_Keywords():
                log.debug(check)
                if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled()):
-                            if element.friendly_class_name() == 'ListView':
-                                 items=element.items()
-                                 items.pop(0)
-                                 newlist=[]
-                                 items_list=input_val
-                                 for i in range(0,len(items)):
-                                        newlist.append(items[i].encode("utf-8"))
-                                        if items_list==newlist:
-                                            status = desktop_constants.TEST_RESULT_PASS
-                                            result = desktop_constants.TEST_RESULT_TRUE
-                                        else:
-                                            status = desktop_constants.TEST_RESULT_FAIL
-                                            result = desktop_constants.TEST_RESULT_FALSE
+                        if element.friendly_class_name() == 'ListView':
+                             items=element.items()
+                             items.pop(0)
+                             newlist=[]
+                             items_list=input_val
+                             for i in range(0,len(items)):
+                                    newlist.append(items[i].encode("utf-8"))
+                                    if items_list==newlist:
+                                        status = desktop_constants.TEST_RESULT_PASS
+                                        result = desktop_constants.TEST_RESULT_TRUE
+                                    else:
+                                        status = desktop_constants.TEST_RESULT_FAIL
+                                        result = desktop_constants.TEST_RESULT_FALSE
 
-                            elif element.friendly_class_name() == 'ComboBox':
-                                items=element.texts()
-                                items.pop(0)
-                                newlist=[]
-                                items_list=input_val
-                                for i in range(0,len(items)):
-                                        newlist.append(items[i].encode("utf-8"))
-                                        if items_list==newlist:
-                                            status = desktop_constants.TEST_RESULT_PASS
-                                            result = desktop_constants.TEST_RESULT_TRUE
-                                        else:
-                                            status = desktop_constants.TEST_RESULT_FAIL
-                                            result = desktop_constants.TEST_RESULT_FALSE
-                        else:
-                          log.info('Element state does not allow to perform the operation')
-                          logger.print_on_console('Element state does not allow to perform the operation')
-                          err_msg= 'Element state does not allow to perform the operation'
+                        elif element.friendly_class_name() == 'ComboBox':
+                            items=element.texts()
+                            items.pop(0)
+                            newlist=[]
+                            items_list=input_val
+                            for i in range(0,len(items)):
+                                    newlist.append(items[i].encode("utf-8"))
+                                    if items_list==newlist:
+                                        status = desktop_constants.TEST_RESULT_PASS
+                                        result = desktop_constants.TEST_RESULT_TRUE
+                                    else:
+                                        status = desktop_constants.TEST_RESULT_FAIL
+                                        result = desktop_constants.TEST_RESULT_FALSE
+
                else:
                    log.info('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'
@@ -580,41 +556,37 @@ class Dropdown_Keywords():
                log.debug(check)
                if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled()):
-                            if element.friendly_class_name() == 'ListView':
-                                 items=element.items()
-                                 elelist=element.texts()
-                                 elelist.pop(0)
-                                 newlist=[]
-                                 items_list=input_val
-                                 for i in range(0,len(items)):
-                                        newlist.append(elelist[i].encode("utf-8"))
-                                        for i in range(0,len(items_list)):
-                                            if items_list[i] in newlist:
-                                                status = desktop_constants.TEST_RESULT_PASS
-                                                result = desktop_constants.TEST_RESULT_TRUE
-                                            else:
-                                                status = desktop_constants.TEST_RESULT_FAIL
-                                                result = desktop_constants.TEST_RESULT_FALSE
+                        if element.friendly_class_name() == 'ListView':
+                             items=element.items()
+                             elelist=element.texts()
+                             elelist.pop(0)
+                             newlist=[]
+                             items_list=input_val
+                             for i in range(0,len(items)):
+                                    newlist.append(elelist[i].encode("utf-8"))
+                                    for i in range(0,len(items_list)):
+                                        if items_list[i] in newlist:
+                                            status = desktop_constants.TEST_RESULT_PASS
+                                            result = desktop_constants.TEST_RESULT_TRUE
+                                        else:
+                                            status = desktop_constants.TEST_RESULT_FAIL
+                                            result = desktop_constants.TEST_RESULT_FALSE
 
-                            elif element.friendly_class_name() == 'ComboBox':
-                                items=element.texts()
-                                items.pop(0)
-                                newlist=[]
-                                items_list=input_val
-                                for i in range(0,len(items)):
-                                        newlist.append(items[i])
-                                        for i in range(0,len(items_list)):
-                                            if items_list[i] in newlist:
-                                                status = desktop_constants.TEST_RESULT_PASS
-                                                result = desktop_constants.TEST_RESULT_TRUE
-                                            else:
-                                                status = desktop_constants.TEST_RESULT_FAIL
-                                                result = desktop_constants.TEST_RESULT_FALSE
-                        else:
-                          log.info('Element state does not allow to perform the operation')
-                          logger.print_on_console('Element state does not allow to perform the operation')
-                          err_msg= 'Element state does not allow to perform the operation'
+                        elif element.friendly_class_name() == 'ComboBox':
+                            items=element.texts()
+                            items.pop(0)
+                            newlist=[]
+                            items_list=input_val
+                            for i in range(0,len(items)):
+                                    newlist.append(items[i])
+                                    for i in range(0,len(items_list)):
+                                        if items_list[i] in newlist:
+                                            status = desktop_constants.TEST_RESULT_PASS
+                                            result = desktop_constants.TEST_RESULT_TRUE
+                                        else:
+                                            status = desktop_constants.TEST_RESULT_FAIL
+                                            result = desktop_constants.TEST_RESULT_FALSE
+
                else:
                    log.info('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'
@@ -726,52 +698,48 @@ class Dropdown_Keywords():
                log.debug(check)
                if (check):
                         log.info('Parent matched')
-                        if(element.is_enabled()):
-                            if element.friendly_class_name() == 'ListView':
-                                if element.is_active() == False:
-                                  element.click()
-                                items=element.items()
-                                cols=element.column_count()
-                                elelist=element.texts()
-                                elelist.pop(0)
-                                oldlist=len(items)
-                                itemcount=element.item_count()
-                                newlist=[]
-                                list = input_val
-                                item_list=[]
-                                for item in list:
-                                    logger.print_on_console(item)
-                                    item_new = (int(item)-1)*2
-                                    logger.print_on_console(item_new)
-                                    item_list.append(item_new)
-                                val,res=0
-                                for i in range(0,len(item_list)):
-                                    if(cols==1):
-                                     val=item_list[i]
-                                     res=elelist[int(val)]
-                                    else:
+                        if element.friendly_class_name() == 'ListView':
+                            if element.is_active() == False:
+                              element.click()
+                            items=element.items()
+                            cols=element.column_count()
+                            elelist=element.texts()
+                            elelist.pop(0)
+                            oldlist=len(items)
+                            itemcount=element.item_count()
+                            newlist=[]
+                            list = input_val
+                            item_list=[]
+                            for item in list:
+                                logger.print_on_console(item)
+                                item_new = (int(item)-1)*2
+                                logger.print_on_console(item_new)
+                                item_list.append(item_new)
+                            val,res=0
+                            for i in range(0,len(item_list)):
+                                if(cols==1):
+                                 val=item_list[i]
+                                 res=elelist[int(val)]
+                                else:
 
-                                     val=item_list[i]
-                                     res1=elelist[int(val)]
-                                     res2=elelist[int(val) + 1]
-                                     newlist.append(res1.encode("utf-8"))
-                                     newlist.append(res2.encode("utf-8"))
+                                 val=item_list[i]
+                                 res1=elelist[int(val)]
+                                 res2=elelist[int(val) + 1]
+                                 newlist.append(res1.encode("utf-8"))
+                                 newlist.append(res2.encode("utf-8"))
                             verb=newlist
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
 
                         elif element.friendly_class_name() == 'ComboBox':
-                                selected=element.selected_text()
-                                verb=selected
-                                logger.print_on_console('Values obtained are:',verb)
-                                status = desktop_constants.TEST_RESULT_PASS
-                                result = desktop_constants.TEST_RESULT_TRUE
-                                log.info(STATUS_METHODOUTPUT_UPDATE)
-                        else:
-                          log.info('Element state does not allow to perform the operation')
-                          logger.print_on_console('Element state does not allow to perform the operation')
-                          err_msg= 'Element state does not allow to perform the operation'
+                            selected=element.selected_text()
+                            verb=selected
+                            logger.print_on_console('Values obtained are:',verb)
+                            status = desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+
                else:
                    log.info('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'
