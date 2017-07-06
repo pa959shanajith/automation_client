@@ -167,7 +167,9 @@ class SAPDispatcher:
                   'selectrows':self.shell_keywords_obj.selectRows,
                   'toolbaractionkeys':self.shell_keywords_obj.toolBarActionKeys,
                   'presstoolbarbutton':self.shell_keywords_obj.pressToolBarButton,
-                  'getcelltext': self.shell_keywords_obj.getCellText
+                  'getcelltext': self.shell_keywords_obj.getCellText,
+                  'clickcell':self.shell_keywords_obj.clickCell,
+                  'doubleclickcell':self.shell_keywords_obj.doubleClickCell
                    }
 
 
