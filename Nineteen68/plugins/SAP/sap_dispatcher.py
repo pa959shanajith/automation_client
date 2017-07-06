@@ -159,7 +159,7 @@ class SAPDispatcher:
 ##                  'selectvaluebyindex':self.table_keywords_obj.selectValueByIndex,
 ##                  'selectvaluebytext':self.table_keywords_obj.selectValueByText,
 ##                  'getselected':self.table_keywords_obj.getSelected,
-                  'gettablestatus':self.table_keywords_obj.getStatus,
+                  'getcellstatus':self.table_keywords_obj.getStatus,
                   'selectrow':self.table_keywords_obj.selectRow,
                   'unselectrow':self.table_keywords_obj.unselectRow,
                   'getrowcount':self.shell_keywords_obj.get_rowCount,

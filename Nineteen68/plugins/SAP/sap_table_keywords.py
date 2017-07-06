@@ -32,6 +32,7 @@ class Table_keywords():
     def __init__(self):
         self.uk = SapUtilKeywords()
         self.lk = Launch_Keywords()
+        self.rk = Radio_Checkbox_keywords()
 
     def getXpath(self,sap_id,elem,row,col):
         try:
@@ -285,7 +286,7 @@ class Table_keywords():
             object_type_input = ses.FindById(id).type
             elem=ses.FindById(id)
             cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            if(cell.__getattr__("type") != object_type_input):
+            if(cell.__getattr__("type") == object_type_input):
                 print "Error: Type Mismatch"
             else:
                 value = dk.selectValueByIndex(cell_xpath,url, index)
@@ -314,7 +315,7 @@ class Table_keywords():
             object_type_input = ses.FindById(id).type
             elem=ses.FindById(id)
             cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            if(cell.__getattr__("type") != object_type_input):
+            if(cell.__getattr__("type") == object_type_input):
                 print "Error: Type Mismatch"
             else:
                 result = dk.selectValueByText(cell_xpath,url, text)
@@ -342,7 +343,7 @@ class Table_keywords():
             object_type_input = ses.FindById(id).type
             elem=ses.FindById(id)
             cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            if(cell.__getattr__("type") != object_type_input):
+            if(cell.__getattr__("type") == object_type_input):
                 print "Error: Type Mismatch"
             else:
                 status,result,value,err_msg = dk.getSelected(cell_xpath)
@@ -360,7 +361,6 @@ class Table_keywords():
         row=int(input_val[0])-2
         col=int(input_val[1])-2
         id,ses=self.uk.getSapElement(sap_id)
-        rk=Radio_Checkbox_keywords()
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
@@ -369,16 +369,12 @@ class Table_keywords():
             object_type_input = ses.FindById(id).type
             elem=ses.FindById(id)
             cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            if(cell.__getattr__("type") != object_type_input):
+            if(cell.__getattr__("type") == object_type_input):
                 print "Error: Type Mismatch"
             else:
+                object_type_input=cell.__getattr__("type")
                 if(object_type_input == "GuiRadioButton" or object_type_input == "GuiCheckBox" ):
-                    if(object_type_input == "GuiRadioButton"):
-                        status,result,value,err_msg = rk.getStatus(cell_xpath)
-                    elif(object_type_input == "GuiCheckBox"):
-                        status,result,value,err_msg = rk.getStatus(cell_xpath)
-                    #status=sap_constants.TEST_RESULT_PASS
-                    #result=sap_constants.TEST_RESULT_TRUE
+                    status,result,value,err_msg = self.rk.get_status(cell_xpath)
                 else:
                     logger.print_on_console('Element state does not allow to perform the operation')
                     err_msg = sap_constants.ERROR_MSG
