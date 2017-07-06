@@ -71,9 +71,12 @@ class Utils:
         return flag
 
     def bring_to_top(self,aut_handle,value):
-        win32gui.BringWindowToTop(aut_handle)
-        win32gui.ShowWindow(aut_handle,value)
-        win32gui.SetForegroundWindow(aut_handle)
+        try:
+            win32gui.BringWindowToTop(aut_handle)
+            win32gui.ShowWindow(aut_handle,value)
+            win32gui.SetForegroundWindow(aut_handle)
+        except Exception as e:
+            log.error(e)
 
     def highlight(self,objectname,windowname):
         status=True
