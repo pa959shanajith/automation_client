@@ -15,7 +15,7 @@ import logger
 import logging
 import step_description
 from datetime import datetime
-
+import core_utils
 log = logging.getLogger("reporting.py")
 
 
@@ -46,6 +46,7 @@ class Reporting:
         self.name=''
         self.user_termination=False
         self.step_description_obj=step_description.StepDescription()
+        self.core_utilsobject = core_utils.CoreUtils()
 
     def get_description(self,tsp,con):
         """
@@ -83,7 +84,8 @@ class Reporting:
             'sap':self.step_description_obj.sap,
             'desktopjava':self.step_description_obj.oebs}
             description=apptype_description[apptype.lower()](*params)
-            description=description.encode('utf-8')
+            description=self.core_utilsobject.get_UTF_8(description)
+##            description=description.encode('utf-8')
 
         except Exception as e:
             log.error(e)
@@ -222,14 +224,23 @@ class Reporting:
             except Exception as e:
                 log.error(e)
         obj={}
+        report_obj._id=self.core_utilsobject.get_UTF_8(report_obj._id)
         obj[ID]=report_obj._id
+        report_obj.name=self.core_utilsobject.get_UTF_8(report_obj.name)
         obj[KEYWORD]=report_obj.name
+        report_obj.parent_id=self.core_utilsobject.get_UTF_8(report_obj.parent_id)
         obj[PARENT_ID]=report_obj.parent_id
+        report_obj.status=self.core_utilsobject.get_UTF_8(report_obj.status)
         obj[STATUS]=report_obj.status
+        report_obj.step=self.core_utilsobject.get_UTF_8(report_obj.step)
         obj[STEP]=report_obj.step
+        report_obj.comments=self.core_utilsobject.get_UTF_8(report_obj.comments)
         obj[COMMENTS]=report_obj.comments
+        report_obj.step_description=self.core_utilsobject.get_UTF_8(report_obj.step_description)
         obj[STEP_DESCRIPTION]=report_obj.step_description
+        report_obj.screenshot_path=self.core_utilsobject.get_UTF_8(report_obj.screenshot_path)
         obj[SCREENSHOT_PATH]= report_obj.screenshot_path
+        report_obj.ellapsedtime=self.core_utilsobject.get_UTF_8(report_obj.ellapsedtime)
         obj[ELLAPSED_TIME]=report_obj.ellapsedtime
         self.report_string.append(obj)
 

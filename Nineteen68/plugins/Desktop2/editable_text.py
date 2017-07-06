@@ -124,15 +124,11 @@ class Text_Box:
                 log.debug(check)
                 if (check):
                     log.info('Parent matched')
-                    if(element.is_enabled()):
-                        output = element.text_block()
-                        status = desktop_constants.TEST_RESULT_PASS
-                        result = desktop_constants.TEST_RESULT_TRUE
-                        log.info(STATUS_METHODOUTPUT_UPDATE)
-                    else:
-                      log.info('Element state does not allow to perform the operation')
-                      logger.print_on_console('Element state does not allow to perform the operation')
-                      err_msg= 'Element state does not allow to perform the operation'
+                    output = element.text_block()
+                    status = desktop_constants.TEST_RESULT_PASS
+                    result = desktop_constants.TEST_RESULT_TRUE
+                    log.info(STATUS_METHODOUTPUT_UPDATE)
+
                 else:
                    log.info('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'
@@ -203,20 +199,16 @@ class Text_Box:
                 log.debug(check)
                 if (check):
                     log.debug('Parent matched')
-                    if(element.is_enabled()):
-                        text = element.text_block()
-                        logger.print_on_console('Text : ' , text)
-                        log.info('Text obtained')
-                        text = str(text)
-                        log.info(text)
-                        if(text == input_val):
-                            log.info(STATUS_METHODOUTPUT_UPDATE)
-                            status = desktop_constants.TEST_RESULT_PASS
-                            result = desktop_constants.TEST_RESULT_TRUE
-                    else:
-                      log.info('Element state does not allow to perform the operation')
-                      logger.print_on_console('Element state does not allow to perform the operation')
-                      err_msg= 'Element state does not allow to perform the operation'
+                    text = element.text_block()
+                    logger.print_on_console('Text : ' , text)
+                    log.info('Text obtained')
+                    text = str(text)
+                    log.info(text)
+                    if(text == input_val):
+                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                        status = desktop_constants.TEST_RESULT_PASS
+                        result = desktop_constants.TEST_RESULT_TRUE
+
                 else:
                    log.info('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'

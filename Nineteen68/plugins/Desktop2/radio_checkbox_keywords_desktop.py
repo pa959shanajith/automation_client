@@ -159,30 +159,26 @@ class Radio_Checkbox_keywords():
                 check = verify_obj.verify_parent(element,parent)
                 if (check):
                     tag = element.friendly_class_name()
-                    if(element.is_enabled()):
-                        status = element.get_check_state()
-                        if(tag == 'CheckBox'):
-                            if(status == 1):
-                                flag = 'Checked'
-                                status=desktop_constants.TEST_RESULT_PASS
-                                result = desktop_constants.TEST_RESULT_TRUE
-                            else:
-                                flag = 'UnChecked'
-                                status=desktop_constants.TEST_RESULT_PASS
-                                result = desktop_constants.TEST_RESULT_TRUE
-                        if(tag == 'RadioButton'):
-                            if(status == 1):
-                                flag = 'Selected'
-                                status=desktop_constants.TEST_RESULT_PASS
-                                result = desktop_constants.TEST_RESULT_TRUE
-                            else:
-                                flag = 'UnSelected'
-                                status=desktop_constants.TEST_RESULT_PASS
-                                result = desktop_constants.TEST_RESULT_TRUE
-                    else:
-                      log.info('Element state does not allow to perform the operation')
-                      logger.print_on_console('Element state does not allow to perform the operation')
-                      err_msg= 'Element state does not allow to perform the operation'
+                    status = element.get_check_state()
+                    if(tag == 'CheckBox'):
+                        if(status == 1):
+                            flag = 'Checked'
+                            status=desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                        else:
+                            flag = 'UnChecked'
+                            status=desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                    if(tag == 'RadioButton'):
+                        if(status == 1):
+                            flag = 'Selected'
+                            status=desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                        else:
+                            flag = 'UnSelected'
+                            status=desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+
                 else:
                    log.info('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'
