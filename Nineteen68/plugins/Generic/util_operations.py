@@ -13,7 +13,7 @@ import sys
 import os
 import logger
 from generic_constants import *
-
+from verify_file_images import VerifyFileImages
 import file_operations
 from constants import *
 
@@ -21,6 +21,10 @@ import logging
 
 log = logging.getLogger('util_operations.py')
 class UtilOperations:
+
+    def __init__(self):
+        self.verify_image_obj=VerifyFileImages()
+
 
     def type_cast(self,input,to_type,*args):
         """
@@ -127,17 +131,19 @@ class UtilOperations:
                 img1 = Image.open(file1)
                 img2 = Image.open(file2)
                 log.debug('comparing the images')
-                if img1==img2:
-                    log.debug('Images comparision is Pass')
-                    logger.print_on_console('Images comparision is Pass')
+                if self.verify_image_obj.imagecomparison(img1,img2):
+                    info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
+                    log.info(info_msg)
+                    logger.print_on_console(info_msg)
                     methodoutput=TEST_RESULT_TRUE
                     status=TEST_RESULT_PASS
                 else:
-                    log.debug('Images comparision is Fail')
-                    logger.print_on_console('Images comparision is Fail')
+                    err_msg=ERROR_CODE_DICT['ERR_IMAGE_COMPARE_FAIL']
             else:
-                log.error('Invalid Input files')
-                logger.print_on_console('Invalid Input files')
+                err_msg=ERROR_CODE_DICT['ERR_IMAGE_INPUT_FILES']
+            if err_msg != None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)

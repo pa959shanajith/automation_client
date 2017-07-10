@@ -24,6 +24,7 @@ import time
 import urllib, cStringIO
 import logging
 from constants import *
+from verify_file_images import VerifyFileImages
 
 log = logging.getLogger('utilweb_operations.py')
 
@@ -88,6 +89,7 @@ class UtilWebKeywords:
     def __init__(self):
         self.keys_info={}
         self.__create_keyinfo_dict()
+        self.verify_image_obj=VerifyFileImages()
 
     def __web_driver_exception(self,e):
         log.error(e)
@@ -575,13 +577,14 @@ class UtilWebKeywords:
                 from PIL import Image
                 img1 = Image.open(file1)
                 img2 = Image.open(file2)
-                if img1==img2:
+                if self.verify_image_obj.imagecomparison(img1,img2):
                     info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
                     logger.print_on_console(info_msg)
+                    log.info(info_msg)
                     methodoutput=TEST_RESULT_TRUE
                     status=TEST_RESULT_PASS
                 else:
-                    err_msg=ERROR_CODE_DICT['ERR_IMAGE_COMPARE_FAIl']
+                    err_msg=ERROR_CODE_DICT['ERR_IMAGE_COMPARE_FAIL']
             else:
                 err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
             if err_msg != None:

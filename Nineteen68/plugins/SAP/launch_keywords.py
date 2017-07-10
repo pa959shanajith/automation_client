@@ -526,7 +526,9 @@ class Launch_Keywords():
                     win32gui.BringWindowToTop(handle)
                     win32gui.ShowWindow(handle,5)
         except Exception as e:
-            logger.print_on_console("The following error has occoured while bringing window to foreground",e)
+            err_msg='The following error has occoured while bringing window to foreground'
+            log.error(err_msg,e)
+            #logger.print_on_console("The following error has occoured while bringing window to foreground",e)
 
     def capture_window(self,handle):
         toplist, winlist = [], []
