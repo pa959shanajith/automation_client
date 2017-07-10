@@ -158,7 +158,7 @@ ERROR_CODE_DICT ={
                     'ERR_ILLEGAL_ARGUMENT_EXCEPTION': 'Input Error: Please provide valid input.',
                     'ERR_NO_IMAGE_SOURCE': 'Image source not available.',
                     'MSG_IMAGE_COMPARE_PASS':'Image comparision is Pass',
-                    'ERR_IMAGE_COMPARE_FAIl':'Image comparision is Fail',
+                    'ERR_IMAGE_COMPARE_FAIL':'Image comparision is Fail',
                     'ERR_NUMBER_FORMAT_EXCEPTION': 'Input Error: Invalid input format.',
                     'ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION': 'Input Error: Invalid number of inputs.',
                     'ERR_ARRAY_INDEX_OUT_OF_BOUNDS_EXCEPTION': 'Input Error: Invalid number of inputs.',
