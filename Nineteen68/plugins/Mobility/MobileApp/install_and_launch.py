@@ -40,7 +40,7 @@ class LaunchAndInstall():
                 # desired_caps['deviceName'] = 'Nineteen68_21s_iPhone'
                 desired_caps['deviceName'] = input_val[1]
                 if str(input_val[0]).endswith('ipa'):
-                    desired_caps['udid'] = input_val[4]
+                    desired_caps['udid'] = input_val[3]
                 # desired_caps['udid'] = '7a8ebddd58e07318edd3dae33adefd75c24a2f65'
                 desired_caps['fullReset'] = False
                 desired_caps['newCommandTimeout'] = 3600
