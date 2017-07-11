@@ -28,7 +28,7 @@ import readconfig
 import spinner_keywords
 import list_view_mobility
 import picker_wheel_ios
-import table_keywords
+import table_keywords_native
 apptypes = None
 
 log = logging.getLogger('mobile_app_dispatcher.py')
@@ -45,7 +45,7 @@ class MobileDispatcher:
     spinner_keywords_object=spinner_keywords.Spinner_Keywords()
     list_view_keywords_object=list_view_mobility.List_Keywords()
     picker_wheel_keywords_object = picker_wheel_ios.Picker_Wheel_Keywords()
-    table_keywords_object=table_keywords.Table_Keywords()
+    table_keywords_object=table_keywords_native.Table_Keywords()
     def __init__(self):
         self.exception_flag=''
 
