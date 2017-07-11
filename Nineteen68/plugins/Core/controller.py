@@ -185,7 +185,7 @@ class Controller():
 
     def __load_web(self):
         try:
-            self.get_all_the_imports('ImageProcessing')
+##            self.get_all_the_imports('ImageProcessing')
             self.get_all_the_imports('WebScrape')
             self.get_all_the_imports('Web')
             import web_dispatcher
