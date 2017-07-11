@@ -819,11 +819,11 @@ class StepDescription:
         def deselectAll():
             return 'Deselect all values in the '+ "'" + tsp.custname + "'"
         def getValueByIndex():
-            return 'Get value with index ' + input + ' in the '+ "'" + tsp.custname + "'" + ' and save the value ' + output + ' in '+ tsp.outputval,
+            return 'Get value with index ' + input + ' in the '+ "'" + tsp.custname + "'" + ' and save the value ' + output + ' in '+ tsp.outputval
         def verifyValuesExists():
             return 'Verify values ' + input + ' exists in the '+ "'" + tsp.custname + "'"
         def selectValueByText():
-            return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']',
+            return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']'
         def getMultipleValuesByIndexes():
             return 'Get values with indexes ' + inputValsb.toString() + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + TestAutomationController.multipleOutputResult + ' in  '+ tsp.outputval
         def verifySelectedValue():
