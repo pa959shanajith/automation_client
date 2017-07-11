@@ -28,6 +28,7 @@ import readconfig
 import spinner_keywords
 import list_view_mobility
 import picker_wheel_ios
+import table_keywords
 apptypes = None
 
 log = logging.getLogger('mobile_app_dispatcher.py')
@@ -44,6 +45,7 @@ class MobileDispatcher:
     spinner_keywords_object=spinner_keywords.Spinner_Keywords()
     list_view_keywords_object=list_view_mobility.List_Keywords()
     picker_wheel_keywords_object = picker_wheel_ios.Picker_Wheel_Keywords()
+    table_keywords_object=table_keywords.Table_Keywords()
     def __init__(self):
         self.exception_flag=''
 
@@ -132,7 +134,12 @@ class MobileDispatcher:
                     'SelectMultipleViewsByIndexes':self.list_view_keywords_object.select_multiple_views_by_indexes,
                     'SelectMultipleViewsByText':self.list_view_keywords_object.select_multiple_views_by_text,
                     'SetValue': self.picker_wheel_keywords_object.set_value,
-                    'GetValue': self.picker_wheel_keywords_object.get_value
+                    'GetValue': self.picker_wheel_keywords_object.get_value,
+                    'GetRowCount':self.table_keywords_object.get_row_count,
+                    'VerifyRowCount':self.table_keywords_object.verify_row_count,
+                    'CellClick':self.table_keywords_object.cell_click,
+                    'GetCellValue':self.table_keywords_object.get_cell_value,
+                    'VerifyCellValue':self.table_keywords_object.verify_cell_value
 
 
 
