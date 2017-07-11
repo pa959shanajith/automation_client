@@ -39,9 +39,9 @@ class Textbox_keywords():
                     enable=element.is_enabled()
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
-                        if len(element.text)>0:
-                            log.debug('clearing  the existing text')
-                            element.clear()
+                        # if len(element.text)>0:
+                        #     log.debug('clearing  the existing text')
+                        element.clear()
                         log.debug('Setting the text')
                         import platform
                         if platform.system() == 'Darwin':
@@ -84,11 +84,11 @@ class Textbox_keywords():
                     enable=element.is_enabled()
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
-                        if len(element.text)>0:
-                            log.debug('clearing  the existing text')
-                            element.clear()
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
+                        # if len(element.text)>0:
+                        log.debug('clearing  the existing text')
+                        element.clear()
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
@@ -124,8 +124,8 @@ class Textbox_keywords():
                     log.info(INPUT_IS)
                     log.info(input)
                     if input is not None:
-                            if len(webelement.text)>0:
-                                webelement.clear()
+                            # if len(webelement.text)>0:
+                            webelement.clear()
                             encryption_obj = AESCipher()
                             input_val = encryption_obj.decrypt(input)
 ##                            user_input=self.validate_input(webelement,input_val)
@@ -162,9 +162,9 @@ class Textbox_keywords():
                     enable=element.is_enabled()
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
-                        if len(element.text)>0:
-                            log.debug('clearing  the existing text')
-                            element.clear()
+                        # if len(element.text)>0:
+                        log.debug('clearing  the existing text')
+                        element.clear()
                         log.debug('Sending the keys')
                         import platform
                         if platform.system() == 'Darwin':
@@ -209,6 +209,9 @@ class Textbox_keywords():
                 log.error(e)
                 logger.print_on_console(err_msg)
         return status,result,output,err_msg
+
+
+
 
     def verify_text(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
