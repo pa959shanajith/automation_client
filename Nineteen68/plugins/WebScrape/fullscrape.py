@@ -262,6 +262,7 @@ class Fullscrape():
         except Exception as e:
             status = domconstants.STATUS_FAIL
             data = domconstants.STATUS_FAIL
+            print 'Error while performing full scrape'
         return data
 
 ##    def save_json_data(self):

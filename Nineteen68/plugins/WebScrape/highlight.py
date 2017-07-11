@@ -266,8 +266,9 @@ class Highlight():
 
             status = domconstants.STATUS_SUCCESS
         except Exception as e:
-            Exceptions.error(e)
+##            Exceptions.error(e)
             status= domconstants.STATUS_FAIL
+            print 'Error while highlighting'
         log.info('Highlight method execution done ')
         return status
 
