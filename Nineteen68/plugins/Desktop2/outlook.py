@@ -123,6 +123,13 @@ class OutlookKeywords:
                 self.senderEmail=input[0]
                 self.subject=input[2]
                 self.toMail=input[1]
+                #clearing all the variables before fetching the values
+                self.Subject=''
+                self.ToMailID=''
+                self.FromMailId=''
+                self.AttachmentStatus=outlook_constants.ATTACH_STATUS_NO
+                self.Body=''
+                self.message=''
 
 ##                pythoncom.CoInitialize()
 ##                engine.subscribe('start_thread', onThreadStart)
