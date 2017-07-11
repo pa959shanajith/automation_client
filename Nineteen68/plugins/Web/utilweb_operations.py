@@ -568,25 +568,28 @@ class UtilWebKeywords:
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             from PIL import Image
-            img_src = webelement.get_attribute("src")
-            file1 = cStringIO.StringIO(urllib.urlopen(img_src).read())
-            file2=input[0]
-            log.info(INPUT_IS)
-            log.info(file2)
-            if file1 != None and file2 != None and  file2 != '' and os.path.exists(file2) :
-                from PIL import Image
-                img1 = Image.open(file1)
-                img2 = Image.open(file2)
-                if self.verify_image_obj.imagecomparison(img1,img2):
-                    info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
-                    logger.print_on_console(info_msg)
-                    log.info(info_msg)
-                    methodoutput=TEST_RESULT_TRUE
-                    status=TEST_RESULT_PASS
+            if webelement!=None and webelement !='':
+                img_src = webelement.get_attribute("src")
+                file1 = cStringIO.StringIO(urllib.urlopen(img_src).read())
+                file2=input[0]
+                log.info(INPUT_IS)
+                log.info(file2)
+                if file1 != None and file2 != None and  file2 != '' and os.path.exists(file2) :
+                    from PIL import Image
+                    img1 = Image.open(file1)
+                    img2 = Image.open(file2)
+                    if self.verify_image_obj.imagecomparison(img1,img2):
+                        info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
+                        logger.print_on_console(info_msg)
+                        log.info(info_msg)
+                        methodoutput=TEST_RESULT_TRUE
+                        status=TEST_RESULT_PASS
+                    else:
+                        err_msg=ERROR_CODE_DICT['ERR_IMAGE_COMPARE_FAIL']
                 else:
-                    err_msg=ERROR_CODE_DICT['ERR_IMAGE_COMPARE_FAIL']
+                    err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
             else:
-                err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
+                err_msg='Web element not found'
             if err_msg != None:
                 logger.print_on_console(err_msg)
                 log.error(err_msg)

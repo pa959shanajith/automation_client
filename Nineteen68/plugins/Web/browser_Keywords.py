@@ -626,54 +626,54 @@ class Singleton_DriverUtil():
             import win32process
             try:
                 # search all the drives to take firefox path
-                def find_file(root_folder, rex):
-                    found = False
-                    for root,dirs,files in os.walk(root_folder):
-                        for f in files:
-                            result = rex.search(f)
-                            if result:
-                                found = True
-                                firefox_path = os.path.join(root,f)
-                                firefox_arr = [firefox_path,found]
-                                break
-                        if found:
-                            break
-                    return firefox_arr
-
-                def find_file_in_all_drives(file_name):
-                    #create a regular expression for the file
-                    rex = re.compile(file_name)
-                    for drive in win32api.GetLogicalDriveStrings().split('\000')[:-1]:
-                        found = find_file( drive, rex )
-                        path=found[0]
-                        flag=found[1]
-                        if flag:
-                            break
-                    return path
-
-                path = find_file_in_all_drives( 'firefox.exe' )
-                # To fetch the version of the firefox browser
-                info = win32api.GetFileVersionInfo(path, "\\")
-                ms = info['ProductVersionMS']
-                ls = info['ProductVersionLS']
-                ver = win32api.HIWORD(ms), win32api.LOWORD(ms), win32api.HIWORD(ls), win32api.LOWORD(ls)
-                version = ver[0]
-
-                # opening firefox browser through selenium if the version 47 and less than 47
-                ignore_certificate = configvalues['ignore_certificate']
-                profile = webdriver.FirefoxProfile()
-                if ignore_certificate.lower() == 'yes':
-                    profile.accept_untrusted_certs = True
-                if int(version) < 48:
-                    driver = webdriver.Firefox(firefox_profile=profile)
-                    drivermap.append(driver)
-                    driver.maximize_window()
-                    logger.print_on_console('Firefox browser started')
-                    log.info('Firefox browser started')
-                else:
+##                def find_file(root_folder, rex):
+##                    found = False
+##                    for root,dirs,files in os.walk(root_folder):
+##                        for f in files:
+##                            result = rex.search(f)
+##                            if result:
+##                                found = True
+##                                firefox_path = os.path.join(root,f)
+##                                firefox_arr = [firefox_path,found]
+##                                break
+##                        if found:
+##                            break
+##                    return firefox_arr
+##
+##                def find_file_in_all_drives(file_name):
+##                    #create a regular expression for the file
+##                    rex = re.compile(file_name)
+##                    for drive in win32api.GetLogicalDriveStrings().split('\000')[:-1]:
+##                        found = find_file( drive, rex )
+##                        path=found[0]
+##                        flag=found[1]
+##                        if flag:
+##                            break
+##                    return path
+##
+##                path = find_file_in_all_drives( 'firefox.exe' )
+##                # To fetch the version of the firefox browser
+##                info = win32api.GetFileVersionInfo(path, "\\")
+##                ms = info['ProductVersionMS']
+##                ls = info['ProductVersionLS']
+##                ver = win32api.HIWORD(ms), win32api.LOWORD(ms), win32api.HIWORD(ls), win32api.LOWORD(ls)
+##                version = ver[0]
+##
+##                # opening firefox browser through selenium if the version 47 and less than 47
+##                ignore_certificate = configvalues['ignore_certificate']
+##                profile = webdriver.FirefoxProfile()
+##                if ignore_certificate.lower() == 'yes':
+##                    profile.accept_untrusted_certs = True
+##                if int(version) < 48:
+##                    driver = webdriver.Firefox(firefox_profile=profile)
+##                    drivermap.append(driver)
+##                    driver.maximize_window()
+##                    logger.print_on_console('Firefox browser started')
+##                    log.info('Firefox browser started')
+##                else:
                     caps=webdriver.DesiredCapabilities.FIREFOX
                     caps['marionette'] = True
-                    driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH,firefox_profile=profile)
+                    driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH)
                     drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('Firefox browser started using geckodriver')
