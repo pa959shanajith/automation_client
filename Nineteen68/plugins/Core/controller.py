@@ -132,6 +132,8 @@ class Controller():
                 self.get_all_the_imports('Generic')
                 import generic_dispatcher
                 self.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
+                self.get_all_the_imports('ImageProcessing')
+
         except Exception as e:
             logger.print_on_console('Error loading Generic plugin')
 
@@ -188,6 +190,7 @@ class Controller():
             self.web_dispatcher_obj = web_dispatcher.Dispatcher()
             self.web_dispatcher_obj.exception_flag=exception_flag
             self.web_dispatcher_obj.action=self.action
+            self.get_all_the_imports('ImageProcessing')
 
         except Exception as e:
              logger.print_on_console('Error loading Web plugin')
