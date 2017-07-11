@@ -148,7 +148,8 @@ class Clickandadd():
             status = domconstants.STATUS_SUCCESS
         except Exception as e:
             status = domconstants.STATUS_FAIL
-            Exceptions.error(e)
+            print 'Error while performing start click and add scrape'
+##            Exceptions.error(e)
         return status
 
     def stopclickandadd(self):
@@ -360,6 +361,7 @@ class Clickandadd():
         except Exception as e:
             status = domconstants.STATUS_FAIL
             data = domconstants.STATUS_FAIL
+            print 'Error while performing stop click and add scrape'
         return data
 
 ##    def save_json_data(self):
