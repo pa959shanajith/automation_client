@@ -1072,7 +1072,7 @@ class Controller():
         if len(outputstring) > 0  and outputstring != None:
             if (outputstring.find(';') > 0):
                 index = outputstring.rfind(';')
-                print outputstring[index + 1:]
+##                print outputstring[index + 1:]
                 if outputstring[index + 1:] == STEPSTATUS_INREPORTS_ZERO:
                     nostatusflag = True
             elif outputstring== STEPSTATUS_INREPORTS_ZERO:
