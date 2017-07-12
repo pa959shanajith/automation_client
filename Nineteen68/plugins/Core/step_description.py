@@ -776,6 +776,23 @@ class StepDescription:
             return 'Select values ' + input + 'in the '+ "'" + tsp.custname + "'"
 
 
+        # dropdown keywords
+        def GetRowCount():
+            return 'Get the count of cells in the table ' + "'" + tsp.custname + "'" + ' and save the count ' + output + ' in ' + output_list
+
+        def VerifyRowCount():
+            return 'Verify ' + input + ' is the list count of the ' +"'" + tsp.custname + "'"
+
+        def CellClick():
+            return 'Click on the cell number ' + input + ' in the table ' +"'" + tsp.custname + "'"
+
+        def GetCellValue():
+            return "Get data from the cell number '" + input+ " in the table '" + tsp.custname + "'" +' and save the value ' + output + ' in ' + output_list
+
+        def VerifyCellValue():
+            return "Verify data from the cell number '" + input+ " in the table '" + tsp.custname + "'"
+
+
         return locals()[keyword]()
 
     def web(self,keyword,tsp,inputval,input,output,con,reporting_obj):

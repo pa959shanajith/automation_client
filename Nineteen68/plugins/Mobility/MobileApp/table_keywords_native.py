@@ -120,6 +120,8 @@ class Table_Keywords():
                         if (int(input_count) > 0 and int(input_count)<=count):
                             # print 'about to click '
                             cells[int(input_count)].click()
+                            status = TEST_RESULT_PASS
+                            result = TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
                         # print 'element is disabled'
