@@ -79,12 +79,11 @@ class DesktopDispatcher:
                 }
 #-----------------------------------------------------------------for custom objects
 
-
     def dispatcher(self,teststepproperty,input):
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
-        keyword = teststepproperty.name
+        keyword = teststepproperty.name.lower()
         url = teststepproperty.url
         err_msg=None
         result=[desktop_constants.TEST_RESULT_FAIL,desktop_constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
