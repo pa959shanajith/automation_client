@@ -730,7 +730,7 @@ class StepDescription:
         def VerifySelectedValue():
             return 'Verify value ' + input + ' are selected in the '+ "'" + tsp.custname + "'"+'.'
         def SelectValueByText():
-            return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']',
+            return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']'
         def GetMultipleValuesByIndexes():
             return 'Get values with indexes ' + inputValsb.toString() + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + TestAutomationController.multipleOutputResult + ' in  '+ output_list
 
