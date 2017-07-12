@@ -114,6 +114,7 @@ class ElementKeywords():
                 if (check):
                     log.info('Parent matched')
                     if(element.is_enabled()):
+                        element.set_focus()
                         element.click()
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
@@ -168,7 +169,11 @@ class ElementKeywords():
         log.info(RETURN_RESULT)
         return status,result,output,err_msg
 
-    def verify_element_text(self, element , parent ,input, *args):
+    def verify_element_text(self, element , parent ,input_value, *args):
+        if(len(input_value)>1):
+            text_verify = input_value[2]
+        else:
+            text_verify=input_value[0]
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
@@ -179,7 +184,7 @@ class ElementKeywords():
         try:
             if launch_keywords.window_name!=None:
                 log.info('Recieved element from the desktop dispatcher')
-                input_val = input[0]
+                input_val = text_verify
                 log.info('input value obtained')
                 log.info(input_val)
                 verify_obj = Text_Box()

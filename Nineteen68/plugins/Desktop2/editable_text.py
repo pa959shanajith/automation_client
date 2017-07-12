@@ -20,6 +20,10 @@ log = logging.getLogger('editable_text.py')
 
 class Text_Box:
     def set_text(self , element , parent , input_val ,*args):
+        if(len(input_val)>1):
+            text = input_val[2]
+        else:
+            text=input_val[0]
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
@@ -40,7 +44,7 @@ class Text_Box:
                 if (check):
                     log.info('Parent matched')
                     if(element.is_enabled()):
-                        input_val = input_val[0]
+                        input_val = text
                         element.type_keys(input_val,with_spaces = True)
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
@@ -61,6 +65,10 @@ class Text_Box:
 
 
     def set_secure_text(self, element , parent , input_val , *args):
+        if(len(input_val)>1):
+            text = input_val[2]
+        else:
+            text=input_val[0]
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
@@ -81,7 +89,7 @@ class Text_Box:
                 if (check):
                     log.info('Parent matched')
                     if(element.is_enabled()):
-                        input_val = input_val[0]
+                        input_val = text
                         log.info('Element state is enabled')
                         encryption_obj = AESCipher()
                         input_val_temp = encryption_obj.decrypt(input_val)

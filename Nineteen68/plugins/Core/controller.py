@@ -106,7 +106,7 @@ class Controller():
         self.cur_dir= os.getcwd()
         self.previous_step=''
         self.verify_dict={'web':VERIFY_EXISTS,
-        'desktopjava':VERIFY_VISIBLE,'sap':VERIFY_EXISTS}
+        'desktopjava':VERIFY_VISIBLE,'sap':VERIFY_EXISTS,'desktop':VERIFY_EXISTS}
         self.dynamic_var_handler_obj=dynamic_variable_handler.DynamicVariables()
         self.status=TEST_RESULT_FAIL
         self.scenario_start_time=''
