@@ -163,8 +163,6 @@ class CustomObjectHandler():
         xpath = None
         try:
             app_uia = launch_keywords.app_uia
-            import desktop_scraping
-            scraping_obj = desktop_scraping.Scrape()
             data = self.for_custom_scrape(app_uia)
             for index, item in enumerate(data):
                 if item['xpath']==parent_xpath:
