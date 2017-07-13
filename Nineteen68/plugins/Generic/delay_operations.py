@@ -86,6 +86,9 @@ class Delay_keywords:
 ##                    if y == 'None' or y == None:
                     if y == None:
                         y = 'null'
+                    if  x.count('{')!=1 and x.count('}')!=1:
+                        logger.print_on_console('Invalid Syntax')
+                        y=''
 ##                    if not isinstance(y,unicode):
 ##                        print str(y)
 ##                        y=str(y)

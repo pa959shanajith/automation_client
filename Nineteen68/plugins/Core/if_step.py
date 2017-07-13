@@ -85,7 +85,15 @@ class If():
             logical_eval_obj=Logical_eval()
             input_expression=''
             if len(input)>=2:
+                none_mark=[]
+                null_count=0
                 for exp in input:
+                    if exp is None:
+                        exp='null'
+                        null_count=null_count+1
+                        none_mark.append(null_count)
+                    elif 'null' in exp:
+                        null_count=null_count+exp.count('null')
                     input_expression=input_expression+exp
             else:
                 logger.print_on_console('Invalid input')
@@ -99,7 +107,7 @@ class If():
                         value=dynamic_variable_handler.dynamic_variable_map['{'+var+'}']
                         input_expression=string.replace(input_expression,'{'+var+'}',value)
             logger.print_on_console('Input_expression is ',input_expression)
-            res=logical_eval_obj.eval_expression(input_expression)
+            res=logical_eval_obj.eval_expression(input_expression,none_mark)
             logger.print_on_console(self.name+': Condition is '+str(res)+'\n')
             self.step_description='Encountered :'+self.name+ ' Condition is '+str(res)
 
@@ -161,16 +169,19 @@ class If():
 class Logical_eval():
 
     #Block to evaluate conditional expression
-    def eval_expression(self,expression):
+    def eval_expression(self,expression,none_mark):
         expression=str(expression)
         expression=expression.replace('AND','and').replace('OR','or').replace('NOT','not')
         try:
             exp = expression
             exp = exp.replace('>=','/').replace('<=','/').replace('>','/').replace('<','/').replace('==','/').replace('OR','/').replace('NOT','/').replace('AND','/').replace('(','/').replace(')','/')
             operands = exp.split('/')
+            null_count=0
             for i in operands:
-                if i== None or i.lower() == 'null' or i.lower() == 'none':
-                    logger.print_on_console('expression should not contain null/None operands')
+                if 'null' in exp:
+                    null_count=null_count+i.count('null')
+                if (i is None) or (i=='null' and null_count in none_mark):
+                    logger.print_on_console('expression should not contain null operands')
                     return INVALID
 
             result=satisfiable(expression)
