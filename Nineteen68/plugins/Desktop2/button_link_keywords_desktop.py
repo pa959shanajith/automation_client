@@ -98,6 +98,61 @@ class ButtonLinkKeyword():
             logger.print_on_console(exception)
         return status,result,verb,err_msg
 
+    def press(self, element , parent  , *args):
+        log.debug('Got window name after launching application')
+        log.debug(launch_keywords.window_name)
+        status=desktop_constants.TEST_RESULT_FAIL
+        result=desktop_constants.TEST_RESULT_FALSE
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        verb = OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            if launch_keywords.window_name!=None:
+                log.info('Recieved element from the desktop dispatcher')
+                dektop_element = element
+                verify_obj = Text_Box()
+                check = verify_obj.verify_parent(element,parent)
+                log.debug('Parent of element while scraping')
+                log.debug(parent)
+                log.debug('Parent check status')
+                log.debug(check)
+                inputval = ''
+                if (check):
+                    log.info('Parent matched')
+                    if(element.is_enabled()):
+                        if len(args)>0:
+                            inputs = args[0]
+                            inputval = inputs[0]
+                            inputval = str(inputval)
+                        else:
+                            inputval = ''
+                        rect = element.rectangle()
+                        l = rect.left
+                        t = rect.top
+                        if inputval.lower() == 'right':
+                            pywinauto.mouse.click(button='right',coords=(l+3, t+3))
+                            status = desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                        else:
+                            pywinauto.mouse.click(button='left',coords=(l+3, t+3))
+                            status = desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+
+                    else:
+                        log.info('Element state does not allow to perform the operation')
+                        logger.print_on_console('Element state does not allow to perform the operation')
+                        err_msg = 'Element state does not allow to perform the operation'
+                else:
+                    log.info('Element not present on the page where operation is trying to be performed')
+                    err_msg='Element not present on the page where operation is trying to be performed'
+                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
+        except Exception as exception:
+            log.error(exception)
+            logger.print_on_console(exception)
+        return status,result,verb,err_msg
+
     def verify_button_name(self, element , parent , input, *args):
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE

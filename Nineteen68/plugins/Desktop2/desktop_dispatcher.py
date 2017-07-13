@@ -111,6 +111,7 @@ class DesktopDispatcher:
 
         try:
             dict={ 'click': self.button_link_keywords_obj.click,
+                    'press':self.button_link_keywords_obj.press,
                     'doubleclick' : self.button_link_keywords_obj.double_click,
                     'verifybuttonname' : self.button_link_keywords_obj.verify_button_name,
                     'getbuttonname' : self.button_link_keywords_obj.get_button_name,
