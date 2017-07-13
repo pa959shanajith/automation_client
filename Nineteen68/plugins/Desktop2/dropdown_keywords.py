@@ -22,6 +22,10 @@ log = logging.getLogger('dropdown_keywords.py')
 class Dropdown_Keywords():
 
         def selectValueByIndex(self,element,parent,input_val, *args):
+            if(len(input_val)>1):
+                text = input_val[2]
+            else:
+                text=input_val[0]
             status=desktop_constants.TEST_RESULT_FAIL
             result=desktop_constants.TEST_RESULT_FALSE
             verb = OUTPUT_CONSTANT
@@ -39,7 +43,7 @@ class Dropdown_Keywords():
                     if (check):
                         log.info('Parent matched')
                         if(element.is_enabled()):
-                            item_index=int(input_val[0])
+                            item_index=int(text)
                             if element.friendly_class_name() == 'ListView':
                                 item_count = element.item_count()
                                 if item_index <= item_count:
@@ -394,6 +398,10 @@ class Dropdown_Keywords():
                 return status,result,verb,err_msg
 
         def selectValueByText(self,element,parent,input_val, *args):
+            if(len(input_val)>1):
+                text = input_val[2]
+            else:
+                text=input_val[0]
             status=desktop_constants.TEST_RESULT_FAIL
             result=desktop_constants.TEST_RESULT_FALSE
             verb = OUTPUT_CONSTANT
@@ -412,7 +420,7 @@ class Dropdown_Keywords():
                     if (check):
                         log.info('Parent matched')
                         if(element.is_enabled()):
-                            item_text=str(input_val[0])
+                            item_text=str(text)
                             if element.friendly_class_name() == 'ListView':
                                 if item_text != '' or item_text != None:
                                     try:

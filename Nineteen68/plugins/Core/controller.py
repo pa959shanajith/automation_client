@@ -106,7 +106,7 @@ class Controller():
         self.cur_dir= os.getcwd()
         self.previous_step=''
         self.verify_dict={'web':VERIFY_EXISTS,
-        'desktopjava':VERIFY_VISIBLE,'sap':VERIFY_EXISTS}
+        'desktopjava':VERIFY_VISIBLE,'sap':VERIFY_EXISTS,'desktop':VERIFY_EXISTS}
         self.dynamic_var_handler_obj=dynamic_variable_handler.DynamicVariables()
         self.status=TEST_RESULT_FAIL
         self.scenario_start_time=''
@@ -1072,7 +1072,7 @@ class Controller():
         if len(outputstring) > 0  and outputstring != None:
             if (outputstring.find(';') > 0):
                 index = outputstring.rfind(';')
-                print outputstring[index + 1:]
+##                print outputstring[index + 1:]
                 if outputstring[index + 1:] == STEPSTATUS_INREPORTS_ZERO:
                     nostatusflag = True
             elif outputstring== STEPSTATUS_INREPORTS_ZERO:

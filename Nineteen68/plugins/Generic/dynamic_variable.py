@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        dynamic_variable
-# Purpose:
+# Purpose:     To display variable and pause window
 #
 # Author:      sushma.p
 #

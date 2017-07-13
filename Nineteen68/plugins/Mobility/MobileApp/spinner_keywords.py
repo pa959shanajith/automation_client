@@ -586,7 +586,8 @@ class Spinner_Keywords():
                     if enable:
                         log.debug('performing the action')
                         driver=install_and_launch.driver
-
+                        action = TouchAction(driver)
+                        action.tap(webelement).perform()
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                             for i in element:
@@ -620,7 +621,6 @@ class Spinner_Keywords():
                             length2=len(text)
                             time.sleep(3)
                             driver.scroll(scrollele1,scrollele2)
-
                             if (length1==length2):
                                 if len(input) == count:
                                     output=temp[0]
@@ -634,6 +634,7 @@ class Spinner_Keywords():
                                         log.error('invalid input')
                                         logger.print_on_console(err_msg)
                                         break
+                        driver.back()
 
 
 
@@ -648,8 +649,6 @@ class Spinner_Keywords():
                     log.error('element is not visible')
                     logger.print_on_console(err_msg)
         except Exception as e:
-
-
                 log.error(e)
 
         return status,result,output,err_msg

@@ -12,6 +12,7 @@
 # CONSTANTS
 ##KEYEVENTF_EXTENDEDKEY = 1
 ##KEYEVENTF_KEYUP = 2
+CUSTOM='@Custom'
 
 #Dictionary used for send function keys special characters
 

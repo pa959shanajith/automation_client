@@ -25,6 +25,7 @@ import outlook
 import constants
 import logging
 import readconfig
+import desktop_custom_object
 from pywinauto.application import Application
 
 log = logging.getLogger('desktop_dispatcher.py')
@@ -39,6 +40,7 @@ class DesktopDispatcher:
     radio_checkbox_keywords_obj = radio_checkbox_keywords_desktop.Radio_Checkbox_keywords()
     tab_control_keywords_obj = tab_control_keywords.Tab_Control_Keywords()
     date_control_keywords_obj = date_control_keywords.DateControlKeywords()
+    desktop_custom_object_obj =desktop_custom_object.CustomObjectHandler()
 ##    outook_obj=outlook.OutlookKeywords()
 
     def __init__(self):
@@ -46,21 +48,70 @@ class DesktopDispatcher:
         self.action = None
         self.outook_obj=outlook.OutlookKeywords()
 
+#-----------------------------------------------------------------for custom objects
+    custom_dict = {
+                    "clickelement":['radiobutton','checkbox','input','button','select'],
+                    "doubleclick":['radiobutton','checkbox','input','button','select'],
+                    "getelementtext":['radiobutton','checkbox','input','button','select'],
+                    "getstatus":['radiobutton','checkbox'],
+                    "gettext":['input'],
+                    "rightclick":['button'],
+                    "selectcheckbox":['checkbox'],
+                    "selectradiobutton":['radiobutton'],
+                    "setfocus" :['radiobutton','checkbox','input','button','select'],
+                    "setsecuretext":['input'],
+                    "selectvaluebyindex":['select'],
+                    "selectvaluebytext":['select'],
+                    "settext":['input'],
+                    "unselectcheckbox":['checkbox'],
+                    'verifyhidden' :['radiobutton','checkbox','input','button','select'],
+                    'verifyvisible':['radiobutton','checkbox','input','button','select'],
+                    "verifyelementtext":['radiobutton','checkbox','input','button','select'],
+                    "verifyexists":['radiobutton','checkbox','input','button','select']
+                  }
 
+    get_ele_type={
+                'radio': 'radiobutton',
+                'checkbox':'checkbox',
+                'dropdown':'select',
+                'textbox':'input',
+                'button':'button',
+                }
+#-----------------------------------------------------------------for custom objects
 
     def dispatcher(self,teststepproperty,input):
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
-        keyword = teststepproperty.name
+        keyword = teststepproperty.name.lower()
         url = teststepproperty.url
         err_msg=None
         result=[desktop_constants.TEST_RESULT_FAIL,desktop_constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
 ##        if objectname != '@Browser' or objectname != '@BrowserPopUp' or objectname != '@Custom':
-
+#-----------------------------------------------------------------for custom objects
+        try:
+            if objectname==desktop_constants.CUSTOM and teststepproperty.custom_flag:
+                ele_type=input[0].lower()
+                if ele_type in self.get_ele_type:
+                    ele_type=self.get_ele_type[ele_type]
+                parent_xpath=teststepproperty.parent_xpath
+                if (keyword in self.custom_dict and ele_type in self.custom_dict[keyword]):
+                    try:
+                        custom_desktop_element=self.desktop_custom_object_obj.getobjectforcustom(parent_xpath,ele_type,input[1])
+                    except:
+                        import traceback
+                        traceback.print_exc()
+                    if(custom_desktop_element != '' or None):
+                        objectname = custom_desktop_element
+                else:
+                    logger.print_on_console("unmapped or non existant custom objects")
+        except Exception as e:
+            logger.print_on_console("error has occured from custom objects")
+#-----------------------------------------------------------------for custom objects
 
         try:
             dict={ 'click': self.button_link_keywords_obj.click,
+                    'press':self.button_link_keywords_obj.press,
                     'doubleclick' : self.button_link_keywords_obj.double_click,
                     'verifybuttonname' : self.button_link_keywords_obj.verify_button_name,
                     'getbuttonname' : self.button_link_keywords_obj.get_button_name,
@@ -201,7 +252,7 @@ class DesktopDispatcher:
                 ch = ele.children()
                 ele = ch[int(index)]
         except Exception as e:
-            print e
+            logger.print_on_console("Unable to get desktop elements because :",e)
         return ele
 
 

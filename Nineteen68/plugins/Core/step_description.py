@@ -730,7 +730,7 @@ class StepDescription:
         def VerifySelectedValue():
             return 'Verify value ' + input + ' are selected in the '+ "'" + tsp.custname + "'"+'.'
         def SelectValueByText():
-            return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']',
+            return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']'
         def GetMultipleValuesByIndexes():
             return 'Get values with indexes ' + inputValsb.toString() + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + TestAutomationController.multipleOutputResult + ' in  '+ output_list
 
@@ -774,6 +774,23 @@ class StepDescription:
             return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' + output + ' in ' +output_list
         def SelectMultipleViewsByText():
             return 'Select values ' + input + 'in the '+ "'" + tsp.custname + "'"
+
+
+        # dropdown keywords
+        def GetRowCount():
+            return 'Get the count of cells in the table ' + "'" + tsp.custname + "'" + ' and save the count ' + output + ' in ' + output_list
+
+        def VerifyRowCount():
+            return 'Verify ' + input + ' is the list count of the ' +"'" + tsp.custname + "'"
+
+        def CellClick():
+            return 'Click on the cell number ' + input + ' in the table ' +"'" + tsp.custname + "'"
+
+        def GetCellValue():
+            return "Get data from the cell number '" + input+ " in the table '" + tsp.custname + "'" +' and save the value ' + output + ' in ' + output_list
+
+        def VerifyCellValue():
+            return "Verify data from the cell number '" + input+ " in the table '" + tsp.custname + "'"
 
 
         return locals()[keyword]()

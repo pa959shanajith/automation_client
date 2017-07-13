@@ -45,6 +45,7 @@ class SliderKeywords():
 
                         # print element.text
                         methodoutput=TEST_RESULT_TRUE
+                        status = TEST_RESULT_PASS
                     else:
                         err_msg='element is disabled'
                         print 'element is disabled'
@@ -82,6 +83,8 @@ class SliderKeywords():
                         output= x=str(float(element.get_attribute('value').replace('%',''))/100)[:3]
                         # print element.text
                         methodoutput=TEST_RESULT_TRUE
+                        status = TEST_RESULT_PASS
+
                     else:
                         err_msg='element is disabled'
                         print 'element is disabled'
