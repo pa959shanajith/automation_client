@@ -386,12 +386,13 @@ class DateOperation:
         verb = OUTPUT_CONSTANT
         try:
             if not (input_from is None or input_from is ''):
-                try:
-                    if '==' in input_from:
-                        input_to=input_from.split('==')[1]
-                        input_from = input_from.split('==')[0]
-                except Exception as e:
-                    log.error(e)
+#                try:
+#                    if '==' in input_from:
+#                        input_to=input_from.split('==')[1]
+#                        input_from = input_from.split('==')[0]
+#                except Exception as e:
+#                    log.error(e)
+#                    print '*****error1*****'
                 if not (input_to is None or input_to is ''):
                     if  (input_format is None):
                         date1 = datetime.datetime.strptime(input_from, generic_constants.DATE_FORMAT )
