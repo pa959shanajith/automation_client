@@ -218,6 +218,7 @@ class Scrape:
                  parent = ''
                  coordinates = ''
                  children = ch[i]
+                 canselectmultiple='false'
                  tag = children.friendly_class_name()
                  log.info(tag)
 ##                 if tag == 'Button' or tag =='RadioButton' or tag == 'Edit' or tag == 'ComboBox' or tag == 'Static' or tag == 'GroupBox' or tag == 'CheckBox' or tag== 'ListView' or tag == 'ListBox'or tag == 'TreeView'or tag == 'TabControl' or tag == 'DateTimePicker'  or tag == 'Toolbar':
@@ -260,9 +261,11 @@ class Scrape:
                             text= str(text) + '_chkbox'
                          elif tag == 'ListView':
                             tag = 'list'
+                            canselectmultiple="true"
                             text= str(text) + '_list'
                          elif tag == 'ListBox':
                             tag = 'list'
+                            canselectmultiple="true"
                             text= str(text) + '_list'
                          elif tag == 'TabControl':
                             tag = 'tab'
@@ -309,7 +312,8 @@ class Scrape:
                                         'height': height,
                                         'width': width,
                                         'x_screen':x_screen,
-                                        'y_screen':y_screen
+                                        'y_screen':y_screen,
+                                        'canselectmultiple':canselectmultiple
                                         })
                             else:
                                 logger.print_on_console( 'This element is duplicate')

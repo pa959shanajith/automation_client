@@ -66,9 +66,11 @@ class DynamicVariables:
                     	actual_value=temp_value
                     else:
                         if not isinstance(temp_value,unicode):
-                     	  actual_value=actual_value.replace(data,str(temp_value))
+                            if actual_value is not None:
+                     	        actual_value=actual_value.replace(data,str(temp_value))
                         else:
-                            actual_value=actual_value.replace(data,temp_value)
+                            if actual_value is not None:
+                                actual_value=actual_value.replace(data,temp_value)
         return actual_value
 
     #To Store the output from keyword as an array if it is multiple values

@@ -139,8 +139,9 @@ class Display(wx.Frame):
 
     def hello(self):
         if(self):
+            self.Hide()
             self.resume_execution()
-            self.Close()
+            
 
     def resume_execution(self):
         global cont
