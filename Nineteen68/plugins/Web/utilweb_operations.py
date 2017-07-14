@@ -336,6 +336,125 @@ class UtilWebKeywords:
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
+            if(len(args[0]) == 2):
+                row = int(args[0][0])-1
+                col = int(args[0][1])-1
+                from table_keywords import TableOperationKeywords
+                tableops = TableOperationKeywords()
+                cell=tableops.javascriptExecutor(webelement,row,col)
+                element_list=cell.find_elements_by_xpath('.//*')
+                if len(list(element_list))>0:
+                    xpath=tableops.getElemntXpath(element_list[0])
+                    cell=browser_Keywords.driver_obj.find_element_by_xpath(xpath)
+                if(cell!=None):
+                    webelement=cell
+
+            elif(len(args[0]) > 2):
+                row = int(args[0][0])-1
+                col = int(args[0][1])-1
+                tag=args[0][2].lower()
+                index=int(args[0][3])
+                eleStatus = False
+                counter = 1
+                from table_keywords import TableOperationKeywords
+                tableops = TableOperationKeywords()
+                cell=tableops.javascriptExecutor(webelement,row,col)
+                element_list=cell.find_elements_by_xpath('.//*')
+                for member in element_list:
+                    js1='function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();'
+                    xpath=browser_Keywords.driver_obj.execute_script(js1,member)
+                    cellChild = browser_Keywords.driver_obj.find_element_by_xpath(xpath)
+                    tagName = cellChild.tag_name
+                    tagType = cellChild.get_attribute('type')
+                    xpath_elements=xpath.split('/')
+                    lastElement=xpath_elements[len(xpath_elements)-1]
+                    childindex=lastElement[lastElement.find("[")+1:lastElement.find("]")]
+                    childindex = int(childindex)
+                    if tag=='button':
+                       if( (tagName==('input') and tagType==('button')) or tagType==('submit') or tagType==('reset') or tagType==('file')):
+                          if index==childindex:
+                            eleStatus =True
+                          else:
+                            if counter==index:
+                               index =childindex
+                               eleStatus =True
+                            else:
+                                counter+=1
+                    elif tag=='image':
+                        if(tagName==('input') and (tagType==('img') or tagType==('image'))):
+                            if index==childindex:
+                                eleStatus =True
+                            else:
+                                if counter==index:
+                                    index =childindex
+                                    eleStatus =True
+                                else:
+                                    counter+=1
+                        elif tagName =='img':
+                            if index==childindex:
+                                eleStatus =True
+                            else:
+                                if counter==index:
+                                   index =childindex
+                                   eleStatus =True
+                                else:
+                                    counter+=1
+                    elif tag=='img':
+                         if index==childindex:
+                                eleStatus =True
+                         else:
+                                if counter==index:
+                                   index =childindex
+                                   eleStatus =True
+                                else:
+                                    counter+=1
+                    elif tag=='checkbox':
+                         if(tagName==('input') and (tagType==('checkbox')) ):
+                             if index==childindex:
+                                eleStatus =True
+                             else:
+                                if counter==index:
+                                   index =childindex
+                                   eleStatus =True
+                                else:
+                                    counter+=1
+                    elif tag=='radiobutton':
+                         if (tagName==('input') and tagType==('radio')):
+                            if index==childindex:
+                                eleStatus =True
+                            else:
+                                if counter==index:
+                                   index =childindex
+                                   eleStatus =True
+                                else:
+                                    counter+=1
+                    elif tag=='textbox':
+                         if (tagName==('input') and (tagType==('text') or tagType==('email') or tagType==('password') or tagType==('range') or tagType==('search') or tagType==('url')) ):
+                            if index==childindex:
+                                eleStatus =True
+                            else:
+                                if counter==index:
+                                   index =childindex
+                                   eleStatus =True
+                                else:
+                                    counter+=1
+                    elif tag=='link':
+                        if(tagName==('a')):
+                            if index==childindex:
+                                eleStatus =True
+                            else:
+                                if counter==index:
+                                   index =childindex
+                                   eleStatus =True
+                                else:
+                                    counter+=1
+                    else:
+                            eleStatus=True
+
+                    if eleStatus==True:
+                        webelement = cellChild
+                        break
+
             if webelement is not None:
                 obj=Utils()
                  #find the location of the element w.r.t viewport
@@ -381,6 +500,27 @@ class UtilWebKeywords:
     def generic_sendfucntion_keys(self,input,*args):
         from sendfunction_keys import SendFunctionKeys
         obj=SendFunctionKeys()
+        pidset = browser_Keywords.pid_set
+        import win32gui,win32api,win32process
+        if(len(pidset)>0):
+            pid = pidset.pop()
+            toplist, winlist = [], []
+            def enum_cb(hwnd, results):
+                winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
+            win32gui.EnumWindows(enum_cb, toplist)
+            app = [(hwnd, title) for hwnd, title in winlist if ((("Chrome" or "Firefox" or "Explorer") in title) and (win32process.GetWindowThreadProcessId(hwnd)[1] == pid))]
+            app = app[0]
+            handle = app[0]
+            foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
+            appThread = win32api.GetCurrentThreadId()
+            if( foreThread != appThread ):
+                win32process.AttachThreadInput(foreThread[0], appThread, True)
+                win32gui.BringWindowToTop(handle)
+                win32gui.ShowWindow(handle,5)
+                win32process.AttachThreadInput(foreThread[0], appThread, False)
+            else:
+                win32gui.BringWindowToTop(handle)
+                win32gui.ShowWindow(handle,5)
         obj.sendfunction_keys(input,*args)
 
 
@@ -392,21 +532,30 @@ class UtilWebKeywords:
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
-                input=input[0]
+                #input=input[0]
+                input1=input[0]
                 info_msg='Focus the given webelement '+webelement.tag_name+' before sending keys'
                 log.info(info_msg)
                 logger.print_on_console(info_msg)
                 self.__setfocus(webelement)
-                if len(args)==0 and input in self.keys_info.keys():
+                if len(args)==0 and input1 in self.keys_info.keys():
                     if webelement.get_attribute('type')!='text':
-                        webelement.send_keys(self.keys_info[input.lower()])
+                        webelement.send_keys(self.keys_info[input1.lower()])
                         log.debug('It is not a textbox')
                     else:
                         log.debug('It is a textbox')
-                        self.generic_sendfucntion_keys(input.lower(),*args)
+                        #self.generic_sendfucntion_keys(input1.lower(),*args)
+                        if(len(input)>1):
+                            self.generic_sendfucntion_keys(input[0].lower(),input[1])
+                        else:
+                            self.generic_sendfucntion_keys(input[0].lower(),*args)
                 else:
                     log.debug('Calling Generic sendfunction keys')
-                    self.generic_sendfucntion_keys(input.lower(),*args)
+                    #self.generic_sendfucntion_keys(input.lower(),*args)
+                    if(len(input)>1):
+                        self.generic_sendfucntion_keys(input[0].lower(),input[1])
+                    else:
+                        self.generic_sendfucntion_keys(input[0].lower(),*args)
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:

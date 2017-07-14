@@ -296,7 +296,9 @@ class Dispatcher:
 
                     if keyword==OPEN_BROWSER:
                         input.append(self.action)
-
+                    actual_input=teststepproperty.inputval[0].split(";")
+                    if(keyword.lower() == "sendfunctionkeys"):
+                        input.extend(actual_input)
                     result= dict[keyword](webelement,input)
                     driver=browser_Keywords.driver_obj
                     if keyword not in [GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
