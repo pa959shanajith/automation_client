@@ -43,6 +43,8 @@ class ButtonLinkKeyword():
                 log.info('Recieved web element from the web dispatcher')
                 log.debug(webelement)
                 log.debug('Check for the element enable')
+                if isinstance(browser_Keywords.driver_obj,webdriver.Firefox ):
+                    browser_Keywords.driver_obj.execute_script('arguments[0].scrollIntoView()',webelement)
                 if webelement.is_enabled():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if isinstance(browser_Keywords.driver_obj,webdriver.Ie):
@@ -318,7 +320,7 @@ class ButtonLinkKeyword():
                         err_msg='There is no link text for the given element'
                         logger.print_on_console(err_msg)
                         log.info(err_msg)
-                        
+
                 else:
                     log.error(INVALID_INPUT)
                     err_msg=INVALID_INPUT
