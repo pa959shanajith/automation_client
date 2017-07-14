@@ -56,12 +56,15 @@ if_array=[constants.IF,constants.ELSE_IF,constants.ELSE,constants.ENDIF]
 """List containing getparam,startloop,endloop constants"""
 get_param=[constants.GETPARAM,constants.STARTLOOP,constants.ENDLOOP]
 
+"""List to store the object of nested if info"""
+cond_nest_info=[]
+
 """Dict to store the start-end of for info"""
 for_info=OrderedDict()
 
 """Dict to store the start-end of if info"""
-
 if_info=OrderedDict()
+
 """Dict to store the start-end of getparam info"""
 get_param_info=OrderedDict()
 
