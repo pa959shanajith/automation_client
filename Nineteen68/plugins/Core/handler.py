@@ -603,7 +603,7 @@ class Handler():
         return :
 
         """
-        import dynamic_variable_handler
+##        import dynamic_variable_handler
         del tspList[:]
         global tspIndex,tspIndex2,copy_for_keywords,for_keywords,copy_condition_keywords,condition_keywords,copy_getparam_keywords                        ,getparam_keywords,for_info,if_info,get_param_info
         tspIndex=-1
@@ -620,6 +620,10 @@ class Handler():
         ws_template=''
         global ws_templates_dict
         ws_templates_dict.clear();
-        dynamic_variable_handler.dynamic_variable_map.clear()
+##        dynamic_variable_handler.dynamic_variable_map.clear()
         if con.oebs_dispatcher_obj != None:
             con.oebs_dispatcher_obj.clear_oebs_window_name()
+
+    def clear_dyn_variables(self):
+        import dynamic_variable_handler
+        dynamic_variable_handler.dynamic_variable_map.clear()

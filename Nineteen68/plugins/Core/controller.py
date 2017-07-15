@@ -851,6 +851,8 @@ class Controller():
         print( '=======================================================================================================')
         #clearing of dynamic variables
         obj.clearList(self)
+        #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
+        obj.clear_dyn_variables()
         return status
 
 
@@ -988,6 +990,8 @@ class Controller():
             log.info('---------------------------------------------------------------------')
             print( '=======================================================================================================')
             log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
+            #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
+            obj.clear_dyn_variables()
             logger.print_on_console('***SUITE ', j ,' EXECUTION COMPLETED***')
             log.info('-----------------------------------------------')
             print( '=======================================================================================================')
