@@ -10,10 +10,10 @@
 #-------------------------------------------------------------------------------
 
 import desktop_constants
-from editable_text import Text_Box
-##from launch_keywords import ldtp
-import launch_keywords
-from launch_keywords import Launch_Keywords
+from desktop_editable_text import Text_Box
+##from desktop_launch_keywords import ldtp
+import desktop_launch_keywords
+from desktop_launch_keywords import Launch_Keywords
 ##from ldtp.client_exception import LdtpExecutionError
 import logging
 from constants import *
@@ -23,14 +23,14 @@ import pywinauto
 class ButtonLinkKeyword():
     def double_click(self, element , parent  , *args):
         log.debug('Got window name after launching application')
-        log.debug(launch_keywords.window_name)
+        log.debug(desktop_launch_keywords.window_name)
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         verb = OUTPUT_CONSTANT
         err_msg=None
         try:
-            if launch_keywords.window_name!=None:
+            if desktop_launch_keywords.window_name!=None:
                 log.info('Recieved element from the desktop dispatcher')
                 dektop_element = element
                 verify_obj = Text_Box()
@@ -62,14 +62,14 @@ class ButtonLinkKeyword():
 
     def click(self, element , parent  , *args):
         log.debug('Got window name after launching application')
-        log.debug(launch_keywords.window_name)
+        log.debug(desktop_launch_keywords.window_name)
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         verb = OUTPUT_CONSTANT
         err_msg=None
         try:
-            if launch_keywords.window_name!=None:
+            if desktop_launch_keywords.window_name!=None:
                 log.info('Recieved element from the desktop dispatcher')
                 dektop_element = element
                 verify_obj = Text_Box()
@@ -100,14 +100,14 @@ class ButtonLinkKeyword():
 
     def press(self, element , parent  , *args):
         log.debug('Got window name after launching application')
-        log.debug(launch_keywords.window_name)
+        log.debug(desktop_launch_keywords.window_name)
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         verb = OUTPUT_CONSTANT
         err_msg=None
         try:
-            if launch_keywords.window_name!=None:
+            if desktop_launch_keywords.window_name!=None:
                 log.info('Recieved element from the desktop dispatcher')
                 dektop_element = element
                 verify_obj = Text_Box()
@@ -157,13 +157,13 @@ class ButtonLinkKeyword():
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
-        log.debug(launch_keywords.window_name)
+        log.debug(desktop_launch_keywords.window_name)
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         verb = OUTPUT_CONSTANT
         err_msg=None
         text = None
         try:
-            if launch_keywords.window_name!=None:
+            if desktop_launch_keywords.window_name!=None:
                 log.info('Recieved element from the desktop dispatcher')
                 input_val = input[0]
                 log.info('input value obtained')
@@ -201,12 +201,12 @@ class ButtonLinkKeyword():
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
-        log.debug(launch_keywords.window_name)
+        log.debug(desktop_launch_keywords.window_name)
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         text=None
         err_msg = None
         try:
-            if launch_keywords.window_name!=None:
+            if desktop_launch_keywords.window_name!=None:
                 log.info('Recieved element from the desktop dispatcher')
                 dektop_element = element
                 verify_obj = Text_Box()
@@ -237,13 +237,13 @@ class ButtonLinkKeyword():
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
-        log.debug(launch_keywords.window_name)
+        log.debug(desktop_launch_keywords.window_name)
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         label=None
         err_msg = None
         verb = OUTPUT_CONSTANT
         try:
-            if launch_keywords.window_name!=None:
+            if desktop_launch_keywords.window_name!=None:
                 log.info('Recieved element from the desktop dispatcher')
                 dektop_element = element
                 verify_obj = Text_Box()
@@ -277,12 +277,12 @@ class ButtonLinkKeyword():
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
-        log.debug(launch_keywords.window_name)
+        log.debug(desktop_launch_keywords.window_name)
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         text=None
         err_msg = None
         try:
-            if launch_keywords.window_name!=None:
+            if desktop_launch_keywords.window_name!=None:
                 log.info('Recieved element from the desktop dispatcher')
                 dektop_element = element
                 verify_obj = Text_Box()
@@ -313,13 +313,13 @@ class ButtonLinkKeyword():
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
-        log.debug(launch_keywords.window_name)
+        log.debug(desktop_launch_keywords.window_name)
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         err_msg = None
         verb = OUTPUT_CONSTANT
         text = None
         try:
-            if launch_keywords.window_name!=None:
+            if desktop_launch_keywords.window_name!=None:
                 log.info('Recieved element from the desktop dispatcher')
                 input_val = input[0]
                 log.info('input value obtained')

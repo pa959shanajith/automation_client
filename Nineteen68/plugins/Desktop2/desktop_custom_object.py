@@ -11,7 +11,7 @@
 # Copyright:   (c) anas.ahmed 2017
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-import launch_keywords
+import desktop_launch_keywords
 import logger
 import logging
 import desktop_constants
@@ -23,7 +23,7 @@ import ctypes
 import win32gui
 import win32api
 import time
-from launch_keywords import Launch_Keywords
+from desktop_launch_keywords import Launch_Keywords
 from constants import *
 
 log = logging.getLogger('desktop_custom_object.py')
@@ -145,7 +145,7 @@ class CustomObjectHandler():
             ch = win.children()
             allobjects = ''
             ne = []
-            obj = launch_keywords.Launch_Keywords()
+            obj = desktop_launch_keywords.Launch_Keywords()
             obj.set_to_foreground()
             obj.bring_Window_Front()
             allobjects =  self.get_all_custom_children(ch,ne,0,'',win)
@@ -162,7 +162,7 @@ class CustomObjectHandler():
         newdata=[]
         xpath = None
         try:
-            app_uia = launch_keywords.app_uia
+            app_uia = desktop_launch_keywords.app_uia
             data = self.for_custom_scrape(app_uia)
             for index, item in enumerate(data):
                 if item['xpath']==parent_xpath:

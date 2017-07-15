@@ -22,7 +22,7 @@ import win32com.client
 import win32process
 from threading import Thread
 from constants import *
-import launch_keywords
+import desktop_launch_keywords
 import ninteen_68_desktop_scrape
 import base64
 import logger
@@ -35,7 +35,7 @@ actualobjects = []
 allobjects = []
 class Scrape:
     def clickandadd(self,operation,app_uia,window_name,wxobject):
-        obj = launch_keywords.Launch_Keywords()
+        obj = desktop_launch_keywords.Launch_Keywords()
         obj.set_to_foreground()
         data={}
         if operation == 'STARTCLICKANDADD':
@@ -334,10 +334,10 @@ class Scrape:
             ch = win.children()
             a = ''
             ne = []
-            obj = launch_keywords.Launch_Keywords()
+            obj = desktop_launch_keywords.Launch_Keywords()
             obj.set_to_foreground()
             obj.bring_Window_Front()
-            winrect = launch_keywords.win_rect;
+            winrect = desktop_launch_keywords.win_rect;
             a =  self.get_all_children(ch,ne,0,'',win,winrect)
             import json
             try:
