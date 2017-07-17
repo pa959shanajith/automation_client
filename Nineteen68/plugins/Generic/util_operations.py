@@ -179,9 +179,9 @@ class UtilOperations:
         status=TEST_RESULT_PASS
         methodoutput=TEST_RESULT_TRUE
         err_msg=None
-        log.info('Stopping the Execution')
-        logger.print_on_console('Stopping the Execution')
-        log.debug('Stopping the Execution')
+        log.info('Execution Stopped')
+        logger.print_on_console('Execution Stopped')
+        log.debug('Execution Stopped')
         import handler
         output=len(handler.tspList)
         return status,methodoutput,output,err_msg

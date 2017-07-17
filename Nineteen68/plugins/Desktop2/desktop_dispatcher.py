@@ -2,7 +2,7 @@
 # Name:        desktop_dispatcher.py
 # Purpose:
 #
-# Author:      rakesh.v
+# Author:      rakesh.v,anas.ahmed
 #
 # Created:     23-11-2016
 # Copyright:   (c) rakesh.v 2016
@@ -10,13 +10,13 @@
 #-------------------------------------------------------------------------------
 
 import button_link_keywords_desktop
-import editable_text
-import element_keywords
-import launch_keywords
-import util_keywords
-import dropdown_keywords
-import tab_control_keywords
-import date_control_keywords
+import desktop_editable_text
+import desktop_element_keywords
+import desktop_launch_keywords
+import desktop_util_keywords
+import desktop_dropdown_keywords
+import desktop_tab_control_keywords
+import desktop_date_control_keywords
 import screenshot_keywords
 import logger
 import desktop_constants
@@ -32,14 +32,14 @@ log = logging.getLogger('desktop_dispatcher.py')
 
 class DesktopDispatcher:
     button_link_keywords_obj = button_link_keywords_desktop.ButtonLinkKeyword()
-    editable_text_obj = editable_text.Text_Box()
-    element_keywords_obj = element_keywords.ElementKeywords()
-    launch_keywords_obj = launch_keywords.Launch_Keywords()
-    util_keywords_obj = util_keywords.Util_Keywords()
-    dropdown_keywords_obj=dropdown_keywords.Dropdown_Keywords()
+    editable_text_obj = desktop_editable_text.Text_Box()
+    element_keywords_obj = desktop_element_keywords.ElementKeywords()
+    launch_keywords_obj = desktop_launch_keywords.Launch_Keywords()
+    util_keywords_obj = desktop_util_keywords.Util_Keywords()
+    dropdown_keywords_obj=desktop_dropdown_keywords.Dropdown_Keywords()
     radio_checkbox_keywords_obj = radio_checkbox_keywords_desktop.Radio_Checkbox_keywords()
-    tab_control_keywords_obj = tab_control_keywords.Tab_Control_Keywords()
-    date_control_keywords_obj = date_control_keywords.DateControlKeywords()
+    tab_control_keywords_obj = desktop_tab_control_keywords.Tab_Control_Keywords()
+    date_control_keywords_obj = desktop_date_control_keywords.DateControlKeywords()
     desktop_custom_object_obj =desktop_custom_object.CustomObjectHandler()
 ##    outook_obj=outlook.OutlookKeywords()
 
@@ -195,7 +195,7 @@ class DesktopDispatcher:
                 else:
                     self.launch_keywords_obj.verifyWindowTitle()
                     if objectname != '':
-                        app_uia = launch_keywords.app_uia
+                        app_uia = desktop_launch_keywords.app_uia
                         ele = self.get_desktop_element(objectname,url,app_uia)
                     result= dict[keyword](ele,url,input,output)
 

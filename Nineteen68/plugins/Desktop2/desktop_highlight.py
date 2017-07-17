@@ -9,11 +9,11 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import launch_keywords
+import desktop_launch_keywords
 from pywinauto.application import Application
 import logger
 import time
-from editable_text import Text_Box
+from desktop_editable_text import Text_Box
 
 
 class highLight():
@@ -47,8 +47,8 @@ class highLight():
 
     def highLiht_element(self,objname,parent,*args):
         try:
-            app_uia = launch_keywords.app_uia
-            obj = launch_keywords.Launch_Keywords()
+            app_uia = desktop_launch_keywords.app_uia
+            obj = desktop_launch_keywords.Launch_Keywords()
             obj.set_to_foreground()
             obj.bring_Window_Front()
             time.sleep(1)

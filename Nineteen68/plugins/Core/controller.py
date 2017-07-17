@@ -421,6 +421,9 @@ class Controller():
             else:
                 self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result)
 
+##      Issue #160
+        if index==STOP:
+            return index
         if len(self.counter)>0 and self.counter[-1]>-1 and self.counter[-1]-index==0:
             return JUMP_TO
 
@@ -678,7 +681,8 @@ class Controller():
 
             #Checking for stop keyword
             if teststepproperty.name==STOP:
-                index=len(handler.tspList)
+                ## Issue #160
+                index=STOP
             return index,result
         else:
             return index,TERMINATE
@@ -708,6 +712,10 @@ class Controller():
                         self.reporting_obj.overallstatus=TERMINATE
                         logger.print_on_console('Terminating the execution')
                         status=i
+                        break
+                    ## Issue #160
+                    elif i==STOP:
+                        log.info('Encountered STOP keyword')
                         break
                     elif i==JUMP_TO:
                         i=self.jumpto_previousindex[-1]
@@ -843,6 +851,8 @@ class Controller():
         print( '=======================================================================================================')
         #clearing of dynamic variables
         obj.clearList(self)
+        #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
+        obj.clear_dyn_variables()
         return status
 
 
@@ -980,6 +990,8 @@ class Controller():
             log.info('---------------------------------------------------------------------')
             print( '=======================================================================================================')
             log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
+            #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
+            obj.clear_dyn_variables()
             logger.print_on_console('***SUITE ', j ,' EXECUTION COMPLETED***')
             log.info('-----------------------------------------------')
             print( '=======================================================================================================')

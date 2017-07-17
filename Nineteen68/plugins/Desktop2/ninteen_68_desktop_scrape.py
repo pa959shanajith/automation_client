@@ -14,7 +14,7 @@ import pywinauto
 import wx
 ##import clientwindow
 from socketIO_client import SocketIO,BaseNamespace
-import launch_keywords
+import desktop_launch_keywords
 desktop_scraping_obj = desktop_scraping.Scrape()
 import os
 from constants import *
@@ -30,7 +30,7 @@ class ScrapeWindow(wx.Frame):
         self.iconpath = os.environ["NINETEEN68_HOME"] + "\\Nineteen68\\plugins\\Core\\Images" + "\\slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         global obj
-        obj = launch_keywords.Launch_Keywords()
+        obj = desktop_launch_keywords.Launch_Keywords()
         self.socketIO = socketIO
         self.core_utilsobject = core_utils.CoreUtils()
         windowname=filePath.split(';')[0]
@@ -38,7 +38,7 @@ class ScrapeWindow(wx.Frame):
         input_val.append(windowname)
         input_val.append(5)
         status = obj.find_window_and_attach(input_val)
-        if launch_keywords.app_uia != None and status[0].lower() != 'fail':
+        if desktop_launch_keywords.app_uia != None and status[0].lower() != 'fail':
             if status!=TERMINATE:
                 self.panel = wx.Panel(self)
                 self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd",pos=(12,8 ), size=(175, 28))
@@ -64,8 +64,8 @@ class ScrapeWindow(wx.Frame):
     #----------------------------------------------------------------------
     def clickandadd(self,event):
         state = event.GetEventObject().GetValue()
-        app_uia = launch_keywords.app_uia
-        window_name = launch_keywords.window_name
+        app_uia = desktop_launch_keywords.app_uia
+        window_name = desktop_launch_keywords.window_name
         if app_uia != None:
             if state == True:
                 self.fullscrapebutton.Disable()
@@ -97,7 +97,7 @@ class ScrapeWindow(wx.Frame):
         self.startbutton.Disable()
 ##        print 'desktop_scraping_obj:',desktop_scraping_obj
 ####        self.comparebutton.Disable()
-        app_uia = launch_keywords.app_uia
+        app_uia = desktop_launch_keywords.app_uia
         if app_uia != None:
             d = desktop_scraping_obj.full_scrape(app_uia,self)
 

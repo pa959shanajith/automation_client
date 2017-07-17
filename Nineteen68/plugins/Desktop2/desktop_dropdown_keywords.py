@@ -1,22 +1,22 @@
 #-------------------------------------------------------------------------------
-# Name:        dropdown_keywords.py
+# Name:        desktop_dropdown_keywords.py
 # Purpose:
 #
-# Author:      kavyasree.l
+# Author:      kavyasree.l,anas.ahmed
 #
 # Created:     25-05-2017
 # Copyright:   (c) kavyasree.l 2017
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import launch_keywords
+import desktop_launch_keywords
 import logger
-from editable_text import Text_Box
+from desktop_editable_text import Text_Box
 import desktop_constants
-import editable_text
+import desktop_editable_text
 import time
 from constants import *
-editable_text=editable_text.Text_Box()
+#editable_text=desktop_editable_text.Text_Box()
 import logging
 log = logging.getLogger('dropdown_keywords.py')
 class Dropdown_Keywords():
@@ -31,7 +31,7 @@ class Dropdown_Keywords():
             verb = OUTPUT_CONSTANT
             err_msg=None
             try:
-                if launch_keywords.window_name!=None:
+                if desktop_launch_keywords.window_name!=None:
                     log.info('Recieved element from the desktop dispatcher')
                     dektop_element = element
                     verify_obj = Text_Box()
@@ -224,7 +224,7 @@ class Dropdown_Keywords():
             output=None
             err_msg=None
             try:
-                if launch_keywords.window_name!=None:
+                if desktop_launch_keywords.window_name!=None:
                     log.info('Recieved element from the desktop dispatcher')
                     dektop_element = element
                     verify_obj = Text_Box()
@@ -267,7 +267,7 @@ class Dropdown_Keywords():
             output=None
             err_msg=None
             try:
-                if launch_keywords.window_name!=None:
+                if desktop_launch_keywords.window_name!=None:
                     log.info('Recieved element from the desktop dispatcher')
                     dektop_element = element
                     input_val[0]=int(input_val[0])
@@ -486,7 +486,7 @@ class Dropdown_Keywords():
             err_msg=None
             text_flag = False
             try:
-                if launch_keywords.window_name!=None:
+                if desktop_launch_keywords.window_name!=None:
                     log.info('Recieved element from the desktop dispatcher')
                     dektop_element = element
                     verify_obj = Text_Box()
@@ -950,7 +950,7 @@ class Dropdown_Keywords():
             verb = OUTPUT_CONSTANT
             err_msg=None
             try:
-                if launch_keywords.window_name!=None:
+                if desktop_launch_keywords.window_name!=None:
                     log.info('Recieved element from the desktop dispatcher')
                     dektop_element = element
                     verify_obj = Text_Box()
@@ -1043,7 +1043,7 @@ class Dropdown_Keywords():
             verb = OUTPUT_CONSTANT
             err_msg=None
             try:
-                if launch_keywords.window_name!=None:
+                if desktop_launch_keywords.window_name!=None:
                     log.info('Recieved element from the desktop dispatcher')
                     dektop_element = element
                     verify_obj = Text_Box()

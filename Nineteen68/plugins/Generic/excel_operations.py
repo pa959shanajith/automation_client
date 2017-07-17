@@ -26,6 +26,7 @@ import logging
 from constants import *
 log = logging.getLogger('excel_operations.py')
 import core_utils
+from xlrd.sheet import ctype_text
 
 
 class ExcelFile:
@@ -198,7 +199,7 @@ class ExcelFile:
                         if res:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
-                            output=value
+                            output=str(value)                  ##Value returned must be integer so thet it will display 20 instead of 20L
                     else:
                         err_msg=ERROR_CODE_DICT["ERR_ROW_COLUMN"]
             else:
@@ -751,6 +752,10 @@ class ExcelXLS:
                     if cell.ctype==3:
                         value=datetime.datetime(*xlrd.xldate_as_tuple(cell.value, book.datemode))
                         value=value.date()
+                    elif cell.ctype==2:         ## added elif statements to detrmine whether the number is percentage and diaplay it as percentage
+                        value=value*100
+                        value=str(value)+'%'
+                    #print cell.ctype
                     status=True
                     log.info(value)
                 else:
@@ -762,6 +767,7 @@ class ExcelXLS:
             log.error(e)
         if err_msg!=None:
             log.error(err_msg)
+        value=str(value)    ##changed type of value to string
         return status,value,err_msg
 
 
@@ -1174,8 +1180,12 @@ class ExcelXLSX:
                 if col<=sheet.max_column:
                     cell=sheet.cell(row=row,column=col)
                     value=cell.value
+
                     if cell.is_date == True and self.__get_formatted_date(value,cell.number_format) is not None :
                         value= self.__get_formatted_date(value,cell.number_format)
+                    elif cell.number_format == '0%':    ## added elif statements to detrmine whether the number is percentage and diaplay it as percentage
+                        value=value*100
+                        value=str(value)+'%'
                     status=True
                 else:
                     err_msg=ERROR_CODE_DICT["ERR_COL_DOESN'T_EXIST"]
@@ -1184,10 +1194,10 @@ class ExcelXLSX:
         except Exception as e:
             err_msg='Error occured in read cell of .xlsx file'
             log.error(e)
-
         if err_msg!=None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
+        value=str(value)
         return status,value,err_msg
 
     def clear_cell_xlsx(self,row,col,excel_path,sheetname):
@@ -1227,7 +1237,6 @@ class ExcelXLSX:
         """
         status=False
         err_msg=None
-
         try:
             #loads the xls workbook
             workbook_info=self.__load_workbook_xlsx(excel_path,sheetname)

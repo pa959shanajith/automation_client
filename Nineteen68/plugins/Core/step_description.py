@@ -24,6 +24,19 @@ class StepDescription:
 
 
         #File operations
+        def createFile():
+            print inputval
+            return 'Create a file: '+ inputval[1] + ' in the path: ' + inputval[0]
+        def verifyFileExists():
+            return 'Verify '+ inputval[1] + ' file exists in the path: ' + inputval[0]
+        def deleteFile():
+            return 'delete: ' + inputval[1] + ' file from the path: ' + inputval[0]
+        def renameFile():
+            return 'rename filename ' + inputval[1] +' to '+ inputval[2]+ ' in the path '+ inputval[0]
+        def savefile():
+            return 'Save File: '+ inputval[1] + 'and stored in: '+ inputval[0]
+
+
         def executeFile():
             return 'Perform execution of the file'  + input
         def verifyContent():
@@ -34,6 +47,17 @@ class StepDescription:
             return 'Compare the contents of file ' + input + ' and '+ input
         def executeScript():
             return 'Perform execution of the file ' + input
+
+        #Folder operations
+        def createFolder():
+            print inputval
+            return 'Create a folder: '+ inputval[1] + ' in the path: ' + inputval[0]
+        def verifyFolderExists():
+            return 'Verify '+ inputval[1] + ' folder exists in the path: ' + inputval[0]
+        def deleteFolder():
+            return 'delete: ' + inputval[1] + ' folder from the path: ' + inputval[0]
+        def renameFolder():
+            return 'rename folder ' + inputval[1] +' to '+ inputval[2]+ ' in the path '+ inputval[0]
 
         #Math opeartions
         def add():
@@ -130,7 +154,7 @@ class StepDescription:
         def dateAddition():
             return "Add the date '"+ input + "' to'"+ inputval[1]+ "' number of days and save the date'" + output + "' in '"+ tsp.outputval
         def dateCompare():
-            return "Compare '" + input+ "' and '" + inputval[1] + "'."
+            return "Compare '" + inputval[1]+ "' and '" + inputval[0] + "'."
         def dateDifference():
             return "Get the difference between the dates '"+ input+ "' and '"+ inputval[1]+ "' and save the date '" + output+ "' in '"+ tsp.outputval + "'"
         def exportData():

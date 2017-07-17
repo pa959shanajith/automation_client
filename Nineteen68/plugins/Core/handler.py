@@ -56,12 +56,15 @@ if_array=[constants.IF,constants.ELSE_IF,constants.ELSE,constants.ENDIF]
 """List containing getparam,startloop,endloop constants"""
 get_param=[constants.GETPARAM,constants.STARTLOOP,constants.ENDLOOP]
 
+"""List to store the object of nested if info"""
+cond_nest_info=[]
+
 """Dict to store the start-end of for info"""
 for_info=OrderedDict()
 
 """Dict to store the start-end of if info"""
-
 if_info=OrderedDict()
+
 """Dict to store the start-end of getparam info"""
 get_param_info=OrderedDict()
 
@@ -600,7 +603,7 @@ class Handler():
         return :
 
         """
-        import dynamic_variable_handler
+##        import dynamic_variable_handler
         del tspList[:]
         global tspIndex,tspIndex2,copy_for_keywords,for_keywords,copy_condition_keywords,condition_keywords,copy_getparam_keywords                        ,getparam_keywords,for_info,if_info,get_param_info
         tspIndex=-1
@@ -617,6 +620,10 @@ class Handler():
         ws_template=''
         global ws_templates_dict
         ws_templates_dict.clear();
-        dynamic_variable_handler.dynamic_variable_map.clear()
+##        dynamic_variable_handler.dynamic_variable_map.clear()
         if con.oebs_dispatcher_obj != None:
             con.oebs_dispatcher_obj.clear_oebs_window_name()
+
+    def clear_dyn_variables(self):
+        import dynamic_variable_handler
+        dynamic_variable_handler.dynamic_variable_map.clear()

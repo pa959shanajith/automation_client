@@ -179,10 +179,11 @@ class TextFile:
         err_msg=None
         log.debug('Comparing content of pdf files: '+str(input_path1)+','+str(input_path2))
         try:
-            content1=self.get_content(input_path1)
-            content2=self.get_content(input_path2)
+            content1=self.get_content(input_path1,1)
+            content2=self.get_content(input_path2,1)
             log.debug('File1 content is ',content1)
             log.debug('File2 content is ',content2)
+
             if content1==content2:
                 status=True
             else:

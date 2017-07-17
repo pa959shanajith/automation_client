@@ -272,7 +272,7 @@ class MainNamespace(BaseNamespace):
         response=str(response)
         print response
         socketIO.emit('result_wsdl_ServiceGenerator',response)
-        
+
     def on_render_screenshot(self,*args):
         try:
             global socketIO
@@ -534,6 +534,7 @@ class ClientWindow(wx.Frame):
         self.SetBackgroundColour('#e6e7e8')
 ##        self.ShowFullScreen(True,wx.ALL)
 ##        self.SetBackgroundColour('#D0D0D0')
+        self.logfilename_error_flag = False
         self.debugwindow = None
         self.id =id
         self.mainclass = self
@@ -548,12 +549,17 @@ class ClientWindow(wx.Frame):
         self.iconpath = IMAGES_PATH +"/slk.ico"
 
         # set up logging to file - see previous section for more details
-        logging.basicConfig(level=logging.INFO,
+        try:
+            logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s %(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s',
                             datefmt='%y-%m-%d %H:%M:%S',
                             filename=configvalues['logFile_Path'] + 'TestautoV2.log',
                             filemode='a')
         # define a Handler which writes INFO messages or higher to the sys.stderr
+            self.logfilename_error_flag = False
+        except:
+            self.logfilename_error_flag = True
+
         console = logging.StreamHandler()
         console.setLevel(logging.INFO)
         logging.addLevelName('INFO','i')
@@ -1068,10 +1074,13 @@ class DebugWindow(wx.Frame):
 #----------------------------------------------------------------------
 def main():
     app = wx.App()
-    ClientWindow()
+    cw = ClientWindow()
     print( '*******************************************************************************************************')
     print( '=========================================Nineteen68 Client Window======================================')
     print( '*******************************************************************************************************')
+    if cw.logfilename_error_flag:
+        logger.print_on_console( "Please provide a valid logfile path in config.json file")
+        cw.logfilename_error_flag = False
     app.MainLoop()
 
 if __name__ == "__main__":

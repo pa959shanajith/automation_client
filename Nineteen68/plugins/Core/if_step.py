@@ -174,15 +174,27 @@ class Logical_eval():
         expression=expression.replace('AND','and').replace('OR','or').replace('NOT','not')
         try:
             exp = expression
-            exp = exp.replace('>=','/').replace('<=','/').replace('>','/').replace('<','/').replace('==','/').replace('OR','/').replace('NOT','/').replace('AND','/').replace('(','/').replace(')','/')
+            exp_dict=dict()
+            exp = exp.replace('>=','/').replace('<=','/').replace('>','/').replace('<','/').replace('==','/').replace('!=','/').replace('or','/').replace('not','/').replace('and','/').replace('(','/').replace(')','/')
             operands = exp.split('/')
             null_count=0
             for i in operands:
-                if 'null' in exp:
+	            ## Issue #156 None is getting stored in dynamic variable instead of null if no value is assigned
+                if 'null' in i:
                     null_count=null_count+i.count('null')
                 if (i is None) or (i=='null' and null_count in none_mark):
                     logger.print_on_console('expression should not contain null operands')
                     return INVALID
+                elif i!='':
+                    exp_dict[i]=1
+            ## Issue #157  Special Characters issue in if condition
+            for i in exp_dict:
+                k=i.replace("\\","\\\\").replace("'","\\'")
+                if k[0]==' ':
+                    k=k.replace(" ","")
+                if k[-1]==' ':
+                    k=k.replace(" ","")
+                expression=expression.replace(i," '"+k+"' ")
 
             result=satisfiable(expression)
             if type(result)==dict:
