@@ -100,7 +100,7 @@ class  JumpBy():
         #Reporting part ends
         return self.jumpByStepNum
 
-    # Issue #153 and #167
+    # Issue #153 and #167: JumpBy passing between inside conditional blocks
     def __validate_jumpbystep(self,stepToJump):
         import handler
         try:
@@ -111,7 +111,9 @@ class  JumpBy():
             else:
                 t_obj=handler.cond_nest_info
                 for item in t_obj:
-                    if self.jumpByStepNum>=item['st'] and self.jumpByStepNum<=item['en']:
+                    if self.jumpByStepNum==item['st']:
+                        break
+                    elif self.jumpByStepNum>item['st'] and self.jumpByStepNum<=item['en']:
                         if self.index>item['st'] and self.index<item['en']:
                             t_obj=item['c']
                         else:

@@ -605,6 +605,7 @@ class Handler():
         """
 ##        import dynamic_variable_handler
         del tspList[:]
+        del cond_nest_info[:]
         global tspIndex,tspIndex2,copy_for_keywords,for_keywords,copy_condition_keywords,condition_keywords,copy_getparam_keywords                        ,getparam_keywords,for_info,if_info,get_param_info
         tspIndex=-1
         tspIndex2=-1
