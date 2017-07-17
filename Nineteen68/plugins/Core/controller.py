@@ -228,8 +228,10 @@ class Controller():
         step=handler.tspList[index]
         return step.executed
 
+    ## Issue #157 Missing endif  messge updated
     def check_dangling(self,tsp,index):
         status=True
+        errormsg=""
         if tsp.__class__.__name__.lower() in [IF,FOR,GETPARAM]:
             info_dict=tsp.info_dict
             if info_dict is not None:
@@ -241,24 +243,29 @@ class Controller():
 
                     if tsp.name.lower() in [IF]:
                         status= info_dict[-1].values()[0].lower() == ENDIF
+                        if not(status):
+                            errormsg="Execution Terminated : EndIf is missing"
 
                     elif tsp.name.lower() in [ELSE_IF,ELSE]:
                         status1= info_dict[-1].values()[0] == ENDIF
                         status2= info_dict[0].keys()[0] != index
                         status = status1 and status2
+                        if not(status1):
+                            errormsg="Execution Terminated : EndIf is missing"
 
                     elif tsp.name.lower() in [ENDIF]:
                         index=info_dict[-1].keys()[0]
                         status=self.dangling_status(index)
-
-
 
             else:
                 status=False
             if tsp.name.lower()==ENDLOOP and len(info_dict)<2:
                 status=False
 
-        if not(status):
+        if not(status) and len(errormsg)>0:
+            logger.print_on_console(errormsg+' in '+tsp.testscript_name+'\n')
+            log.error(errormsg+' in '+tsp.testscript_name)
+        elif not(status):
             logger.print_on_console('Dangling: '+tsp.name +' in '+tsp.testscript_name+'\n')
             log.error('Dangling: '+tsp.name +' in '+tsp.testscript_name)
         return status
