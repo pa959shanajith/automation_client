@@ -181,10 +181,10 @@ class Highlight():
                             else:
                                 return element
 
-                            try:
-                                driver.switch_to.default_content()
-                            except Exception as e4:
-                                evb = e4
+##                            try:
+##                                driver.switch_to.default_content()
+##                            except Exception as e4:
+##                                evb = e4
                         else:
                             print 'The element '+ str(element['custname']) +'  is not found'
                             return element
