@@ -63,11 +63,11 @@ class DynamicVariables:
                     #changes to fix issue:304-Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
                     #changes done by jayashree.r
                     if temp_value is None:
-                    	actual_value=temp_value
+                        actual_value=temp_value
                     else:
                         if not isinstance(temp_value,unicode):
                             if actual_value is not None:
-                     	        actual_value=actual_value.replace(data,str(temp_value))
+                                actual_value=actual_value.replace(data,str(temp_value))
                         else:
                             if actual_value is not None:
                                 actual_value=actual_value.replace(data,temp_value)

@@ -14,13 +14,13 @@ class GenericKeywordResult():
         self.result=result
         self.returnVal=returnVal
 
-    def getresult():
+    def getresult(self):
         return self.result
 
     def setresult(self,result):
         self.result = result
 
-    def getreturnVal():
+    def getreturnVal(self):
         return self.returnVal
 
     def setreturnVal(self,returnVal):
