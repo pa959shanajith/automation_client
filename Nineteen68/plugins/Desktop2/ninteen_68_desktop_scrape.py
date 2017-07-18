@@ -20,7 +20,10 @@ import os
 from constants import *
 import logger
 import core_utils
-
+#--------------------
+import win32gui
+import base64
+#-------------------
 obj=None
 class ScrapeWindow(wx.Frame):
     def __init__(self, parent,id, title,filePath,socketIO):
@@ -70,21 +73,40 @@ class ScrapeWindow(wx.Frame):
             if state == True:
                 self.fullscrapebutton.Disable()
     ##        self.comparebutton.Disable()
-                desktop_scraping_obj.clickandadd('STARTCLICKANDADD',app_uia,window_name)
+                desktop_scraping_obj.clickandadd('STARTCLICKANDADD',self)
                 event.GetEventObject().SetLabel("Stop ClickAndAdd")
                 logger.print_on_console( 'click and add initiated, select the elements from AUT')
 
             else:
-                d = desktop_scraping_obj.clickandadd('STOPCLICKANDADD',app_uia,window_name,self)
+                data={}
+                d = desktop_scraping_obj.clickandadd('STOPCLICKANDADD',self)
                 event.GetEventObject().SetLabel("Start ClickAndAdd")
                 logger.print_on_console('Stopped click and add')
-                logger.print_on_console( 'Scrapped data saved successfully in domelements.json file')
+                objc=desktop_launch_keywords.Launch_Keywords()
+                try:
+                    img=objc.captureScreenshot()
+                    img.save('out.png')
+                    with open("out.png", "rb") as image_file:
+                              encoded_string = base64.b64encode(image_file.read())
+                except Exception as e:
+                    try:
+                        img=obj.capture_window( win32gui.GetDesktopWindow())
+                        img.save('out.png')
+                        with open("out.png", "rb") as image_file:
+                            encoded_string = base64.b64encode(image_file.read())
+                    except Exception as e:
+                        import traceback
+                        traceback.print_exc()
+                        logger.print_on_console('Error occured while capturing Screenshot ')
+                data['mirror'] =encoded_string.encode('UTF-8').strip()
+                data['view'] = d
                 # 5 is the limit of MB set as per Nineteen68 standards
-                if self.core_utilsobject.getdatasize(str(d),'mb') < 5:
-                    self.socketIO.emit('scrape',d)
+                if self.core_utilsobject.getdatasize(str(data),'mb') < 5:
+                    self.socketIO.emit('scrape',data)
                 else:
                     logger.print_on_console( 'Scraped data exceeds max. Limit.')
                     self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
+                os.remove("out.png")
                 self.Close()
                 logger.print_on_console('Click and add scrape  completed successfully...')
         else:
