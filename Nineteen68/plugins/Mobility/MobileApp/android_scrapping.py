@@ -278,8 +278,7 @@ class Exact(xml.sax.handler.ContentHandler):
 
     attsLength = len(attrs)
     if(attsLength>1):
-
- 	  XpathList.append(childXPath)
+        XpathList.append(childXPath)
     elements_list = attrs.getQNames()
     label_flag = False
     for x in attrs.getQNames():
