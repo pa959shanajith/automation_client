@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:         SAP_Shell_keywords
 # Purpose:      Handling SAP-Shell elements
 #
 # Author:      anas.ahmed1
@@ -14,7 +14,7 @@ from constants import *
 import logger
 import time
 from saputil_operations import SapUtilKeywords
-from launch_keywords import Launch_Keywords
+from sap_launch_keywords import Launch_Keywords
 
 class Shell_Keywords():
     def __init__(self):

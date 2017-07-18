@@ -10,8 +10,8 @@
 #-------------------------------------------------------------------------------
 
 import sap_constants
-import launch_keywords
-from launch_keywords import Launch_Keywords
+import sap_launch_keywords
+from sap_launch_keywords import Launch_Keywords
 from saputil_operations import SapUtilKeywords
 from constants import *
 import logger
@@ -61,7 +61,7 @@ class ButtonLinkKeyword():
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
-        #log.debug(launch_keywords.window_name)
+        #log.debug(sap_launch_keywords.window_name)
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         name=input_val[0]
         #verb = OUTPUT_CONSTANT
@@ -93,7 +93,7 @@ class ButtonLinkKeyword():
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
-        #log.debug(launch_keywords.window_name)
+        #log.debug(sap_launch_keywords.window_name)
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         name=input_val[0]
         #verb = OUTPUT_CONSTANT
@@ -125,7 +125,7 @@ class ButtonLinkKeyword():
         result=sap_constants.TEST_RESULT_FALSE
         filepath=input_val[0]
         log.debug('Got window name after launching application')
-        log.debug(launch_keywords.window_name)
+        log.debug(sap_launch_keywords.window_name)
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         value=OUTPUT_CONSTANT
         err_msg=None
