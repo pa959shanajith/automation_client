@@ -2,18 +2,18 @@ import wx
 import sys
 import os
 from selenium import webdriver
-import browserops
-import clickandadd
-import fullscrape
+import browserops_MW
+import clickandadd_MW
+import fullscrape_MW
 
 from socketIO_client import SocketIO,BaseNamespace
 import time
-import objectspy
+import objectspy_MW
 import core_utils
 
-browserobj = browserops.BrowserOperations()
-clickandaddoj = clickandadd.Clickandadd()
-fullscrapeobj = fullscrape.Fullscrape()
+browserobj = browserops_MW.BrowserOperations()
+clickandadd_MWoj = clickandadd_MW.clickandadd_MW()
+fullscrape_MWobj = fullscrape_MW.fullscrape_MW()
 
 class ScrapeWindow(wx.Frame):
 
@@ -25,18 +25,18 @@ class ScrapeWindow(wx.Frame):
         self.iconpath = os.environ["NINETEEN68_HOME"] + "\\Nineteen68\\plugins\\Core\\Images" + "\\slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
-        obj = browserops.BrowserOperations()
+        obj = browserops_MW.BrowserOperations()
         self.socketIO = socketIO
         status = obj.openBrowser(browser)
         self.panel = wx.Panel(self)
         self.core_utilsobject = core_utils.CoreUtils()
 
-        self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd",pos=(12,8 ), size=(175, 28))
-        self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)   # need to implement OnExtract()
-        self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,38 ), size=(175, 28))
-        self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)   # need to implement OnExtract()
+        self.startbutton = wx.ToggleButton(self.panel, label="Start clickandadd",pos=(12,8 ), size=(175, 28))
+        self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd_MW)   # need to implement OnExtract()
+        self.fullscrape_MWbutton = wx.Button(self.panel, label="Full Scrape",pos=(12,38 ), size=(175, 28))
+        self.fullscrape_MWbutton.Bind(wx.EVT_BUTTON, self.fullscrape_MW)   # need to implement OnExtract()
 
-##            self.fullscrapebutton.SetToolTip(wx.ToolTip("To perform FULLSCRAPE Scraping"))
+##            self.fullscrape_MWbutton.SetToolTip(wx.ToolTip("To perform fullscrape_MW Scraping"))
         self.comparebutton = wx.ToggleButton(self.panel, label="Compare",pos=(12,68 ), size=(175, 28))
         self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)   # need to implement OnExtract()
         self.Centre()
@@ -50,22 +50,22 @@ class ScrapeWindow(wx.Frame):
     #----------------------------------------------------------------------
     def OnExit(self, event):
         self.Close()
-        driver = browserops.driver
+        driver = browserops_MW.driver
         driver.close()
 
     #----------------------------------------------------------------------
-    def clickandadd(self,event):
+    def clickandadd_MW(self,event):
         state = event.GetEventObject().GetValue()
         if state == True:
-            self.fullscrapebutton.Disable()
+            self.fullscrape_MWbutton.Disable()
             self.comparebutton.Disable()
-            clickandaddoj.startclickandadd()
-            event.GetEventObject().SetLabel("Stop ClickAndAdd")
-##            wx.MessageBox('CLICKANDADD: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
+            clickandadd_MWoj.startclickandadd_MW()
+            event.GetEventObject().SetLabel("Stop clickandadd")
+##            wx.MessageBox('clickandadd_MW: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
             print 'click and add initiated, select the elements from AUT'
 
         else:
-            d = clickandaddoj.stopclickandadd()
+            d = clickandadd_MWoj.stopclickandadd_MW()
             print 'Scrapped data saved successfully in domelements.json file'
 
             # 5 is the limit of MB set as per Nineteen68 standards
@@ -75,35 +75,35 @@ class ScrapeWindow(wx.Frame):
                 print 'Scraped data exceeds max. Limit.'
                 self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
 
-##            wx.MessageBox('CLICKANDADD: Scrape completed', 'Info',wx.OK | wx.ICON_INFORMATION)
+##            wx.MessageBox('clickandadd_MW: Scrape completed', 'Info',wx.OK | wx.ICON_INFORMATION)
             self.Close()
-            event.GetEventObject().SetLabel("Start ClickAndAdd")
+            event.GetEventObject().SetLabel("Start clickandadd_MW")
             print 'Click and add scrape  completed'
 
     def compare(self,event):
         state = event.GetEventObject().GetValue()
         if state == True:
-            self.fullscrapebutton.Disable()
+            self.fullscrape_MWbutton.Disable()
             self.startbutton.Disable()
-            obj = objectspy.Object_Mapper()
+            obj = objectspy_MW.Object_Mapper()
             obj.compare()
             event.GetEventObject().SetLabel("Update")
         else:
-            obj = objectspy.Object_Mapper()
+            obj = objectspy_MW.Object_Mapper()
             d = obj.update()
             self.socketIO.send(d)
             self.Close()
 
 
     #----------------------------------------------------------------------
-    def fullscrape(self,event):
+    def fullscrape_MW(self,event):
         print 'Performing full scrape'
         self.startbutton.Disable()
         self.comparebutton.Disable()
-        d = fullscrapeobj.fullscrape()
+        d = fullscrape_MWobj.fullscrape_MW()
 ##        self.startbutton.Enable()
 ##        self.savescrapebutton.Enable()
-##        wx.MessageBox('FULLSCRAPE: Scrape completed', 'Info', wx.OK | wx.ICON_INFORMATION)
+##        wx.MessageBox('fullscrape_MW: Scrape completed', 'Info', wx.OK | wx.ICON_INFORMATION)
 ##        print 'self.socketIO : ',self.socketIO
 ##        print 'Acknoledgement id : ',self.socketIO._ack_id
 

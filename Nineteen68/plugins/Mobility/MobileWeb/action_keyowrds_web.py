@@ -20,7 +20,7 @@ import logging
 import logger
 import platform
 if platform.system()!='Darwin':
-    import browser_Keywords
+    import browser_Keywords_MW
 import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -43,8 +43,8 @@ class Action_Key_App():
         output=OUTPUT_CONSTANT
         err_msg=None
         status=None
-        device=browser_Keywords.device_id
-        print device,'android web'
+        device=browser_Keywords_MW.device_id
+##        print device,'android web'
 
 ##        print '123456789'
 ##        print 'device is',device
@@ -153,7 +153,7 @@ class Action_Key_App():
 ##                input=int(inputs[1])
 ##                if input > 0 :
 ##                    while True:
-##                        actions = ActionChains(mobile_browser_keywords.driver_obj)
+##                        actions = ActionChains(browser_Keywords_MW.driver_obj)
 ##                        result=actions.send_keys(Keys.TAB).perform()
 ##                        time.sleep(1)
 ##                        status=TEST_RESULT_PASS
@@ -177,7 +177,7 @@ class Action_Key_App():
 ##    def down_Arrow(self,inputs,*args):
 ##
 ##        mobile_server_utilities.cleardata()
-##        status=webconstants.TEST_RESULT_FAIL
+##        status=webconstants_MW.TEST_RESULT_FAIL
 ####        methodoutput=TEST_RESULT_FALSE
 ##        value=''
 ##        try:
@@ -191,10 +191,10 @@ class Action_Key_App():
 ##                input=int(inputs[1])
 ##                if input > 0 :
 ##                    while True:
-##                        actions = ActionChains(mobile_browser_keywords.driver_obj)
+##                        actions = ActionChains(browser_Keywords_MW.driver_obj)
 ##                        result=actions.send_keys(Keys.DOWN).perform()
 ##                        time.sleep(1)
-##                        status=webconstants.TEST_RESULT_PASS
+##                        status=webconstants_MW.TEST_RESULT_PASS
 ##                        input=input-1
 ##                        if input < 1 :
 ##                            break
@@ -217,7 +217,7 @@ class Action_Key_App():
 ##    def up_Arrow(self,inputs,*args):
 ##
 ##        mobile_server_utilities.cleardata()
-##        status=webconstants.TEST_RESULT_FAIL
+##        status=webconstants_MW.TEST_RESULT_FAIL
 ####        methodoutput=TEST_RESULT_FALSE
 ##        value=''
 ##        try:
@@ -231,10 +231,10 @@ class Action_Key_App():
 ##                input=int(inputs[1])
 ##                if input > 0 :
 ##                    while True:
-##                        actions = ActionChains(mobile_browser_keywords.driver_obj)
+##                        actions = ActionChains(browser_Keywords_MW.driver_obj)
 ##                        result=actions.send_keys(Keys.UP).perform()
 ##                        time.sleep(1)
-##                        status=webconstants.TEST_RESULT_PASS
+##                        status=webconstants_MW.TEST_RESULT_PASS
 ##                        input=input-1
 ##                        if input < 1 :
 ##                            break
@@ -256,7 +256,7 @@ class Action_Key_App():
 ##    def enter_key(self,inputs,*args):
 ##
 ##        mobile_server_utilities.cleardata()
-##        status=webconstants.TEST_RESULT_FAIL
+##        status=webconstants_MW.TEST_RESULT_FAIL
 ####        methodoutput=TEST_RESULT_FALSE
 ##        value=''
 ##        try:
@@ -272,10 +272,10 @@ class Action_Key_App():
 ##                input=int(inputs[1])
 ##                if input > 0 :
 ##                    while True:
-##                        actions = ActionChains(mobile_browser_keywords.driver_obj)
+##                        actions = ActionChains(browser_Keywords_MW.driver_obj)
 ##                        result=actions.send_keys(Keys.ENTER).perform()
 ##                        time.sleep(1)
-##                        status=webconstants.TEST_RESULT_PASS
+##                        status=webconstants_MW.TEST_RESULT_PASS
 ##                        input=input-1
 ##                        if input < 1 :
 ##                            break

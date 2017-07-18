@@ -10,19 +10,19 @@
 #-------------------------------------------------------------------------------
 
 from selenium.webdriver.support.ui import Select
-import  browser_Keywords
-import webconstants
-from utilweb_operations import UtilWebKeywords
+import  browser_Keywords_MW
+import webconstants_MW
+from utilweb_operations_MW import UtilWebKeywords
 import logger
-import radio_checkbox_operations
+import radio_checkbox_operations_MW
 import logging
 
 from constants import *
-log = logging.getLogger('dropdown_listbox.py')
+log = logging.getLogger('dropdown_listbox_MW.py')
 class DropdownKeywords():
 
     def __init__(self):
-        self.radioKeywordsObj=radio_checkbox_operations.RadioCheckboxKeywords()
+        self.radioKeywordsObj=radio_checkbox_operations_MW.RadioCheckboxKeywords()
 
     def selectValueByIndex(self,webelement,input,*args):
         """
@@ -31,8 +31,8 @@ class DropdownKeywords():
         param  : webelement,list
         return : bool
         """
-        status=webconstants.TEST_RESULT_FAIL
-        result=webconstants.TEST_RESULT_FALSE
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
         visibilityFlag=True
         verb = OUTPUT_CONSTANT
         err_msg=None
@@ -64,12 +64,12 @@ class DropdownKeywords():
                             if(input_val < iListSize):
                                 for i in range(0,iListSize):
                                     if(input_val == i):
-##                                        if (isinstance(browser_Keywords.driver_obj,webdriver.Firefox)):
+##                                        if (isinstance(browser_Keywords_MW.driver_obj,webdriver.Firefox)):
 ##                                            iList[i].click()
 ##                                        else:
                                         select.select_by_index(input_val)
-                                        status=webconstants.TEST_RESULT_PASS
-                                        result=webconstants.TEST_RESULT_TRUE
+                                        status=webconstants_MW.TEST_RESULT_PASS
+                                        result=webconstants_MW.TEST_RESULT_TRUE
                                         log.info(STATUS_METHODOUTPUT_UPDATE)
 ##                                    else:
 ##                                      logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -102,8 +102,8 @@ class DropdownKeywords():
         param  : webelement
         return : string
         """
-        status=webconstants.TEST_RESULT_FAIL
-        result=webconstants.TEST_RESULT_FALSE
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         visibilityFlag=True
         iListSize = None
@@ -120,8 +120,8 @@ class DropdownKeywords():
                     log.info(iListSize)
                     logger.print_on_console('Count obtained is',iListSize)
                     if (iListSize > 0):
-                        status=webconstants.TEST_RESULT_PASS
-                        result=webconstants.TEST_RESULT_TRUE
+                        status=webconstants_MW.TEST_RESULT_PASS
+                        result=webconstants_MW.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                 except Exception as e:
                     log.error(e)
@@ -140,8 +140,8 @@ class DropdownKeywords():
         param  : webelement,list
         return : bool
         """
-        status=webconstants.TEST_RESULT_FAIL
-        result=webconstants.TEST_RESULT_FALSE
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
         visibilityFlag=True
         verb = OUTPUT_CONSTANT
         err_msg=None
@@ -170,8 +170,8 @@ class DropdownKeywords():
                                     flag = True
                             if(flag):
                                 select.select_by_visible_text(inp_val)
-                                status=webconstants.TEST_RESULT_PASS
-                                result=webconstants.TEST_RESULT_TRUE
+                                status=webconstants_MW.TEST_RESULT_PASS
+                                result=webconstants_MW.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                             else:
                                 logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
@@ -207,8 +207,8 @@ class DropdownKeywords():
         param  : webelement,list
         return : bool
         """
-        status=webconstants.TEST_RESULT_FAIL
-        result=webconstants.TEST_RESULT_FALSE
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
         visibilityFlag=True
         verb = OUTPUT_CONSTANT
         err_msg=None
@@ -224,8 +224,8 @@ class DropdownKeywords():
                         first_value = select.first_selected_option.text
                         inp_val = input[0]
                         if (first_value == inp_val):
-                            status=webconstants.TEST_RESULT_PASS
-                            result=webconstants.TEST_RESULT_TRUE
+                            status=webconstants_MW.TEST_RESULT_PASS
+                            result=webconstants_MW.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
                             logger.print_on_console(ERROR_CODE_DICT['ERR_INPUT_MISS_MATCH'])
@@ -252,8 +252,8 @@ class DropdownKeywords():
         param  : webelement,list
         return : bool
         """
-        status=webconstants.TEST_RESULT_FAIL
-        result=webconstants.TEST_RESULT_FALSE
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
         visibilityFlag=True
         verb = OUTPUT_CONSTANT
         err_msg=None
@@ -272,8 +272,8 @@ class DropdownKeywords():
                         logger.print_on_console(iListSize)
                         input_val = int(input[0])
                         if (iListSize == input_val):
-                            status=webconstants.TEST_RESULT_PASS
-                            result=webconstants.TEST_RESULT_TRUE
+                            status=webconstants_MW.TEST_RESULT_PASS
+                            result=webconstants_MW.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
                             logger.print_on_console('Count mismatched')
@@ -307,8 +307,8 @@ class DropdownKeywords():
         return : bool
         """
 
-        status=webconstants.TEST_RESULT_FAIL
-        result=webconstants.TEST_RESULT_FALSE
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
         visibilityFlag=True
         verb = OUTPUT_CONSTANT
         err_msg=None
@@ -342,8 +342,8 @@ class DropdownKeywords():
                                 break
 
                         if(len(temp) ==  0 and flag == True):
-                            status=webconstants.TEST_RESULT_PASS
-                            result=webconstants.TEST_RESULT_TRUE
+                            status=webconstants_MW.TEST_RESULT_PASS
+                            result=webconstants_MW.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
                             err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
@@ -372,8 +372,8 @@ class DropdownKeywords():
         param  : webelement,list
         return : bool
         """
-        status=webconstants.TEST_RESULT_FAIL
-        result=webconstants.TEST_RESULT_FALSE
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
         visibilityFlag=True
         verb = OUTPUT_CONSTANT
         err_msg=None
@@ -403,7 +403,7 @@ class DropdownKeywords():
                                             input_val_temp = input[x]
                                             input_val = int(input_val_temp)
                                             if( input_val == i):
-                                                if (isinstance(browser_Keywords.driver_obj,webdriver.Firefox)):
+                                                if (isinstance(browser_Keywords_MW.driver_obj,webdriver.Firefox)):
                                                     iList[i].click()
                                                 else:
                                                     select.select_by_index(input_val)
@@ -414,8 +414,8 @@ class DropdownKeywords():
                                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                                         break;
                                 if (not flag):
-                                    status=webconstants.TEST_RESULT_PASS
-                                    result=webconstants.TEST_RESULT_TRUE
+                                    status=webconstants_MW.TEST_RESULT_PASS
+                                    result=webconstants_MW.TEST_RESULT_TRUE
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
                         logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -444,7 +444,7 @@ class DropdownKeywords():
                                             input_val_temp = input[x]
                                             input_val = int(input_val_temp)
                                             if( input_val == i):
-##                                                if (isinstance(browser_Keywords.driver_obj,webdriver.Firefox)):
+##                                                if (isinstance(browser_Keywords_MW.driver_obj,webdriver.Firefox)):
 ##                                                    iList[i].click()
 ##                                                else:
                                                     select.select_by_index(input_val)
@@ -458,8 +458,8 @@ class DropdownKeywords():
                                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                                         break;
                                 if (not flag):
-                                    status=webconstants.TEST_RESULT_PASS
-                                    result=webconstants.TEST_RESULT_TRUE
+                                    status=webconstants_MW.TEST_RESULT_PASS
+                                    result=webconstants_MW.TEST_RESULT_TRUE
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
                             else:
                                 err_msg = 'Element is not displayed or enabled '
@@ -485,8 +485,8 @@ class DropdownKeywords():
         param  : webelement,list
         return : bool
         """
-        status=webconstants.TEST_RESULT_FAIL
-        result=webconstants.TEST_RESULT_FALSE
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
         visibilityFlag=True
         output = None
         err_msg=None
@@ -506,8 +506,8 @@ class DropdownKeywords():
                         output = select.all_selected_options[i].text
                         str(output)
                         logger.print_on_console(output)
-                        status=webconstants.TEST_RESULT_PASS
-                        result=webconstants.TEST_RESULT_TRUE
+                        status=webconstants_MW.TEST_RESULT_PASS
+                        result=webconstants_MW.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
                         temp = []
@@ -522,8 +522,8 @@ class DropdownKeywords():
                             output=temp
                         else:
                             output = value
-                        status=webconstants.TEST_RESULT_PASS
-                        result=webconstants.TEST_RESULT_TRUE
+                        status=webconstants_MW.TEST_RESULT_PASS
+                        result=webconstants_MW.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                 else:
                     logger.print_on_console('Element is not displayed')
@@ -537,8 +537,8 @@ class DropdownKeywords():
 
 
     def selectMultipleValuesByText(self,webelement,input,*args):
-        status=webconstants.TEST_RESULT_FAIL
-        result=webconstants.TEST_RESULT_FALSE
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
         visibilityFlag=True
         verb = OUTPUT_CONSTANT
         err_msg=None
@@ -572,8 +572,8 @@ class DropdownKeywords():
                                     counter = counter + 1
 
                             if counter == count :
-                                status=webconstants.TEST_RESULT_PASS
-                                result=webconstants.TEST_RESULT_TRUE
+                                status=webconstants_MW.TEST_RESULT_PASS
+                                result=webconstants_MW.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                             else:
                                 logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
@@ -601,8 +601,8 @@ class DropdownKeywords():
                                 counter = counter + 1
 
                         if counter == count :
-                            status=webconstants.TEST_RESULT_PASS
-                            result=webconstants.TEST_RESULT_TRUE
+                            status=webconstants_MW.TEST_RESULT_PASS
+                            result=webconstants_MW.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
                             logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
@@ -621,8 +621,8 @@ class DropdownKeywords():
         return status,result,verb,err_msg
 
     def getMultipleValuesByIndexes(self,webelement,input,*args):
-        status=webconstants.TEST_RESULT_FAIL
-        result=webconstants.TEST_RESULT_FALSE
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
         visibilityFlag=True
         output = None
         err_msg=None
@@ -662,8 +662,8 @@ class DropdownKeywords():
                                         output = ';'.join(temp)
                                         logger.print_on_console(output)
                                         output=temp
-                                        status=webconstants.TEST_RESULT_PASS
-                                        result=webconstants.TEST_RESULT_TRUE
+                                        status=webconstants_MW.TEST_RESULT_PASS
+                                        result=webconstants_MW.TEST_RESULT_TRUE
                                         log.info(STATUS_METHODOUTPUT_UPDATE)
                                 else:
                                     logger.print_on_console('Element is not displayed')
@@ -705,8 +705,8 @@ class DropdownKeywords():
                                 output = ';'.join(temp)
                                 logger.print_on_console(output)
                                 output=temp
-                                status=webconstants.TEST_RESULT_PASS
-                                result=webconstants.TEST_RESULT_TRUE
+                                status=webconstants_MW.TEST_RESULT_PASS
+                                result=webconstants_MW.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
                             logger.print_on_console('Element is not displayed')
@@ -724,8 +724,8 @@ class DropdownKeywords():
         return status,result,output,err_msg
 
     def selectAllValues(self,webelement,*args):
-        status=webconstants.TEST_RESULT_FAIL
-        result=webconstants.TEST_RESULT_FALSE
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
         visibilityFlag=True
         verb = OUTPUT_CONSTANT
         err_msg=None
@@ -752,8 +752,8 @@ class DropdownKeywords():
                     log.debug('iListSize is')
                     log.debug(iListSize)
                     if(size == iListSize):
-                        status=webconstants.TEST_RESULT_PASS
-                        result=webconstants.TEST_RESULT_TRUE
+                        status=webconstants_MW.TEST_RESULT_PASS
+                        result=webconstants_MW.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                 except Exception as e:
                     log.error(e)
@@ -767,8 +767,8 @@ class DropdownKeywords():
         return status,result,verb,err_msg
 
     def getValueByIndex(self,webelement,input,*args):
-        status=webconstants.TEST_RESULT_FAIL
-        result=webconstants.TEST_RESULT_FALSE
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
         visibilityFlag=True
         output = None
         err_msg=None
@@ -790,8 +790,8 @@ class DropdownKeywords():
                                 for i in range(0,iListSize):
                                     if(input_val == i):
                                         output=select.options[input_val].text
-                                        status=webconstants.TEST_RESULT_PASS
-                                        result=webconstants.TEST_RESULT_TRUE
+                                        status=webconstants_MW.TEST_RESULT_PASS
+                                        result=webconstants_MW.TEST_RESULT_TRUE
                                         log.info(STATUS_METHODOUTPUT_UPDATE)
                             else:
                                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -816,8 +816,8 @@ class DropdownKeywords():
         return status,result,output,err_msg
 
     def verifyValuesExists(self,webelement,input,*args):
-        status=webconstants.TEST_RESULT_FAIL
-        result=webconstants.TEST_RESULT_FALSE
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
         visibilityFlag=True
         verb = OUTPUT_CONSTANT
         err_msg=None
@@ -852,8 +852,8 @@ class DropdownKeywords():
                             else:
                                 flag = False
                         if(not(flag == False)):
-                            status=webconstants.TEST_RESULT_PASS
-                            result=webconstants.TEST_RESULT_TRUE
+                            status=webconstants_MW.TEST_RESULT_PASS
+                            result=webconstants_MW.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
                             logger.print_on_console('Inputs does not match')
@@ -878,8 +878,8 @@ class DropdownKeywords():
         param  : webelement,list
         return : bool
         """
-        status=webconstants.TEST_RESULT_FAIL
-        result=webconstants.TEST_RESULT_FALSE
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
         visibilityFlag=True
         verb = OUTPUT_CONSTANT
         err_msg=None
@@ -911,8 +911,8 @@ class DropdownKeywords():
                                 break
 
                         if(len(temp) ==  0 and flag == True):
-                            status=webconstants.TEST_RESULT_PASS
-                            result=webconstants.TEST_RESULT_TRUE
+                            status=webconstants_MW.TEST_RESULT_PASS
+                            result=webconstants_MW.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
                             err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
@@ -934,8 +934,8 @@ class DropdownKeywords():
 
 
     def deselectAll(self,webelement,*args):
-        status=webconstants.TEST_RESULT_FAIL
-        result=webconstants.TEST_RESULT_FALSE
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
         visibilityFlag=True
         verb = OUTPUT_CONSTANT
         err_msg=None
@@ -953,8 +953,8 @@ class DropdownKeywords():
                     log.debug('value given by select.all_selected_options')
                     log.debug(check)
                     if(len(check) == 0):
-                        status=webconstants.TEST_RESULT_PASS
-                        result=webconstants.TEST_RESULT_TRUE
+                        status=webconstants_MW.TEST_RESULT_PASS
+                        result=webconstants_MW.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                 except Exception as e:
                     log.error(e)

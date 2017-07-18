@@ -15,6 +15,7 @@ import mobile_key_objects
 import ast
 import json
 import re
+import webconstants_MW
 global count
 count=''
 accessContext=''
@@ -41,7 +42,7 @@ def clientresponse():
         })
     else:
         mobile_key_objects.custom_msg.append[:]
-        mobile_key_objects.custom_msg.append(MSG_ELEMENT_NOT_FOUND)
+        mobile_key_objects.custom_msg.append(webconstants_MW.MSG_ELEMENT_NOT_FOUND)
         clientresp.append({
             "keywordMessage" : mobile_key_objects.custom_msg
         })

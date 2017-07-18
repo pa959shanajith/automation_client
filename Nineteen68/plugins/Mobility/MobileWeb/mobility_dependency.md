@@ -1,1 +1,0 @@
-Appium-Python-Client==0.24(requires selenium)
