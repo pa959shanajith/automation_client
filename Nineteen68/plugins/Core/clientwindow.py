@@ -90,8 +90,8 @@ class MainNamespace(BaseNamespace):
             res = light.highlight(args,None,None)
             print 'Highlight result: ',res
         if appType==APPTYPE_MOBILE.lower():
-            import highlight
-            light =highlight.Highlight()
+            import highlight_MW
+            light =highlight_MW.Highlight()
             res = light.highlight(args,None,None)
             print 'Highlight result: ',res
         if appType==APPTYPE_DESKTOP_JAVA.lower():
