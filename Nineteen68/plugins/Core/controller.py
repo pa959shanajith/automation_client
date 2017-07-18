@@ -421,7 +421,7 @@ class Controller():
             elif self.status == TERMINATE:
                 self.reporting_obj.overallstatus=self.status
 
-       	if self.action==EXECUTE:
+        if self.action==EXECUTE:
 ##            self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
             if statusflag:
                 self.reporting_obj.generate_report_step(tsp,'',self,ellapsed_time,keyword_flag,result)
