@@ -181,7 +181,7 @@ class BrowserKeywords():
         try:
             url = url[0]
             if not (url is None and url is ''):
-            	url.strip()
+                url.strip()
                 if url[0:4].lower()!='http' and url[0:4].lower()!='file':
                     url='http://'+url
                 driver_obj.get(url)
