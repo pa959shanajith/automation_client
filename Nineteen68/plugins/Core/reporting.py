@@ -38,8 +38,8 @@ class Reporting:
         self.id_counter=1
         self.testscript_name=None
         self.overallstatus=TEST_RESULT_PASS
-        self.browser_version='-'
-        self.browser_type='-'
+        self.browser_version='NA'
+        self.browser_type='NA'
         self.start_time=''
         self.end_time=''
         self.ellapsed_time=''

@@ -271,7 +271,12 @@ class Dispatcher:
                   'clearCache':self.browser_object.clear_cache,
                   'navigateWithAuthenticate':self.browser_object.navigate_with_authenticate
                 }
-
+            if browser_Keywords.driver_obj is not None:
+                browser_info=browser_Keywords.driver_obj.capabilities
+                reporting_obj.browser_type=browser_info.get('browserName')
+                reporting_obj.browser_version=browser_info.get('version')
+                if(reporting_obj.browser_version == '' or reporting_obj.browser_version == None):
+                    reporting_obj.browser_version= browser_info['browserVersion']
             if keyword in dict.keys():
                 flag=False
                 #Finding the webelement for NON_WEBELEMENT_KEYWORDS
