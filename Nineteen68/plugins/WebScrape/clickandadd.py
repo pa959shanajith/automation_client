@@ -153,7 +153,9 @@ class Clickandadd():
             status = domconstants.STATUS_SUCCESS
         except Exception as e:
             status = domconstants.STATUS_FAIL
-            Exceptions.error(e)
+            print 'Error while performing start click and add scrape'
+            if (isinstance(driver,webdriver.Ie)):
+                print 'Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked) and retry'
         return status
 
     def stopclickandadd(self):
@@ -324,7 +326,7 @@ class Clickandadd():
             log.info('stopclickandadd operation on frame/iframe pages is completed')
             driver.switch_to.window(currenthandle)
             driver.switch_to_default_content()
-            
+
 ##            global vie
 ##            vie = {'view': tempne_stopclicknadd}
 ##            global data
@@ -367,23 +369,9 @@ class Clickandadd():
         except Exception as e:
             status = domconstants.STATUS_FAIL
             data = domconstants.STATUS_FAIL
+            print 'Error while performing stop click and add scrape'
+            if (isinstance(driver,webdriver.Ie)):
+                print 'Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked) and retry'
         return data
-
-##    def save_json_data(self):
-####        data = {'view' : vie}
-##        data = []
-##        driver = browserops.driver
-##        data.append(vie)
-##        screen = driver.get_screenshot_as_base64()
-##        screenshot = {'mirror':screen}
-##        scrapetype = {'scrapetype' : 'cna'}
-##        data.append(screenshot)
-##        data.append(scrapetype)
-##        with open('domelements.json', 'w') as outfile:
-##                log.info('FILE: clickandadd.py , DEF: stopclickandadd() , MSG: Opening domelements.json file to write vie object')
-##                json.dump(data, outfile, indent=4, sort_keys=False)
-##                log.info('FILE: clickandadd.py , DEF: stopclickandadd() , MSG: vie is dumped into  domelements.json file ')
-##        outfile.close()
-##        return data
 
 

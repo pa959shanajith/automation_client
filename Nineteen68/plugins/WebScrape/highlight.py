@@ -269,6 +269,8 @@ class Highlight():
 ##            Exceptions.error(e)
             status= domconstants.STATUS_FAIL
             print 'Error while highlighting'
+            if (isinstance(driver,webdriver.Ie)):
+                print 'Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked)'
         log.info('Highlight method execution done ')
         return status
 

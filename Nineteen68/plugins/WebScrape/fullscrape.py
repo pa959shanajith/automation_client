@@ -16,7 +16,7 @@ import time
 import json
 import domconstants
 import logger
-import Exceptions
+##import Exceptions
 import logging.config
 import logging
 import os
@@ -263,6 +263,9 @@ class Fullscrape():
             status = domconstants.STATUS_FAIL
             data = domconstants.STATUS_FAIL
             print 'Error while performing full scrape'
+            if (isinstance(driver,webdriver.Ie)):
+                print 'Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked) and retry'
+
         return data
 
 ##    def save_json_data(self):
