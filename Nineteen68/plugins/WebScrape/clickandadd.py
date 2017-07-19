@@ -324,6 +324,7 @@ class Clickandadd():
             log.info('stopclickandadd operation on frame/iframe pages is completed')
             driver.switch_to.window(currenthandle)
             driver.switch_to_default_content()
+            
 ##            global vie
 ##            vie = {'view': tempne_stopclicknadd}
 ##            global data
