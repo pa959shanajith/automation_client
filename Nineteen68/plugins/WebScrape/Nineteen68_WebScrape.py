@@ -74,7 +74,11 @@ class ScrapeWindow(wx.Frame):
 
             # 5 is the limit of MB set as per Nineteen68 standards
             if self.core_utilsobject.getdatasize(str(d),'mb') < 5:
-                self.socketIO.emit('scrape',d)
+                if  isinstance(d,str):
+                    if d.lower() == 'fail':
+                        self.socketIO.emit('scrape',d)
+                else:
+                    self.socketIO.emit('scrape',d)
             else:
                 print 'Scraped data exceeds max. Limit.'
                 self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
@@ -108,8 +112,9 @@ class ScrapeWindow(wx.Frame):
 
         # 5 is the limit of MB set as per Nineteen68 standards
         if self.core_utilsobject.getdatasize(str(d),'mb') < 5:
-            if d.lower() == 'fail':
-                self.socketIO.emit('scrape',d)
+            if  isinstance(d,str):
+                if d.lower() == 'fail':
+                    self.socketIO.emit('scrape',d)
             else:
                 self.socketIO.emit('scrape',d)
                 print 'Full scrape  completed'
