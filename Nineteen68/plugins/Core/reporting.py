@@ -274,7 +274,8 @@ class Reporting:
         if len(args)>0:
             if args[0] != None:
                 result_tuple=args[0]
-                comments= result_tuple[3]
+                if "Terminate" not in result_tuple:
+                    comments= result_tuple[3]
                 if(len(result_tuple) == 5):
                     screenshot_path = result_tuple[4]
                 else:

@@ -345,10 +345,19 @@ class TextFile:
         input_path=coreutilsobj.get_UTF_8(input_path)
         log.info('Writing ',content,' to text file ',input_path)
         try:
-            if len(args)>0:
-                content+=' '.join(args)
+            ##for i in args:
+            ##    content='\n'.join(i)
+            len_args=len(args)
+            ##print len_args
+            ##print args[len_args-1]
             with open(input_path, 'a') as file:
-                file.write(content)
+                if (args[len_args-1]).lower()=="newline" :
+                    file.write(content+"\n")
+                    for i in range(0,(len(args)-1)):
+                        file.write(args[i]+"\n")
+                else:
+                    content+=''.join(args)
+                    file.write(content)
                 file.close()
                 log.debug('Content is written successfully')
                 status= True

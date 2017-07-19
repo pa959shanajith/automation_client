@@ -209,16 +209,17 @@ class DesktopDispatcher:
             configvalues = configobj.readJson()
             screen_shot_obj = screenshot_keywords.Screenshot()
             if self.action == constants.EXECUTE:
-                result=list(result)
-                if configvalues['screenShot_Flag'].lower() == 'fail':
-                    if result[0].lower() == 'fail':
+                if result !=constants.TERMINATE:
+                    result=list(result)
+                    if configvalues['screenShot_Flag'].lower() == 'fail':
+                        if result[0].lower() == 'fail':
+                            if keyword not in desktop_constants.APPLICATION_KEYWORDS:
+                                file_path = screen_shot_obj.captureScreenshot()
+                                result.append(file_path[2])
+                    elif configvalues['screenShot_Flag'].lower() == 'all':
                         if keyword not in desktop_constants.APPLICATION_KEYWORDS:
                             file_path = screen_shot_obj.captureScreenshot()
                             result.append(file_path[2])
-                elif configvalues['screenShot_Flag'].lower() == 'all':
-                    if keyword not in desktop_constants.APPLICATION_KEYWORDS:
-                        file_path = screen_shot_obj.captureScreenshot()
-                        result.append(file_path[2])
         except TypeError as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result=list(result)
