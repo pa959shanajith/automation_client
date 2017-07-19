@@ -69,36 +69,39 @@ class Delay_keywords:
         err_msg=None
         display_input=''
         try:
-             if not (args is None or args is ''):
+            if not (args is None or args is ''):
                 import time
                 input_list=list(args)
                 index=input_list.index(';')
                 values=input_list[0:index]
                 variables=input_list[index+1:len(input_list)]
+                flag_invalid_syntax=False
                 for x, y in zip(variables, values):
                     coreutilsobj=core_utils.CoreUtils()
                     y=coreutilsobj.get_UTF_8(y)
                     x=coreutilsobj.get_UTF_8(x)
-##                    if type(x)==unicode or type(x)==str:
+##                  if type(x)==unicode or type(x)==str:
 ##                        x=str(x)
-                    ##changes to fix issue:304-Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
-                    ##changes done by jayashree.r
-##                    if y == 'None' or y == None:
+##                        changes to fix issue:304-Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
+##                  changes done by jayashree.r
+##                  if y == 'None' or y == None:
                     if y == None:
                         y = 'null'
-                    if  x.count('{')!=1 and x.count('}')!=1:
-                        logger.print_on_console('Invalid Syntax')
-                        y=''
+                    if  not(x.startswith('{') and x.endswith('}')):
+                        flag_invalid_syntax=True
 ##                    if not isinstance(y,unicode):
 ##                        print str(y)
 ##                        y=str(y)
 ##                    display_input+=x+' = '+(y if type(y)==str else repr(y))+'\n'
                     display_input+=x+' = '+y+'\n'
-                o = pause_display_operation.PauseAndDisplay()
-                o.display_value(display_input,args[-2],args[-1])
-                status=TEST_RESULT_PASS
-                methodoutput=TEST_RESULT_TRUE
-             else :
+                if not (flag_invalid_syntax):
+                    o = pause_display_operation.PauseAndDisplay()
+                    o.display_value(display_input,args[-2],args[-1])
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+                else:
+                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+            else:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)

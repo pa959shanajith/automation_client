@@ -57,6 +57,8 @@ class If():
         index=self.index
         end_info=self.info_dict
         start_step=self.info_dict[0]
+        none_mark=[]
+        null_count=0
         #NO need to keep track of next targets when endIf is encountered
         if self.name.lower() != ENDIF:
             self.step_description='Encountered :'+self.name
@@ -85,8 +87,6 @@ class If():
             logical_eval_obj=Logical_eval()
             input_expression=''
             if len(input)>=2:
-                none_mark=[]
-                null_count=0
                 for exp in input:
                     if exp is None:
                         exp='null'
