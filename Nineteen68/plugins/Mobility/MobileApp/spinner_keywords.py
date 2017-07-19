@@ -26,6 +26,7 @@ class Spinner_Keywords():
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=None
+        className=''
         err_msg=None
         text=[]
         obj=[]
@@ -44,6 +45,13 @@ class Spinner_Keywords():
                         action.tap(webelement).perform()
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
@@ -56,6 +64,13 @@ class Spinner_Keywords():
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
@@ -69,7 +84,8 @@ class Spinner_Keywords():
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
-                        driver.back()
+                        if className == 'CheckedTextView' :
+                            driver.back()
 
                     else:
                         err_msg='element is disabled'
@@ -90,6 +106,7 @@ class Spinner_Keywords():
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         count=None
+        className=''
         input=int(input[0])
         err_msg=None
         text=[]
@@ -109,6 +126,13 @@ class Spinner_Keywords():
                         action.tap(webelement).perform()
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
@@ -121,6 +145,13 @@ class Spinner_Keywords():
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
@@ -132,7 +163,8 @@ class Spinner_Keywords():
                             if (length1==length2):
                                 count=length1
                                 break
-                        driver.back()
+                        if className == 'CheckedTextView' :
+                            driver.back()
                         if (input==count):
                                 log.debug('count matched')
                                 status=TEST_RESULT_PASS
@@ -163,6 +195,7 @@ class Spinner_Keywords():
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        className=''
         input=input[0]
         text=[]
         obj=[]
@@ -183,6 +216,13 @@ class Spinner_Keywords():
                         action.tap(webelement).perform()
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
@@ -207,6 +247,13 @@ class Spinner_Keywords():
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
@@ -232,7 +279,8 @@ class Spinner_Keywords():
                                     err_msg='invalid input'
                                     log.error('invalid input')
                                     logger.print_on_console(err_msg)
-                                    driver.back()
+                                    if className == 'CheckedTextView' :
+                                        driver.back()
                                 break
 
 
@@ -255,6 +303,7 @@ class Spinner_Keywords():
         output=OUTPUT_CONSTANT
         err_msg=None
         input=input[0]
+        className=''
         text=[]
         obj=[]
         flag=False
@@ -274,6 +323,13 @@ class Spinner_Keywords():
                         action.tap(webelement).perform()
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
@@ -299,6 +355,13 @@ class Spinner_Keywords():
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
@@ -325,9 +388,11 @@ class Spinner_Keywords():
                                     err_msg='invalid input'
                                     log.error('invalid input')
                                     logger.print_on_console(err_msg)
-                                    driver.back()
+                                    if className == 'CheckedTextView' :
+                                        driver.back()
                                 break
-                        driver.back()
+                        if className == 'CheckedTextView' :
+                            driver.back()
 
                     else:
                         err_msg='element is disabled'
@@ -349,6 +414,7 @@ class Spinner_Keywords():
         output=OUTPUT_CONSTANT
         err_msg=None
         text=[]
+        className=''
         input=int(input[0])
         obj=[]
         flag=False
@@ -367,6 +433,13 @@ class Spinner_Keywords():
                         action.tap(webelement).perform()
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
@@ -391,6 +464,13 @@ class Spinner_Keywords():
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
@@ -416,7 +496,8 @@ class Spinner_Keywords():
                                     err_msg='invalid input'
                                     log.error('invalid input')
                                     logger.print_on_console(err_msg)
-                                    driver.back()
+                                    if className == 'CheckedTextView' :
+                                        driver.back()
                                 break
                     else:
                         err_msg='element is disabled'
@@ -440,6 +521,7 @@ class Spinner_Keywords():
         err_msg=None
         text=[]
         obj=[]
+        className=''
         flag=False
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
@@ -456,6 +538,13 @@ class Spinner_Keywords():
                         action.tap(webelement).perform()
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text :
                                     text.append(i.text)
@@ -481,7 +570,8 @@ class Spinner_Keywords():
                                     scrollele1=obj[length1-1]
                                     scrollele2=obj[length1-2]
                                     driver.scroll(scrollele1,scrollele2)
-                        driver.back()
+                        if className == 'CheckedTextView' :
+                            driver.back()
 
                     else:
                         err_msg='element is disabled'
@@ -504,6 +594,7 @@ class Spinner_Keywords():
         output=OUTPUT_CONSTANT
         err_msg=None
         text=[]
+        className=''
         obj=[]
         flag=False
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -521,6 +612,13 @@ class Spinner_Keywords():
                         action.tap(webelement).perform()
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text :
                                     text.append(i.text)
@@ -547,7 +645,8 @@ class Spinner_Keywords():
                                     scrollele1=obj[length1-1]
                                     scrollele2=obj[length1-2]
                                     driver.scroll(scrollele1,scrollele2)
-                        driver.back()
+                        if className == 'CheckedTextView' :
+                            driver.back()
 
                     else:
                         err_msg='element is disabled'
@@ -569,6 +668,7 @@ class Spinner_Keywords():
         result=TEST_RESULT_FALSE
         output=None
         temp=[]
+        className=''
         err_msg=None
         text=[]
         obj=[]
@@ -590,6 +690,13 @@ class Spinner_Keywords():
                         action.tap(webelement).perform()
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(str(i.text))
@@ -608,6 +715,13 @@ class Spinner_Keywords():
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(str(i.text))
@@ -634,7 +748,8 @@ class Spinner_Keywords():
                                         log.error('invalid input')
                                         logger.print_on_console(err_msg)
                                         break
-                        driver.back()
+                        if className == 'CheckedTextView' :
+                            driver.back()
 
 
 
@@ -659,6 +774,7 @@ class Spinner_Keywords():
         result=TEST_RESULT_FALSE
         output=None
         err_msg=None
+        className=''
         text=[]
         obj=[]
 ##        input=int(input[0])
@@ -678,6 +794,13 @@ class Spinner_Keywords():
                         action.tap(webelement).perform()
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text :
                                     text.append(i.text)
@@ -707,7 +830,8 @@ class Spinner_Keywords():
                                     scrollele1=obj[length1-1]
                                     scrollele2=obj[length1-2]
                                     driver.scroll(scrollele1,scrollele2)
-                        driver.back()
+                        if className == 'CheckedTextView' :
+                            driver.back()
 
                     else:
                         err_msg='element is disabled'
@@ -732,6 +856,7 @@ class Spinner_Keywords():
         result=TEST_RESULT_FALSE
         output=None
         temp=[]
+        className=''
         err_msg=None
         text=[]
         obj=[]
@@ -753,6 +878,13 @@ class Spinner_Keywords():
                         action.tap(webelement).perform()
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(str(i.text))
@@ -771,6 +903,13 @@ class Spinner_Keywords():
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(str(i.text))
@@ -802,7 +941,8 @@ class Spinner_Keywords():
 
 
 
-                        driver.back()
+                        if className == 'CheckedTextView' :
+                            driver.back()
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
@@ -828,6 +968,7 @@ class Spinner_Keywords():
         err_msg=None
         text=[]
         obj=[]
+        className=''
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
@@ -843,6 +984,13 @@ class Spinner_Keywords():
                         action.tap(webelement).perform()
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(str(i.text))
@@ -855,6 +1003,13 @@ class Spinner_Keywords():
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count= len(element)
+
+                            if count == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
@@ -868,7 +1023,8 @@ class Spinner_Keywords():
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
-                        driver.back()
+                        if className == 'CheckedTextView' :
+                            driver.back()
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
@@ -891,6 +1047,7 @@ class Spinner_Keywords():
         err_msg=None
         count=0
         text=[]
+        className=''
         obj=[]
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
@@ -907,6 +1064,13 @@ class Spinner_Keywords():
                         action.tap(webelement).perform()
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count1= len(element)
+
+                            if count1 == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(str(i.text))
@@ -919,6 +1083,13 @@ class Spinner_Keywords():
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            count1= len(element)
+
+                            if count1 == 0 :
+                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                className='RadioButton'
+                            else :
+                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
@@ -956,7 +1127,8 @@ class Spinner_Keywords():
                                 break
 
 
-                        driver.back()
+                        if className == 'CheckedTextView' :
+                            driver.back()
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
