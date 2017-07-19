@@ -46,9 +46,6 @@ class Clickandadd():
                 driver.switch_to.window(eachdriverhand)
                 log.info('Switching to each handle and checking weather it has focus ')
 
-                ##added by nikunj
-                log.info(driver.window_handles)
-
                 if (driver.execute_script(javascript_hasfocus)):
                     log.info('Got the window which has the focus')
                     global currenthandle
