@@ -772,7 +772,7 @@ class StepDescription:
         def GetCount():
             return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' + output + ' in ' +output_list
         def GetViewByIndex():
-            return 'Get View with index ' + input + ' in the '+ "'" + tsp.custname + "'" + ' and save the value ' + output + ' in '+ output_list,
+            return 'Get View with index ' + input + ' in the '+ "'" + tsp.custname + "'" + ' and save the value ' + output + ' in '+ output_list
         def GetSelectedViews():
             return 'Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save value ' + output + ' in '+output_list+ '.'
         def VerifySelectedViews():
