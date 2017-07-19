@@ -169,14 +169,14 @@ class CustomObjectHandler():
                     newdata =data[index+1:]
             for elem in newdata :
                 if elem['tag'].lower() == eleType.strip().lower():
-                    try:
+##                    try:
                         eleIndex = int(eleIndex) - 1
                         if(eleIndex == 0):
                             xpath = elem['xpath']
 ##                        elif(eleIndex<0):
 ##                            logger.print_on_console("Entered index value is 0 or lesser,please provide a correct index value")
-                    except:
-                        logger.print_on_console( e)
+##                    except:
+##                        logger.print_on_console( e)
         except Exception as e:
             import traceback
             traceback.print_exc()
