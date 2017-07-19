@@ -19,7 +19,7 @@ from selenium.common.exceptions import *
 import logging
 from constants import *
 import core_utils
-
+import readconfig
 
 log = logging.getLogger('textbox_operations.py')
 
@@ -149,7 +149,16 @@ class TextboxKeywords:
                                 browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
                             else:
                                 webelement.clear()
-                                webelement.send_keys(input)
+                                configobj = readconfig.readConfig()
+                                configvalues = configobj.readJson()
+                                bit64 = configvalues['bit_64']
+                                if(isinstance(browser_Keywords.driver_obj,selenium.webdriver.Ie) and bit64.lower() == "yes"):
+                                    import time
+                                    for i in range (0,len(input)+1):
+                                        browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input[0:i])
+                                        time.sleep(1)
+                                else:
+                                    webelement.send_keys(input)
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:
@@ -399,7 +408,16 @@ class TextboxKeywords:
                                 encryption_obj = AESCipher()
                                 input_val = encryption_obj.decrypt(input)
                                 webelement.clear()
-                                webelement.send_keys(input_val)
+                                configobj = readconfig.readConfig()
+                                configvalues = configobj.readJson()
+                                bit64 = configvalues['bit_64']
+                                if(isinstance(browser_Keywords.driver_obj,selenium.webdriver.Ie) and bit64.lower() == "yes"):
+                                    import time
+                                    for i in range (0,len(input)+1):
+                                        browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val[0:i])
+                                        time.sleep(1)
+                                else:
+                                    webelement.send_keys(input_val)
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:

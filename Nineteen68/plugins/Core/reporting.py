@@ -202,6 +202,8 @@ class Reporting:
         obj[STEP]=description
         if self.user_termination:
             description=USER_TERMINATION
+        else:
+            description="Terminated by program"
         obj[STEP_DESCRIPTION]=description
         self.report_string.append(obj)
         self.id_counter+=1
