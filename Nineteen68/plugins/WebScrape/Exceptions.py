@@ -11,9 +11,9 @@
 
 import logging
 def error(e):
-    print 'Exception occured is : %s', e
-    print 'Type of the exception : %s', type(e)
-    print 'Exception args : %s', e.args
+##    print 'Exception occured is : %s', e
+##    print 'Type of the exception : %s', type(e)
+##    print 'Exception args : %s', e.args
     logging.debug('MSG: Exception occured is : %s', e)
     logging.debug('MSG: Type of the exception : %s', type(e))
     logging.debug('MSG: Exception args : %s', e.args)

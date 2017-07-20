@@ -13,11 +13,11 @@ import logging
 import logging.config
 log = logging.getLogger('sap_dispatcher.py')
 #-------------------------------------------------------------importing  keywords
-import launch_keywords
+import sap_launch_keywords
 import button_link_keywords_sap
 import text_keywords_sap
-import element_keywords
-import dropdown_keywords
+import sap_element_keywords
+import sap_dropdown_keywords
 import radio_checkbox_keywords_sap
 import saputil_operations
 import sap_table_keywords
@@ -30,12 +30,12 @@ import constants
 
 class SAPDispatcher:
 
-    launch_keywords_obj = launch_keywords.Launch_Keywords()
+    launch_keywords_obj = sap_launch_keywords.Launch_Keywords()
     editable_text_obj = text_keywords_sap.Text_Keywords()
     button_link_obj =button_link_keywords_sap.ButtonLinkKeyword()
-    dropdown_keywords_obj = dropdown_keywords.Dropdown_Keywords()
+    dropdown_keywords_obj = sap_dropdown_keywords.Dropdown_Keywords()
     radiocheckbox_keywords_obj= radio_checkbox_keywords_sap.Radio_Checkbox_keywords()
-    element_keywords_obj=element_keywords.ElementKeywords()
+    element_keywords_obj=sap_element_keywords.ElementKeywords()
     saputil_keywords_obj=saputil_operations.SapUtilKeywords()
     table_keywords_obj=sap_table_keywords.Table_keywords()
     shell_keywords_obj=sap_shell_keywords.Shell_Keywords()
@@ -162,8 +162,8 @@ class SAPDispatcher:
                   'getcellstatus':self.table_keywords_obj.getStatus,
                   'selectrow':self.table_keywords_obj.selectRow,
                   'unselectrow':self.table_keywords_obj.unselectRow,
-                  'getrowcount':self.shell_keywords_obj.get_rowCount,
-                  'getcolumncount':self.shell_keywords_obj.get_colCount,
+                  'getcountofrows':self.shell_keywords_obj.get_rowCount,
+                  'getcountofcolumns':self.shell_keywords_obj.get_colCount,
                   'selectrows':self.shell_keywords_obj.selectRows,
                   'toolbaractionkeys':self.shell_keywords_obj.toolBarActionKeys,
                   'presstoolbarbutton':self.shell_keywords_obj.pressToolBarButton,

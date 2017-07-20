@@ -100,18 +100,20 @@ class  JumpBy():
         #Reporting part ends
         return self.jumpByStepNum
 
-    # Issue #153 and #167
+    # Issue #153 and #167: JumpBy passing between inside conditional blocks
     def __validate_jumpbystep(self,stepToJump):
         import handler
         try:
             if len(handler.cond_nest_info)==0:
-            	handler.cond_nest_info = self.__generate_conditional_structure(handler.copy_condition_keywords)
+                handler.cond_nest_info = self.__generate_conditional_structure(handler.copy_condition_keywords)
             if handler.tspList[self.jumpByStepNum].name.lower()==STARTLOOP:
                 return False, ['Jump By The given step is not allowed']
             else:
                 t_obj=handler.cond_nest_info
                 for item in t_obj:
-                    if self.jumpByStepNum>=item['st'] and self.jumpByStepNum<=item['en']:
+                    if self.jumpByStepNum==item['st']:
+                        break
+                    elif self.jumpByStepNum>item['st'] and self.jumpByStepNum<=item['en']:
                         if self.index>item['st'] and self.index<item['en']:
                             t_obj=item['c']
                         else:
@@ -126,22 +128,22 @@ class  JumpBy():
         t_obj=[]
         t_obj.append({'p':-1,'c':[],'l':0})
         for idx,kw in condition_keywords.iteritems():
-        	if kw=='if':
-        		if cn==-1:
-        			cn=0
-        		else:
-        			cn=unix-1
-        		t_obj.append({'p':cn,'c':[],'l':t_obj[cn]['l']+1,'st':idx,'en':-1})
-        		t_obj[cn]['c'].append(t_obj[unix])
-        		unix+=1
-        	if kw=='elseif' or kw=='else':
-        		p_list=t_obj[cn]['c']
-        		p_list[len(p_list)-1]['en']=idx-1
-        		t_obj.append({'p':cn,'c':[],'l':t_obj[cn]['l']+1,'st':idx,'en':-1})
-        		t_obj[cn]['c'].append(t_obj[unix])
-        		unix+=1
-        	if kw=='endif':
-        		p_list=t_obj[cn]['c']
-        		p_list[len(p_list)-1]['en']=idx-1
-        		cn=t_obj[cn]['p']
-       	return json.loads(json.dumps(t_obj[0]))['c']
+            if kw=='if':
+                if cn==-1:
+                    cn=0
+                else:
+                    cn=unix-1
+                t_obj.append({'p':cn,'c':[],'l':t_obj[cn]['l']+1,'st':idx,'en':-1})
+                t_obj[cn]['c'].append(t_obj[unix])
+                unix+=1
+            if kw=='elseif' or kw=='else':
+                p_list=t_obj[cn]['c']
+                p_list[len(p_list)-1]['en']=idx-1
+                t_obj.append({'p':cn,'c':[],'l':t_obj[cn]['l']+1,'st':idx,'en':-1})
+                t_obj[cn]['c'].append(t_obj[unix])
+                unix+=1
+            if kw=='endif':
+                p_list=t_obj[cn]['c']
+                p_list[len(p_list)-1]['en']=idx-1
+                cn=t_obj[cn]['p']
+        return json.loads(json.dumps(t_obj[0]))['c']

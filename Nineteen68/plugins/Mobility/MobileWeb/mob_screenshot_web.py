@@ -17,7 +17,7 @@ import logger
 ##import generic_constants
 import os
 from constants import *
-import browser_Keywords
+import browser_Keywords_MW
 
 import logging
 
@@ -66,13 +66,13 @@ class Screenshot():
 
             log.debug('screenshot captured')
 
-            if browser_Keywords.driver_obj==None:
+            if browser_Keywords_MW.driver_obj==None:
                 img=ImageGrab.grab()
                 img.save(filePath+'.png')
 ##                logger.print_on_console('screenshot captured')
             else:
 
-                img=browser_Keywords.driver_obj.save_screenshot(filePath+'.png')
+                img=browser_Keywords_MW.driver_obj.save_screenshot(filePath+'.png')
 ##                logger.print_on_console('screenshot captured')
 
             status=TEST_RESULT_PASS

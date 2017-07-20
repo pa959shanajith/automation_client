@@ -209,16 +209,17 @@ class DesktopDispatcher:
             configvalues = configobj.readJson()
             screen_shot_obj = screenshot_keywords.Screenshot()
             if self.action == constants.EXECUTE:
-                result=list(result)
-                if configvalues['screenShot_Flag'].lower() == 'fail':
-                    if result[0].lower() == 'fail':
+                if result !=constants.TERMINATE:
+                    result=list(result)
+                    if configvalues['screenShot_Flag'].lower() == 'fail':
+                        if result[0].lower() == 'fail':
+                            if keyword not in desktop_constants.APPLICATION_KEYWORDS:
+                                file_path = screen_shot_obj.captureScreenshot()
+                                result.append(file_path[2])
+                    elif configvalues['screenShot_Flag'].lower() == 'all':
                         if keyword not in desktop_constants.APPLICATION_KEYWORDS:
                             file_path = screen_shot_obj.captureScreenshot()
                             result.append(file_path[2])
-                elif configvalues['screenShot_Flag'].lower() == 'all':
-                    if keyword not in desktop_constants.APPLICATION_KEYWORDS:
-                        file_path = screen_shot_obj.captureScreenshot()
-                        result.append(file_path[2])
         except TypeError as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result=list(result)
@@ -237,6 +238,7 @@ class DesktopDispatcher:
         return result
 
     def get_desktop_element(self,xpath,url,app):
+        index=None
         #logic to find the desktop element using the xpath
         ele = ''
         try:
@@ -244,15 +246,17 @@ class DesktopDispatcher:
             ch = win.children()
             split_xpath = xpath.split('/')
             parent = split_xpath[0]
-            index = parent[parent.index('[') + 1 : parent.index(']')]
+            index = int(parent[parent.index('[') + 1 : parent.index(']')])
             ele = ch[int(index)]
             for i in range(1,len(split_xpath)):
                 child = split_xpath[i]
                 index = child[child.index('[') + 1 : child.index(']')]
                 ch = ele.children()
                 ele = ch[int(index)]
-        except Exception as e:
-            logger.print_on_console("Unable to get desktop elements because :",e)
+        except :
+            logger.print_on_console("Unable to get desktop elements because :")
+##            import traceback
+##            traceback.print_exc()
         return ele
 
 

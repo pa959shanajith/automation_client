@@ -12,7 +12,7 @@ import sap_scraping
 import wx
 ##import clientwindow
 from socketIO_client import SocketIO,BaseNamespace
-import launch_keywords
+import sap_launch_keywords
 sap_scraping_obj = sap_scraping.Scrape()
 import os
 from constants import *
@@ -49,8 +49,8 @@ class ScrapeWindow(wx.Frame):
         self.core_utilsobject = core_utils.CoreUtils()
 
         global obj
-        #logger.print_on_console("going to launch_keywords")
-        obj = launch_keywords.Launch_Keywords()
+        #logger.print_on_console("going to sap_launch_keywords")
+        obj = sap_launch_keywords.Launch_Keywords()
         self.socketIO = socketIO
         fileLoc=filePath.split(';')[0]
         windowname=filePath.split(';')[1]
@@ -89,7 +89,7 @@ class ScrapeWindow(wx.Frame):
             d = sap_scraping_obj.clickandadd('STOPCLICKANDADD')
             event.GetEventObject().SetLabel("Start ClickAndAdd")
             SapGui=self.uk.getSapObject()
-            obj=launch_keywords.Launch_Keywords()
+            obj=sap_launch_keywords.Launch_Keywords()
             wndname=sap_scraping_obj.getWindow(SapGui)
             wnd_title = wndname.__getattr__("Text")
             wnd_id = wndname.__getattr__("Id")
@@ -123,7 +123,7 @@ class ScrapeWindow(wx.Frame):
         wnd_id = wndname.__getattr__("Id")
         data={}
         scraped_data = sap_scraping_obj.full_scrape(wndname,wnd_title)
-        obj=launch_keywords.Launch_Keywords()
+        obj=sap_launch_keywords.Launch_Keywords()
         self.Hide()
         time.sleep(1)
         try:

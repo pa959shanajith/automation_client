@@ -111,10 +111,7 @@ class Exact(xml.sax.handler.ContentHandler):
 
     attsLength = len(attrs)
     if(attsLength>1):
-
- 	  XpathList.append(childXPath)
-
-
+        XpathList.append(childXPath)
     print 'count ++++++++ ',self.elementNameCount
     print 'len ++++++++ ',attsLength
     for x in attrs.getQNames():
@@ -122,39 +119,36 @@ class Exact(xml.sax.handler.ContentHandler):
         value=attrs.getValue(x)
 
         if x.lower()=='text':
-##//        		System.out.println(atts.getValue(x).length()+ " come on "+qName);
             if(value == ''):
-##        			//System.out.println(" in length is 0"+qName);
-		      label.append(qName)
+                label.append(qName)
             else:
-##        			//System.out.println("other value is "+atts.getValue(x));
                 if value in label:
                     label.append(qName)
                 else:
-                	label.append(value)
+                    label.append(value)
 
             name.append(qName)
 
         elif x.lower()=='bounds':
-				rectangle.append(value)
+            rectangle.append(value)
 
         elif x.lower()=='enabled':
-				enabled.append(value)
+            enabled.append(value)
 
         elif x.lower()=='resource-id':
-				resource_id.append(value)
+            resource_id.append(value)
 
         elif x.lower()=='focusable':
-				focusable.append(value)
+            focusable.append(value)
 
         elif x.lower()=='class':
-				class_name.append(value)
+            class_name.append(value)
 
         elif x.lower()=='content-desc':
-				content_desc.append(value)
+            content_desc.append(value)
 
         elif x.lower()=='checked':
-				checked.append(value)
+            checked.append(value)
     curobj=self
 
     child = Exact(childXPath,self.parser,curobj)

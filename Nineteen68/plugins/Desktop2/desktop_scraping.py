@@ -34,10 +34,11 @@ log = logging.getLogger('desktop_scraping.py')
 actualobjects = []
 allobjects = []
 class Scrape:
-    def clickandadd(self,operation,app_uia,window_name,wxobject):
+    def clickandadd(self,operation,wxobject):
+        window_name=desktop_launch_keywords.window_name
+        app_uia=desktop_launch_keywords.app_uia
         obj = desktop_launch_keywords.Launch_Keywords()
         obj.set_to_foreground()
-        data={}
         if operation == 'STARTCLICKANDADD':
             global view
             view = []
@@ -56,6 +57,7 @@ class Scrape:
                         #method returns 1 if the coordinates passed of any xpath, is near to the curson postion coordinates
                         #returns 0 if if coordinates doesnot fit into the condition
                         def match(x,y,width,height,coord_x,coord_y):
+
                             expectedx=int(x)+int(width)
                             expectedy=int(y)+int(height)
 
@@ -64,9 +66,8 @@ class Scrape:
                             else:
                                 return 0
                         try:
-                            obj = Scrape()
                             global allobjects
-                            allobjects = obj.full_scrape(app_uia,wxobject)
+                            allobjects=self.get_all_children_caller(app_uia)
                             objects = allobjects['view']
                             tempobjects = []
                             for i in objects:
@@ -79,11 +80,11 @@ class Scrape:
                                     first_ele = tempobjects[i]
                                     actualelement = first_ele
                                     next_ele = tempobjects[i+1]
-                                    if ((first_ele['x_screen'] < next_ele['x_screen']) and (first_ele['y_screen'] < next_ele['y_screen'])):
+                                    if ((first_ele['x_screen'] > next_ele['x_screen']) and (first_ele['y_screen'] > next_ele['y_screen'])):
                                         actualelement = first_ele
+                                        break
                                 except Exception as e:
                                     break
-
                             disp_obj = desktop_dispatcher.DesktopDispatcher()
                             ele = disp_obj.get_desktop_element(actualelement['xpath'],actualelement['url'],app_uia)
                             global actualobjects
@@ -92,16 +93,35 @@ class Scrape:
                             logger.print_on_console('Clicked option is not a part of DesktopGUI')
                         return True
 
+                    def get_all_children_caller(self,app_uia):
+                        allobjs = {}
+                        try:
+                            win = app_uia.top_window()
+                            ch = win.children()
+                            a = ''
+                            ne = []
+                            obj = desktop_launch_keywords.Launch_Keywords()
+                            obj.set_to_foreground()
+                            obj.bring_Window_Front()
+                            winrect = desktop_launch_keywords.win_rect;
+                            scrape_obj=Scrape()
+                            a =  scrape_obj.get_all_children(ch,ne,0,'',win,winrect)
+                            import json
+                            allobjs["view"] = a
+                        except Exception as e:
+                            logger.print_on_console(e)
+                        return allobjs
+
                     def abort(self):
                         self._want_continue = 0
 
                 class StartPump(Thread):
+                    #print "starting pump"
                     def __init__(self):
                         Thread.__init__(self)
                         self._want_continue = 1
                         self.stopumpingmsgs = False
                         self.ctrldownflag = False
-
                         self.start()
 
                     def StopPump(self):
@@ -131,7 +151,6 @@ class Scrape:
                                                         coordY = pos[1]
                                                         obj = OutlookThread(coordX, coordY, window_id)
                                                         return False
-
                             except Exception as e:
                                 logger.print_on_console( e)
 
@@ -160,6 +179,7 @@ class Scrape:
                             return True
 
                         global window_id
+                        #global handle
                         get_obj = GetObject()
                         window_id, self.handle = get_obj.GetWindow()
                         self.hm = pyHook.HookManager()
@@ -169,10 +189,8 @@ class Scrape:
                         self.hm.HookKeyboard()
                         self.hm.HookMouse()
                         pythoncom.PumpMessages()
-    ##                        dumpToJson()
 
                 class GetObject():
-    ##
                     def GetWindow(self):
                         """ Returns the id of window to scrape and brings the window to foreground """
                         wndId = 0
@@ -194,21 +212,15 @@ class Scrape:
                 obj_ref = StartPump()
             except Exception as exception:
                 pass
-
         elif operation == 'STOPCLICKANDADD':
+            global actualobjects
             try:
                 obj_ref.StopPump()
-                with open('domelements.json', 'w') as outfile:
-                    allobjects["view"] = actualobjects
-                    json.dump(allobjects, outfile, indent=4, sort_keys=False)
-                    outfile.close()
-##                return view
-                global actualobjects
+                allobjects= actualobjects
                 actualobjects = []
             except Exception as exception:
                 pass
             return allobjects
-
 
     def get_all_children(self,ch,ne,i,path,win,winrect):
         try:

@@ -88,7 +88,7 @@ class CustomKeyword:
     def find_object(self,array_index, ele_type, visible_text, url, ele_index,local_index):
         return_list=browser_Keywords.driver_obj.execute_script(CUSTOM_JS,'', array_index, ele_type, visible_text, ele_index,local_index)
         if return_list[0] == 'null':
-			return None
+            return None
         elif return_list[0] == FOUND:
             logger.print_on_console(WEB_ELEMENT_FOUND)
             return return_list[4]
@@ -207,7 +207,7 @@ class CustomKeyword:
                 log.error(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
 
@@ -250,7 +250,7 @@ class CustomKeyword:
             return browser_Keywords.driver_obj.execute_script(GET_XPATH_SCRIPT,webelement)
         except Exception as e:
             log.error(e)
-            
+
             logger.print_on_console(e)
 
 

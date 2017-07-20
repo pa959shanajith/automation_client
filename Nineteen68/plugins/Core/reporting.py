@@ -38,8 +38,8 @@ class Reporting:
         self.id_counter=1
         self.testscript_name=None
         self.overallstatus=TEST_RESULT_PASS
-        self.browser_version='-'
-        self.browser_type='-'
+        self.browser_version='NA'
+        self.browser_type='NA'
         self.start_time=''
         self.end_time=''
         self.ellapsed_time=''
@@ -202,6 +202,8 @@ class Reporting:
         obj[STEP]=description
         if self.user_termination:
             description=USER_TERMINATION
+        else:
+            description="Terminated by program"
         obj[STEP_DESCRIPTION]=description
         self.report_string.append(obj)
         self.id_counter+=1
@@ -272,7 +274,8 @@ class Reporting:
         if len(args)>0:
             if args[0] != None:
                 result_tuple=args[0]
-                comments= result_tuple[3]
+                if "Terminate" not in result_tuple:
+                    comments= result_tuple[3]
                 if(len(result_tuple) == 5):
                     screenshot_path = result_tuple[4]
                 else:

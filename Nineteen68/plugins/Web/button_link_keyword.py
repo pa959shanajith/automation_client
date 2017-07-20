@@ -69,6 +69,7 @@ class ButtonLinkKeyword():
                     else:
                         try:
                             log.debug('Going to perform click operation')
+                            time.sleep(0.5)
                             webelement.click()
                             log.info('Click operation performed using selenium click')
                             log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -352,6 +353,7 @@ class ButtonLinkKeyword():
                 if webelement.is_enabled():
                     log.debug(WEB_ELEMENT_ENABLED)
                     log.debug('Going to perform click operation')
+                    time.sleep(0.5)
                     webelement.click()
                     log.info('press operation performed using selenium click')
                     log.info(STATUS_METHODOUTPUT_UPDATE)

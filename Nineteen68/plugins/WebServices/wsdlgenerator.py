@@ -21,8 +21,8 @@ from suds.client import Client
 from lxml import etree
 import logger
 import os
-maindir = os.getcwd()
-path = maindir + '\Nineteen68\plugins\WebServices\zeep'
+maindir=os.getcwd()
+path = maindir + "/Nineteen68/plugins/WebServices/zeep"
 import sys
 sys.path.append(path)
 import zeep

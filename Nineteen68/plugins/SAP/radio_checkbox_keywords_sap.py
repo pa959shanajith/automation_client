@@ -12,7 +12,7 @@ import sap_constants
 import logger
 from constants import *
 from saputil_operations import SapUtilKeywords
-from launch_keywords import Launch_Keywords
+from sap_launch_keywords import Launch_Keywords
 import logging
 import logging.config
 log = logging.getLogger('radio_checkbox_keywords_sap.py')

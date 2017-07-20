@@ -15,7 +15,7 @@ import win32con
 import win32api
 import time
 import ninteen_68_sap_scrape
-import launch_keywords
+import sap_launch_keywords
 import logger
 
 launchobj=ninteen_68_sap_scrape.obj
@@ -28,7 +28,7 @@ class highLight():
 
     def highlight_element(self, elem):
         try:
-            launch = launch_keywords.Launch_Keywords()
+            launch = sap_launch_keywords.Launch_Keywords()
             ses, window = launch.getSessWindow()
             try:
                 i = elem.index("/")

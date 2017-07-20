@@ -157,7 +157,7 @@ class WSkeywords:
             method=str(method)
             if method != None and method.strip() != '':
                 log.debug('Removing leading and trailing spaces from method name and converting it to uppercase')
-            	method=method.strip().upper()
+                method=method.strip().upper()
                 log.debug('Removed leading and trailing spaces from method name and converting it to uppercase')
                 if method in ws_constants.METHOD_ARRAY:
                     log.debug('Setting input method name to base method name ')

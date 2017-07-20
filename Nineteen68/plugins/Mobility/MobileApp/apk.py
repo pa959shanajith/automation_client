@@ -600,8 +600,9 @@ class APK(object):
             :type deleted_files: None or a string
             :type new_files: a dictionnary (key:filename, value:content of the file)
         """
+        from androguard.patch import zipfile
         if self.zipmodule == 2:
-            from androguard.patch import zipfile
+
 
             zout = zipfile.ZipFile(filename, 'w')
         else:

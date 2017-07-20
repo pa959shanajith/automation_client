@@ -1,11 +1,11 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
-# Purpose:
+# Name:        SAP_Table_keywords
+# Purpose:     To perform Actions of SAP Table objects
 #
-# Author:      sakshi.goyal
+# Author:      anas.ahmed,sakshi.goyal
 #
 # Created:     06-04-2017
-# Copyright:   (c) sakshi.goyal 2017
+# Copyright:   (c) anas.ahmed 2017
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
@@ -17,14 +17,14 @@ from constants import *
 from saputil_operations import SapUtilKeywords
 import logging
 import logging.config
-log = logging.getLogger('table_keywords.py')
+log = logging.getLogger('sap_table_keywords.py')
 #-----------------------------------------------------Module Imports
 import pywinauto
-from launch_keywords import Launch_Keywords
+from sap_launch_keywords import Launch_Keywords
 from button_link_keywords_sap import ButtonLinkKeyword
-from dropdown_keywords import Dropdown_Keywords
+from sap_dropdown_keywords import Dropdown_Keywords
 from radio_checkbox_keywords_sap import Radio_Checkbox_keywords
-from element_keywords import ElementKeywords
+from sap_element_keywords import ElementKeywords
 #-----------------------------------------------------Module Imports
 
 class Table_keywords():

@@ -52,7 +52,13 @@ class SapUtilKeywords:
 ##            index = sap_id.index('/')
 ##            path = sap_id[index:]
 ##            id = '/app/con[' + conNumber + ']/ses[' + sesNumber + ']/wnd[' + wndNumber + ']' + path
-            i = sap_id.index("/")
+            #-----------------------------------------------------Checking if there is a "/" in the sap_id, if exists take the index(i) after the "/"'s in title to append to id
+            title = ses.ActiveWindow.Text
+            if("/" in title):
+                i = sap_id.index("/",len(title))
+            else:
+                i = sap_id.index("/")
+                #-----------------------------------------------------
             id = wndId + sap_id[i:]
             return id,ses
         except Exception as e:
