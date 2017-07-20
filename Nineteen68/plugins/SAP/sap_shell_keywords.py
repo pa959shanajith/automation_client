@@ -43,7 +43,7 @@ class Shell_Keywords():
                   err_msg = sap_constants.ERROR_MSG
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            Exceptions.error(e)
+            Exception.error(e)
             logger.print_on_console('Error occured in GETROWCOUNT and is a :',e)
         return status,result,value,err_msg
 
@@ -69,7 +69,7 @@ class Shell_Keywords():
                   err_msg = sap_constants.ERROR_MSG
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            Exceptions.error(e)
+            Exception.error(e)
             logger.print_on_console('Error occured in GETCOLUMNCOUNT and is a :',e)
         return status,result,value,err_msg
 
@@ -107,7 +107,7 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exceptions.error(e)
+                Exception.error(e)
                 logger.print_on_console('Error occured in SELECTROWS and is a :',e)
                 import traceback
                 traceback.print_exc()
@@ -140,7 +140,7 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exceptions.error(e)
+                Exception.error(e)
                 logger.print_on_console('Error occured in SELECTROWS and is a :',e)
                 import traceback
                 traceback.print_exc()
@@ -186,7 +186,7 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exceptions.error(e)
+                Exception.error(e)
                 logger.print_on_console('Error occured in GetCellText and is a :',e)
                 import traceback
                 traceback.print_exc()
@@ -202,22 +202,50 @@ class Shell_Keywords():
             value=OUTPUT_CONSTANT
             elem = ses.FindById(id)
             try:
+                rowcount = elem.rowCount
+                ele_type = "GuiGridControl"
+            except Exception as e:
+                ele_type = "GuiToolbarControl"
+            try:
                 if(id != None):
                     if(elem.type == 'GuiShell'):
-                        if elem.rowCount!=0:
+                        if(ele_type == "GuiGridControl"):
                             try:
                                 #-------------------------------store the tooltips of the grid buttons
-                                lim=elem.ToolbarButtonCount
-                                for x in range (0,lim):
-                                     a=elem.GetToolbarButtonTooltip(x)
-                                     if text.strip()==str(a).strip():
-                                        elmID=elem.GetToolbarButtonId(x)
-                                        elem.PressToolbarButton(elmID)
-                                        status = sap_constants.TEST_RESULT_PASS
-                                        result = sap_constants.TEST_RESULT_TRUE
-                                        break
+                                if elem.rowCount!=0:
+                                    lim=elem.ToolbarButtonCount
+                                    for x in range (0,lim):
+                                         a=elem.GetToolbarButtonTooltip(x)
+                                         if text.strip().lower()==str(a).strip().lower():
+                                            elmID=elem.GetToolbarButtonId(x)
+                                            elem.PressToolbarButton(elmID)
+                                            status = sap_constants.TEST_RESULT_PASS
+                                            result = sap_constants.TEST_RESULT_TRUE
+                                            break
                                 #-------------------------------store the tooltips of the grid buttons
                             except Exception as e:
+                                logger.print_on_console('Unable to press button / button does not exist')
+                                err_msg = sap_constants.ERROR_MSG
+                        elif(ele_type == "GuiToolbarControl"):
+                            count = elem.ButtonCount
+                            btn_id = None
+                            for i in range(0,count):
+                                if(elem.GetButtonTooltip(i).lower() == text.strip().lower()):
+                                    btn_id = elem.GetButtonId(i)
+                                    btn_type = elem.GetButtonType(i)
+                                    break
+                            if(btn_id != None):
+                                if(btn_type == "Button"):
+                                    if(len(input_val)>1):
+                                        logger.print_on_console('Extra input not required')
+                                    elem.pressButton(btn_id)
+                                else:
+                                    menuItem = str(input_val[1]).strip()
+                                    elem.PressContextButton(btn_id)
+                                    elem.SelectContextMenuItemByText(menuItem)
+                                status = sap_constants.TEST_RESULT_PASS
+                                result = sap_constants.TEST_RESULT_TRUE
+                            else:
                                 logger.print_on_console('Unable to press button / button does not exist')
                                 err_msg = sap_constants.ERROR_MSG
                     else:
@@ -228,7 +256,7 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exceptions.error(e)
+                Exception.error(e)
                 logger.print_on_console('Error occured in readGridCells and is a :',e)
                 import traceback
                 traceback.print_exc()
@@ -274,7 +302,7 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exceptions.error(e)
+                Exception.error(e)
                 logger.print_on_console('Error occured in GetCellText and is a :',e)
                 import traceback
                 traceback.print_exc()
@@ -320,7 +348,7 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exceptions.error(e)
+                Exception.error(e)
                 logger.print_on_console('Error occured in GetCellText and is a :',e)
                 import traceback
                 traceback.print_exc()
