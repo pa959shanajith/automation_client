@@ -106,7 +106,7 @@ class Scrape:
                             winrect = desktop_launch_keywords.win_rect;
                             scrape_obj=Scrape()
                             a =  scrape_obj.get_all_children(ch,ne,0,'',win,winrect)
-                            import json
+                            #import json
                             allobjs["view"] = a
                         except Exception as e:
                             logger.print_on_console(e)
@@ -351,25 +351,26 @@ class Scrape:
             obj.bring_Window_Front()
             winrect = desktop_launch_keywords.win_rect;
             a =  self.get_all_children(ch,ne,0,'',win,winrect)
-            import json
-            try:
-                wxobject.Hide()
-                time.sleep(2)
-                img=ninteen_68_desktop_scrape.obj.captureScreenshot()
-                img.save('out.png')
-                with open("out.png", "rb") as image_file:
-                    encoded_string = base64.b64encode(image_file.read())
-                allobjects['mirror'] =encoded_string.encode('UTF-8').strip()
-            except Exception as e:
-                img=obj.capture_window( win32gui.GetDesktopWindow())
-                img.save('out.png')
-                with open("out.png", "rb") as image_file:
-                    encoded_string = base64.b64encode(image_file.read())
-                allobjects['mirror'] =encoded_string.encode('UTF-8').strip()
-            with open('domelements.json', 'w') as outfile:
-                allobjects["view"] = a
-                json.dump(allobjects, outfile, indent=4, sort_keys=False)
-                outfile.close()
+            allobjects = a
+##            import json
+##            try:
+##                wxobject.Hide()
+##                time.sleep(2)
+##                img=ninteen_68_desktop_scrape.obj.captureScreenshot()
+##                img.save('out.png')
+##                with open("out.png", "rb") as image_file:
+##                    encoded_string = base64.b64encode(image_file.read())
+##                allobjects['mirror'] =encoded_string.encode('UTF-8').strip()
+##            except Exception as e:
+##                img=obj.capture_window( win32gui.GetDesktopWindow())
+##                img.save('out.png')
+##                with open("out.png", "rb") as image_file:
+##                    encoded_string = base64.b64encode(image_file.read())
+##                allobjects['mirror'] =encoded_string.encode('UTF-8').strip()
+##            with open('domelements.json', 'w') as outfile:
+##                allobjects["view"] = a
+##                json.dump(allobjects, outfile, indent=4, sort_keys=False)
+##                outfile.close()
 
         except Exception as e:
             logger.print_on_console(e)

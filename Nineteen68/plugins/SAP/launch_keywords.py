@@ -266,6 +266,7 @@ class Launch_Keywords():
             start_window = pywinauto.findwindows.find_window(title=self.windowName)
             if(start_window>1):
                 try:
+                    cursor_x,cursor_y = win32api.GetCursorPos()
                     app = Application(backend="win32").connect(path =self.filePath).window(title=self.windowName)
                     SetForegroundWindow(find_window(title=self.windowName))
                     try:
@@ -276,6 +277,7 @@ class Launch_Keywords():
                         app.FilterEdit.type_keys(server, with_spaces = True)
                     keyboard.SendKeys('{ENTER}')
                     time.sleep(5)
+                    win32api.SetCursorPos((cursor_x,cursor_y))
                     if app!=None and app!='':
                         try:
                             SapGui=self.uk.getSapObject()

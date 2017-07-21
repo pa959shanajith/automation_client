@@ -11,7 +11,12 @@
 import desktop_constants
 from encryption_utility import AESCipher
 import logger
-
+#----------------------------------------win32 imports
+##import win32gui
+##import win32process
+##import win32con
+import win32api
+#----------------------------------------win32 imports
 import desktop_launch_keywords
 import logging
 from constants import *
@@ -45,7 +50,9 @@ class Text_Box:
                     log.info('Parent matched')
                     if(element.is_enabled()):
                         input_val = text
+                        cursor_x,cursor_y = win32api.GetCursorPos()#handling cursor move
                         element.type_keys(input_val,with_spaces = True)
+                        win32api.SetCursorPos((cursor_x,cursor_y))#handling cursor move
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)

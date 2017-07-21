@@ -153,10 +153,8 @@ class TextboxKeywords:
                                 configvalues = configobj.readJson()
                                 bit64 = configvalues['bit_64']
                                 if(isinstance(browser_Keywords.driver_obj,selenium.webdriver.Ie) and bit64.lower() == "yes"):
-                                    import time
                                     for i in range (0,len(input)+1):
                                         browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input[0:i])
-                                        time.sleep(1)
                                 else:
                                     webelement.send_keys(input)
                             status=TEST_RESULT_PASS
@@ -412,10 +410,8 @@ class TextboxKeywords:
                                 configvalues = configobj.readJson()
                                 bit64 = configvalues['bit_64']
                                 if(isinstance(browser_Keywords.driver_obj,selenium.webdriver.Ie) and bit64.lower() == "yes"):
-                                    import time
                                     for i in range (0,len(input)+1):
                                         browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val[0:i])
-                                        time.sleep(1)
                                 else:
                                     webelement.send_keys(input_val)
                             status=TEST_RESULT_PASS

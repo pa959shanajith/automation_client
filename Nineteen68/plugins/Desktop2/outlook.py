@@ -59,11 +59,11 @@ class OutlookKeywords:
                 folderPath=folderPath.strip('\\')
                 folders=folderPath.split('\\')
                 accountname=folders[0]
-                global count
-                if count>0:
-                    import pythoncom
-                    pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
-                count=count+1
+##                global count
+##                if count>0:
+##                    import pythoncom
+##                    pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
+##                count=count+1
                 self.outlook = Dispatch('Outlook.Application').GetNamespace('MAPI')
 
 #               get the message stores in outlook
