@@ -496,8 +496,6 @@ class Clickandadd():
             else:
                 status = domconstants.STATUS_SUCCESS
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             status = domconstants.STATUS_FAIL
             data = domconstants.STATUS_FAIL
             print 'Error while performing stop click and add scrape'
