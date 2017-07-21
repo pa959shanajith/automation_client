@@ -266,14 +266,17 @@ class Launch_Keywords():
             start_window = pywinauto.findwindows.find_window(title=self.windowName)
             if(start_window>1):
                 try:
+                    cursor_x,cursor_y = win32api.GetCursorPos()
                     app = Application(backend="win32").connect(path =self.filePath).window(title=self.windowName)
                     SetForegroundWindow(find_window(title=self.windowName))
                     try:
                         app.Edit2.set_edit_text(u'')
                         app.Edit2.type_keys(server, with_spaces = True)
+                        win32api.SetCursorPos((cursor_x,cursor_y))
                     except:
                         app.FilterEdit.set_edit_text(u'')
                         app.FilterEdit.type_keys(server, with_spaces = True)
+                        win32api.SetCursorPos((cursor_x,cursor_y))
                     keyboard.SendKeys('{ENTER}')
                     time.sleep(5)
                     if app!=None and app!='':

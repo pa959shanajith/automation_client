@@ -287,7 +287,10 @@ class Shell_Keywords():
                             #----------------------------------function to append columnorder
                             if index>=0 and row >=0:
                                 column=str(bList[index])
-                                elem.Click(row,column)
+                                try:
+                                    elem.Click(row,column)
+                                except:
+                                    elem.setCurrentCell(row,column)
                                 status = sap_constants.TEST_RESULT_PASS
                                 result = sap_constants.TEST_RESULT_TRUE
                             else:
