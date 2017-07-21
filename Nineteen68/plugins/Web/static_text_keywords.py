@@ -53,8 +53,8 @@ class StaticTextKeywords:
             if self.switchtoiframe(path):
                 elements = browser_Keywords.driver_obj.find_elements_by_tag_name("*")
                 for element in elements:
-                    if element.tag_name.lower() not in tags:
-                        try:
+                    try:
+                        if element.tag_name.lower() not in tags:
                             text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
 ##                            import ftfy
 ##                            text = ftfy.fix_text(text)
@@ -62,15 +62,15 @@ class StaticTextKeywords:
                             text = text.strip()
                             if len(text) != 0:
                                 sourcetext = sourcetext + separator + text
-                        except Exception as e:
-                            print e
+                    except Exception as e:
+                        print e
                 for frames in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(IFRAME)))):
                     inpath = path + str(frames) + 'i' +  '/'
                     if self.switchtoiframe(inpath):
                         elements = browser_Keywords.driver_obj.find_elements_by_tag_name("*")
                         for element in elements:
-                            if element.tag_name.lower() not in tags:
-                                try:
+                            try:
+                                if element.tag_name.lower() not in tags:
                                     text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
 ##                                    import ftfy
 ##                                    text = ftfy.fix_text(text)
@@ -78,16 +78,16 @@ class StaticTextKeywords:
                                     text = text.strip()
                                     if len(text) != 0:
                                         sourcetext = sourcetext + separator + text
-                                except Exception as e:
-                                    print e
+                            except Exception as e:
+                                print e
                     self.get_source1(ipath)
                 for frames in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(FRAME)))):
                     inpath = path + str(frames) + 'f' +  '/'
                     if self.switchtoiframe(inpath):
                         elements = browser_Keywords.driver_obj.find_elements_by_tag_name("*")
                         for element in elements:
-                            if element.tag_name.lower() not in tags:
-                                try:
+                            try:
+                                if element.tag_name.lower() not in tags:
                                     text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
 ##                                    import ftfy
 ##                                    text = ftfy.fix_text(text)
@@ -95,8 +95,8 @@ class StaticTextKeywords:
                                     text = text.strip()
                                     if len(text) != 0:
                                         sourcetext = sourcetext + separator + text
-                                except Exception as e:
-                                    print e
+                            except Exception as e:
+                                print e
                     self.get_source1(ipath)
                 self.get_source1(path)
 
@@ -109,8 +109,8 @@ class StaticTextKeywords:
             if self.switchtoiframe(path):
                 elements = browser_Keywords.driver_obj.find_elements_by_tag_name("*")
                 for element in elements:
-                    if element.tag_name.lower() not in tags:
-                        try:
+                    try:
+                        if element.tag_name.lower() not in tags:
                             text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
 ##                            import ftfy
 ##                            text = ftfy.fix_text(text)
@@ -118,15 +118,15 @@ class StaticTextKeywords:
                             text = text.strip()
                             if len(text) != 0:
                                 sourcetext = sourcetext + separator + text
-                        except Exception as e:
-                            print e
+                    except Exception as e:
+                        print e
                 for frames in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(FRAME)))):
                     inpath = path + str(frames) + 'f' +  '/'
                     if self.switchtoiframe(inpath):
                        elements = browser_Keywords.driver_obj.find_elements_by_tag_name("*")
                        for element in elements:
-                            if element.tag_name.lower() not in tags:
-                                try:
+                            try:
+                                if element.tag_name.lower() not in tags:
                                     text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
 ##                                    import ftfy
 ##                                    text = ftfy.fix_text(text)
@@ -134,16 +134,16 @@ class StaticTextKeywords:
                                     text = text.strip()
                                     if len(text) != 0:
                                         sourcetext = sourcetext + separator + text
-                                except Exception as e:
-                                    print e
+                            except Exception as e:
+                                print e
                     self.get_source2(inpath)
                 for frames in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(IFRAME)))):
                     inpath = path + str(frames) + 'i' +  '/'
                     if self.switchtoiframe(inpath):
                        elements = browser_Keywords.driver_obj.find_elements_by_tag_name("*")
                        for element in elements:
-                            if element.tag_name.lower() not in tags:
-                                try:
+                            try:
+                                if element.tag_name.lower() not in tags:
                                     text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
 ##                                    import ftfy
 ##                                    text = ftfy.fix_text(text)
@@ -151,8 +151,8 @@ class StaticTextKeywords:
                                     text = text.strip()
                                     if len(text) != 0:
                                         sourcetext = sourcetext + separator + text
-                                except Exception as e:
-                                    print e
+                            except Exception as e:
+                                print e
                     self.get_source2(inpath)
                 self.get_source2(path)
 
@@ -176,8 +176,8 @@ class StaticTextKeywords:
                 if actualtext is not None or len(actualtext) > 0:
                     elements = browser_Keywords.driver_obj.find_elements_by_tag_name("*")
                     for element in elements:
-                        if element.tag_name.lower()  not in tags:
-                            try:
+                        try:
+                            if element.tag_name.lower()  not in tags:
                                 text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
 ##                                import ftfy
 ##                                text = ftfy.fix_text(text)
@@ -185,8 +185,8 @@ class StaticTextKeywords:
                                 text = text.strip()
                                 if len(text) != 0:
                                     sourcetext = sourcetext + separator + text
-                            except Exception as e:
-                                print e
+                        except Exception as e:
+                            print e
                     browser_Keywords.driver_obj.switch_to.default_content()
                     self.get_source1('')
                     browser_Keywords.driver_obj.switch_to.default_content()
@@ -212,7 +212,7 @@ class StaticTextKeywords:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                         output = text_count
-                        logger.print_on_console('No. of occurance of the text ',actualtext , ' is ',text_count ,' time(s).')
+                        logger.print_on_console('No. of occurance of the text ',actualtext, ' is ',str(text_count),' time(s).')
                     else:
                         output = 0
                         logger.print_on_console('Text not present')
@@ -256,7 +256,7 @@ class StaticTextKeywords:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                         output = text_count
-                        logger.print_on_console('No. of occurance of the text ',actualtext , ' is ',text_count ,' time(s).')
+                        logger.print_on_console('No. of occurance of the text ',actualtext, ' is ',str(text_count),' time(s).')
                     else:
                         output = 0
                         logger.print_on_console('Text not present')

@@ -432,7 +432,7 @@ class DatabaseOperation():
            wb = xlwt.Workbook()
            ws = wb.add_sheet(generic_constants.DATABASE_SHEET)
            maindir = os.environ["NINETEEN68_HOME"]
-           path = maindir +'\Nineteen68\plugins\Generic' + generic_constants.DATABASE_FILE
+           path = maindir +'//Nineteen68//plugins//Generic' + generic_constants.DATABASE_FILE
 ##           path = 'D:\db5.xls'
            wb.save(path)
         except Exception as e:

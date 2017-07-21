@@ -203,15 +203,18 @@ class OebsDispatcher:
                 err_msg=constants.INVALID_KEYWORD
                 result[3]=err_msg
             #capture screenshot feature has been implemented for OEBS
+            result=list(result)
             screen_shot_obj = screenshot_keywords.Screenshot()
             configobj = readconfig.readConfig()
             configvalues = configobj.readJson()
             if self.action == constants.EXECUTE:
                 if configvalues['screenShot_Flag'].lower() == 'fail':
                     if result[0].lower() == 'fail':
-                        screen_shot_obj.captureScreenshot()
+                        filepath = screen_shot_obj.captureScreenshot()
+                        result.append(filepath[2])
                 elif configvalues['screenShot_Flag'].lower() == 'all':
-                    screen_shot_obj.captureScreenshot()
+                    filepath = screen_shot_obj.captureScreenshot()
+                    result.append(filepath[2])
          except TypeError as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
