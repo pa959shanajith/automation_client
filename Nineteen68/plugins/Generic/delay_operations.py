@@ -13,6 +13,7 @@ import pause_display_operation
 import logging
 from constants import *
 import core_utils
+import dynamic_variable_handler
 log = logging.getLogger('delay_operations.py')
 
 class Delay_keywords:
@@ -76,23 +77,36 @@ class Delay_keywords:
                 values=input_list[0:index]
                 variables=input_list[index+1:len(input_list)]
                 flag_invalid_syntax=False
+                dv_check = dynamic_variable_handler.DynamicVariables()
+                #st_check = getparam.GetParam()
                 for x, y in zip(variables, values):
                     coreutilsobj=core_utils.CoreUtils()
                     y=coreutilsobj.get_UTF_8(y)
                     x=coreutilsobj.get_UTF_8(x)
+
 ##                  if type(x)==unicode or type(x)==str:
 ##                        x=str(x)
 ##                        changes to fix issue:304-Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
 ##                  changes done by jayashree.r
 ##                  if y == 'None' or y == None:
+##                    logger.print_on_console(dv_check.get_dynamic_value(x))
+
                     if y == None:
                         y = 'null'
-                    if  not(x.startswith('{') and x.endswith('}')):
+                    if not((x.startswith('{') and x.endswith('}')) or (x.startswith('|') and x.endswith('|'))):
                         flag_invalid_syntax=True
+                    elif x.startswith('{') and x.endswith('}') and dv_check.get_dynamic_value(x)!=y:
+                        y=""
+                        logger.print_on_console("please provide the valid variable name.")
+                    elif x.startswith('|') and x.endswith('|') and x.count('|')!=2:
+                        y=""
+                        logger.print_on_console("please provide the valid variable name.")
+                        
 ##                    if not isinstance(y,unicode):
 ##                        print str(y)
 ##                        y=str(y)
 ##                    display_input+=x+' = '+(y if type(y)==str else repr(y))+'\n'
+
                     display_input+=x+' = '+y+'\n'
                 if not (flag_invalid_syntax):
                     o = pause_display_operation.PauseAndDisplay()

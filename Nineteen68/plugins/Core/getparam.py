@@ -583,27 +583,27 @@ class GetParam():
                             log.info('Data Param end row: ')
                             log.info(endRow)
                             logger.print_on_console('Data Param end row: ',endRow)
-                        elif len(fileinfo) == 3 :
-                            if fileinfo[2].find(HYPHEN) != -1:
-                                filters = fileinfo[2].split(HYPHEN)
-                                start = filters[0]
-                                #start - check for dynamic variable
-                                end = filters[1]
-                                #end - check for dynamic variable
-                                startRow = int(start);
-                                endRow = int(end);
-                                log.info('Data Param start row: ')
-                                log.info(startRow)
-                                logger.print_on_console('Data Param start row: ',startRow)
-                                log.info('Data Param end row: ')
-                                log.info(endRow)
-                                logger.print_on_console('Data Param end row: ',endRow)
-                            else:
-                                filter1 = fileinfo[1]
-                                filter = int(filter1)
-                                log.info('Data Param  row: ')
-                                log.info(filter)
-                                logger.print_on_console('Data Param  row: ',filter)
+                    elif len(fileinfo) == 3 :
+                        if fileinfo[2].find(HYPHEN) != -1:
+                            filters = fileinfo[2].split(HYPHEN)
+                            start = filters[0]
+                            #start - check for dynamic variable
+                            end = filters[1]
+                            #end - check for dynamic variable
+                            startRow = int(start);
+                            endRow = int(end);
+                            log.info('Data Param start row: ')
+                            log.info(startRow)
+                            logger.print_on_console('Data Param start row: ',startRow)
+                            log.info('Data Param end row: ')
+                            log.info(endRow)
+                            logger.print_on_console('Data Param end row: ',endRow)
+                        else:
+                            filter1 = fileinfo[1]
+                            filter = int(filter1)
+                            log.info('Data Param  row: ')
+                            log.info(filter)
+                            logger.print_on_console('Data Param  row: ',filter)
 
                 if startRow !=None and endRow != None:
                     log.info( '***Data Parameterization started***')
@@ -612,7 +612,7 @@ class GetParam():
                     reporting_obj.name=GETPARAM
                     self.add_report_step_getparam(reporting_obj,step_description)
                     #Reporting part ends
-                    for i in range(startRow,endRow):
+                    for i in range(startRow,endRow+1):
                         if self.name.lower()==GETPARAM:
                             inputval = self.inputval[0]
                             paramindex = self.index+1;
@@ -626,6 +626,8 @@ class GetParam():
                                 iterations = len(data.values()[0])
                                 while (paramindex < endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,i-1)
+                                    if i > iterations:
+                                        input=['']
                                     paramindex =con.methodinvocation(paramindex,input)
                                     if paramindex in [TERMINATE,BREAK_POINT]:
                                         return paramindex
@@ -649,7 +651,7 @@ class GetParam():
                     reporting_obj.name=GETPARAM
                     self.add_report_step_getparam(reporting_obj,step_description)
                     #Reporting part ends
-                    filter = filter - 2
+                    filter = filter - 1
                     if self.name.lower()==GETPARAM:
                         inputval = self.inputval[0]
                         paramindex = self.index+1;
@@ -664,6 +666,8 @@ class GetParam():
                             iterations = len(data.values()[0])
                             while (paramindex < endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,filter)
+                                    if filter >= iterations:
+                                        input=[''] 
                                     paramindex =con.methodinvocation(paramindex,input)
                                     if paramindex in [TERMINATE,BREAK_POINT]:
                                         return paramindex
