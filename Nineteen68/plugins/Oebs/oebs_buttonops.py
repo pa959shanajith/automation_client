@@ -107,9 +107,9 @@ class ButtonOperations:
                 oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
-       	    log.debug('%s',e)
+            log.debug('%s',e)
             log.debug('Result %s',keywordresult)
-       	log.debug('Status %s',str(verifyresponse))
+        log.debug('Status %s',str(verifyresponse))
         # response is sent to the client
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
