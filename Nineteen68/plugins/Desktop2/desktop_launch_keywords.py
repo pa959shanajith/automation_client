@@ -152,6 +152,8 @@ class Launch_Keywords():
 
 
     def capture_window(self,handle):
+        img=None
+        bbox=None
         toplist, winlist = [], []
         def enum_cb(hwnd, results):
             winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
