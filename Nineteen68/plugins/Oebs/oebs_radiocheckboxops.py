@@ -58,7 +58,7 @@ class RadioCheckboxOperations:
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
         except Exception as e:
             self.utilities_obj.cleardata()
-       	    log.debug('%s',e)
+            log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Result %s',verifyresponse)
         log.debug('Status %s',keywordresult)
@@ -107,7 +107,7 @@ class RadioCheckboxOperations:
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
         except Exception as e:
             self.utilities_obj.cleardata()
-       	    log.debug('%s',e)
+            log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Result %s',verifyresponse)
         log.debug('Status %s',keywordresult)
@@ -139,10 +139,10 @@ class RadioCheckboxOperations:
                         curaccinfo = acc.getAccessibleContextInfo()
                         objstates = curaccinfo.states
                         if 'checked' in objstates:
-                       	    log.debug('%s',MSG_OBJECT_READONLY)
+                            log.debug('%s',MSG_OBJECT_READONLY)
                             oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
                         else:
-                       	    verifyresponse = MSG_TRUE
+                            verifyresponse = MSG_TRUE
                             keywordresult=MSG_PASS
                     else:
                         oebs_mouseops.MouseOperation('click',x_coor,y_coor)
@@ -164,7 +164,7 @@ class RadioCheckboxOperations:
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
         except Exception as e:
             self.utilities_obj.cleardata()
-       	    log.debug('%s',e)
+            log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Result %s',verifyresponse)
         log.debug('Status %s',keywordresult)
