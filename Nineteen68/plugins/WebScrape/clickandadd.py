@@ -112,12 +112,56 @@ class Clickandadd():
                                 log.info('Performing the click and add operation on frame/iframe page done')
                             callback_clicknadd2(inpath)
                         callback_clicknadd1(path)
+                for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                    #custom switchtoframe:
+                    path = myipath + str(frames) + 'f' + '/'
+                    if(switchtoframe_clicknadd1(path)):
+                        log.info('Performing the click and add operation on iframe/frame page')
+                        driver.execute_script(javascript_clicknadd, path,browser)
+                        log.info('Performing the click and add operation on iframe/frame page done')
+                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                            inpath = path + str(frames) + 'f' + '/'
+                            if switchtoframe_clicknadd1(inpath):
+                                log.info('Performing the click and add operation on frame/iframe page')
+                                driver.execute_script(javascript_clicknadd, inpath,browser)
+                                log.info('Performing the click and add operation on frame/iframe page done')
+                            callback_clicknadd1(inpath)
+                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                            inpath = path + str(frames) + 'i' + '/'
+                            if switchtoframe_clicknadd1(inpath):
+                                log.info('Performing the click and add operation on frame/iframe page')
+                                driver.execute_script(javascript_clicknadd, inpath,browser)
+                                log.info('Performing the click and add operation on frame/iframe page done')
+                            callback_clicknadd2(inpath)
+                        callback_clicknadd1(path)
 
             def callback_clicknadd2(myipath):
                 path = myipath
                 for iframes in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
                     #custom switchtoframe:
                     path = myipath + str(iframes) + 'f' + '/'
+                    if(switchtoframe_clicknadd1(path)):
+                        log.info('Performing the click and add operation on frame/iframe page')
+                        driver.execute_script(javascript_clicknadd, path,browser)
+                        log.info('Performing the click and add operation on frame/iframe page done')
+                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                            inpath = path + str(frames) + 'i' + '/'
+                            if switchtoframe_clicknadd1(inpath):
+                                log.info('Performing the click and add operation on iframe/frame page')
+                                driver.execute_script(javascript_clicknadd, inpath,browser)
+                                log.info('Performing the click and add operation on iframe/frame page done')
+                            callback_clicknadd2(inpath)
+                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                            inpath = path + str(frames) + 'f' + '/'
+                            if switchtoframe_clicknadd1(inpath):
+                                log.info(' Performing the click and add operation on iframe/frame page')
+                                driver.execute_script(javascript_clicknadd, inpath,browser)
+                                log.info(' Performing the click and add operation on iframe/frame page done')
+                            callback_clicknadd1(inpath)
+                        callback_clicknadd2(path)
+                for iframes in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                    #custom switchtoframe:
+                    path = myipath + str(iframes) + 'i' + '/'
                     if(switchtoframe_clicknadd1(path)):
                         log.info('Performing the click and add operation on frame/iframe page')
                         driver.execute_script(javascript_clicknadd, path,browser)
@@ -158,6 +202,7 @@ class Clickandadd():
     def stopclickandadd(self):
 ##        vie = {}
         data = {}
+        pathlist = list()
         try:
             log.info('Inside stopclickandadd method .....')
             driver = browserops.driver
@@ -170,7 +215,6 @@ class Clickandadd():
             tempreturn_stopclicknadd = driver.execute_script(javascript_stopclicknadd)
             log.info('stopclickandd operation on default/outer page is done and data is obtained')
             tempne_stopclicknadd.extend(tempreturn_stopclicknadd)
-
 
             def switchtoframe_stopclicknadd1(mypath):
                 log.info('Inside switchtoframe_stopclicknadd1 method')
@@ -205,56 +249,144 @@ class Clickandadd():
                 for iframes in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
                     #custom switchtoframe:
                     path = myipath + str(iframes) + 'i' + '/'
-                    if(switchtoframe_stopclicknadd1(path)):
-                        log.info('before stopclicknadd operation on iframe page is done and data is obtained')
-                        temp = driver.execute_script(javascript_stopclicknadd)
-                        log.info('stopclicknadd operation on iframe page is done and data is obtained')
-                        tempne_stopclicknadd.extend(temp)
-                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
-                            inpath = path + str(frames) + 'f' + '/'
-                            if switchtoframe_stopclicknadd1(inpath):
-                                itemp = driver.execute_script(javascript_stopclicknadd)
-                                log.info('before stopclicknadd operation on frame page is done and data is obtained')
-                                tempne_stopclicknadd.extend(itemp)
-                                log.info('stopclicknadd operation on frame page is done and data is obtained')
-                            callback_stopclicknadd1(inpath, tempne_stopclicknadd)
-                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
-                            inpath = path + str(frames) + 'i' + '/'
-                            if switchtoframe_stopclicknadd1(inpath):
-                                itemp = driver.execute_script(javascript_stopclicknadd)
-                                log.info('stopclicknadd operation on frame page is done and data is obtained')
-                                tempne_stopclicknadd.extend(itemp)
-                                log.info('stopclicknadd operation on frame page is done and data is obtained')
-                            callback_stopclicknadd2(inpath, tempne_stopclicknadd)
-                        callback_stopclicknadd1(path, tempne_stopclicknadd)
+                    pathlist.append(path)
+                    if pathlist.count(path) == 1:
+                        if(switchtoframe_stopclicknadd1(path)):
+                            log.info('before stopclicknadd operation on iframe page is done and data is obtained')
+                            temp = driver.execute_script(javascript_stopclicknadd)
+                            log.info('stopclicknadd operation on iframe page is done and data is obtained')
+                            if temp is not None:
+                                tempne_stopclicknadd.extend(temp)
+                            for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                                inpath = path + str(frames) + 'f' + '/'
+                                pathlist.append(inpath)
+                                if pathlist.count(inpath) == 1:
+                                    if switchtoframe_stopclicknadd1(inpath):
+                                        itemp = driver.execute_script(javascript_stopclicknadd)
+                                        log.info('before stopclicknadd operation on frame page is done and data is obtained')
+                                        if itemp is not None:
+                                            tempne_stopclicknadd.extend(itemp)
+                                            log.info('stopclicknadd operation on frame page is done and data is obtained')
+                                    callback_stopclicknadd1(inpath, tempne_stopclicknadd)
+                            for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                                inpath = path + str(frames) + 'i' + '/'
+                                pathlist.append(inpath)
+                                if pathlist.count(inpath) == 1:
+                                    if switchtoframe_stopclicknadd1(inpath):
+                                            itemp = driver.execute_script(javascript_stopclicknadd)
+                                            log.info('stopclicknadd operation on frame page is done and data is obtained')
+                                            if itemp is not None:
+                                                tempne_stopclicknadd.extend(itemp)
+                                                log.info('stopclicknadd operation on frame page is done and data is obtained')
+                                    callback_stopclicknadd2(inpath, tempne_stopclicknadd)
+                            callback_stopclicknadd1(path, tempne_stopclicknadd)
+
+                for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                    #custom switchtoframe:
+                    path = myipath + str(frames) + 'f' + '/'
+                    pathlist.append(path)
+                    if pathlist.count(path) == 1:
+                        if(switchtoframe_stopclicknadd1(path)):
+                            log.info('before stopclicknadd operation on iframe page is done and data is obtained')
+                            temp = driver.execute_script(javascript_stopclicknadd)
+                            log.info('stopclicknadd operation on iframe page is done and data is obtained')
+                            if temp is not None:
+                                tempne_stopclicknadd.extend(temp)
+                            for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                                inpath = path + str(frames) + 'f' + '/'
+                                pathlist.append(inpath)
+                                if pathlist.count(inpath) == 1:
+                                    if switchtoframe_stopclicknadd1(inpath):
+                                            itemp = driver.execute_script(javascript_stopclicknadd)
+                                            log.info('before stopclicknadd operation on frame page is done and data is obtained')
+                                            if itemp is not None:
+                                                tempne_stopclicknadd.extend(itemp)
+                                                log.info('stopclicknadd operation on frame page is done and data is obtained')
+                                    callback_stopclicknadd1(inpath, tempne_stopclicknadd)
+                            for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                                inpath = path + str(frames) + 'i' + '/'
+                                pathlist.append(inpath)
+                                if pathlist.count(inpath) == 1:
+                                    if switchtoframe_stopclicknadd1(inpath):
+                                            itemp = driver.execute_script(javascript_stopclicknadd)
+                                            log.info('stopclicknadd operation on frame page is done and data is obtained')
+                                            if itemp is not None:
+                                                tempne_stopclicknadd.extend(itemp)
+                                                log.info('stopclicknadd operation on frame page is done and data is obtained')
+                                    callback_stopclicknadd2(inpath, tempne_stopclicknadd)
+                            callback_stopclicknadd1(path, tempne_stopclicknadd)
 
             def callback_stopclicknadd2(myipath, tempne_stopclicknadd):
                 path = myipath
                 for iframes in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
                     #custom switchtoframe:
                     path = myipath + str(iframes) + 'f' + '/'
-                    if(switchtoframe_stopclicknadd1(path)):
-                        log.info('before stopclicknadd operation on frame page is done and data is obtained')
-                        temp = driver.execute_script(javascript_stopclicknadd)
-                        log.info('stopclicknadd operation on frame page is done and data is obtained')
-                        tempne_stopclicknadd.extend(temp)
-                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
-                            inpath = path + str(frames) + 'i' + '/'
-                            if switchtoframe_stopclicknadd1(inpath):
-                                log.info('before stopclicknadd operation on iframe page is done and data is obtained')
-                                itemp = driver.execute_script(javascript_stopclicknadd)
-                                log.info('stopclicknadd operation on iframe page is done and data is obtained')
-                                tempne_stopclicknadd.extend(itemp)
-                            callback_stopclicknadd2(inpath, tempne_stopclicknadd)
-                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
-                            inpath = path + str(frames) + 'f' + '/'
-                            if switchtoframe_stopclicknadd1(inpath):
-                                itemp = driver.execute_script(javascript_stopclicknadd)
-                                log.info('before stopclicknadd operation on frame page is done and data is obtained')
-                                tempne_stopclicknadd.extend(itemp)
-                                log.info('stopclicknadd operation on frame page is done and data is obtained')
-                            callback_stopclicknadd1(inpath, tempne_stopclicknadd)
-                        callback_stopclicknadd2(path, tempne_stopclicknadd)
+                    pathlist.append(path)
+                    if pathlist.count(path) == 1:
+                        if(switchtoframe_stopclicknadd1(path)):
+                            log.info('before stopclicknadd operation on frame page is done and data is obtained')
+                            temp = driver.execute_script(javascript_stopclicknadd)
+                            log.info('stopclicknadd operation on frame page is done and data is obtained')
+                            if temp is not None:
+                                tempne_stopclicknadd.extend(temp)
+                            for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                                inpath = path + str(frames) + 'i' + '/'
+                                pathlist.append(inpath)
+                                if pathlist.count(inpath) == 1:
+                                    if switchtoframe_stopclicknadd1(inpath):
+                                        log.info('before stopclicknadd operation on iframe page is done and data is obtained')
+                                        itemp = driver.execute_script(javascript_stopclicknadd)
+                                        log.info('stopclicknadd operation on iframe page is done and data is obtained')
+                                        if itemp is not None:
+                                            tempne_stopclicknadd.extend(itemp)
+                                            log.info('stopclicknadd operation on iframe page is done and data is obtained')
+                                    callback_stopclicknadd2(inpath, tempne_stopclicknadd)
+                            for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                                inpath = path + str(frames) + 'f' + '/'
+                                pathlist.append(inpath)
+                                if pathlist.count(inpath) == 1:
+                                    if switchtoframe_stopclicknadd1(inpath):
+                                        itemp = driver.execute_script(javascript_stopclicknadd)
+                                        log.info('before stopclicknadd operation on frame page is done and data is obtained')
+                                        if itemp is not None:
+                                            tempne_stopclicknadd.extend(itemp)
+                                            log.info('stopclicknadd operation on frame page is done and data is obtained')
+                                    callback_stopclicknadd1(inpath, tempne_stopclicknadd)
+                            callback_stopclicknadd2(path, tempne_stopclicknadd)
+                for iframes in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                    #custom switchtoframe:
+                    path = myipath + str(iframes) + 'i' + '/'
+                    pathlist.append(path)
+                    if pathlist.count(path) == 1:
+                        if(switchtoframe_stopclicknadd1(path)):
+                            log.info('before stopclicknadd operation on frame page is done and data is obtained')
+                            temp = driver.execute_script(javascript_stopclicknadd)
+                            log.info('stopclicknadd operation on frame page is done and data is obtained')
+                            if temp is not None:
+                                tempne_stopclicknadd.extend(temp)
+                            for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                                inpath = path + str(frames) + 'i' + '/'
+                                pathlist.append(inpath)
+                                if pathlist.count(inpath) == 1:
+                                    if switchtoframe_stopclicknadd1(inpath):
+                                        log.info('before stopclicknadd operation on iframe page is done and data is obtained')
+                                        itemp = driver.execute_script(javascript_stopclicknadd)
+                                        log.info('stopclicknadd operation on iframe page is done and data is obtained')
+                                        if itemp is not None:
+                                            tempne_stopclicknadd.extend(itemp)
+                                    callback_stopclicknadd2(inpath, tempne_stopclicknadd)
+                            for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                                inpath = path + str(frames) + 'f' + '/'
+                                pathlist.append(inpath)
+                                if pathlist.count(inpath) == 1:
+                                    if switchtoframe_stopclicknadd1(inpath):
+                                        itemp = driver.execute_script(javascript_stopclicknadd)
+                                        log.info('before stopclicknadd operation on frame page is done and data is obtained')
+                                        if itemp is not None:
+                                            tempne_stopclicknadd.extend(itemp)
+                                        log.info('stopclicknadd operation on frame page is done and data is obtained')
+                                    callback_stopclicknadd1(inpath, tempne_stopclicknadd)
+                            callback_stopclicknadd2(path, tempne_stopclicknadd)
 
             def fullpage_screenshot(driver, screen_shot_path):
                 try:
@@ -364,6 +496,8 @@ class Clickandadd():
             else:
                 status = domconstants.STATUS_SUCCESS
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             status = domconstants.STATUS_FAIL
             data = domconstants.STATUS_FAIL
             print 'Error while performing stop click and add scrape'
