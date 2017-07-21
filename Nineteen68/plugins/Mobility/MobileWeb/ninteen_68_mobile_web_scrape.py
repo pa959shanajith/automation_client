@@ -2,9 +2,9 @@ import wx
 import sys
 import os
 from selenium import webdriver
-import browserops_MW
-import clickandadd_MW
-import fullscrape_MW
+import browserops
+import clickandadd
+import fullscrape
 
 from socketIO_client import SocketIO,BaseNamespace
 import time
@@ -25,7 +25,7 @@ class ScrapeWindow(wx.Frame):
         self.iconpath = os.environ["NINETEEN68_HOME"] + "\\Nineteen68\\plugins\\Core\\Images" + "\\slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
-        obj = browserops_MW.BrowserOperations()
+        obj = browserops.BrowserOperations()
         self.socketIO = socketIO
         status = obj.openBrowser(browser)
         self.panel = wx.Panel(self)
@@ -68,8 +68,8 @@ class ScrapeWindow(wx.Frame):
             d = clickandadd_MWoj.stopclickandadd_MW()
             print 'Scrapped data saved successfully in domelements.json file'
 
-            # 5 is the limit of MB set as per Nineteen68 standards
-            if self.core_utilsobject.getdatasize(str(d),'mb') < 5:
+            #10 is the limit of MB set as per Nineteen68 standards
+            if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
                 self.socketIO.emit('scrape',d)
             else:
                 print 'Scraped data exceeds max. Limit.'
@@ -107,8 +107,8 @@ class ScrapeWindow(wx.Frame):
 ##        print 'self.socketIO : ',self.socketIO
 ##        print 'Acknoledgement id : ',self.socketIO._ack_id
 
-        # 5 is the limit of MB set as per Nineteen68 standards
-        if self.core_utilsobject.getdatasize(str(d),'mb') < 5:
+        #10 is the limit of MB set as per Nineteen68 standards
+        if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
             self.socketIO.emit('scrape',d)
         else:
             print 'Scraped data exceeds max. Limit.'

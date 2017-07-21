@@ -487,7 +487,7 @@ class Controller():
             if len(display_keyword_response) == 2:
                 logger.print_on_console('Response Header: \n',display_keyword_response[0])
                 #data size check
-                if self.core_utilsobject.getdatasize(display_keyword_response[1],'mb') < 5:
+                if self.core_utilsobject.getdatasize(display_keyword_response[1],'mb') < 10:
                     if 'soap:Envelope' in display_keyword_response[1]:
                         from lxml import etree
                         root = etree.fromstring(display_keyword_response[1])
@@ -504,7 +504,7 @@ class Controller():
                 logger.print_on_console('Response Header: ',display_keyword_response[0])
             else:
                 #data size check
-                if self.core_utilsobject.getdatasize(display_keyword_response,'mb') < 5:
+                if self.core_utilsobject.getdatasize(display_keyword_response,'mb') < 10:
                     if not isinstance(display_keyword_response,list):
                         logger.print_on_console('Result obtained is ',display_keyword_response)
                     else:
@@ -513,7 +513,7 @@ class Controller():
                     logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         else:
             #data size check
-            if self.core_utilsobject.getdatasize(display_keyword_response,'mb') < 5:
+            if self.core_utilsobject.getdatasize(display_keyword_response,'mb') < 10:
                 if not isinstance(display_keyword_response,list):
                     logger.print_on_console('Result obtained is ',display_keyword_response)
                 else:

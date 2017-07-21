@@ -72,8 +72,8 @@ class ScrapeWindow(wx.Frame):
             d = clickandaddoj.stopclickandadd()
             print 'Scrapped data saved successfully in domelements.json file'
 
-            # 5 is the limit of MB set as per Nineteen68 standards
-            if self.core_utilsobject.getdatasize(str(d),'mb') < 5:
+            # 10 is the limit of MB set as per Nineteen68 standards
+            if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
                 if  isinstance(d,str):
                     if d.lower() == 'fail':
                         self.socketIO.emit('scrape',d)
@@ -110,8 +110,8 @@ class ScrapeWindow(wx.Frame):
         self.comparebutton.Disable()
         d = fullscrapeobj.fullscrape()
 
-        # 5 is the limit of MB set as per Nineteen68 standards
-        if self.core_utilsobject.getdatasize(str(d),'mb') < 5:
+        # 10 is the limit of MB set as per Nineteen68 standards
+        if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
             if  isinstance(d,str):
                 if d.lower() == 'fail':
                     self.socketIO.emit('scrape',d)

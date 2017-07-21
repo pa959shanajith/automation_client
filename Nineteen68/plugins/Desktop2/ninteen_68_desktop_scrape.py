@@ -105,8 +105,8 @@ class ScrapeWindow(wx.Frame):
                         logger.print_on_console('Error occured while capturing Screenshot ')
                 data['mirror'] =encoded_string.encode('UTF-8').strip()
                 data['view'] = d
-                # 5 is the limit of MB set as per Nineteen68 standards
-                if self.core_utilsobject.getdatasize(str(data),'mb') < 5:
+                #10 is the limit of MB set as per Nineteen68 standards
+                if self.core_utilsobject.getdatasize(str(data),'mb') < 10:
                     self.socketIO.emit('scrape',data)
                 else:
                     logger.print_on_console( 'Scraped data exceeds max. Limit.')
@@ -150,7 +150,7 @@ class ScrapeWindow(wx.Frame):
                     logger.print_on_console('Error occured while capturing Screenshot ')
             data['mirror'] =encoded_string.encode('UTF-8').strip()
             data['view'] = d
-            if self.core_utilsobject.getdatasize(str(data),'mb') < 5:
+            if self.core_utilsobject.getdatasize(str(data),'mb') < 10:
                 self.socketIO.emit('scrape',data)
             else:
                 logger.print_on_console( 'Scraped data exceeds max. Limit.')
