@@ -19,8 +19,9 @@ from constants import *
 import logger
 import pythoncom
 import threading
+import core_utils
 log = logging.getLogger('outlook.py')
-import ftfy
+##import ftfy
 ##from  cherrypy import engine
 
 count=0
@@ -130,14 +131,15 @@ class OutlookKeywords:
                 self.AttachmentStatus=outlook_constants.ATTACH_STATUS_NO
                 self.Body=''
                 self.message=''
+                self.Flag=False
 
 ##                pythoncom.CoInitialize()
 ##                engine.subscribe('start_thread', onThreadStart)
-                global count
-                if count>1:
-                    import pythoncom
-                    pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
-                count=count+1
+##                global count
+##                if count>1:
+##                    import pythoncom
+##                    pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
+##                count=count+1
                 if (self.outlook==None):
 
                      from win32com.client.gencache import EnsureDispatch
@@ -156,29 +158,34 @@ class OutlookKeywords:
                     if msg.Class==43:
                         if msg.SenderName==self.senderEmail:
                             if msg.Subject==self.subject:
-                                if self.toMail in msg.To:
-                                    self.Content=msg
-                                    self.Subject = msg.Subject
-                                    self.Body= msg.Body
-                                    if msg.SenderEmailType=='EX':
-                                         self.FromMailId= msg.Sender.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS)
-                                    else:
-                                        self.FromMailId=msg.SenderEmailAddress
-                                    for recipient in  msg.Recipients:
-                                        if recipient.Type==1:
-                                            self.ToMailID+=recipient.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS)+';'
-                                    self.ToMailID=self.ToMailID[:-1]
-                                    if msg.Attachments.Count>0:
-                                        self.AttachmentStatus=outlook_constants.ATTACH_STATUS_YES
-##                                    message="From : "+msg.SenderName+" <"+self.FromMailId+">"+"\n"+ "To: "+ self.ToMailID + "\n"+ "Date: "+str(msg.SentOn)+ "\n"+ "Subject: "+ msg.Subject+ "\n"+ str(msg.Attachments.Count)+ " attachments." + "\n"+ msg.Body
-                                    self.Flag=True
+                                tomails = msg.To
+                                tomailsList = tomails.split(';')
+                                for to in tomailsList:
+                                    to = str(to)
+                                    to = to.strip()
+                                    if self.toMail == to:
+                                        self.Content=msg
+                                        self.Subject = msg.Subject
+                                        self.Body= msg.Body
+                                        if msg.SenderEmailType=='EX':
+                                             self.FromMailId= msg.Sender.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS)
+                                        else:
+                                            self.FromMailId=msg.SenderEmailAddress
+                                        for recipient in  msg.Recipients:
+                                            if recipient.Type==1:
+                                                self.ToMailID+=recipient.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS)+';'
+                                        self.ToMailID=self.ToMailID[:-1]
+                                        if msg.Attachments.Count>0:
+                                            self.AttachmentStatus=outlook_constants.ATTACH_STATUS_YES
+    ##                                    message="From : "+msg.SenderName+" <"+self.FromMailId+">"+"\n"+ "To: "+ self.ToMailID + "\n"+ "Date: "+str(msg.SentOn)+ "\n"+ "Subject: "+ msg.Subject+ "\n"+ str(msg.Attachments.Count)+ " attachments." + "\n"+ msg.Body
+                                        self.Flag=True
 
-                                    msg.Display(False)
-                                    status=desktop_constants.TEST_RESULT_PASS
-                                    method_output=desktop_constants.TEST_RESULT_TRUE
-                                    break
-                                else:
-                                    continue
+                                        msg.Display(False)
+                                        status=desktop_constants.TEST_RESULT_PASS
+                                        method_output=desktop_constants.TEST_RESULT_TRUE
+                                        break
+                                    else:
+                                        continue
                             else:
                                 continue
                         else :
@@ -272,7 +279,10 @@ class OutlookKeywords:
             error_msg=None
             try:
                 if self.Flag==True:
-                    res= ftfy.fix_text(self.Body)
+                    res= self.Body
+##                    res= ftfy.fix_text(res)
+                    coreutilsobj=core_utils.CoreUtils()
+                    res=coreutilsobj.get_UTF_8(res)
                     status=desktop_constants.TEST_RESULT_PASS
                     method_output=desktop_constants.TEST_RESULT_TRUE
                 else:
