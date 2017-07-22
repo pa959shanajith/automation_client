@@ -77,7 +77,7 @@ class DynamicVariables:
     def store_as_array(self,variable,value):
         variable=variable[0:len(variable)-1]
         for i in range(len(value)):
-            dynamic_variable_map[variable+'['+str(i)+']}']=str(value[i])
+            dynamic_variable_map[variable+'['+str(i)+']}']=value[i]
 
 
      #To Store the output from keyword as an array if it is single value
@@ -89,9 +89,9 @@ class DynamicVariables:
                     self.store_as_array(output_var,output_value)
                 else:
                     output_value.append(output_var)
-                    dynamic_variable_map[DB_VAR]=str(output_value)
+                    dynamic_variable_map[DB_VAR]=output_value
             else:
-                dynamic_variable_map[output_var]=str(output_value)
+                dynamic_variable_map[output_var]=output_value
 
      #To Check if the given pattern of the variable matches '{a}'
     def check_for_dynamicvariables(self,outputval):

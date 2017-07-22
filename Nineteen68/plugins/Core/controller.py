@@ -422,7 +422,8 @@ class Controller():
                     if not isinstance(display_keyword_response,list):
                         logger.print_on_console('Result obtained is ',display_keyword_response)
                     else:
-                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i]) for i in range(len(display_keyword_response))]))
+                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i]) 
+                        if not isinstance(i,basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
                 else:
                     logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         else:
@@ -432,9 +433,11 @@ class Controller():
                     logger.print_on_console('Result obtained is ',display_keyword_response)
                 else:
                     if(tsp.apptype.lower() == 'webservice' and tsp.name == 'getHeader'):
-                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i]) for i in range(len(display_keyword_response))]))
+                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i]) 
+                        if not isinstance(i,basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
                     else:
-                        logger.print_on_console('Result obtained is ',",".join([display_keyword_response[i] for i in range(len(display_keyword_response))]))
+                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i]) 
+                        if not isinstance(i,basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))                 
             else:
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         log.info('Result obtained is: ')
