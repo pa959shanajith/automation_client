@@ -150,7 +150,8 @@ class TextFile:
             log.debug('Verifying content of Text file ')
             with open(input_path) as myFile:
                 for num, line in enumerate(myFile, 1):
-                    if content in line:
+                    line = line.replace('\n','')
+                    if content == line :
                         log.info('found at line:'+str(num))
 ##                        logger.print_on_console('found at line:',(num))
                         status=True
@@ -278,7 +279,8 @@ class TextFile:
         try:
             with open(input_path) as myFile:
                 for num, line in enumerate(myFile, 1):
-                    if content in line:
+                    line =line.replace('\n','')
+                    if content == line:
                         log.debug('found at line: '+str(num))
                         line_numbers.append(num)
                         status=True

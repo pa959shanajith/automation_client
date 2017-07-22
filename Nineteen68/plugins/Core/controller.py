@@ -459,7 +459,7 @@ class Controller():
         #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
             x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
             inpval.append(x)
-
+            
         return inpval
 
     def store_result(self,result_temp,tsp):
@@ -508,7 +508,7 @@ class Controller():
                     if not isinstance(display_keyword_response,list):
                         logger.print_on_console('Result obtained is ',display_keyword_response)
                     else:
-                        logger.print_on_console('Result obtained is ',",".join([display_keyword_response[i] for i in range(len(display_keyword_response))]))
+                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i]) for i in range(len(display_keyword_response))]))
                 else:
                     logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         else:
@@ -517,7 +517,7 @@ class Controller():
                 if not isinstance(display_keyword_response,list):
                     logger.print_on_console('Result obtained is ',display_keyword_response)
                 else:
-                    logger.print_on_console('Result obtained is ',",".join([display_keyword_response[i] for i in range(len(display_keyword_response))]))
+                    logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i]) for i in range(len(display_keyword_response))]))
             else:
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         log.info('Result obtained is: ')

@@ -534,9 +534,9 @@ class ExcelXLS:
                     for i in indices:
                         i = i+1
                         line_number.append(i)
+                        status=True
 ##                    log.debug('line numbers are '+''.join(str(line_number)))
                     log.debug(line_number)
-                    status=True
                     logger.print_on_console('Line numbers:')
                     logger.print_on_console(line_number)
                     break
@@ -1040,8 +1040,8 @@ class ExcelXLSX:
                 for cell in row:
                     if  cell.internal_value is not None and content == cell.internal_value:
                         value.append(i)
+                        status=True
             line_number=value
-            status=True
         except Exception as e:
            err_msg='Error getting line number in .xls'
            log.error(e)
