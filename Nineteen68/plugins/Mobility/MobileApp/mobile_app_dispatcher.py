@@ -27,6 +27,8 @@ import mob_screenshot
 import readconfig
 import spinner_keywords
 import list_view_mobility
+import DatePicker_Keywords_Mobility
+import TimePicker_Keywords_Mobility
 import picker_wheel_ios
 import table_keywords_native
 apptypes = None
@@ -46,6 +48,8 @@ class MobileDispatcher:
     list_view_keywords_object=list_view_mobility.List_Keywords()
     picker_wheel_keywords_object = picker_wheel_ios.Picker_Wheel_Keywords()
     table_keywords_object=table_keywords_native.Table_Keywords()
+    date_keywords_object=DatePicker_Keywords_Mobility.Date_Keywords()
+    time_keywords_object=TimePicker_Keywords_Mobility.Time_Keywords()
     def __init__(self):
         self.exception_flag=''
 
@@ -139,8 +143,11 @@ class MobileDispatcher:
                     'VerifyRowCount':self.table_keywords_object.verify_row_count,
                     'CellClick':self.table_keywords_object.cell_click,
                     'GetCellValue':self.table_keywords_object.get_cell_value,
-                    'VerifyCellValue':self.table_keywords_object.verify_cell_value
-
+                    'VerifyCellValue':self.table_keywords_object.verify_cell_value,
+                    'SetDate' : self.date_keywords_object.Set_Date,
+                    'GetDate' : self.date_keywords_object.Get_Date,
+                    'SetTime' : self.time_keywords_object.Set_Time,
+                    'GetTime' : self.time_keywords_object.Get_Time
 
 
                 }
