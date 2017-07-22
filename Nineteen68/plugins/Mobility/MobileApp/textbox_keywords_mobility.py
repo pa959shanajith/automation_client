@@ -30,8 +30,8 @@ class Textbox_keywords():
         text=input_val[0]
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            logger.print_on_console(INPUT_IS+text)
-            log.info(INPUT_IS+text)
+##            logger.print_on_console(INPUT_IS+text)
+##            log.info(INPUT_IS+text)
             if element is not None:
                 visibility=element.is_displayed()
                 log.debug('element is visible')
@@ -39,18 +39,23 @@ class Textbox_keywords():
                     enable=element.is_enabled()
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
-                        # if len(element.text)>0:
-                        #     log.debug('clearing  the existing text')
-                        element.clear()
+
                         log.debug('Setting the text')
                         import platform
                         if platform.system() == 'Darwin':
+                            element.clear()
                             element.set_value(text)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                         else:
-                            element.send_keys(text)
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                            if len(element.text)>0:
+                             log.debug('clearing  the existing text')
+                             element.clear()
+                            element.set_text(text)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                     else:
+
                         err_msg='element is disabled'
                         log.error('element is disabled')
                         logger.print_on_console(err_msg)
@@ -62,8 +67,7 @@ class Textbox_keywords():
         except Exception as e:
             err_msg=e
             log.error(e)
-            import traceback
-            traceback.print_exc()
+
             logger.print_on_console(err_msg)
 
         return status,methodoutput,output,err_msg
@@ -84,11 +88,21 @@ class Textbox_keywords():
                     enable=element.is_enabled()
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
-                        # if len(element.text)>0:
-                        log.debug('clearing  the existing text')
-                        element.clear()
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                        import platform
+                        if platform.system() == 'Darwin':
+                            element.clear()
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                        else:
+                            if len(element.text)>0:
+                                log.debug('clearing  the existing text')
+                                element.clear()
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                            else:
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
@@ -100,6 +114,8 @@ class Textbox_keywords():
 
         except Exception as e:
             log.error(e)
+            import traceback
+            traceback.print_exc()
             logger.print_on_console(err_msg)
 
         return status,methodoutput,output,err_msg
@@ -120,11 +136,12 @@ class Textbox_keywords():
                     if len(args)>0 and args[0] != '':
                         visibilityFlag=args[0]
                     input=input[0]
-                    logger.print_on_console(INPUT_IS+str(input))
-                    log.info(INPUT_IS)
+##                    logger.print_on_console(INPUT_IS+str(input))
+##                    log.info(INPUT_IS)
                     log.info(input)
                     if input is not None:
-                            # if len(webelement.text)>0:
+                        import platform
+                        if platform.system() == 'Darwin':
                             webelement.clear()
                             encryption_obj = AESCipher()
                             input_val = encryption_obj.decrypt(input)
@@ -134,6 +151,21 @@ class Textbox_keywords():
                             webelement.send_keys(input_val)
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
+                        else:
+                            if len(webelement.text)>0:
+                                log.debug('clearing  the existing text')
+                                webelement.clear()
+                                encryption_obj = AESCipher()
+                                input_val = encryption_obj.decrypt(input)
+##                            user_input=self.validate_input(webelement,input_val)
+##                            if user_input is not None:
+##                                input_val=user_input
+                                webelement.send_keys(input_val)
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+
+
+
                 else:
                     err_msg='element is disabled'
 
@@ -153,8 +185,8 @@ class Textbox_keywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             text=input_val[0]
-            logger.print_on_console(INPUT_IS+text)
-            log.info(INPUT_IS+text)
+##            logger.print_on_console(INPUT_IS+text)
+##            log.info(INPUT_IS+text)
             if element is not None:
                 visibility=element.is_displayed()
                 log.debug('element is visible')
@@ -162,17 +194,21 @@ class Textbox_keywords():
                     enable=element.is_enabled()
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
-                        # if len(element.text)>0:
-                        log.debug('clearing  the existing text')
-                        element.clear()
+
                         log.debug('Sending the keys')
                         import platform
                         if platform.system() == 'Darwin':
+                            element.clear()
                             element.set_value(text)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                         else:
-                            element.send_keys(text)
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                            if len(element.text)>0:
+                                log.debug('clearing  the existing text')
+                                element.clear()
+                                element.send_keys(text)
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
