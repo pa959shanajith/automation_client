@@ -157,7 +157,7 @@ class Dropdown_Keywords():
                         #====================================================================ListView and ListBox
                         elif checkName == 'ListView' or 'ListBox':
                             index=int(input_val[0])-1
-                            if index>0:
+                            if index>=0:
                                 if checkName=='ListBox':
                                     items=element.ItemTexts()
                                     verb =items[index]
@@ -583,7 +583,6 @@ class Dropdown_Keywords():
 
 
         def verifyAllValues(self,element,parent,input_val, *args):
-            print"==========================verifyAllValues================================="
             status=desktop_constants.TEST_RESULT_FAIL
             result=desktop_constants.TEST_RESULT_FALSE
             verb = OUTPUT_CONSTANT
@@ -598,7 +597,6 @@ class Dropdown_Keywords():
                if (check):
                         log.info('Parent matched')
                         if checkName == 'ComboBox':
-                            print"====================code is here=============="
                             items=element.texts()
                             items.pop(0)
                             newlist=[]
@@ -1036,46 +1034,40 @@ class Dropdown_Keywords():
                     dektop_element = element
                     verify_obj = Text_Box()
                     check = verify_obj.verify_parent(element,parent)
-                    log.debug('Parent of element while scraping')
-                    log.debug(parent)
-                    log.debug('Parent check status')
-                    log.debug(check)
+                    checkName=element.friendly_class_name()
                     if (check):
                         log.info('Parent matched')
                         if(element.is_enabled()):
                             item_text=input_val
-                            if element.friendly_class_name() == 'ListView':
+                            if checkName == 'ListView':
                                 items=element.items()
                                 elelist=element.texts()
                                 new_elelist=[]
                                 for i in range(0,len(elelist)):
                                     new_elelist.append(elelist[i].encode("utf-8"))
                         #=======================================================================================================
-                            if element.friendly_class_name() == 'ListView' or 'ListBox':
-
-                                if element.friendly_class_name() == 'ListBox':
+                            if checkName == 'ListView' or 'ListBox':
+                                if checkName == 'ListBox':
                                     fail_flag=False
                                     if(element.IsSingleSelection()!=True):
-                                        if element.is_active() == False:
-                                           element.click()
+##                                        if element.is_active() == False:
+##                                           element.click()
                                         newlist=[]
                                         items=element.ItemTexts()
                                         newlist=[item.encode("utf-8") for item in items]#removing unicode
                                         for i in range(len(item_text)):
-                                            for j in range(len(newlist)):
-                                                if(item_text[i]!=newlist[j]):
-                                                    fail_flag=True
-                                                else:
-                                                    element.Select(item_text[i])
+                                            if(item_text[i] not in newlist):
+                                                fail_flag=True
                                         if fail_flag==False:
-                                            err_msg="Entered indexs are out of bound"
+                                            for i in range(len(item_text)):
+                                                element.Select(item_text[i])
+                                            #err_msg="Entered indexs are out of bound"
                                             status = desktop_constants.TEST_RESULT_PASS
                                             result = desktop_constants.TEST_RESULT_TRUE
                                     else:
                                         logger.print_on_console('List is a single selection type.Could not select all values')
                                         err_msg='List is a single selection type.Could not select all values'
-
-                                elif element.friendly_class_name() == 'ListView':
+                                elif checkName == 'ListView':
                                     item_count = element.item_count()
                                     items=element.items()
                                     for i in range(0,len(items)):
@@ -1111,5 +1103,3 @@ class Dropdown_Keywords():
 
 
             return status,result,verb,err_msg
-
-
