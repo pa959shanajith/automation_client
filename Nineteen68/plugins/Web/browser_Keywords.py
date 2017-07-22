@@ -9,7 +9,6 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 from selenium import webdriver
-
 import logger
 import webconstants
 driver_obj = None
@@ -33,7 +32,6 @@ pid_set = set()
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
 class TestThread(threading.Thread):
     """Test Worker Thread Class."""
-    
     #----------------------------------------------------------------------
     def __init__(self,url):
         """Init Worker Thread Class."""
@@ -41,7 +39,6 @@ class TestThread(threading.Thread):
         self.url=url
         self.start()
           # start the thread
-          
     #----------------------------------------------------------------------
     def run(self):
         """Run Worker Thread."""
@@ -54,13 +51,11 @@ class TestThread(threading.Thread):
 class BrowserKeywords():
     def __init__(self):
         self.browser_num=''
-        
     def __web_driver_exception(self,e):
         log.error(e)
         logger.print_on_console(e)
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         return err_msg
-        
     def openBrowser(self,webelement,browser_num,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -155,7 +150,7 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
-
+        
     def refresh(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -171,8 +166,6 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
-        
-        
     def navigateToURL(self ,webelement, url , *args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -500,6 +493,7 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
         
+        
     def closeSubWindows(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -787,7 +781,6 @@ class Singleton_DriverUtil():
             log.info('Safari browser started')
 ##        print __driver
         return driver
-        
         
         
         
