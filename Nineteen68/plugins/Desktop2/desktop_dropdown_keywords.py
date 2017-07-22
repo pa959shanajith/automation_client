@@ -36,56 +36,13 @@ class Dropdown_Keywords():
                     dektop_element = element
                     verify_obj = Text_Box()
                     check = verify_obj.verify_parent(element,parent)
-                    log.debug('Parent of element while scraping')
-                    log.debug(parent)
-                    log.debug('Parent check status')
-                    log.debug(check)
+                    checkName =element.friendly_class_name()
                     if (check):
                         log.info('Parent matched')
                         if(element.is_enabled()):
                             item_index=int(text)
-                            if element.friendly_class_name() == 'ListView' or 'ListBox':
-                                item_count = element.item_count()
-                                if item_index <= item_count:
-                                     #----------------------------------------------------ListBox
-                                    if element.friendly_class_name() == 'ListBox':
-                                        if item_index <=0:
-                                                log.info('List item index starts with 1')
-                                                logger.print_on_console('List item index starts with 1')
-                                        else:
-                                            element.Select(item_index-1)
-                                            status = desktop_constants.TEST_RESULT_PASS
-                                            result = desktop_constants.TEST_RESULT_TRUE
-                                    #----------------------------------------------------ListBox
-                                    #----------------------------------------------------ListView
-                                    elif element.friendly_class_name() == 'ListView':
-                                        item = element.GetItem(item_index-1)
-                                        if not item.is_selected():
-                                            if element.is_active() == False:
-                                                element.click()
-                                            if item_index <=0:
-                                                log.info('List item index starts with 1')
-                                                logger.print_on_console('List item index starts with 1')
-                                            else:
-                                                item.select()
-                                                log.info('List item selected')
-                                                logger.print_on_console('ListView item selected')
-                                                status = desktop_constants.TEST_RESULT_PASS
-                                                result = desktop_constants.TEST_RESULT_TRUE
-                                                log.info(STATUS_METHODOUTPUT_UPDATE)
-
-                                        else:
-                                            log.info('List item is already selected')
-                                            logger.print_on_console('List item is already selected')
-                                            err_msg = 'List item is already selected'
-                                    #----------------------------------------------------ListView
-
-                                else:
-                                    log.info('There is no List item in List view with the given index')
-                                    logger.print_on_console('There is no List item in List view with the given index')
-                                    err_msg = 'There is no List item in List view with the given index'
-
-                            elif element.friendly_class_name() == 'ComboBox':
+                            #------------------------------------------------------------dropdown
+                            if checkName == 'ComboBox':
                                 item_count = element.item_count()
                                 if item_index <= item_count:
                                     if element.is_enabled():
@@ -114,6 +71,49 @@ class Dropdown_Keywords():
                                     log.info('There is no item in Combobox with the given index')
                                     logger.print_on_console('There is no item in Combobox with the given index')
                                     err_msg = 'There is no item in Combobox with the given index'
+                            #---------------------------------------------------------------------------List element
+                            elif checkName == 'ListView' or 'ListBox':
+                                item_count = element.item_count()
+                                if item_index <= item_count:
+                                     #----------------------------------------------------ListBox
+                                    if checkName == 'ListBox':
+                                        if item_index <=0:
+                                                log.info('List item index starts with 1')
+                                                logger.print_on_console('List item index starts with 1')
+                                        else:
+                                            element.Select(item_index-1)
+                                            status = desktop_constants.TEST_RESULT_PASS
+                                            result = desktop_constants.TEST_RESULT_TRUE
+                                    #----------------------------------------------------ListBox
+                                    #----------------------------------------------------ListView
+                                    elif checkName == 'ListView':
+                                        item = element.GetItem(item_index-1)
+                                        if not item.is_selected():
+                                            if element.is_active() == False:
+                                                element.click()
+                                            if item_index <=0:
+                                                log.info('List item index starts with 1')
+                                                logger.print_on_console('List item index starts with 1')
+                                            else:
+                                                item.select()
+                                                log.info('List item selected')
+                                                logger.print_on_console('ListView item selected')
+                                                status = desktop_constants.TEST_RESULT_PASS
+                                                result = desktop_constants.TEST_RESULT_TRUE
+                                                log.info(STATUS_METHODOUTPUT_UPDATE)
+
+                                        else:
+                                            log.info('List item is already selected')
+                                            logger.print_on_console('List item is already selected')
+                                            err_msg = 'List item is already selected'
+                                    #----------------------------------------------------ListView
+
+                                else:
+                                    log.info('There is no List item in List view with the given index')
+                                    logger.print_on_console('There is no List item in List view with the given index')
+                                    err_msg = 'There is no List item in List view with the given index'
+
+
                         else:
                             log.info('Element not present on the page where operation is trying to be performed')
                             err_msg='Element not present on the page where operation is trying to be performed'
@@ -133,23 +133,38 @@ class Dropdown_Keywords():
                dektop_element = element
                verify_obj = Text_Box()
                check = verify_obj.verify_parent(element,parent)
-               log.debug('Parent of element while scraping')
-               log.debug(parent)
-               log.debug('Parent check status')
-               log.debug(check)
+               checkName =element.friendly_class_name()
                if (check):
                         log.info('Parent matched')
+                        #-------------------------------------------------------------------------dropdown
+                        if checkName == 'ComboBox':
+                            elelist=element.texts()
+                            elelist.pop(0)
+                            newlist=[]
+                            index=input_val
+                            res1=[]
+                            if int(index[0])<0:
+                                log.info('Combobox index starts with 1')
+                                logger.print_on_console('Combobox index starts with 1')
+                                err_msg = 'Combobox index starts with 1'
+                            else:
+                                res1=elelist[int(index[0])-1]
+                                verb=res1
+                                logger.print_on_console('Value obtained is',verb)
+                                status = desktop_constants.TEST_RESULT_PASS
+                                result = desktop_constants.TEST_RESULT_TRUE
+                                log.info(STATUS_METHODOUTPUT_UPDATE)
                         #====================================================================ListView and ListBox
-                        if element.friendly_class_name() == 'ListView' or 'ListBox':
+                        elif checkName == 'ListView' or 'ListBox':
                             index=int(input_val[0])-1
                             if index>0:
-                                if element.friendly_class_name()=='ListBox':
+                                if checkName=='ListBox':
                                     items=element.ItemTexts()
                                     verb =items[index]
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
 
-                                elif element.friendly_class_name()=='ListView':
+                                elif checkName=='ListView':
                                     if element.is_active() == False:
                                       element.click()
                                     items=element.items()
@@ -186,23 +201,7 @@ class Dropdown_Keywords():
                             else:
                                 logger.print_on_console('Index value index starts with 1')
                         #========================================================================
-                        elif element.friendly_class_name() == 'ComboBox':
-                            elelist=element.texts()
-                            elelist.pop(0)
-                            newlist=[]
-                            index=input_val
-                            res1=[]
-                            if int(index[0])<0:
-                                log.info('Combobox index starts with 1')
-                                logger.print_on_console('Combobox index starts with 1')
-                                err_msg = 'Combobox index starts with 1'
-                            else:
-                                res1=elelist[int(index[0])-1]
-                                verb=res1
-                                logger.print_on_console('Value obtained is',verb)
-                                status = desktop_constants.TEST_RESULT_PASS
-                                result = desktop_constants.TEST_RESULT_TRUE
-                                log.info(STATUS_METHODOUTPUT_UPDATE)
+
 
                else:
                    log.info('Element not present on the page where operation is trying to be performed')
@@ -312,19 +311,26 @@ class Dropdown_Keywords():
             verb = OUTPUT_CONSTANT
             err_msg=None
             items=[]
+            checkName=""
             try:
+               checkName =element.friendly_class_name()
                dektop_element = element
                verify_obj = Text_Box()
                check = verify_obj.verify_parent(element,parent)
-               log.debug('Parent of element while scraping')
-               log.debug(parent)
-               log.debug('Parent check status')
-               log.debug(check)
                if (check):
                         log.info('Parent matched')
-                        #=========================================================
-                        if element.friendly_class_name() == 'ListView' or 'ListBox':
-                            if element.friendly_class_name() =='ListBox':
+                        if checkName.strip() == 'ComboBox':
+                            try:
+                                selected=element.selected_text()
+                                verb=selected
+                                logger.print_on_console('selected values are:',verb)
+                                status = desktop_constants.TEST_RESULT_PASS
+                                result = desktop_constants.TEST_RESULT_TRUE
+                                log.info(STATUS_METHODOUTPUT_UPDATE)
+                            except Exception as e :
+                                logger.print_on_console(e)
+                        elif checkName == 'ListView' or 'ListBox':
+                            if checkName =='ListBox':
                                 if element.is_active() == False:
                                   element.click()
                                 items=element.ItemTexts()
@@ -345,8 +351,7 @@ class Dropdown_Keywords():
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
-
-                            if element.friendly_class_name() =='ListView':
+                            elif checkName =='ListView':
                                 if element.is_active() == False:
                                   element.click()
                                 items=element.items()
@@ -363,14 +368,6 @@ class Dropdown_Keywords():
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                         #=========================================================
-
-                        elif element.friendly_class_name() == 'ComboBox':
-                            selected=element.selected_text()
-                            verb=selected
-                            logger.print_on_console('selected values are:',verb)
-                            status = desktop_constants.TEST_RESULT_PASS
-                            result = desktop_constants.TEST_RESULT_TRUE
-                            log.info(STATUS_METHODOUTPUT_UPDATE)
 
                else:
                    log.info('Element not present on the page where operation is trying to be performed')
@@ -391,6 +388,7 @@ class Dropdown_Keywords():
                 verb = OUTPUT_CONSTANT
                 err_msg=None
                 try:
+                   checkName =element.friendly_class_name()
                    dektop_element = element
                    verify_obj = Text_Box()
                    check = verify_obj.verify_parent(element,parent)
@@ -400,11 +398,22 @@ class Dropdown_Keywords():
                    log.debug(check)
                    if (check):
                             log.info('Parent matched')
+                            if checkName == 'ComboBox':
+                                selected=element.selected_text()
+                                verb=selected
+                                item_list=input_val
+                                for item in item_list:
+                                 if item == verb:
+                                   status=desktop_constants.TEST_RESULT_PASS
+                                   result=desktop_constants.TEST_RESULT_TRUE
+                                 else:
+                                  status = desktop_constants.TEST_RESULT_FAIL
+                                  result = desktop_constants.TEST_RESULT_FALSE
                             #================================================================
-                            if element.friendly_class_name() == 'ListView' or 'ListBox':
+                            elif checkName == 'ListView' or 'ListBox':
                                 if element.is_active() == False:
                                   element.click()
-                                if element.friendly_class_name() == 'ListBox':
+                                if checkName == 'ListBox':
                                     if element.is_active() == False:
                                       element.click()
                                     items=element.ItemTexts()
@@ -427,8 +436,7 @@ class Dropdown_Keywords():
                                      if item in verb:
                                        status=desktop_constants.TEST_RESULT_PASS
                                        result=desktop_constants.TEST_RESULT_TRUE
-
-                                if element.friendly_class_name() == 'ListView':
+                                if checkName == 'ListView':
                                     items=element.items()
                                     elelist=element.texts()
                                     elelist.pop(0)
@@ -451,17 +459,7 @@ class Dropdown_Keywords():
                                       status = desktop_constants.TEST_RESULT_FAIL
                                     result = desktop_constants.TEST_RESULT_FALSE
                             #================================================================
-                            elif element.friendly_class_name() == 'ComboBox':
-                                selected=element.selected_text()
-                                verb=selected
-                                item_list=input_val
-                                for item in item_list:
-                                 if item == verb:
-                                   status=desktop_constants.TEST_RESULT_PASS
-                                   result=desktop_constants.TEST_RESULT_TRUE
-                                 else:
-                                  status = desktop_constants.TEST_RESULT_FAIL
-                                  result = desktop_constants.TEST_RESULT_FALSE
+
 
                    else:
                        log.info('Element not present on the page where operation is trying to be performed')
@@ -491,62 +489,13 @@ class Dropdown_Keywords():
                     dektop_element = element
                     verify_obj = Text_Box()
                     check = verify_obj.verify_parent(element,parent)
-                    log.debug('Parent of element while scraping')
-                    log.debug(parent)
-                    log.debug('Parent check status')
-                    log.debug(check)
+                    checkName =element.friendly_class_name()
                     if (check):
                         log.info('Parent matched')
                         if(element.is_enabled()):
                             item_text=str(text)
-                            #==============================================================================
-                            if element.friendly_class_name() == 'ListView' or 'ListBox':
-                                if element.friendly_class_name() == 'ListBox':
-                                    if item_text != '' or item_text != None:
-                                        items=element.ItemTexts()
-                                        for i in range(0,len(items)):
-                                            if(item_text==str(items[i])):
-                                                try:
-                                                    element.Select(item_text)
-                                                    status = desktop_constants.TEST_RESULT_PASS
-                                                    result = desktop_constants.TEST_RESULT_TRUE
-                                                    log.info(STATUS_METHODOUTPUT_UPDATE)
-                                                except Exception as e:
-                                                    import traceback
-                                                    traceback.print_exc()
-                                                    logger.print_on_console('There is no item in List with the given text',e)
-
-                                elif element.friendly_class_name() == 'ListView':
-                                    if item_text != '' or item_text != None:
-                                        try:
-                                            item = element.get_item(item_text)
-                                        except:
-                                            text_flag = True
-                                        if text_flag == False:
-                                            if not item.is_selected():
-                                                if element.is_active() == False:
-                                                    element.click()
-                                                item.select()
-                                                log.info('List item selected')
-                                                logger.print_on_console('List item selected')
-                                                status = desktop_constants.TEST_RESULT_PASS
-                                                result = desktop_constants.TEST_RESULT_TRUE
-                                                log.info(STATUS_METHODOUTPUT_UPDATE)
-                                            else:
-                                                log.info('List item is already selected')
-                                                logger.print_on_console('List item is already selected')
-                                                err_msg = 'List item is already selected'
-                                        else:
-                                            log.info('There is no List item in List view with the given text')
-                                            logger.print_on_console('There is no List item in List view with the given text')
-                                            err_msg = 'There is no List item in List view with the given text'
-                                else:
-                                    log.info('There is no List item in List view with the given text')
-                                    logger.print_on_console('There is no List item in List view with the given text')
-                                    err_msg = 'There is no List item in List view with the given text'
-                            #==============================================================================
-
-                            elif element.friendly_class_name() == 'ComboBox':
+                            #----------------------------------------------------------------------------------------dropdown
+                            if checkName == 'ComboBox':
                                 if item_text != '' or item_text != None:
                                     if element.is_enabled():
                                         selected_text = element.selected_text()
@@ -576,6 +525,53 @@ class Dropdown_Keywords():
                                     log.info('There is no item in Combobox with the given text')
                                     logger.print_on_console('There is no item in Combobox with the given text')
                                     err_msg = 'There is no item in Combobox with the given text'
+                            #==============================================================================
+                            elif checkName == 'ListView' or 'ListBox':
+                                if checkName == 'ListBox':
+                                    if item_text != '' or item_text != None:
+                                        items=element.ItemTexts()
+                                        for i in range(0,len(items)):
+                                            if(item_text==str(items[i])):
+                                                try:
+                                                    element.Select(item_text)
+                                                    status = desktop_constants.TEST_RESULT_PASS
+                                                    result = desktop_constants.TEST_RESULT_TRUE
+                                                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                                                except Exception as e:
+                                                    import traceback
+                                                    traceback.print_exc()
+                                                    logger.print_on_console('There is no item in List with the given text',e)
+
+                                elif checkName == 'ListView':
+                                    if item_text != '' or item_text != None:
+                                        try:
+                                            item = element.get_item(item_text)
+                                        except:
+                                            text_flag = True
+                                        if text_flag == False:
+                                            if not item.is_selected():
+                                                if element.is_active() == False:
+                                                    element.click()
+                                                item.select()
+                                                log.info('List item selected')
+                                                logger.print_on_console('List item selected')
+                                                status = desktop_constants.TEST_RESULT_PASS
+                                                result = desktop_constants.TEST_RESULT_TRUE
+                                                log.info(STATUS_METHODOUTPUT_UPDATE)
+                                            else:
+                                                log.info('List item is already selected')
+                                                logger.print_on_console('List item is already selected')
+                                                err_msg = 'List item is already selected'
+                                        else:
+                                            log.info('There is no List item in List view with the given text')
+                                            logger.print_on_console('There is no List item in List view with the given text')
+                                            err_msg = 'There is no List item in List view with the given text'
+                                else:
+                                    log.info('There is no List item in List view with the given text')
+                                    logger.print_on_console('There is no List item in List view with the given text')
+                                    err_msg = 'There is no List item in List view with the given text'
+                            #==============================================================================
+
                         else:
                             log.info('Element not present on the page where operation is trying to be performed')
                             err_msg='Element not present on the page where operation is trying to be performed'
@@ -587,24 +583,37 @@ class Dropdown_Keywords():
 
 
         def verifyAllValues(self,element,parent,input_val, *args):
+            print"==========================verifyAllValues================================="
             status=desktop_constants.TEST_RESULT_FAIL
             result=desktop_constants.TEST_RESULT_FALSE
             verb = OUTPUT_CONSTANT
             err_msg=None
             items=[]
+            checkName=""
             try:
                dektop_element = element
                verify_obj = Text_Box()
                check = verify_obj.verify_parent(element,parent)
-               log.debug('Parent of element while scraping')
-               log.debug(parent)
-               log.debug('Parent check status')
-               log.debug(check)
+               checkName =element.friendly_class_name()
                if (check):
                         log.info('Parent matched')
+                        if checkName == 'ComboBox':
+                            print"====================code is here=============="
+                            items=element.texts()
+                            items.pop(0)
+                            newlist=[]
+                            items_list=input_val
+                            for i in range(0,len(items)):
+                                    newlist.append(items[i].encode("utf-8"))
+                                    if items_list==newlist:
+                                        status = desktop_constants.TEST_RESULT_PASS
+                                        result = desktop_constants.TEST_RESULT_TRUE
+                                    else:
+                                        status = desktop_constants.TEST_RESULT_FAIL
+                                        result = desktop_constants.TEST_RESULT_FALSE
                         #==================================================================
-                        if element.friendly_class_name() == 'ListView' or 'ListBox':
-                             if element.friendly_class_name() == 'ListBox':
+                        elif checkName == 'ListView' or 'ListBox':
+                             if checkName == 'ListBox':
                                 items=element.ItemTexts()
                                 newlist=[]
                                 newlist=[item.encode("utf-8") for item in items]#removing unicode
@@ -613,7 +622,7 @@ class Dropdown_Keywords():
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
 
-                             elif element.friendly_class_name() == 'ListView':
+                             elif checkName == 'ListView':
                                  items=element.items()
                                  items.pop(0)
                                  newlist=[]
@@ -628,21 +637,6 @@ class Dropdown_Keywords():
                                             status = desktop_constants.TEST_RESULT_FAIL
                                             result = desktop_constants.TEST_RESULT_FALSE
                         #==================================================================
-
-                        elif element.friendly_class_name() == 'ComboBox':
-                            items=element.texts()
-                            items.pop(0)
-                            newlist=[]
-                            items_list=input_val
-                            for i in range(0,len(items)):
-                                    newlist.append(items[i].encode("utf-8"))
-                                    if items_list==newlist:
-                                        status = desktop_constants.TEST_RESULT_PASS
-                                        result = desktop_constants.TEST_RESULT_TRUE
-                                    else:
-                                        status = desktop_constants.TEST_RESULT_FAIL
-                                        result = desktop_constants.TEST_RESULT_FALSE
-
                else:
                    log.info('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'
@@ -667,15 +661,26 @@ class Dropdown_Keywords():
                dektop_element = element
                verify_obj = Text_Box()
                check = verify_obj.verify_parent(element,parent)
-               log.debug('Parent of element while scraping')
-               log.debug(parent)
-               log.debug('Parent check status')
-               log.debug(check)
+               checkName =element.friendly_class_name()
                if (check):
                         log.info('Parent matched')
+                        if checkName == 'ComboBox':
+                            items=element.texts()
+                            items.pop(0)
+                            newlist=[]
+                            items_list=input_val
+                            for i in range(0,len(items)):
+                                    newlist.append(items[i])
+                                    for i in range(0,len(items_list)):
+                                        if items_list[i] in newlist:
+                                            status = desktop_constants.TEST_RESULT_PASS
+                                            result = desktop_constants.TEST_RESULT_TRUE
+                                        else:
+                                            status = desktop_constants.TEST_RESULT_FAIL
+                                            result = desktop_constants.TEST_RESULT_FALSE
                         #==============================================================
-                        if element.friendly_class_name() == 'ListView' or 'ListBox':
-                            if element.friendly_class_name() == 'ListBox':
+                        elif checkName == 'ListView' or 'ListBox':
+                            if checkName == 'ListBox':
                                 fail_flag=False #will set to true if item is not apart of original list,if set to true result is set to fail
                                 items=element.ItemTexts()
                                 newlist=[]
@@ -688,7 +693,7 @@ class Dropdown_Keywords():
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
 
-                            if element.friendly_class_name() == 'ListView':
+                            if checkName == 'ListView':
                                  items=element.items()
                                  elelist=element.texts()
                                  elelist.pop(0)
@@ -704,21 +709,6 @@ class Dropdown_Keywords():
                                                 status = desktop_constants.TEST_RESULT_FAIL
                                                 result = desktop_constants.TEST_RESULT_FALSE
                         #=================================================================
-                        elif element.friendly_class_name() == 'ComboBox':
-                            items=element.texts()
-                            items.pop(0)
-                            newlist=[]
-                            items_list=input_val
-                            for i in range(0,len(items)):
-                                    newlist.append(items[i])
-                                    for i in range(0,len(items_list)):
-                                        if items_list[i] in newlist:
-                                            status = desktop_constants.TEST_RESULT_PASS
-                                            result = desktop_constants.TEST_RESULT_TRUE
-                                        else:
-                                            status = desktop_constants.TEST_RESULT_FAIL
-                                            result = desktop_constants.TEST_RESULT_FALSE
-
                else:
                    log.info('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'
@@ -884,8 +874,6 @@ class Dropdown_Keywords():
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
-
-
                             if element.friendly_class_name() == 'ListView':
                                 if element.is_active() == False:
                                   element.click()
