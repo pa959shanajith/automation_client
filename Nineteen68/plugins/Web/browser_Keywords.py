@@ -28,11 +28,12 @@ import win32gui
 import win32api
 import readconfig
 import core_utils
+from sendfunction_keys import SendFunctionKeys as SF
 pid_set = set()
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
 class TestThread(threading.Thread):
     """Test Worker Thread Class."""
-
+    
     #----------------------------------------------------------------------
     def __init__(self,url):
         """Init Worker Thread Class."""
@@ -40,27 +41,26 @@ class TestThread(threading.Thread):
         self.url=url
         self.start()
           # start the thread
-
+          
     #----------------------------------------------------------------------
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         time.sleep(2)
         driver_obj.get(self.url[0])
-
-
-
+        
+        
+        
 class BrowserKeywords():
     def __init__(self):
         self.browser_num=''
-
+        
     def __web_driver_exception(self,e):
         log.error(e)
-
         logger.print_on_console(e)
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         return err_msg
-
+        
     def openBrowser(self,webelement,browser_num,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -134,8 +134,8 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
-
-
+        
+        
     def openNewBrowser(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -171,8 +171,8 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
-
-
+        
+        
     def navigateToURL(self ,webelement, url , *args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -181,7 +181,7 @@ class BrowserKeywords():
         try:
             url = url[0]
             if not (url is None and url is ''):
-                url.strip()
+            	url.strip()
                 if url[0:4].lower()!='http' and url[0:4].lower()!='file':
                     url='http://'+url
                 driver_obj.get(url)
@@ -203,7 +203,7 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
-
+        
     def type(self,url):
         """thread worker function"""
         try:
@@ -219,9 +219,9 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return
-
-
-
+        
+        
+        
     def navigate_with_authenticate(self ,webelement, url , *args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -233,21 +233,95 @@ class BrowserKeywords():
                 encryption_obj = AESCipher()
                 input_val = encryption_obj.decrypt(url[2])
                 url[2]=input_val
+                url[3]=int(url[3])
                 t=TestThread(url)
-                import win32gui
-
-                if len(url)>3:
-                    timeout=url[3]
+                keyword_list = ['email','username','ctl00_Content_frmLogin_UserName','login','login_field']         #Possible Keywords for username field
+                if len(url)>4:
+                    timeout=url[4]
                     time.sleep(int(timeout))
-                hwndMain = win32gui.FindWindow(None, "Authentication Required")
-                if hwndMain>0:
-                    self.type(url)
-                    status=webconstants.TEST_RESULT_PASS
-                    result=webconstants.TEST_RESULT_TRUE
+                if(isinstance(driver_obj,webdriver.Ie)):
+                    obj=SF()
+                    username=url[1].strip()
+
+                    match_found_flag = False
+
+                    try:
+                        for i in keyword_list:
+                            try:
+                                username1 = driver_obj.find_element_by_id(i)
+                                username1.send_keys(username)
+                                match_found_flag = True
+                            except:
+                                username1 = driver_obj.find_element_by_name(i)
+                                username1.send_keys(username)
+                                match_found_flag = True
+                            if(match_found_flag):
+                                break
+                        password=url[2]
+                        obj.execute_key('tab',1)
+                        obj.type(password)
+                        obj.execute_key('tab',url[3])
+                        obj.execute_key('enter',1)
+                        status=webconstants.TEST_RESULT_PASS
+                        result=webconstants.TEST_RESULT_TRUE
+                    except:
+                        try:
+                            password=url[2]
+                            obj.type(username)
+                            obj.execute_key('tab',1)
+                            obj.type(password)
+                            obj.execute_key('tab',url[3])
+                            obj.execute_key('enter',1)
+                            status=webconstants.TEST_RESULT_PASS
+                            result=webconstants.TEST_RESULT_TRUE
+                        except:
+                            logger.print_on_console('Navigate with authenticate failed.')
+                            log.error('Navigate with authenticate failed.')
+                            err_msg = 'Navigate with authenticate failed.'
+                            status=webconstants.TEST_RESULT_FAIL
+                            result=webconstants.TEST_RESULT_FALSE
+
                 else:
-                    logger.print_on_console('Authentication popup not found')
-                    log.error('Authentication popup not found')
-                    err_msg = 'Authentication popup not found'
+                    obj=SF()
+                    username=url[1].strip()
+                    match_found_flag = False
+
+                    try:
+                        for i in keyword_list:
+                            try:
+                                username1 = driver_obj.find_element_by_id(i)
+                                username1.send_keys(username)
+                                match_found_flag = True
+                            except:
+                                username1 = driver_obj.find_element_by_name(i)
+                                username1.send_keys(username)
+                                match_found_flag = True
+                            if(match_found_flag):
+                                break
+                        password=url[2]
+                        obj.execute_key('tab',1)
+                        obj.type(password)
+                        obj.execute_key('tab',url[3])
+                        obj.execute_key('enter',1)
+                        status=webconstants.TEST_RESULT_PASS
+                        result=webconstants.TEST_RESULT_TRUE
+                    except:
+                        try:
+                            password=url[2]
+                            obj.type(username)
+                            obj.execute_key('tab',1)
+                            obj.type(password)
+                            obj.execute_key('tab',url[3])
+                            obj.execute_key('enter',1)
+                            status=webconstants.TEST_RESULT_PASS
+                            result=webconstants.TEST_RESULT_TRUE
+                        except:
+                            logger.print_on_console('Navigate with authenticate failed.')
+                            log.error('Navigate with authenticate failed.')
+                            err_msg = 'Navigate with authenticate failed.'
+                            status=webconstants.TEST_RESULT_FAIL
+                            result=webconstants.TEST_RESULT_FALSE
+
             else:
                 logger.print_on_console(webconstants.INVALID_INPUT)
                 log.error(webconstants.INVALID_INPUT)
@@ -262,7 +336,6 @@ class BrowserKeywords():
         result=webconstants.TEST_RESULT_FALSE
         page_title = None
         err_msg=None
-
         try:
             if (driver_obj!= None):
                 page_title= driver_obj.title
@@ -280,7 +353,7 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,page_title,err_msg
-
+        
     def verify_page_title(self,webelement,input_val,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -314,8 +387,8 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
-
-
+        
+        
     def getCurrentURL(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -336,7 +409,7 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,url,err_msg
-
+        
     def verifyCurrentURL(self ,webelement, input_url,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -368,8 +441,8 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
-
-
+        
+        
     def closeBrowser(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -385,7 +458,6 @@ class BrowserKeywords():
                     count+=1
                     if(current_handle == x):
                         break
-
                 count = count - 2
                 webdriver_list[driver_instance].quit()
                 logger.print_on_console('browser closed')
@@ -400,15 +472,14 @@ class BrowserKeywords():
                     a=1
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
-
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         else:
             logger.print_on_console('For this close browser open browser or open new browser is not present')
             log.error('For this close browser open browser or open new browser is not present')
         return status,result,output,err_msg
-
-
+        
+        
     def maximizeBrowser(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -428,7 +499,7 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
-
+        
     def closeSubWindows(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -463,7 +534,7 @@ class BrowserKeywords():
                         log.info('Sub windows closed')
                     except Exception as e:
                         err_msg=self.__web_driver_exception(e)
-
+                        
                 after_close = driver_obj.window_handles
                 after_close = driver_obj.window_handles
                 if(len(after_close) >= 1):
@@ -473,12 +544,12 @@ class BrowserKeywords():
             else:
                 logger.print_on_console('No sub windows to close')
                 log.info('No sub windows to close')
-
+                
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
             driver_obj.switch_to.window(parent_handle)
         return status,result,output,err_msg
-
+        
     def clear_cache(self,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -499,7 +570,7 @@ class BrowserKeywords():
                     driver_obj.delete_all_cookies()
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
-
+                    
                 else:
                     logger.print_on_console('No Cookies found')
                     log.error('No Cookies found')
@@ -511,8 +582,8 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
-
-
+        
+        
 class Singleton_DriverUtil():
 ##    def check_available_driver(self,browser_num):
 ##        global driver_obj
@@ -567,7 +638,7 @@ class Singleton_DriverUtil():
                         except Exception as e:
                             d = 'stale'
                             break
-
+                            
         elif browserType == '2':
             if len(drivermap) > 0:
                 for i in drivermap:
@@ -593,7 +664,7 @@ class Singleton_DriverUtil():
                             break
 ##        drivermap.reverse()
         return d
-
+        
     def getBrowser(self,browser_num):
         driver=None
         log.debug('BROWSER NUM: ')
@@ -601,7 +672,7 @@ class Singleton_DriverUtil():
         logger.print_on_console( 'BROWSER NUM: ',browser_num)
         configobj = readconfig.readConfig()
         configvalues = configobj.readJson()
-
+        
         if (browser_num == '1'):
             chrome_path = configvalues['chrome_path']
             exec_path = webconstants.CHROME_DRIVER_PATH
@@ -618,7 +689,7 @@ class Singleton_DriverUtil():
             drivermap.append(driver)
             logger.print_on_console('Chrome browser started')
             log.info('Chrome browser started')
-
+            
         elif(browser_num == '2'):
             import re
             import win32api
@@ -680,7 +751,7 @@ class Singleton_DriverUtil():
                     log.info('Firefox browser started using geckodriver ')
             except Exception as e:
                 logger.print_on_console(e)
-
+                
         elif(browser_num == '3'):
             caps = webdriver.DesiredCapabilities.INTERNETEXPLORER
             caps['INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS'] = True
@@ -698,17 +769,17 @@ class Singleton_DriverUtil():
             driver.maximize_window()
             logger.print_on_console('IE browser started')
             log.info('IE browser started')
-
+            
         elif(browser_num == '4'):
             driver = webdriver.Opera()
             drivermap.append(driver)
             logger.print_on_console('Opera browser started')
-
+            
         elif(browser_num == '5'):
             driver = webdriver.PhantomJS(executable_path=webconstants.PHANTOM_DRIVER_PATH)
             drivermap.append(driver)
             logger.print_on_console('Phantom browser started')
-
+            
         elif(browser_num == '6'):
             driver = webdriver.Safari()
             drivermap.append(driver)
@@ -716,12 +787,12 @@ class Singleton_DriverUtil():
             log.info('Safari browser started')
 ##        print __driver
         return driver
-
-
-
-
-
-
+        
+        
+        
+        
+        
+        
 ##driver = Singleton_DriverUtil()
 ##driver.driver('1','D:\Browser\chromedriver.exe')
 ##driver.driver('2')
