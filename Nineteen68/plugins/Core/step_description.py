@@ -698,6 +698,14 @@ class StepDescription:
         	return 'Wait until the element'  + "'" + tsp.custname + "'"+  'is exists'
         def VerifyEnabled():
             return ' Verify '+ "'" + tsp.custname + "'" + ' is enabled '
+        def SetDate():
+            return 'Set date '+ inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
+        def GetTime():
+            return 'Get Time From '+ "'" +tsp.custname + "'" + ' and save the time '+ output + ' in ' + output_list+ '.'
+        def GetDate():
+            return 'Get Date From '+ "'" +tsp.custname + "'" + ' and save the date '+ output + ' in ' + output_list+ '.'
+        def SetTime():
+            return 'Enter time '+ inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
         def VerifyElementEnabled():
             return ' Verify '+ "'" + tsp.custname + "'" + ' is enabled '
         def VerifyElementDisabled():
