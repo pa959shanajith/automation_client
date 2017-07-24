@@ -700,6 +700,8 @@ class StepDescription:
             return ' Verify '+ "'" + tsp.custname + "'" + ' is enabled '
         def SetDate():
             return 'Set date '+ inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
+        def SetNumber():
+            return 'Set number '+ inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
         def GetTime():
             return 'Get Time From '+ "'" +tsp.custname + "'" + ' and save the time '+ output + ' in ' + output_list+ '.'
         def GetDate():
