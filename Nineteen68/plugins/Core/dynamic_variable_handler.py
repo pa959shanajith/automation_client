@@ -56,21 +56,22 @@ class DynamicVariables:
                         actual_value=db_result[1]
 
             elif self.check_for_dynamicvariables(input_var)==TEST_RESULT_TRUE:
-                var_list=re.findall("\{(.*?)\}",input_var)
-                for data in var_list:
-                    data='{'+data+'}'
-                    temp_value=self.get_dynamic_value(data)
-                    #changes to fix issue:304-Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
-                    #changes done by jayashree.r
-                    if temp_value is None:
-                        actual_value=temp_value
+##                var_list=re.findall("\{(.*?)\}",input_var)
+                data=input_var[1:-1]
+##                for data in var_list:
+                data='{'+data+'}'
+                temp_value=self.get_dynamic_value(data)
+                #changes to fix issue:304-Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
+                #changes done by jayashree.r
+                if temp_value is None:
+                    actual_value=temp_value
+                else:
+                    if not isinstance(temp_value,unicode):
+                        if actual_value is not None:
+                            actual_value=actual_value.replace(data,str(temp_value))
                     else:
-                        if not isinstance(temp_value,unicode):
-                            if actual_value is not None:
-                                actual_value=actual_value.replace(data,str(temp_value))
-                        else:
-                            if actual_value is not None:
-                                actual_value=actual_value.replace(data,temp_value)
+                        if actual_value is not None:
+                            actual_value=actual_value.replace(data,temp_value)
         return actual_value
 
     #To Store the output from keyword as an array if it is multiple values
@@ -139,7 +140,8 @@ class DynamicVariables:
                 if self.check_for_dynamicvariables(nested_variable[i])==TEST_RESULT_TRUE:
                     if dynamic_variable_map.has_key(nested_variable[i]):
                         replacestring = dynamic_variable_map.get(nested_variable[i])
-
+                if not isinstance(replacestring,basestring):
+                    replacestring = str(replacestring)
                 inputvar = inputvar.replace(nested_variable[i],replacestring)
                 value=inputvar
 

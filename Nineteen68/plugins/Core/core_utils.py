@@ -38,7 +38,7 @@ class CoreUtils():
     #definition to convert to UTF-8 format when input is not within ascii 128
     def get_UTF_8(self,value):
         try:
-            if not isinstance(value,int):
+            if isinstance(value,str) or isinstance(value, list):
                 if isinstance(value, list):
                     for eachvalue in value:
                         if not isinstance(eachvalue,unicode):
@@ -51,6 +51,6 @@ class CoreUtils():
             return value
         except Exception as e:
             log.info(e)
-            
+
 
 
