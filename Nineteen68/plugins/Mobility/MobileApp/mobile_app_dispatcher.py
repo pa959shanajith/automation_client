@@ -15,6 +15,7 @@ import radio_button_keywords_mobility
 import install_and_launch
 import textbox_keywords_mobility
 import slider_util_keywords
+import Number_picker_Keywords
 import swipe_keywords
 import toggle_keywords
 import device_keywords
@@ -50,6 +51,7 @@ class MobileDispatcher:
     table_keywords_object=table_keywords_native.Table_Keywords()
     date_keywords_object=DatePicker_Keywords_Mobility.Date_Keywords()
     time_keywords_object=TimePicker_Keywords_Mobility.Time_Keywords()
+    number_picker_object=Number_picker_Keywords.Number_Picker()
     def __init__(self):
         self.exception_flag=''
 
@@ -147,7 +149,8 @@ class MobileDispatcher:
                     'SetDate' : self.date_keywords_object.Set_Date,
                     'GetDate' : self.date_keywords_object.Get_Date,
                     'SetTime' : self.time_keywords_object.Set_Time,
-                    'GetTime' : self.time_keywords_object.Get_Time
+                    'GetTime' : self.time_keywords_object.Get_Time,
+                    'SetNumber':self.number_picker_object.Select_Number
 
 
                 }

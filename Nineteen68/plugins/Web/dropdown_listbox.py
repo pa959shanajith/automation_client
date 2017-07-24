@@ -117,7 +117,7 @@ class DropdownKeywords():
                     log.info('Count of dropdown/listbox')
                     log.info(iListSize)
                     logger.print_on_console('Count obtained is',iListSize)
-                    if (iListSize > 0):
+                    if (iListSize >= 0):
                         status=webconstants.TEST_RESULT_PASS
                         result=webconstants.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)

@@ -2,7 +2,7 @@ import wx
 import sys
 import os
 from selenium import webdriver
-import browserops
+import browserops_MW
 import clickandadd
 import fullscrape
 
@@ -25,7 +25,7 @@ class ScrapeWindow(wx.Frame):
         self.iconpath = os.environ["NINETEEN68_HOME"] + "\\Nineteen68\\plugins\\Core\\Images" + "\\slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
-        obj = browserops.BrowserOperations()
+        obj = browserops_MW.BrowserOperations()
         self.socketIO = socketIO
         status = obj.openBrowser(browser)
         self.panel = wx.Panel(self)

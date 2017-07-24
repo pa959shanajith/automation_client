@@ -33,11 +33,11 @@ class SliderKeywords():
     def find_coordinates_vertical(self):
         size=install_and_launch.driver.get_window_size()
         log.debug('Window size is '+str(size))
-        starty=(size['width']*0.80)
-        endy=(size['width']*0.30)
-        startx=(size['height']/2)
-        log.debug(startx,starty,endy)
-        return startx,starty,endy
+        min_y=(size['height']/4)
+        max_y=(size['height']/1.2)
+        x_Value=(size['width']*0.50)
+        log.debug(x_Value,max_y,min_y)
+        return x_Value,max_y,min_y
 
 
 
@@ -89,12 +89,12 @@ class SliderKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            startx,starty,endy=self.find_coordinates_vertical()
+            x_Value,max_y,min_y=self.find_coordinates_vertical()
             #Swipe from down to up
             if platform.system() == 'Darwin':
                 install_and_launch.driver.execute_script('mobile: scroll', {'direction': 'down'})
             else:
-                install_and_launch.driver.swipe(startx, starty, startx, endy, 3000)
+                install_and_launch.driver.swipe(x_Value, max_y, x_Value, min_y, 3000)
             time.sleep(3)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
@@ -114,9 +114,9 @@ class SliderKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            startx,starty,endx=self.find_coordinates_vertical()
+            x_Value,max_y,min_y=self.find_coordinates_vertical()
             #Swipe from up to bottom
-            install_and_launch.driver.swipe(startx, endx, startx, starty, 3000)
+            install_and_launch.driver.swipe(x_Value, min_y, x_Value, max_y, 3000)
             time.sleep(3)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
