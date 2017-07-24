@@ -90,21 +90,20 @@ class Delay_keywords:
 ##                  changes done by jayashree.r
 ##                  if y == 'None' or y == None:
 ##                    logger.print_on_console(dv_check.get_dynamic_value(x))
-
+                    
                     if y == None:
                         y = 'null'
                     if not((x.startswith('{') and x.endswith('}')) or (x.startswith('|') and x.endswith('|'))):
                         flag_invalid_syntax=True
                     elif x.startswith('{') and x.endswith('}') and dv_check.get_dynamic_value(x)!=y:
                         y=""
-                        logger.print_on_console("please provide the valid variable name.")
+                        logger.print_on_console("Dynamic variable doesn't exist")
                     elif x.startswith('|') and x.endswith('|') and x.count('|')!=2:
                         y=""
-                        logger.print_on_console("please provide the valid variable name.")
+                        logger.print_on_console("Static variable doesn't exist")
                         
-##                    if not isinstance(y,unicode):
-##                        print str(y)
-##                        y=str(y)
+                    if not isinstance(y,unicode):
+                        y=str(y)
 ##                    display_input+=x+' = '+(y if type(y)==str else repr(y))+'\n'
 
                     display_input+=x+' = '+y+'\n'

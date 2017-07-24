@@ -8,7 +8,6 @@
 # Copyright:   (c) wasimakram.sutar 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-
 import if_step
 import for_step
 import getparam
@@ -33,27 +32,17 @@ import threading
 from datetime import datetime
 import logging
 import time
-
-
-
-
 #index for iterating the teststepproperty for executor
 i = 0
-
 #Terminate Flag
 terminate_flag=False
 pause_flag=False
 break_point=-1
 socket_object = None
-
-
 thread_tracker = []
 log = logging.getLogger("controller.py")
-
-
 class TestThread(threading.Thread):
     """Test Worker Thread Class."""
-
     #----------------------------------------------------------------------
     def __init__(self,browser,mythread):
         """Init Worker Thread Class."""
@@ -63,14 +52,11 @@ class TestThread(threading.Thread):
         self.browser = browser
         self.thread=mythread
         self.start()    # start the thread
-
     #----------------------------------------------------------------------
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         try:
-
-
             time.sleep(2)
             con = Controller()
 ##            print 'Controller object created'
@@ -80,14 +66,9 @@ class TestThread(threading.Thread):
                 logger.print_on_console( '---------Termination Completed-------')
             else:
                 logger.print_on_console('***SUITE EXECUTION COMPLETED***')
-
         except Exception as m:
             print m
-
-
-
 class Controller():
-
     generic_dispatcher_obj = None
     mobile_web_dispatcher_obj = None
     web_dispatcher_obj = None
@@ -97,9 +78,6 @@ class Controller():
     desktop_dispatcher_obj = None
     sap_dispatcher_obj = None
     mobile_app_dispatcher_obj = None
-
-
-
     def __init__(self):
         self.get_all_the_imports(CORE)
         self.__load_generic()
@@ -124,8 +102,6 @@ class Controller():
         self.debugfrom_step=1
         self.configvalues={}
         self.core_utilsobject = core_utils.CoreUtils()
-
-
     def __load_generic(self):
         try:
             if self.generic_dispatcher_obj==None:
@@ -133,11 +109,8 @@ class Controller():
                 self.get_all_the_imports('Generic')
                 import generic_dispatcher
                 self.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
-
-
         except Exception as e:
             logger.print_on_console('Error loading Generic plugin')
-
     def __load_mobile_web(self):
         try:
             if self.mobile_web_dispatcher_obj==None:
@@ -147,7 +120,6 @@ class Controller():
                 self.mobile_web_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading MobileWeb plugin')
-
     def __load_mobile_app(self):
         try:
             if self.mobile_app_dispatcher_obj==None:
@@ -159,10 +131,8 @@ class Controller():
                 import mobile_app_dispatcher
                 self.mobile_app_dispatcher_obj = mobile_app_dispatcher.MobileDispatcher()
                 self.mobile_app_dispatcher_obj.action=self.action
-
         except Exception as e:
             logger.print_on_console('Error loading MobileApp plugin')
-
     def __load_webservice(self):
         try:
             self.get_all_the_imports('WebServices')
@@ -170,7 +140,6 @@ class Controller():
             self.webservice_dispatcher_obj = websevice_dispatcher.Dispatcher()
         except Exception as e:
             logger.print_on_console('Error loading Web services plugin')
-
     def __load_oebs(self):
         try:
             self.get_all_the_imports('Oebs')
@@ -180,9 +149,6 @@ class Controller():
             self.oebs_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading OEBS plugin')
-
-
-
     def __load_web(self):
         try:
 ##            self.get_all_the_imports('ImageProcessing')
@@ -192,11 +158,8 @@ class Controller():
             self.web_dispatcher_obj = web_dispatcher.Dispatcher()
             self.web_dispatcher_obj.exception_flag=exception_flag
             self.web_dispatcher_obj.action=self.action
-
-
         except Exception as e:
              logger.print_on_console('Error loading Web plugin')
-
     def __load_desktop(self):
         try:
             self.get_all_the_imports('Desktop2')
@@ -209,7 +172,6 @@ class Controller():
             #--------------------------------------------------------------------------------SAP change
     def __load_sap(self):
         try:
-
             self.get_all_the_imports('SAP')
             #logger.print_on_console('all imports',get_all_the_imports('SAP'))
             import sap_dispatcher
@@ -223,11 +185,9 @@ class Controller():
             traceback.print_exc()
             logger.print_on_console('Error loading SAP plugin',e)
     #--------------------------------------------------------------------------------SAP change
-
     def dangling_status(self,index):
         step=handler.tspList[index]
         return step.executed
-
     ## Issue #157 Missing endif  messge updated
     def check_dangling(self,tsp,index):
         status=True
@@ -238,30 +198,24 @@ class Controller():
                 if tsp.name.lower() in [ENDFOR,ENDLOOP]:
                     index=info_dict[0].keys()[0]
                     status=self.dangling_status(index)
-
                 if tsp.name.lower() in [IF,ELSE_IF,ELSE,ENDIF]:
-
                     if tsp.name.lower() in [IF]:
                         status= info_dict[-1].values()[0].lower() == ENDIF
                         if not(status):
                             errormsg="Execution Terminated : EndIf is missing"
-
                     elif tsp.name.lower() in [ELSE_IF,ELSE]:
                         status1= info_dict[-1].values()[0] == ENDIF
                         status2= info_dict[0].keys()[0] != index
                         status = status1 and status2
                         if not(status1):
                             errormsg="Execution Terminated : EndIf is missing"
-
                     elif tsp.name.lower() in [ENDIF]:
                         index=info_dict[-1].keys()[0]
                         status=self.dangling_status(index)
-
             else:
                 status=False
             if tsp.name.lower()==ENDLOOP and len(info_dict)<2:
                 status=False
-
         if not(status) and len(errormsg)>0:
             logger.print_on_console(errormsg+' in '+tsp.testscript_name+'\n')
             log.error(errormsg+' in '+tsp.testscript_name)
@@ -269,7 +223,6 @@ class Controller():
             logger.print_on_console('Dangling: '+tsp.name +' in '+tsp.testscript_name+'\n')
             log.error('Dangling: '+tsp.name +' in '+tsp.testscript_name)
         return status
-
     def __print_details(self,tsp,input,inpval):
         keyowrd='Keyword : '+tsp.name
         input_val='Input :'+str(input)
@@ -282,12 +235,9 @@ class Controller():
         for i in range(len(inpval)):
             log.info('Input: '+str(i + 1)+ '= '+repr(inpval[i]))
             ##logger.print_on_console('Input: '+str(i + 1)+ '= ',inpval[i])
-
     def clear_data(self):
         global terminate_flag,pause_flag
         terminate_flag=pause_flag=False
-
-
     def resume_execution(self):
         logger.print_on_console('=======Resuming=======')
         log.info('=======Resuming=======')
@@ -301,8 +251,6 @@ class Controller():
         except Exception as e:
             log.error('Debug is not paused to Resume')
             logger.print_on_console('Debug is not paused to Resume')
-
-
     def pause_execution(self):
         logger.print_on_console('=======Pausing=======')
         log.info('=======Pausing=======')
@@ -312,10 +260,7 @@ class Controller():
             while self.conthread.paused:
                 self.conthread.pause_cond.wait()
         log.debug('Wait is sover')
-
-
     def methodinvocation(self,index,*args):
-
         global pause_flag
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
 		#COmapring breakpoint with the step number of tsp instead of index - (Sushma)
@@ -326,29 +271,21 @@ class Controller():
             if self.debug_choice=='RunfromStep' and self.debugfrom_step>0 and tsp.stepnum < self.debugfrom_step :
                 return index +1
             pause_flag=True
-
         keyword_flag=True
         #Check for 'terminate_flag' before execution
         if not(terminate_flag):
             #Check for 'pause_flag' before executionee
-
             if pause_flag:
                 self.pause_execution()
-
             start_time = datetime.now()
             if(self.check_dangling(tsp,index)):
-
                 input = tsp.inputval[0]
                 addtionalinfo = tsp.additionalinfo
-
-
-
                 if input.find(IGNORE_THIS_STEP) != -1 :
                     #Skip the current step execution
                     #update in the report
                     #increment the tsp index to point to next step and continue
                     index += 1
-
                 else:
                     if addtionalinfo != None:
                         if addtionalinfo == IGNORE_THIS_STEP:
@@ -356,22 +293,17 @@ class Controller():
                             #update in the report
                             #increment the tsp index to point to next step and continue
                             index += 1
-
                 #Logic to split input and handle dynamic variables
                 rawinput = tsp.inputval
                 if len(args) > 0:
                     rawinput = args[0]
-
                 inpval=self.split_input(rawinput,tsp.name)
                 if tsp.name.lower() not in [FOR,ENDFOR] :
                     #Print the details of keyword
                     self.__print_details(tsp,input,inpval)
-
                 #Calculating Start time
                 logger.print_on_console('Step number is : ',tsp.stepnum)
                 log.info('Step number is : '+str(tsp.stepnum))
-
-
                 if tsp != None and isinstance(tsp,TestStepProperty) :
                     log.info( "----Keyword :"+str(tsp.name)+' execution Started----')
                     start_time = datetime.now()
@@ -394,17 +326,12 @@ class Controller():
                         self.jumpto_previousindex.append(index+1)
                         index,counter = tsp.invoke_jumpto(inpval,self.reporting_obj,self.counter)
                         self.counter.append(counter)
-
             else:
-
                 index= TERMINATE
                 self.status=index
         else:
             index= TERMINATE
             self.status=index
-
-
-
         ellapsed_time=''
         statusflag = self.step_execution_status(tsp)
         if keyword_flag:
@@ -420,31 +347,24 @@ class Controller():
                     self.reporting_obj.overallstatus=self.status
             elif self.status == TERMINATE:
                 self.reporting_obj.overallstatus=self.status
-
         if self.action==EXECUTE:
 ##            self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
             if statusflag:
                 self.reporting_obj.generate_report_step(tsp,'',self,ellapsed_time,keyword_flag,result)
             else:
                 self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result)
-
 ##      Issue #160
         if index==STOP:
             return index
         if len(self.counter)>0 and self.counter[-1]>-1 and self.counter[-1]-index==0:
             return JUMP_TO
-
         return index
-
     def split_input(self,input,keyword):
         inpval = []
         input_list=[]
-
         input_list = input[0].split(SEMICOLON)
-
         if keyword in WS_KEYWORDS or keyword == 'navigateToURL':
             input_list=[input[0]]
-
         elif keyword in DYNAMIC_KEYWORDS:
             input_list=[]
             string=input[0]
@@ -454,14 +374,11 @@ class Controller():
                 input_list.append(string[index+1:len(string)])
             elif string != '':
                 input_list.append(string)
-
         for x in input_list:
         #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
             x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
             inpval.append(x)
-
         return inpval
-
     def store_result(self,result_temp,tsp):
         output=tsp.outputval.split(SEMICOLON)
         result=result_temp
@@ -471,23 +388,20 @@ class Controller():
         if result[-2] == OUTPUT_CONSTANT:
             keyword_response=result[-3]
         display_keyword_response=keyword_response
-
         if len(result_temp)>4:
             tsp.additionalinfo=result_temp[-1]
         elif result_temp[2] != OUTPUT_CONSTANT:
             tsp.additionalinfo=result_temp[2]
             display_keyword_response=result_temp[2]
-
 		#To Handle dynamic variables of DB keywords
         if tsp.name.lower() in DATABASE_KEYWORDS:
             if keyword_response != []:
                 display_keyword_response='DB data fetched'
-
         if(tsp.apptype.lower() == 'webservice' and tsp.name == 'executeRequest'):
             if len(display_keyword_response) == 2:
                 logger.print_on_console('Response Header: \n',display_keyword_response[0])
                 #data size check
-                if self.core_utilsobject.getdatasize(display_keyword_response[1],'mb') < 5:
+                if self.core_utilsobject.getdatasize(display_keyword_response[1],'mb') < 10:
                     if 'soap:Envelope' in display_keyword_response[1]:
                         from lxml import etree
                         root = etree.fromstring(display_keyword_response[1])
@@ -504,33 +418,34 @@ class Controller():
                 logger.print_on_console('Response Header: ',display_keyword_response[0])
             else:
                 #data size check
-                if self.core_utilsobject.getdatasize(display_keyword_response,'mb') < 5:
+                if self.core_utilsobject.getdatasize(display_keyword_response,'mb') < 10:
                     if not isinstance(display_keyword_response,list):
                         logger.print_on_console('Result obtained is ',display_keyword_response)
                     else:
-                        logger.print_on_console('Result obtained is ',",".join([display_keyword_response[i] for i in range(len(display_keyword_response))]))
+                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i]) 
+                        if not isinstance(i,basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
                 else:
                     logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         else:
             #data size check
-            if self.core_utilsobject.getdatasize(display_keyword_response,'mb') < 5:
+            if self.core_utilsobject.getdatasize(display_keyword_response,'mb') < 10:
                 if not isinstance(display_keyword_response,list):
                     logger.print_on_console('Result obtained is ',display_keyword_response)
                 else:
-                    logger.print_on_console('Result obtained is ',",".join([display_keyword_response[i] for i in range(len(display_keyword_response))]))
+                    if(tsp.apptype.lower() == 'webservice' and tsp.name == 'getHeader'):
+                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i]) 
+                        if not isinstance(i,basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
+                    else:
+                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i]) 
+                        if not isinstance(i,basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))                 
             else:
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         log.info('Result obtained is: ')
         log.info(display_keyword_response)
-
-
-
         if len(output)>0 and output[0] != '':
             self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response,tsp.name)
-
         if len(output)>1:
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
-
     def keywordinvocation(self,index,inpval,*args):
         #configobj = readconfig.readConfig()
         global socket_object
@@ -546,18 +461,14 @@ class Controller():
         if not(terminate_flag):
             #Check for 'pause_flag' before execution
             if pause_flag:
-
                 self.pause_execution()
-
             teststepproperty = handler.tspList[index]
             keyword=teststepproperty.name
-
             #Custom object implementation for Web
             if teststepproperty.objectname==CUSTOM:
                 if self.verify_exists==False:
                     previous_step=handler.tspList[index-1]
                     apptype=previous_step.apptype.lower()
-
                     if  apptype in self.verify_dict and previous_step.name==self.verify_dict[apptype]:
                         self.previous_step=previous_step
                         teststepproperty.custom_flag=True
@@ -572,7 +483,6 @@ class Controller():
             #Fixed OEBS custom reference defect #398
             elif keyword in [VERIFY_EXISTS,VERIFY_VISIBLE] and self.verify_exists:
                 self.verify_exists=False
-
             #Checking of  Drag and Drop keyowrds Issue #115 in Git
             if teststepproperty.name==DROP:
                 log.debug('Drop keyword encountered')
@@ -581,8 +491,6 @@ class Controller():
                     teststepproperty.execute_flag=False
                     result=list(result)
                     result[3]='Drag Keyword is missing'
-
-
             elif keyword==DRAG:
                 log.debug('Drag keyword encountered')
                 if(index+1)<len(handler.tspList):
@@ -591,14 +499,8 @@ class Controller():
                         teststepproperty.execute_flag=False
                         result=list(result)
                         result[3]='Drop Keyword is missing'
-
-
-
-
-
             #get the output varible from the teststep property
             outputstring = teststepproperty.outputval
-
             if teststepproperty.execute_flag:
                 #Check the apptype and pass to perticular module
                 if teststepproperty.apptype.lower() == APPTYPE_GENERIC:
@@ -606,69 +508,56 @@ class Controller():
                     if self.generic_dispatcher_obj == None:
                         self.__load_generic()
                     result = self.invokegenerickeyword(teststepproperty,self.generic_dispatcher_obj,inpval)
-
                 elif teststepproperty.apptype.lower() == APPTYPE_WEB:
                     #Web apptype module call
                     if self.web_dispatcher_obj == None:
                         self.__load_web()
                     result = self.invokewebkeyword(teststepproperty,self.web_dispatcher_obj,inpval,args[0])
-
                 elif teststepproperty.apptype.lower() == APPTYPE_MOBILE:
                     #MobileWeb apptype module call
                     if self.mobile_web_dispatcher_obj == None:
                         self.__load_mobile_web()
                     result = self.invokemobilekeyword(teststepproperty,self.mobile_web_dispatcher_obj,inpval,args[0])
-
                 elif teststepproperty.apptype.lower() == APPTYPE_MOBILE_APP:
                     #MobileApp apptype module call
                     if self.mobile_app_dispatcher_obj==None:
                         self.__load_mobile_app()
                     result = self.invokemobileappkeyword(teststepproperty,self.mobile_app_dispatcher_obj,inpval,args[0])
-
                 elif teststepproperty.apptype.lower() == APPTYPE_WEBSERVICE:
                     #Webservice apptype module call
                     if self.webservice_dispatcher_obj == None:
                         self.__load_webservice()
                     result = self.invokewebservicekeyword(teststepproperty,self.webservice_dispatcher_obj,inpval,socket_object)
-
                 elif teststepproperty.apptype.lower() == APPTYPE_DESKTOP:
                     #Desktop apptype module call
                     if self.desktop_dispatcher_obj == None:
                         self.__load_desktop()
                     result = self.invokeDesktopkeyword(teststepproperty,self.desktop_dispatcher_obj,inpval)
                     #----------------------------------------------------------------------------------------------SAP change
-
-
                 elif teststepproperty.apptype.lower() == APPTYPE_SAP:
                     #SAP apptype module call
                     if self.sap_dispatcher_obj == None:
                         self.__load_sap()
                     result = self.invokeSAPkeyword(teststepproperty,self.sap_dispatcher_obj,inpval)
                 #----------------------------------------------------------------------------------------------SAP change
-
                 elif teststepproperty.apptype.lower() == APPTYPE_DESKTOP_JAVA:
                     #OEBS apptype module call
                     if self.oebs_dispatcher_obj == None:
                         self.__load_oebs()
                     result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
-
 			#Fixed issue num #389 (Taiga)
             temp_result=result
-
             if result!=TERMINATE:
                 temp_result=list(result)
                 if  len(temp_result)>2 and temp_result[2]==OUTPUT_CONSTANT:
                     temp_result[2]=None
                 if len(temp_result)>4:
                     temp_result=temp_result[0:-1]
-
-
             if pause_flag:
                 self.pause_execution()
 ##            logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',temp_result)
             log.info('Result in methodinvocation : '+ str(teststepproperty.name)+' : ')
             log.info(result)
-
             self.keyword_status=TEST_RESULT_FAIL
             if result!=TERMINATE:
                 self.store_result(result,teststepproperty)
@@ -678,14 +567,10 @@ class Controller():
             else:
                 index=result
                 self.status=result
-
             #Fixing issue #382
             logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n')
             log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
-
-
 ##            print '\n'
-
             #Checking for stop keyword
             if teststepproperty.name==STOP:
                 ## Issue #160
@@ -693,8 +578,6 @@ class Controller():
             return index,result
         else:
             return index,TERMINATE
-
-
     def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread):
         i=0
         status=True
@@ -711,7 +594,6 @@ class Controller():
                     self.pause_execution()
                 self.last_tc_num=last_tc_num
                 self.debugfrom_step=debugfrom_step
-
                 try:
                     i = self.methodinvocation(i)
                     if i== TERMINATE:
@@ -729,7 +611,6 @@ class Controller():
                         if len(self.jumpto_previousindex)>0 and len(self.counter)>0:
                             self.jumpto_previousindex.pop()
                             self.counter.pop()
-
                 except Exception as e:
                     log.error(e)
                     logger.print_on_console(e)
@@ -741,30 +622,24 @@ class Controller():
                 self.reporting_obj.overallstatus=TERMINATE
                 status=TERMINATE
                 break
-
         self.scenario_end_time=datetime.now()
         end_time_string=self.scenario_end_time.strftime(TIME_FORMAT)
         logger.print_on_console('Scenario Execution end time is : '+end_time_string)
-
         self.scenario_ellapsed_time=self.scenario_end_time-self.scenario_start_time
         if terminate_flag:
             #Indication of user_termination to report_obj to add a proper description in report - (Sushma)
             self.reporting_obj.user_termination=True
         self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
         logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
-
         return status
-
     def invokegenerickeyword(self,teststepproperty,dispatcher_obj,inputval):
         keyword = teststepproperty.name
         res = dispatcher_obj.dispatcher(teststepproperty,self.wx_object,self.conthread,*inputval)
         return res
-
     def invokeoebskeyword(self,teststepproperty,dispatcher_obj,inputval):
         keyword = teststepproperty.name
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
         return res
-
     def invokewebservicekeyword(self,teststepproperty,dispatcher_obj,inputval,socket_object):
         keyword = teststepproperty.name
         if keyword == 'setTagValue' or keyword == 'setTagAttribute':
@@ -774,26 +649,18 @@ class Controller():
                 handler.ws_template=''
         res = dispatcher_obj.dispatcher(teststepproperty,socket_object,*inputval)
         return res
-
     def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
-
         keyword = teststepproperty.name
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
         return res
-
     def invokemobilekeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
-
         keyword = teststepproperty.name
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
         return res
-
     def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
-
         keyword = teststepproperty.name
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
         return res
-
-
     def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval):
         keyword = teststepproperty.name
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
@@ -812,7 +679,6 @@ class Controller():
             for d in dirs:
                 p = path + '\\' + d
                 sys.path.append(p)
-
     def invoke_debug(self,mythread,runfrom_step,json_data):
         status=COMPLETED
         global break_point
@@ -825,15 +691,13 @@ class Controller():
 ##        flag=True
 ##        scenario1=json_data
         #______reading from file
-
         scenario=[json_data]
-
         print( '=======================================================================================================')
         log.info('***DEBUG STARTED***')
         logger.print_on_console('***DEBUG STARTED***')
         print( '=======================================================================================================')
         for d in scenario:
-            flag,browser_type,last_tc_num=obj.parse_json(d)
+            flag,browser_type,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(d)
             if flag == False:
                 break
             print '\n'
@@ -842,7 +706,6 @@ class Controller():
                 if tsplist[k].name.lower() == 'openbrowser':
                     if tsplist[k].apptype.lower()=='web':
                         tsplist[k].inputval = browser_type
-
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
@@ -862,18 +725,18 @@ class Controller():
         obj.clear_dyn_variables()
         return status
 
-
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues):
         global terminate_flag
         obj = handler.Handler()
         status=COMPLETED
         condition_check_flag = False
+        testcase_empty_flag = False
+        info_msg=''
 ##        t = test.Test()
 ##        suites_list,flag = t.gettsplist()
         #Getting all the details by parsing the json_data
         suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path=obj.parse_json_execute(json_data)
         self.action=EXECUTE
-
         log.info( 'No  of Suites : '+str(len(suiteId_list)))
         logger.print_on_console('No  of Suites : ',len(suiteId_list))
         j=1
@@ -882,8 +745,6 @@ class Controller():
             #EXECUTION GOES HERE
             status = False
             flag=True
-
-
             if terminate_flag:
                 status=TERMINATE
 ##                break
@@ -893,11 +754,8 @@ class Controller():
             logger.print_on_console('***SUITE ', j ,' EXECUTION STARTED***')
             log.info('-----------------------------------------------')
             print( '=======================================================================================================')
-
             do_not_execute = False
-
             #Check for the disabled scenario
-
             if not (do_not_execute) :
                 i=0
                  #Logic to Execute each suite for each of the browser
@@ -909,6 +767,21 @@ class Controller():
                         con.configvalues=configvalues
                         con.wx_object=wxObject
                         handler.tspList=[]
+
+                        #Custom logic here to check empty testcase and if empty, terminate the scnerio execution
+                        for d in [eval(scenario[scenario_id])]:
+                            if terminate_flag:
+                                break
+                            flag,browser_temp,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(d,dataparam_path_value)
+                            if(testcase_empty_flag):
+                                terminate_flag = True
+                                condition_check_flag = True
+                                info_msg=str("Scenario cannot be executed, since the following testcases are empty: "+','.join(empty_testcase_names))
+                                logger.print_on_console(info_msg)
+                                log.info(info_msg)
+                                status = TERMINATE
+
+
                         #condition check for scenario execution and reporting for condition check
                         if not(condition_check_flag):
                              #check for temrinate flag before printing loggers
@@ -919,31 +792,24 @@ class Controller():
                                 log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
                             #Iterating through each test case in the scenario
                             for d in [eval(scenario[scenario_id])]:
-
                                 #check for temrinate flag before parsing tsp list
                                 if terminate_flag:
                                     break
-                                flag,browser_temp,last_tc_num=obj.parse_json(d,dataparam_path_value)
-
+                                flag,browser_temp,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(d,dataparam_path_value)
                                 if flag == False:
                                     break
                                 print '\n'
                                 tsplist = handler.tspList
-
                                 if len(tsplist)==0:
                                     continue
                                 for k in range(len(tsplist)):
                                     if tsplist[k].name.lower() == 'openbrowser':
                                         if tsplist[k].apptype.lower()=='web':
                                             tsplist[k].inputval = [browser]
-
-
                             if len(handler.tspList)==0:
                                 execute_flag=False
                                 logger.print_on_console('Scenario '+str((i  + 1 ) )+' is empty')
                                 log.info('Scenario '+str((i  + 1 ) )+' is empty')
-
-
                             if flag and execute_flag :
                                 #check for temrinate flag before execution
                                 tsplist = obj.read_step()
@@ -954,7 +820,6 @@ class Controller():
                                     print( '=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
                                     print( '=======================================================================================================')
-
 ##                            else:
 ##                                print 'Invalid script'
                             if execute_flag:
@@ -980,20 +845,30 @@ class Controller():
                                             logger.print_on_console('Condition Check: Terminated by program ')
                             else:
                                 i+=1
-
                         else:
-                            logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
-                            log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
-                            os.chdir(self.cur_dir)
-                            filename='Scenario'+str(i  + 1)+'.json'
-                            con.reporting_obj.save_report_json_conditioncheck(filename)
-                            socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck(suite_id,scenario_id,con,execution_id))
-                            obj.clearList(con)
-                            i+=1
-                            #logic for condition check
-                            report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+                            if (testcase_empty_flag):
+                                logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
+                                log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
+                                os.chdir(self.cur_dir)
+                                filename='Scenario'+str(i  + 1)+'.json'
+                                con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg)
 
-
+                                socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck_testcase_empty(suite_id,scenario_id,con,execution_id))
+                                obj.clearList(con)
+                                i+=1
+                                #logic for condition check
+                                report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+                            else:
+                                logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
+                                log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
+                                os.chdir(self.cur_dir)
+                                filename='Scenario'+str(i  + 1)+'.json'
+                                con.reporting_obj.save_report_json_conditioncheck(filename)
+                                socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck(suite_id,scenario_id,con,execution_id))
+                                obj.clearList(con)
+                                i+=1
+                                #logic for condition check
+                                report_json=con.reporting_obj.report_json[OVERALLSTATUS]
             log.info('---------------------------------------------------------------------')
             print( '=======================================================================================================')
             log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
@@ -1008,7 +883,6 @@ class Controller():
             logger.print_on_console( '***Terminating the Execution***')
             print( '=======================================================================================================')
         return status
-
     #Building of Dictionary to send back toserver to save the data
     def getreport_data(self,testsuite_id,scenario_id,con,execution_id):
         obj={'testsuiteId':testsuite_id,
@@ -1025,6 +899,14 @@ class Controller():
         'executionId':execution_id}
         return obj
 
+    #Building of Dictionary to send back toserver to save the data for condition check for testcase empty
+    def getreport_data_conditioncheck_testcase_empty(self,testsuite_id,scenario_id,con,execution_id):
+        obj={'testsuiteId':testsuite_id,
+        'scenarioId':scenario_id,
+        'reportData':con.reporting_obj.report_json_condition_check_testcase_empty,
+        'executionId':execution_id}
+        return obj
+
     def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,wxObject,socketIO,*args):
         status = COMPLETED
         global terminate_flag,break_point,pause_flag,socket_object
@@ -1037,8 +919,6 @@ class Controller():
         self.debug_choice=wxObject.choice
         if action.lower()==EXECUTE:
             self.execution_mode=SERIAL
-
-
             #Parallel Execution
             obj=handler.Handler()
 ##            kill_process()
@@ -1054,8 +934,6 @@ class Controller():
         if status != TERMINATE:
             status=COMPLETED
         return status
-
-
     def invoke_parralel_exe(self,action,input_breakpoint,mythread):
         #create a ThreadPoolExecutor to perform parallel execution
         executor = ThreadPoolExecutor(max_workers=len(browsers))
@@ -1064,7 +942,6 @@ class Controller():
         for browser in range(len(browsers)):
             #create a future object and start execution
             future = executor.submit(TestThread(browsers[browser],mythread))
-
             #Store the future object to track in future
             thread_tracker.append(future)
             time.sleep(2)
@@ -1081,9 +958,7 @@ class Controller():
                         logger.print_on_console( 'Update the result json as complete')
                 executor.shutdown()
                 break
-
         logger.print_on_console ('Parallel execution completed')
-
     def step_execution_status(self,teststepproperty):
         #325 : Report - Skip status in report by providing value 0 in the output column in testcase grid is not handled.
         outputstring = teststepproperty.outputval
@@ -1097,11 +972,6 @@ class Controller():
             elif outputstring== STEPSTATUS_INREPORTS_ZERO:
                 nostatusflag = True
         return nostatusflag
-
-
-
-
-
 def kill_process():
     import tempfile
     import psutil
@@ -1128,9 +998,7 @@ def kill_process():
     except Exception as e:
         log.error(e)
         logger.print_on_console(e)
-
 ##    import os, shutil
-
     try:
         import browser_Keywords
         pidset = browser_Keywords.pid_set
@@ -1142,7 +1010,6 @@ def kill_process():
         browser_Keywords.pid_set.clear()
     except Exception as e:
         log.error(e)
-
     try:
         time.sleep(3)
         try:
@@ -1172,7 +1039,6 @@ def kill_process():
             log.error('Error while deleting file/folder')
     except Exception as e:
         log.error('Error while deleting file/folder')
-
 #main method
 if __name__ == '__main__':
 ##    kill_process()
@@ -1198,75 +1064,40 @@ if __name__ == '__main__':
 ##
 ##        else:
 ##            print 'Invalid script'
-
     #To execute from main method
     #obj=Controller()
     json_data={
-
 	"suitedetails": [{
-
 		"ts1": [{
-
 			"f432bd8c-ccc3-462f-9281-40fded159eeb": [{
-
 				"template": "",
-
 				"testcase": "[{ \"outputVal\": \"\", \"keywordVal\": \"openBrowser\", \"objectName\": \" \", \"_id_\": \"1\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 1, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [\"this is first remark\", \"this is second remark\"] }, { \"outputVal\": \"\", \"keywordVal\": \"navigateToURL\", \"objectName\": \" \", \"_id_\": \"2\", \"inputVal\": [\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\"], \"appType\": \"Web\", \"stepNo\": 2, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"3\", \"inputVal\": [\"{a};D:\\\\OEBS\"], \"appType\": \"Generic\", \"stepNo\": 3, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"4\", \"inputVal\": [\"{b};txt\"], \"appType\": \"Generic\", \"stepNo\": 4, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"{1}\", \"keywordVal\": \"verifyExists\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"5\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 5, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"displayVariableValue\", \"objectName\": \" \", \"_id_\": \"6\", \"inputVal\": [\"{1}\"], \"appType\": \"Generic\", \"stepNo\": 6, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"click\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"7\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 7, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"sendFunctionKeys\", \"objectName\": \" \", \"_id_\": \"8\", \"inputVal\": [\"ctrl+s\"], \"appType\": \"Generic\", \"stepNo\": 8, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"saveFile\", \"objectName\": \" \", \"_id_\": \"9\", \"inputVal\": [\"{a};{b}\"], \"appType\": \"Generic\", \"stepNo\": 9, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }]",
-
 				"testcasename": "Dev_Testing1"
-
 			}, {
-
 				"template": "",
-
 				"testcase": "[{\"stepNo\":1,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"doubleClick\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Comments updated\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"1\"},{\"stepNo\":2,\"objectName\":\" \",\"custname\":\"@Generic\",\"keywordVal\":\"captureScreenshot\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Remarks for step 2\",\"url\":\" \",\"appType\":\"Generic\",\"_id_\":\"2\"},{\"stepNo\":3,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"getElementText\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 3\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"3\"},{\"stepNo\":4,\"objectName\":\" \",\"custname\":\"@Browser\",\"keywordVal\":\"getCurrentURL\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 4\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"4\"}]",
-
 				"testcasename": "Dev_Testing"
-
 			}]
-
 		}],
-
 		"scenarioIds": ["f432bd8c-ccc3-462f-9281-40fded159eeb"],
-
 		"browserType": ["1",'3']
-
 	}, {
-
 		"ts2": [{
-
 			"f432bd8c-ccc3-462f-9281-40fded159ccb": [{
-
 				"template": "",
-
 				"testcase": "[{ \"outputVal\": \"\", \"keywordVal\": \"openBrowser\", \"objectName\": \" \", \"_id_\": \"1\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 1, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [\"this is first remark\", \"this is second remark\"] }, { \"outputVal\": \"\", \"keywordVal\": \"navigateToURL\", \"objectName\": \" \", \"_id_\": \"2\", \"inputVal\": [\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\"], \"appType\": \"Web\", \"stepNo\": 2, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"3\", \"inputVal\": [\"{a};D:\\\\OEBS\"], \"appType\": \"Generic\", \"stepNo\": 3, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"4\", \"inputVal\": [\"{b};txt\"], \"appType\": \"Generic\", \"stepNo\": 4, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"{1}\", \"keywordVal\": \"verifyExists\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"5\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 5, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"displayVariableValue\", \"objectName\": \" \", \"_id_\": \"6\", \"inputVal\": [\"{1}\"], \"appType\": \"Generic\", \"stepNo\": 6, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"click\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"7\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 7, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"sendFunctionKeys\", \"objectName\": \" \", \"_id_\": \"8\", \"inputVal\": [\"ctrl+s\"], \"appType\": \"Generic\", \"stepNo\": 8, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"saveFile\", \"objectName\": \" \", \"_id_\": \"9\", \"inputVal\": [\"{a};{b}\"], \"appType\": \"Generic\", \"stepNo\": 9, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }]",
-
 				"testcasename": "Dev_Testing1"
-
 			}, {
-
 				"template": "",
-
 				"testcase": "[{\"stepNo\":1,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"doubleClick\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Comments updated\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"1\"},{\"stepNo\":2,\"objectName\":\" \",\"custname\":\"@Generic\",\"keywordVal\":\"captureScreenshot\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Remarks for step 2\",\"url\":\" \",\"appType\":\"Generic\",\"_id_\":\"2\"},{\"stepNo\":3,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"getElementText\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 3\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"3\"},{\"stepNo\":4,\"objectName\":\" \",\"custname\":\"@Browser\",\"keywordVal\":\"getCurrentURL\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 4\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"4\"}]",
-
 				"testcasename": "Dev_Testing"
-
 			}]
-
 		}],
-
 		"scenarioIds": ["f432bd8c-ccc3-462f-9281-40fded159ccb"],
-
 		"browserType": ["3"]
-
 	}],
-
-
 	"testsuiteIds": ["ts1", "ts2"]
-
     }
-
-
 ##json_data1=[{
 ##                "f432bd8c-ccc3-462f-9281-40fded159778": [{
 ##                                "f432bd8c-ccc3-462f-9281-40fded159eeb": [{

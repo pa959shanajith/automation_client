@@ -544,6 +544,23 @@ class WSkeywords:
                         status = ws_constants.TEST_RESULT_PASS
                         methodoutput = ws_constants.TEST_RESULT_TRUE
                     output=self.baseResHeader
+            else:
+                output = []
+                for i in range(0,len(args)):
+                    key = args[i]
+                    if key!= None and key != '':
+##                    logger.print_on_console(ws_constants.RESULT,str(self.baseResHeader[key]))
+                        log.debug(STATUS_METHODOUTPUT_UPDATE)
+                        status = ws_constants.TEST_RESULT_PASS
+                        methodoutput = ws_constants.TEST_RESULT_TRUE
+                        output.append(self.baseResHeader[key])
+                    else:
+    ##                    logger.print_on_console(ws_constants.RESULT,str(self.baseResHeader))
+                        log.debug(STATUS_METHODOUTPUT_UPDATE)
+                        if self.baseResHeader != None:
+                            status = ws_constants.TEST_RESULT_PASS
+                            methodoutput = ws_constants.TEST_RESULT_TRUE
+                        output.append(self.baseResHeader[key])
         except Exception as e:
             log.error(e)
             err_msg=ws_constants.ERR_MSG1+'getBody'

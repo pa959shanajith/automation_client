@@ -63,8 +63,8 @@ cond_nest_info=[]
 for_info=OrderedDict()
 
 """Dict to store the start-end of if info"""
-if_info=OrderedDict()
 
+if_info=OrderedDict()
 """Dict to store the start-end of getparam info"""
 get_param_info=OrderedDict()
 
@@ -107,6 +107,8 @@ class Handler():
         new_obj = json.loads(json_string)
         script=[]
         testcasename_list=[]
+        testcase_empty_flag = False
+        empty_testcase_names=[]
         browser_type=[]
         extract_path = []
         if(data_param_path is not None and data_param_path != ''):
@@ -122,6 +124,9 @@ class Handler():
                     if len(testcase)==0:
                         logger.print_on_console('Testcase is empty')
                         log.info('Testcase is empty')
+                        testcase_empty_flag = True
+                        if json_data.has_key('testcasename'):
+                            empty_testcase_names.append(json_data['testcasename'])
                         continue
                 except Exception as e:
                     log.error(e)
@@ -160,7 +165,7 @@ class Handler():
             flag=self.create_list(script,testcasename_list)
         else:
             flag=self.create_list(script,testcasename_list,extract_path)
-        return flag,browser_type,len(script)
+        return flag,browser_type,len(script),testcase_empty_flag,empty_testcase_names
 
 
     def parse_json_execute(self,test_data):
@@ -603,7 +608,7 @@ class Handler():
         return :
 
         """
-##        import dynamic_variable_handler
+        import dynamic_variable_handler
         del tspList[:]
         del cond_nest_info[:]
         global tspIndex,tspIndex2,copy_for_keywords,for_keywords,copy_condition_keywords,condition_keywords,copy_getparam_keywords                        ,getparam_keywords,for_info,if_info,get_param_info
@@ -621,10 +626,10 @@ class Handler():
         ws_template=''
         global ws_templates_dict
         ws_templates_dict.clear();
-##        dynamic_variable_handler.dynamic_variable_map.clear()
+        #dynamic_variable_handler.dynamic_variable_map.clear()
         if con.oebs_dispatcher_obj != None:
             con.oebs_dispatcher_obj.clear_oebs_window_name()
-
+            	##        dynamic_variable_handler.dynamic_variable_map.clear()
     def clear_dyn_variables(self):
         import dynamic_variable_handler
         dynamic_variable_handler.dynamic_variable_map.clear()

@@ -121,7 +121,7 @@ class Table_Keywords():
                             # print 'about to click '
                             cells[int(input_count)].click()
                             status = TEST_RESULT_PASS
-                            result = TEST_RESULT_TRUE
+                            methodoutput = TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
                         # print 'element is disabled'
@@ -152,26 +152,56 @@ class Table_Keywords():
                         # for x in input:
                         #     print x,'wsgfddhgdsughj'
                         # print element_path[3]
-                        type_raw_input=str(input[0]).title()
-                        if type_raw_input=='Text':
-                            object_type = 'XCUIElementTypeStatic' + type_raw_input
+                        type_raw_input=str(input[1]).lower()
+                        if type_raw_input=='text':
+                            object_type = 'XCUIElementTypeStaticText'
+
+                        elif type_raw_input=='slider':
+                            object_type = 'XCUIElementTypeSlider'
+
+                        elif type_raw_input=='button':
+                            object_type = 'XCUIElementTypeButton'
+
+                        elif type_raw_input=='toggle':
+                            object_type = 'XCUIElementTypeSwitch'
+
+
+                        elif type_raw_input=='textbox':
+                            object_type = 'XCUIElementTypeTextField'
+
+                        elif type_raw_input=='picker':
+                            object_type = 'XCUIElementTypePickerWheel'
+
+                        elif type_raw_input=='searchbar':
+                            object_type = 'XCUIElementTypeSearchField'
+
+
                         else:
-                            object_type='XCUIElementType'+type_raw_input
+                            object_type=type_raw_input
                         # print object_type
-                        row_num=int(input[1])-1
+                        row_num=int(input[0])-1
                         type_index=int(input[2])-1
                         # check the inoput is less than cell count
                         count = len(cells)
                         if (row_num >= 0 and row_num < count):
+                            print object_type,' inhgj'
                             child_object=cells[row_num].find_elements_by_class_name(object_type)
+                            print len(child_object)
                             # print len(child_object),'len is',type(len(child_object)),'ghjk',type(child_object)
-                            if(type_index>=0 and type_index<len(child_object)):
+                            if(type_index>=0 and type_index<=len(child_object)):
                                 output=child_object[type_index].text
+                                print type(output)
+                                print output,' is the output'
+                                if type_raw_input=='toggle':
+                                    if output == 1:
+                                        output='On'
+                                    else:
+                                        output='Off'
                                 # print count, 'from get count',output
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                             else:
-                                print 'please provide valid input'
+                                print 'please provide valid input in type'
                         else:
                             print 'please provide valid input'
                     else:
@@ -186,8 +216,8 @@ class Table_Keywords():
 
     def verify_cell_value(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
-        result=TEST_RESULT_FALSE
-        output=None
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
@@ -205,27 +235,52 @@ class Table_Keywords():
                         # print input[1]
                         # print input[2]
                         # print element_path[3]
-                        type_raw_input=str(input[0]).title()
-                        if type_raw_input=='Text':
-                            # print 'in text'
-                            object_type = 'XCUIElementTypeStatic' + type_raw_input
+                        type_raw_input=str(input[1]).lower()
+                        if type_raw_input=='text':
+                            object_type = 'XCUIElementTypeStaticText'
+
+                        elif type_raw_input=='slider':
+                            object_type = 'XCUIElementTypeSlider'
+
+                        elif type_raw_input=='button':
+                            object_type = 'XCUIElementTypeButton'
+
+                        elif type_raw_input=='toggle':
+                            object_type = 'XCUIElementTypeSwitch'
+
+
+                        elif type_raw_input=='textbox':
+                            object_type = 'XCUIElementTypeTextField'
+
+                        elif type_raw_input=='picker':
+                            object_type = 'XCUIElementTypePickerWheel'
+
+                        elif type_raw_input=='searchbar':
+                            object_type = 'XCUIElementTypeSearchField'
+
                         else:
-                            object_type='XCUIElementType'+str(input[0]).title()
+                            object_type=type_raw_input
                         # print object_type
-                        row_num=int(input[1])-1
+                        row_num=int(input[0])-1
                         type_index=int(input[2])-1
+                        row_input=str(input[3])
                         # check the inoput is less than cell count
                         count = len(cells)
-                        if (row_num > 0 and row_num < count):
+                        if (row_num >= 0 and row_num < count):
                             child_object=cells[row_num].find_elements_by_class_name(object_type)
                             # print len(child_object),'len is',type(len(child_object)),'ghjk',type(child_object),'fdsghjkc',type_index
                             if(type_index>=0 and type_index<len(child_object)):
-                                output=child_object[type_index].text
+                                output_val=child_object[type_index].text
                                 # print count, 'from get count',output
-                                if str(output) == str(input[3]):
+                                if type_raw_input=='toggle':
+                                    if output_val == 1:
+                                        output_val='On'
+                                    else:
+                                        output_val='Off'
+                                if str(output_val) == row_input:
                                     # print 'pass'
                                     status = TEST_RESULT_PASS
-                                    result = TEST_RESULT_TRUE
+                                    methodoutput = TEST_RESULT_TRUE
                                 else:
                                     print ' fail '
                             else:
@@ -237,4 +292,4 @@ class Table_Keywords():
         except Exception as e:
                 log.error(e)
                 logger.print_on_console(err_msg)
-        return status,result,output,err_msg
+        return status, methodoutput, output, err_msg

@@ -528,11 +528,11 @@ class UtilOperations:
             if(self.getObjectVisibility(acc,x_coor,y_coor)):
             #check for object enabled
                 if 'enabled' in objstates:
-                	log.debug('RightClick Happens on :%s , %s',x_coor,y_coor)
-                	oebs_mouseops.MouseOperation('rightclick',x_coor,y_coor)
-                	log.debug('RightClick Successful',DEF_RIGHTCLICK)
-                	verifyresponse = MSG_TRUE
-                	keywordresult=MSG_PASS
+                    log.debug('RightClick Happens on :%s , %s',x_coor,y_coor)
+                    oebs_mouseops.MouseOperation('rightclick',x_coor,y_coor)
+                    log.debug('RightClick Successful',DEF_RIGHTCLICK)
+                    verifyresponse = MSG_TRUE
+                    keywordresult=MSG_PASS
                 else:
                     log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                     oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)

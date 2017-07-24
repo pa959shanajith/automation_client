@@ -28,10 +28,13 @@ class Reporting:
     """
     def __init__(self):
         self.report_string=[]
+        self.report_string_testcase_empty = []
         self.overallstatus_array=[]
         self.overallstatus_array_incomplete = []
         self.report_json={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_array}
         self.report_json_condition_check={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_array_incomplete}
+        self.report_json_condition_check_testcase_empty={ROWS:self.report_string_testcase_empty,OVERALLSTATUS:self.overallstatus_array_incomplete}
+
         self.nested_flag=False
         self.pid_list=[]
         self.parent_id=0
@@ -132,6 +135,24 @@ class Reporting:
             obj[BROWSER_TYPE]=""
             self.overallstatus_array_incomplete.append(obj)
 
+    def build_overallstatus_conditionCheck_testcase_empty(self):
+            """
+            def : build_overallstatus_conditionCheck_testcase_empty
+            purpose : builds the overallstatus field of condition check if any testcase is empty report_json
+
+            """
+            self.start_time = datetime.now()
+            self.end_time = datetime.now()
+            self.ellapsed_time = self.end_time - self.start_time
+            obj={}
+            obj[ELLAPSED_TIME]=str(self.ellapsed_time)
+            obj[END_TIME]=str(self.end_time)
+            obj[BROWSER_VERSION]=""
+            obj[START_TIME]=str(self.start_time)
+            obj[OVERALLSTATUS]=TERMINATE
+            obj[BROWSER_TYPE]=""
+            self.overallstatus_array_incomplete.append(obj)
+
     def get_pid(self):
         """
         def : get_pid
@@ -185,6 +206,23 @@ class Reporting:
         obj[COMMENTS]=''
         obj[STEP_DESCRIPTION]=TEST_SCRIPT_NAME+': '+report_obj.testscript_name
         self.report_string.append(obj)
+        self.id_counter+=1
+
+    def add_report_testcase_empty(self,description):
+        """
+        def : add_report_testcase_empty
+        purpose : report message if testcase is empty
+        in scenario
+        """
+        print "report testcase empty description:", description
+        obj={}
+        obj[ID]='1'
+        obj[KEYWORD]=''
+        obj[PARENT_ID]=''
+        obj[COMMENTS]=''
+        obj[STEP]=PROGRAM_TERMINATION
+        obj[STEP_DESCRIPTION]=description
+        self.report_string_testcase_empty.append(obj)
         self.id_counter+=1
 
     def add_termination_step(self):
@@ -318,6 +356,15 @@ class Reporting:
                 json.dump(self.report_json_condition_check, outfile, indent=4, sort_keys=False)
         outfile.close()
 
+    def save_report_json_conditioncheck_testcase_empty(self,filename,description):
+        log.debug('Saving report json to a file')
+        self.add_report_testcase_empty(description)
+        self.build_overallstatus_conditionCheck_testcase_empty()
+
+        with open(filename, 'w') as outfile:
+                log.info('Writing report data to the file '+filename)
+                json.dump(self.report_json_condition_check_testcase_empty, outfile, indent=4, sort_keys=False)
+        outfile.close()
 
 
 
