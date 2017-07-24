@@ -587,6 +587,8 @@ class StepDescription:
             return 'Select values ' + input + 'in the '+ "'" + tsp.custname + "'"
         def SelectValueByText():
             return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']',
+        def SelectValueByIndex():
+            return 'Select value by index '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']',
         def GetCount():
             return 'Get the count of the values present in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + output + ' in '+ tsp.outputval,
         def SelectMultipleValuesByText():
