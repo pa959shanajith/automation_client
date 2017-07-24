@@ -768,18 +768,18 @@ class Controller():
                         con.wx_object=wxObject
                         handler.tspList=[]
 
-                        #Custom logic here to check empty testcase and if empty, terminate the scnerio execution
-                        for d in [eval(scenario[scenario_id])]:
-                            if terminate_flag:
-                                break
-                            flag,browser_temp,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(d,dataparam_path_value)
-                            if(testcase_empty_flag):
-                                terminate_flag = True
-                                condition_check_flag = True
-                                info_msg=str("Scenario cannot be executed, since the following testcases are empty: "+','.join(empty_testcase_names))
-                                logger.print_on_console(info_msg)
-                                log.info(info_msg)
-                                status = TERMINATE
+##                        #Custom logic here to check empty testcase and if empty, terminate the scnerio execution
+##                        for d in [eval(scenario[scenario_id])]:
+##                            if terminate_flag:
+##                                break
+##                            flag,browser_temp,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(d,dataparam_path_value)
+##                            if(testcase_empty_flag):
+##                                terminate_flag = True
+##                                condition_check_flag = True
+##                                info_msg=str("Scenario cannot be executed, since the following testcases are empty: "+','.join(empty_testcase_names))
+##                                logger.print_on_console(info_msg)
+##                                log.info(info_msg)
+##                                status = TERMINATE
 
 
                         #condition check for scenario execution and reporting for condition check
@@ -796,20 +796,28 @@ class Controller():
                                 if terminate_flag:
                                     break
                                 flag,browser_temp,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(d,dataparam_path_value)
+
                                 if flag == False:
                                     break
                                 print '\n'
-                                tsplist = handler.tspList
-                                if len(tsplist)==0:
-                                    continue
-                                for k in range(len(tsplist)):
-                                    if tsplist[k].name.lower() == 'openbrowser':
-                                        if tsplist[k].apptype.lower()=='web':
-                                            tsplist[k].inputval = [browser]
-                            if len(handler.tspList)==0:
-                                execute_flag=False
-                                logger.print_on_console('Scenario '+str((i  + 1 ) )+' is empty')
-                                log.info('Scenario '+str((i  + 1 ) )+' is empty')
+                                if(testcase_empty_flag):
+                                    info_msg=str("Scenario cannot be executed, since the following testcases are empty: "+','.join(empty_testcase_names))
+                                    logger.print_on_console(info_msg)
+                                    log.info(info_msg)
+                                    status = TERMINATE
+                                    execute_flag=False
+                                else:
+                                    tsplist = handler.tspList
+                                    if len(tsplist)==0:
+                                        continue
+                                    for k in range(len(tsplist)):
+                                        if tsplist[k].name.lower() == 'openbrowser':
+                                            if tsplist[k].apptype.lower()=='web':
+                                                tsplist[k].inputval = [browser]
+##                            if len(handler.tspList)==0:
+##                                execute_flag=False
+##                                logger.print_on_console('Scenario '+str((i  + 1 ) )+' is empty')
+##                                log.info('Scenario '+str((i  + 1 ) )+' is empty')
                             if flag and execute_flag :
                                 #check for temrinate flag before execution
                                 tsplist = obj.read_step()
@@ -843,22 +851,30 @@ class Controller():
                                         else:
                                             condition_check_flag = True
                                             logger.print_on_console('Condition Check: Terminated by program ')
-                            else:
+                            elif testcase_empty_flag:
                                 i+=1
-                        else:
-                            if (testcase_empty_flag):
                                 logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
                                 log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                                 os.chdir(self.cur_dir)
                                 filename='Scenario'+str(i  + 1)+'.json'
                                 con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg)
-
                                 socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck_testcase_empty(suite_id,scenario_id,con,execution_id))
                                 obj.clearList(con)
-                                i+=1
-                                #logic for condition check
-                                report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-                            else:
+
+                        else:
+##                            if (testcase_empty_flag):
+##                                logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
+##                                log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
+##                                os.chdir(self.cur_dir)
+##                                filename='Scenario'+str(i  + 1)+'.json'
+##                                con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg)
+##
+##                                socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck_testcase_empty(suite_id,scenario_id,con,execution_id))
+##                                obj.clearList(con)
+##                                i+=1
+##                                #logic for condition check
+##                                report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+##                            else:
                                 logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
                                 log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                                 os.chdir(self.cur_dir)
