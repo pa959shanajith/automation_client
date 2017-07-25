@@ -16,6 +16,7 @@ import browserops
 import fullscrape
 import logger
 import objectspy
+from selenium import webdriver
 status =domconstants.STATUS_FAIL
 currentdriverhandle = None
 import logging
