@@ -74,6 +74,35 @@ class MainNamespace(BaseNamespace):
 
         if(str(args[0]) == 'connected'):
             print('Connection to the Node Server established')
+            
+    def on_webscrape(self,*args):
+        global action,wxObject,browsername,desktopScrapeFlag,data
+        args = list(args)
+        d = args[0]
+        action = d['action']
+        task = d['task']
+        data = ''
+        if action == 'scrape':
+            if str(task) == 'OPEN BROWSER CH':
+                browsername = '1'
+                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+            elif str(task) == 'OPEN BROWSER IE':
+                browsername = '3'
+                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+            elif str(task) == 'OPEN BROWSER FX':
+                browsername = '2'
+                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+        elif action == 'compare':
+            data = d['viewString']
+            if str(task) == 'OPEN BROWSER CH':
+                browsername = '1'
+                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+            elif str(task) == 'OPEN BROWSER IE':
+                browsername = '3'
+                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+            elif str(task) == 'OPEN BROWSER FX':
+                browsername = '2'
+                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
 
     def on_emit(self, *args):
@@ -324,6 +353,7 @@ class SocketThread(threading.Thread):
         socketIO.emit('wsdl_ServiceGenerator')
         socketIO.emit('LAUNCH_MOBILE_WEB')
         socketIO.emit('LAUNCH_OEBS')
+        socketIO.emit('webscrape')
         socketIO.wait()
 
 
