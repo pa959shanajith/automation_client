@@ -751,6 +751,12 @@ class StepDescription:
              return 'Clear text from the '+ "'" + tsp.custname + "'"+ '.'
         def SetText():
             return 'Enter text '+ inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
+        def SetMaxValue():
+            return 'Set maximum value in seekbar  ' + "'" + tsp.custname + "'"+ '.'
+        def SetMidValue():
+            return 'Set mid value in seekbar  ' + "'" + tsp.custname + "'"+ '.'
+        def SetMinValue():
+            return 'Set minimum value in seekbar  ' + "'" + tsp.custname + "'"+ '.'
         def VerifyText():
             return 'Verify ' + input + ' is the the text in the '+ "'" + tsp.custname + "'"+ '.'
         def GetTextboxLength():
