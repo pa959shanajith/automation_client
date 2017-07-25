@@ -824,6 +824,7 @@ class Controller():
                                 if not(terminate_flag):
                                     con.action=EXECUTE
                                     con.conthread=mythread
+                                    con.tsp_list=tsplist
                                     status = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
                                     print( '=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')

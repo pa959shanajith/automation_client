@@ -295,16 +295,24 @@ class Reporting:
         screenshot_path = None
         parent_id=0
         name=tsp.name
+        step_num=tsp.stepnum
+        step_testcase_name=tsp.testscript_name
         step_description=''
         if keyword_flag:
             step_description=self.get_description(tsp,con)
             if self.nested_flag:
                 parent_id=self.get_pid()
-##        if keyword_flag and self.nested_flag:
-##            parent_id=self.get_pid()
+
         elif not(keyword_flag):
             parent_id=tsp.parent_id
             step_description=tsp.step_description
+            if step_description==ENDFOR_DESCRIPTION:
+                endfor_index=tsp.info_dict[0].keys()[0]
+                endfor_step=con.tsp_list[endfor_index]
+                step_num=endfor_step.stepnum
+                step_testcase_name=endfor_step.testscript_name
+
+
             name=self.name
             ##            Added this line to remove status for conditional keyword in reports
             status = ''
@@ -318,7 +326,7 @@ class Reporting:
                 else:
                     screenshot_path = None
 
-        reporting_pojo_obj=reporting_pojo.ReportingStep(self.id_counter,name,parent_id,status,STEP+str(tsp.stepnum),comments,step_description,str(ellapsedtime),tsp.testscript_name,screenshot_path)
+        reporting_pojo_obj=reporting_pojo.ReportingStep(self.id_counter,name,parent_id,status,STEP+str(step_num),comments,step_description,str(ellapsedtime),step_testcase_name,screenshot_path)
 
         self.generate_keyword_step(reporting_pojo_obj)
         self.id_counter+=1
