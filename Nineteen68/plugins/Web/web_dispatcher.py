@@ -308,7 +308,7 @@ class Dispatcher:
                     driver=browser_Keywords.driver_obj
                     if keyword not in [GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
                         driver.switch_to.default_content()
-                    if flag and webelement==None:
+                    if flag and webelement==None and teststepproperty.custname!='@Browser':
                         result=list(result)
                         result[3]=WEB_ELEMENT_NOT_FOUND
                     if keyword == GET_INNER_TABLE and (output != '' and output.startswith('{') and output.endswith('}')):

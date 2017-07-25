@@ -69,7 +69,7 @@ class For():
         #Reporting part
         self.step_description='Encountered :'+self.name+' Invalid for count '+inputval
         reporting_obj.name=constants.ENDFOR
-        self.add_report_step(reporting_obj,'EndFor: completed')
+        self.add_report_step(reporting_obj,constants.ENDFOR_DESCRIPTION)
         #Reporting part ends
         self.executed=False
         self.status=constants.TEST_RESULT_FAIL
@@ -127,7 +127,7 @@ class For():
 
                     #Reporting part
                     reporting_obj.name=constants.ENDFOR
-                    self.add_report_step(reporting_obj,'EndFor: completed')
+                    self.add_report_step(reporting_obj,constants.ENDFOR_DESCRIPTION)
                     #Reporting part ends
 
 

@@ -63,7 +63,7 @@ class StaticTextKeywords:
                             if len(text) != 0:
                                 sourcetext = sourcetext + separator + text
                     except Exception as e:
-                        print e
+                        log.error(e)
                 for frames in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(IFRAME)))):
                     inpath = path + str(frames) + 'i' +  '/'
                     if self.switchtoiframe(inpath):
@@ -79,7 +79,7 @@ class StaticTextKeywords:
                                     if len(text) != 0:
                                         sourcetext = sourcetext + separator + text
                             except Exception as e:
-                                print e
+                                log.error(e)
                     self.get_source1(ipath)
                 for frames in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(FRAME)))):
                     inpath = path + str(frames) + 'f' +  '/'
@@ -96,7 +96,7 @@ class StaticTextKeywords:
                                     if len(text) != 0:
                                         sourcetext = sourcetext + separator + text
                             except Exception as e:
-                                print e
+                                log.error(e)
                     self.get_source1(ipath)
                 self.get_source1(path)
 
@@ -119,7 +119,7 @@ class StaticTextKeywords:
                             if len(text) != 0:
                                 sourcetext = sourcetext + separator + text
                     except Exception as e:
-                        print e
+                        log.error(e)
                 for frames in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(FRAME)))):
                     inpath = path + str(frames) + 'f' +  '/'
                     if self.switchtoiframe(inpath):
@@ -135,7 +135,7 @@ class StaticTextKeywords:
                                     if len(text) != 0:
                                         sourcetext = sourcetext + separator + text
                             except Exception as e:
-                                print e
+                                log.error(e)
                     self.get_source2(inpath)
                 for frames in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(IFRAME)))):
                     inpath = path + str(frames) + 'i' +  '/'
@@ -152,7 +152,7 @@ class StaticTextKeywords:
                                     if len(text) != 0:
                                         sourcetext = sourcetext + separator + text
                             except Exception as e:
-                                print e
+                                log.error(e)
                     self.get_source2(inpath)
                 self.get_source2(path)
 
@@ -186,7 +186,7 @@ class StaticTextKeywords:
                                 if len(text) != 0:
                                     sourcetext = sourcetext + separator + text
                         except Exception as e:
-                            print e
+                            log.error(e)
                     browser_Keywords.driver_obj.switch_to.default_content()
                     self.get_source1('')
                     browser_Keywords.driver_obj.switch_to.default_content()
@@ -231,25 +231,28 @@ class StaticTextKeywords:
                 if actualtext is not None or len(actualtext) > 0:
                     elements = webelement.find_elements_by_tag_name("*")
                     for element in elements:
-                        if element.tag_name.lower()  not in tags:
-                            text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
-##                            import ftfy
-##                            text = ftfy.fix_text(text)
-                            text = text.replace('\n','')
-                            text = text.strip()
-                            if len(text) != 0:
-                                sourcetext = sourcetext + separator + text
-                            texts = sourcetext.split('~@~')
-                            log.info('texts array :')
-                            log.info(texts)
-                            for i in texts:
-                                i=coreutilsobj.get_UTF_8(i)
-                                if actualtext in i:
-                                    countflag = True
-                                    cnt = i.count(actualtext)
-                                    text_count = text_count + cnt
+                        try:
+                            if element.tag_name.lower()  not in tags:
+                                text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
+##                                import ftfy
+##                                text = ftfy.fix_text(text)
+                                text = text.replace('\n','')
+                                text = text.strip()
+                                if len(text) != 0:
+                                    sourcetext = sourcetext + separator + text
+                        except Exception as e:
+                            log.error(e)
+                    texts = sourcetext.split('~@~')
+                    log.info('texts array :')
+                    log.info(texts)
+                    for i in texts:
+                        i=coreutilsobj.get_UTF_8(i)
+                        if actualtext in i:
+                            countflag = True
+                            cnt = i.count(actualtext)
+                            text_count = text_count + cnt
 
-                            sourcetext = ''
+                    sourcetext = ''
                     if countflag:
                         logger.print_on_console('Text  present')
                         log.info('Text  present')

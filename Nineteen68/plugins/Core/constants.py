@@ -391,4 +391,8 @@ DATE_COMPARE='dateCompare'
 
 STEPSTATUS_INREPORTS_ZERO = '0'
 
+EVALUATE='evaluate'
+
+ENDFOR_DESCRIPTION='EndFor: completed'
+
 

@@ -18,6 +18,7 @@ from desktop_launch_keywords import Launch_Keywords
 from constants import *
 import pywinauto
 from desktop_editable_text import Text_Box
+import win32api
 log = logging.getLogger('desktop_util_keywords.py')
 class Util_Keywords():
 
@@ -144,7 +145,9 @@ class Util_Keywords():
                         if (check):
                             log.info('Parent matched')
                             if(element != None):
+                                cursor_x,cursor_y = win32api.GetCursorPos()#handling cursor move
                                 element.set_focus()
+                                win32api.SetCursorPos((cursor_x,cursor_y))#handling cursor move
                                 import desktop_highlight
                                 highlightObj=desktop_highlight.highLight()
                                 highlightObj.highlight_desktop_element(element)

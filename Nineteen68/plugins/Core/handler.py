@@ -107,7 +107,7 @@ class Handler():
         new_obj = json.loads(json_string)
         script=[]
         testcasename_list=[]
-        testcase_empty_flag = False
+        testcase_empty_flag = []
         empty_testcase_names=[]
         browser_type=[]
         extract_path = []
@@ -121,10 +121,10 @@ class Handler():
             if json_data.has_key('testcase'):
                 testcase=json_data['testcase']
                 try:
-                    if len(testcase)==0:
+                    if testcase=='[]':
                         logger.print_on_console('Testcase is empty')
                         log.info('Testcase is empty')
-                        testcase_empty_flag = True
+                        testcase_empty_flag.append(True)
                         if json_data.has_key('testcasename'):
                             empty_testcase_names.append(json_data['testcasename'])
                         continue

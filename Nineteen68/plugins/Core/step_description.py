@@ -587,6 +587,8 @@ class StepDescription:
             return 'Select values ' + input + 'in the '+ "'" + tsp.custname + "'"
         def SelectValueByText():
             return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']',
+        def SelectValueByIndex():
+            return 'Select value by index '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']',
         def GetCount():
             return 'Get the count of the values present in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + output + ' in '+ tsp.outputval,
         def SelectMultipleValuesByText():
@@ -696,6 +698,16 @@ class StepDescription:
         	return 'Wait until the element'  + "'" + tsp.custname + "'"+  'is exists'
         def VerifyEnabled():
             return ' Verify '+ "'" + tsp.custname + "'" + ' is enabled '
+        def SetDate():
+            return 'Set date '+ inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
+        def SetNumber():
+            return 'Set number '+ inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
+        def GetTime():
+            return 'Get Time From '+ "'" +tsp.custname + "'" + ' and save the time '+ output + ' in ' + output_list+ '.'
+        def GetDate():
+            return 'Get Date From '+ "'" +tsp.custname + "'" + ' and save the date '+ output + ' in ' + output_list+ '.'
+        def SetTime():
+            return 'Enter time '+ inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
         def VerifyElementEnabled():
             return ' Verify '+ "'" + tsp.custname + "'" + ' is enabled '
         def VerifyElementDisabled():
@@ -916,7 +928,7 @@ class StepDescription:
         def navigateBack():
             return 'Navigate back in the browser'
         def verifyTextExists():
-            return 'Verify ' + input + ' exist and Number of occurance of the text ' + input + ' is'+ tsp.outputval +' time(s).'
+            return 'Verify ' + input + ' exist and Number of occurance of the text ' + input + ' is '+ output +' time(s).'
         def getCurrentURL():
             return 'Get current url of the web page and save the URL '+ output + ' in '+ tsp.outputval
         def verifyCurrentURL():

@@ -18,7 +18,7 @@ import folder_operations
 from file_comparison_operations import TextFile,PdfFile,XML
 import excel_operations
 import core_utils
-
+import urllib2
 
 
 import logging
@@ -551,7 +551,11 @@ class FileOperations:
 
         """
         try:
-
+            url_save=None
+            import browser_Keywords
+            url_save=browser_Keywords.url_save
+            ##print url_save
+            import time
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             err_msg=None
@@ -560,30 +564,51 @@ class FileOperations:
             folder_path=str(folder_path)
             file_path=str(file_path)
             log.debug('Folder path is '+folder_path+' and File is '+file_path)
+
 ##            logger.print_on_console('Folder path is '+folder_path+' and File is '+file_path)
             if (not(folder_path is None or folder_path == '' or file_path is None or file_path == '') and os.path.exists(folder_path)):
                 log.debug('saving the file')
-                from sendfunction_keys import SendFunctionKeys
-                obj=SendFunctionKeys()
-                #Get the focus on Windows Dialog box by pressing 'alt+d'
-                obj.press_multiple_keys(['alt','d'],1)
-                #Enter the folder path
-                obj.type(folder_path)
-                #Press 'Enter' key
-                obj.execute_key('enter',1)
-                #Press 'tab' key to get the focus on 'search tab'
-                obj.execute_key('tab',1)
-                #Press 'alt+n' key to create a new file
-                obj.press_multiple_keys(['alt','n'],1)
-                #Enter the file name
-                obj.type(file_path)
-                #Press 'Enter' key
-                obj.execute_key('enter',1)
-                #Press 'ctrl+y' key in case if the file is already existing
-                obj.press_multiple_keys(['ctrl','y'],1)
-                status=TEST_RESULT_PASS
-                methodoutput=TEST_RESULT_TRUE
-                log.info('File has been saved')
+                if (url_save is not None):
+                    ##print folder_path,file_path
+                    response = urllib2.urlopen(url_save)
+                    file = open(folder_path+"\\"+file_path+".pdf", 'wb')
+                    file.write(response.read())
+                    file.close()
+                    ##print("Completed")
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+                    log.info('File has been saved')
+                else:
+
+                    from sendfunction_keys import SendFunctionKeys
+                    obj=SendFunctionKeys()
+
+                    #Get the focus on Windows Dialog box by pressing 'alt+d'
+                    obj.press_multiple_keys(['alt','d'],1)      ##added timer after every step
+                    time.sleep(1)
+
+                    #Enter the folder path
+                    obj.type(folder_path)
+                    time.sleep(1)
+                    #Press 'Enter' key
+                    obj.execute_key('enter',1)
+                    time.sleep(1)
+                    #Press 'tab' key to get the focus on 'search tab'
+                    obj.execute_key('tab',1)
+                    time.sleep(1)
+                    #Press 'alt+n' key to create a new file
+                    obj.press_multiple_keys(['alt','n'],1)
+                    time.sleep(1)
+                    #Enter the file name
+                    obj.type(file_path)
+                    time.sleep(1)
+                    #Press 'Enter' key
+                    obj.execute_key('enter',1)
+                    time.sleep(2)
+                    #Press 'alt+y' key in case if the file is already existing
+                    obj.press_multiple_keys(['alt','y'],1)   #added alt+y sendfunction key for automating overwrite process if the file is already existed.
+                    log.info('File has been saved')
+
 
             else:
                 err_msg=generic_constants.INVALID_INPUT

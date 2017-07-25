@@ -30,9 +30,9 @@ class Time_Keywords():
         err_msg=None
         text=[]
         obj=[]
-        print 'input',input
-        input_date=input
-        print 'input_date',input_date
+
+        input_date=input[0].split(':')
+
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
@@ -52,37 +52,36 @@ class Time_Keywords():
                                 element=driver.find_elements_by_class_name('android.widget.EditText')
                                 element[0].set_text(input_date[0])
                                 value=element[0].text
-                                print 'value1',value
+
                                 print 'input_date[0]',input_date[0]
                                 if value != input_date[0] :
-                                    print '111'
+
                                     err_msg='Invalid input'
                                     log.error('Invalid input')
                                     logger.print_on_console(err_msg)
                                 else :
-                                    print '222'
+
                                     element[1].set_text(input_date[1])
                                     value=element[1].text
-                                    print 'value2',value
-                                    print 'input_date[1]',input_date[1]
+
                                     if value != input_date[1] :
-                                        print '333'
+
                                         err_msg='Invalid input'
                                         log.error('Invalid input')
                                         logger.print_on_console(err_msg)
                                     else :
-                                        print '44444'
+
                                         element[2].set_text(input_date[2])
                                         value=element[2].text
-                                        print 'value3',value
-                                        print 'input_date[2]',input_date[2]
+
+
                                         if value != input_date[2] :
-                                            print '5555'
+
                                             err_msg='Invalid input'
                                             log.error('Invalid input')
                                             logger.print_on_console(err_msg)
                                         else :
-                                            print '666'
+
                                             status=TEST_RESULT_PASS
                                             result=TEST_RESULT_TRUE
 
