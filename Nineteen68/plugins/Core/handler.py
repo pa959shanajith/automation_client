@@ -121,7 +121,7 @@ class Handler():
             if json_data.has_key('testcase'):
                 testcase=json_data['testcase']
                 try:
-                    if testcase=='[]':
+                    if len(testcase)==0:
                         logger.print_on_console('Testcase is empty')
                         log.info('Testcase is empty')
                         testcase_empty_flag.append(True)
