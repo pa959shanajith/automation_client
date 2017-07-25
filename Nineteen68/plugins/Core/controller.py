@@ -422,7 +422,7 @@ class Controller():
                     if not isinstance(display_keyword_response,list):
                         logger.print_on_console('Result obtained is ',display_keyword_response)
                     else:
-                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i]) 
+                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i])
                         if not isinstance(i,basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
                 else:
                     logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
@@ -433,11 +433,11 @@ class Controller():
                     logger.print_on_console('Result obtained is ',display_keyword_response)
                 else:
                     if(tsp.apptype.lower() == 'webservice' and tsp.name == 'getHeader'):
-                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i]) 
+                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i])
                         if not isinstance(i,basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
                     else:
-                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i]) 
-                        if not isinstance(i,basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))                 
+                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i])
+                        if not isinstance(i,basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
             else:
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         log.info('Result obtained is: ')
@@ -800,7 +800,7 @@ class Controller():
                                 if flag == False:
                                     break
                                 print '\n'
-                                if(testcase_empty_flag):
+                                if (True in testcase_empty_flag):
                                     info_msg=str("Scenario cannot be executed, since the following testcases are empty: "+','.join(empty_testcase_names))
                                     logger.print_on_console(info_msg)
                                     log.info(info_msg)
@@ -852,7 +852,7 @@ class Controller():
                                         else:
                                             condition_check_flag = True
                                             logger.print_on_console('Condition Check: Terminated by program ')
-                            elif testcase_empty_flag:
+                            elif (True in testcase_empty_flag):
                                 i+=1
                                 logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
                                 log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
