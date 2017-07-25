@@ -8,7 +8,6 @@
 # Copyright:   (c) wasimakram.sutar 2017
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-
 import desktop_constants
 from desktop_editable_text import Text_Box
 import desktop_launch_keywords
@@ -134,6 +133,8 @@ class ElementKeywords():
         return status,result,verb,err_msg
 
     def get_element_text(self, element , parent , *args):
+        import pythoncom
+        pythoncom.CoInitialize()
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
@@ -170,6 +171,8 @@ class ElementKeywords():
         return status,result,output,err_msg
 
     def verify_element_text(self, element , parent ,input_value, *args):
+        import pythoncom
+        pythoncom.CoInitialize()
         if(len(input_value)>1):
             text_verify = input_value[2]
         else:
