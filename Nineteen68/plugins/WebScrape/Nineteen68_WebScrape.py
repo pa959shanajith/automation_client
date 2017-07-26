@@ -16,7 +16,7 @@ fullscrapeobj = fullscrape.Fullscrape()
 
 class ScrapeWindow(wx.Frame):
     #----------------------------------------------------------------------
-    def __init__(self, parent,id, title,browser,socketIO):
+    def __init__(self, parent,id, title,browser,socketIO,action,data):
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(200, 150) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
@@ -26,19 +26,19 @@ class ScrapeWindow(wx.Frame):
         self.SetIcon(self.wicon)
         obj = browserops.BrowserOperations()
         self.socketIO = socketIO
+        self.action = action
+        self.data = data
         status = obj.openBrowser(browser)
         self.panel = wx.Panel(self)
         self.core_utilsobject = core_utils.CoreUtils()
-
-
-        self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd",pos=(12,8 ), size=(175, 28))
-        self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)   # need to implement OnExtract()
-        self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,38 ), size=(175, 28))
-        self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)   # need to implement OnExtract()
-
-##            self.fullscrapebutton.SetToolTip(wx.ToolTip("To perform FULLSCRAPE Scraping"))
-        self.comparebutton = wx.ToggleButton(self.panel, label="Compare",pos=(12,68 ), size=(175, 28))
-        self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)   # need to implement OnExtract()
+        if (self.action == 'scrape'):
+            self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd",pos=(12,18 ), size=(175, 28))
+            self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)   # need to implement OnExtract()
+            self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,48 ), size=(175, 28))
+            self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)   # need to implement OnExtract()
+        elif(self.action == 'compare'):
+            self.comparebutton = wx.ToggleButton(self.panel, label="Compare",pos=(12,38 ), size=(175, 28))
+            self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)   # need to implement OnExtract()
         self.Centre()
         style = self.GetWindowStyle()
         self.SetWindowStyle( style|wx.STAY_ON_TOP )
@@ -58,7 +58,6 @@ class ScrapeWindow(wx.Frame):
         state = event.GetEventObject().GetValue()
         if state == True:
             self.fullscrapebutton.Disable()
-            self.comparebutton.Disable()
             status = clickandaddoj.startclickandadd()
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
 ##            wx.MessageBox('CLICKANDADD: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
@@ -91,15 +90,22 @@ class ScrapeWindow(wx.Frame):
     def compare(self,event):
         state = event.GetEventObject().GetValue()
         if state == True:
-            self.fullscrapebutton.Disable()
-            self.startbutton.Disable()
             obj = objectspy.Object_Mapper()
-            obj.compare()
+            obj.compare(self.data)
             event.GetEventObject().SetLabel("Update")
         else:
             obj = objectspy.Object_Mapper()
             d = obj.update()
-            self.socketIO.send(d)
+            if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
+                if  isinstance(d,str):
+                    if d.lower() == 'fail':
+                        self.socketIO.emit('scrape',d)
+                else:
+                    self.socketIO.emit('scrape',d)
+                    print 'Update completed'
+            else:
+                print 'data exceeds max. Limit.'
+                self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
             self.Close()
 
 
@@ -107,7 +113,6 @@ class ScrapeWindow(wx.Frame):
     def fullscrape(self,event):
         print 'Performing full scrape'
         self.startbutton.Disable()
-        self.comparebutton.Disable()
         d = fullscrapeobj.fullscrape()
 
         # 10 is the limit of MB set as per Nineteen68 standards

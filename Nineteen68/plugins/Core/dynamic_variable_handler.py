@@ -57,7 +57,7 @@ class DynamicVariables:
 
             elif self.check_for_dynamicvariables(input_var)==TEST_RESULT_TRUE:
                 #Logic to replace dynamic variable values for keywords other than IF and  Evaluate
-                if keyword not in [EVALUATE,IF]:
+                if keyword not in [EVALUATE,IF,ELSE_IF]:
                     data=input_var[1:-1]
                     data='{'+data+'}'
                     temp_value=self.get_dynamic_value(data)
@@ -150,6 +150,8 @@ class DynamicVariables:
         #gets the value of nested dynamic variable if it exists
         value = None
         if len(nested_variable) > 0 :
+            print 'nesedted',nested_variable
+
             for i in range(len(nested_variable)):
                 #Check if the nested variable is again a dynamic variable or actual value
                 replacestring=nested_variable[i]
@@ -160,6 +162,7 @@ class DynamicVariables:
                     replacestring = str(replacestring)
                 inputvar = inputvar.replace(nested_variable[i],replacestring)
                 value=inputvar
+                print 'output',inputvar
 
         return value
 

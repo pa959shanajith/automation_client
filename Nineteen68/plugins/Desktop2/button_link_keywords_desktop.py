@@ -154,6 +154,8 @@ class ButtonLinkKeyword():
         return status,result,verb,err_msg
 
     def verify_button_name(self, element , parent , input, *args):
+        import pythoncom
+        pythoncom.CoInitialize()
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
@@ -198,6 +200,8 @@ class ButtonLinkKeyword():
         return status,result,verb,err_msg
 
     def get_button_name(self, element , parent , *args):
+        import pythoncom
+        pythoncom.CoInitialize()
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
@@ -274,6 +278,8 @@ class ButtonLinkKeyword():
         return status,result,verb,err_msg
 
     def get_link_text(self, element , parent , *args):
+        import pythoncom
+        pythoncom.CoInitialize()
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
@@ -310,6 +316,8 @@ class ButtonLinkKeyword():
         return status,result,link_text,err_msg
 
     def verify_link_text(self, element , parent , input, *args):
+        import pythoncom
+        pythoncom.CoInitialize()
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')

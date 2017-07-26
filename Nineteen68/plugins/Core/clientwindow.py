@@ -74,6 +74,35 @@ class MainNamespace(BaseNamespace):
 
         if(str(args[0]) == 'connected'):
             print('Connection to the Node Server established')
+            
+    def on_webscrape(self,*args):
+        global action,wxObject,browsername,desktopScrapeFlag,data
+        args = list(args)
+        d = args[0]
+        action = d['action']
+        task = d['task']
+        data = ''
+        if action == 'scrape':
+            if str(task) == 'OPEN BROWSER CH':
+                browsername = '1'
+                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+            elif str(task) == 'OPEN BROWSER IE':
+                browsername = '3'
+                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+            elif str(task) == 'OPEN BROWSER FX':
+                browsername = '2'
+                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+        elif action == 'compare':
+            data = d['viewString']
+            if str(task) == 'OPEN BROWSER CH':
+                browsername = '1'
+                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+            elif str(task) == 'OPEN BROWSER IE':
+                browsername = '3'
+                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+            elif str(task) == 'OPEN BROWSER FX':
+                browsername = '2'
+                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
 
     def on_emit(self, *args):
@@ -324,6 +353,7 @@ class SocketThread(threading.Thread):
         socketIO.emit('wsdl_ServiceGenerator')
         socketIO.emit('LAUNCH_MOBILE_WEB')
         socketIO.emit('LAUNCH_OEBS')
+        socketIO.emit('webscrape')
         socketIO.wait()
 
 
@@ -939,7 +969,7 @@ class ClientWindow(wx.Frame):
             self.connectbutton.Disable()
         except Exception as e:
             print 'Forbidden request, Connection refused, please check the server ip and server port in Config.json, and restart the client window.'
-
+            
     def test(self,event):
 ##        print 'Self',self
         global mobileScrapeFlag
@@ -949,6 +979,8 @@ class ClientWindow(wx.Frame):
         global debugFlag
         global socketIO
         global browsername
+        global action
+        global data
         global oebsScrapeFlag
         if mobileScrapeFlag==True:
 ##            global socketIO
@@ -984,7 +1016,7 @@ class ClientWindow(wx.Frame):
                 con.get_all_the_imports('WebScrape')
                 import Nineteen68_WebScrape
 ##                global socketIO
-                self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO)
+                self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data)
                 browsername = ''
             else:
                 import pause_display_operation
@@ -997,6 +1029,7 @@ class ClientWindow(wx.Frame):
                     #call display logic
                     self.new = pause_display_operation.Display(parent = self,id = -1, title="SLK Nineteen68 - Display Variable",input = inputvalue)
 
+    
 
 
 class DebugWindow(wx.Frame):

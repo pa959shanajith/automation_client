@@ -20,6 +20,7 @@ import swipe_keywords
 import toggle_keywords
 import device_keywords
 import logging
+import seekBar_Mobility
 import logger
 from mobile_app_constants import *
 import constants
@@ -52,6 +53,7 @@ class MobileDispatcher:
     date_keywords_object=DatePicker_Keywords_Mobility.Date_Keywords()
     time_keywords_object=TimePicker_Keywords_Mobility.Time_Keywords()
     number_picker_object=Number_picker_Keywords.Number_Picker()
+    seekBar_object=seekBar_Mobility.Seek_Bar_Keywords()
     def __init__(self):
         self.exception_flag=''
 
@@ -150,7 +152,10 @@ class MobileDispatcher:
                     'GetDate' : self.date_keywords_object.Get_Date,
                     'SetTime' : self.time_keywords_object.Set_Time,
                     'GetTime' : self.time_keywords_object.Get_Time,
-                    'SetNumber':self.number_picker_object.Select_Number
+                    'SetNumber':self.number_picker_object.Select_Number,
+                    'SetMinValue':self.seekBar_object.Set_Min_Value,
+                    'SetMidValue':self.seekBar_object.Set_Mid_Value,
+                    'SetMaxValue':self.seekBar_object.Set_Max_Value
 
 
                 }
