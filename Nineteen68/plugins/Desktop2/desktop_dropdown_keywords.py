@@ -165,8 +165,14 @@ class Dropdown_Keywords():
                                     result = desktop_constants.TEST_RESULT_TRUE
 
                                 elif checkName=='ListView':
-                                    if element.is_active() == False:
-                                      element.click()
+                                    #---------------------------------------------checker(32 or 64)
+                                    import platform
+                                    info_32=platform.architecture()
+                                    if info_32[0]=='32bit':
+                                        logger.print_on_console('Warning:You are using 32bit version of ICE Engine.This keyword is unstable for this version.If unsatisfactory results, use 64bit ICE Engine.')
+                                    #---------------------------------------------
+##                                    if element.is_active() == False:
+##                                      element.click()
                                     items=element.items()
                                     cols=element.column_count()
                                     elelist=element.texts()
@@ -177,11 +183,12 @@ class Dropdown_Keywords():
                                     list = input_val
                                     item_list=[]
                                     for item in list:
-                                        logger.print_on_console(item)
+                                        #logger.print_on_console(item)
                                         item_new = (int(item)-1)*2
-                                        logger.print_on_console(item_new)
+                                        #logger.print_on_console(item_new)
                                         item_list.append(item_new)
-                                    val,res=0
+                                    val=''
+                                    res=''
                                     for i in range(0,len(item_list)):
                                         if(cols==1):
                                          val=item_list[i]
@@ -873,6 +880,12 @@ class Dropdown_Keywords():
                                     result = desktop_constants.TEST_RESULT_TRUE
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
                             if element.friendly_class_name() == 'ListView':
+                                #---------------------------------------------checker(32 or 64)
+                                import platform
+                                info_32=platform.architecture()
+                                if info_32[0]=='32bit':
+                                    logger.print_on_console('Warning:You are using 32bit version of ICE Engine.This keyword is unstable for this version.If unsatisfactory results, use 64bit ICE Engine.')
+                                #---------------------------------------------
                                 if element.is_active() == False:
                                   element.click()
                                 items=element.items()
@@ -885,11 +898,12 @@ class Dropdown_Keywords():
                                 list = input_val
                                 item_list=[]
                                 for item in list:
-                                    logger.print_on_console(item)
+                                    #logger.print_on_console(item)
                                     item_new = (int(item)-1)*2
-                                    logger.print_on_console(item_new)
+                                    #logger.print_on_console(item_new)
                                     item_list.append(item_new)
-                                val,res=0
+                                val=''
+                                res=''
                                 for i in range(0,len(item_list)):
                                     if(cols==1):
                                      val=item_list[i]
