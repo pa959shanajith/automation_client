@@ -193,13 +193,13 @@ class ExcelFile:
                     col=int(col)
                     if row>0 and col>0:
                         res,value,err_msg=self.dict['read_cell_'+file_ext](row,col,self.excel_path,self.sheetname,*args)
-                        info_msg='cell value is '+str(value)
+                        info_msg='cell value is '+value
                         logger.print_on_console(info_msg)
                         log.info(info_msg)
                         if res:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
-                            output=str(value)                  ##Value returned must be integer so thet it will display 20 instead of 20L
+                            output=value                 ##Value returned must be integer so thet it will display 20 instead of 20L
                     else:
                         err_msg=ERROR_CODE_DICT["ERR_ROW_COLUMN"]
             else:
@@ -224,6 +224,10 @@ class ExcelFile:
         return : Returns Bool
 
         """
+        #Support for special languages (#872) decode if unicode(special language) (Himanshu)
+        coreutilsobj=core_utils.CoreUtils()
+        value=coreutilsobj.get_UTF_8(value)
+
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output = OUTPUT_CONSTANT
@@ -234,7 +238,7 @@ class ExcelFile:
                 if res:
                     info_msg=generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname
                     log.info(info_msg)
-                    info_msg='Row is '+str(row)+' col is '+str(col)+' and Value: '+str(value)
+                    info_msg='Row is '+str(row)+' col is '+str(col)+' and Value: '+value
                     log.info(info_msg)
 ##                    logger.print_on_console(info_msg)
                     row=int(row)
@@ -450,10 +454,6 @@ class ExcelXLS:
 
         """
 
-        coreutilsobj=core_utils.CoreUtils()
-        value=coreutilsobj.get_UTF_8(value)
-        input_path=coreutilsobj.get_UTF_8(input_path)
-        sheetname=coreutilsobj.get_UTF_8(sheetname)
         from xlutils.copy import copy
         from xlwt import easyxf,XFStyle
         workbook = copy(book)
@@ -767,7 +767,7 @@ class ExcelXLS:
             log.error(e)
         if err_msg!=None:
             log.error(err_msg)
-        value=str(value)    ##changed type of value to string
+        #value=str(value)    ##changed type of value to string
         return status,value,err_msg
 
 
@@ -1183,7 +1183,7 @@ class ExcelXLSX:
 
                     if cell.is_date == True and self.__get_formatted_date(value,cell.number_format) is not None :
                         value= self.__get_formatted_date(value,cell.number_format)
-                    elif cell.number_format == '0%':    ## added elif statements to detrmine whether the number is percentage and diaplay it as percentage
+                    elif cell.number_format == '0%':	## added elif statements to detrmine whether the number is percentage and diaplay it as percentage
                         value=value*100
                         value=str(value)+'%'
                     status=True
@@ -1197,7 +1197,7 @@ class ExcelXLSX:
         if err_msg!=None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
-        value=str(value)
+        #value=str(value)
         return status,value,err_msg
 
     def clear_cell_xlsx(self,row,col,excel_path,sheetname):

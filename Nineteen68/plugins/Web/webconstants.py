@@ -27,6 +27,8 @@ TEST_RESULT_FALSE = "False";
 
 METHOD_INVALID='Invalid Keyword'
 
+INVALID_INPUT='Input is Invalid'
+
 ##CHROME_DRIVER_PATH = 'chromedriver.exe'
 CHROME_DRIVER_PATH = drivers_path + "\\chromedriver.exe"
 
