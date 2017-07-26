@@ -50,8 +50,11 @@ class Highlight():
             except Exception as e4:
                 evb = e4
 
+            if(type(data)== tuple):
+                highele = list(data)
+            else:
             #Split the string with delimiter ','
-            highele = data.split(',')
+                highele = data.split(',')
             # find out if the highele[1] has id or name attrib
             if  highele[0] == 'OBJECTMAPPER':
                 action='OBJECTMAPPER'
