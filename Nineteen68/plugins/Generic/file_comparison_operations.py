@@ -343,6 +343,8 @@ class TextFile:
         err_msg=None
 ##        logger.print_on_console('Writing '+str(content)+' to text file '+str(input_path))
 ##        log.info('Writing '+str(content)+' to text file '+str(input_path))
+        coreutilsobj=core_utils.CoreUtils()
+        input_path=coreutilsobj.get_UTF_8(input_path)
         log.info('Writing ',content,' to text file ',input_path)
         try:
             ##for i in args:
@@ -357,12 +359,7 @@ class TextFile:
                         file.write(args[i]+"\n")
                 else:
                     content+=''.join(args)
-                    #Support for special languages (#872)
-                    try:
-                        file.write(content)
-                    except:
-                        file.write(content.encode('utf8'))
-
+                    file.write(content)
                 file.close()
                 log.debug('Content is written successfully')
                 status= True
@@ -394,17 +391,11 @@ class XML:
         log.info('Writing '+content+' to XML file '+input_path)
         coreutilsobj=core_utils.CoreUtils()
         input_path=coreutilsobj.get_UTF_8(input_path)
-        content=coreutilsobj.get_UTF_8(content)
         import xml.dom.minidom as minidom
         from xml.etree import ElementTree as ET
         from xml.etree import ElementTree
         try:
-            #Support for special languages (#872)  incase special language, encode and then save
-            try:
-                tree = ET.XML(content)
-            except:
-                tree = ET.XML(content.encode('UTF-8'))
-
+            tree = ET.XML(content)
             rough_string = ElementTree.tostring(tree,'utf-8')
             reparsed = minidom.parseString(rough_string)
             val=reparsed.toprettyxml(indent="\t")
