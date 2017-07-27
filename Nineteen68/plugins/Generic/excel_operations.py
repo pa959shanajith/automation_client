@@ -193,13 +193,13 @@ class ExcelFile:
                     col=int(col)
                     if row>0 and col>0:
                         res,value,err_msg=self.dict['read_cell_'+file_ext](row,col,self.excel_path,self.sheetname,*args)
-                        info_msg='cell value is '+value
+                        info_msg='cell value is '+str(value)
                         logger.print_on_console(info_msg)
                         log.info(info_msg)
                         if res:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
-                            output=value                 ##Value returned must be integer so thet it will display 20 instead of 20L
+                            output=str(value)                  ##Value returned must be integer so thet it will display 20 instead of 20L
                     else:
                         err_msg=ERROR_CODE_DICT["ERR_ROW_COLUMN"]
             else:
@@ -224,10 +224,6 @@ class ExcelFile:
         return : Returns Bool
 
         """
-        #Support for special languages (#872) decode if unicode(special language) (Himanshu)
-        coreutilsobj=core_utils.CoreUtils()
-        value=coreutilsobj.get_UTF_8(value)
-
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output = OUTPUT_CONSTANT
@@ -238,7 +234,7 @@ class ExcelFile:
                 if res:
                     info_msg=generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname
                     log.info(info_msg)
-                    info_msg='Row is '+str(row)+' col is '+str(col)+' and Value: '+value
+                    info_msg='Row is '+str(row)+' col is '+str(col)+' and Value: '+str(value)
                     log.info(info_msg)
 ##                    logger.print_on_console(info_msg)
                     row=int(row)
@@ -454,6 +450,10 @@ class ExcelXLS:
 
         """
 
+        coreutilsobj=core_utils.CoreUtils()
+        value=coreutilsobj.get_UTF_8(value)
+        input_path=coreutilsobj.get_UTF_8(input_path)
+        sheetname=coreutilsobj.get_UTF_8(sheetname)
         from xlutils.copy import copy
         from xlwt import easyxf,XFStyle
         workbook = copy(book)
@@ -752,9 +752,6 @@ class ExcelXLS:
                     if cell.ctype==3:
                         value=datetime.datetime(*xlrd.xldate_as_tuple(cell.value, book.datemode))
                         value=value.date()
-                    elif cell.ctype==2:         ## added elif statements to detrmine whether the number is percentage and diaplay it as percentage
-                        value=value*100
-                        value=str(value)+'%'
                     #print cell.ctype
                     status=True
                     log.info(value)
@@ -767,7 +764,7 @@ class ExcelXLS:
             log.error(e)
         if err_msg!=None:
             log.error(err_msg)
-        #value=str(value)    ##changed type of value to string
+        value=str(value)    ##changed type of value to string
         return status,value,err_msg
 
 
@@ -887,20 +884,45 @@ class ExcelXLS:
             workbook_info=self.__load_workbook_xls(input_path,sheetname)
             row=workbook_info[2]
             col=workbook_info[3]
-            if len(args)>0 and args[0].lower() == 'newline'  :
+            len_args=len(args)
+##            if len(args)>0 and args[0].lower() == 'newline'  :
+##                col=0
+##                if workbook_info[3] != -1:
+##                    row=row+1
+##                    col=workbook_info[3]
+##                else:
+##                    row=0
+##            elif workbook_info[3]==-1:
+##                row=col=0
+##            else:
+##                col+=1
+##            #writes to the cell in given row,col
+##            status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content,args)
+            if row==-1 and col==-1:
+                row=0
                 col=0
-                if workbook_info[3] != -1:
-                    row=row+1
-                    col=workbook_info[3]
-                else:
-                    row=0
-            elif workbook_info[3]==-1:
-                row=col=0
+                ##print row, col, content
+                status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content)
             else:
-                col+=1
+                col=col+1
+                status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content)
+            ##print "content ",row,col
+            if len(args)>0 and args[len_args-1].lower() == 'newline':
+                for i in range(0,(len_args-1)):
+                    workbook_info=self.__load_workbook_xls(input_path,sheetname)
+                    row=row+1
+                    col=0
+                    ##print "start",i,row,col
+                    status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,args[i])
+            else:
+                for i in range(0,(len_args)):
+                    workbook_info=self.__load_workbook_xls(input_path,sheetname)
+                    row=row
+                    col=col+1
+                #writes to the cell in given row,col
+                    ##print "start",i,row,col
+                    status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,args[i])
 
-            #writes to the cell in given row,col
-            status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content)
         except Exception as e:
             err_msg='Error occurred writing to .xls file'
             log.error(e)
@@ -1183,7 +1205,7 @@ class ExcelXLSX:
 
                     if cell.is_date == True and self.__get_formatted_date(value,cell.number_format) is not None :
                         value= self.__get_formatted_date(value,cell.number_format)
-                    elif cell.number_format == '0%':	## added elif statements to detrmine whether the number is percentage and diaplay it as percentage
+                    elif cell.number_format == '0%':    ## added elif statements to detrmine whether the number is percentage and diaplay it as percentage
                         value=value*100
                         value=str(value)+'%'
                     status=True
@@ -1197,7 +1219,7 @@ class ExcelXLSX:
         if err_msg!=None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
-        #value=str(value)
+        value=str(value)
         return status,value,err_msg
 
     def clear_cell_xlsx(self,row,col,excel_path,sheetname):
@@ -1317,16 +1339,26 @@ class ExcelXLSX:
         sheetname=coreutilsobj.get_UTF_8(sheetname)
         log.debug(generic_constants.INPUT_IS+input_path+' '+sheetname)
         try:
-            #loads the xls workbook
+            #loads the xlsx workbook
+
             workbook_info=self.__load_workbook_xlsx(input_path,sheetname)
             row=workbook_info[2]
             col=workbook_info[3]
-            if len(args)>0 and args[0].lower() == 'newline':
-                row=row+1
-                col=1
 
-            #writes to the cell in given row,col
+            len_args=len(args)
+            ##print args,'dfvgbjnml,',row,col
             status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,content)
+            if len(args)>0 and args[len_args-1].lower() == 'newline':
+                for i in range(0,(len_args-1)):
+                    row=row+1
+                    col=1
+                    ##print row,col
+                    status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,args[i])
+            else:
+                for i in range(0,(len_args)):
+                    col=col+1
+                    ##print row,col
+                    status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,args[i])
         except Exception as e:
             log.error(e)
             err_msg='Error occurred writing to .xlsx file '

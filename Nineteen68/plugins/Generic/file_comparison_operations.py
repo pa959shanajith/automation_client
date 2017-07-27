@@ -352,11 +352,11 @@ class TextFile:
             len_args=len(args)
             ##print len_args
             ##print args[len_args-1]
-            with open(input_path, 'a') as file:
-                if (args[len_args-1]).lower()=="newline" :
-                    file.write(content+"\n")
+            with open(input_path, 'a+') as file:
+                if len(args)>0 and (args[len_args-1]).lower()=="newline" :
+                    file.write(content)
                     for i in range(0,(len(args)-1)):
-                        file.write(args[i]+"\n")
+                        file.write("\n"+args[i])
                 else:
                     content+=''.join(args)
                     file.write(content)
