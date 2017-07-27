@@ -500,27 +500,6 @@ class UtilWebKeywords:
     def generic_sendfucntion_keys(self,input,*args):
         from sendfunction_keys import SendFunctionKeys
         obj=SendFunctionKeys()
-        pidset = browser_Keywords.pid_set
-        import win32gui,win32api,win32process
-        if(len(pidset)>0):
-            pid = pidset.pop()
-            toplist, winlist = [], []
-            def enum_cb(hwnd, results):
-                winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
-            win32gui.EnumWindows(enum_cb, toplist)
-            app = [(hwnd, title) for hwnd, title in winlist if ((("Chrome" or "Firefox" or "Explorer") in title) and (win32process.GetWindowThreadProcessId(hwnd)[1] == pid))]
-            app = app[0]
-            handle = app[0]
-            foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
-            appThread = win32api.GetCurrentThreadId()
-            if( foreThread != appThread ):
-                win32process.AttachThreadInput(foreThread[0], appThread, True)
-                win32gui.BringWindowToTop(handle)
-                win32gui.ShowWindow(handle,5)
-                win32process.AttachThreadInput(foreThread[0], appThread, False)
-            else:
-                win32gui.BringWindowToTop(handle)
-                win32gui.ShowWindow(handle,5)
         obj.sendfunction_keys(input,*args)
 
 

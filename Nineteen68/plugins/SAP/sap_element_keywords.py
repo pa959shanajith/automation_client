@@ -183,8 +183,8 @@ class ElementKeywords():
                         if(elem.type=='GuiTableControl'):
                             arg=args[1]
                             if len(arg) > 0 and len(arg)==2 :
-                                row=int(arg[0])-2
-                                col=int(arg[1])-2
+                                row=int(arg[0])-1
+                                col=int(arg[1])-1
                                 elem = elem.GetCell(row, col)
                             else:
                                 elem=None
@@ -226,8 +226,8 @@ class ElementKeywords():
             if(elem.type=='GuiTableControl'):
                 arg=args[1]
                 if len(arg) > 0 and len(arg)==2 :
-                    row=int(arg[0])-2
-                    col=int(arg[1])-2
+                    row=int(arg[0])-1
+                    col=int(arg[1])-1
                     elem = elem.GetCell(row, col)
                 else:
                     elem=None
@@ -263,8 +263,8 @@ class ElementKeywords():
             if(elem.type=='GuiTableControl'):
                 arg=args[1]
                 if len(arg) > 0 and len(arg)==2:
-                    row=int(arg[0])-2
-                    col=int(arg[1])-2
+                    row=int(arg[0])-1
+                    col=int(arg[1])-1
                     elem = elem.GetCell(row, col)
                 else:
                     elem=None
@@ -306,8 +306,8 @@ class ElementKeywords():
                 if(elem.type=='GuiTableControl'):
                     arg=args[1]
                     if len(arg) > 0 and len(arg)==2:
-                        row=int(arg[0])-2
-                        col=int(arg[1])-2
+                        row=int(arg[0])-1
+                        col=int(arg[1])-1
                         elem = elem.GetCell(row, col)
                     else:
                         elem=None
@@ -344,8 +344,8 @@ class ElementKeywords():
                     if(elem.type=='GuiTableControl'):
                         arg=args[1]
                         if len(arg) > 0 and len(arg)==2:
-                            row=int(arg[0])-2
-                            col=int(arg[1])-2
+                            row=int(arg[0])-1
+                            col=int(arg[1])-1
                             elem = elem.GetCell(row, col)
                         else:
                             elem=None
@@ -384,8 +384,8 @@ class ElementKeywords():
             if(elem.type=='GuiTableControl'):
                 arg=args[1]
                 if len(arg) > 0 and len(arg)==2 :
-                    row=int(arg[0])-2
-                    col=int(arg[1])-2
+                    row=int(arg[0])-1
+                    col=int(arg[1])-1
                     elem = elem.GetCell(row, col)
                 else:
                     elem=None

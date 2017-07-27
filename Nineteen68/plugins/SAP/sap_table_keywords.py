@@ -54,7 +54,7 @@ class Table_keywords():
         err_msg=None
         try:
             elem=ses.FindById(id)
-            value = elem.RowCount+1
+            value = elem.RowCount
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
@@ -73,7 +73,7 @@ class Table_keywords():
         err_msg=None
         try:
             elem=ses.FindById(id)
-            value = elem.Columns.Length+1
+            value = elem.Columns.Length
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
@@ -96,8 +96,12 @@ class Table_keywords():
             no_of_rows = elem.RowCount
             for i in range(-1, no_of_rows):
                 for j in range(-1, no_of_cols):
+                    try:
+                        cell = elem.GetCell(i,j)
+                    except:
+                        break
                     if(colText in elem.GetCell(i,j).text):
-                        value = j+2
+                        value = j+1
                         break
                     else:
                         value =''
@@ -128,8 +132,12 @@ class Table_keywords():
             no_of_rows = elem.RowCount
             for i in range(0, no_of_rows):
                 for j in range(0, no_of_cols):
-                    if(rowText in elem.GetCell(i,j).text):
-                        value = i+2
+                    try:
+                        cell = elem.GetCell(i,j)
+                    except:
+                        break
+                    if(rowText in cell.text):
+                        value = i+1
                         break
                     else:
                         value =''
@@ -148,8 +156,8 @@ class Table_keywords():
 
     def getCellValue(self, sap_id,url, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
-        row=int(input_val[0])-2
-        col=int(input_val[1])-2
+        row=int(input_val[0])-1
+        col=int(input_val[1])-1
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -169,8 +177,8 @@ class Table_keywords():
 
     def verifyCellValue(self, sap_id,url, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
-        row=int(input_val[0])-2
-        col=int(input_val[1])-2
+        row=int(input_val[0])-1
+        col=int(input_val[1])-1
         cell_value=input_val[2]
 
         id,ses=self.uk.getSapElement(sap_id)
@@ -206,7 +214,11 @@ class Table_keywords():
             no_of_rows = elem.RowCount
             for i in range(0, no_of_rows):
                 for j in range(0, no_of_cols):
-                    if(ses.FindById(id).GetCell(i,j).text == text):
+                    try:
+                        cell = elem.GetCell(i,j)
+                    except:
+                        break
+                    if(cell.text == text):
                         status=sap_constants.TEST_RESULT_PASS
                         result=sap_constants.TEST_RESULT_TRUE
                         break
@@ -271,8 +283,8 @@ class Table_keywords():
 
     def selectValueByIndex(self, sap_id,url, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
-        row=int(input_val[0])-2
-        col=int(input_val[1])-2
+        row=int(input_val[0])-1
+        col=int(input_val[1])-1
         index=input_val[2]
         id,ses=self.uk.getSapElement(sap_id)
         dk = Dropdown_Keywords()
@@ -301,8 +313,8 @@ class Table_keywords():
 
     def selectValueByText(self, sap_id, url,input_val,*args):
         self.lk.setWindowToForeground(sap_id)
-        row=int(input_val[0])-2
-        col=int(input_val[1])-2
+        row=int(input_val[0])-1
+        col=int(input_val[1])-1
         text= input_val[2]
         id,ses=self.uk.getSapElement(sap_id)
         dk = Dropdown_Keywords()
@@ -330,8 +342,8 @@ class Table_keywords():
 
     def getSelected(self, sap_id,url, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
-        row=int(input_val[0])-2
-        col=int(input_val[1])-2
+        row=int(input_val[0])-1
+        col=int(input_val[1])-1
         id,ses=self.uk.getSapElement(sap_id)
         dk = Dropdown_Keywords()
         status = sap_constants.TEST_RESULT_FAIL
@@ -358,8 +370,8 @@ class Table_keywords():
 
     def getStatus(self, sap_id, url,input_val,*args):
         self.lk.setWindowToForeground(sap_id)
-        row=int(input_val[0])-2
-        col=int(input_val[1])-2
+        row=int(input_val[0])-1
+        col=int(input_val[1])-1
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -386,7 +398,7 @@ class Table_keywords():
 
     def selectRow(self, sap_id,url, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
-        rowNum=int(input_val[0])-2
+        rowNum=int(input_val[0])-1
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -412,7 +424,7 @@ class Table_keywords():
 
     def unselectRow(self, sap_id,url, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
-        rowNum=int(input_val[0])-2
+        rowNum=int(input_val[0])-1
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
