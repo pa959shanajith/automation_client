@@ -200,7 +200,10 @@ class Dropdown_Keywords():
                                          res2=elelist[int(val) + 1]
                                          newlist.append(res1.encode("utf-8"))
                                          newlist.append(res2.encode("utf-8"))
-                                    verb=newlist
+                                    if cols==1:
+                                        verb=newlist
+                                    else:
+                                        verb=self.multiListGetter(cols,elelist,input_val)
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -914,7 +917,10 @@ class Dropdown_Keywords():
                                      res2=elelist[int(val) + 1]
                                      newlist.append(res1.encode("utf-8"))
                                      newlist.append(res2.encode("utf-8"))
-                                verb=newlist
+                                if cols==1:
+                                    verb=newlist
+                                else:
+                                    verb=self.multiListGetter(cols,elelist,input_val)
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -1117,3 +1123,61 @@ class Dropdown_Keywords():
 
 
             return status,result,verb,err_msg
+
+        def multiListGetter(self,cols,elelist,input_val):
+            rows=len(elelist)/cols
+            #-------------------------------------------------creating a 2D list
+            #print"creating a 2D list"
+            Matrix = [[0 for x in range(cols)] for y in range(rows)]
+            #-------------------------------------------------creating a 2D list
+            #-------------------------------------------------populating the 2D list
+            #print"populating the 2D list"
+            index_i=0
+            for j in range(0,rows):
+                for k in range (0,cols):
+                    try:
+                        Matrix[j][k]=elelist[index_i].encode("utf-8")
+                        index_i=index_i+1
+                    except Exception as e:
+                        print"Error Occured",e
+            #-------------------------------------------------populating the 2D list
+            #-------------------------------------------------printing the 2D list
+##                                print"printing the 2D list"
+##                                for j in range(0,rows):
+##                                    for k in range (0,cols):
+##                                        try:
+##                                            print"Matrix"+"["+str(j+1)+"]["+str(k+1)+"]:"+str(Matrix[j][k])+"."
+##                                        except Exception as e:
+##                                            print"out of bound",e
+            #-------------------------------------------------printing the 2D list
+            #-------------------------------------------------creating new Matrix based on indexes given
+            #print"creating new matrix based on input vals"
+            NewMatrix = [[0 for x in range(cols)] for y in range(len(input_val))]
+            #-------------------------------------------------creating new Matrix based on indexes given
+            #-------------------------------------------------poulating the new martix
+            #print"populating the new matrix"
+            new_input_val=[]
+            for z in range(0,len(input_val)):
+                new_input_val.append(str(int(input_val[z])-1))
+            try:
+                r=0
+                for nr in new_input_val:
+                    rowindex=int(nr)
+                    for c in range(0,cols):
+                        NewMatrix[r][c]=Matrix[rowindex][c]
+                    r=r+1
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                print "Error happened :",e
+            #-------------------------------------------------poulating the new martix
+            #-------------------------------------------------printing the new 2D list
+##            print"printing the new 2D list"
+##            for j1 in range(0,len(input_val)):
+##                for k1 in range (0,cols):
+##                    try:
+##                        print"NewMatrix"+"["+str(j1+1)+"]["+str(k1+1)+"]:"+str(NewMatrix[j1][k1])+"."
+##                    except Exception as e:
+##                        print"out of bound",e
+            #-------------------------------------------------printing the new 2D list
+            return NewMatrix

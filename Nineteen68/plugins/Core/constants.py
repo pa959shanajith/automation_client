@@ -379,6 +379,8 @@ PROGRAM_TERMINATION='Terminated'
 
 DATABASE_KEYWORDS=['getdata','securegetdata']
 
+DESKTOP_LIST_KEYWORDS=['getmultiplevaluesbyindexes','getvaluebyindex']
+
 DB_VAR='ret_riever'
 
 COMPLETED='success'
