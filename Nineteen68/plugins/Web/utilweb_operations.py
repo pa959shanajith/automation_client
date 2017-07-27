@@ -275,7 +275,7 @@ class UtilWebKeywords:
                 browser_info=browser_Keywords.driver_obj.capabilities
                 browser_name=browser_info.get('browserName')
                 browser_version=browser_info.get('version')
-                log.info('Browser is:'+browser_name+'Version is:'+browser_version)
+##                log.info('Browser is:'+browser_name+'Version is:'+browser_version)
                 #get the original style of the element
                 original_style = webelement.get_attribute('style')
                 #Apply css to the element
@@ -283,7 +283,7 @@ class UtilWebKeywords:
                 if isinstance(browser_Keywords.driver_obj,webdriver.Ie):
                     browser_Keywords.driver_obj.execute_script(HIGHLIGHT_SCRIPT_IE,webelement,original_style+APPLY_CSS)
                 else:
-                    browser_Keywords.driver_obj.execute_script(HIGHLIGHT_SCRIPT,webelement,original_style+APPLY_CSS)
+                    browser_Keywords.driver_obj.execute_script(HIGHLIGHT_SCRIPT,webelement,str(original_style)+APPLY_CSS)
 
                 #highlight remains for 3 secs on the element
                 import time
