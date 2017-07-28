@@ -227,15 +227,15 @@ class Launch_Keywords():
                         fg_thread, fg_process = win32process.GetWindowThreadProcessId(foreground)
                         aut_thread, aut_process = win32process.GetWindowThreadProcessId(aut_handle)
                         win32process.AttachThreadInput(aut_thread, fg_thread, True)
-                        self.bring_to_top(aut_handle,4)
+                        self.bring_to_top(aut_handle,5)
                         return True
                     else:
-                        self.bring_to_top(aut_handle,4)
+                        self.bring_to_top(aut_handle,5)
                         self.hide_always_on_top_windows()
                         win32gui.SetForegroundWindow(aut_handle)
                         return True
                 else:
-                    self.bring_to_top(aut_handle,1)
+                    self.bring_to_top(aut_handle,5)
                     return True
         except Exception as e:
             err_msg = desktop_constants.ERROR_MSG
