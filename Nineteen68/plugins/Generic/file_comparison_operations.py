@@ -354,12 +354,25 @@ class TextFile:
             ##print args[len_args-1]
             with open(input_path, 'a+') as file:
                 if len(args)>0 and (args[len_args-1]).lower()=="newline" :
-                    file.write(content)
+                
+            #872 unicode write file support (Himanshu)
+                    try:
+                        file.write(content)
+                    except:
+                        file.write(content.encode('UTF-8'))
                     for i in range(0,(len(args)-1)):
-                        file.write("\n"+args[i])
+                        file.write("\n")
+                        try:
+                            file.write(args[i])
+                        except:
+                            file.write(args[i].encode('UTF-8'))
+
                 else:
                     content+=''.join(args)
-                    file.write(content)
+                    try:
+                        file.write(content)
+                    except:
+                        file.write(content.encode('UTF-8'))
                 file.close()
                 log.debug('Content is written successfully')
                 status= True
@@ -395,7 +408,11 @@ class XML:
         from xml.etree import ElementTree as ET
         from xml.etree import ElementTree
         try:
-            tree = ET.XML(content)
+        #872 Unicode file write support for XML (Himanshu)
+            try:
+                tree = ET.XML(content)
+            except:
+                tree = ET.XML(content.encode('UTF-8'))
             rough_string = ElementTree.tostring(tree,'utf-8')
             reparsed = minidom.parseString(rough_string)
             val=reparsed.toprettyxml(indent="\t")

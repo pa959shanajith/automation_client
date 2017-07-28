@@ -193,13 +193,22 @@ class ExcelFile:
                     col=int(col)
                     if row>0 and col>0:
                         res,value,err_msg=self.dict['read_cell_'+file_ext](row,col,self.excel_path,self.sheetname,*args)
-                        info_msg='cell value is '+str(value)
+                    #872 added unicode support for info (Himanshu)
+                        try:
+                            info_msg='cell value is '+str(value)
+                        except:
+                            info_msg='cell value is '+value
                         logger.print_on_console(info_msg)
                         log.info(info_msg)
                         if res:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
-                            output=str(value)                  ##Value returned must be integer so thet it will display 20 instead of 20L
+                    #872 return without str conversion if unicode (Himanshu)
+                            if not(type(value) is unicode):
+                                output=str(value)                  ##Value returned must be integer so that it will display 20 instead of 20L
+                                print 'Converted to str'
+                            else:
+                                output=value
                     else:
                         err_msg=ERROR_CODE_DICT["ERR_ROW_COLUMN"]
             else:
@@ -228,13 +237,19 @@ class ExcelFile:
         methodoutput=TEST_RESULT_FALSE
         output = OUTPUT_CONSTANT
         err_msg = None
+
+        #Support for special languages (#872) decode if unicode(special language) (Himanshu)
+        coreutilsobj=core_utils.CoreUtils()
+        value=coreutilsobj.get_UTF_8(value)
+
         try:
             if self.excel_path != None and self.sheetname != None:
                 file_ext,res,err_msg=self.__get_ext(self.excel_path)
                 if res:
                     info_msg=generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname
                     log.info(info_msg)
-                    info_msg='Row is '+str(row)+' col is '+str(col)+' and Value: '+str(value)
+                    #872 removed str from value to support unicode (Himanshu)
+                    info_msg='Row is '+str(row)+' col is '+str(col)+' and Value: '+value
                     log.info(info_msg)
 ##                    logger.print_on_console(info_msg)
                     row=int(row)
@@ -450,10 +465,6 @@ class ExcelXLS:
 
         """
 
-        coreutilsobj=core_utils.CoreUtils()
-        value=coreutilsobj.get_UTF_8(value)
-        input_path=coreutilsobj.get_UTF_8(input_path)
-        sheetname=coreutilsobj.get_UTF_8(sheetname)
         from xlutils.copy import copy
         from xlwt import easyxf,XFStyle
         workbook = copy(book)
@@ -764,7 +775,6 @@ class ExcelXLS:
             log.error(e)
         if err_msg!=None:
             log.error(err_msg)
-        value=str(value)    ##changed type of value to string
         return status,value,err_msg
 
 
@@ -876,7 +886,6 @@ class ExcelXLS:
         status=False
         err_msg=None
         coreutilsobj=core_utils.CoreUtils()
-        input_path=coreutilsobj.get_UTF_8(input_path)
         sheetname=coreutilsobj.get_UTF_8(sheetname)
         log.debug(generic_constants.INPUT_IS+input_path+' '+sheetname)
         try:
@@ -1219,7 +1228,6 @@ class ExcelXLSX:
         if err_msg!=None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
-        value=str(value)
         return status,value,err_msg
 
     def clear_cell_xlsx(self,row,col,excel_path,sheetname):
@@ -1335,7 +1343,6 @@ class ExcelXLSX:
         status=False
         err_msg=None
         coreutilsobj=core_utils.CoreUtils()
-        input_path=coreutilsobj.get_UTF_8(input_path)
         sheetname=coreutilsobj.get_UTF_8(sheetname)
         log.debug(generic_constants.INPUT_IS+input_path+' '+sheetname)
         try:
