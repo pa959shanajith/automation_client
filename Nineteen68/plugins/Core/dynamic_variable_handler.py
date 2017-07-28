@@ -92,9 +92,17 @@ class DynamicVariables:
 
     #To Store the output from keyword as an array if it is multiple values
     def store_as_array(self,variable,value):
-        variable=variable[0:len(variable)-1]
-        for i in range(len(value)):
-            dynamic_variable_map[variable+'['+str(i)+']}']=value[i]
+        if not(isinstance(value[0],list)):
+            variable=variable[0:len(variable)-1]
+            for i in range(len(value)):
+                dynamic_variable_map[variable+'['+str(i)+']}']=value[i]
+        else:
+            variable=variable[0:len(variable)-1]
+            for i in range(len(value)):
+                p=i+1
+                for j in range(len(value[i])):
+                    q=j+1
+                    dynamic_variable_map[variable+'['+str(p)+']['+str(q)+']}']=value[i][j]
 
 
      #To Store the output from keyword as an array if it is single value
