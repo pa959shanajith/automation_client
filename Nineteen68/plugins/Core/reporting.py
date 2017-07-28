@@ -349,29 +349,47 @@ class Reporting:
 
 
     def save_report_json(self,filename):
-        log.debug('Saving report json to a file')
-        with open(filename, 'w') as outfile:
-                log.info('Writing report data to the file '+filename)
-                json.dump(self.report_json, outfile, indent=4, sort_keys=False)
-        outfile.close()
+        try:
+            log.debug('Saving report json to a file')
+            with open(filename, 'w') as outfile:
+                    log.info('Writing report data to the file '+filename)
+                    json.dump(self.report_json, outfile, indent=4, sort_keys=False)
+            outfile.close()
+        except Exception as e:
+            log.debug(self.report_json)
+            import traceback
+            log.debug(traceback.print_exc())
+            traceback.print_exc()
 
     def save_report_json_conditioncheck(self,filename):
-        log.debug('Saving report json to a file')
-        self.build_overallstatus_conditionCheck()
-        with open(filename, 'w') as outfile:
-                log.info('Writing report data to the file '+filename)
-                json.dump(self.report_json_condition_check, outfile, indent=4, sort_keys=False)
-        outfile.close()
+        try:
+            log.debug('Saving report json to a file')
+            self.build_overallstatus_conditionCheck()
+            with open(filename, 'w') as outfile:
+                    log.info('Writing report data to the file '+filename)
+                    json.dump(self.report_json_condition_check, outfile, indent=4, sort_keys=False)
+            outfile.close()
+        except Exception as e:
+            log.debug(self.report_json_condition_check)
+            import traceback
+            log.debug(traceback.print_exc())
+            traceback.print_exc()
 
     def save_report_json_conditioncheck_testcase_empty(self,filename,description):
-        log.debug('Saving report json to a file')
-        self.add_report_testcase_empty(description)
-        self.build_overallstatus_conditionCheck_testcase_empty()
+        try:
+            log.debug('Saving report json to a file')
+            self.add_report_testcase_empty(description)
+            self.build_overallstatus_conditionCheck_testcase_empty()
 
-        with open(filename, 'w') as outfile:
-                log.info('Writing report data to the file '+filename)
-                json.dump(self.report_json_condition_check_testcase_empty, outfile, indent=4, sort_keys=False)
-        outfile.close()
+            with open(filename, 'w') as outfile:
+                    log.info('Writing report data to the file '+filename)
+                    json.dump(self.report_json_condition_check_testcase_empty, outfile, indent=4, sort_keys=False)
+            outfile.close()
+        except Exception as e:
+            log.debug(self.report_json_condition_check_testcase_empty)
+            import traceback
+            log.debug(traceback.print_exc())
+            traceback.print_exc()
 
 
 

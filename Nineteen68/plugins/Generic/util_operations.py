@@ -16,7 +16,7 @@ from generic_constants import *
 from verify_file_images import VerifyFileImages
 import file_operations
 from constants import *
-
+import core_utils
 import logging
 
 log = logging.getLogger('util_operations.py')
@@ -151,6 +151,10 @@ class UtilOperations:
         return status,methodoutput,output,err_msg
 
     def verify_values(self,input1,input2):
+        #special language support defect #872 added support for non english characters using unicode (Himanshu)
+        coreutilsobj=core_utils.CoreUtils()
+        input1=coreutilsobj.get_UTF_8(input1)
+        input2=coreutilsobj.get_UTF_8(input2)
 
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
@@ -159,8 +163,8 @@ class UtilOperations:
         try:
             log.debug('reading the inputs')
             if input1 != None and input2 != None and input1 != '' and input2 != '' :
-                input1=str(input1).replace('\n','').replace('\r','')
-                input2=str(input2).replace('\n','').replace('\r','')
+#                input1=str(input1).replace('\n','').replace('\r','')
+#                input2=str(input2).replace('\n','').replace('\r','')
                 if input1==input2:
                     log.debug('Values are equal')
                     logger.print_on_console('Values are equal')

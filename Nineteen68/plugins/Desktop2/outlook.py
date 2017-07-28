@@ -103,7 +103,7 @@ class OutlookKeywords:
                     error_msg='Check the path given'
             except Exception as e:
                 log.error(e)
-                logger.print_on_console(e)
+                logger.print_on_console('Check the path given')
             return status,method_output,result,error_msg
 
 
@@ -188,14 +188,17 @@ class OutlookKeywords:
                                         continue
                             else:
                                 continue
+                            #added this break statement to stop opening multiple emails of the same input types (from,to,subject)
+                            break
                         else :
                             continue
+
                 if self.Flag!=True:
                     logger.print_on_console('Error: No such mail found')
                     error_msg='Error: No such mail found'
             except Exception as e:
                 log.error(e)
-                logger.print_on_console(e)
+                logger.print_on_console('Error: No such mail found')
             return status,method_output,result,error_msg
 
         def GetFromMailId(self,input,*args):
@@ -213,7 +216,7 @@ class OutlookKeywords:
                     error_msg='Error : No such mail id found'
             except Exception as  e:
                 log.error(e)
-                logger.print_on_console(e)
+                logger.print_on_console('Error : No such mail id found')
             return status,method_output,res,error_msg
 
 
@@ -232,7 +235,7 @@ class OutlookKeywords:
                     error_msg='Error : mail does''t have such info'
             except Exception as  e:
                 log.error(e)
-                logger.print_on_console(e)
+                logger.print_on_console('Error : mail does''t have such info')
             return status,method_output,res,error_msg
 
         def GetSubject(self,input,*args):
@@ -250,7 +253,7 @@ class OutlookKeywords:
                     error_msg='Error : No subject found'
             except Exception as  e:
                 log.error(e)
-                logger.print_on_console(e)
+                logger.print_on_console('Error : No subject found')
             return status,method_output,res,error_msg
 
         def GetToMailID(self,input,*args):
@@ -268,7 +271,7 @@ class OutlookKeywords:
                     error_msg='Error : No such mail id found'
             except Exception as  e:
                 log.error(e)
-                logger.print_on_console(e)
+                logger.print_on_console('Error : No such mail id found')
             return status,method_output,res,error_msg
 
 
@@ -290,7 +293,7 @@ class OutlookKeywords:
                     error_msg='Error : No Body found'
             except Exception as  e:
                     log.error(e)
-                    logger.print_on_console(e)
+                    logger.print_on_console('Error : No Body found')
             return status,method_output,res,error_msg
 
 
@@ -314,12 +317,13 @@ class OutlookKeywords:
                                                 method_output=desktop_constants.TEST_RESULT_TRUE
 
 
-                    except (com_error):
+                    except Exception as e:
                         logger.print_on_console('Error occured : File not found')
                 else:
                     logger.print_on_console('Error : No such mail found')
             except Exception as  e:
-                Exceptions.error(e)
+                #import traceback
+                logger.print_on_console('Error occured : File not found')
             return status,method_output,res,error_msg
 
 # Internal method to search for a folder in given folder

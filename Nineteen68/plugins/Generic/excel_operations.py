@@ -752,9 +752,6 @@ class ExcelXLS:
                     if cell.ctype==3:
                         value=datetime.datetime(*xlrd.xldate_as_tuple(cell.value, book.datemode))
                         value=value.date()
-                    elif cell.ctype==2:         ## added elif statements to detrmine whether the number is percentage and diaplay it as percentage
-                        value=value*100
-                        value=str(value)+'%'
                     #print cell.ctype
                     status=True
                     log.info(value)
@@ -887,20 +884,45 @@ class ExcelXLS:
             workbook_info=self.__load_workbook_xls(input_path,sheetname)
             row=workbook_info[2]
             col=workbook_info[3]
-            if len(args)>0 and args[0].lower() == 'newline'  :
+            len_args=len(args)
+##            if len(args)>0 and args[0].lower() == 'newline'  :
+##                col=0
+##                if workbook_info[3] != -1:
+##                    row=row+1
+##                    col=workbook_info[3]
+##                else:
+##                    row=0
+##            elif workbook_info[3]==-1:
+##                row=col=0
+##            else:
+##                col+=1
+##            #writes to the cell in given row,col
+##            status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content,args)
+            if row==-1 and col==-1:
+                row=0
                 col=0
-                if workbook_info[3] != -1:
-                    row=row+1
-                    col=workbook_info[3]
-                else:
-                    row=0
-            elif workbook_info[3]==-1:
-                row=col=0
+                ##print row, col, content
+                status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content)
             else:
-                col+=1
+                col=col+1
+                status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content)
+            ##print "content ",row,col
+            if len(args)>0 and args[len_args-1].lower() == 'newline':
+                for i in range(0,(len_args-1)):
+                    workbook_info=self.__load_workbook_xls(input_path,sheetname)
+                    row=row+1
+                    col=0
+                    ##print "start",i,row,col
+                    status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,args[i])
+            else:
+                for i in range(0,(len_args)):
+                    workbook_info=self.__load_workbook_xls(input_path,sheetname)
+                    row=row
+                    col=col+1
+                #writes to the cell in given row,col
+                    ##print "start",i,row,col
+                    status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,args[i])
 
-            #writes to the cell in given row,col
-            status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content)
         except Exception as e:
             err_msg='Error occurred writing to .xls file'
             log.error(e)
@@ -1317,16 +1339,26 @@ class ExcelXLSX:
         sheetname=coreutilsobj.get_UTF_8(sheetname)
         log.debug(generic_constants.INPUT_IS+input_path+' '+sheetname)
         try:
-            #loads the xls workbook
+            #loads the xlsx workbook
+
             workbook_info=self.__load_workbook_xlsx(input_path,sheetname)
             row=workbook_info[2]
             col=workbook_info[3]
-            if len(args)>0 and args[0].lower() == 'newline':
-                row=row+1
-                col=1
 
-            #writes to the cell in given row,col
+            len_args=len(args)
+            ##print args,'dfvgbjnml,',row,col
             status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,content)
+            if len(args)>0 and args[len_args-1].lower() == 'newline':
+                for i in range(0,(len_args-1)):
+                    row=row+1
+                    col=1
+                    ##print row,col
+                    status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,args[i])
+            else:
+                for i in range(0,(len_args)):
+                    col=col+1
+                    ##print row,col
+                    status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,args[i])
         except Exception as e:
             log.error(e)
             err_msg='Error occurred writing to .xlsx file '

@@ -275,7 +275,7 @@ class UtilWebKeywords:
                 browser_info=browser_Keywords.driver_obj.capabilities
                 browser_name=browser_info.get('browserName')
                 browser_version=browser_info.get('version')
-                log.info('Browser is:'+browser_name+'Version is:'+browser_version)
+##                log.info('Browser is:'+browser_name+'Version is:'+browser_version)
                 #get the original style of the element
                 original_style = webelement.get_attribute('style')
                 #Apply css to the element
@@ -283,7 +283,7 @@ class UtilWebKeywords:
                 if isinstance(browser_Keywords.driver_obj,webdriver.Ie):
                     browser_Keywords.driver_obj.execute_script(HIGHLIGHT_SCRIPT_IE,webelement,original_style+APPLY_CSS)
                 else:
-                    browser_Keywords.driver_obj.execute_script(HIGHLIGHT_SCRIPT,webelement,original_style+APPLY_CSS)
+                    browser_Keywords.driver_obj.execute_script(HIGHLIGHT_SCRIPT,webelement,str(original_style)+APPLY_CSS)
 
                 #highlight remains for 3 secs on the element
                 import time
@@ -500,27 +500,6 @@ class UtilWebKeywords:
     def generic_sendfucntion_keys(self,input,*args):
         from sendfunction_keys import SendFunctionKeys
         obj=SendFunctionKeys()
-        pidset = browser_Keywords.pid_set
-        import win32gui,win32api,win32process
-        if(len(pidset)>0):
-            pid = pidset.pop()
-            toplist, winlist = [], []
-            def enum_cb(hwnd, results):
-                winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
-            win32gui.EnumWindows(enum_cb, toplist)
-            app = [(hwnd, title) for hwnd, title in winlist if ((("Chrome" or "Firefox" or "Explorer") in title) and (win32process.GetWindowThreadProcessId(hwnd)[1] == pid))]
-            app = app[0]
-            handle = app[0]
-            foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
-            appThread = win32api.GetCurrentThreadId()
-            if( foreThread != appThread ):
-                win32process.AttachThreadInput(foreThread[0], appThread, True)
-                win32gui.BringWindowToTop(handle)
-                win32gui.ShowWindow(handle,5)
-                win32process.AttachThreadInput(foreThread[0], appThread, False)
-            else:
-                win32gui.BringWindowToTop(handle)
-                win32gui.ShowWindow(handle,5)
         obj.sendfunction_keys(input,*args)
 
 

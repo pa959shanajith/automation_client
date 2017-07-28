@@ -473,6 +473,11 @@ class FileOperations:
         return : bool
 
         """
+        # Defect #872 Special Language Support using unicode to address the issue (Himanshu)
+        coreutilsobj=core_utils.CoreUtils()
+        input_path=coreutilsobj.get_UTF_8(input_path)
+        content=coreutilsobj.get_UTF_8(content)
+
         try:
 
             status=TEST_RESULT_FAIL

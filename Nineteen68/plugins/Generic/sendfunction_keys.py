@@ -30,6 +30,38 @@ class SendFunctionKeys:
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_res=OUTPUT_CONSTANT
+
+        '''For bringing the browser to foreground'''
+        try:
+            import browser_Keywords
+            import selenium
+            import win32gui,win32api,win32process
+            pids = browser_Keywords.pid_set
+            if(len(pids)>0):
+                pid = pids.pop()
+                toplist, winlist = [], []
+                def enum_cb(hwnd, results):
+                    winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
+                win32gui.EnumWindows(enum_cb, toplist)
+                app = [(hwnd, title) for hwnd, title in winlist if ((("Chrome" in title) or ("Firefox" in title) or ("Explorer" in title)) and (win32process.GetWindowThreadProcessId(hwnd)[1] == pid))]
+                if(len(app)==1):
+                    app = app[0]
+                    handle = app[0]
+                    foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
+                    appThread = win32api.GetCurrentThreadId()
+                    if( foreThread != appThread ):
+                        win32process.AttachThreadInput(foreThread[0], appThread, True)
+                        win32gui.BringWindowToTop(handle)
+                        win32gui.ShowWindow(handle,5)
+                        win32process.AttachThreadInput(foreThread[0], appThread, False)
+                    else:
+                        win32gui.BringWindowToTop(handle)
+                        win32gui.ShowWindow(handle,5)
+                time.sleep(1)
+        except Exception as e:
+            log.error("Web plugin not loaded")
+            pass
+
         try:
             log.debug('reading the inputs')
             input=str(input)
@@ -106,7 +138,6 @@ class SendFunctionKeys:
                     value= 'type'
                 elif re.match(('^\d+$'),var):
                     value=int(var)
-
         return value
 
 

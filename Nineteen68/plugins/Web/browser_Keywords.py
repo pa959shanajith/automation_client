@@ -219,104 +219,60 @@ class BrowserKeywords():
 
 
     def navigate_with_authenticate(self ,webelement, url , *args):
+        """
+        def : navigate_with_authenticate
+        purpose : To open a URL which throws a popup and automatically fill
+        the credentials and proceed to next window.
+        param : URL,userID,password,timeout(Optional)
+        return : bool
+        """
+
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            if url[0] is not None and url[0] != '':
+            if (url[0] is not None and url[0] != '')\
+             and (url[1] is not None and url[1] != '')\
+              and (url[2] is not None and url[2] != ''):
                 from encryption_utility import AESCipher
                 encryption_obj = AESCipher()
                 input_val = encryption_obj.decrypt(url[2])
                 url[2]=input_val
-                url[3]=int(url[3])
                 t=TestThread(url)
-                keyword_list = ['email','username','ctl00_Content_frmLogin_UserName','login','login_field']         #Possible Keywords for username field
-                if len(url)>4:
-                    timeout=url[4]
+                if len(url)>3:
+                    url[3]=int(url[3])
+                    timeout=url[3]
                     time.sleep(int(timeout))
+                else:
+                    time.sleep(6)
+
+                # defect #193 added functionality for authentication automation in browser popup (Himanshu)
                 if(isinstance(driver_obj,webdriver.Ie)):
                     obj=SF()
                     username=url[1].strip()
-
-                    match_found_flag = False
-
-                    try:
-                        for i in keyword_list:
-                            try:
-                                username1 = driver_obj.find_element_by_id(i)
-                                username1.send_keys(username)
-                                match_found_flag = True
-                            except:
-                                username1 = driver_obj.find_element_by_name(i)
-                                username1.send_keys(username)
-                                match_found_flag = True
-                            if(match_found_flag):
-                                break
-                        password=url[2]
-                        obj.execute_key('tab',1)
-                        obj.type(password)
-                        obj.execute_key('tab',url[3])
-                        obj.execute_key('enter',1)
-                        status=webconstants.TEST_RESULT_PASS
-                        result=webconstants.TEST_RESULT_TRUE
-                    except:
-                        try:
-                            password=url[2]
-                            obj.type(username)
-                            obj.execute_key('tab',1)
-                            obj.type(password)
-                            obj.execute_key('tab',url[3])
-                            obj.execute_key('enter',1)
-                            status=webconstants.TEST_RESULT_PASS
-                            result=webconstants.TEST_RESULT_TRUE
-                        except:
-                            logger.print_on_console('Navigate with authenticate failed.')
-                            log.error('Navigate with authenticate failed.')
-                            err_msg = 'Navigate with authenticate failed.'
-                            status=webconstants.TEST_RESULT_FAIL
-                            result=webconstants.TEST_RESULT_FALSE
-
+                    password=url[2]
+                    obj.type(username)
+                    obj.execute_key('tab',1)
+                    obj.type(password)
+                    obj.execute_key('tab',1)
+                    obj.execute_key('spacebar',1)
+                    obj.execute_key('tab',1)
+                    obj.execute_key('enter',1)
+                    status=webconstants.TEST_RESULT_PASS
+                    result=webconstants.TEST_RESULT_TRUE
                 else:
                     obj=SF()
                     username=url[1].strip()
                     match_found_flag = False
-
-                    try:
-                        for i in keyword_list:
-                            try:
-                                username1 = driver_obj.find_element_by_id(i)
-                                username1.send_keys(username)
-                                match_found_flag = True
-                            except:
-                                username1 = driver_obj.find_element_by_name(i)
-                                username1.send_keys(username)
-                                match_found_flag = True
-                            if(match_found_flag):
-                                break
-                        password=url[2]
-                        obj.execute_key('tab',1)
-                        obj.type(password)
-                        obj.execute_key('tab',url[3])
-                        obj.execute_key('enter',1)
-                        status=webconstants.TEST_RESULT_PASS
-                        result=webconstants.TEST_RESULT_TRUE
-                    except:
-                        try:
-                            password=url[2]
-                            obj.type(username)
-                            obj.execute_key('tab',1)
-                            obj.type(password)
-                            obj.execute_key('tab',url[3])
-                            obj.execute_key('enter',1)
-                            status=webconstants.TEST_RESULT_PASS
-                            result=webconstants.TEST_RESULT_TRUE
-                        except:
-                            logger.print_on_console('Navigate with authenticate failed.')
-                            log.error('Navigate with authenticate failed.')
-                            err_msg = 'Navigate with authenticate failed.'
-                            status=webconstants.TEST_RESULT_FAIL
-                            result=webconstants.TEST_RESULT_FALSE
+                    password=url[2]
+                    obj.type(username)
+                    obj.execute_key('tab',1)
+                    obj.type(password)
+                    obj.execute_key('tab',1)
+                    obj.execute_key('enter',1)
+                    status=webconstants.TEST_RESULT_PASS
+                    result=webconstants.TEST_RESULT_TRUE
 
             else:
                 logger.print_on_console(webconstants.INVALID_INPUT)
