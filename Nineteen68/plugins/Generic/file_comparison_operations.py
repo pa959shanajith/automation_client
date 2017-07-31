@@ -386,7 +386,7 @@ class TextFile:
 
 
                 else:
-                    print "HIII"
+           
                     content+=''.join(args)
                     try:
                         file.write(content)
