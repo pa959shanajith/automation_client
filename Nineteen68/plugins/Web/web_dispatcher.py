@@ -163,6 +163,7 @@ class Dispatcher:
 
 
         try:
+            window_ops_list=['click','press','doubleClick','rightClick','uploadFile','acceptPopUp','dismissPopUp','getPopUpText','selectRadioButton','selectCheckbox','unselectCheckbox','cellClick','clickElement','drag','drop','setText','sendValue','clearText','setSecureText','sendSecureValue','selectValueByIndex','selectValueByText','selectAllValues','selectMultipleValuesByIndexes','selectMultipleValuesByText','verifyValuesExists','deselectAll','setFocus','mouseHover','tab','sendFunctionKeys','rightClick','mouseClick','openBrowser','navigateToURL','openNewBrowser','refresh','closeBrowser','closeSubWindows','switchToWindow','clearCache','navigateWithAuthenticate']
             dict={'getObjectCount':self.custom_object.get_object_count,
                   'click': self.button_link_object.click,
                   'verifyButtonName' : self.button_link_object.verify_button_name,
@@ -304,7 +305,11 @@ class Dispatcher:
                     actual_input=teststepproperty.inputval[0].split(";")
                     if(keyword.lower() == "sendfunctionkeys"):
                         input.extend(actual_input)
+                    ## Issue #190 Driver control won’t switch back to parent window
+                    self.browser_object.validate_current_window_handle()
                     result= dict[keyword](webelement,input)
+                    if keyword in window_ops_list:
+                        self.browser_object.update_window_handles()
                     driver=browser_Keywords.driver_obj
                     if keyword not in [GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
                         driver.switch_to.default_content()

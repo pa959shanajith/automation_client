@@ -13,6 +13,8 @@ import logger
 import webconstants
 driver_obj = None
 parent_handle=None
+all_handles=[]
+recent_handles=[]
 webdriver_list = []
 import threading
 import time
@@ -123,6 +125,8 @@ class BrowserKeywords():
             hwndg = utilobject.bring_Window_Front(pid)
             webdriver_list.append(driver_obj)
             parent_handle = driver_obj.current_window_handle
+            recent_handles.append(parent_handle)
+            all_handles.append(parent_handle)
             logger.print_on_console('Browser opened')
             log.info('Browser opened')
             status=webconstants.TEST_RESULT_PASS
@@ -144,6 +148,8 @@ class BrowserKeywords():
             driver_obj=driver.getBrowser(self.browser_num)
             webdriver_list.append(driver_obj)
             parent_handle = driver_obj.current_window_handle
+            recent_handles.append(parent_handle)
+            all_handles.append(parent_handle)
             logger.print_on_console('Opened new browser')
             log.info('Opened new browser')
             status=webconstants.TEST_RESULT_PASS
@@ -414,14 +420,8 @@ class BrowserKeywords():
                 webdriver_list[driver_instance].quit()
                 logger.print_on_console('browser closed')
                 log.info('browser closed')
-                try:
-                    if(len(winHandles) > 1):
-                        webdriver_list[driver_instance].switch_to.window(winHandles[count])
-                    if(len(winHandles) == 1):
-                        webdriver_list.pop(len(webdriver_list)-1)
-                        print 'Kill driver logic'
-                except Exception as e:
-                    a=1
+                ## Issue #190 Driver control won’t switch back to parent window
+                webdriver_list.pop(len(webdriver_list)-1)
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             except Exception as e:
@@ -457,41 +457,39 @@ class BrowserKeywords():
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
+        ## Issue #190 Driver control won’t switch back to parent window
+        global all_handles
+        global parent_handle
+        global recent_handles
         err_msg=None
         try:
             if (len(args) > 1):
                 inp = args[1]
                 inp = str(inp[0])
-            winHandles = driver_obj.window_handles
-            winHandles = driver_obj.window_handles
-            if len(winHandles) > 1:
+            if len(all_handles) > 1:
                 if(inp == 'ALL'):
-                    for x in winHandles:
-                        if(not(parent_handle == x)):
-                            try:
-                                driver_obj.switch_to.window(parent_handle)
-                                driver_obj.switch_to.window(x)
-                                driver_obj.close()
-                                driver_obj.switch_to.window(parent_handle)
-                                logger.print_on_console('Sub window closed')
-                                log.info('Sub window closed')
-                            except Exception as e:
-                                err_msg=self.__web_driver_exception(e)
+                    while all_handles[-1]!=parent_handle:
+                        try:
+                            driver_obj.switch_to.window(all_handles[-1])
+                            driver_obj.close()
+                            all_handles=all_handles[0:-1]
+                            logger.print_on_console('Sub window closed')
+                            log.info('Sub window closed')
+                        except Exception as e:
+                            err_msg=self.__web_driver_exception(e)
                 else:
                     try:
-                        driver_obj.switch_to.window(parent_handle)
-                        driver_obj.switch_to.window(winHandles[len(winHandles) - 1])
+                        driver_obj.switch_to.window(all_handles[-1])
                         driver_obj.close()
-                        driver_obj.switch_to.window(parent_handle)
+                        all_handles=all_handles[0:-1]
                         logger.print_on_console('Sub window closed')
                         log.info('Sub windows closed')
                     except Exception as e:
                         err_msg=self.__web_driver_exception(e)
 
-                after_close = driver_obj.window_handles
-                after_close = driver_obj.window_handles
-                if(len(after_close) >= 1):
+                if(len(all_handles) >= 1):
                     driver_obj.switch_to.window(parent_handle)
+                    recent_handles.append(parent_handle)
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
             else:
@@ -535,6 +533,52 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
+
+    def update_window_handles(self):
+    	## Issue #190 Driver control won’t switch back to parent window
+        global driver_obj
+        global all_handles
+        global recent_handles
+        if driver_obj is not None:
+            try:
+                winHandles=driver_obj.window_handles
+                winHandles=list(driver_obj.window_handles)
+                new_handles=[]
+                invalid_handles=[]
+                for h in all_handles:
+                    if h in winHandles:
+                        new_handles.append(h)
+                        winHandles.remove(h)
+                    else:
+                        invalid_handles.append(h)
+                del all_handles[:]
+                if len(winHandles)>0:
+                    all_handles=new_handles+winHandles
+                else:
+                    all_handles=new_handles
+                #parent_handle=all_handles[0]
+                recent_handles=filter(lambda a:a not in invalid_handles,recent_handles)
+                if len(recent_handles)>0:
+                    driver_obj.switch_to.window(recent_handles[-1])
+            except Exception as e:
+                log.error(e)
+
+    def validate_current_window_handle(self):
+    	## Issue #190 Driver control won’t switch back to parent window
+        global driver_obj
+        if driver_obj is not None:
+            try:
+                winHandles=driver_obj.window_handles
+                curHandle=driver_obj.current_window_handle
+            except Exception as e:
+                log.error(e)
+                rev_recent_handles=list(recent_handles)
+                rev_recent_handles.reverse()
+                for h in rev_recent_handles:
+                    try:
+                        driver_obj.switch_to.window(h)
+                    except Exception as e:
+                        log.error(e)
 
 
 class Singleton_DriverUtil():
@@ -619,6 +663,10 @@ class Singleton_DriverUtil():
         return d
 
     def getBrowser(self,browser_num):
+        global recent_handles
+        global all_handles
+        del recent_handles[:]
+        del all_handles[:]
         driver=None
         log.debug('BROWSER NUM: ')
         log.debug(browser_num)
