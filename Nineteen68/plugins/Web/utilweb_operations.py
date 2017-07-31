@@ -578,7 +578,7 @@ class UtilWebKeywords:
                 log.info('Switching to the window ')
                 log.info(to_window)
                 window_handles=self.__get_window_handles()
-                ## Issue #190 Driver control won’t switch back to parent window
+                ## Issue #190 Driver control won't switch back to parent window
                 if to_window>=len(window_handles):
                     err_msg='Window '+input+' not found'
                     logger.print_on_console(err_msg)
@@ -612,7 +612,7 @@ class UtilWebKeywords:
                 if len(window_handles)>0:
                     total_handles=len(window_handles)
                     browser_Keywords.driver_obj.switch_to.window(window_handles[total_handles-1])
-                    ## Issue #190 Driver control won’t switch back to parent window
+                    ## Issue #190 Driver control won't switch back to parent window
                     browser_Keywords.recent_handles.append(window_handles[total_handles-1])
                     logger.print_on_console('Control switched to latest window')
                     status=TEST_RESULT_PASS
@@ -634,7 +634,7 @@ class UtilWebKeywords:
                     if len(window_handles)>0:
                         total_handles=len(window_handles)
                         browser_Keywords.driver_obj.switch_to.window(window_handles[total_handles-1])
-                        ## Issue #190 Driver control won’t switch back to parent window
+                        ## Issue #190 Driver control won't switch back to parent window
                         browser_Keywords.recent_handles.append(window_handles[total_handles-1])
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -736,7 +736,7 @@ class UtilWebKeywords:
         return status,methodoutput,output,err_msg
 
     def __get_window_handles(self):
-    	## Issue #190 Driver control won’t switch back to parent window
+    	## Issue #190 Driver control won't switch back to parent window
         window_handles=browser_Keywords.all_handles
         logger.print_on_console('Window handles size '+str(len(window_handles)))
         return window_handles

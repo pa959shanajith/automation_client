@@ -305,7 +305,7 @@ class Dispatcher:
                     actual_input=teststepproperty.inputval[0].split(";")
                     if(keyword.lower() == "sendfunctionkeys"):
                         input.extend(actual_input)
-                    ## Issue #190 Driver control won’t switch back to parent window
+                    ## Issue #190 Driver control won't switch back to parent window
                     self.browser_object.validate_current_window_handle()
                     result= dict[keyword](webelement,input)
                     if keyword in window_ops_list:

@@ -420,7 +420,7 @@ class BrowserKeywords():
                 webdriver_list[driver_instance].quit()
                 logger.print_on_console('browser closed')
                 log.info('browser closed')
-                ## Issue #190 Driver control won’t switch back to parent window
+                ## Issue #190 Driver control won't switch back to parent window
                 webdriver_list.pop(len(webdriver_list)-1)
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
@@ -457,7 +457,7 @@ class BrowserKeywords():
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
-        ## Issue #190 Driver control won’t switch back to parent window
+        ## Issue #190 Driver control won't switch back to parent window
         global all_handles
         global parent_handle
         global recent_handles
@@ -535,7 +535,7 @@ class BrowserKeywords():
         return status,result,output,err_msg
 
     def update_window_handles(self):
-    	## Issue #190 Driver control won’t switch back to parent window
+    	## Issue #190 Driver control won't switch back to parent window
         global driver_obj
         global all_handles
         global recent_handles
@@ -564,7 +564,7 @@ class BrowserKeywords():
                 log.error(e)
 
     def validate_current_window_handle(self):
-    	## Issue #190 Driver control won’t switch back to parent window
+    	## Issue #190 Driver control won't switch back to parent window
         global driver_obj
         if driver_obj is not None:
             try:
