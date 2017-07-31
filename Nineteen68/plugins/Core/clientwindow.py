@@ -38,7 +38,13 @@ IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images"
 CERTIFICATE_PATH = os.environ["NINETEEN68_HOME"] + "/Scripts/CA_BUNDLE"
 
 configobj = readconfig.readConfig()
-configvalues = configobj.readJson()
+#747 check for syntax error in config.json
+try:
+    configvalues = configobj.readJson()
+    jsonSyntaxErrorFlag = False
+except:
+    jsonSyntaxErrorFlag = True
+
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
 ##        print 'Inside debugTestCase method'
@@ -74,7 +80,7 @@ class MainNamespace(BaseNamespace):
 
         if(str(args[0]) == 'connected'):
             print('Connection to the Node Server established')
-            
+
     def on_webscrape(self,*args):
         global action,wxObject,browsername,desktopScrapeFlag,data
         args = list(args)
@@ -565,6 +571,10 @@ class ClientWindow(wx.Frame):
 ##        self.ShowFullScreen(True,wx.ALL)
 ##        self.SetBackgroundColour('#D0D0D0')
         self.logfilename_error_flag = False
+
+		#747 Screenshot path flag (Himanshu)
+        self.screenshotPath_error_flag = False
+        
         self.debugwindow = None
         self.id =id
         self.mainclass = self
@@ -589,6 +599,14 @@ class ClientWindow(wx.Frame):
             self.logfilename_error_flag = False
         except:
             self.logfilename_error_flag = True
+
+        ##747 Screenshot path validity check (Himanshu)
+        if not(jsonSyntaxErrorFlag):
+            spath = configvalues['screenShot_PathName']
+            self.screenshotPath_error_flag = False
+
+            if not os.path.exists(spath):
+                self.screenshotPath_error_flag = True
 
         console = logging.StreamHandler()
         console.setLevel(logging.INFO)
@@ -716,6 +734,14 @@ class ClientWindow(wx.Frame):
         self.Centre()
         style = self.GetWindowStyle()
         self.Show()
+		#747 disable buttons if any flag raised (Himanshu)
+        if (self.logfilename_error_flag or self.screenshotPath_error_flag):
+            self.cancelbutton.Disable()
+            self.terminatebutton.Disable()
+            self.clearbutton.Disable()
+            self.connectbutton.Disable()
+            self.rbox.Disable()
+
 
     def menuhandler(self, event):
       id = event.GetId()
@@ -969,7 +995,14 @@ class ClientWindow(wx.Frame):
             self.connectbutton.Disable()
         except Exception as e:
             print 'Forbidden request, Connection refused, please check the server ip and server port in Config.json, and restart the client window.'
-            
+            #747 Disable buttons if port or ip is invalid in config.json (Himanshu)
+            log.info('Forbidden request, Connection refused, please check the server ip and server port in Config.json, and restart the client window.')
+            self.cancelbutton.Disable()
+            self.terminatebutton.Disable()
+            self.clearbutton.Disable()
+            self.connectbutton.Disable()
+            self.rbox.Disable()
+
     def test(self,event):
 ##        print 'Self',self
         global mobileScrapeFlag
@@ -1029,7 +1062,7 @@ class ClientWindow(wx.Frame):
                     #call display logic
                     self.new = pause_display_operation.Display(parent = self,id = -1, title="SLK Nineteen68 - Display Variable",input = inputvalue)
 
-    
+
 
 
 class DebugWindow(wx.Frame):
@@ -1106,18 +1139,33 @@ class DebugWindow(wx.Frame):
 
 #----------------------------------------------------------------------
 def main():
+	#747 json syntax error flag (Himanshu)
+    global jsonSyntaxErrorFlag
     app = wx.App()
     cw = ClientWindow()
     print( '*******************************************************************************************************')
     print( '=========================================Nineteen68 Client Window======================================')
     print( '*******************************************************************************************************')
-    if cw.logfilename_error_flag:
-        logger.print_on_console( "Please provide a valid logfile path in config.json file")
+	#747 user friendly messages if any flag raised (Himanshu)
+    if jsonSyntaxErrorFlag:
+        logger.print_on_console( "[Error]: Syntax error in config.json file, please check and restart the client window.")
+        log.info("[Error]: Syntax error in config.json file, and please check and restart the client window.")
+        jsonSyntaxErrorFlag = False
+        app.MainLoop()
+    elif cw.logfilename_error_flag:
+        logger.print_on_console( "[Error]: Please provide a valid logfile path in config.json file and restart the client window.")
+        log.info("[Error]: Please provide a valid logfile path in config.json file and restart the client window.")
         cw.logfilename_error_flag = False
-    app.MainLoop()
+        app.MainLoop()
+    elif cw.screenshotPath_error_flag:
+        logger.print_on_console( "[Error]: Please provide a valid Screenshot path in config.json file and restart the client window.")
+        log.info("[Error]: Please provide a valid Screenshot path in config.json file and restart the client window.")
+        cw.screenshotPath_error_flag = False
+        app.MainLoop()
+    else:
+        app.MainLoop()
 
 if __name__ == "__main__":
     main()
-
 
 
