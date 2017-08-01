@@ -132,7 +132,7 @@ class Controller():
                 self.mobile_app_dispatcher_obj = mobile_app_dispatcher.MobileDispatcher()
                 self.mobile_app_dispatcher_obj.action=self.action
         except Exception as e:
-            logger.print_on_console('Error loading MobileApp plugin')
+           logger.print_on_console('Error loading MobileApp plugin')
     def __load_webservice(self):
         try:
             self.get_all_the_imports('WebServices')
@@ -281,51 +281,45 @@ class Controller():
             if(self.check_dangling(tsp,index)):
                 input = tsp.inputval[0]
                 addtionalinfo = tsp.additionalinfo
-                if input.find(IGNORE_THIS_STEP) != -1 :
-                    #Skip the current step execution
-                    #update in the report
-                    #increment the tsp index to point to next step and continue
-                    index += 1
-                else:
-                    if addtionalinfo != None:
-                        if addtionalinfo == IGNORE_THIS_STEP:
-                            #Skip the current step execution
-                            #update in the report
-                            #increment the tsp index to point to next step and continue
-                            index += 1
                 #Logic to split input and handle dynamic variables
                 rawinput = tsp.inputval
                 if len(args) > 0:
                     rawinput = args[0]
-                inpval=self.split_input(rawinput,tsp.name)
+                inpval,ignore_stat=self.split_input(rawinput,tsp.name)
                 if tsp.name.lower() not in [FOR,ENDFOR] :
                     #Print the details of keyword
                     self.__print_details(tsp,input,inpval)
                 #Calculating Start time
                 logger.print_on_console('Step number is : ',tsp.stepnum)
                 log.info('Step number is : '+str(tsp.stepnum))
-                if tsp != None and isinstance(tsp,TestStepProperty) :
-                    log.info( "----Keyword :"+str(tsp.name)+' execution Started----')
-                    start_time = datetime.now()
-                    start_time_string=start_time.strftime(TIME_FORMAT)
-                    logger.print_on_console('Step Execution start time is : '+start_time_string)
-                    log.info('Step Execution start time is : '+start_time_string)
-                    index,result = self.keywordinvocation(index,inpval,self.reporting_obj,*args)
+                if ignore_stat:
+                    teststepproperty = handler.tspList[index]
+                    keyword=teststepproperty.name
+                    logger.print_on_console('Step Skipped : Encountered ignore step instruction for the keyword : ',keyword)
+                    index=index+1
                 else:
-                    keyword_flag=False
-                    start_time = datetime.now()
-                    if tsp != None and isinstance(tsp,if_step.If):
-                        index = tsp.invoke_condtional_keyword(inpval,self.reporting_obj)
-                    elif tsp != None and isinstance(tsp,for_step.For):
-                        index = tsp.invokeFor(inpval,self.reporting_obj)
-                    elif tsp != None and isinstance(tsp,getparam.GetParam):
-                        index = tsp.performdataparam(inpval,self,self.reporting_obj)
-                    elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
-                        index = tsp.invoke_jumpby(inpval,self.reporting_obj)
-                    elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
-                        self.jumpto_previousindex.append(index+1)
-                        index,counter = tsp.invoke_jumpto(inpval,self.reporting_obj,self.counter)
-                        self.counter.append(counter)
+                    if tsp != None and isinstance(tsp,TestStepProperty) :
+                        log.info( "----Keyword :"+str(tsp.name)+' execution Started----')
+                        start_time = datetime.now()
+                        start_time_string=start_time.strftime(TIME_FORMAT)
+                        logger.print_on_console('Step Execution start time is : '+start_time_string)
+                        log.info('Step Execution start time is : '+start_time_string)
+                        index,result = self.keywordinvocation(index,inpval,self.reporting_obj,*args)
+                    else:
+                        keyword_flag=False
+                        start_time = datetime.now()
+                        if tsp != None and isinstance(tsp,if_step.If):
+                            index = tsp.invoke_condtional_keyword(inpval,self.reporting_obj)
+                        elif tsp != None and isinstance(tsp,for_step.For):
+                            index = tsp.invokeFor(inpval,self.reporting_obj)
+                        elif tsp != None and isinstance(tsp,getparam.GetParam):
+                            index = tsp.performdataparam(inpval,self,self.reporting_obj)
+                        elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
+                            index = tsp.invoke_jumpby(inpval,self.reporting_obj)
+                        elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
+                            self.jumpto_previousindex.append(index+1)
+                            index,counter = tsp.invoke_jumpto(inpval,self.reporting_obj,self.counter)
+                            self.counter.append(counter)
             else:
                 index= TERMINATE
                 self.status=index
@@ -333,7 +327,11 @@ class Controller():
             index= TERMINATE
             self.status=index
         ellapsed_time=''
+        ##print "Status_Flag_2::",statusflag
         statusflag = self.step_execution_status(tsp)
+        if ignore_stat:
+            statusflag=True
+            ##print "IGNORED"
         if keyword_flag:
             end_time = datetime.now()
             end_time_string=end_time.strftime(TIME_FORMAT)
@@ -350,9 +348,9 @@ class Controller():
         if self.action==EXECUTE:
 ##            self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
             if statusflag:
-                self.reporting_obj.generate_report_step(tsp,'',self,ellapsed_time,keyword_flag,result)
+                self.reporting_obj.generate_report_step(tsp,'',self,ellapsed_time,keyword_flag,result,ignore_stat)
             else:
-                self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result)
+                self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat)
 ##      Issue #160
         if index==STOP:
             return index
@@ -360,6 +358,7 @@ class Controller():
             return JUMP_TO
         return index
     def split_input(self,input,keyword):
+        ignore_status = False
         inpval = []
         input_list=[]
         input_list = input[0].split(SEMICOLON)
@@ -377,8 +376,10 @@ class Controller():
         for x in input_list:
         #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
             x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
+            if x == IGNORE_THIS_STEP:
+                ignore_status=True
             inpval.append(x)
-        return inpval
+        return inpval,ignore_status
     def store_result(self,result_temp,tsp):
         output=tsp.outputval.split(SEMICOLON)
         result=result_temp
@@ -984,6 +985,7 @@ class Controller():
                     nostatusflag = True
             elif outputstring== STEPSTATUS_INREPORTS_ZERO:
                 nostatusflag = True
+            print "nostatusflag:",nostatusflag
         return nostatusflag
 def kill_process():
     import tempfile
