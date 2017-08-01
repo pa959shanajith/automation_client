@@ -299,15 +299,12 @@ class Reporting:
         step_testcase_name=tsp.testscript_name
         step_description=''
         ignore_stat=False
-        ##print "Entered Generate Report Step"
         if len(args)>1 and isinstance(args[1],bool) and args[1]==True:
             step_description='Step Skipped : Encountered ignore step instruction for the keyword : ' + name
             ignore_stat=True
-            print len(args),args[1]
 
         if keyword_flag :
             if not(ignore_stat):
-                ##print "YESSSS_Not_Ignored"
                 step_description=self.get_description(tsp,con)
             if self.nested_flag:
                 parent_id=self.get_pid()

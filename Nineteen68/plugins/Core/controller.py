@@ -327,11 +327,9 @@ class Controller():
             index= TERMINATE
             self.status=index
         ellapsed_time=''
-        ##print "Status_Flag_2::",statusflag
         statusflag = self.step_execution_status(tsp)
         if ignore_stat:
             statusflag=True
-            ##print "IGNORED"
         if keyword_flag:
             end_time = datetime.now()
             end_time_string=end_time.strftime(TIME_FORMAT)
@@ -985,7 +983,6 @@ class Controller():
                     nostatusflag = True
             elif outputstring== STEPSTATUS_INREPORTS_ZERO:
                 nostatusflag = True
-            print "nostatusflag:",nostatusflag
         return nostatusflag
 def kill_process():
     import tempfile
