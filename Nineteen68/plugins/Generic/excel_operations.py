@@ -894,6 +894,7 @@ class ExcelXLS:
             row=workbook_info[2]
             col=workbook_info[3]
             len_args=len(args)
+            ##print row,col
 ##            if len(args)>0 and args[0].lower() == 'newline'  :
 ##                col=0
 ##                if workbook_info[3] != -1:
@@ -913,10 +914,16 @@ class ExcelXLS:
                 ##print row, col, content
                 status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content)
             else:
-                col=col+1
-                status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content)
+                if len(args)>0 and args[len_args-1].lower() == 'newline':
+                    row=row+1
+                    col=0
+                    status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content)
+                else:
+                    col=col+1
+                    status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content)
             ##print "content ",row,col
             if len(args)>0 and args[len_args-1].lower() == 'newline':
+
                 for i in range(0,(len_args-1)):
                     workbook_info=self.__load_workbook_xls(input_path,sheetname)
                     row=row+1
@@ -1353,15 +1360,23 @@ class ExcelXLSX:
             col=workbook_info[3]
 
             len_args=len(args)
+            ##print row,col
             ##print args,'dfvgbjnml,',row,col
-            status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,content)
+            ##status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,content)
             if len(args)>0 and args[len_args-1].lower() == 'newline':
+                if row == 1 and col == 1:
+                    status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,content)
+                else:
+                    row=row+1
+                    col=1
+                    status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,content)
                 for i in range(0,(len_args-1)):
                     row=row+1
                     col=1
                     ##print row,col
                     status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,args[i])
             else:
+                status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,content)
                 for i in range(0,(len_args)):
                     col=col+1
                     ##print row,col

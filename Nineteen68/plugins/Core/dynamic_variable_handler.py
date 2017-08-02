@@ -158,7 +158,6 @@ class DynamicVariables:
         #gets the value of nested dynamic variable if it exists
         value = None
         if len(nested_variable) > 0 :
-            print 'nesedted',nested_variable
 
             for i in range(len(nested_variable)):
                 #Check if the nested variable is again a dynamic variable or actual value
@@ -170,7 +169,6 @@ class DynamicVariables:
                     replacestring = str(replacestring)
                 inputvar = inputvar.replace(nested_variable[i],replacestring)
                 value=inputvar
-                print 'output',inputvar
 
         return value
 

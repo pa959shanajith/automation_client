@@ -122,20 +122,37 @@ class Launch_Keywords():
                 mainhandle=hwnd
                 hdc=win32gui.GetDC(win32gui.GetDesktopWindow())
                 hdcMemDc=win32gui.CreateCompatibleDC(hdc)
-
                 parent=win32gui.GetWindow(window_handle,4)
                 ancestor=win32gui.GetWindow(mainhandle,3)
                 foreground=win32gui.GetForegroundWindow()
+                #------------------------------------------------------------------------Calc
+                try:
+                    rect2 =win32gui.GetWindowRect(parent)
+                    rect1=win32gui.GetWindowRect(hwnd)
+                    if parent>0:
+                        pheight=int(rect2[3])-int(rect2[1])
+                        pwidth=int(rect2[2])-int(rect2[0])
+                        mheight=int(rect1[3])-int(rect1[1])
+                        mwidth=int(rect1[2])-int(rect1[0])
+                except Exception as e:
+                    print ""
+                #------------------------------------------------------------------------Calc
                 if foreground!=mainhandle:
                     fg_thread, fg_process_id = win32process.GetWindowThreadProcessId(foreground)
                     aut_thread, aut_process_id = win32process.GetWindowThreadProcessId(mainhandle)
                     if fg_process_id==aut_process_id:
-                        image=self.capture_window( win32gui.GetDesktopWindow())
+                        if self.getWindowText(mainhandle)!=None:
+                            image=self.capture_window(mainhandle)
+                        else:
+                            image=self.capture_window( win32gui.GetDesktopWindow())
                 else:
                     if  self.getWindowText(ancestor)!=None and len(self.getWindowText(ancestor))>0:
                         image=self.capture_window( ancestor)
                     elif self.getWindowText(parent)!=None and len(self.getWindowText(parent))>0:
-                        image=self.capture_window( parent)
+                        if mheight>pheight or mwidth>pwidth:
+                            image=self.capture_window( foreground)
+                        else:
+                            image=self.capture_window( parent)
                 if image==None:
                     win32gui.SetForegroundWindow(window_handle)
                     image=self.capture_window( window_handle)
@@ -222,7 +239,7 @@ class Launch_Keywords():
                     process_id=    win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
                     i= win32gui.GetWindowRect(aut_handle)
                     pid = self.get_window_pid(window_name)
-                    rect = self.getParentRectangle(pid)
+                    rect = self.getParentRectangle(pid,window_name)
                     if i[0] <= -32000:
                         fg_thread, fg_process = win32process.GetWindowThreadProcessId(foreground)
                         aut_thread, aut_process = win32process.GetWindowThreadProcessId(aut_handle)
@@ -269,7 +286,7 @@ class Launch_Keywords():
 ##            Exceptions.error(e)
             err_msg = desktop_constants.ERROR_MSG
 
-    def getParentRectangle(self,pid):
+    def getParentRectangle(self,pid,winname):
         EnumWindows = ctypes.windll.user32.EnumWindows
         EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
         GetWindowText = ctypes.windll.user32.GetWindowTextW
@@ -278,17 +295,25 @@ class Launch_Keywords():
         i = []
         tup_list = []
         def foreach_window(hwnd, lParam):
-            if IsWindowVisible(hwnd):
-                fg_thread, fg_process_id = win32process.GetWindowThreadProcessId(hwnd)
-                if fg_process_id == pid:
-                    i = win32gui.GetWindowRect(hwnd)
-                    global win_rect
-                    tup_list.append(i)
-                    min_val = min(x[1] for x in tup_list)
-                    max_val = max(b for b in tup_list if b[1] == min_val)
-                    global win_rect
-                    win_rect = max_val
-            return True
+            compFlag=1
+            try:
+                if IsWindowVisible(hwnd):
+                    fg_thread, fg_process_id = win32process.GetWindowThreadProcessId(hwnd)
+                    if fg_process_id == pid:
+                        i = win32gui.GetWindowRect(hwnd)
+                        global win_rect
+                        tup_list.append(i)
+                        min_val = min(x[1] for x in tup_list)
+                        max_val = max(b for b in tup_list if b[1] == min_val)
+                        global win_rect
+                        if winname==win32gui.GetWindowText(hwnd):
+                            win_rect = max_val
+                            compFlag =0
+                if compFlag==0:
+                    return False
+                return True
+            except Exception as e:
+                logger.print_on_console(e)
         win32gui.EnumWindows(foreach_window, None)
 
         return i

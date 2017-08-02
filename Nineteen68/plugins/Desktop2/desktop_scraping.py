@@ -287,7 +287,10 @@ class Scrape:
                             text= str(text) + '_dtp'
                          else:
                             tag = 'label'
-                            text= str(text) + '_lbl'
+                            if not isinstance(text,basestring):
+                                text=str(text)+'_lbl'
+                            else:
+                                text=text+'_lbl'
 
 
                          left = 0

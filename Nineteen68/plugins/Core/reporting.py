@@ -298,14 +298,21 @@ class Reporting:
         step_num=tsp.stepnum
         step_testcase_name=tsp.testscript_name
         step_description=''
-        if keyword_flag:
-            step_description=self.get_description(tsp,con)
+        ignore_stat=False
+        if len(args)>1 and isinstance(args[1],bool) and args[1]==True:
+            step_description='Step Skipped : Encountered ignore step instruction for the keyword : ' + name
+            ignore_stat=True
+
+        if keyword_flag :
+            if not(ignore_stat):
+                step_description=self.get_description(tsp,con)
             if self.nested_flag:
                 parent_id=self.get_pid()
 
         elif not(keyword_flag):
             parent_id=tsp.parent_id
-            step_description=tsp.step_description
+            if not(ignore_stat):
+                step_description=tsp.step_description
             if step_description==ENDFOR_DESCRIPTION:
                 endfor_index=tsp.info_dict[0].keys()[0]
                 endfor_step=con.tsp_list[endfor_index]

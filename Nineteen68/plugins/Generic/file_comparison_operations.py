@@ -14,6 +14,7 @@ import generic_constants
 import logging
 import constants
 import core_utils
+import os
 
 log = logging.getLogger('file_comparison_operations.py')
 
@@ -350,24 +351,42 @@ class TextFile:
             ##for i in args:
             ##    content='\n'.join(i)
             len_args=len(args)
+            ##print "len_args",len_args
             ##print len_args
             ##print args[len_args-1]
             with open(input_path, 'a+') as file:
                 if len(args)>0 and (args[len_args-1]).lower()=="newline" :
-                
+                    ##print "Newline"
+                    ##print "size: ",os.stat(input_path).st_size
+
             #872 unicode write file support (Himanshu)
                     try:
-                        file.write(content)
+                        ##print "hiiiiiiiiiii"
+                        if os.stat(input_path).st_size == 0:
+                            ##print "Zero"
+                            file.write(content)
+                        else:
+                            ##print "NotZero"
+                            file.write("\n"+content)
                     except:
-                        file.write(content.encode('UTF-8'))
+                        ##print "except"
+                        if os.stat(input_path).st_size == 0:
+                            file.write(content.encode('UTF-8'))
+                        else:
+                            file.write("\n")
+                            file.write(content.encode('UTF-8'))
                     for i in range(0,(len(args)-1)):
-                        file.write("\n")
                         try:
+                            file.write("\n")
                             file.write(args[i])
+
                         except:
+                            file.write("\n")
                             file.write(args[i].encode('UTF-8'))
 
+
                 else:
+           
                     content+=''.join(args)
                     try:
                         file.write(content)

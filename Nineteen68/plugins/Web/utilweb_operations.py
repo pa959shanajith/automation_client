@@ -575,29 +575,35 @@ class UtilWebKeywords:
                 to_window = -1
             if not(input is None or input is '' or to_window <0):
                 logger.print_on_console(INPUT_IS+input)
-##                input=int(input)
                 log.info('Switching to the window ')
                 log.info(to_window)
                 window_handles=self.__get_window_handles()
-                log.info('The available window handles are ')
-                log.info(window_handles)
-                cur_handle=browser_Keywords.driver_obj.current_window_handle
-                from_window=-1
-                if cur_handle in window_handles:
-                    from_window=window_handles.index(cur_handle)+1
-                    log.info('Switching from the window')
-                    log.info(from_window)
-                if from_window>-1:
-                    browser_Keywords.driver_obj.switch_to.window(window_handles[to_window-1])
-                    logger.print_on_console('Switched to window handle'+browser_Keywords.driver_obj.current_window_handle)
-                    logger.print_on_console('Control switched from window ' + str(from_window)
-							+ " to window " + str(to_window))
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
-                else:
-                    err_msg='Current window handle not found'
+                ## Issue #190 Driver control won't switch back to parent window
+                if to_window>=len(window_handles):
+                    err_msg='Window '+input+' not found'
                     logger.print_on_console(err_msg)
                     log.error(err_msg)
+                else:
+                    log.info('The available window handles are ')
+                    log.info(window_handles)
+                    cur_handle=browser_Keywords.driver_obj.current_window_handle
+                    from_window=-1
+                    if cur_handle in window_handles:
+                        from_window=window_handles.index(cur_handle)+1
+                        log.info('Switching from the window')
+                        log.info(from_window)
+                    if from_window>-1:
+                        browser_Keywords.driver_obj.switch_to.window(window_handles[to_window-1])
+                        browser_Keywords.recent_handles.append(window_handles[to_window-1])
+                        logger.print_on_console('Switched to window handle'+browser_Keywords.driver_obj.current_window_handle)
+                        logger.print_on_console('Control switched from window ' + str(from_window)
+    							+ " to window " + str(to_window))
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                    else:
+                        err_msg='Current window handle not found'
+                        logger.print_on_console(err_msg)
+                        log.error(err_msg)
             elif (input is None or input is ''):
                 window_handles=self.__get_window_handles()
                 log.info('Current window handles are ')
@@ -606,6 +612,8 @@ class UtilWebKeywords:
                 if len(window_handles)>0:
                     total_handles=len(window_handles)
                     browser_Keywords.driver_obj.switch_to.window(window_handles[total_handles-1])
+                    ## Issue #190 Driver control won't switch back to parent window
+                    browser_Keywords.recent_handles.append(window_handles[total_handles-1])
                     logger.print_on_console('Control switched to latest window')
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
@@ -626,6 +634,8 @@ class UtilWebKeywords:
                     if len(window_handles)>0:
                         total_handles=len(window_handles)
                         browser_Keywords.driver_obj.switch_to.window(window_handles[total_handles-1])
+                        ## Issue #190 Driver control won't switch back to parent window
+                        browser_Keywords.recent_handles.append(window_handles[total_handles-1])
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
@@ -726,8 +736,8 @@ class UtilWebKeywords:
         return status,methodoutput,output,err_msg
 
     def __get_window_handles(self):
-        window_handles=browser_Keywords.driver_obj.window_handles
-        window_handles=browser_Keywords.driver_obj.window_handles
+    	## Issue #190 Driver control won't switch back to parent window
+        window_handles=browser_Keywords.all_handles
         logger.print_on_console('Window handles size '+str(len(window_handles)))
         return window_handles
 
