@@ -88,7 +88,7 @@ class Highlight():
                     original_style = element.get_attribute('style')
                     log.info('Original style obtained.....')
                     log.info('Before highlighting .....')
-                    apply_style(str(original_style) + "background: #fff300; border: 2px solid #cc3300;outline: 2px solid #fff300;", 3)
+                    apply_style(str(original_style) + "background: #fff300 !important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;", 3)
                     log.info('Element highlighted .....')
 
                     if driver.name == 'internet explorer' :
