@@ -61,7 +61,7 @@ class Highlight():
                 identifiers = highele[1].split(';')
             else:
                 identifiers = highele[0].split(';')
-            url = highele[len(highele) - 1]
+            url = highele[len(highele) - 2]
 
             def highlight1(element):
                 log.info(' Inside highlight1 method .....')
