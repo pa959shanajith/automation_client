@@ -579,7 +579,7 @@ class UtilWebKeywords:
                 log.info(to_window)
                 window_handles=self.__get_window_handles()
                 ## Issue #190 Driver control won't switch back to parent window
-                if to_window>=len(window_handles):
+                if to_window>len(window_handles):
                     err_msg='Window '+input+' not found'
                     logger.print_on_console(err_msg)
                     log.error(err_msg)
