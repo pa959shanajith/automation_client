@@ -96,12 +96,13 @@ class Fullscrape():
 
             def callback_scrape1(myipath, tempne):
                 path = myipath
-                pathlist.append(path)
+
                 for iframes in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
                     # check if it is really a valid iframe before performing any further actions!
     ##                            if (driver.find_elements_by_tag_name('iframe')[iframes]).is_displayed():
                     #custom switchtoframe:
                     path = myipath + str(iframes) + 'i' +  '/'
+                    pathlist.append(path)
                     if pathlist.count(path) == 1:
                         if switchtoframe_scrape1(path):
                             temp = driver.execute_script(javascript_scrape, path)
@@ -182,7 +183,7 @@ class Fullscrape():
                                 tempne.extend(temp)
                         for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
                             inpath = path + str(frames) + 'i' +  '/'
-                            pathlist.append(path)
+                            pathlist.append(inpath)
                             if switchtoframe_scrape1(inpath):
                                 if pathlist.count(inpath) == 1:
                                     itemp = driver.execute_script(javascript_scrape, inpath)
@@ -192,7 +193,7 @@ class Fullscrape():
                             callback_scrape2(inpath, tempne)
                         for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
                             inpath = path + str(frames) + 'f' +  '/'
-                            pathlist.append(path)
+                            pathlist.append(inpath)
                             if switchtoframe_scrape1(inpath):
                                 if pathlist.count(inpath) == 1:
                                     itemp = driver.execute_script(javascript_scrape, inpath)
