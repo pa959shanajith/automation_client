@@ -809,7 +809,19 @@ class Dropdown_Keywords():
                             #===============================================================
                             if element.friendly_class_name() == 'ListView' or 'ListBox':
                                 if element.friendly_class_name() == 'ListBox':
-                                    logger.print_on_console('Element state does not allow to perform the operation, DeSelectAll does no work for ListBox')
+                                    items=element.ItemTexts()
+                                    fail_flag=False
+                                    if(element.IsSingleSelection()!=True):#to check if the ListBox is a singleSelection type
+                                        for item in range(0,len(items)):
+                                            try:
+                                                element.select(item,select=False)
+                                            except:
+                                                fail_flag=True
+                                        if fail_flag==False:
+                                            status = desktop_constants.TEST_RESULT_PASS
+                                            result = desktop_constants.TEST_RESULT_TRUE
+                                    else:
+                                        logger.print_on_console('Element state does not allow to perform the operation')
                                 elif element.friendly_class_name() == 'ListView':
                                      if element.is_active() == False:
                                        element.click()
