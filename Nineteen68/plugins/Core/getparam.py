@@ -629,7 +629,7 @@ class GetParam():
                                     if i > iterations:
                                         input=['']
                                     paramindex =con.methodinvocation(paramindex,input)
-                                    if paramindex in [TERMINATE,BREAK_POINT]:
+                                    if paramindex in [TERMINATE,BREAK_POINT,STOP]:
                                         return paramindex
                                 log.info( '***Data Param: Iteration ' + str(k) + ' completed***\n\n')
                                 logger.print_on_console( '***Data Param: Iteration ',k, ' completed***\n\n')
@@ -667,9 +667,9 @@ class GetParam():
                             while (paramindex < endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,filter)
                                     if filter >= iterations:
-                                        input=[''] 
+                                        input=['']
                                     paramindex =con.methodinvocation(paramindex,input)
-                                    if paramindex in [TERMINATE,BREAK_POINT]:
+                                    if paramindex in [TERMINATE,BREAK_POINT,STOP]:
                                         return paramindex
                             log.info( '***Data Param: Iteration '+str(k)+ ' completed***\n\n')
                             logger.print_on_console('***Data Param: Iteration ',k, ' completed***\n\n')
@@ -709,7 +709,7 @@ class GetParam():
                                 while (paramindex < endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,i)
                                     paramindex =con.methodinvocation(paramindex,input)
-                                    if paramindex in [TERMINATE,BREAK_POINT]:
+                                    if paramindex in [TERMINATE,BREAK_POINT,STOP]:
                                         return paramindex
                                 log.info( '***Data Param: Iteration '+str(k)+ ' completed***\n\n')
                                 logger.print_on_console('***Data Param: Iteration ',k, ' completed***\n\n')
