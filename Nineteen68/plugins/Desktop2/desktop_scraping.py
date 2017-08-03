@@ -238,7 +238,35 @@ class Scrape:
                  cor = children.rectangle()
                  properties = ''
                  try:
-                     properties = json.loads(json.dumps(children.get_properties(    ), default=lambda x: str(x)))
+                     try:
+                        properties = json.loads(json.dumps(children.get_properties(    ), default=lambda x: str(x)))
+                     except Exception as e:
+                        #----hardcoding only done for 32bit python as its not performing via children.get_properties
+                        #----' id {0}'.format(button.idCommand)) or
+                        #----RuntimeError: GetButtonInfo failed for "element" with command id XXXX occours when one of the properties not correct
+                        #----Please Refer SWAPY application and check the element ,if all the properties are not populating , chances are this
+                        #--- error will occour.I have noticed most of the time children.texts() is the problem hence setting it to u''
+                        try:
+                            getProperties={u'is_enabled': children.is_enabled(),
+                                           u'is_visible': children.is_visible(),
+                                           u'style': children.style(),
+                                           u'fonts': children.fonts(),
+                                           u'client_rects': children.client_rects(),
+                                           u'texts': u'',
+                                           u'class_name': children.class_name(),
+                                           u'is_unicode': children.is_unicode(),
+                                           u'control_id': children.control_id(),
+                                           u'menu_items': children.menu_items(),
+                                           u'user_data': children.user_data(),
+                                           u'friendly_class_name': children.friendly_class_name(),
+                                           u'control_count': children.control_count(),
+                                           u'exstyle': children.exstyle(),
+                                           u'context_help_id': children.context_help_id(),
+                                           u'rectangle': children.rectangle()
+                                          }
+                            properties = json.loads(json.dumps(getProperties, default=lambda x: str(x)))
+                        except Exception as e:
+                            logger.print_on_console (e)
                      if properties['is_visible'] == True :
                          properties["url"] =  win.texts()[0] if len(win.texts())>0 else ""
                          properties['control_id'] = children.element_info.control_id

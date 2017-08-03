@@ -785,6 +785,20 @@ class Controller():
                                 logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
                                 print( '=======================================================================================================')
                                 log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
+
+                            if(len(scenario)==3 and len(scenario['qcdetails'])==7):
+                                qc_details_creds=scenario['qccredentials']
+                                qc_username=qc_details_creds['qcusername']
+                                qc_password=qc_details_creds['qcpassword']
+                                qc_url=qc_details_creds['qcurl']
+
+                                qc_sceanrio_data=scenario['qcdetails']
+                                qc_domain=qc_sceanrio_data['qcdomain']
+                                qc_project=qc_sceanrio_data['qcproject']
+                                qc_folder=qc_sceanrio_data['qcfolderpath']
+                                qc_tsList=qc_sceanrio_data['qctestset']
+                                qc_testrunname=qc_sceanrio_data['qctestcase']
+
                             #Iterating through each test case in the scenario
                             for d in [eval(scenario[scenario_id])]:
                                 #check for temrinate flag before parsing tsp list
@@ -838,6 +852,24 @@ class Controller():
                                 i+=1
                                 #logic for condition check
                                 report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+                                if len(scenario['qcdetails'])==7:
+                                    sys.path.append(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins'+'/Qc')
+                                    import qc
+                                    qc_json=qc.Qc()
+                                    qc_status_over=report_json[0]
+                                    qc_update_status=qc_status_over['overallstatus']
+                                    if(str(qc_update_status).lower()=='pass'):
+                                        qc_update_status='Passed'
+                                    elif(str(qc_update_status).lower()=='fail'):
+                                        qc_update_status='Failed'
+                                    else:
+                                        qc_update_status='Not Completed'
+    ##                                qc_status='http://srv03wap121:8080/qcbin,Chethan,Chethan1,ENTERPRISE,DimensionLab,root\TestFolder1,TestSet1,[1]QC-2,'+str(qc_update_status)
+
+                                    qc_status=qc_url+','+qc_username+','+qc_password+','+qc_domain+','+qc_project+','+qc_folder+','+qc_tsList+','+qc_testrunname+','+str(qc_update_status)
+
+                                    status_qc=qc_json.update_qc_details(str(qc_status))
+
                                 #Check is made to fix issue #401
                                 if len(report_json)>0:
                                     overall_status=report_json[0]['overallstatus']
