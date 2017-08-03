@@ -19,6 +19,8 @@ import httplib
 i = 0
 wxObject = None
 browsername = None
+qcdata = None
+qcConFlag=False
 desktopScrapeFlag=False
 sapScrapeFlag=False
 mobileScrapeFlag=False
@@ -213,6 +215,23 @@ class MainNamespace(BaseNamespace):
             import traceback
             traceback.print_exc()
             print e
+
+
+    def on_qclogin(self, *args):
+        con = controller.Controller()
+        global qcdata
+##        con = controller.Controller()
+        import json
+        qcdata = args[0]
+        print ("qc adata is : ",qcdata)
+        con.get_all_the_imports('Qc')
+        import QcController
+        global qcConObj
+        qcConObj=QcController
+        global qcConFlag
+        qcConFlag=True
+        wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+
 
     def on_LAUNCH_MOBILE(self, *args):
         con = controller.Controller()
@@ -574,7 +593,7 @@ class ClientWindow(wx.Frame):
 
 		#747 Screenshot path flag (Himanshu)
         self.screenshotPath_error_flag = False
-        
+
         self.debugwindow = None
         self.id =id
         self.mainclass = self
@@ -1006,6 +1025,7 @@ class ClientWindow(wx.Frame):
     def test(self,event):
 ##        print 'Self',self
         global mobileScrapeFlag
+        global qcConFlag
         global mobileWebScrapeFlag
         global desktopScrapeFlag
         global sapScrapeFlag
@@ -1019,6 +1039,11 @@ class ClientWindow(wx.Frame):
 ##            global socketIO
             self.new = mobileScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
             mobileScrapeFlag=False
+        elif qcConFlag==True:
+            #print 'For QC'
+##            global socketIO
+            self.new = qcConObj.QcWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = qcdata,socketIO = socketIO)
+            qcConFlag=False
         elif mobileWebScrapeFlag==True:
 ##            global socketIO
             self.new = mobileWebScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",browser = browsername,socketIO = socketIO)
@@ -1167,5 +1192,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
