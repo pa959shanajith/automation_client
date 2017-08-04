@@ -39,6 +39,7 @@ class Scrape:
         app_uia=desktop_launch_keywords.app_uia
         obj = desktop_launch_keywords.Launch_Keywords()
         obj.set_to_foreground()
+        obj.bring_Window_Front()
         if operation == 'STARTCLICKANDADD':
             global view
             view = []
