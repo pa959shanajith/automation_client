@@ -3,8 +3,8 @@ import sys
 import os
 from selenium import webdriver
 import browserops_MW
-import clickandadd
-import fullscrape
+import clickandadd_MW
+import fullscrape_MW
 
 from socketIO_client import SocketIO,BaseNamespace
 import time
