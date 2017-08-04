@@ -88,7 +88,8 @@ class Scrape:
                             disp_obj = desktop_dispatcher.DesktopDispatcher()
                             ele = disp_obj.get_desktop_element(actualelement['xpath'],actualelement['url'],app_uia)
                             global actualobjects
-                            actualobjects.append(actualelement)
+                            if actualelement not in actualobjects:#------check to remove duplicate elements
+                                actualobjects.append(actualelement)
                         except Exception as e:
                             logger.print_on_console('Clicked option is not a part of DesktopGUI')
                         return True
