@@ -223,7 +223,6 @@ class MainNamespace(BaseNamespace):
 ##        con = controller.Controller()
         import json
         qcdata = args[0]
-        print ("qc adata is : ",qcdata)
         con.get_all_the_imports('Qc')
         import QcController
         global qcConObj

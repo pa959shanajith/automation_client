@@ -69,6 +69,7 @@ class Qc():
             tsList = details[6]
             testrunname = details[7]
             result =  details[8]
+##            print 'details',data
             #When we install qc client - TDApiOle80.TDConnection(this entry ) will be there in regedit
             #logger.log('Creating a dispatch of TDApiOle80.TDConnection (regedit entry)')
             t = Dispatch('TDApiOle80.TDConnection')
@@ -80,7 +81,6 @@ class Qc():
                 t.Login(qcUser,qcPassword)
             except Exception as e:
                 status = qcconstants.TEST_RESULT_FAIL
-                print status
                 t.Logout
                 t.ReleaseConnection
                 logger.print_on_console(' Connection not established due to invalid Credentials')
@@ -136,7 +136,7 @@ class Qc():
         except Exceptions as e:
             logger.print_on_console('Something went wrong - Connection not established/ Login unsuccessful/Domain/Project/Folder/Testset/Testrun name wrong')
             status = qcconstants.TEST_RESULT_FAIL
-            print status
+##            print status
         return status
 
 

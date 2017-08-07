@@ -852,7 +852,7 @@ class Controller():
                                 i+=1
                                 #logic for condition check
                                 report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-                                if len(scenario['qcdetails'])==7:
+                                if len(scenario['qcdetails'])==7 and (qc_url!='' and qc_password!='' and  qc_username!=''):
                                     sys.path.append(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins'+'/Qc')
                                     import qc
                                     qc_json=qc.Qc()
