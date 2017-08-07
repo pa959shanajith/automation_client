@@ -16,12 +16,13 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import time
-import psutil
-import win32process
-import xml.etree.ElementTree as ET
+import platform
+##import psutil
+##import win32process
+##import xml.etree.ElementTree as ET
 import domconstants_MW
 ##import utils
-import win32gui
+##import win32gui
 import logger
 import Exceptions_MW
 import mobile_server_utilities
@@ -101,31 +102,61 @@ class BrowserOperations():
 
     def openBrowser(self,inputs):
        try:
-            self.start_server()
-            input_list = inputs.split(';')
-            time.sleep(5)
-            desired_caps = {}
-            desired_caps['platformName'] = 'Android'
-            ##desired_caps['platformVersion'] =input_list[1]
-            desired_caps['deviceName'] = input_list[0]
-            desired_caps['udid'] = input_list[0]
-            desired_caps['browserName'] = 'Chrome'
-            ##desired_caps['appium-version'] = '1.4.0'
-            desired_caps['newCommandTimeout'] = '36000'
-            driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
-            global driver
-            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
-            driver.get(domconstants_MW.BLANK_PAGE)
-##            p = psutil.Process(driver.service.process.pid)
-##            # logging.warning(p.get_children(recursive=True))
-##            pidchrome = p.children()[0]
-##            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Pid is obtained')
-##            # logging.warning(pidchrome.pid)
-##            global hwndg
-##            hwndg = util.bring_Window_Front(pidchrome.pid)
-##            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Using Pid handle is obtained')
-            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
-            status = domconstants_MW.STATUS_SUCCESS
+           if platform.system() == "Darwin":
+               global driver
+               input_list = inputs.split(';')
+               time.sleep(5)
+               desired_caps = {}
+               desired_caps['platformName'] = 'iOS'
+               desired_caps['platformVersion'] =input_list[1]
+               desired_caps['deviceName'] = input_list[0]
+               ##desired_caps['udid'] = input_list[0]
+               desired_caps['browserName'] = 'Safari'
+               ##desired_caps['appium-version'] = '1.4.0'
+               desired_caps['fullReset'] = False
+               desired_caps['newCommandTimeout'] = 3600
+               desired_caps['launchTimeout'] = 180000
+               driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
+
+               logger.log('FILE: browserops_MW.py , DEF: openSafariBrowser() , MSG:  Navigating to blank page')
+               driver.get(domconstants_MW.BLANK_PAGE)
+               ##            p = psutil.Process(driver.service.process.pid)
+               ##            # logging.warning(p.get_children(recursive=True))
+               ##            pidchrome = p.children()[0]
+               ##            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Pid is obtained')
+               ##            # logging.warning(pidchrome.pid)
+               ##            global hwndg
+               ##            hwndg = util.bring_Window_Front(pidchrome.pid)
+               ##            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Using Pid handle is obtained')
+               logger.log(
+                   'FILE: browserops_MW.py , DEF: openSafariBrowser() , MSG:  Safari browser opened successfully')
+               status = domconstants_MW.STATUS_SUCCESS
+           else:
+                global driver
+                self.start_server()
+                input_list = inputs.split(';')
+                time.sleep(5)
+                desired_caps = {}
+                desired_caps['platformName'] = 'Android'
+                ##desired_caps['platformVersion'] =input_list[1]
+                desired_caps['deviceName'] = input_list[0]
+                desired_caps['udid'] = input_list[0]
+                desired_caps['browserName'] = 'Chrome'
+                ##desired_caps['appium-version'] = '1.4.0'
+                desired_caps['newCommandTimeout'] = '36000'
+                driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
+                logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
+                driver.get(domconstants_MW.BLANK_PAGE)
+        ##            p = psutil.Process(driver.service.process.pid)
+        ##            # logging.warning(p.get_children(recursive=True))
+        ##            pidchrome = p.children()[0]
+        ##            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Pid is obtained')
+        ##            # logging.warning(pidchrome.pid)
+        ##            global hwndg
+        ##            hwndg = util.bring_Window_Front(pidchrome.pid)
+        ##            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Using Pid handle is obtained')
+                logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
+                status = domconstants_MW.STATUS_SUCCESS
        except Exception as e:
             mobile_key_objects.custom_msg.append("ERR_WEB_DRIVER")
             status = domconstants_MW.STATUS_FAIL

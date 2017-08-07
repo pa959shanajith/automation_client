@@ -10,6 +10,7 @@ from socketIO_client import SocketIO,BaseNamespace
 import time
 import objectspy_MW
 import core_utils
+import platform
 
 browserobj = browserops_MW.BrowserOperations()
 clickandadd_MWoj = clickandadd_MW.clickandadd_MW()
@@ -22,7 +23,10 @@ class ScrapeWindow(wx.Frame):
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(200, 150) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
-        self.iconpath = os.environ["NINETEEN68_HOME"] + "\\Nineteen68\\plugins\\Core\\Images" + "\\slk.ico"
+        if platform.system() != "Darwin":
+            self.iconpath = os.environ["NINETEEN68_HOME"] + "\\Nineteen68\\plugins\\Core\\Images" + "\\slk.ico"
+        else:
+            self.iconpath = os.environ["NINETEEN68_HOME"] + "//Nineteen68//plugins//Core//Images" + "//slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         obj = browserops_MW.BrowserOperations()
@@ -31,8 +35,9 @@ class ScrapeWindow(wx.Frame):
         self.panel = wx.Panel(self)
         self.core_utilsobject = core_utils.CoreUtils()
 
-        self.startbutton = wx.ToggleButton(self.panel, label="Start clickandadd",pos=(12,8 ), size=(175, 28))
-        self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd_MW)   # need to implement OnExtract()
+        if platform.system()!= "Darwin":
+            self.startbutton = wx.ToggleButton(self.panel, label="Start clickandadd",pos=(12,8 ), size=(175, 28))
+            self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd_MW)   # need to implement OnExtract()
         self.fullscrape_MWbutton = wx.Button(self.panel, label="Full Scrape",pos=(12,38 ), size=(175, 28))
         self.fullscrape_MWbutton.Bind(wx.EVT_BUTTON, self.fullscrape_MW)   # need to implement OnExtract()
 
@@ -98,8 +103,8 @@ class ScrapeWindow(wx.Frame):
     #----------------------------------------------------------------------
     def fullscrape_MW(self,event):
         print 'Performing full scrape'
-        self.startbutton.Disable()
-        self.comparebutton.Disable()
+        # self.startbutton.Disable()
+        # self.comparebutton.Disable()
         d = fullscrape_MWobj.fullscrape_MW()
 ##        self.startbutton.Enable()
 ##        self.savescrapebutton.Enable()

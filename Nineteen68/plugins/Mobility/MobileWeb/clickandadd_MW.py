@@ -10,8 +10,10 @@
 #-------------------------------------------------------------------------------
 
 import browserops_MW
-import win32gui
-import win32con
+import platform
+if platform.system()!= "Darwin":
+    import win32gui
+    import win32con
 import time
 import json
 import domconstants_MW
@@ -30,9 +32,9 @@ class clickandadd_MW():
             driver = browserops_MW.driver
             browser = browserops_MW.browser
             log.info('Obtained browser handle and driver from browserops_MW.py class .....')
-            toolwindow = win32gui.GetForegroundWindow()
+##            toolwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
-            actwindow = win32gui.GetForegroundWindow()
+##           actwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
             log.info('Minimizing the foreground window i.e tool and assuming AUT on top .....')
             javascript_hasfocus = """return(document.hasFocus());"""

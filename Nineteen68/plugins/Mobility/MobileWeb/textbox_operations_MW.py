@@ -239,8 +239,8 @@ class TextboxKeywords:
                         obj=UtilWebKeywords()
                         if obj.is_visible(webelement):
                             webelement.clear()
-                            from selenium.webdriver.common.keys import Keys
-                            webelement.send_keys(Keys.BACK_SPACE)
+                            ##from selenium.webdriver.common.keys import Keys
+                            ##webelement.send_keys(Keys.BACK_SPACE)
                         else:
                             self.__clear_text(webelement)
                         status=TEST_RESULT_PASS

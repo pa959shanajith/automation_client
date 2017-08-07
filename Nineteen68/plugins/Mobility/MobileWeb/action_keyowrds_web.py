@@ -12,7 +12,7 @@
 
 from constants import *
 import constants
-from mobile_app_constants import *
+from mobile_web_constants import *
 from appium.webdriver.common.touch_action import TouchAction
 
 
