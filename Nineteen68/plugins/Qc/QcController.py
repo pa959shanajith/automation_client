@@ -45,25 +45,21 @@ class QcWindow(wx.Frame):
                     domain_dict={}
                     key="view"
                     domain_dict.setdefault(key, [])
-
-
+                    global loginflag
+                    loginflag=False
                     global TD
                     TD = win32com.client.Dispatch("TDApiOle80.TDConnection")
                     TD.InitConnectionEx(str(Qc_Url))
-
 ##                    print TD.connected
                     un=str(user_name)
                     pw=str(pass_word)
 ##                    print user_name,',',pass_word
                     TD.Login(un,pw)
-                    global loginflag
                     loginflag=True
                     status = self.getDomain(filePath)
                 except Exception as eqc:
                     self.quit_qc()
-
-                    logger.print_on_console('Please provide valid credentials - Connection not established/ Login unsuccessful')
-                    self.socketIO.emit('qcresponse','invalidcredentials')
+                    logger.print_on_console('Please provide valid credentials - Connection not established / Login unsuccessful')
             elif(filePath["qcaction"]=='project'):
                 status = self.getProjects(filePath)
             elif(filePath["qcaction"]=='folder'):
@@ -72,7 +68,6 @@ class QcWindow(wx.Frame):
                 status = self.test_case_generator(filePath)
             elif(filePath["qcaction"]=='qcquit'):
                 status = self.quit_qc()
-
             if status!=None:
                 self.emit_data()
             else:
