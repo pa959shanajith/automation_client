@@ -103,8 +103,8 @@ class ScrapeWindow(wx.Frame):
     #----------------------------------------------------------------------
     def fullscrape_MW(self,event):
         print 'Performing full scrape'
-        # self.startbutton.Disable()
-        # self.comparebutton.Disable()
+        ##self.startbutton.Disable()
+        ##self.comparebutton.Disable()
         d = fullscrape_MWobj.fullscrape_MW()
 ##        self.startbutton.Enable()
 ##        self.savescrapebutton.Enable()
