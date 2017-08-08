@@ -540,19 +540,16 @@ class ExcelXLS:
             sheet = book.sheet_by_name(sheetname)
             for col in range(sheet.ncols):
                 indices = [i for i, x in enumerate(sheet.col_values(col)) if x == content]
-##                line_number=indices
                 if indices != None:
                     for i in indices:
                         i = i+1
                         line_number.append(i)
                         status=True
-##                    log.debug('line numbers are '+''.join(str(line_number)))
-                    log.debug(line_number)
-                    logger.print_on_console('Line numbers:')
-                    logger.print_on_console(line_number)
-                    break
+            log.info(line_number)
+            logger.print_on_console('Line numbers:')
+            logger.print_on_console(line_number)
         except Exception as e:
-           err_msg='Error getting line number in .xlsx'
+           err_msg='Error getting line number in .xls'
            log.error(e)
            logger.print_on_console(err_msg)
 ##        log.info('Status is '+str(status))
@@ -1081,7 +1078,7 @@ class ExcelXLSX:
                         status=True
             line_number=value
         except Exception as e:
-           err_msg='Error getting line number in .xls'
+           err_msg='Error getting line number in .xlsx'
            log.error(e)
            logger.print_on_console(err_msg)
         return status,line_number,err_msg

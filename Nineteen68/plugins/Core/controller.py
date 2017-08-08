@@ -308,18 +308,22 @@ class Controller():
                     else:
                         keyword_flag=False
                         start_time = datetime.now()
-                        if tsp != None and isinstance(tsp,if_step.If):
-                            index = tsp.invoke_condtional_keyword(inpval,self.reporting_obj)
-                        elif tsp != None and isinstance(tsp,for_step.For):
-                            index = tsp.invokeFor(inpval,self.reporting_obj)
-                        elif tsp != None and isinstance(tsp,getparam.GetParam):
-                            index = tsp.performdataparam(inpval,self,self.reporting_obj)
-                        elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
-                            index = tsp.invoke_jumpby(inpval,self.reporting_obj)
-                        elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
-                            self.jumpto_previousindex.append(index+1)
-                            index,counter = tsp.invoke_jumpto(inpval,self.reporting_obj,self.counter)
-                            self.counter.append(counter)
+                        if len(tsp.inputval[0].strip())==0 and tsp.name.lower().strip() in [IF,ELSE_IF,FOR,GETPARAM]:
+                            logger.print_on_console('Input value for '+tsp.name+' cannot be empty')
+                            index = TERMINATE
+                        else:
+                            if tsp != None and isinstance(tsp,if_step.If):
+                                index = tsp.invoke_condtional_keyword(inpval,self.reporting_obj)
+                            elif tsp != None and isinstance(tsp,for_step.For):
+                                index = tsp.invokeFor(inpval,self.reporting_obj)
+                            elif tsp != None and isinstance(tsp,getparam.GetParam):
+                                index = tsp.performdataparam(inpval,self,self.reporting_obj)
+                            elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
+                                index = tsp.invoke_jumpby(inpval,self.reporting_obj)
+                            elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
+                                self.jumpto_previousindex.append(index+1)
+                                index,counter = tsp.invoke_jumpto(inpval,self.reporting_obj,self.counter)
+                                self.counter.append(counter)
             else:
                 index= TERMINATE
                 self.status=index
@@ -346,9 +350,9 @@ class Controller():
         if self.action==EXECUTE:
 ##            self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
             if statusflag:
-                self.reporting_obj.generate_report_step(tsp,'',self,ellapsed_time,keyword_flag,result,ignore_stat)
+                self.reporting_obj.generate_report_step(tsp,'',self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
             else:
-                self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat)
+                self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
 ##      Issue #160
         if index==STOP:
             return index
