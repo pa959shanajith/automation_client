@@ -10,13 +10,11 @@
 #-------------------------------------------------------------------------------
 
 from sympy.logic.inference import satisfiable
-
 import logger
 import handler
 from constants import *
 import reporting
 import logging
-import dynamic_variable_handler
 
 log = logging.getLogger('if_step.py')
 
@@ -42,7 +40,6 @@ class If():
         log.info(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
 
 
-
     def invoke_condtional_keyword(self,input,reporting_obj):
 
         """
@@ -57,8 +54,6 @@ class If():
         index=self.index
         end_info=self.info_dict
         start_step=self.info_dict[0]
-        none_mark=[]
-        null_count=0
         #NO need to keep track of next targets when endIf is encountered
         if self.name.lower() != ENDIF:
             self.step_description='Encountered :'+self.name
@@ -72,8 +67,6 @@ class If():
         #block to execute if,elseIf part
         if self.name.lower() in [IF,ELSE_IF]:
 
-
-            input_expression=None
             #Check is made when elseIf is encountered to ensure it is to be executed or not
             if self.name.lower() == ELSE_IF:
                 step=handler.tspList[start_step.keys()[0]]
@@ -84,33 +77,20 @@ class If():
                     return last_target.keys()[0]
 
             logger.print_on_console('Encountered :'+self.name+'\n')
-            logical_eval_obj=Logical_eval()
-            input_expression=''
-            if len(input)>=2:
-                for exp in input:
-                    if exp is None:
-                        exp='null'
-                        null_count=null_count+1
-                        none_mark.append(null_count)
-                    elif 'null' in exp:
-                        null_count=null_count+exp.count('null')
-                    input_expression=input_expression+exp
+            if len(input)>2 and input[2] is not None:
+                logger.print_on_console('Input expression is',input[2])
             else:
-                logger.print_on_console('Invalid input')
-
-            if '{' in input_expression and '}' in input_expression :
-                import re
-                dyn_var_list=re.findall("\{(.*?)\}", input_expression)
-                if len(dyn_var_list)>0:
-                    import string
-                    for var in dyn_var_list:
-                        value=dynamic_variable_handler.dynamic_variable_map['{'+var+'}']
-                        input_expression=string.replace(input_expression,'{'+var+'}',value)
-            logger.print_on_console('Input_expression is ',input_expression)
-            res=logical_eval_obj.eval_expression(input_expression,none_mark)
+                logger.print_on_console('Input expression is',input[0])
+            res=INVALID
+            if input[1] is not None:
+                errs=input[1].split('\n')
+                for err in errs:
+                    logger.print_on_console(err+'\n')
+            else:
+                logical_eval_obj=Logical_eval()
+                res=logical_eval_obj.eval_expression(input[0])
             logger.print_on_console(self.name+': Condition is '+str(res)+'\n')
             self.step_description='Encountered :'+self.name+ ' Condition is '+str(res)
-
 
             if res==True:
                 #Reporting part
@@ -165,37 +145,11 @@ class If():
             return next_index
 
 
-
 class Logical_eval():
 
     #Block to evaluate conditional expression
-    def eval_expression(self,expression,none_mark):
-        expression=str(expression)
-        expression=expression.replace('AND','and').replace('OR','or').replace('NOT','not')
+    def eval_expression(self,expression):
         try:
-            exp = expression
-            exp_dict=dict()
-            exp = exp.replace('>=','/').replace('<=','/').replace('>','/').replace('<','/').replace('==','/').replace('!=','/').replace('or','/').replace('not','/').replace('and','/').replace('(','/').replace(')','/')
-            operands = exp.split('/')
-            null_count=0
-            for i in operands:
-	            ## Issue #156 None is getting stored in dynamic variable instead of null if no value is assigned
-                if 'null' in i:
-                    null_count=null_count+i.count('null')
-                if (i is None) or (i=='null' and null_count in none_mark):
-                    logger.print_on_console('expression should not contain null operands')
-                    return INVALID
-                elif i!='':
-                    exp_dict[i]=1
-            ## Issue #157  Special Characters issue in if condition
-            for i in exp_dict:
-                k=i.replace("\\","\\\\").replace("'","\\'")
-                if k[0]==' ':
-                    k=k.replace(" ","")
-                if k[-1]==' ':
-                    k=k.replace(" ","")
-                expression=expression.replace(i," '"+k+"' ")
-
             result=satisfiable(expression)
             if type(result)==dict:
                 for res in result.iterkeys():

@@ -207,13 +207,15 @@ class Controller():
                         status1= info_dict[-1].values()[0] == ENDIF
                         status2= info_dict[0].keys()[0] != index
                         status = status1 and status2
-                        if not(status1):
+                        if not(status1) and status2:
                             errormsg="Execution Terminated : EndIf is missing"
                     elif tsp.name.lower() in [ENDIF]:
                         index=info_dict[-1].keys()[0]
                         status=self.dangling_status(index)
             else:
                 status=False
+                if tsp.name.lower() == FOR:
+                    errormsg="Execution Terminated : EndFor is missing"
             if tsp.name.lower()==ENDLOOP and len(info_dict)<2:
                 status=False
         if not(status) and len(errormsg)>0:
@@ -364,23 +366,28 @@ class Controller():
         inpval = []
         input_list=[]
         input_list = input[0].split(SEMICOLON)
-        if keyword in WS_KEYWORDS or keyword == 'navigateToURL':
-            input_list=[input[0]]
-        elif keyword in DYNAMIC_KEYWORDS:
-            input_list=[]
-            string=input[0]
-            index=string.find(';')
-            if index >-1:
-                input_list.append(string[0:index])
-                input_list.append(string[index+1:len(string)])
-            elif string != '':
-                input_list.append(string)
-        for x in input_list:
-        #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
-            x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
-            if x == IGNORE_THIS_STEP:
+        if keyword in [IF,ELSE_IF,EVALUATE]:
+            inpval=self.dynamic_var_handler_obj.simplify_expression(input[0],keyword,self)
+            if inpval[1]==IGNORE_THIS_STEP:
                 ignore_status=True
-            inpval.append(x)
+        else:
+            if keyword in WS_KEYWORDS or keyword == 'navigateToURL':
+                input_list=[input[0]]
+            elif keyword in DYNAMIC_KEYWORDS:
+                input_list=[]
+                string=input[0]
+                index=string.find(';')
+                if index >-1:
+                    input_list.append(string[0:index])
+                    input_list.append(string[index+1:len(string)])
+                elif string != '':
+                    input_list.append(string)
+            for x in input_list:
+            #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
+                x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
+                if x == IGNORE_THIS_STEP:
+                    ignore_status=True
+                inpval.append(x)
         return inpval,ignore_status
     def store_result(self,result_temp,tsp):
         output=tsp.outputval.split(SEMICOLON)
