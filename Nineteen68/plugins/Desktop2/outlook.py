@@ -46,6 +46,23 @@ class OutlookKeywords:
             self.outlook=None
             self.store=None
 
+        def getOutlookComObj(self,optflag):
+            import pythoncom
+            pythoncom.CoInitialize()
+            if optflag==1:
+                try:
+                    outlookObj=Dispatch('Outlook.Application').GetNamespace('MAPI')
+                except Exception as e:
+                    logger.print_on_console(e)
+            elif optflag==2:
+                try:
+                    from win32com.client.gencache import EnsureDispatch
+                    outlookObj=EnsureDispatch('Outlook.Application').GetNamespace('MAPI')
+                except Exception as e:
+                    logger.print_on_console(e)
+
+            return outlookObj
+
 
 
 #To support seperate accounts and  subFolders this method is implemented , Input should be the folder path in properties of outlook folder
@@ -65,8 +82,7 @@ class OutlookKeywords:
 ##                    import pythoncom
 ##                    pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
 ##                count=count+1
-                self.outlook = Dispatch('Outlook.Application').GetNamespace('MAPI')
-
+                self.outlook = self.getOutlookComObj(1)
 #               get the message stores in outlook
                 stores=self.outlook.Stores
                 if accountname!='':
@@ -141,15 +157,12 @@ class OutlookKeywords:
 ##                    pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
 ##                count=count+1
                 if (self.outlook==None):
-
-                     from win32com.client.gencache import EnsureDispatch
-                     self.outlook = EnsureDispatch('Outlook.Application').GetNamespace('MAPI')
+                     self.outlook = self.getOutlookComObj(2)
                      inbox = self.outlook.GetDefaultFolder(outlook_constants.INBOX_FOLDER)
                 else:
                     inbox=self.targetFolder
                 if inbox==None:
-                    from win32com.client.gencache import EnsureDispatch
-                    self.outlook = EnsureDispatch('Outlook.Application').GetNamespace('MAPI')
+                    self.outlook = self.getOutlookComObj(2)
                     inbox = self.outlook.GetDefaultFolder(outlook_constants.INBOX_FOLDER)
                 all_inbox = inbox.Items
                 folders = inbox.Folders
@@ -178,11 +191,16 @@ class OutlookKeywords:
                                         if msg.Attachments.Count>0:
                                             self.AttachmentStatus=outlook_constants.ATTACH_STATUS_YES
     ##                                    message="From : "+msg.SenderName+" <"+self.FromMailId+">"+"\n"+ "To: "+ self.ToMailID + "\n"+ "Date: "+str(msg.SentOn)+ "\n"+ "Subject: "+ msg.Subject+ "\n"+ str(msg.Attachments.Count)+ " attachments." + "\n"+ msg.Body
-                                        self.Flag=True
-
-                                        msg.Display(False)
-                                        status=desktop_constants.TEST_RESULT_PASS
-                                        method_output=desktop_constants.TEST_RESULT_TRUE
+                                        try:
+                                                msg.Display()
+                                                self.Flag=True
+                                                status=desktop_constants.TEST_RESULT_PASS
+                                                method_output=desktop_constants.TEST_RESULT_TRUE
+                                        except Exception as e:# done to handle popups and dialog boxes
+                                            f=e[2]
+                                            if str(f[2])=="Outlook can't do this because a dialog box is open. Please close it and try again.":
+                                                logger.print_on_console(str(f[2]))
+                                                error_msg=str(f[2])
                                         break
                                     else:
                                         continue
@@ -194,8 +212,9 @@ class OutlookKeywords:
                             continue
 
                 if self.Flag!=True:
-                    logger.print_on_console('Error: No such mail found')
-                    error_msg='Error: No such mail found'
+                    if error_msg==None:
+                        logger.print_on_console('Error: No such mail found')
+                        error_msg='Error: No such mail found'
             except Exception as e:
                 log.error(e)
                 logger.print_on_console('Error: No such mail found')
