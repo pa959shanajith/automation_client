@@ -339,6 +339,22 @@ class MainNamespace(BaseNamespace):
             print 'Eror while sending screenshot data'
             socketIO.emit('render_screenshot','fail')
 
+    def on_webCrawlerGo(self,*args):
+        try:
+            con = controller.Controller()
+            con.get_all_the_imports('WebOccular')
+            import weboccular
+            wo = weboccular.Weboccular()
+
+            args=list(args)
+            global socketIO
+
+            wo.runCrawler(args[0],args[1],socketIO)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+
 
 socketIO = None
 
