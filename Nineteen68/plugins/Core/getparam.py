@@ -524,6 +524,7 @@ class GetParam():
                 step_description='Data Parameterization started'
                 fileinfo = input
                 filepath = fileinfo[0]
+                data = self.invokegetparam(input)
                 startRow = None
                 endRow =None
                 filter = None
