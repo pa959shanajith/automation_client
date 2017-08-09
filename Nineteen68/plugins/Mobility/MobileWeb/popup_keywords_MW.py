@@ -17,6 +17,8 @@ from selenium import webdriver
 import browser_Keywords_MW
 import logging
 from constants import *
+from selenium.common.exceptions import NoAlertPresentException
+
 
 log = logging.getLogger('popup_keywords_MW.py')
 class PopupKeywords():
@@ -38,6 +40,8 @@ class PopupKeywords():
             log.info(STATUS_METHODOUTPUT_UPDATE)
             status = webconstants_MW.TEST_RESULT_PASS
             methodoutput = webconstants_MW.TEST_RESULT_TRUE
+        except NoAlertPresentException:
+            pass
         except Exception as e:
             logger.print_on_console(EXCEPTION_OCCURED,e)
             log.error(EXCEPTION_OCCURED)

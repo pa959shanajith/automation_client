@@ -29,9 +29,12 @@ import win32gui
 import win32api
 import readconfig
 import core_utils
+import time
 from sendfunction_keys import SendFunctionKeys as SF
 pid_set = set()
 url_save=""
+configobj = readconfig.readConfig()
+configvalues = configobj.readJson()
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
 class TestThread(threading.Thread):
     """Test Worker Thread Class."""
@@ -189,8 +192,6 @@ class BrowserKeywords():
                 #ignore certificate implementation
                 url_save=url
                 try:
-                    configobj = readconfig.readConfig()
-                    configvalues = configobj.readJson()
                     ignore_certificate = configvalues['ignore_certificate']
                     if ((ignore_certificate.lower() == 'yes') and ((driver_obj.title !=None) and ('Certificate' in driver_obj.title))):
                         driver_obj.execute_script("""document.getElementById('overridelink').click();""")
@@ -541,7 +542,8 @@ class BrowserKeywords():
         global recent_handles
         if driver_obj is not None:
             try:
-                winHandles=driver_obj.window_handles
+                delay_time=float(configvalues['delay'])
+                time.sleep(delay_time)
                 winHandles=list(driver_obj.window_handles)
                 new_handles=[]
                 invalid_handles=[]
@@ -671,8 +673,6 @@ class Singleton_DriverUtil():
         log.debug('BROWSER NUM: ')
         log.debug(browser_num)
         logger.print_on_console( 'BROWSER NUM: ',browser_num)
-        configobj = readconfig.readConfig()
-        configvalues = configobj.readJson()
 
         if (browser_num == '1'):
             chrome_path = configvalues['chrome_path']

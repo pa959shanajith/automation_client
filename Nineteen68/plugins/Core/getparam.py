@@ -524,7 +524,6 @@ class GetParam():
                 step_description='Data Parameterization started'
                 fileinfo = input
                 filepath = fileinfo[0]
-                data = self.invokegetparam(input)
                 startRow = None
                 endRow =None
                 filter = None
@@ -606,23 +605,72 @@ class GetParam():
                             logger.print_on_console('Data Param  row: ',filter)
 
                 if startRow !=None and endRow != None:
-                    log.info( '***Data Parameterization started***')
-                    logger.print_on_console( '***Data Parameterization started***')
-                    #Reporting part
-                    reporting_obj.name=GETPARAM
-                    self.add_report_step_getparam(reporting_obj,step_description)
-                    #Reporting part ends
-                    for i in range(startRow,endRow+1):
+                    if startRow > endRow or startRow <= 1 or endRow <=1:
+                        log.info( 'Invalid filter, Provide valid Start row and End row value')
+                        logger.print_on_console( '***Invalid filter, Provide valid start row and end row value***')
+                        return_value =TERMINATE
+                    else:
+                        log.info( '***Data Parameterization started***')
+                        logger.print_on_console( '***Data Parameterization started***')
+                        #Reporting part
+                        reporting_obj.name=GETPARAM
+                        self.add_report_step_getparam(reporting_obj,step_description)
+                        #Reporting part ends
+                        for i in range(startRow-1,endRow):
+                            if self.name.lower()==GETPARAM:
+                                inputval = self.inputval[0]
+                                paramindex = self.index+1;
+                                if (inputval != None):
+                                    j = 0
+                                    log.info(  '***Data Param: Iteration '+ str(k) +  ' started***')
+                                    logger.print_on_console(  '***Data Param: Iteration ',k, ' started***')
+                                    step_description='Data Param: Iteration '+str(k)+' started'
+                                    reporting_obj.name='Iteration '+str(k)
+                                    self.add_report_step_getparam(reporting_obj,step_description)
+                                    iterations = len(data.values()[0])
+                                    while (paramindex < endlopnum):
+                                        input = self.retrievestaticvariable(data,paramindex,i-1)
+                                        if i > iterations:
+                                            input=['']
+                                        paramindex =con.methodinvocation(paramindex,input)
+                                        if paramindex in [TERMINATE,BREAK_POINT,STOP]:
+                                            return paramindex
+                                    log.info( '***Data Param: Iteration ' + str(k) + ' completed***\n\n')
+                                    logger.print_on_console( '***Data Param: Iteration ',k, ' completed***\n\n')
+                                    #Reporting part
+                                    step_description='Data Param: Iteration '+str(k)+' completed'
+                                    reporting_obj.name='Iteration '+str(k)
+                                    self.add_report_end_iteration(reporting_obj,step_description,k,endRow+1)
+                                    #Reporting part ends
+                                    k = k + 1
+                        log.info( '***Data Parameterization completed***')
+                        logger.print_on_console( '***Data Parameterization completed***')
+                        return_value=paramindex
+
+                elif filter != None:
+                    if filter<=1:
+                        log.info( 'Invalid filter, Provide valid filter value')
+                        logger.print_on_console( '***Invalid filter, Provide valid filter value***')
+                        return_value =TERMINATE
+                    else:
+                        log.info( '***Data Parameterization started***')
+                        logger.print_on_console('***Data Parameterization started***')
+                        #Reporting part
+                        reporting_obj.name=GETPARAM
+                        self.add_report_step_getparam(reporting_obj,step_description)
+                        #Reporting part ends
+                        filter = filter - 2
                         if self.name.lower()==GETPARAM:
                             inputval = self.inputval[0]
-                            paramindex = self.index+1;
+                            paramindex = self.index+1
                             if (inputval != None):
-                                j = 0
-                                log.info(  '***Data Param: Iteration '+ str(k) +  ' started***')
-                                logger.print_on_console(  '***Data Param: Iteration ',k, ' started***')
+                                log.info( '***Data Param: Iteration '+str(k)+ ' started***')
+                                logger.print_on_console( '***Data Param: Iteration ',k, ' started***')
+                                #Reporting part
                                 step_description='Data Param: Iteration '+str(k)+' started'
                                 reporting_obj.name='Iteration '+str(k)
                                 self.add_report_step_getparam(reporting_obj,step_description)
+                                #Reporting part ends
                                 iterations = len(data.values()[0])
                                 while (paramindex < endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,i-1)
@@ -631,58 +679,20 @@ class GetParam():
                                     paramindex =con.methodinvocation(paramindex,input)
                                     if paramindex in [TERMINATE,BREAK_POINT,STOP]:
                                         return paramindex
-                                log.info( '***Data Param: Iteration ' + str(k) + ' completed***\n\n')
-                                logger.print_on_console( '***Data Param: Iteration ',k, ' completed***\n\n')
+                                log.info( '***Data Param: Iteration '+str(k)+ ' completed***\n\n')
+                                logger.print_on_console('***Data Param: Iteration ',k, ' completed***\n\n')
+
                                 #Reporting part
                                 step_description='Data Param: Iteration '+str(k)+' completed'
                                 reporting_obj.name='Iteration '+str(k)
-                                self.add_report_end_iteration(reporting_obj,step_description,k,endRow+1)
+                                self.add_report_end_iteration(reporting_obj,step_description,k,k)
                                 #Reporting part ends
                                 k = k + 1
-                    log.info( '***Data Parameterization completed***')
-                    logger.print_on_console( '***Data Parameterization completed***')
 
-                    return_value=paramindex
+                        log.info( '***Data Parameterization completed***')
+                        logger.print_on_console( '***Data Parameterization completed***')
 
-                elif filter != None:
-                    log.info( '***Data Parameterization started***')
-                    logger.print_on_console('***Data Parameterization started***')
-                    #Reporting part
-                    reporting_obj.name=GETPARAM
-                    self.add_report_step_getparam(reporting_obj,step_description)
-                    #Reporting part ends
-                    filter = filter - 1
-                    if self.name.lower()==GETPARAM:
-                        inputval = self.inputval[0]
-                        paramindex = self.index+1;
-                        if (inputval != None):
-                            log.info( '***Data Param: Iteration '+str(k)+ ' started***')
-                            logger.print_on_console( '***Data Param: Iteration ',k, ' started***')
-                            #Reporting part
-                            step_description='Data Param: Iteration '+str(k)+' started'
-                            reporting_obj.name='Iteration '+str(k)
-                            self.add_report_step_getparam(reporting_obj,step_description)
-                            #Reporting part ends
-                            iterations = len(data.values()[0])
-                            while (paramindex < endlopnum):
-                                    input = self.retrievestaticvariable(data,paramindex,filter)
-                                    if filter >= iterations:
-                                        input=['']
-                                    paramindex =con.methodinvocation(paramindex,input)
-                                    if paramindex in [TERMINATE,BREAK_POINT,STOP]:
-                                        return paramindex
-                            log.info( '***Data Param: Iteration '+str(k)+ ' completed***\n\n')
-                            logger.print_on_console('***Data Param: Iteration ',k, ' completed***\n\n')
-                            #Reporting part
-                            step_description='Data Param: Iteration '+str(k)+' completed'
-                            reporting_obj.name='Iteration '+str(k)
-                            self.add_report_end_iteration(reporting_obj,step_description,k,k)
-                            #Reporting part ends
-                            k = k + 1
-                    log.info( '***Data Parameterization completed***')
-                    logger.print_on_console( '***Data Parameterization completed***')
-
-                    return_value=paramindex
+                        return_value=paramindex
 
                 else:
                     log.info( '***Data Parameterization started***')
@@ -744,7 +754,6 @@ class GetParam():
             #Reporting part ends
 
             log.error(e)
-
             logger.print_on_console(e)
         return return_value
 

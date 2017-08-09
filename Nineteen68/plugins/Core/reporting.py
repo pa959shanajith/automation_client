@@ -51,7 +51,7 @@ class Reporting:
         self.step_description_obj=step_description.StepDescription()
         self.core_utilsobject = core_utils.CoreUtils()
 
-    def get_description(self,tsp,con):
+    def get_description(self,tsp,con,static_value):
         """
         def : get_description
         purpose : To Fetch the step description of given keyword
@@ -65,17 +65,38 @@ class Reporting:
             inputVal=[]
             outputval=[]
             input=[]
+            output_list = []
             inputVal=tsp.inputval[0].split(';')
+            #Replace None with 'null' in Reporting
+            if static_value is None:
+                static_value = 'null'
+            #Fetching dynamic variable values to display in report
             for x in inputVal:
                 x=con.dynamic_var_handler_obj.replace_dynamic_variable(x,tsp.name,con)
-                input.append(x)
+                if x is None:
+                    input.append("null")
+                else:
+                    input.append(x)
+            #Fetching static variable values to display in report
+            for i in range(len(input)):
+                if input[i].startswith('|') and input[i].endswith('|'):
+                    if static_value[i] is not None:
+                        input[i]=static_value[i]
+                    else:
+                        input[i]="null"
             input=','.join(input)
-            output=con.dynamic_var_handler_obj.replace_dynamic_variable(tsp.outputval,tsp.name,con)
+            for i in tsp.outputval.split(';'):
+                value=con.dynamic_var_handler_obj.replace_dynamic_variable(i,tsp.name,con)
+                if value is None:
+                    output_list.append('null')
+                else:
+                    output_list.append(value)
+            output = ','.join(output_list)
+
+            #output=con.dynamic_var_handler_obj.replace_dynamic_variable(tsp.outputval,tsp.name,con)
             if (tsp.name in MULTIPLE_OUTPUT_KEYWORDS and output != '' and output != None) or tsp.name==GENERIC_KEYWORD  :
                 output=tsp.additionalinfo
             apptype=tsp.apptype
-##            inputVal=tsp.inputval[0].split(';')
-            outputval=tsp.outputval.split(';')[0]
             params=tsp.name,tsp,inputVal,input,output,con,self
             apptype_description={'generic':self.step_description_obj.generic,
             'web':self.step_description_obj.web,
@@ -305,7 +326,11 @@ class Reporting:
 
         if keyword_flag :
             if not(ignore_stat):
-                step_description=self.get_description(tsp,con)
+                static_value =''
+                if len(args) > 2:
+                    static_value = args[2]
+                    step_description=self.get_description(tsp,con,static_value)
+
             if self.nested_flag:
                 parent_id=self.get_pid()
 

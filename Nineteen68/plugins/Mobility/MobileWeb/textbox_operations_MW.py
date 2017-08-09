@@ -18,6 +18,7 @@ from encryption_utility import AESCipher
 from selenium.common.exceptions import *
 import logging
 from constants import *
+import platform
 
 
 log = logging.getLogger('textbox_operations_MW.py')
@@ -56,6 +57,8 @@ class TextboxKeywords:
 
     def __web_driver_exception(self,e):
         logger.print_on_console(e)
+        import traceback
+        traceback.print_exc()
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         return err_msg
 
@@ -144,12 +147,13 @@ class TextboxKeywords:
                                 browser_Keywords_MW.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
                             else:
                                 webelement.clear()
-                                if isinstance(browser_Keywords_MW.driver_obj,browser_Keywords_MW.webdriver.Ie):
+                                if platform.system()== "Darwin":
                                     log.debug('Sending the value via part 1')
                                     browser_Keywords_MW.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
                                 else:
                                     log.debug('Sending the value via part 2')
-                                    webelement.send_keys(input)
+                                    if platform.system()!= "Darwin":
+                                        webelement.send_keys(input)
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:
@@ -239,8 +243,9 @@ class TextboxKeywords:
                         obj=UtilWebKeywords()
                         if obj.is_visible(webelement):
                             webelement.clear()
-                            from selenium.webdriver.common.keys import Keys
-                            webelement.send_keys(Keys.BACK_SPACE)
+                            if platform.system() != "Darwin":
+                                from selenium.webdriver.common.keys import Keys
+                                webelement.send_keys(Keys.BACK_SPACE)
                         else:
                             self.__clear_text(webelement)
                         status=TEST_RESULT_PASS

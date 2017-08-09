@@ -118,7 +118,16 @@ class NumericStringParser(object):
         self.exprStack=[]
         parseAll=True
         try:
-            if not (num_string is None or num_string is ''):
+            if len(args)>1 and args[1] is not None:
+                logger.print_on_console('Input expression is',args[1],'\n')
+            else:
+                logger.print_on_console('Input expression is',num_string,'\n')
+            if args[0] is not None:
+                errs=args[0].split('\n')
+                for err in errs:
+                    logger.print_on_console(err+'\n')
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+            elif not (num_string is None or num_string is ''):
                 log.debug('Parsing the expression')
                 #logger.print_on_console('Parsing the expression')
                 results=self.bnf.parseString(num_string,parseAll)
@@ -135,7 +144,6 @@ class NumericStringParser(object):
             else:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
-
             log.error(e)
             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         if err_msg!=None:

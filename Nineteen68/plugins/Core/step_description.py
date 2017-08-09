@@ -8,7 +8,7 @@
 # Copyright:   (c) sushma.p
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-
+import logger
 class StepDescription:
 
 
@@ -241,7 +241,6 @@ class StepDescription:
 
 
     def webservices(self,keyword,tsp,inputval,input,output,con,reporting_obj):
-
         def setWholeBody():
             return 'Set the entire body ' + input+ ' that needs to be sent in the request'
         def setOperations():
@@ -273,7 +272,6 @@ class StepDescription:
         return locals()[key](keyword)
 
     def oebs(self,keyword,tsp,inputval,input,output,con,reporting_obj):
-
         def LaunchApplication():
         	return 'The application present in the path'+ inputval[0]	+  'is launched'
         def FindWindowAndAttach():
@@ -361,7 +359,7 @@ class StepDescription:
         def verifyValuesExists():
             return 'Verify values ' + input + ' exists in the '+  "'" + tsp.custname + "'"
         def getValueByIndex():
-        	return 'Get value with index ' + input + ' in the '	+ "'" + tsp.custname + "'" + ' and save the value \'' + output + '\' in ' + tsp.outputval
+            return 'Get value with index ' + input + ' in the '     + "'" + tsp.custname + "'" + ' and save the value \'' + output + '\' in ' + tsp.outputval
         def selectMultipleValuesByIndexes():
             return 'Select values ' + mulInputValin.toString() + ' in the '+ "'" + "'" + tsp.custname + "'" + "'"
         def selectMultipleValuesByText():
@@ -377,11 +375,14 @@ class StepDescription:
         def getColumnCount():
         	return'Get column count of the ' + "'" + tsp.custname + "'"	+ ' and save the count \'' + output + '\' in ' + tsp.outputval
         def getCellValue():
-        	return 'Get cell value of '+ "'" + tsp.custname + '['+input[1] +']['+ input[2] + "]'" + ' in the table and save the value ' + output + ' in ' + tsp.outputval
+            f_input = input.split(',')
+            return 'Get cell value of '+ "'" + tsp.custname + '['+f_input[0] +']['+ f_input[1] + "]'" + ' in the table and save the value ' + output + ' in ' + tsp.outputval
         def verifyCellValue():
-            return 'Verify cell value ' + input[2] + ' is present in the '	+ "'" + tsp.custname + '['+input[1] +']['+ input[2] + "]'" +  '  table'
+            f_input = input.split(',')
+            return 'Verify cell value ' + f_input[2] + ' is present in the '	+ "'" + tsp.custname + '['+f_input[0] +']['+ f_input[1] + "]'" +  '  table'
         def cellClick():
-            return 'Click ' + "'" + tsp.custname + '['+input[1] +']['+ input[2] + "]'"
+            f_input = input.split(',')
+            return 'Click ' + "'" + tsp.custname + '['+f_input[0] +']['+ f_input[1] + "]'"
         def clickElement():
        	    return 'Click '	+ "'" + tsp.custname + "'"
         def getElementText():
@@ -407,7 +408,6 @@ class StepDescription:
         return locals()[keyword]()
 
     def sap(self,keyword,tsp,inputval,input,output,con,reporting_obj):
-        print 'keyword',keyword
         #Launch keywords
         def LaunchApplication():
             return ' The application present in the path '+ inputval[0]+ ' is launched'+ '.'
@@ -1034,4 +1034,3 @@ class StepDescription:
         def getCellValue():
             return 'Get row number of ' + "'" + tsp.custname + "'" + ' by text '+input +' and save the row number ' + output + ' in '+ tsp.outputval
         return locals()[keyword]()
-

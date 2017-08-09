@@ -250,7 +250,7 @@ class Dispatcher:
 
                   'openBrowser':self.browser_object.openBrowser,
                   'navigateToURL':self.browser_object.navigateToURL,
-                  'openNewBrowser':self.browser_object.openBrowser,
+                  'openNewBrowser':self.browser_object.openNewBrowser,
                   'getPageTitle':self.browser_object.getPageTitle,
                   'getCurrentURL':self.browser_object.getCurrentURL,
                   'maximizeBrowser':self.browser_object.maximizeBrowser,
@@ -286,7 +286,6 @@ class Dispatcher:
 
                     if keyword==OPEN_BROWSER:
                         input.append(self.action)
-
                     result= dict[keyword](webelement,input)
 ##                    driver.switch_to.default_content()
                     if flag and webelement==None:

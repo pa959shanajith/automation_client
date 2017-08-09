@@ -207,13 +207,15 @@ class Controller():
                         status1= info_dict[-1].values()[0] == ENDIF
                         status2= info_dict[0].keys()[0] != index
                         status = status1 and status2
-                        if not(status1):
+                        if not(status1) and status2:
                             errormsg="Execution Terminated : EndIf is missing"
                     elif tsp.name.lower() in [ENDIF]:
                         index=info_dict[-1].keys()[0]
                         status=self.dangling_status(index)
             else:
                 status=False
+                if tsp.name.lower() == FOR:
+                    errormsg="Execution Terminated : EndFor is missing"
             if tsp.name.lower()==ENDLOOP and len(info_dict)<2:
                 status=False
         if not(status) and len(errormsg)>0:
@@ -308,18 +310,22 @@ class Controller():
                     else:
                         keyword_flag=False
                         start_time = datetime.now()
-                        if tsp != None and isinstance(tsp,if_step.If):
-                            index = tsp.invoke_condtional_keyword(inpval,self.reporting_obj)
-                        elif tsp != None and isinstance(tsp,for_step.For):
-                            index = tsp.invokeFor(inpval,self.reporting_obj)
-                        elif tsp != None and isinstance(tsp,getparam.GetParam):
-                            index = tsp.performdataparam(inpval,self,self.reporting_obj)
-                        elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
-                            index = tsp.invoke_jumpby(inpval,self.reporting_obj)
-                        elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
-                            self.jumpto_previousindex.append(index+1)
-                            index,counter = tsp.invoke_jumpto(inpval,self.reporting_obj,self.counter)
-                            self.counter.append(counter)
+                        if len(tsp.inputval[0].strip())==0 and tsp.name.lower().strip() in [IF,ELSE_IF,FOR,GETPARAM]:
+                            logger.print_on_console('Input value for '+tsp.name+' cannot be empty')
+                            index = TERMINATE
+                        else:
+                            if tsp != None and isinstance(tsp,if_step.If):
+                                index = tsp.invoke_condtional_keyword(inpval,self.reporting_obj)
+                            elif tsp != None and isinstance(tsp,for_step.For):
+                                index = tsp.invokeFor(inpval,self.reporting_obj)
+                            elif tsp != None and isinstance(tsp,getparam.GetParam):
+                                index = tsp.performdataparam(inpval,self,self.reporting_obj)
+                            elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
+                                index = tsp.invoke_jumpby(inpval,self.reporting_obj)
+                            elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
+                                self.jumpto_previousindex.append(index+1)
+                                index,counter = tsp.invoke_jumpto(inpval,self.reporting_obj,self.counter)
+                                self.counter.append(counter)
             else:
                 index= TERMINATE
                 self.status=index
@@ -346,9 +352,9 @@ class Controller():
         if self.action==EXECUTE:
 ##            self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
             if statusflag:
-                self.reporting_obj.generate_report_step(tsp,'',self,ellapsed_time,keyword_flag,result,ignore_stat)
+                self.reporting_obj.generate_report_step(tsp,'',self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
             else:
-                self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat)
+                self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
 ##      Issue #160
         if index==STOP:
             return index
@@ -360,23 +366,28 @@ class Controller():
         inpval = []
         input_list=[]
         input_list = input[0].split(SEMICOLON)
-        if keyword in WS_KEYWORDS or keyword == 'navigateToURL':
-            input_list=[input[0]]
-        elif keyword in DYNAMIC_KEYWORDS:
-            input_list=[]
-            string=input[0]
-            index=string.find(';')
-            if index >-1:
-                input_list.append(string[0:index])
-                input_list.append(string[index+1:len(string)])
-            elif string != '':
-                input_list.append(string)
-        for x in input_list:
-        #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
-            x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
-            if x == IGNORE_THIS_STEP:
+        if keyword in [IF,ELSE_IF,EVALUATE]:
+            inpval=self.dynamic_var_handler_obj.simplify_expression(input[0],keyword,self)
+            if inpval[1]==IGNORE_THIS_STEP:
                 ignore_status=True
-            inpval.append(x)
+        else:
+            if keyword in WS_KEYWORDS or keyword == 'navigateToURL':
+                input_list=[input[0]]
+            elif keyword in DYNAMIC_KEYWORDS:
+                input_list=[]
+                string=input[0]
+                index=string.find(';')
+                if index >-1:
+                    input_list.append(string[0:index])
+                    input_list.append(string[index+1:len(string)])
+                elif string != '':
+                    input_list.append(string)
+            for x in input_list:
+            #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
+                x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
+                if x == IGNORE_THIS_STEP:
+                    ignore_status=True
+                inpval.append(x)
         return inpval,ignore_status
     def store_result(self,result_temp,tsp):
         output=tsp.outputval.split(SEMICOLON)
