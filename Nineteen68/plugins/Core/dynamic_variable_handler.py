@@ -189,9 +189,9 @@ class DynamicVariables:
         if len(re.findall(IGNORE_THIS_STEP,input_var))!=0:
             return [input_var,IGNORE_THIS_STEP]
         k=-1
-        if keyword in [IF,ELSE_IF]:
+        if keyword.lower() in [IF,ELSE_IF]:
             k=1
-        elif keyword == EVALUATE:
+        elif keyword.lower() == EVALUATE:
             k=2
             input_var='('+input_var+')'
         else:

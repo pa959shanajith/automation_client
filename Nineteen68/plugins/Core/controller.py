@@ -366,7 +366,7 @@ class Controller():
         inpval = []
         input_list=[]
         input_list = input[0].split(SEMICOLON)
-        if keyword in [IF,ELSE_IF,EVALUATE]:
+        if keyword.lower() in [IF,ELSE_IF,EVALUATE]:
             inpval=self.dynamic_var_handler_obj.simplify_expression(input[0],keyword,self)
             if inpval[1]==IGNORE_THIS_STEP:
                 ignore_status=True
