@@ -18,8 +18,10 @@ import clickandadd_MW
 import highlight_MW
 import io
 import logging
-##import win32gui
-##import win32con
+import platform
+if platform.system()!="Darwin":
+    import win32gui
+    import win32con
 import logger
 import logging
 

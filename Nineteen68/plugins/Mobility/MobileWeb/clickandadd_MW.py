@@ -32,9 +32,11 @@ class clickandadd_MW():
             driver = browserops_MW.driver
             browser = browserops_MW.browser
             log.info('Obtained browser handle and driver from browserops_MW.py class .....')
-##            toolwindow = win32gui.GetForegroundWindow()
+            if platform.system()!="Darwin":
+                toolwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
-##           actwindow = win32gui.GetForegroundWindow()
+            if platform.system() != "Darwin":
+                actwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
             log.info('Minimizing the foreground window i.e tool and assuming AUT on top .....')
             javascript_hasfocus = """return(document.hasFocus());"""

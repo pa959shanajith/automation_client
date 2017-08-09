@@ -79,6 +79,8 @@ class CustomKeyword:
             log.info(log_msg)
         except WebDriverException as e:
             err_msg='Control failed to switched to frame/iframe '+input_url
+            import traceback
+            traceback.print_exc()
             log.error(err_msg)
             logger.print_on_console(err_msg)
 
