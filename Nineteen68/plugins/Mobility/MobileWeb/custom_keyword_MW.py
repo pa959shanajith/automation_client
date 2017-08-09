@@ -14,7 +14,7 @@ import browser_Keywords_MW
 from webconstants_MW import *
 from constants import *
 from selenium.common.exceptions import *
-
+import platform
 import logging
 
 
@@ -47,7 +47,8 @@ class CustomKeyword:
     def switch_to_parent(self):
         log.debug('Switching to Parent')
         curr_window_handle=browser_Keywords_MW.driver_obj.current_window_handle
-        browser_Keywords_MW.driver_obj.switch_to.window(curr_window_handle)
+        if platform.system()!="Darwin":
+            browser_Keywords_MW.driver_obj.switch_to.window(curr_window_handle)
         log.debug('Switched to Parent ')
         log.debug('curr_window_handle')
 
@@ -62,7 +63,8 @@ class CustomKeyword:
 
 ##            logger.print_on_console('Url is '+url)
             indiframes = url.split('/')
-            browser_Keywords_MW.driver_obj.switch_to.window(curr_window_handle)
+            if platform.system()!= "Darwin":
+                browser_Keywords_MW.driver_obj.switch_to.window(curr_window_handle)
             #0i/1f
             for i in indiframes:
                 if i is not '':

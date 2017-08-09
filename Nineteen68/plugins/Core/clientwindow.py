@@ -261,8 +261,11 @@ class MainNamespace(BaseNamespace):
         global browsername
         browsername = args[0]+";"+args[1]
         con =controller.Controller()
-
-        con.get_all_the_imports('Mobility')
+        import platform
+        if platform.system()=='Darwin':
+            con.get_all_the_imports('Mobility/MobileWeb')
+        else:
+            con.get_all_the_imports('Mobility')
         import ninteen_68_mobile_web_scrape
 
         mobileWebScrapeObj=ninteen_68_mobile_web_scrape
