@@ -576,8 +576,10 @@ class TestThread(threading.Thread):
                 else:
                     socketIO.emit('result_debugTestCaseWS',status)
             elif self.action==EXECUTE:
-                if len(testcasename) > 0:
-                    socketIO.emit('result_executeTestSuite',status)
+#                if len(testcasename) > 0:
+#                    socketIO.emit('result_executeTestSuite',status)
+            #  To check for empty testcase Bug #246 (Himanshu)
+                socketIO.emit('result_executeTestSuite',status)
         except Exception as e:
             print e
             status=TERMINATE

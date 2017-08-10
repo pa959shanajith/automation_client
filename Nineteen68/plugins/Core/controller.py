@@ -895,7 +895,7 @@ class Controller():
                                             condition_check_flag = True
                                             logger.print_on_console('Condition Check: Terminated by program ')
                             elif (True in testcase_empty_flag):
-                                i+=1
+
                                 logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
                                 log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                                 os.chdir(self.cur_dir)
@@ -903,6 +903,7 @@ class Controller():
                                 con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg)
                                 socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck_testcase_empty(suite_id,scenario_id,con,execution_id))
                                 obj.clearList(con)
+                                i+=1
 
                         else:
 ##                            if (testcase_empty_flag):

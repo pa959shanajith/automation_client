@@ -149,10 +149,11 @@ class Reporting:
             obj={}
             obj[ELLAPSED_TIME]=str(self.ellapsed_time)
             obj[END_TIME]=str(self.end_time)
-            obj[BROWSER_VERSION]=""
+            obj[BROWSER_VERSION]=self.browser_version
             obj[START_TIME]=str(self.start_time)
             obj[OVERALLSTATUS]=INCOMPLETE
-            obj[BROWSER_TYPE]=""
+            # Bug #246 (Himanshu) browser type should not be empty or null for reports
+            obj[BROWSER_TYPE]=self.browser_type
             self.overallstatus_array_incomplete.append(obj)
 
     def build_overallstatus_conditionCheck_testcase_empty(self):
@@ -167,10 +168,11 @@ class Reporting:
             obj={}
             obj[ELLAPSED_TIME]=str(self.ellapsed_time)
             obj[END_TIME]=str(self.end_time)
-            obj[BROWSER_VERSION]=""
+            obj[BROWSER_VERSION]=self.browser_version
             obj[START_TIME]=str(self.start_time)
             obj[OVERALLSTATUS]=TERMINATE
-            obj[BROWSER_TYPE]=""
+            # Bug #246 (Himanshu) browser type should not be empty or null for reports
+            obj[BROWSER_TYPE]=self.browser_type
             self.overallstatus_array_incomplete.append(obj)
 
     def get_pid(self):
@@ -241,6 +243,8 @@ class Reporting:
         obj[PARENT_ID]=''
         obj[COMMENTS]=''
         obj[STEP]=PROGRAM_TERMINATION
+        # Bug #246 (Himanshu) Status bar in reports
+        obj[STATUS]='Terminate'
         obj[STEP_DESCRIPTION]=description
         self.report_string_testcase_empty.append(obj)
         self.id_counter+=1
