@@ -44,7 +44,35 @@ class CustomObjectHandler():
                  cor = children.rectangle()
                  properties = ''
                  try:
-                     properties = json.loads(json.dumps(children.get_properties(    ), default=lambda x: str(x)))
+                     try:
+                        properties = json.loads(json.dumps(children.get_properties(    ), default=lambda x: str(x)))
+                     except Exception as e:
+                        #----hardcoding only done for 32bit python as its not performing via children.get_properties
+                        #----' id {0}'.format(button.idCommand)) or
+                        #----RuntimeError: GetButtonInfo failed for "element" with command id XXXX occours when one of the properties not correct
+                        #----Please Refer SWAPY application and check the element ,if all the properties are not populating , chances are this
+                        #--- error will occour.I have noticed most of the time children.texts() is the problem hence setting it to u''
+                        try:
+                            getProperties={u'is_enabled': children.is_enabled(),
+                                           u'is_visible': children.is_visible(),
+                                           u'style': children.style(),
+                                           u'fonts': children.fonts(),
+                                           u'client_rects': children.client_rects(),
+                                           u'texts': u'',
+                                           u'class_name': children.class_name(),
+                                           u'is_unicode': children.is_unicode(),
+                                           u'control_id': children.control_id(),
+                                           u'menu_items': children.menu_items(),
+                                           u'user_data': children.user_data(),
+                                           u'friendly_class_name': children.friendly_class_name(),
+                                           u'control_count': children.control_count(),
+                                           u'exstyle': children.exstyle(),
+                                           u'context_help_id': children.context_help_id(),
+                                           u'rectangle': children.rectangle()
+                                          }
+                            properties = json.loads(json.dumps(getProperties, default=lambda x: str(x)))
+                        except Exception as e:
+                            logger.print_on_console (e)
                      if properties['is_visible'] == True :
                          properties["url"] =  win.texts()[0] if len(win.texts())>0 else ""
                          properties['control_id'] = children.element_info.control_id
@@ -141,13 +169,18 @@ class CustomObjectHandler():
     def for_custom_scrape(self,app_uia):
         """Method to perform a  full scrape, returns allobjects"""
         try:
-            win = app_uia.top_window()
-            ch = win.children()
-            allobjects = ''
-            ne = []
             obj = desktop_launch_keywords.Launch_Keywords()
             obj.set_to_foreground()
             obj.bring_Window_Front()
+            win = app_uia.top_window()
+            #----------------------Tooltips are treated as children to the top window, they will disappear after 7 seconds
+            if win.friendly_class_name()=="ToolTips" or win.friendly_class_name()=="SysShadow": #---Checking if the win has a friendly class name Tooltips
+                time.sleep(7)                                   #---Waiting for 7 seconds so that the Tooltip disappears
+                win = app_uia.top_window()                      #---trying to get the top window again
+            #---------------------------------------------------
+            ch = win.children()
+            allobjects = ''
+            ne = []
             allobjects =  self.get_all_custom_children(ch,ne,0,'',win)
         except Exception as e:
             import traceback

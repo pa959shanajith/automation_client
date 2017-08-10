@@ -101,7 +101,9 @@ class Text_Box:
                         encryption_obj = AESCipher()
                         input_val_temp = encryption_obj.decrypt(input_val)
                         if input_val_temp is not None:
+                            cursor_x,cursor_y = win32api.GetCursorPos()#handling cursor move
                             element.type_keys(input_val_temp,with_spaces = True)
+                            win32api.SetCursorPos((cursor_x,cursor_y))#handling cursor move
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -175,7 +177,9 @@ class Text_Box:
                 if (check):
                     log.info('Parent matched')
                     if(element.is_enabled()):
+                        cursor_x,cursor_y = win32api.GetCursorPos()#handling cursor move
                         element.type_keys('^a{BACKSPACE}')
+                        win32api.SetCursorPos((cursor_x,cursor_y))#handling cursor move
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)

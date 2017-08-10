@@ -40,8 +40,6 @@ class PopupKeywords():
             log.info(STATUS_METHODOUTPUT_UPDATE)
             status = webconstants_MW.TEST_RESULT_PASS
             methodoutput = webconstants_MW.TEST_RESULT_TRUE
-        except NoAlertPresentException:
-            pass
         except Exception as e:
             logger.print_on_console(EXCEPTION_OCCURED,e)
             log.error(EXCEPTION_OCCURED)

@@ -114,7 +114,11 @@ class Controller():
     def __load_mobile_web(self):
         try:
             if self.mobile_web_dispatcher_obj==None:
-                self.get_all_the_imports('Mobility')
+                import platform
+                if platform.system() == 'Darwin':
+                    self.get_all_the_imports('Mobility/MobileWeb')
+                else:
+                    self.get_all_the_imports('Mobility')
                 import web_dispatcher_MW
                 self.mobile_web_dispatcher_obj = web_dispatcher_MW.Dispatcher()
                 self.mobile_web_dispatcher_obj.action=self.action
@@ -366,7 +370,7 @@ class Controller():
         inpval = []
         input_list=[]
         input_list = input[0].split(SEMICOLON)
-        if keyword in [IF,ELSE_IF,EVALUATE]:
+        if keyword.lower() in [IF,ELSE_IF,EVALUATE]:
             inpval=self.dynamic_var_handler_obj.simplify_expression(input[0],keyword,self)
             if inpval[1]==IGNORE_THIS_STEP:
                 ignore_status=True

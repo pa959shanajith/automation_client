@@ -261,8 +261,11 @@ class MainNamespace(BaseNamespace):
         global browsername
         browsername = args[0]+";"+args[1]
         con =controller.Controller()
-
-        con.get_all_the_imports('Mobility')
+        import platform
+        if platform.system()=='Darwin':
+            con.get_all_the_imports('Mobility/MobileWeb')
+        else:
+            con.get_all_the_imports('Mobility')
         import ninteen_68_mobile_web_scrape
 
         mobileWebScrapeObj=ninteen_68_mobile_web_scrape
@@ -338,6 +341,22 @@ class MainNamespace(BaseNamespace):
         except Exception as e:
             print 'Eror while sending screenshot data'
             socketIO.emit('render_screenshot','fail')
+
+    def on_webCrawlerGo(self,*args):
+        try:
+            con = controller.Controller()
+            con.get_all_the_imports('WebOccular')
+            import weboccular
+            wo = weboccular.Weboccular()
+
+            args=list(args)
+            global socketIO
+
+            wo.runCrawler(args[0],args[1],socketIO)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
 
 
 socketIO = None
