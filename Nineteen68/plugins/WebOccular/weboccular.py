@@ -155,7 +155,7 @@ class Weboccular():
                             if new_url != None :
                                 if new_url not in self.discovered:
     #                            if new_url not in self.visited:
-                                    if '.pdf ' not in new_url and '.zip' not in new_url and '.docx' not in new_url:
+                                    if '.pdf' not in new_url and '.zip' not in new_url and '.docx' not in new_url:
                                         pagelinks.add(new_url)
                                         self.discovered.add(new_url)
                                         self.queue.append({"name" : new_url, "parent" : rurl, "desc" : url_text, "level" : obj['level']+1  })
@@ -171,8 +171,6 @@ class Weboccular():
             obj['error'] = str(e)
             self.nodedata.append(obj)
             print e
-            import traceback
-            traceback.print_exc()
             print "error url" , url
             self.crawlStatus = False
 
