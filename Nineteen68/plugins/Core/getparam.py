@@ -674,8 +674,8 @@ class GetParam():
                                 #Reporting part ends
                                 iterations = len(data.values()[0])
                                 while (paramindex < endlopnum):
-                                    input = self.retrievestaticvariable(data,paramindex,i-1)
-                                    if i > iterations:
+                                    input = self.retrievestaticvariable(data,paramindex,filter)
+                                    if filter > iterations:
                                         input=['']
                                     paramindex =con.methodinvocation(paramindex,input)
                                     if paramindex in [TERMINATE,BREAK_POINT,STOP]:
@@ -756,6 +756,8 @@ class GetParam():
 
             log.error(e)
             logger.print_on_console(e)
+            import traceback
+            tracback.print_exc()
         return return_value
 
 
