@@ -171,8 +171,6 @@ class Weboccular():
             obj['error'] = str(e)
             self.nodedata.append(obj)
             print e
-            import traceback
-            traceback.print_exc()
             print "error url" , url
             self.crawlStatus = False
 
