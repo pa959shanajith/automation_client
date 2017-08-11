@@ -836,9 +836,9 @@ class ExcelXLS:
             else:
                 logger.print_on_console('Row/Col should be greater than 0')
         except Exception as e:
-            err_msg='Error occurred in clearing cell of .xlsx file'
+            err_msg='Error occurred in clearing cell of .xls file'
         workbook.save(excel_path)
-        return status
+        return status,err_msg
 
 
     def write_cell_xls(self,row,col,value,excel_path,sheetname,*args):
