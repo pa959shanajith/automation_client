@@ -974,7 +974,8 @@ class StepDescription:
             return 'Double click on the '+ "'" + tsp.custname + "'"
         def waitForElementVisible():
             return 'Wait until the element '+ "'" + tsp.custname + "'" +'is visible'
-
+        def dropFile():
+            return 'Drop file executed'
         #Button link keywords
         def click():
             return ' Click on the '+ "'" + tsp.custname + "'"

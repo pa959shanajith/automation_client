@@ -205,7 +205,7 @@ class Dispatcher:
                   'verifyToolTipText' : self.element_object.verify_tooltip_text,
                   'drag':self.element_object.drag,
                   'drop':self.element_object.drop,
-
+                  'dropFile':self.element_object.drop_file,
                   'setText':self.textbox_object.set_text,
                   'sendValue':self.textbox_object.send_value,
                   'getText':self.textbox_object.get_text,
