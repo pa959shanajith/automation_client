@@ -567,6 +567,7 @@ class UtilWebKeywords:
         output=OUTPUT_CONSTANT
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        bk_obj=browser_Keywords.BrowserKeywords()
         try:
             input=input[0]
             try:
@@ -594,7 +595,7 @@ class UtilWebKeywords:
                         log.info(from_window)
                     if from_window>-1:
                         browser_Keywords.driver_obj.switch_to.window(window_handles[to_window-1])
-                        browser_Keywords.recent_handles.append(window_handles[to_window-1])
+                        bk_obj.update_recent_handle(window_handles[to_window-1])
                         logger.print_on_console('Switched to window handle'+browser_Keywords.driver_obj.current_window_handle)
                         logger.print_on_console('Control switched from window ' + str(from_window)
     							+ " to window " + str(to_window))
@@ -613,7 +614,7 @@ class UtilWebKeywords:
                     total_handles=len(window_handles)
                     browser_Keywords.driver_obj.switch_to.window(window_handles[total_handles-1])
                     ## Issue #190 Driver control won't switch back to parent window
-                    browser_Keywords.recent_handles.append(window_handles[total_handles-1])
+                    bk_obj.update_recent_handle(window_handles[total_handles-1])
                     logger.print_on_console('Control switched to latest window')
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
@@ -635,7 +636,7 @@ class UtilWebKeywords:
                         total_handles=len(window_handles)
                         browser_Keywords.driver_obj.switch_to.window(window_handles[total_handles-1])
                         ## Issue #190 Driver control won't switch back to parent window
-                        browser_Keywords.recent_handles.append(window_handles[total_handles-1])
+                        bk_obj.update_recent_handle(window_handles[total_handles-1])
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:

@@ -9,6 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 from selenium import webdriver
+from collections import OrderedDict
 import logger
 import webconstants
 driver_obj = None
@@ -128,7 +129,7 @@ class BrowserKeywords():
             hwndg = utilobject.bring_Window_Front(pid)
             webdriver_list.append(driver_obj)
             parent_handle = driver_obj.current_window_handle
-            recent_handles.append(parent_handle)
+            self.update_recent_handle(parent_handle)
             all_handles.append(parent_handle)
             logger.print_on_console('Browser opened')
             log.info('Browser opened')
@@ -151,7 +152,7 @@ class BrowserKeywords():
             driver_obj=driver.getBrowser(self.browser_num)
             webdriver_list.append(driver_obj)
             parent_handle = driver_obj.current_window_handle
-            recent_handles.append(parent_handle)
+            self.update_recent_handle(parent_handle)
             all_handles.append(parent_handle)
             logger.print_on_console('Opened new browser')
             log.info('Opened new browser')
@@ -490,7 +491,7 @@ class BrowserKeywords():
 
                 if(len(all_handles) >= 1):
                     driver_obj.switch_to.window(parent_handle)
-                    recent_handles.append(parent_handle)
+                    self.update_recent_handle(parent_handle)
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
             else:
@@ -547,6 +548,7 @@ class BrowserKeywords():
                 winHandles=list(driver_obj.window_handles)
                 new_handles=[]
                 invalid_handles=[]
+                all_handles=list(OrderedDict.fromkeys(all_handles))
                 for h in all_handles:
                     if h in winHandles:
                         new_handles.append(h)
@@ -581,6 +583,11 @@ class BrowserKeywords():
                         driver_obj.switch_to.window(h)
                     except Exception as e:
                         log.error(e)
+
+    def update_recent_handle(self,h):
+        global recent_handles
+        if len(recent_handles)==0 or recent_handles[-1]!=h:
+            recent_handles.append(h)
 
 
 class Singleton_DriverUtil():
