@@ -278,6 +278,7 @@ class Controller():
                 return index +1
             pause_flag=True
         keyword_flag=True
+        ignore_stat=False
         #Check for 'terminate_flag' before execution
         if not(terminate_flag):
             #Check for 'pause_flag' before executionee
