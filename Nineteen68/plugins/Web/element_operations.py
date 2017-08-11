@@ -17,7 +17,7 @@ from webconstants import *
 
 import logging
 from constants import *
-
+DROP_JS = """var target = arguments[0],     offsetX = arguments[1],     offsetY = arguments[2],     document = target.ownerDocument || document,     window = document.defaultView || window;  var input = document.createElement('INPUT'); input.type = 'file'; input.style.display = 'none'; input.onchange = function() {     target.scrollIntoView(true);      var rect = target.getBoundingClientRect(),         x = rect.left + (offsetX || (rect.width >> 1)),         y = rect.top + (offsetY || (rect.height >> 1)),         dataTransfer = {             files: this.files         };      ['dragenter', 'dragover', 'drop'].forEach(function(name) {         var evt = document.createEvent('MouseEvent');         evt.initMouseEvent(name, !0, !0, window, 0, 0, 0, x, y, !1, !1, !1, !1, 0, null);         evt.dataTransfer = dataTransfer;         target.dispatchEvent(evt);     });      setTimeout(function() {         document.body.removeChild(input);     }, 25); }; document.body.appendChild(input); return input;"""
 log = logging.getLogger('element_operations.py')
 
 class ElementKeywords:
@@ -367,6 +367,39 @@ class ElementKeywords:
 
             logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        return status,methodoutput,output,err_msg
+
+    def drop_file(self,webelement,inputs,*args):
+        status = TEST_RESULT_FAIL
+        methodoutput =TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        #upload_file keyword implementation
+        try:
+            import browser_Keywords
+            filepath = inputs[0]
+            filename = inputs[1]
+            inputfile = filepath + '\\' + filename
+            if webelement is not None:
+                print 'Recieved web element from the web dispatcher'
+                log.debug(webelement)
+                log.debug('Check for the element enable')
+                if webelement.is_enabled():
+                    i = browser_Keywords.driver_obj.execute_script(DROP_JS,webelement,0,0)
+                    i.send_keys(inputfile)
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
+                else:
+                    log.info(WEB_ELEMENT_DISABLED)
+                    err_msg = WEB_ELEMENT_DISABLED
+                    logger.print_on_console(WEB_ELEMENT_DISABLED)
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        #return status and methodoutput
+        log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
 

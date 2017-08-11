@@ -39,9 +39,6 @@ class Weboccular():
         self.subdomain = ""
         self.discovered = set()
         self.agent="chrome"
-        self.ss=""
-        self.g = ""
-        self.tx = ""
         self.rooturl=""
         self.start_url=""
         self.crawlStatus = True
@@ -108,64 +105,74 @@ class Weboccular():
         "ie": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"}
         try:
             headers = {'User-Agent': agents[self.agent]}
-            r = requests.get(url, headers = headers,verify = False)
-            rurl = r.url
-            if rurl == url :
-                obj["redirected"] = "no"
-            else :
-                obj["redirected"] = rurl
-            status = r.status_code
-            obj["status"] = status
-            response = r.text
-            soup = BeautifulSoup(response, "html5lib")
-            if soup.title :
-                obj["title"] = soup.title.text
-            else :
-                obj["title"] = "None"
 
-            if (tldextract.extract(rurl).subdomain != self.subdomain) or (tldextract.extract(rurl).domain != self.domain) :
-                if (self.domain in urlparse(rurl).netloc) :
-                    #it is a subdomain
-                     self.subdomains.append(rurl)
-                     obj['type'] = "subdomain"
+            #if URL is for file type .pdf, .docx or .zip we will send only header request, will not download entire content
+
+
+            if not url.endswith('.pdf') and not url.endswith('.docx') and not url.endswith('.zip'):
+                r = requests.get(url, headers = headers,verify = False)
+                rurl = r.url
+                if rurl == url :
+                    obj["redirected"] = "no"
                 else :
-                    #it is some other URL
-                    self.others.append(rurl)
-                    obj['type'] = "subdomain"
-            else:
-                obj['type'] = 'page'
-            self.nodedata.append(obj)
-            data = json.dumps(obj)
-            socketIO.emit('result_web_crawler',data)
-            if obj['level'] < lev :
-                if (tldextract.extract(rurl).domain == self.domain) and (tldextract.extract(rurl).subdomain == self.subdomain):
-                    if rurl not in self.visited:
-                        self.visited.add(rurl)
-                        links = soup.find_all('a')
-                        buttons = self.get_buttonlinks(soup)
-                        images = self.get_imagelinks(soup)
-                        pagelinks = set()
-                        pagelinks.add(rurl)
-                        for link in links:
-                            new_url = link.get('href')
-                            url_text = link.text
-                            url_text = url_text.strip()
-                            new_url = self.get_complete_url(rurl, new_url)
+                    obj["redirected"] = rurl
+                status = r.status_code
+                obj["status"] = status
+                response = r.text
+                soup = BeautifulSoup(response, "html5lib")
+                if soup.title :
+                    obj["title"] = soup.title.text
+                else :
+                    obj["title"] = "None"
 
-                            if new_url != None :
-                                if new_url not in self.discovered:
-    #                            if new_url not in self.visited:
-                                    if '.pdf' not in new_url and '.zip' not in new_url and '.docx' not in new_url:
-                                        pagelinks.add(new_url)
-                                        self.discovered.add(new_url)
-                                        self.queue.append({"name" : new_url, "parent" : rurl, "desc" : url_text, "level" : obj['level']+1  })
-                                        leveln = obj['level']+1
-                                        self.edgedata.append({"source" : rurl, "target" : new_url })
-                                    else:
-                                        self.notParsedURLs.append({"name" : new_url, "parent" : rurl, "desc" : url_text, "level" : obj['level']+1  })
-                                else :
-                                    if new_url not in pagelinks :
-                                         self.extraLinks.append({"source" : new_url, "target" :rurl })
+                if (tldextract.extract(rurl).subdomain != self.subdomain) or (tldextract.extract(rurl).domain != self.domain) :
+                    if (self.domain in urlparse(rurl).netloc) :
+                        #it is a subdomain
+                         self.subdomains.append(rurl)
+                         obj['type'] = "subdomain"
+                    else :
+                        #it is some other URL
+                        self.others.append(rurl)
+                        obj['type'] = "subdomain"
+                else:
+                    obj['type'] = 'page'
+                self.nodedata.append(obj)
+                data = json.dumps(obj)
+                socketIO.emit('result_web_crawler',data)
+                if obj['level'] < lev :
+                    if (tldextract.extract(rurl).domain == self.domain) and (tldextract.extract(rurl).subdomain == self.subdomain):
+                        if rurl not in self.visited:
+                            self.visited.add(rurl)
+                            links = soup.find_all('a')
+                            buttons = self.get_buttonlinks(soup)
+                            images = self.get_imagelinks(soup)
+                            pagelinks = set()
+                            pagelinks.add(rurl)
+                            for link in links:
+                                new_url = link.get('href')
+                                url_text = link.text
+                                url_text = url_text.strip()
+                                new_url = self.get_complete_url(rurl, new_url)
+
+                                if new_url != None :
+                                    if new_url not in self.discovered:
+        #                            if new_url not in self.visited:
+                                            pagelinks.add(new_url)
+                                            self.discovered.add(new_url)
+                                            self.queue.append({"name" : new_url, "parent" : rurl, "desc" : url_text, "level" : obj['level']+1  })
+                                            leveln = obj['level']+1
+                                            self.edgedata.append({"source" : rurl, "target" : new_url })
+                                    else :
+                                        if new_url not in pagelinks :
+                                             self.extraLinks.append({"source" : new_url, "target" :rurl })
+
+            else:
+                headerResponse = requests.get(url,headers = headers,verify = False,stream = True)
+                obj["status"] = headerResponse.status_code
+                obj['type'] = "others"
+                self.nodedata.append(obj)
+                data = json.dumps(obj)
+                socketIO.emit('result_web_crawler',data)
 
         except Exception as e:
             obj['error'] = str(e)
@@ -175,7 +182,7 @@ class Weboccular():
             self.crawlStatus = False
 
     def runCrawler(self,url,level,socketIO) :
-        log.info("inside runCrawler method")
+        log.debug("inside runCrawler method")
         level  = int(level)
         start_url = url
         self.rooturl = start_url
@@ -196,15 +203,10 @@ class Weboccular():
         sdata = { "nodes" : self.nodedata, "links" : self.extraLinks }
 
         time_taken = time.clock() - start
-        if(self.crawlStatus):
-            log.info("crawling request completed succesfully in " +  str(time_taken)  +  " seconds")
-            completetionObj = json.dumps({"progress" : "complete" , "status": "success" ,"subdomains":  self.subdomains, "others" : self.others, "notParsedURLs" : self.notParsedURLs, "time_taken" : str(time_taken) +  " seconds"})
-            socketIO.emit('result_web_crawler_finished',completetionObj)
-            logger.print_on_console("--------------------")
-            logger.print_on_console("crawling request completed succesfully in " +  str(time_taken)  +  " seconds")
-            logger.print_on_console("--------------------")
-        else:
-            log.info("crawling request unsuccessful!")
-            completetionObj = json.dumps({"progress" : "incomplete" , "status": "fail" ,"subdomains":  self.subdomains, "others" : self.others, "notParsedURLs" : self.notParsedURLs, "time_taken" : str(time_taken) +  " seconds"})
-            socketIO.emit('result_web_crawler_finished',completetionObj)
-            print("crawling request unsuccessful!")
+
+        log.info("crawling request completed succesfully in " +  str(time_taken)  +  " seconds")
+        completetionObj = json.dumps({"progress" : "complete" , "status": "success" ,"subdomains":  self.subdomains, "others" : self.others, "notParsedURLs" : self.notParsedURLs, "time_taken" : str(time_taken) +  " seconds"})
+        socketIO.emit('result_web_crawler_finished',completetionObj)
+        logger.print_on_console("--------------------")
+        logger.print_on_console("crawling request completed succesfully in " +  str(time_taken)  +  " seconds")
+        logger.print_on_console("--------------------")

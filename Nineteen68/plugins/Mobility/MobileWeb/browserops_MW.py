@@ -110,8 +110,11 @@ class BrowserOperations():
                desired_caps['platformName'] = 'iOS'
                desired_caps['platformVersion'] =input_list[1]
                desired_caps['deviceName'] = input_list[0]
-               ##desired_caps['udid'] = input_list[0]
+               if len(input_list) > 2:
+                   desired_caps['udid'] = input_list[2]
                desired_caps['browserName'] = 'Safari'
+               desired_caps['autoWebview'] = True
+               desired_caps['startIWDP'] = True
                ##desired_caps['appium-version'] = '1.4.0'
                desired_caps['fullReset'] = False
                desired_caps['newCommandTimeout'] = 3600
@@ -160,7 +163,8 @@ class BrowserOperations():
        except Exception as e:
             mobile_key_objects.custom_msg.append("ERR_WEB_DRIVER")
             status = domconstants_MW.STATUS_FAIL
-            Exceptions_MW.error(e)
+            logger.print_on_console("ERR_WEB_DRIVER")
+            ##Exceptions_MW.error(e)
        return status
 ##    def openIeBrowser(self):
 ##        logger.log('FILE: browserops_MW.py , DEF: openIeBrowser() , MSG: Reading config.xml file.....')

@@ -706,6 +706,38 @@ class ExcelXLS:
             status=True
         return status,err_msg
 
+    def delete_sheet_xls(self,inputpath,sheetname):
+        """
+        def : delete_sheet_xls
+        purpose : Deleting the sheet from .xls file
+        param  : inputpath,sheetname
+        return : nothing (if it fails then through the exception)
+
+        """
+        import pythoncom
+        from win32com.client.gencache import EnsureDispatch
+        pythoncom.CoInitialize()
+        excel = EnsureDispatch("Excel.Application")
+        excel.DisplayAlerts = False
+        excel_file = excel.Workbooks.Open(inputpath)
+        sheet = excel.Sheets(sheetname)
+        sheet.Delete()
+        excel_file.Close(True)
+
+    def create_sheet_xls(self,inputpath,sheetname):
+        """
+        def : create_sheet_xls
+        purpose : creating a new sheet without removing existing data.
+        param : inputpath,sheetname
+        return : nothing (if it fails then through the exception)
+
+        """
+        from xlutils.copy import copy
+        xl_ref=xlrd.open_workbook(inputpath)
+        xlw_ref=copy(xl_ref)
+        xlw_ref.add_sheet(sheetname)
+        xlw_ref.save(inputpath)
+
     def clear_content_xls(self,inputpath,filename,sheetname):
         """
         def : clear_content_xls
@@ -719,20 +751,23 @@ class ExcelXLS:
         info_msg=generic_constants.INPUT_IS+inputpath+' filename: '+filename+' Sheetname: '+sheetname
         logger.print_on_console(info_msg)
         log.info(info_msg)
-        inputpath=inputpath+'/'+filename
+        if inputpath.endswith('/'):
+            inputpath=inputpath+filename
+        else:
+            inputpath=inputpath+'/'+filename
         try:
-            from win32com.client.gencache import EnsureDispatch
-            excel = EnsureDispatch("Excel.Application")
-            excel.DisplayAlerts = False
-            excel_file = excel.Workbooks.Open(inputpath)
-            sheet = excel.Sheets(sheetname)
-            if excel_file.Sheets.Count>1:
-                sheet.Delete()
+            if sheetname in xlrd.open_workbook(inputpath).sheet_names():
+                import random,string
+                dummy_sheet_name =''.join([random.choice(string.ascii_letters + string.digits) for n in xrange(10)])
+                self.create_sheet_xls(inputpath,dummy_sheet_name)
+                self.delete_sheet_xls(inputpath,sheetname)
+                self.create_sheet_xls(inputpath,sheetname)
+                self.delete_sheet_xls(inputpath,dummy_sheet_name)
+                status=True
             else:
-                err_msg='Cannot clear the content if single sheet is present in Excel'
+                err_msg='File/Sheet does not exist to clear'
                 log.error(err_msg)
-            excel_file.Close(True)
-            status=True
+
         except Exception as e:
             err_msg='File/Sheet does not exist to clear'
             log.error(e)
@@ -801,9 +836,9 @@ class ExcelXLS:
             else:
                 logger.print_on_console('Row/Col should be greater than 0')
         except Exception as e:
-            err_msg='Error occurred in clearing cell of .xlsx file'
+            err_msg='Error occurred in clearing cell of .xls file'
         workbook.save(excel_path)
-        return status
+        return status,err_msg
 
 
     def write_cell_xls(self,row,col,value,excel_path,sheetname,*args):
@@ -1178,12 +1213,18 @@ class ExcelXLSX:
         log.info(info_msg)
         inputpath=inputpath+'/'+filename
         try:
+            import random,string
+            dummy_sheet_name =''.join([random.choice(string.ascii_letters + string.digits) for n in xrange(10)])
             book=load_workbook(inputpath)
             sheet=book.get_sheet_by_name(sheetname)
+            book.create_sheet(dummy_sheet_name)
             book.remove(sheet)
             book.active=len(book.sheetnames)-1
             book.save(inputpath)
             book.create_sheet(sheetname)
+            book.save(inputpath)
+            sheet=book.get_sheet_by_name(dummy_sheet_name)
+            book.remove(sheet)
             book.save(inputpath)
             status=True
         except Exception as e:

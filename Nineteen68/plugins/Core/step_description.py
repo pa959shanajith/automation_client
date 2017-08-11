@@ -853,6 +853,14 @@ class StepDescription:
 
 
         #Textbox keywords
+        def setText():
+            return 'Enter text '+ inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
+        def clearText():
+        	return 'Clear text from the ' + "'" + tsp.custname + "'"
+        def getText():
+        	return 'Get text from the '	+ "'" + tsp.custname + "'" + ' and save the text \'' + output + '\' in ' + tsp.outputval
+        def getTextboxLength():
+        	return 'Get length from the ' + "'" + tsp.custname + "'" + ' and save the length \'' + output + '\' in ' + tsp.outputval
         def verifyText():
             return 'Verify ' + input + ' is the the text in the '+ "'" + tsp.custname + "'"
         def sendValue():
@@ -974,7 +982,8 @@ class StepDescription:
             return 'Double click on the '+ "'" + tsp.custname + "'"
         def waitForElementVisible():
             return 'Wait until the element '+ "'" + tsp.custname + "'" +'is visible'
-
+        def dropFile():
+            return 'Drop file executed'
         #Button link keywords
         def click():
             return ' Click on the '+ "'" + tsp.custname + "'"

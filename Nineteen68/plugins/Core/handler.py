@@ -121,7 +121,8 @@ class Handler():
             if json_data.has_key('testcase'):
                 testcase=json_data['testcase']
                 try:
-                    if len(testcase)==0:
+                #Empty testcase scenerio not terminating fix Bug #246 (Himanshu)
+                    if (len(testcase)==0 or testcase=='[]' or testcase=='' or testcase=='null'):
                         logger.print_on_console('Testcase is empty')
                         log.info('Testcase is empty')
                         testcase_empty_flag.append(True)
