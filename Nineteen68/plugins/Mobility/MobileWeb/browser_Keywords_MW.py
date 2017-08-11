@@ -56,9 +56,8 @@ class BrowserKeywords():
 
     def __web_driver_exception(self,e):
         log.error(e)
-
-        logger.print_on_console(e)
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        logger.print_on_console(err_msg)
         return err_msg
     def start_server(self):
         try:
@@ -103,9 +102,13 @@ class BrowserKeywords():
                     desired_caps['platformName'] = 'iOS'
                     desired_caps['platformVersion'] = input_list[1]
                     desired_caps['deviceName'] = input_list[0]
-                    ##desired_caps['udid'] = input_list[0]
+                    if len(input_list) > 3 :
+                        desired_caps['udid'] = input_list[2]
+                        desired_caps['autoWebview'] = True
+                        desired_caps['startIWDP'] = True
                     desired_caps['browserName'] = 'Safari'
                     ##            desired_caps['appium-version'] = '1.4.0'
+
                     desired_caps['newCommandTimeout'] = '36000'
                     driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
                     logger.log('FILE: browserops_MW.py , DEF: openSafariBrowser() , MSG:  Navigating to blank page')
