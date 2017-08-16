@@ -85,6 +85,12 @@ class Tab_Control_Keywords():
             verb = OUTPUT_CONSTANT
             err_msg=None
             items=[]
+            #---------------------------------------------checker(32 or 64)
+            import platform
+            info_32=platform.architecture()
+            if info_32[0]=='32bit':
+                logger.print_on_console('Warning:You are using 32bit version of ICE Engine.This keyword is unstable for this version.')
+            #---------------------------------------------
             try:
                dektop_element = element
                verify_obj = Text_Box()
@@ -100,6 +106,13 @@ class Tab_Control_Keywords():
                             selected_tab_index = int(selected_tab_index)
                             selected = element.GetTabText(selected_tab_index)
                             verb=selected
+                            if verb=="":
+                                handle = element.handle
+                                import pywinauto
+                                import pythoncom
+                                pythoncom.CoInitialize()
+                                text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
+                                verb=text
                             logger.print_on_console('selected tab:',verb)
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
@@ -125,6 +138,12 @@ class Tab_Control_Keywords():
                 result=desktop_constants.TEST_RESULT_FALSE
                 verb = OUTPUT_CONSTANT
                 err_msg=None
+                #---------------------------------------------checker(32 or 64)
+                import platform
+                info_32=platform.architecture()
+                if info_32[0]=='32bit':
+                    logger.print_on_console('Warning:You are using 32bit version of ICE Engine.This keyword is unstable for this version.')
+                #---------------------------------------------
                 try:
                    dektop_element = element
                    verify_obj = Text_Box()
@@ -140,6 +159,13 @@ class Tab_Control_Keywords():
                                 selected_tab_index = int(selected_tab_index)
                                 selected = element.GetTabText(selected_tab_index)
                                 selected= str(selected)
+                                if selected=='':
+                                    handle = element.handle
+                                    import pywinauto
+                                    import pythoncom
+                                    pythoncom.CoInitialize()
+                                    text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
+                                    selected=text
                                 input_val = input_val[0]
                                 if selected == input_val:
                                     status = desktop_constants.TEST_RESULT_PASS
@@ -167,6 +193,12 @@ class Tab_Control_Keywords():
             verb = OUTPUT_CONSTANT
             err_msg=None
             text_flag = False
+            #---------------------------------------------checker(32 or 64)
+            import platform
+            info_32=platform.architecture()
+            if info_32[0]=='32bit':
+                logger.print_on_console('Warning:You are using 32bit version of ICE Engine.This keyword is unstable for this version.')
+            #---------------------------------------------
             try:
                 if desktop_launch_keywords.window_name!=None:
                     log.info('Recieved element from the desktop dispatcher')
