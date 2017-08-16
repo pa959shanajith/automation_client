@@ -240,6 +240,7 @@ class DesktopDispatcher:
     def get_desktop_element(self,xPath,url,app):
         index=None
         ele = ''
+        prev_flag=False
         if ";" in xPath:
             x_var=xPath.split(';')
             xpath=x_var[0]
@@ -247,6 +248,7 @@ class DesktopDispatcher:
             xconID=int(x_var[2])
         else:
             xpath=xPath
+            prev_flag=True # setting prev_flag to True since the xpath recieved is of an old test case.
         #logic to find the desktop element using the xpath
         try:
             win = app.top_window()
@@ -270,7 +272,8 @@ class DesktopDispatcher:
                     else:
                         ele=''
             except Exception as e:
-                ele=''
+                if prev_flag==False:#checking if previous test case flag is True or not.
+                    ele=''  #If false then new test case and AUT structure has changed, so setting the ele to ''
             #---------------------------------------------------
         except :
             #logger.print_on_console("Unable to get desktop elements because :")
