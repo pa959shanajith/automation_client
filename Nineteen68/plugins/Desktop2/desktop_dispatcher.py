@@ -67,7 +67,9 @@ class DesktopDispatcher:
                     'verifyhidden' :['radiobutton','checkbox','input','button','select'],
                     'verifyvisible':['radiobutton','checkbox','input','button','select'],
                     "verifyelementtext":['radiobutton','checkbox','input','button','select'],
-                    "verifyexists":['radiobutton','checkbox','input','button','select']
+                    "verifyexists":['radiobutton','checkbox','input','button','select'],
+                    "mousehover":['radiobutton','checkbox','input','button'],
+                    "verifyallvalues":['select']
                   }
 
     get_ele_type={
@@ -128,6 +130,7 @@ class DesktopDispatcher:
                     'clickelement' : self.element_keywords_obj.click_element,
                     'getelementtext' : self.element_keywords_obj.get_element_text,
                     'verifyelementtext' : self.element_keywords_obj.verify_element_text,
+                    'mousehover':self.element_keywords_obj.mouseHover,
                     'launchapplication' : self.launch_keywords_obj.launch_application,
                     'findwindowandattach' : self.launch_keywords_obj.find_window_and_attach,
                     'selectmenu': self.launch_keywords_obj.select_menu,
