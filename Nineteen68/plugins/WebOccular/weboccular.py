@@ -164,10 +164,10 @@ class Weboccular():
                                             self.edgedata.append({"source" : rurl, "target" : new_url })
                                     else :
                                         if new_url not in pagelinks :
-                                             #self.extraLinks.append({"source" : new_url, "target" :rurl })
-                                             reversedObj = {"type" : "reverse" }
-                                             data = json.dumps(reversedObj)
-                                             socketIO.emit('result_web_crawler',data)
+                                             self.extraLinks.append({"source" : new_url, "target" :rurl })
+##                                             reversedObj = {"type" : "reverse" }
+##                                             data = json.dumps(reversedObj)
+##                                             socketIO.emit('result_web_crawler',data)
 
             else:
                 headerResponse = requests.get(url,headers = headers,verify = False,stream = True)
