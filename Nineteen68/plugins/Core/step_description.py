@@ -111,34 +111,34 @@ class StepDescription:
         def clearFileContent():
 #            this needs to be implemeted
 ##            if(testStepProperty.getInputVal().size() == 2){
-##			String path = testStepProperty.getInputVal().get(0).trim();
-##			if (UtilKeyword.checkforDynamicVariables(path)) {
-##				path = UtilKeyword.dynamicVarGeneration(path, null);
-##			}
-##			String fileName = testStepProperty.getInputVal().get(1).trim();
-##			if (UtilKeyword.checkforDynamicVariables(fileName)) {
-##				fileName = UtilKeyword.dynamicVarGeneration(fileName, null);
-##			}
-##			String extension = FilenameUtils.getExtension(path + fileName);
+##            String path = testStepProperty.getInputVal().get(0).trim();
+##            if (UtilKeyword.checkforDynamicVariables(path)) {
+##                path = UtilKeyword.dynamicVarGeneration(path, null);
+##            }
+##            String fileName = testStepProperty.getInputVal().get(1).trim();
+##            if (UtilKeyword.checkforDynamicVariables(fileName)) {
+##                fileName = UtilKeyword.dynamicVarGeneration(fileName, null);
+##            }
+##            String extension = FilenameUtils.getExtension(path + fileName);
 ##
-##			if (extension.equalsIgnoreCase(TestAutomationConstants.FILE_TYPE_TEXT) || extension.equals(TestAutomationConstants.FILE_TYPE_XML)) {
-##				testDesicriptionDirectory.put("clearFileContent", "Clear all the content of the file '"
-##						+ fileName + "' present in the path  '" + path + "'");
-##			}  else if (extension.equals(TestAutomationConstants.FILE_TYPE_XLS) || extension.equals(TestAutomationConstants.FILE_TYPE_XLSX)) {
-##				if(testStepProperty.getInputVal().size() == 3){
-##				 String sheetName = testStepProperty.getInputVal().get(2).trim();
-##		            if (UtilKeyword.checkforDynamicVariables(sheetName)) {
-##						sheetName = UtilKeyword.dynamicVarGeneration(
-##								sheetName, null);
-##					}
-##				testDesicriptionDirectory.put("clearFileContent", "Clear all the content of the file '"
-##						+ fileName + "','" + sheetName + "' present in the path  '" + path + "'");
-##				}else{
-##					testDesicriptionDirectory.put("clearFileContent", "ClearFileContent failed - SheetName is missing");
-##				}
-##			}else{
-##				testDesicriptionDirectory.put("clearFileContent", "ClearFileContent failed - File type is Invalid ");
-##			}
+##            if (extension.equalsIgnoreCase(TestAutomationConstants.FILE_TYPE_TEXT) || extension.equals(TestAutomationConstants.FILE_TYPE_XML)) {
+##                testDesicriptionDirectory.put("clearFileContent", "Clear all the content of the file '"
+##                        + fileName + "' present in the path  '" + path + "'");
+##            }  else if (extension.equals(TestAutomationConstants.FILE_TYPE_XLS) || extension.equals(TestAutomationConstants.FILE_TYPE_XLSX)) {
+##                if(testStepProperty.getInputVal().size() == 3){
+##                 String sheetName = testStepProperty.getInputVal().get(2).trim();
+##                    if (UtilKeyword.checkforDynamicVariables(sheetName)) {
+##                        sheetName = UtilKeyword.dynamicVarGeneration(
+##                                sheetName, null);
+##                    }
+##                testDesicriptionDirectory.put("clearFileContent", "Clear all the content of the file '"
+##                        + fileName + "','" + sheetName + "' present in the path  '" + path + "'");
+##                }else{
+##                    testDesicriptionDirectory.put("clearFileContent", "ClearFileContent failed - SheetName is missing");
+##                }
+##            }else{
+##                testDesicriptionDirectory.put("clearFileContent", "ClearFileContent failed - File type is Invalid ");
+##            }
             return  "Cleard all the content of the file '"
 
 
@@ -273,87 +273,87 @@ class StepDescription:
 
     def oebs(self,keyword,tsp,inputval,input,output,con,reporting_obj):
         def LaunchApplication():
-        	return 'The application present in the path'+ inputval[0]	+  'is launched'
+            return 'The application present in the path'+ inputval[0] + 'is launched'
         def FindWindowAndAttach():
-       	    return 'Find window and attach is executed'
+            return 'Find window and attach is executed'
         def CloseApplication():
-        	return 'The application is closed'
+            return 'The application is closed'
         def SwitchToFrame():
-        	return 'Control switched to Frame():'+ input
+            return 'Control switched to Frame():'+ input
         def setFocus():
-        	return 'Set focus on'+ "'" + tsp.custname + "'"
+            return 'Set focus on'+ "'" + tsp.custname + "'"
         def waitForElementVisible():
-        	return 'Wait until the element'  + "'" + tsp.custname + "'"+  'is visible'
+            return 'Wait until the element'  + "'" + tsp.custname + "'"+  'is visible'
         def verifyHidden():
-        	return 'Verify'	+ tsp.custname +  'is hidden'
+            return 'Verify' + tsp.custname +  'is hidden'
         def verifyDisabled():
-        	return 'Verify'	+ "'" + tsp.custname + "'" +  'is disabled'
+            return 'Verify' + "'" + tsp.custname + "'" +  'is disabled'
         def verifyEnabled():
-        	return 'Verify'	+ "'" + tsp.custname + "'" +  'is enabled'
+            return 'Verify' + "'" + tsp.custname + "'" +  'is enabled'
         def verifyVisible():
-        	return 'Verify' + "'" + tsp.custname + "'" +  'is visible'
+            return 'Verify' + "'" + tsp.custname + "'" +  'is visible'
         def verifyReadOnly():
-        	return 'Verify'	+ "'" + tsp.custname + "'" +  'is read-only'
+            return 'Verify' + "'" + tsp.custname + "'" +  'is read-only'
         def verifyToolTipText():
-        	return 'Verify' + input + ' is the tooltip of '+ "'" + tsp.custname + "'"
+            return 'Verify' + input + ' is the tooltip of '+ "'" + tsp.custname + "'"
         def getToolTipText():
-        	return 'Get the tool tip from the '	+ "'" + tsp.custname + "'" + ' and save the tool tip text \'' + output + '\' in ' + tsp.output
+            return 'Get the tool tip from the ' + "'" + tsp.custname + "'" + ' and save the tool tip text \'' + output + '\' in ' + tsp.output
         def verifyExists():
-        	return 'Verify ' + "'" + tsp.custname + "'" + ' exists'
+            return 'Verify ' + "'" + tsp.custname + "'" + ' exists'
         def verifyDoesNotExists():
-        	return 'Verify ' + "'" + tsp.custname + "'" + ' does not exists'
+            return 'Verify ' + "'" + tsp.custname + "'" + ' does not exists'
         def rightClick():
-        	return 'Perform right click on element'	+ "'" + tsp.custname + "'"
+            return 'Perform right click on element' + "'" + tsp.custname + "'"
         def drag():
-        	return 'Perform drag on element' + "'" + tsp.custname + "'"
+            return 'Perform drag on element' + "'" + tsp.custname + "'"
         def drop():
-        	return'Perform drop on element'	+ "'" + tsp.custname + "'"
+            return'Perform drop on element' + "'" + tsp.custname + "'"
         def setText():
-        	return 'Enter text ' + input + ' in the '+ "'" + tsp.custname + "'"
+            return 'Enter text ' + input + ' in the '+ "'" + tsp.custname + "'"
         def getText():
-        	return 'Get text from the '	+ "'" + tsp.custname + "'" + ' and save the text \'' + output + '\' in ' + tsp.outputval
+            return 'Get text from the ' + "'" + tsp.custname + "'" + ' and save the text \'' + output + '\' in ' + tsp.outputval
         def getTextboxLength():
-        	return 'Get length from the ' + "'" + tsp.custname + "'" + ' and save the length \'' + output + '\' in ' + tsp.outputval
+            return 'Get length from the ' + "'" + tsp.custname + "'" + ' and save the length \'' + output + '\' in ' + tsp.outputval
         def verifyTextboxLength():
-        	return 'Verify ' + input + ' is the length of textbox ' + "'" + tsp.custname + "'"
+            return 'Verify ' + input + ' is the length of textbox ' + "'" + tsp.custname + "'"
         def verifyText():
-        	return 'Verify ' + input + ' is the text in the ' + "'" + tsp.custname + "'"
+            return 'Verify ' + input + ' is the text in the ' + "'" + tsp.custname + "'"
         def clearText():
-        	return 'Clear text from the ' + "'" + tsp.custname + "'"
+            return 'Clear text from the ' + "'" + tsp.custname + "'"
         def click():
-        	return 'Click on the ' + "'" + tsp.custname + "'"
+            return 'Click on the ' + "'" + tsp.custname + "'"
         def doubleClick():
-        	return 'DoubleClick on the ' + "'" + tsp.custname + "'"
+            return 'DoubleClick on the ' + "'" + tsp.custname + "'"
         def verifyButtonName():
-        	return 'Verify ' + input +  'is the name of ' + "'" + tsp.custname + "'"
+            return 'Verify ' + input +  'is the name of ' + "'" + tsp.custname + "'"
         def getButtonName():
-        	return 'Get the name of the ' + "'" + tsp.custname + "'" + 'and save the +output+ in ' + tsp.outputval
+            return 'Get the name of the ' + "'" + tsp.custname + "'" + 'and save the +output+ in ' + tsp.outputval
         def getLinkText():
-        	return 'Get Text From '	+ "'" + tsp.custname + "'" + ' and save the text \'' + output + '\' in ' + tsp.outputval
+            return 'Get Text From ' + "'" + tsp.custname + "'" + ' and save the text \'' + output + '\' in ' + tsp.outputval
         def verifyLinkText():
-        	return 'Verify text ' + input + ' is the name of the ' + "'" + tsp.custname + "'"
+            return 'Verify text ' + input + ' is the name of the ' + "'" + tsp.custname + "'"
         def selectRadioButton():
-        	return 'Select ' + "'" + tsp.custname + "'"
+            return 'Select ' + "'" + tsp.custname + "'"
         def getStatus():
-        	return 'Get the status of the ' + "'" + tsp.custname + "'"	+ ' and save the status \'' + output + '\' in '	+ tsp.outputval
+            return 'Get the status of the ' + "'" + tsp.custname + "'" + ' and save the status \'' + output + '\' in ' + tsp.outputval
         def selectCheckbox():
-        	return 'Select ' + "'" + tsp.custname + "'"
+            return 'Select ' + "'" + tsp.custname + "'"
         def unselectCheckbox():
-        	return 'Unselect '+ "'" + tsp.custname + "'"
+            return 'Unselect '+ "'" + tsp.custname + "'"
         def selectValueByIndex():
-        	return 'Select value with index value ' + input + ' in the ' + "'" + tsp.custname + "'"
+            return 'Select value with index value ' + input + ' in the ' + "'" + tsp.custname + "'"
         def getCount():
-        	return'Get the count of values in the '	+ "'" + tsp.custname + "'"	+ ' and save the count \'' + output + '\' in ' + tsp.outputval
+            return'Get the count of values in the ' + "'" + tsp.custname + "'" + ' and save the count \'' + output + '\' in ' + tsp.outputval
         def selectValueByText():
-        	return 'Select value ' + input + ' in the ' + "'" + tsp.custname + "'"
+            return 'Select value ' + input + ' in the ' + "'" + tsp.custname + "'"
         def verifySelectedValue():
-        	return 'Verify value ' + input + ' is selected in the '	+ "'" + tsp.custname + "'"
+            return 'Verify value ' + input + ' is selected in the ' + "'" + tsp.custname + "'"
         def verifyCount():
-        	return 'Verify ' + input + ' is the count of the ' + "'" + tsp.custname + "'"
+            return 'Verify ' + input + ' is the count of the ' + "'" + tsp.custname + "'"
         def verifyAllValues():
             return 'Verify values ' + input + ' are present in the ' + "'" + tsp.custname + "'"
         def verifySelectedValues():
-        	return 'Verify values ' + input + ' are selected in the ' + "'" + tsp.custname + "'"
+            return 'Verify values ' + input + ' are selected in the ' + "'" + tsp.custname + "'"
         def getSelected():
             return 'Get Selected value of '+  "'" + tsp.custname + "'" + ' and save value \'' + output + '\' in '+ tsp.outputval
         def verifyValuesExists():
@@ -367,44 +367,44 @@ class StepDescription:
         def getMultipleValuesByIndexes():
             return 'Get values with indexes ' + inputValsb.toString() + ' in the ' + "'" + tsp.custname + "'" +  ' and save the value ' + TestAutomationController.multipleOutputResult + ' in  '+ tsp.outputval
         def selectAllValues():
-        	return 'Select all values in the ' + "'" + tsp.custname + "'"
+            return 'Select all values in the ' + "'" + tsp.custname + "'"
         def deselectAll():
-        	return'Deselect all values in the '	+ "'" + tsp.custname + "'"
+            return'Deselect all values in the ' + "'" + tsp.custname + "'"
         def getRowCount():
-        	return 'Get row count of the ' + "'" + tsp.custname  + "'" + ' and save the count \'' + output + '\' in ' + tsp.outputval
+            return 'Get row count of the ' + "'" + tsp.custname  + "'" + ' and save the count \'' + output + '\' in ' + tsp.outputval
         def getColumnCount():
-        	return'Get column count of the ' + "'" + tsp.custname + "'"	+ ' and save the count \'' + output + '\' in ' + tsp.outputval
+            return'Get column count of the ' + "'" + tsp.custname + "'" + ' and save the count \'' + output + '\' in ' + tsp.outputval
         def getCellValue():
             f_input = input.split(',')
             return 'Get cell value of '+ "'" + tsp.custname + '['+f_input[0] +']['+ f_input[1] + "]'" + ' in the table and save the value ' + output + ' in ' + tsp.outputval
         def verifyCellValue():
             f_input = input.split(',')
-            return 'Verify cell value ' + f_input[2] + ' is present in the '	+ "'" + tsp.custname + '['+f_input[0] +']['+ f_input[1] + "]'" +  '  table'
+            return 'Verify cell value ' + f_input[2] + ' is present in the ' + "'" + tsp.custname + '['+f_input[0] +']['+ f_input[1] + "]'" +  '  table'
         def cellClick():
             f_input = input.split(',')
             return 'Click ' + "'" + tsp.custname + '['+f_input[0] +']['+ f_input[1] + "]'"
         def clickElement():
-       	    return 'Click '	+ "'" + tsp.custname + "'"
+            return 'Click ' + "'" + tsp.custname + "'"
         def getElementText():
-        	return'Get the text of the element ' + "'" + tsp.custname + "'" + ' and save the value  \'' + output + '\' in '	+ tsp.outputval
+            return'Get the text of the element ' + "'" + tsp.custname + "'" + ' and save the value  \'' + output + '\' in ' + tsp.outputval
         def verifyElementText():
-        	return 'Verify ' + input + ' is the the text of the ' + "'" + tsp.custname + "'"
+            return 'Verify ' + input + ' is the the text of the ' + "'" + tsp.custname + "'"
         def sendFunctionKeys():
-        	return 'Press '	+ tsp.inputval[0] + ' key'
+            return 'Press ' + tsp.inputval[0] + ' key'
         def right():
-        	return 'Right button clicked ' + input + ' times'
+            return 'Right button clicked ' + input + ' times'
         def left():
-        	return 'Left button clicked ' + input + ' times'
+            return 'Left button clicked ' + input + ' times'
         def up():
-        	return 'Up button clicked '	+ input + ' times'
+            return 'Up button clicked ' + input + ' times'
         def down():
-        	return 'Down button clicked ' + input + ' times'
+            return 'Down button clicked ' + input + ' times'
         def closeFrame():
-        	return 'Close frame ' + "'" + tsp.custname + "'"
+            return 'Close frame ' + "'" + tsp.custname + "'"
         def toggleMaximize():
-        	return 'Perform toggle maximize operation on '	+ "'" + tsp.custname + "'"
+            return 'Perform toggle maximize operation on ' + "'" + tsp.custname + "'"
         def toggleMinimize():
-        	return 'Perform toggle minimize operation on '	+ "'" + tsp.custname + "'"
+            return 'Perform toggle minimize operation on ' + "'" + tsp.custname + "'"
         return locals()[keyword]()
 
     def sap(self,keyword,tsp,inputval,input,output,con,reporting_obj):
@@ -620,7 +620,7 @@ class StepDescription:
 
         #Date control keywords
         def GetDate():
-        	return 'Get the date from '	+ "'" + tsp.custname + "'" + ' and save the date  in ' + tsp.outputval
+            return 'Get the date from ' + "'" + tsp.custname + "'" + ' and save the date  in ' + tsp.outputval
         def SetDate():
             return 'Set the date, with the format  '+ input + ' in '+ tsp.custname
 
@@ -657,45 +657,45 @@ class StepDescription:
         else:
             output_list=output_list
         def InstallApplication():
-        	return 'The application present in the path '+ inputval[0]	+  ' is installed'
+            return 'The application present in the path '+ inputval[0] +  ' is installed'
         def UnInstallApplication():
-        	return 'The application present in the path '+ inputval[0]	+  ' is uninstalled'
+            return 'The application present in the path '+ inputval[0] +  ' is uninstalled'
         def LaunchApplication():
-        	return 'The application present in the path '+ inputval[0]	+  ' is launched'
+            return 'The application present in the path '+ inputval[0] +  ' is launched'
         def CloseApplication():
-        	return 'The application is closed'
+            return 'The application is closed'
         def SwipeUp():
-        	return 'Performed swipe up operation'
+            return 'Performed swipe up operation'
         def VerifyDoesNotExists():
             return ' Verify '+ "'" + tsp.custname + "'" + '  does not exists '
         def SwipeDown():
-        	return 'Performed swipe down operation'
+            return 'Performed swipe down operation'
         def SwipeLeft():
-        	return 'Performed swipe left operation'
+            return 'Performed swipe left operation'
         def HideSoftKeyBoard():
-        	return 'Performed HideSoftKeyBoard operation'
+            return 'Performed HideSoftKeyBoard operation'
         def BackPress():
-        	return 'Performed Back Press operation'
+            return 'Performed Back Press operation'
         def SwipeRight():
-        	return 'Performed swipe right operation'
+            return 'Performed swipe right operation'
         def ToggleOn():
-       	    return 'Performed toggle on operation on  '	+ "'" + tsp.custname + "'"
+            return 'Performed toggle on operation on  ' + "'" + tsp.custname + "'"
         def ToggleOff():
-       	    return 'Performed toggle off operation on  '	+ "'" + tsp.custname + "'"
+            return 'Performed toggle off operation on  ' + "'" + tsp.custname + "'"
         def InvokeDevice():
-       	    return 'Invoking  '	+ "'" + input + "'"
+            return 'Invoking  ' + "'" + input + "'"
         def GetDevices():
             return 'Get all the connected devices ' + ' and save the result  '+ output + ' in ' + output_list+ '.'
         def PressElement():
-       	    return 'Press '	+ "'" + tsp.custname + "'"
+            return 'Press ' + "'" + tsp.custname + "'"
         def LongPressElement():
-       	    return 'Long Press '	+ "'" + tsp.custname + "'"
+            return 'Long Press ' + "'" + tsp.custname + "'"
         def GetElementText():
-        	return'Get the text of the element ' + "'" + tsp.custname + "'" + ' and save the value  ' + output + ' in '	+ output_list
+            return'Get the text of the element ' + "'" + tsp.custname + "'" + ' and save the value  ' + output + ' in ' + output_list
         def VerifyElementText():
-        	return 'Verify ' + input + ' is the the text of the ' + "'" + tsp.custname + "'"
+            return 'Verify ' + input + ' is the the text of the ' + "'" + tsp.custname + "'"
         def WaitForElementExists():
-        	return 'Wait until the element'  + "'" + tsp.custname + "'"+  'is exists'
+            return 'Wait until the element'  + "'" + tsp.custname + "'"+  'is exists'
         def VerifyEnabled():
             return ' Verify '+ "'" + tsp.custname + "'" + ' is enabled '
         def SetDate():
@@ -856,11 +856,11 @@ class StepDescription:
         def setText():
             return 'Enter text '+ inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
         def clearText():
-        	return 'Clear text from the ' + "'" + tsp.custname + "'"
+            return 'Clear text from the ' + "'" + tsp.custname + "'"
         def getText():
-        	return 'Get text from the '	+ "'" + tsp.custname + "'" + ' and save the text \'' + output + '\' in ' + tsp.outputval
+            return 'Get text from the ' + "'" + tsp.custname + "'" + ' and save the text \'' + output + '\' in ' + tsp.outputval
         def getTextboxLength():
-        	return 'Get length from the ' + "'" + tsp.custname + "'" + ' and save the length \'' + output + '\' in ' + tsp.outputval
+            return 'Get length from the ' + "'" + tsp.custname + "'" + ' and save the length \'' + output + '\' in ' + tsp.outputval
         def verifyText():
             return 'Verify ' + input + ' is the the text in the '+ "'" + tsp.custname + "'"
         def sendValue():
@@ -938,7 +938,7 @@ class StepDescription:
         def navigateForward():
             return 'Navigate forward in the browser'
         def navigateWithAuthenticate():
-            return ' Open url ' + input	+ ' in the browser'
+            return ' Open url ' + input  + ' in the browser'
         def navigateBack():
             return 'Navigate back in the browser'
         def verifyTextExists():

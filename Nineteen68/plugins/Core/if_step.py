@@ -84,11 +84,16 @@ class If():
             res=INVALID
             if input[1] is not None:
                 errs=input[1].split('\n')
+                if errs[-1]=='':
+                    errs=errs[:-1]
                 for err in errs:
                     logger.print_on_console(err+'\n')
             else:
                 logical_eval_obj=Logical_eval()
                 res=logical_eval_obj.eval_expression(input[0])
+                if len(res)>1:
+                    logger.print_on_console(self.name+': '+res[1]+'\n')
+                res=res[0]
             logger.print_on_console(self.name+': Condition is '+str(res)+'\n')
             self.step_description='Encountered :'+self.name+ ' Condition is '+str(res)
 
@@ -154,10 +159,12 @@ class Logical_eval():
             if type(result)==dict:
                 for res in result.iterkeys():
                     status=result[res]
-                    return status
+                    return [status]
             else:
-                return False
+                return [False]
         except Exception as e:
-            return INVALID
+            if e.__class__.__name__=='TypeError':
+                return [INVALID,str(e)]
+            return [INVALID]
 
 

@@ -200,6 +200,7 @@ class DynamicVariables:
         disp_expression=''
         invalid_flag=False
         invalid_msg=''
+        input_var=input_var.strip()
         if not(input_var[0]=='(' and input_var[-1]==')'):
             invalid_msg=keyword+': Expression must be enclosed within "(" and ")"\n'
             log.error(keyword+': Expression must be enclosed within "(" and ")"')
@@ -222,6 +223,15 @@ class DynamicVariables:
             exp=re.sub(r'[)][\s]*AND[\s]*[(]', ')and(',exp)
             exp=re.sub(r'[)][\s]*OR[\s]*[(]', ')or(',exp)
             exp=re.sub(r'[\s]*NOT[\s]*[(]', 'not(',exp)
+##            for c in exp[:-1]:
+##                if c=='(':
+##                    paran_cnt+=1
+##                elif c==')':
+##                    paran_cnt-=1
+##                if paran_cnt==0:
+##                    invalid_flag=True
+##                    invalid_msg=keyword+': Expression must be enclosed within "(" and ")" and balanced\n'
+##                    break
             exp=exp.replace(";>=;","$~>=~$").replace(";<=;","$~<=~$").replace(";==;","$~==~$").replace(";!=;","$~!=~$").replace(";>;","$~>~$").replace(";<;","$~<~$")
         elif k==2:
             exp=input_var
@@ -237,6 +247,7 @@ class DynamicVariables:
         exp=re.sub(r'[\s]*[)]', ')',exp)
         log.debug('Stage 1: ',exp)
         dv_flag=i=0
+        paran_cnt=0
         try:
             while i < len(exp)-1:
                 if (exp[i]=='{' and exp[i-1]=='$') or (exp[i]=='{' and exp[i-1]=='('):
@@ -246,12 +257,20 @@ class DynamicVariables:
                 if dv_flag!=0:
                     i+=1
                     continue
-                if exp[i]=='(' and exp[i+1]!='(' and exp[i+1]!=')' and exp[i+1:i+5]!='not(':
-                    exp=exp[0:i+1]+"~$"+exp[i+1:]
-                    i+=2
+                if exp[i]=='(':
+                    paran_cnt+=1
+                    if exp[i+1]!='(' and exp[i+1]!=')' and exp[i+1:i+5]!='not(':
+                        exp=exp[0:i+1]+"~$"+exp[i+1:]
+                        i+=2
+                elif exp[i]==')':
+                    paran_cnt-=1
                 elif exp[i+1]==')' and exp[i]!='(' and exp[i]!=')':
                     exp=exp[0:i+1]+"$~"+exp[i+1:]
                     i+=2
+                if paran_cnt==0:
+                    paran_cnt=1000
+                    invalid_flag=True
+                    invalid_msg=keyword+': Expression must be enclosed within "(" and ")" and balanced\n'
                 i+=1
             log.debug('Stage 2: ',exp)
             inp_err_list=exp.split('~')
