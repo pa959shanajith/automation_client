@@ -24,7 +24,6 @@ import time
 import urllib, cStringIO
 import logging
 from constants import *
-from verify_file_images import VerifyFileImages
 
 log = logging.getLogger('utilweb_operations.py')
 
@@ -87,9 +86,18 @@ class UtilWebKeywords:
 
 
     def __init__(self):
+        self.verify_image_obj=None
         self.keys_info={}
         self.__create_keyinfo_dict()
-        self.verify_image_obj=VerifyFileImages()
+        self.__load_Image_processingobj()
+
+
+    def __load_Image_processingobj(self):
+        try:
+            from verify_file_images import VerifyFileImages
+            self.verify_image_obj=VerifyFileImages()
+        except Exception as e:
+            log.error(e)
 
     def __web_driver_exception(self,e):
         log.error(e)
@@ -714,17 +722,36 @@ class UtilWebKeywords:
                 log.info(INPUT_IS)
                 log.info(file2)
                 if file1 != None and file2 != None and  file2 != '' and os.path.exists(file2) :
-                    from PIL import Image
-                    img1 = Image.open(file1)
-                    img2 = Image.open(file2)
-                    if self.verify_image_obj.imagecomparison(img1,img2):
-                        info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
-                        logger.print_on_console(info_msg)
-                        log.info(info_msg)
-                        methodoutput=TEST_RESULT_TRUE
-                        status=TEST_RESULT_PASS
+                    log.debug('comparing the images')
+                    if self.verify_image_obj != None: #Meaning user has advanced image processing plugin
+                        if self.verify_image_obj.imagecomparison(file1,file2):
+                            info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
+                            log.info(info_msg)
+                            logger.print_on_console(info_msg)
+                            methodoutput=TEST_RESULT_TRUE
+                            status=TEST_RESULT_PASS
                     else:
-                        err_msg=ERROR_CODE_DICT['ERR_IMAGE_COMPARE_FAIL']
+                            from PIL import Image
+                            import numpy as np
+                            size=(128,128)
+                            img1 = Image.open(file1)
+                            img2 = Image.open(file2)
+                            img1 = img1.convert('RGB')
+                            img2 = img2.convert('RGB')
+                            img1 = img1.resize(size);
+                            img2 = img2.resize(size);
+                            imageA = np.asarray(img1)
+                            imageB = np.asarray(img2)
+                            err = np.sum((imageA.astype("float") - imageB.astype("float"))**2)
+                            err /= float(imageA.shape[0] * imageA.shape[1])
+                            if(err<1000):
+                                info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
+                                log.info(info_msg)
+                                logger.print_on_console(info_msg)
+                                methodoutput=TEST_RESULT_TRUE
+                                status=TEST_RESULT_PASS
+                            else:
+                                err_msg=ERROR_CODE_DICT['ERR_IMAGE_COMPARE_FAIL']
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
             else:

@@ -13,7 +13,7 @@ import sys
 import os
 import logger
 from generic_constants import *
-from verify_file_images import VerifyFileImages
+
 import file_operations
 from constants import *
 import core_utils
@@ -23,8 +23,16 @@ log = logging.getLogger('util_operations.py')
 class UtilOperations:
 
     def __init__(self):
-        self.verify_image_obj=VerifyFileImages()
+    	#960 Imageverificaton (Himanshu)
+        self.verify_image_obj=None
+        self.__load_Image_processingobj()
 
+    def __load_Image_processingobj(self):
+        try:
+            from verify_file_images import VerifyFileImages
+            self.verify_image_obj=VerifyFileImages()
+        except Exception as e:
+            log.error(e)
 
     def type_cast(self,input,to_type,*args):
         """
@@ -126,21 +134,50 @@ class UtilOperations:
         err_msg=None
         try:
             log.debug('reading the inputs')
+
             if file1 != None and file2 != None and file1 != '' and file2 != '' and os.path.exists(file1) and os.path.exists(file2) :
-                from PIL import Image
-                img1 = Image.open(file1)
-                img2 = Image.open(file2)
+				#960 Imageverificaton added ssim and histogram algo. (Himanshu)
+                #sending Image path instead of Images (Himanshu)
+                #img1 = Image.open(file1)
+                #img2 = Image.open(file2)
                 log.debug('comparing the images')
-                if self.verify_image_obj.imagecomparison(img1,img2):
-                    info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
-                    log.info(info_msg)
-                    logger.print_on_console(info_msg)
-                    methodoutput=TEST_RESULT_TRUE
-                    status=TEST_RESULT_PASS
+                if self.verify_image_obj != None: 
+                	#Meaning user has advanced image processing plugin
+                    if self.verify_image_obj.imagecomparison(file1,file2):
+                        info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
+                        log.info(info_msg)
+                        logger.print_on_console(info_msg)
+                        methodoutput=TEST_RESULT_TRUE
+                        status=TEST_RESULT_PASS
                 else:
-                    err_msg=ERROR_CODE_DICT['ERR_IMAGE_COMPARE_FAIL']
+                		#using MSE
+                        from PIL import Image
+                        import numpy as np
+                        size=(128,128)
+                        img1 = Image.open(file1)
+                        img2 = Image.open(file2)
+                        if not(file1.split('.')[-1]=='jpg'):
+                            img1 = img1.convert('RGB')
+                            print 'converted img 1'
+                        if not(file2.split('.')[-1]=='jpg'):
+                            img2 = img2.convert('RGB')
+                            print 'converted img 2'
+                        img1 = img1.resize(size);
+                        img2 = img2.resize(size);
+                        imageA = np.asarray(img1)
+                        imageB = np.asarray(img2)
+                        err = np.sum((imageA.astype("float") - imageB.astype("float"))**2)
+                        err /= float(imageA.shape[0] * imageA.shape[1])
+                        if(err<1000):
+                            info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
+                            log.info(info_msg)
+                            logger.print_on_console(info_msg)
+                            methodoutput=TEST_RESULT_TRUE
+                            status=TEST_RESULT_PASS
+                        else:
+                            err_msg=ERROR_CODE_DICT['ERR_IMAGE_COMPARE_FAIL']
             else:
-                err_msg=ERROR_CODE_DICT['ERR_IMAGE_INPUT_FILES']
+                err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
             if err_msg != None:
                 logger.print_on_console(err_msg)
                 log.error(err_msg)
