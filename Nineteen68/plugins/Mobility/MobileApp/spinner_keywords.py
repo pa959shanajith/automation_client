@@ -925,7 +925,8 @@ class Spinner_Keywords():
                             driver.scroll(scrollele1,scrollele2)
 
                             if (length1==length2):
-                                if len(input) == count:
+
+                                if len(input) == len(temp):
                                     output=temp
                                     status=TEST_RESULT_PASS
                                     result=TEST_RESULT_TRUE
