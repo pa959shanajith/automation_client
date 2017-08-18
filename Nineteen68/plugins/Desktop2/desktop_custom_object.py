@@ -44,6 +44,7 @@ class CustomObjectHandler():
                  cor = children.rectangle()
                  properties = ''
                  try:
+                     pythoncom.CoInitialize()
                      try:
                         properties = json.loads(json.dumps(children.get_properties(    ), default=lambda x: str(x)))
                      except Exception as e:
@@ -119,7 +120,10 @@ class CustomObjectHandler():
                             text= str(text) + '_dtp'
                          else:
                             tag = 'label'
-                            text= str(text) + '_lbl'
+                            if not isinstance(text,basestring):
+                                text=str(text)+'_lbl'
+                            else:
+                                text=text+'_lbl'
                          width = coordinates.width()
                          height = coordinates.height()
                          x_screen = cor.left
@@ -135,13 +139,16 @@ class CustomObjectHandler():
                             for k in range(len(ne)):
                                 if ne[k]['xpath'] == path:
                                     flag = True
+                            new_path=''
+                            className=children.friendly_class_name()
+                            new_path=path+';'+className+';'+str(control_id)
                             if not flag:
                                 ne.append({"custname":text,
                                         "tag":tag,
                                         "url":url,
                                         'control_id':control_id,
                                         'parent':parent,
-                                        'xpath' : path,
+                                        'xpath' : new_path,
                                         'hiddentag':hiddentag,
                                         'top': top,
                                         'left': left,
@@ -191,6 +198,8 @@ class CustomObjectHandler():
     def getobjectforcustom(self, parent_xpath, eleType, eleIndex):
         """Method to retreve Custom elements, returns xpath of the element , after searching for in the list of data recieved from function(for_custom_scrape)"""
         """Note: parent_xpath is the xpath of the element from where custom keyword performs its operation."""
+        x_var=parent_xpath.split(';')
+        parent_xpath=x_var[0]
         data = []
         newdata=[]
         xpath = None
@@ -198,7 +207,9 @@ class CustomObjectHandler():
             app_uia = desktop_launch_keywords.app_uia
             data = self.for_custom_scrape(app_uia)
             for index, item in enumerate(data):
-                if item['xpath']==parent_xpath:
+                i_var=item['xpath'].split(';')
+                item_xpath=i_var[0]
+                if item_xpath==parent_xpath:
                     newdata =data[index+1:]
             for elem in newdata :
                 if elem['tag'].lower() == eleType.strip().lower():
@@ -213,6 +224,8 @@ class CustomObjectHandler():
         except Exception as e:
             import traceback
             traceback.print_exc()
+        if xpath==None:
+            logger.print_on_console('Warning!:AUT Structure has changed, unable to verify the parent element.')
         return xpath
 
 

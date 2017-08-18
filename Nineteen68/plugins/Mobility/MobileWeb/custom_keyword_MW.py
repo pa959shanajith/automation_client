@@ -65,6 +65,8 @@ class CustomKeyword:
             indiframes = url.split('/')
             if platform.system()!= "Darwin":
                 browser_Keywords_MW.driver_obj.switch_to.window(curr_window_handle)
+            else:
+                browser_Keywords_MW.driver_obj.switch_to.default_content()
             #0i/1f
             for i in indiframes:
                 if i is not '':

@@ -462,10 +462,10 @@ class Dispatcher:
                     logger.print_on_console(err_msg)
                     log.error(err_msg)
             #Fixing issue #381
-            if webElement==None:
+            if webElement == None or webElement == '':
+                webElement = None
                 err_msg=WEB_ELEMENT_NOT_FOUND
                 logger.print_on_console(err_msg)
                 log.error(err_msg)
-
         return webElement
 

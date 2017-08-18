@@ -67,7 +67,9 @@ class DesktopDispatcher:
                     'verifyhidden' :['radiobutton','checkbox','input','button','select'],
                     'verifyvisible':['radiobutton','checkbox','input','button','select'],
                     "verifyelementtext":['radiobutton','checkbox','input','button','select'],
-                    "verifyexists":['radiobutton','checkbox','input','button','select']
+                    "verifyexists":['radiobutton','checkbox','input','button','select'],
+                    "mousehover":['radiobutton','checkbox','input','button'],
+                    "verifyallvalues":['select']
                   }
 
     get_ele_type={
@@ -128,6 +130,7 @@ class DesktopDispatcher:
                     'clickelement' : self.element_keywords_obj.click_element,
                     'getelementtext' : self.element_keywords_obj.get_element_text,
                     'verifyelementtext' : self.element_keywords_obj.verify_element_text,
+                    'mousehover':self.element_keywords_obj.mouseHover,
                     'launchapplication' : self.launch_keywords_obj.launch_application,
                     'findwindowandattach' : self.launch_keywords_obj.find_window_and_attach,
                     'selectmenu': self.launch_keywords_obj.select_menu,
@@ -237,10 +240,19 @@ class DesktopDispatcher:
 
         return result
 
-    def get_desktop_element(self,xpath,url,app):
+    def get_desktop_element(self,xPath,url,app):
         index=None
-        #logic to find the desktop element using the xpath
         ele = ''
+        prev_flag=False
+        if ";" in xPath:
+            x_var=xPath.split(';')
+            xpath=x_var[0]
+            xclass=x_var[1]
+            xconID=int(x_var[2])
+        else:
+            xpath=xPath
+            prev_flag=True # setting prev_flag to True since the xpath recieved is of an old test case.
+        #logic to find the desktop element using the xpath
         try:
             win = app.top_window()
             ch = win.children()
@@ -253,10 +265,52 @@ class DesktopDispatcher:
                 index = child[child.index('[') + 1 : child.index(']')]
                 ch = ele.children()
                 ele = ch[int(index)]
+            #---------------------------------------------------
+            try:
+                if ele!='':     #checking if element is not empty
+                    if xclass==ele.friendly_class_name(): #comparing top window element class with the one obtained from TSP
+                        if xconID!=ele.control_id(): #comparing if the control ID of top window element is same as one from TSP
+                            #-------element dosent handles matched
+                            ele=''
+                    else:
+                        ele=''
+            except Exception as e:
+                if prev_flag==False:#checking if previous test case flag is True or not.
+                    ele=''  #If false then new test case and AUT structure has changed, so setting the ele to ''
+            #---------------------------------------------------
         except :
+            #logger.print_on_console("Unable to get desktop elements because :")
+            import traceback
+            traceback.print_exc()
+        if ele=='':
+            logger.print_on_console("Warning! AUT Structure has changed")
+            ele=self.get_desktop_static_element(xclass,xconID,app)
+        if ele=='':
             logger.print_on_console("Unable to get desktop elements because :")
-##            import traceback
-##            traceback.print_exc()
+        return ele
+
+    def get_desktop_static_element(self,xclass,xconID,app):
+        """This method was added to handle change in tabs, when different tabs are selected, the xpath of all elements will change
+        This will result in increment or decrement of objects also!. Hence using this method to comapre the calss name and control ID of object
+        returned from UI with all the elements of the top window. The first object whoes class name and control ID is the same is returned."""
+        #logic to find the desktop element using custname of the element returned from UI
+        ele = ''
+        try:
+            win = app.top_window()
+            ch = win.children()
+            for i in range(0,len(ch)):
+                try:
+                    conID = ch[i].control_id()
+                    className=ch[i].friendly_class_name()
+                    if xclass==className:
+                        if xconID==conID:
+                            ele=ch[i]
+                except:
+                    import traceback
+                    traceback.print_exc()
+        except :
+            import traceback
+            traceback.print_exc()
         return ele
 
 

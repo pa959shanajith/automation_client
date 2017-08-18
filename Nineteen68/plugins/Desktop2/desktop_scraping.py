@@ -344,13 +344,16 @@ class Scrape:
                             for k in range(len(ne)):
                                 if ne[k]['xpath'] == path:
                                     flag = True
+                            new_path=''
+                            className=children.friendly_class_name()
+                            new_path=path+';'+className+';'+str(control_id)
                             if not flag:
                                 ne.append({"custname":text,
                                         "tag":tag,
                                         "url":url,
                                         'control_id':control_id,
                                         'parent':parent,
-                                        'xpath' : path,
+                                        'xpath' : new_path,
                                         'hiddentag':hiddentag,
                                         'top': top,
                                         'left': left,

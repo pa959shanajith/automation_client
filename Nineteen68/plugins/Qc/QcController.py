@@ -20,6 +20,7 @@ import logger
 obj=None
 TD=None
 loginflag=False
+urlflag=False
 dictFolderJson=None
 import core_utils
 class QcWindow(wx.Frame):
@@ -49,7 +50,11 @@ class QcWindow(wx.Frame):
                     loginflag=False
                     global TD
                     TD = win32com.client.Dispatch("TDApiOle80.TDConnection")
+                    global urlflag
+                    urlflag=False
                     TD.InitConnectionEx(str(Qc_Url))
+
+                    urlflag=True
 ##                    print TD.connected
                     un=str(user_name)
                     pw=str(pass_word)
@@ -253,12 +258,15 @@ class QcWindow(wx.Frame):
 
 
     def quit_qc(self):
-        ##print 'quiting qc'
+##        print 'quiting qc'
+##        print urlflag
         if TD.connected==True and loginflag==True:
             self.socketIO.emit('qcresponse','closedqc')
             logger.print_on_console('Closing QC Connection')
             TD.Logout()
             TD.releaseconnection()
+        elif urlflag==False:
+            self.socketIO.emit('qcresponse','invalidurl')
         else:
             self.socketIO.emit('qcresponse','invalidcredentials')
             logger.print_on_console('Releasing QC Connection')

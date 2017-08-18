@@ -218,3 +218,52 @@ class ElementKeywords():
             logger.print_on_console(exception)
         log.info(RETURN_RESULT)
         return status,result,verb,err_msg
+
+    def mouseHover(self,element,parent,*args):
+        status=desktop_constants.TEST_RESULT_FAIL
+        result=desktop_constants.TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
+        Rect=''
+        try:
+            #----------get the element coordinates
+            Rect=str(element.Rectangle())
+            Rect=Rect[1:len(Rect)-1]
+            Rect=Rect.split(",")
+            Left=Rect[0].strip()#left
+            if "L" in Left:
+                Left=int(Left[1:])
+            else:
+                Left=int(Left)
+            Top=Rect[1].strip()#top
+            if "T" in Top:
+                Top=int(Top[1:])
+            else:
+                Top=int(Top)
+            Right=Rect[2].strip()#right
+            if "R" in Right:
+                Right=int(Right[1:])
+            else:
+                Right=int(Right)
+            Bottom=Rect[3].strip()#bottom
+            if "B" in Bottom:
+                Bottom=int(Bottom[1:])
+            else:
+                Bottom=int(Bottom)
+            #---------------------Finding height and width
+            height=Bottom-Top
+            width=Right-Left
+            #--------------------Finding X and Y co-ordinates
+            x = Left + width/2
+            y= Top + height/2
+            pywinauto.mouse.move(coords=(int(x), int(y)))
+            status = desktop_constants.TEST_RESULT_PASS
+            result = desktop_constants.TEST_RESULT_TRUE
+        except Exception as exception:
+            import traceback
+            traceback.print_exc()
+            log.error(exception)
+            logger.print_on_console(exception)
+            err_msg="Unable to perform Mouse Hover"
+        log.info(RETURN_RESULT)
+        return status,result,verb,err_msg
