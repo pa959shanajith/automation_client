@@ -94,6 +94,14 @@ VERIFY_VISIBLE='verifyVisible'
 
 DYNAMIC_KEYWORDS=['createDynVariable','copyValue','modifyValue','deleteDynVariable']
 
+CREATE_DYN_VARIABLE='createdynvariable'
+
+COPY_VALUE='copyvalue'
+
+MODIFY_VALUE='modifyvalue'
+
+DELETE_DYN_VARIABLE='deletedynvariable'
+
 WS_KEYWORDS=['setHeader','setHeaderTemplate']
 
 PARALLEL = 'parallel'

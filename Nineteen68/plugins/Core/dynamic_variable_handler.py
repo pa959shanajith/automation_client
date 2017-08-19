@@ -68,38 +68,10 @@ class DynamicVariables:
                     else:
                         if actual_value is not None:
                             actual_value=actual_value.replace(input_var,temp_value)
-                ###Logic to replace dynamic variable values for keywords other than IF and  Evaluate
-                ##if keyword not in [EVALUATE,IF,ELSE_IF]:
-                ##    data=input_var[1:-1]
-                ##    data='{'+data+'}'
-                ##    temp_value=self.get_dynamic_value(data)
-                ##    if temp_value is None:
-                ##        actual_value=temp_value
-                ##    else:
-                ##        if not isinstance(temp_value,unicode):
-                ##            if actual_value is not None:
-                ##                actual_value=actual_value.replace(data,str(temp_value))
-                ##        else:
-                ##            if actual_value is not None:
-                ##                actual_value=actual_value.replace(data,temp_value)
-                ##
-                ##else:
-                ##     #Logic to replace dynamic variable values for keywords IF and  Evaluate
-                ##     #since input does not contain ';' and input will be expression
-                ##    var_list=re.findall("\{(.*?)\}",input_var)
-                ##    for data in var_list:
-                ##        data='{'+data+'}'
-                ##        temp_value=self.get_dynamic_value(data)
-                ##        if temp_value is None:
-                ##            actual_value=temp_value
-                ##        else:
-                ##            if not isinstance(temp_value,unicode):
-                ##                if actual_value is not None:
-                ##                    actual_value=actual_value.replace(data,str(temp_value))
-                ##            else:
-                ##                if actual_value is not None:
-                ##                    actual_value=actual_value.replace(data,temp_value)
-
+        else:
+            status,nested_var=self.check_dynamic_inside_dynamic(input_var)
+            if status==TEST_RESULT_TRUE:
+                actual_value=self.get_nestedDyn_value(nested_var,input_var)
         return actual_value
 
     #To Store the output from keyword as an array if it is multiple values
@@ -186,8 +158,6 @@ class DynamicVariables:
 
     #To simplify expression for IF, ELSEIF and EVALUATE keywords
     def simplify_expression(self,input_var,keyword,con_obj):
-        if len(re.findall(IGNORE_THIS_STEP,input_var))!=0:
-            return [input_var,IGNORE_THIS_STEP]
         k=-1
         if keyword.lower() in [IF,ELSE_IF]:
             k=1
@@ -223,15 +193,6 @@ class DynamicVariables:
             exp=re.sub(r'[)][\s]*AND[\s]*[(]', ')and(',exp)
             exp=re.sub(r'[)][\s]*OR[\s]*[(]', ')or(',exp)
             exp=re.sub(r'[\s]*NOT[\s]*[(]', 'not(',exp)
-##            for c in exp[:-1]:
-##                if c=='(':
-##                    paran_cnt+=1
-##                elif c==')':
-##                    paran_cnt-=1
-##                if paran_cnt==0:
-##                    invalid_flag=True
-##                    invalid_msg=keyword+': Expression must be enclosed within "(" and ")" and balanced\n'
-##                    break
             exp=exp.replace(";>=;","$~>=~$").replace(";<=;","$~<=~$").replace(";==;","$~==~$").replace(";!=;","$~!=~$").replace(";>;","$~>~$").replace(";<;","$~<~$")
         elif k==2:
             exp=input_var
