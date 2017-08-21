@@ -283,7 +283,7 @@ class DesktopDispatcher:
             import traceback
             traceback.print_exc()
         if ele=='':
-            logger.print_on_console("Warning! AUT Structure has changed")
+            #logger.print_on_console("Warning! AUT Structure has changed")
             ele=self.get_desktop_static_element(xclass,xconID,app)
         if ele=='':
             logger.print_on_console("Unable to get desktop elements because :")
