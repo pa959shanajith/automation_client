@@ -38,7 +38,6 @@ class Weboccular():
         self.domain = ""
         self.subdomain = ""
         self.discovered = set()
-        self.agent="chrome"
         self.rooturl=""
         self.start_url=""
         self.crawlStatus = True
@@ -75,7 +74,7 @@ class Weboccular():
         return imglinks
 
 
-    def crawl(self,start_url, level,socketIO) :
+    def crawl(self,start_url, level,agent,socketIO) :
         self.domain = tldextract.extract(str(start_url)).domain
         start_obj = {"name" : start_url, "parent" : "None", "level" : 0 }
         self.discovered.add(start_url)
@@ -87,7 +86,7 @@ class Weboccular():
         while(self.queue) :
             obj = self.queue.pop(0)
             url = obj['name']
-            t = threading.Thread(target = self.parse, args = (url, obj, level,socketIO))
+            t = threading.Thread(target = self.parse, args = (url, obj, level,agent,socketIO))
             t.start()
             threads.append(t)
             if i == 1 :
@@ -98,14 +97,14 @@ class Weboccular():
         for thread in threads :
             thread.join()
 
-    def parse(self,url, obj, lev,socketIO) :
+    def parse(self,url, obj, lev,agent,socketIO) :
         agents = { "safari" : "Mozilla/5.0 AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A",
         "firefox" : "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1",
         "chrome" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36",
         "ie": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"}
         try:
-            headers = {'User-Agent': agents[self.agent]}
-
+            headers = {'User-Agent': agents[agent]}
+            print "agent is : ",agents[agent]
             #if URL is for file type .pdf, .docx or .zip we will send only header request, will not download entire content
 
 
@@ -184,19 +183,18 @@ class Weboccular():
             print "error url" , url
             self.crawlStatus = False
 
-    def runCrawler(self,url,level,socketIO) :
+    def runCrawler(self,url,level,agent,socketIO) :
         log.debug("inside runCrawler method")
         level  = int(level)
         start_url = url
         self.rooturl = start_url
-    #    self.agent = sys.argv[3]
         start = time.clock()
         log.info("starting new crawling request with following parameteres: [URL] : " + start_url  +  " [LEVEL] : "  +  str(level))
         logger.print_on_console("--------------------")
         logger.print_on_console("starting new crawling request with following parameteres: [URL] : " + start_url  +  " [LEVEL] : "  +  str(level))
         logger.print_on_console("--------------------")
         try:
-            t = threading.Thread(target = self.crawl, args = (start_url, level,socketIO))
+            t = threading.Thread(target = self.crawl, args = (start_url, level,agent,socketIO))
             t.start()
             t.join()
             self.crawlStatus = True

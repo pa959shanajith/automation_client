@@ -352,7 +352,7 @@ class MainNamespace(BaseNamespace):
             args=list(args)
             global socketIO
 
-            wo.runCrawler(args[0],args[1],socketIO)
+            wo.runCrawler(args[0],args[1],args[2],socketIO)
 
         except Exception as e:
             import traceback
