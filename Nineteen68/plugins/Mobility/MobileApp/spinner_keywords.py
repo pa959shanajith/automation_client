@@ -927,7 +927,7 @@ class Spinner_Keywords():
 
                             if (length1==length2):
 
-                                if len(input) == len(temp):
+                                if len(input) ==  len(temp):
                                     output=temp
                                     status=TEST_RESULT_PASS
                                     result=TEST_RESULT_TRUE
