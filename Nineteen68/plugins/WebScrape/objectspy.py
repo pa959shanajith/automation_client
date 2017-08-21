@@ -18,8 +18,10 @@ import clickandadd
 import highlight
 import io
 import logging
-import win32gui
-import win32con
+import platform
+if platform.system()!='Darwin':
+    import win32gui
+    import win32con
 import logger
 import logging
 import os
@@ -35,7 +37,7 @@ class Object_Mapper():
     def compare(self,data):
         find_ele=highlight.Highlight()
         maindir = os.environ["NINETEEN68_HOME"]
-        screen_shot_path = maindir + '\Nineteen68\plugins\WebScrape' + domconstants.SCREENSHOT_IMG
+        screen_shot_path = maindir + '/Nineteen68/plugins/WebScrape' + domconstants.SCREENSHOT_IMG
         driver = browserops.driver
         time.sleep(10)
         hwndg = browserops.hwndg
@@ -220,7 +222,7 @@ class Object_Mapper():
         self.remove_highlight()
         time.sleep(2)
         maindir = os.environ["NINETEEN68_HOME"]
-        screen_shot_path = maindir + '\Nineteen68\plugins\WebScrape' + domconstants.SCREENSHOT_IMG
+        screen_shot_path = maindir + '/Nineteen68/plugins/WebScrape' + domconstants.SCREENSHOT_IMG
         if (isinstance(driver,webdriver.Firefox) or isinstance(driver,webdriver.Chrome)):
             screen = self.fullpage_screenshot(driver, screen_shot_path )
         else:

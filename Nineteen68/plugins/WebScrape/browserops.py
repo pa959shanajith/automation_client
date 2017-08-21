@@ -14,13 +14,15 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import time
-import psutil
-import win32process
+
 import xml.etree.ElementTree as ET
 import domconstants
-import utils_sc
-import win32gui
-import win32api
+
+import platform
+if platform.system()!='Darwin':
+    import utils_sc
+    import win32gui
+    import win32api
 import logger
 import Exceptions
 import logging

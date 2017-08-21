@@ -16,9 +16,11 @@ import logger
 import browser_Keywords
 from utils_web import Utils
 from webconstants import *
-from pyrobot import Robot
-import win32gui
-import pyrobot
+import platform
+if platform.system()!='Darwin':
+    from pyrobot import Robot
+    import win32gui
+    import pyrobot
 import table_keywords
 import time
 import urllib, cStringIO
