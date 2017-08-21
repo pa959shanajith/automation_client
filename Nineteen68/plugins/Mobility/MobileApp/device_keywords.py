@@ -62,6 +62,49 @@ class Device_Keywords():
             logger.print_on_console(err_msg)
         return status,methodoutput,devices,err_msg
 
+    def wifi_connect(self,*args):
+        try:
+            android_home=os.environ['ANDROID_HOME']
+            cmd=android_home+'\\platform-tools\\'
+            os.chdir(cmd)
+            cmd=cmd +'adb.exe'
+            if android_home!=None:
+                a,b,serial,d=self.get_device_list(None)
+
+                if len(serial)!=0:
+                    if ':' in serial :
+                             output=subprocess.check_output([cmd, 'connect',out])
+                             if 'connected' in output :
+                                    print 'already connected to the network'
+                             else:
+                                    print 'connection lost please retry'
+                    else :
+                            cm=cmd + ' tcpip 5555'
+                            abc=subprocess.check_output(cm)
+                            import time
+                            time.sleep(5)
+                            cmmmm=cmd + '  shell ip -f inet addr show wlan0'
+                            out1 = subprocess.check_output(cmmmm)
+                            b=out1[out1.find('inet'):]
+                            b=b.strip('inet')
+                            c=b.split('/')
+                            ser=c[0] + ':5555'
+                            c= cmd + ' connect ' +ser
+                            o=subprocess.check_output(c)
+                            if 'connected' in o :
+                                print ' both devices areconnected over wifi unplug the cable '
+                else:
+                    print 'no device found pls connect connect the device via usb '
+
+                    # The first line of `adb devices` just says "List of attached devices", so
+                    # skip that.
+
+
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(err_msg)
+
+
     def invoke_device(self,input_val,*args):
 
         status=TEST_RESULT_FAIL
