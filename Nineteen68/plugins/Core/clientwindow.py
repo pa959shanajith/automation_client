@@ -74,6 +74,14 @@ class MainNamespace(BaseNamespace):
 
 ##            time.sleep(5)
             print 'Importing done'
+        elif str(args[0]) == 'OPEN BROWSER SF':
+##
+            browsername = '6'
+##
+            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+
+##            time.sleep(5)
+            print 'Importing done'
 
         elif str(args[0]) == 'debugTestCase':
             print 'on_debugTestCase_message'
@@ -99,6 +107,9 @@ class MainNamespace(BaseNamespace):
                 wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
             elif str(task) == 'OPEN BROWSER FX':
                 browsername = '2'
+                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+            elif str(task) == 'OPEN BROWSER SF':
+                browsername = '6'
                 wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
         elif action == 'compare':
             data = d['viewString']
@@ -1086,7 +1097,7 @@ class ClientWindow(wx.Frame):
             debugFlag = False
         else:
 ##            global browsername
-            browsernumbers = ['1','2','3']
+            browsernumbers = ['1','2','3','6']
             if browsername in browsernumbers:
                 print 'Browser name : ',browsername
                 con = controller.Controller()

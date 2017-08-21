@@ -18,6 +18,7 @@ import logger
 import radio_checkbox_operations
 import core_utils
 import logging
+import platform
 
 from constants import *
 log = logging.getLogger('dropdown_listbox.py')
@@ -68,6 +69,13 @@ class DropdownKeywords():
                                     if(input_val == i):
                                         if (isinstance(browser_Keywords.driver_obj,webdriver.Firefox)):
                                             iList[i].click()
+                                        elif platform.system() == 'Darwin':
+
+                                            ##print input_list
+                                            scroll = """arguments[0].scrollIntoView()"""
+                                            browser_Keywords.driver_obj.execute_script(scroll, webelement)
+                                            jstext = """for (var j = 0; j < arguments[1].length; j++) {for (var i = 0; i < arguments[0].length; i++) {if ( i == arguments[1][j]) {arguments[0][i].selected = true;}}}"""
+                                            browser_Keywords.driver_obj.execute_script(jstext, webelement, input)
                                         else:
                                             select.select_by_index(input_val)
                                         status=webconstants.TEST_RESULT_PASS
@@ -181,7 +189,17 @@ class DropdownKeywords():
                                 if iList[i].text == inp_val:
                                     flag = True
                             if(flag):
-                                select.select_by_visible_text(inp_val)
+                                import platform
+                                if platform.system() == 'Darwin':
+
+                                    input_list=[inp_val]
+
+                                    scroll = """arguments[0].scrollIntoView()"""
+                                    browser_Keywords.driver_obj.execute_script(scroll,webelement)
+                                    jstext = """for (var j = 0; j < arguments[1].length; j++) {for (var i = 0; i < arguments[0].length; i++) {if (arguments[0][i].innerHTML == arguments[1][j]) {arguments[0][i].selected = true;}}}"""
+                                    browser_Keywords.driver_obj.execute_script(jstext,webelement,input_list)
+                                else:
+                                    select.select_by_visible_text(inp_val)
                                 status=webconstants.TEST_RESULT_PASS
                                 result=webconstants.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -535,6 +553,7 @@ class DropdownKeywords():
         verb = OUTPUT_CONSTANT
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+
         try:
             if input is not None:
                 if len(input) == 1:
@@ -554,23 +573,29 @@ class DropdownKeywords():
                                 log.info('iListSize is')
                                 log.info(iListSize)
                                 flag = False
-                                for x in range(0,count):
-                                    if int(input[x]) <= iListSize:
-                                        for i in range(0,iListSize):
-                                            input_val_temp = input[x]
-                                            input_val = int(input_val_temp)
-                                            if( input_val == i):
-                                                if (isinstance(browser_Keywords.driver_obj,webdriver.Firefox)):
-                                                    iList[i].click()
-                                                else:
-                                                    select.select_by_index(input_val)
-                                    else:
-                                        flag = True
-                                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                        break;
-
+                                if platform.system() == 'Darwin':
+                                    input_list = [input]
+                                    scroll = """arguments[0].scrollIntoView()"""
+                                    browser_Keywords.driver_obj.execute_script(scroll, webelement)
+                                    jstext = """for (var j = 0; j < arguments[1].length; j++) {for (var i = 0; i < arguments[0].length; i++) {if ( i == arguments[1][j]) {arguments[0][i].selected = true;}}}"""
+                                    browser_Keywords.driver_obj.execute_script(jstext, webelement, input_list)
+                                else:
+                                    for x in range(0,count):
+                                        if int(input[x]) <= iListSize:
+                                            for i in range(0,iListSize):
+                                                input_val_temp = input[x]
+                                                input_val = int(input_val_temp)
+                                                if( input_val == i):
+                                                    if (isinstance(browser_Keywords.driver_obj,webdriver.Firefox)):
+                                                        iList[i].click()
+                                                    else:
+                                                        select.select_by_index(input_val)
+                                        else:
+                                            flag = True
+                                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                            log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                            break;
                                 if (not flag):
                                     status=webconstants.TEST_RESULT_PASS
                                     result=webconstants.TEST_RESULT_TRUE
@@ -596,22 +621,29 @@ class DropdownKeywords():
                                 log.info(iListSize)
 
                                 flag = False
-                                for x in range(0,count):
-                                    if int(input[x]) <= iListSize:
-                                        for i in range(0,iListSize):
-                                            input_val_temp = input[x]
-                                            input_val = int(input_val_temp)
-                                            if( input_val == i):
-                                                if (isinstance(browser_Keywords.driver_obj,webdriver.Firefox)):
-                                                    iList[i].click()
-                                                else:
-                                                    select.select_by_index(input_val)
-                                    else:
-                                        flag = True
-                                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                        break;
+                                if platform.system() == 'Darwin':
+                                    input_list = input
+                                    scroll = """arguments[0].scrollIntoView()"""
+                                    browser_Keywords.driver_obj.execute_script(scroll, webelement)
+                                    jstext = """for (var j = 0; j < arguments[1].length; j++) {for (var i = 0; i < arguments[0].length; i++) {if ( i == arguments[1][j]) {arguments[0][i].selected = true;}}}"""
+                                    browser_Keywords.driver_obj.execute_script(jstext, webelement, input)
+                                else:
+                                    for x in range(0,count):
+                                        if int(input[x]) <= iListSize:
+                                            for i in range(0,iListSize):
+                                                input_val_temp = input[x]
+                                                input_val = int(input_val_temp)
+                                                if( input_val == i):
+                                                    if (isinstance(browser_Keywords.driver_obj,webdriver.Firefox)):
+                                                        iList[i].click()
+                                                    else:
+                                                        select.select_by_index(input_val)
+                                        else:
+                                            flag = True
+                                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                            log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                            break;
 
                                 if (not flag):
                                     status=webconstants.TEST_RESULT_PASS
@@ -713,6 +745,77 @@ class DropdownKeywords():
                             iList = select.options
                             iListSize = len(iList)
 
+                            if platform.system() == 'Darwin':
+                                jscount = 0
+                                ##print input_list
+                                scroll = """arguments[0].scrollIntoView()"""
+                                browser_Keywords.driver_obj.execute_script(scroll, webelement)
+                                jstext = """for (var j = 0; j < arguments[1].length; j++) {for (var i = 0; i < arguments[0].length; i++) {if (arguments[0][i].innerHTML == arguments[1][j]) {arguments[0][i].selected = true;}}}"""
+                                browser_Keywords.driver_obj.execute_script(jstext, webelement, input)
+                                items = select.options
+                                for i in items:
+                                    if i.is_selected():
+                                        jscount = jscount + 1
+                                if jscount == count:
+                                    status = webconstants.TEST_RESULT_PASS
+                                    result = webconstants.TEST_RESULT_TRUE
+                                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                                else:
+                                    logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                            else:
+                                counter = 0
+                                for x in range(0,count):
+                                    flag = False
+                                    for i in range(0,len(iList)):
+                                         if iList[i].text == input[x] :
+                                            flag = True
+                                    if(flag):
+                                        input_val = input[x]
+                                        log.info('Input value obtained')
+                                        log.info(input_val)
+                                        coreutilsobj=core_utils.CoreUtils()
+                                        input_val=coreutilsobj.get_UTF_8(input_val)
+                                        select.select_by_visible_text(input_val)
+                                        counter = counter + 1
+
+                                if counter == count :
+                                    status=webconstants.TEST_RESULT_PASS
+                                    result=webconstants.TEST_RESULT_TRUE
+                                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                                else:
+                                    logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                        else:
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                    else:
+                        select = Select(webelement)
+                        iList = select.options
+                        iListSize = len(iList)
+                        if platform.system() == 'Darwin':
+                            jscount = 0
+                            ##print input_list
+                            scroll = """arguments[0].scrollIntoView()"""
+                            browser_Keywords.driver_obj.execute_script(scroll, webelement)
+                            jstext = """for (var j = 0; j < arguments[1].length; j++) {for (var i = 0; i < arguments[0].length; i++) {if (arguments[0][i].innerHTML == arguments[1][j]) {arguments[0][i].selected = true;}}}"""
+                            browser_Keywords.driver_obj.execute_script(jstext, webelement, input)
+                            items = select.options
+                            for i in items:
+                                if i.is_selected():
+                                    jscount = jscount + 1
+                            if jscount == count:
+                                status = webconstants.TEST_RESULT_PASS
+                                result = webconstants.TEST_RESULT_TRUE
+                                log.info(STATUS_METHODOUTPUT_UPDATE)
+                            else:
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                        else:
                             counter = 0
                             for x in range(0,count):
                                 flag = False
@@ -723,8 +826,6 @@ class DropdownKeywords():
                                     input_val = input[x]
                                     log.info('Input value obtained')
                                     log.info(input_val)
-                                    coreutilsobj=core_utils.CoreUtils()
-                                    input_val=coreutilsobj.get_UTF_8(input_val)
                                     select.select_by_visible_text(input_val)
                                     counter = counter + 1
 
@@ -736,37 +837,10 @@ class DropdownKeywords():
                                 logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
                                 log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
                                 err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                        else:
-                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                    else:
-                        select = Select(webelement)
-                        iList = select.options
-                        iListSize = len(iList)
-                        counter = 0
-                        for x in range(0,count):
-                            flag = False
-                            for i in range(0,len(iList)):
-                                 if iList[i].text == input[x] :
-                                    flag = True
-                            if(flag):
-                                input_val = input[x]
-                                log.info('Input value obtained')
-                                log.info(input_val)
-                                select.select_by_visible_text(input_val)
-                                counter = counter + 1
-
-                        if counter == count :
-                            status=webconstants.TEST_RESULT_PASS
-                            result=webconstants.TEST_RESULT_TRUE
-                            log.info(STATUS_METHODOUTPUT_UPDATE)
-                        else:
-                            logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                            log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                            err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
 
                 except Exception as e:
+                    import traceback
+                    traceback.print_exc()
                     log.error(e)
 
                     logger.print_on_console(e)
@@ -897,21 +971,36 @@ class DropdownKeywords():
                     select = Select(webelement)
                     iList = select.options
                     iListSize = len(iList)
-                    for i in range(0,iListSize):
-                        check = select.options[i].is_selected()
-                        if(check == False):
-                            to_select = select.options[i].text
-                            select.select_by_visible_text(to_select)
-                    wlist = select.all_selected_options
-                    size = len(wlist)
-                    log.debug('size is')
-                    log.debug(size)
-                    log.debug('iListSize is')
-                    log.debug(iListSize)
-                    if(size == iListSize):
-                        status=webconstants.TEST_RESULT_PASS
-                        result=webconstants.TEST_RESULT_TRUE
-                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                    if platform.system()=='Darwin':
+                        size=0
+                        scroll = """arguments[0].scrollIntoView()"""
+                        browser_Keywords.driver_obj.execute_script(scroll, webelement)
+                        jsall = """for (var i = 0; i < arguments[0].length; i++) {arguments[0][i].selected = true;}"""
+                        browser_Keywords.driver_obj.execute_script(jsall, webelement)
+                        items = select.options
+                        for i in items:
+                            if i.is_selected():
+                                size = size + 1
+                        if (size == iListSize):
+                            status = webconstants.TEST_RESULT_PASS
+                            result = webconstants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                    else:
+                        for i in range(0,iListSize):
+                            check = select.options[i].is_selected()
+                            if(check == False):
+                                to_select = select.options[i].text
+                                select.select_by_visible_text(to_select)
+                        wlist = select.all_selected_options
+                        size = len(wlist)
+                        log.debug('size is')
+                        log.debug(size)
+                        log.debug('iListSize is')
+                        log.debug(iListSize)
+                        if(size == iListSize):
+                            status=webconstants.TEST_RESULT_PASS
+                            result=webconstants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
                 except Exception as e:
                     log.error(e)
 
@@ -1043,7 +1132,14 @@ class DropdownKeywords():
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
                     select = Select(webelement)
-                    select.deselect_all()
+                    if platform.system() == 'Darwin':
+                        scroll = """arguments[0].scrollIntoView()"""
+                        browser_Keywords.driver_obj.execute_script(scroll, webelement)
+                        jsdeselect = """for (var i = 0; i < arguments[0].length; i++) {arguments[0][i].selected = false;}"""
+                        browser_Keywords.driver_obj.execute_script(jsdeselect, webelement)
+                    else:
+
+                        select.deselect_all()
                     check = select.all_selected_options
                     log.debug('value given by select.all_selected_options')
                     log.debug(check)
