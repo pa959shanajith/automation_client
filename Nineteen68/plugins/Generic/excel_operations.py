@@ -248,8 +248,12 @@ class ExcelFile:
                 if res:
                     info_msg=generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname
                     log.info(info_msg)
-                    #872 removed str from value to support unicode (Himanshu)
-                    info_msg='Row is '+str(row)+' col is '+str(col)+' and Value: '+value
+                    #983(Sakshi) - str required when value is an int because of the error - cannot concatenate string and int.
+                    if(isinstance(value,int)):
+                        info_msg='Row is '+str(row)+' col is '+str(col)+' and Value: '+str(value)
+                    else:
+                        #872 removed str from value to support unicode (Himanshu)
+                        info_msg='Row is '+str(row)+' col is '+str(col)+' and Value: '+value
                     log.info(info_msg)
 ##                    logger.print_on_console(info_msg)
                     row=int(row)

@@ -155,6 +155,27 @@ class GenericKeywordDispatcher:
                     output=[tsp.outputval]
                     if ';' in tsp.outputval:
                         output=tsp.outputval.split(';')
+                    #Changes for defect #983(Sakshi) - to resolve values of static and dynamic variables in output for this particular keyword
+                    if(keyword == "exportData" and len(output)>0):
+                        if str(output[0]).startswith("{") and str(output[0]).endswith("}"):
+                            import dynamic_variable_handler
+                            import controller
+                            con = controller.Controller()
+                            dynamic_var_handler_obj=dynamic_variable_handler.DynamicVariables()
+                            output[0] = dynamic_var_handler_obj.replace_dynamic_variable(output[0],keyword,con)
+                        elif str(output[0]).startswith("|") and str(output[0]).endswith("|"):
+                            import handler
+                            import controller
+                            con = controller.Controller()
+                            for test in handler.tspList:
+                                if((test.name).lower() == "getparam"):
+                                    teststep = test
+                                    break
+                            rawinput = teststep.inputval
+                            inpval,ignore_stat=con.split_input(rawinput,tsp.name)
+                            data = teststep.invokegetparam(inpval)
+                            var = str(output[0])[1:len(str(output[0]))-1]
+                            output[0] = data[var][0]
                     message.extend(output)
                 result= dict[keyword](*message)
             else:

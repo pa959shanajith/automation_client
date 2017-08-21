@@ -371,27 +371,28 @@ class Controller():
         inpval = []
         input_list=[]
         input_list = input[0].split(SEMICOLON)
+        if IGNORE_THIS_STEP in input_list:
+            ignore_status=True
         if keyword.lower() in [IF,ELSE_IF,EVALUATE]:
             inpval=self.dynamic_var_handler_obj.simplify_expression(input[0],keyword,self)
-            if inpval[1]==IGNORE_THIS_STEP:
-                ignore_status=True
+        elif keyword in WS_KEYWORDS or keyword == 'navigateToURL':
+            inpval=[input[0]]
+        elif keyword in DYNAMIC_KEYWORDS:
+            string=input[0]
+            index=string.find(';')
+            if index >-1:
+                inpval.append(string[0:index])
+                inpval.append(string[index+1:len(string)])
+            elif string != '':
+                inpval.append(string)
+            if keyword.lower() not in [CREATE_DYN_VARIABLE]:
+                inpval[0]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[0],keyword,self)
+            if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE]:
+                inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self)
         else:
-            if keyword in WS_KEYWORDS or keyword == 'navigateToURL':
-                input_list=[input[0]]
-            elif keyword in DYNAMIC_KEYWORDS:
-                input_list=[]
-                string=input[0]
-                index=string.find(';')
-                if index >-1:
-                    input_list.append(string[0:index])
-                    input_list.append(string[index+1:len(string)])
-                elif string != '':
-                    input_list.append(string)
-            for x in input_list:
             #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
+            for x in input_list:
                 x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
-                if x == IGNORE_THIS_STEP:
-                    ignore_status=True
                 inpval.append(x)
         return inpval,ignore_status
     def store_result(self,result_temp,tsp):
