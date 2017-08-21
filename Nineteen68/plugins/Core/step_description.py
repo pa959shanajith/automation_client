@@ -645,6 +645,18 @@ class StepDescription:
             return 'Verify '+ "'" + tsp.custname + "'" + ' does not exists '
         def ClickElement():
             return 'Click on ' +"'" + tsp.custname + "'"
+        def MouseHover():
+            return 'Mouse Hovered on '+"'"+tsp.custname + "'"
+
+        #Button Keywords
+        def Click():
+            return 'Click on ' +"'" + tsp.custname + "'"
+        def DoubleClick():
+            return 'Double clicked on '+"'"+tsp.custname + "'"
+        def VerifyButtonName():
+            return 'Verify button name '+"'"+tsp.custname + "'" +'and save the value ' + output + ' in '+ tsp.outputval
+        def GetButtonName():
+            return 'Get button name '+"'"+tsp.custname + "'" +'and save the value ' + output + ' in '+ tsp.outputval
 
         #text box
         return locals()[keyword]()
