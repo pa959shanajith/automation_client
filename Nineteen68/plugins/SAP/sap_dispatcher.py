@@ -25,6 +25,8 @@ import sap_shell_keywords
 #-------------------------------------------------------------
 import sap_constants
 import constants
+import screenshot_keywords
+import readconfig
 
 
 
@@ -44,6 +46,7 @@ class SAPDispatcher:
     def __init__(self):
 
         self.exception_flag=''
+        self.action = None
 #-----------------------------------------------------------------for custom objects
     custom_dict = {
                     "click":['radiobutton','checkbox','input','button','select','table'],
@@ -186,8 +189,22 @@ class SAPDispatcher:
             else:
                 err_msg=sap_constants.INVALID_KEYWORD
                 logger.print_on_console(err_msg)
-
                 result[3]=err_msg
+            configobj = readconfig.readConfig()
+            configvalues = configobj.readJson()
+            screen_shot_obj = screenshot_keywords.Screenshot()
+            if self.action == constants.EXECUTE:
+                if result !=constants.TERMINATE:
+                    result=list(result)
+                    if configvalues['screenShot_Flag'].lower() == 'fail':
+                        if result[0].lower() == 'fail':
+                            if keyword not in sap_constants.APPLICATION_KEYWORDS:
+                                file_path = screen_shot_obj.captureScreenshot()
+                                result.append(file_path[2])
+                    elif configvalues['screenShot_Flag'].lower() == 'all':
+                        if keyword not in sap_constants.APPLICATION_KEYWORDS:
+                            file_path = screen_shot_obj.captureScreenshot()
+                            result.append(file_path[2])
         except TypeError as e:
             logger.print_on_console('type error found')
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
