@@ -55,6 +55,8 @@ class Text_Keywords():
         return status,result,value,err_msg
 
     def setText(self, sap_id,url,input_val, *args):
+        ses=''
+        id=''
         self.lk.setWindowToForeground(sap_id)
         if(len(input_val)>1):
             text = input_val[2]

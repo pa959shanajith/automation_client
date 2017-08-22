@@ -10,16 +10,17 @@
 #-------------------------------------------------------------------------------
 import os
 import sys
-from pyrobot import Robot
-import win32gui
+
 
 
 import logging
-
-
-import win32gui
-import win32process
-import win32con
+import platform
+if platform.system()!='Darwin':
+    from pyrobot import Robot
+    import win32gui
+    import win32gui
+    import win32process
+    import win32con
 
 
 log = logging.getLogger('utils_web.py')

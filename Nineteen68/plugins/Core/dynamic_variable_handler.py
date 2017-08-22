@@ -68,38 +68,10 @@ class DynamicVariables:
                     else:
                         if actual_value is not None:
                             actual_value=actual_value.replace(input_var,temp_value)
-                ###Logic to replace dynamic variable values for keywords other than IF and  Evaluate
-                ##if keyword not in [EVALUATE,IF,ELSE_IF]:
-                ##    data=input_var[1:-1]
-                ##    data='{'+data+'}'
-                ##    temp_value=self.get_dynamic_value(data)
-                ##    if temp_value is None:
-                ##        actual_value=temp_value
-                ##    else:
-                ##        if not isinstance(temp_value,unicode):
-                ##            if actual_value is not None:
-                ##                actual_value=actual_value.replace(data,str(temp_value))
-                ##        else:
-                ##            if actual_value is not None:
-                ##                actual_value=actual_value.replace(data,temp_value)
-                ##
-                ##else:
-                ##     #Logic to replace dynamic variable values for keywords IF and  Evaluate
-                ##     #since input does not contain ';' and input will be expression
-                ##    var_list=re.findall("\{(.*?)\}",input_var)
-                ##    for data in var_list:
-                ##        data='{'+data+'}'
-                ##        temp_value=self.get_dynamic_value(data)
-                ##        if temp_value is None:
-                ##            actual_value=temp_value
-                ##        else:
-                ##            if not isinstance(temp_value,unicode):
-                ##                if actual_value is not None:
-                ##                    actual_value=actual_value.replace(data,str(temp_value))
-                ##            else:
-                ##                if actual_value is not None:
-                ##                    actual_value=actual_value.replace(data,temp_value)
-
+        else:
+            status,nested_var=self.check_dynamic_inside_dynamic(input_var)
+            if status==TEST_RESULT_TRUE:
+                actual_value=self.get_nestedDyn_value(nested_var,input_var)
         return actual_value
 
     #To Store the output from keyword as an array if it is multiple values
@@ -186,8 +158,6 @@ class DynamicVariables:
 
     #To simplify expression for IF, ELSEIF and EVALUATE keywords
     def simplify_expression(self,input_var,keyword,con_obj):
-        if len(re.findall(IGNORE_THIS_STEP,input_var))!=0:
-            return [input_var,IGNORE_THIS_STEP]
         k=-1
         if keyword.lower() in [IF,ELSE_IF]:
             k=1
@@ -200,6 +170,7 @@ class DynamicVariables:
         disp_expression=''
         invalid_flag=False
         invalid_msg=''
+        input_var=input_var.strip()
         if not(input_var[0]=='(' and input_var[-1]==')'):
             invalid_msg=keyword+': Expression must be enclosed within "(" and ")"\n'
             log.error(keyword+': Expression must be enclosed within "(" and ")"')
@@ -237,6 +208,7 @@ class DynamicVariables:
         exp=re.sub(r'[\s]*[)]', ')',exp)
         log.debug('Stage 1: ',exp)
         dv_flag=i=0
+        paran_cnt=0
         try:
             while i < len(exp)-1:
                 if (exp[i]=='{' and exp[i-1]=='$') or (exp[i]=='{' and exp[i-1]=='('):
@@ -246,12 +218,20 @@ class DynamicVariables:
                 if dv_flag!=0:
                     i+=1
                     continue
-                if exp[i]=='(' and exp[i+1]!='(' and exp[i+1]!=')' and exp[i+1:i+5]!='not(':
-                    exp=exp[0:i+1]+"~$"+exp[i+1:]
-                    i+=2
+                if exp[i]=='(':
+                    paran_cnt+=1
+                    if exp[i+1]!='(' and exp[i+1]!=')' and exp[i+1:i+5]!='not(':
+                        exp=exp[0:i+1]+"~$"+exp[i+1:]
+                        i+=2
+                elif exp[i]==')':
+                    paran_cnt-=1
                 elif exp[i+1]==')' and exp[i]!='(' and exp[i]!=')':
                     exp=exp[0:i+1]+"$~"+exp[i+1:]
                     i+=2
+                if paran_cnt==0:
+                    paran_cnt=1000
+                    invalid_flag=True
+                    invalid_msg=keyword+': Expression must be enclosed within "(" and ")" and balanced\n'
                 i+=1
             log.debug('Stage 2: ',exp)
             inp_err_list=exp.split('~')

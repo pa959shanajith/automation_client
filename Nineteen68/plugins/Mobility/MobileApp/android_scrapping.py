@@ -99,22 +99,26 @@ class InstallAndLaunch():
                 # desired_caps['app'] =input_val[0]
                 self.driver = webdriver.Remote('http://0.0.0.0:4723/wd/hub', desired_caps)
             else:
-                self.start_server()
-                desired_caps = {}
-                desired_caps['platformName'] = 'Android'
-                ##            desired_caps['platformVersion'] = platform_version
-                desired_caps['deviceName'] = device_name
-                desired_caps['udid'] = device_name
-                desired_caps['noReset'] = True
-                desired_caps['newCommandTimeout'] = 0
-                ##desired_caps['app'] = 'D:\\mobility\\selendroid-test-app-0.17.0.apk'
-                desired_caps['app'] = apk_path
-                desired_caps['sessionOverride'] = True
-                desired_caps['fullReset'] = False
-                ##            desired_caps['logLevel'] = 'info'
-                desired_caps['log_level'] = False
-##                print 'come in'
-                self.driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
+                if device_name == 'wifi':
+                    device_keywords_object = device_keywords.Device_Keywords()
+                    device_keywords_object.wifi_connect()
+                else:
+                    self.start_server()
+                    desired_caps = {}
+                    desired_caps['platformName'] = 'Android'
+                    ##            desired_caps['platformVersion'] = platform_version
+                    desired_caps['deviceName'] = device_name
+                    desired_caps['udid'] = device_name
+                    desired_caps['noReset'] = True
+                    desired_caps['newCommandTimeout'] = 0
+                    ##desired_caps['app'] = 'D:\\mobility\\selendroid-test-app-0.17.0.apk'
+                    desired_caps['app'] = apk_path
+                    desired_caps['sessionOverride'] = True
+                    desired_caps['fullReset'] = False
+                    ##            desired_caps['logLevel'] = 'info
+                    desired_caps['log_level'] = False
+                    ##                print 'come in'
+                    self.driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
         except Exception as e:
             logger.print_on_console("Not able to install or launch application")
         return self.driver

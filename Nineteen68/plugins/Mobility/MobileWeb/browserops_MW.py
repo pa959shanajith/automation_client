@@ -16,6 +16,9 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import time
+import subprocess
+import os
+import re
 import platform
 ##import psutil
 ##import win32process
@@ -63,6 +66,83 @@ class BrowserOperations():
             logger.print_on_console('Server started')
         except Exception as e:
             logger.print_on_console('Exception in starting server')
+
+    def get_device_list(self,input_val,*args):
+
+
+        maindir=os.getcwd()
+        devices = []
+        try:
+            android_home=os.environ['ANDROID_HOME']
+            cmd=android_home+'\\platform-tools\\'
+
+            os.chdir(cmd)
+            cmd=cmd +'adb.exe'
+            if android_home!=None:
+                with open(os.devnull, 'wb') as devnull:
+                    subprocess.check_call([cmd, 'start-server'], stdout=devnull,
+                              stderr=devnull)
+##                print subprocess.check_output([cmd, 'devices'])
+                out = self.split_lines(subprocess.check_output([cmd, 'devices']))
+                # The first line of `adb devices` just says "List of attached devices", so
+                # skip that.
+                devices = []
+                for line in out[1:]:
+                    if not line.strip():
+                        continue
+                    if 'offline' in line:
+                        continue
+                    serial, _ = re.split(r'\s+', line, maxsplit=1)
+                    devices.append(serial)
+
+                os.chdir(maindir)
+
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(err_msg)
+        return devices
+
+    def wifi_connect(self,*args):
+        try:
+            android_home=os.environ['ANDROID_HOME']
+            cmd=android_home+'\\platform-tools\\'
+            os.chdir(cmd)
+            cmd=cmd +'adb.exe'
+            if android_home!=None:
+                serial=self.get_device_list(None)
+
+                if len(serial)!=0:
+                    if ':' in serial :
+                             output=subprocess.check_output([cmd, 'connect',out])
+                             if 'connected' in output :
+                                    print 'already connected to the network'
+                             else:
+                                    print 'connection lost please retry'
+                    else :
+
+                            cm=cmd + ' tcpip 5555'
+                            abc=subprocess.check_output(cm)
+                            time.sleep(5)
+                            cmmmm=cmd + '  shell ip -f inet addr show wlan0'
+                            out1 = subprocess.check_output(cmmmm)
+                            b=out1[out1.find('inet'):]
+                            b=b.strip('inet')
+                            c=b.split('/')
+                            ser=c[0] + ':5555'
+                            c= cmd + ' connect ' +ser
+                            o=subprocess.check_output(c)
+                            if 'connected' in o :
+                                print ' both devices are connected over wifi unplug the cable '
+                else:
+                    print 'no device found  connect the device via usb '
+
+                    # The first line of `adb devices` just says "List of attached devices", so
+                    # skip that.
+
+
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(err_msg)
 
 
     def stop_server(self):
@@ -135,37 +215,55 @@ class BrowserOperations():
                    'FILE: browserops_MW.py , DEF: openSafariBrowser() , MSG:  Safari browser opened successfully')
                status = domconstants_MW.STATUS_SUCCESS
            else:
-                global driver
-                self.start_server()
                 input_list = inputs.split(';')
-                time.sleep(5)
-                desired_caps = {}
-                desired_caps['platformName'] = 'Android'
-                ##desired_caps['platformVersion'] =input_list[1]
-                desired_caps['deviceName'] = input_list[0]
-                desired_caps['udid'] = input_list[0]
-                desired_caps['browserName'] = 'Chrome'
-                ##desired_caps['appium-version'] = '1.4.0'
-                desired_caps['newCommandTimeout'] = '36000'
-                driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
-                logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
-                driver.get(domconstants_MW.BLANK_PAGE)
-        ##            p = psutil.Process(driver.service.process.pid)
-        ##            # logging.warning(p.get_children(recursive=True))
-        ##            pidchrome = p.children()[0]
-        ##            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Pid is obtained')
-        ##            # logging.warning(pidchrome.pid)
-        ##            global hwndg
-        ##            hwndg = util.bring_Window_Front(pidchrome.pid)
-        ##            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Using Pid handle is obtained')
-                logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
-                status = domconstants_MW.STATUS_SUCCESS
+                if input_list[1] == 'wifi':
+                    self.wifi_connect()
+                else :
+                    global driver
+                    self.start_server()
+
+                    time.sleep(5)
+                    desired_caps = {}
+                    desired_caps['platformName'] = 'Android'
+                    ##desired_caps['platformVersion'] =input_list[1]
+                    desired_caps['deviceName'] = input_list[0]
+                    desired_caps['udid'] = input_list[0]
+                    desired_caps['browserName'] = 'Chrome'
+                    ##desired_caps['appium-version'] = '1.4.0'
+                    desired_caps['clearSystemFiles']=True
+                    desired_caps['newCommandTimeout'] = '36000'
+                    driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
+                    logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
+                    driver.get(domconstants_MW.BLANK_PAGE)
+            ##            p = psutil.Process(driver.service.process.pid)
+            ##            # logging.warning(p.get_children(recursive=True))
+            ##            pidchrome = p.children()[0]
+            ##            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Pid is obtained')
+            ##            # logging.warning(pidchrome.pid)
+            ##            global hwndg
+            ##            hwndg = util.bring_Window_Front(pidchrome.pid)
+            ##            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Using Pid handle is obtained')
+                    logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
+                    status = domconstants_MW.STATUS_SUCCESS
        except Exception as e:
             mobile_key_objects.custom_msg.append("ERR_WEB_DRIVER")
             status = domconstants_MW.STATUS_FAIL
             logger.print_on_console("ERR_WEB_DRIVER")
             ##Exceptions_MW.error(e)
        return status
+
+    def split_lines(self,s):
+        """Splits lines in a way that works even on Windows and old devices.
+        Windows will see \r\n instead of \n, old devices do the same, old devices
+        on Windows will see \r\r\n."""
+        # rstrip is used here to workaround a difference between splineslines and
+        # re.split:
+        # >>> 'foo\n'.splitlines()
+        # ['foo']
+        # >>> re.split(r'\n', 'foo\n')
+        # ['foo', '']
+        return re.split(r'[\r\n]+', s.rstrip())
+
 ##    def openIeBrowser(self):
 ##        logger.log('FILE: browserops_MW.py , DEF: openIeBrowser() , MSG: Reading config.xml file.....')
 ##        for child in xroot:

@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 import logger
 import constants
-iteration_count=0
+iteration_count={}
 
 import logging
 
@@ -81,16 +81,15 @@ class For():
     def invokeFor(self,input,reporting_obj):
         global iteration_count
 
-
         #block to execute endFor
         if self.name.lower() == constants.ENDFOR:
             logger.print_on_console('\nEncountered :'+self.name+'\n')
             self.executed=True
             index=self.getEndfor()
-            logger.print_on_console('***For: Iteration '+str(iteration_count)+' completed***\n\n')
-            log.info('***For: Iteration '+str(iteration_count)+' completed***\n\n')
+            logger.print_on_console('***For: Iteration '+str(iteration_count[index])+' completed***\n\n')
+            log.info('***For: Iteration '+str(iteration_count[index])+' completed***\n\n')
             #Reporting part
-            self.add_report_step(reporting_obj,'For: Iteration '+str(iteration_count)+' completed')
+            self.add_report_step(reporting_obj,'For: Iteration '+str(iteration_count[index])+' completed')
             #Reporting part ends
 
             return index
@@ -99,19 +98,19 @@ class For():
         #block to execute for
         if self.name==constants.FOR:
 
-
             endForNum = self.info_dict[0].keys()[0]
             inputval=input[0]
             try:
                 if(int(input[0]) <= 0):
                     forIndex=self.invalid_for_input(endForNum,inputval,reporting_obj)
-                    iteration_count=0
+                    iteration_count[self.index]=0
                     return forIndex
                 else:
                    inputval = int(input[0])
+                   iteration_count[self.index]=0
             except ValueError:
                 forIndex=self.invalid_for_input(endForNum,inputval,reporting_obj)
-                iteration_count=0
+                iteration_count[self.index]=0
                 return forIndex
 
 
@@ -120,7 +119,7 @@ class For():
                 self.count=self.count+1
 
                 if not(self.count<= inputval):
-                    iteration_count=0
+                    iteration_count[self.index]=0
                     self.count=0
                     self.executed=False
                     forIndex=endForNum+1
@@ -138,16 +137,16 @@ class For():
                         self.add_report_step_for(reporting_obj,'Encountered :'+self.name)
                         #Reporting part ends
                     self.executed=True
-                    iteration_count=self.count
+                    iteration_count[self.index]=self.count
                     logger.print_on_console('***For: Iteration '+str(self.count)+ ' started***')
                     log.info('***For: Iteration '+str(self.count)+ ' started***')
 
                     #Reporting part
-                    self.add_report_step_iteration(reporting_obj,'For: Iteration '+str(iteration_count)+' started')
+                    self.add_report_step_iteration(reporting_obj,'For: Iteration '+str(iteration_count[self.index])+' started')
                     #Reporting part ends
             else:
                 forIndex=self.invalid_for_input(endForNum,inputval,reporting_obj)
-                iteration_count=0
+                iteration_count[self.index]=0
 
             return forIndex
 

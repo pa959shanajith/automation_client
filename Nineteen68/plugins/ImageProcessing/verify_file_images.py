@@ -16,75 +16,74 @@ import logger
 import logging
 
 # Required for Image Comparison Task
-##from skimage.measure import compare_ssim as ssim
-##import matplotlib.pyplot as plt
+#960 Imageverificaton: added histogram and ssim algorithm (Himanshu)
+#import matplotlib.pyplot as plt
+
+#All libraries required for ImageProcessing plugin will be at this location
+path1 = os.environ["NINETEEN68_HOME"]
+##sys.path.insert(0, path1+'\Lib\site-packages\ImageProcessingBundle')
+sys.path.append(path1+'\Nineteen68\plugins\ImageProcessing\ImageProcessing')
+
 import numpy as np
-##import cv2
+import cv2
 from PIL import Image
 import urllib
 import os
+#from skimage.measure import compare_ssim as ssim
 
 
 log = logging.getLogger('util_operations.py')
 
+def get_thumbnail(image, size=(128,128), stretch_to_fit=False, greyscale=False):
+    " get a smaller version of the image - makes comparison much faster/easier"
+    if not stretch_to_fit:
+        image.thumbnail(size, Image.ANTIALIAS)
+    else:
+        image = image.resize(size); # for faster computation
+    if greyscale:
+        image = image.convert("L")  # Convert it to grayscale.
+    return image
+
+def image_similarity_histogram_via_pil(image1,image2):
+    from PIL import Image
+    import math
+    import operator
+
+    image1 = get_thumbnail(image1)
+    image2 = get_thumbnail(image2)
+
+    h1 = image1.histogram()
+    h2 = image2.histogram()
+
+    rms = math.sqrt(reduce(operator.add,  list(map(lambda a,b: (a-b)**2, h1, h2)))/len(h1) )
+    return rms
+
+
 class VerifyFileImages:
 
-    # Function to do Image Comparison. It prints percentage similarity between the images
-    def imagecomparison(self,source,target):
+
+#ssim algo instead of MSE for better performence(Himanshu)
+      # Function to do Image Comparison. It prints percentage similarity between the images
+    def imagecomparison(self,image_filepath1,image_filepath2):
         # Open source & target image as np array
+        import ssim
 
-        sarray = np.asarray(source)
-        tarray = np.asarray(target)
-
-        """# Print the value of MSE and SSIM
-        print 'Mean Square Error (MSE): ', mse(s, t)
-        print 'Structural Similarity Index (SSIM): ', ssim(s, t)"""
-
-        percentage_mse = 100 - (self.mse(sarray,tarray) / 600)
+        im1 = Image.open(image_filepath1)
+        im2 = Image.open(image_filepath2)
+        im1 = im1.convert('RGB')
+        im2 = im2.convert('RGB')
 
 
-        if percentage_mse >= 60:
+        similarity2 = image_similarity_histogram_via_pil(im1,im2)
+
+
+        similarity5 = ssim.compute_ssim(im1,im2)
+        #Classification logic
+        if(similarity2<10):
+            return 1
+        elif(similarity2<100 and similarity5>.50):
+            return 1
+        elif(similarity5>.70):
             return 1
         else:
             return 0
-
-
-
-##    # Function to do Image Comparison. It prints percentage similarity between the images
-##    def imagecomparison(self,source,target):
-##        # Open source & target image as np array
-##        source = Image.open(source)
-##        sarray = np.asarray(source)
-##
-##        target = Image.open(target)
-##        tarray = np.asarray(target)
-##
-##        # Resize the images to 1024 * 768
-##        s = cv2.resize(sarray, (1024,768))
-##        t = cv2.resize(tarray, (1024,768))
-##
-##        # Convert images to Gray color
-##        s = cv2.cvtColor(s, cv2.COLOR_BGR2GRAY)
-##        t = cv2.cvtColor(t, cv2.COLOR_BGR2GRAY)
-##
-##        """# Print the value of MSE and SSIM
-##        print 'Mean Square Error (MSE): ', mse(s, t)
-##        print 'Structural Similarity Index (SSIM): ', ssim(s, t)"""
-##
-##        percentage_mse = 100 - (self.mse(s,t) / 600)
-##        percentage_ssim = 100 * ssim(s,t)
-##
-##        percentage_similarity = (percentage_mse + percentage_ssim) / 2
-##
-##        if percentage_similarity >= 60:
-##            return 1
-##        else:
-##            return 0
-
-    # Defining Fuction for Mean Square Error MSE
-    def mse(self,imageA, imageB):
-        err = np.sum((imageA.astype("float") - imageB.astype("float"))**2)
-        err /= float(imageA.shape[0] * imageA.shape[1])
-        return err
-
-

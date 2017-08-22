@@ -14,7 +14,9 @@ import logger
 import webconstants
 import time
 from selenium import webdriver
-from pyrobot import Robot,Keys
+import platform
+if platform.system()!='Darwin':
+    from pyrobot import Robot, Keys
 import browser_Keywords
 import logging
 from constants import *

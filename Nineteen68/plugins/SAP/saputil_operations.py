@@ -34,6 +34,8 @@ class SapUtilKeywords:
         return self.SapGui
 
     def getSapElement(self,sap_id,*args):
+        id=''
+        ses=''
         try:
             SapGui = self.getSapObject()
             scrappingObj=Scrape()                                   #calling scrape class
