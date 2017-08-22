@@ -98,8 +98,8 @@ class BrowserOperations():
                 os.chdir(maindir)
 
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(err_msg)
+            logger.log(e)
+##            logger.print_on_console(e)
         return devices
 
     def wifi_connect(self,*args):
@@ -113,7 +113,7 @@ class BrowserOperations():
 
                 if len(serial)!=0:
                     if ':' in serial :
-                             output=subprocess.check_output([cmd, 'connect',out])
+                             output=subprocess.check_output([cmd, 'connect',serial])
                              if 'connected' in output :
                                     print 'already connected to the network'
                              else:
@@ -141,8 +141,8 @@ class BrowserOperations():
 
 
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(err_msg)
+            logger.log(e)
+##            logger.print_on_console(e)
 
 
     def stop_server(self):
