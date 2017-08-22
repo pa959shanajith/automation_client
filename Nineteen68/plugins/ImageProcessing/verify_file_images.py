@@ -22,7 +22,7 @@ import logging
 #All libraries required for ImageProcessing plugin will be at this location
 path1 = os.environ["NINETEEN68_HOME"]
 ##sys.path.insert(0, path1+'\Lib\site-packages\ImageProcessingBundle')
-sys.path.append(path1+'\Nineteen68\plugins\ImageProcessing\ImageProcessing')
+sys.path.append(path1+"\\Nineteen68\\plugins\\ImageProcessing\\ImageProcessing")
 
 import numpy as np
 import cv2
