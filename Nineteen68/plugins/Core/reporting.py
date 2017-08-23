@@ -320,7 +320,7 @@ class Reporting:
         screenshot_path = None
         parent_id=0
         name=tsp.name
-        step_num=tsp.stepnum
+        step_num=STEP+str(tsp.stepnum)
         step_testcase_name=tsp.testscript_name
         step_description=''
         ignore_stat=False
@@ -345,10 +345,22 @@ class Reporting:
             if step_description==ENDFOR_DESCRIPTION:
                 endfor_index=tsp.info_dict[0].keys()[0]
                 endfor_step=con.tsp_list[endfor_index]
-                step_num=endfor_step.stepnum
+                step_num=''
                 step_testcase_name=endfor_step.testscript_name
-
-
+            if name.lower() in [FOR,ENDFOR]:
+                step_num=''
+                if (step_description[0:9]).lower() == 'iteration' and (step_description[13:]).lower()== 'started':
+                    step_num='Start iteration'
+                elif (step_description[0:9]).lower() == 'iteration' and (step_description[13:]).lower()== 'executed':
+                    step_num='End iteration'
+            if name.lower() in [GETPARAM,ENDLOOP,STARTLOOP]:
+                step_num=''
+                if (step_description[0:10]).lower() == 'dataparam:' and (step_description[23:]).lower()== 'started':
+                    step_num='Start iteration'
+                    print "yess"
+                elif (step_description[0:10]).lower() == 'dataparam:' and (step_description[23:]).lower()== 'executed':
+                    step_num='End iteration'
+                    print "yes"
             name=self.name
             ##            Added this line to remove status for conditional keyword in reports
             status = ''
@@ -362,7 +374,7 @@ class Reporting:
                 else:
                     screenshot_path = None
 
-        reporting_pojo_obj=reporting_pojo.ReportingStep(self.id_counter,name,parent_id,status,STEP+str(step_num),comments,step_description,str(ellapsedtime),step_testcase_name,screenshot_path)
+        reporting_pojo_obj=reporting_pojo.ReportingStep(self.id_counter,name,parent_id,status,str(step_num),comments,step_description,str(ellapsedtime),step_testcase_name,screenshot_path)
 
         self.generate_keyword_step(reporting_pojo_obj)
         self.id_counter+=1

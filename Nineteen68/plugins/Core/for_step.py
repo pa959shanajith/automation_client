@@ -89,7 +89,7 @@ class For():
             logger.print_on_console('***For: Iteration '+str(iteration_count[index])+' completed***\n\n')
             log.info('***For: Iteration '+str(iteration_count[index])+' completed***\n\n')
             #Reporting part
-            self.add_report_step(reporting_obj,'For: Iteration '+str(iteration_count[index])+' completed')
+            self.add_report_step(reporting_obj,'Iteration: '+str(iteration_count[index])+' executed')
             #Reporting part ends
 
             return index
@@ -134,7 +134,7 @@ class For():
                     if self.count==1:
                         logger.print_on_console('\nEncountered :'+self.name+'\n')
                         #Reporting part
-                        self.add_report_step_for(reporting_obj,'Encountered :'+self.name)
+                        self.add_report_step_for(reporting_obj,'Execute the steps in the loop for the given count '+str(inputval))
                         #Reporting part ends
                     self.executed=True
                     iteration_count[self.index]=self.count
@@ -142,7 +142,7 @@ class For():
                     log.info('***For: Iteration '+str(self.count)+ ' started***')
 
                     #Reporting part
-                    self.add_report_step_iteration(reporting_obj,'For: Iteration '+str(iteration_count[self.index])+' started')
+                    self.add_report_step_iteration(reporting_obj,'Iteration '+str(iteration_count[self.index])+' started')
                     #Reporting part ends
             else:
                 forIndex=self.invalid_for_input(endForNum,inputval,reporting_obj)
