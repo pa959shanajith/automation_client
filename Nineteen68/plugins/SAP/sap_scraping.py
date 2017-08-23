@@ -246,7 +246,8 @@ class Scrape:
                                     'tooltip': elem.__getattr__("ToolTip"),
                                     'defaulttooltip': elem.__getattr__("DefaultToolTip")
                                     }
-                            view.append(dict)
+                            if dict not in view:#------------to handle duplicate elements from backend
+                                view.append(dict)
                         except Exception as e:
                             logger.print_on_console('Clicked option is not a part of SAPGUI')
                         return True

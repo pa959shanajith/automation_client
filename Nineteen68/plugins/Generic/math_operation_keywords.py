@@ -108,7 +108,14 @@ class NumericStringParser(object):
         elif op[0].isalpha():
             return 0
         else:
-            return float( op )
+            if '.' in op:
+                opt=op.split('.')
+                opi=int(opt[0])
+                opd=float('0.'+opt[1])
+                op=opi+opd
+                return op
+            else:
+                return int(op)
 
     def eval(self,num_string,*args):
         status=TEST_RESULT_FAIL
@@ -134,13 +141,19 @@ class NumericStringParser(object):
                 log.debug('Evaluating the expression')
                 #logger.print_on_console('Evaluating the expression')
                 output=self.evaluateStack( self.exprStack[:] )
-                if isinstance(output,float):
-                    if output % 1 == 0.0:
-                        output = int(output)
-                log.debug('Got the result : %s', output)
-                #logger.print_on_console('Got the result : ', output)
-                status=TEST_RESULT_PASS
-                methodoutput=TEST_RESULT_TRUE
+                if (output/10**17)>1:
+                    err_msg='Output value exceeds seventeen digits'
+                    output=None
+                else:
+                    if isinstance(output,float):
+                        if output % 1 == 0.0:
+                            output = int(output)
+                    elif isinstance(output,long):
+                        output=str(output)
+                    log.debug('Got the result : %s', output)
+                    #logger.print_on_console('Got the result : ', output)
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
             else:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:

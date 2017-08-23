@@ -486,7 +486,7 @@ class GetParam():
         #(iteration_count<loop_count-1) condition i smade to avoid adding of  the Iteration completed message of last iteration step twice t
         # the report
         #since it is added in the 'methodInvocation' in controller
-        if self.name.lower() != ENDLOOP and (iteration_count<loop_count-1):
+        if self.name.lower() != ENDLOOP and (iteration_count<loop_count-2):
             reporting_obj.generate_report_step(self,'',step_description,'3.00',False)
         reporting_obj.remove_nested_flag()
         #Reporting part ends
@@ -521,7 +521,7 @@ class GetParam():
 
 
             if self.getparam(input) == TEST_RESULT_PASS :
-                step_description='Data Parameterization started'
+                step_description='Parameterization method executed and status is Pass'
                 fileinfo = input
                 filepath = fileinfo[0]
                 data = self.invokegetparam(input)
@@ -616,16 +616,22 @@ class GetParam():
                         #Reporting part
                         reporting_obj.name=GETPARAM
                         self.add_report_step_getparam(reporting_obj,step_description)
+                        step_description='Read file: '+str(input[0])+', Sheet name: '+str(input[1])
+                        self.add_report_step_getparam(reporting_obj,step_description)
+                        step_description='Start Loop'
+                        self.add_report_step_getparam(reporting_obj,step_description)
                         #Reporting part ends
                         for i in range(startRow-1,endRow):
                             if self.name.lower()==GETPARAM:
                                 inputval = self.inputval[0]
-                                paramindex = self.index+1;
+                                paramindex = self.index+2
+                                if handler.tspList[self.index+1].name.lower()==STARTLOOP:
+                                    handler.tspList[self.index+1].executed=True
                                 if (inputval != None):
                                     j = 0
                                     log.info(  '***Data Param: Iteration '+ str(k) +  ' started***')
                                     logger.print_on_console(  '***Data Param: Iteration ',k, ' started***')
-                                    step_description='Data Param: Iteration '+str(k)+' started'
+                                    step_description='Dataparam: Iteration '+str(k)+' started'
                                     reporting_obj.name='Iteration '+str(k)
                                     self.add_report_step_getparam(reporting_obj,step_description)
                                     iterations = len(data.values()[0])
@@ -639,7 +645,7 @@ class GetParam():
                                     log.info( '***Data Param: Iteration ' + str(k) + ' completed***\n\n')
                                     logger.print_on_console( '***Data Param: Iteration ',k, ' completed***\n\n')
                                     #Reporting part
-                                    step_description='Data Param: Iteration '+str(k)+' completed'
+                                    step_description='Dataparam: Iteration '+str(k)+' executed'
                                     reporting_obj.name='Iteration '+str(k)
                                     self.add_report_end_iteration(reporting_obj,step_description,k,endRow+1)
                                     #Reporting part ends
@@ -659,16 +665,22 @@ class GetParam():
                         #Reporting part
                         reporting_obj.name=GETPARAM
                         self.add_report_step_getparam(reporting_obj,step_description)
+                        step_description='Read file: '+str(input)+str(input[1])+' :Dataparam'
+                        self.add_report_step_getparam(reporting_obj,step_description)
+                        step_description='Start Loop'
+                        self.add_report_step_getparam(reporting_obj,step_description)
                         #Reporting part ends
                         filter = filter - 2
                         if self.name.lower()==GETPARAM:
                             inputval = self.inputval[0]
-                            paramindex = self.index+1
+                            paramindex = self.index+2
+                            if handler.tspList[self.index+1].name.lower()==STARTLOOP:
+                                handler.tspList[self.index+1].executed=True
                             if (inputval != None):
                                 log.info( '***Data Param: Iteration '+str(k)+ ' started***')
                                 logger.print_on_console( '***Data Param: Iteration ',k, ' started***')
                                 #Reporting part
-                                step_description='Data Param: Iteration '+str(k)+' started'
+                                step_description='Dataparam: Iteration '+str(k)+' started'
                                 reporting_obj.name='Iteration '+str(k)
                                 self.add_report_step_getparam(reporting_obj,step_description)
                                 #Reporting part ends
@@ -684,7 +696,7 @@ class GetParam():
                                 logger.print_on_console('***Data Param: Iteration ',k, ' completed***\n\n')
 
                                 #Reporting part
-                                step_description='Data Param: Iteration '+str(k)+' completed'
+                                step_description='Dataparam: Iteration '+str(k)+' executed'
                                 reporting_obj.name='Iteration '+str(k)
                                 self.add_report_end_iteration(reporting_obj,step_description,k,k)
                                 #Reporting part ends
@@ -701,18 +713,24 @@ class GetParam():
                     #Reporting part
                     reporting_obj.name=GETPARAM
                     self.add_report_step_getparam(reporting_obj,step_description)
+                    step_description='Read file: '+str(input[0])+str(input[1])+' :Dataparam'
+                    self.add_report_step_getparam(reporting_obj,step_description)
+                    step_description='Start Loop'
+                    self.add_report_step_getparam(reporting_obj,step_description)
                     #Reporting part ends
                     count=len(data.values()[0])
                     for i in range(count):
                         if self.name.lower()==GETPARAM:
                             inputval = self.inputval[0]
-                            paramindex = self.index+1;
+                            paramindex = self.index+2
+                            if handler.tspList[self.index+1].name.lower()==STARTLOOP:
+                                handler.tspList[self.index+1].executed=True
                             if (inputval != None):
                                 log.info( '***Data Param: Iteration '+str(k)+ ' started***')
                                 logger.print_on_console( '***Data Param: Iteration ',k, ' started***')
                                 #Reporting part
                                 reporting_obj.name='Iteration '+str(k)
-                                step_description='Data Param: Iteration '+str(k)+' started'
+                                step_description='Dataparam: Iteration '+str(k)+' started'
                                 self.add_report_step_getparam(reporting_obj,step_description)
                                 #Reporting part ends
                                 iterations = len(data.values()[0])
@@ -725,7 +743,7 @@ class GetParam():
                                 log.info( '***Data Param: Iteration '+str(k)+ ' completed***\n\n')
                                 logger.print_on_console('***Data Param: Iteration ',k, ' completed***\n\n')
                                 #Reporting part
-                                step_description='Data Param: Iteration '+str(k)+' completed'
+                                step_description='Dataparam: Iteration '+str(k)+' executed'
                                 reporting_obj.name='Iteration '+str(k)
                                 self.add_report_end_iteration(reporting_obj,step_description,k,count)
                                 #Reporting part ends

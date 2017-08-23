@@ -16,9 +16,11 @@ import logger
 import browser_Keywords
 from utils_web import Utils
 from webconstants import *
-from pyrobot import Robot
-import win32gui
-import pyrobot
+import platform
+if platform.system()!='Darwin':
+    from pyrobot import Robot
+    import win32gui
+    import pyrobot
 import table_keywords
 import time
 import urllib, cStringIO
@@ -478,7 +480,8 @@ class UtilWebKeywords:
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            err_msg=self.__web_driver_exception(e)
+            ##err_msg=self.__web_driver_exception(e)
+            logger.print_on_console("Cannot perform mouseHover operation.")
         return status,methodoutput,output,err_msg
 
 

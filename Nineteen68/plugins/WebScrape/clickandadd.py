@@ -10,8 +10,10 @@
 #-------------------------------------------------------------------------------
 
 import browserops
-import win32gui
-import win32con
+import platform
+if platform.system()!='Darwin':
+    import win32gui
+    import win32con
 import time
 import json
 import domconstants
@@ -207,7 +209,7 @@ class Clickandadd():
             log.info('Inside stopclickandadd method .....')
             driver = browserops.driver
             maindir = os.environ["NINETEEN68_HOME"]
-            screen_shot_path = maindir + '\Nineteen68\plugins\WebScrape' + domconstants.SCREENSHOT_IMG
+            screen_shot_path = maindir + '/Nineteen68/plugins/WebScrape' + domconstants.SCREENSHOT_IMG
             log.info('Obtained driver from browserops.py class .....')
             javascript_stopclicknadd = """localStorage.tastopflag= true; document.getElementsByTagName('HTML')[0].click(); function getElementsByClassName(classname) {     var a = [];     var re = new RegExp('(^| )'+classname+'( |$)');     var els = document.getElementsByTagName("*");     for(var i=0,j=els.length; i<j; i++)         if(re.test(els[i].className))a.push(els[i]);     return a; } if(document.getElementById('SLKNineteen68_Table')){ styleTag = document.getElementById('SLKNineteen68_Table'); head = document.head || document.getElementsByTagName('head')[0]; head.removeChild(styleTag); var a=getElementsByClassName('SLKNineteen68_Highlight'); for (var i = 0; i < a.length; i++) { a[i].removeAttribute('style'); }}var temp = window.tasarr; window.tasarr = null; return (temp);"""
             tempne_stopclicknadd = []

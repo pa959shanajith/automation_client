@@ -212,7 +212,7 @@ class StepDescription:
         def secureVerifyData():
             return "Verify SQL Query '"+ inputval[5]+ "' and result is same as '"+ inputval[7] + ","+ inputval[8] + "'"
         def sendFunctionKeys():
-            return "Execute Function key  "+ input
+            return "Press "+ input +" Key"
         def split():
             return "Split the string '"+ input+ "' with split character '"+ inputval[1]+ "' and save the value:"+ inputval[2] + " in '"+ tsp.outputval + "'"
         def stop():
@@ -902,7 +902,7 @@ class StepDescription:
         def verifyValuesExists():
             return 'Verify values ' + input + ' exists in the '+ "'" + tsp.custname + "'"
         def selectValueByText():
-            return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']'
+            return 'Select value '+input+' in ' + tsp.custname
         def getMultipleValuesByIndexes():
             return 'Get values with indexes ' + inputValsb.toString() + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + TestAutomationController.multipleOutputResult + ' in  '+ tsp.outputval
         def verifySelectedValue():
@@ -922,7 +922,7 @@ class StepDescription:
         def verifySelectedValue():
             return 'Verify value ' + input + ' is selected in the ' +"'" + tsp.custname + "'"
         def selectValueByIndex():
-            return 'Select the value '+ input+' of the '+"'" + tsp.custname + "'"+' with the index '+input+' present in the table cell  '+"'" + tsp.custname + "'"+'-['+input+']['+input+']'
+            return ' Select value with index value '+ input+' in the '+"'" + tsp.custname + "'"
         def getCount():
             return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' + output + ' in ' +tsp.outputval
 

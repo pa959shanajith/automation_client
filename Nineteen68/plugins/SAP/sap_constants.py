@@ -90,3 +90,5 @@ LABEL='label'
 ELEMENT_FOUND=True
 
 ERROR_MSG = 'Error occured'
+
+APPLICATION_KEYWORDS=['serverconnect','launchapplication','starttransaction','closeapplication']

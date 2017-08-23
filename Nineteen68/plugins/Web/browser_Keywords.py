@@ -24,16 +24,17 @@ from constants import *
 import logging
 drivermap = []
 log = logging.getLogger('browser_Keywords.py')
-import utils_web
+import platform
+if platform.system() != 'Darwin':
+    import win32gui
+    import win32api
+    import utils_web
 import psutil
-import win32gui
-import win32api
 import readconfig
 import core_utils
 import time
 from sendfunction_keys import SendFunctionKeys as SF
 pid_set = set()
-url_save=""
 configobj = readconfig.readConfig()
 configvalues = configobj.readJson()
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
@@ -103,30 +104,31 @@ class BrowserKeywords():
             elif browser_num[-1] == EXECUTE:
                 driver_obj=obj.getBrowser(self.browser_num)
                 del drivermap[:]
-            utilobject = utils_web.Utils()
-            pid = None
-            if (self.browser_num == '1'):
-                #logic to the pid of chrome window
-                p = psutil.Process(driver_obj.service.process.pid)
-                pidchrome = p.children()[0]
-                pid = pidchrome.pid
-                pid_set.add(pid)
-            elif(self.browser_num == '2'):
-                #logic to get the pid of the firefox window
-                try:
-                    pid = driver_obj.binary.process.pid
-                except Exception as e:
+            if platform.system()!='Darwin':
+                utilobject = utils_web.Utils()
+                pid = None
+                if (self.browser_num == '1'):
+                    #logic to the pid of chrome window
                     p = psutil.Process(driver_obj.service.process.pid)
                     pidchrome = p.children()[0]
                     pid = pidchrome.pid
                     pid_set.add(pid)
-            elif(self.browser_num == '3'):
-                #Logic to get the pid of the ie window
-                p = psutil.Process(driver_obj.iedriver.process.pid)
-                pidie = p.children()[0]
-                pid = pidie.pid
-                pid_set.add(pid)
-            hwndg = utilobject.bring_Window_Front(pid)
+                elif(self.browser_num == '2'):
+                    #logic to get the pid of the firefox window
+                    try:
+                        pid = driver_obj.binary.process.pid
+                    except Exception as e:
+                        p = psutil.Process(driver_obj.service.process.pid)
+                        pidchrome = p.children()[0]
+                        pid = pidchrome.pid
+                        pid_set.add(pid)
+                elif(self.browser_num == '3'):
+                    #Logic to get the pid of the ie window
+                    p = psutil.Process(driver_obj.iedriver.process.pid)
+                    pidie = p.children()[0]
+                    pid = pidie.pid
+                    pid_set.add(pid)
+                hwndg = utilobject.bring_Window_Front(pid)
             webdriver_list.append(driver_obj)
             parent_handle = driver_obj.current_window_handle
             self.update_recent_handle(parent_handle)
@@ -178,7 +180,6 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
     def navigateToURL(self ,webelement, url , *args):
-        global url_save
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -191,7 +192,6 @@ class BrowserKeywords():
                     url='http://'+url
                 driver_obj.get(url)
                 #ignore certificate implementation
-                url_save=url
                 try:
                     ignore_certificate = configvalues['ignore_certificate']
                     if ((ignore_certificate.lower() == 'yes') and ((driver_obj.title !=None) and ('Certificate' in driver_obj.title))):
@@ -668,7 +668,22 @@ class Singleton_DriverUtil():
                         except Exception as e:
                             d = 'stale'
                             break
-##        drivermap.reverse()
+        elif browserType == '6':
+            if len(drivermap) > 0:
+                for i in drivermap:
+                    if isinstance(i, webdriver.Safari):
+                        try:
+                            if len(i.window_handles) == 0:
+                                d = 'stale'
+                                break
+                            else:
+                                d = i
+                        except Exception as e:
+                            d = 'stale'
+                            break
+
+
+                                    ##        drivermap.reverse()
         return d
 
     def getBrowser(self,browser_num):
@@ -789,8 +804,11 @@ class Singleton_DriverUtil():
             logger.print_on_console('Phantom browser started')
 
         elif(browser_num == '6'):
+            print 'This will be our new safari'
             driver = webdriver.Safari()
             drivermap.append(driver)
+
+            
             logger.print_on_console('Safari browser started')
             log.info('Safari browser started')
 ##        print __driver

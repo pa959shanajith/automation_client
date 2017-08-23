@@ -10,8 +10,10 @@
 #-------------------------------------------------------------------------------
 
 import browserops
-import win32gui
-import win32con
+import platform
+if platform.system()!='Darwin':
+    import win32gui
+    import win32con
 import time
 import json
 import domconstants
@@ -38,13 +40,15 @@ class Fullscrape():
             driver = browserops.driver
             hwndg = browserops.hwndg
             maindir = os.environ["NINETEEN68_HOME"]
-            screen_shot_path = maindir + '\Nineteen68\plugins\WebScrape' + domconstants.SCREENSHOT_IMG
+            screen_shot_path = maindir + '/Nineteen68/plugins/WebScrape' + domconstants.SCREENSHOT_IMG
             log.info('Obtained browser handle and driver from browserops.py class .....')
-            toolwindow = win32gui.GetForegroundWindow()
+            if platform.system()!='Darwin':
+                toolwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
             log.info(' Minimizing the foreground window i.e tool and assuming AUT on top .....')
             time.sleep(2)
-            actwindow = win32gui.GetForegroundWindow()
+            if platform.system() != 'Darwin':
+                actwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
             javascript_hasfocus = """return(document.hasFocus());"""
 ##            time.sleep(6)
@@ -303,13 +307,13 @@ class Fullscrape():
                 except Exception as e:
                     screen = driver.get_screenshot_as_base64()
                 return screen
-
-            callback_scrape1('', tempne)
-            log.info('full scrape operation on iframe/frame pages is completed')
-            driver.switch_to.window(currenthandle)
-            callback_scrape2('', tempne)
-            log.info('full scrape operation on iframe/frame pages is completed')
-            driver.switch_to.window(currenthandle)
+            if platform.system()!='Darwin':
+                callback_scrape1('', tempne)
+                log.info('full scrape operation on iframe/frame pages is completed')
+                driver.switch_to.window(currenthandle)
+                callback_scrape2('', tempne)
+                log.info('full scrape operation on iframe/frame pages is completed')
+                driver.switch_to.window(currenthandle)
             tempne = json.dumps(tempne)
             tempne = json.loads(tempne)
             log.info('json opertions dumps and loads are performed on the return data')
