@@ -231,7 +231,7 @@ class DesktopDispatcher:
             import traceback
             traceback.print_exc()
             log.error(e)
-            logger.print_on_console('Exception at dispatcher')
+            #logger.print_on_console('Exception at dispatcher')
         if err_msg!=None:
             import traceback
             traceback.print_exc()
