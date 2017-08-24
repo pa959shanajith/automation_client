@@ -148,8 +148,8 @@ class Dropdown_Keywords():
                                 result=sap_constants.TEST_RESULT_TRUE
 
                         except Exception as e:
-                            err_msg = sap_constants.ERROR_MSG
-                            log.error(err_msg)
+##                            err_msg = sap_constants.ERROR_MSG
+##                            log.error(err_msg)
                             break
                         i = i + 1
                 else:
@@ -177,8 +177,8 @@ class Dropdown_Keywords():
             if(id != None):
                 if(ses.FindById(id).Changeable == True):
                     if(ses.FindById(id).Text.strip() == val):
-                                status=sap_constants.TEST_RESULT_PASS
-                                result=sap_constants.TEST_RESULT_TRUE
+                        status=sap_constants.TEST_RESULT_PASS
+                        result=sap_constants.TEST_RESULT_TRUE
                     else:
                         err_msg = sap_constants.ERROR_MSG
                         log.info(err_msg)
@@ -212,7 +212,7 @@ class Dropdown_Keywords():
                             status=sap_constants.TEST_RESULT_PASS
                             result=sap_constants.TEST_RESULT_TRUE
                         except Exception as e:
-                            log.error('Error occured',e)
+##                            log.error('Error occured',e)
                             break
 ##                else:
 ##                    logger.print_on_console( "Element is not changeable")
@@ -220,6 +220,7 @@ class Dropdown_Keywords():
 ##                    log.info(err_msg)
         except Exception as e:
               log.error('Error occured',e)
+              err_msg = sap_constants.ERROR_MSG
         return status,result,value,err_msg
 
     def verifyCount(self,sap_id,url,input_val, *args):
@@ -240,7 +241,7 @@ class Dropdown_Keywords():
                             value = entries(count).value
                             count = count + 1
                         except Exception as e:
-                            err_msg = sap_constants.ERROR_MSG
+##                            err_msg = sap_constants.ERROR_MSG
                             break
                     if(length == count):
                      status=sap_constants.TEST_RESULT_PASS
@@ -255,6 +256,7 @@ class Dropdown_Keywords():
 
         except Exception as e:
               log.error('Error occured',e)
+              err_msg = sap_constants.ERROR_MSG
         return status,result,verb,err_msg
 
     def verifyValuesExists(self,sap_id,url,input_val, *args):
@@ -280,7 +282,7 @@ class Dropdown_Keywords():
                                 status=sap_constants.TEST_RESULT_PASS
                                 result=sap_constants.TEST_RESULT_TRUE
                         except Exception as e:
-                            err_msg = sap_constants.ERROR_MSG
+##                            err_msg = sap_constants.ERROR_MSG
                             break
 ##                else:
 ##                    logger.print_on_console( "Element is not changeable")
@@ -289,6 +291,7 @@ class Dropdown_Keywords():
 
         except Exception as e:
               log.error('Error occured',e)
+              err_msg = sap_constants.ERROR_MSG
         return status,result,verb,err_msg
 
 
@@ -311,7 +314,6 @@ class Dropdown_Keywords():
                             dd_entries.append(str(entries(i).value))
                             i = i + 1
                         except Exception as e:
-                            #print e
                             break
                     if(cmp(dd_entries,val) == 0):
 
@@ -326,6 +328,7 @@ class Dropdown_Keywords():
 
         except Exception as e:
               log.error('Error occured',e)
+              err_msg = sap_constants.ERROR_MSG
         return status,result,verb,err_msg
 
 
