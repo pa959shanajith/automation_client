@@ -25,7 +25,7 @@ import json
 import ast
 
 from xlrd import open_workbook
-
+import re
 import logger
 
 import handler
@@ -231,7 +231,7 @@ class GetParam():
                 logger.print_on_console ('Rowcount : ',rowcount)
                 logger.print_on_console( 'Colcount :',colcount)
                 if testdataexist == True:
-                    for columnindex in range(colcount - 1)  :
+                    for columnindex in range(colcount)  :
                         rowcount1 = 1
                         for row in allRows:
                             if rowcount1 == 0:
@@ -419,29 +419,43 @@ class GetParam():
         return : Returns actual value of the static variable
         """
 
-        if data !=None:
-            teststepproperty =handler.tspList[paramindex]
-            inputval = teststepproperty.inputval
-            inputlistwithval = []
-            inputlistwithval = (list)( inputval)
-            try:
-                for i in range(0,len(inputval)):
-                    inputvalstring = inputval[i]
-                    resultinput = inputvalstring
-                    inputresult = ''
-    ##                staticlist = []
-
-                    # A check should be made to see static variables in evaluate keyword, like |b| - |c|
-    ##                staticlist.append(inputvalstring)
-                    variable = ''
-                    temp = ''
-                    columnname = ''
-                    arr=[]
-                    #added keyword constant DATE_COMPARE to fix issue 304:'Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
-                    #changes done by jayashree.r
-                    keywordList=[IF,FOR,JUMP_BY,JUMP_TO,DATE_COMPARE]
-                    if teststepproperty.name in keywordList :
-                        import re
+        if data is None:
+            return None
+        teststepproperty =handler.tspList[paramindex]
+        inputval = teststepproperty.inputval
+        inputlistwithval = (list)( inputval)
+        try:
+            for i in range(0,len(inputval)):
+                inputvalstring = inputval[i]
+                resultinput = inputvalstring
+                inputresult = ''
+                variable = ''
+                temp = ''
+                columnname = ''
+                arr=[]
+                if teststepproperty.name.lower() in [IF,ELSE_IF]:
+                    static_var_list=re.findall("\|(.*?)\|", inputvalstring)
+                    statDict={'{#@#n_o_n_e#@#}':None}
+                    statCnt=0
+                    for var in static_var_list:
+                        inputresult=self.get_static_value(data,row,var)
+                        #if isinstance(inputresult,ValueError):
+                        #    return inputresult
+                        if inputresult is None:
+                            resultinput = resultinput.replace('|'+var+'|','{#@#n_o_n_e#@#}')
+                        else:
+                            if isinstance(inputresult,float):
+                                if inputresult%1 == 0.0:
+                                    inputresult= int(inputresult)
+                            temp='{#@#'+str(statCnt)+'#@#}'
+                            statDict[temp]=inputresult
+                            resultinput = resultinput.replace('|'+var+'|',temp)
+                            statCnt+=1
+                    inputlistwithval.insert(i,resultinput)
+                    inputlistwithval.insert(i+1,statDict)
+                else:
+                    keywordList=[EVALUATE,DATE_COMPARE]
+                    if teststepproperty.name.lower() in keywordList :
                         static_var_list=re.findall("\|(.*?)\|", inputvalstring)
                         for var in static_var_list:
                             arr.append('|'+var+'|')
@@ -449,27 +463,31 @@ class GetParam():
                         arr = inputvalstring.split(';')
                     for item in arr:
                         if self.checkforstaticvariable(item.strip()):
-                            p = 0
-                            while p < len(item.strip()) - 1:
-                                if(item.find(PIPE) != -1):
-                                    temp = item[p+1 : len(item)]
-                                    columnname = temp[0:temp.find(PIPE)]
-                                    variable = PIPE + columnname + PIPE
-                                    p = p + len(variable)
-                                    if row >=0:
-                                        inputresult = data[columnname][row]
+                            p=0
+                            pLen=len(item.strip())-1
+                            while p < pLen:
+                                temp = item[p+1:len(item)]
+                                columnname = temp[0:temp.find(PIPE)]
+                                variable = PIPE + columnname + PIPE
+                                p = p + len(variable)
+                                inputresult=self.get_static_value(data,row,columnname)
+                                #if isinstance(inputresult,ValueError):
+                                #    return inputresult
+                                if inputresult is None:
+                                    inputresult='{#@#n_o_n_e#@#}'
+                                    #inputresult=''
+                                else:
                                     if isinstance(inputresult,float):
-                                        if inputresult % 1 == 0.0:
+                                        if inputresult%1 == 0.0:
                                             inputresult = int(inputresult)
-                                    resultinput = resultinput.replace(variable,str(inputresult))
-                                    inputlistwithval.insert(i,resultinput)
-            except Exception as e:
-                log.error(e)
+                                resultinput = resultinput.replace(variable,str(inputresult))
+                                inputlistwithval.insert(i,resultinput)
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+        return inputlistwithval
 
-                logger.print_on_console(e)
-            return inputlistwithval
-
-    def checkforstaticvariable(self, statvariable):
+    def checkforstaticvariable(self,statvariable):
         """
         def : checkforstaticvariable
         purpose : To check variable is static or not
@@ -477,6 +495,23 @@ class GetParam():
         return : Returns True if the variable is staticvariable else False
         """
         return (statvariable.startswith('|') and statvariable.endswith('|'))
+
+    #To get the value of given static variable
+    def get_static_value(self,data,i,var):
+        #returns the value of the static variable if it exists otherwise returns None
+        value=None
+        if data.has_key(var):
+            if i>=0 and i<len(data[var]):
+                value=data[var][i]
+                if value=='':
+                    value=None
+            #else:
+            #    emsg='No data found at Row: '+i
+            #    value=ValueError(emsg)
+        else:
+            log.error('Column name '+var+' not found')
+            logger.print_on_console('Column name '+var+' not found')
+        return value
 
     def add_report_end_iteration(self,reporting_obj,step_description,iteration_count,loop_count):
         #Reporting part
@@ -530,7 +565,7 @@ class GetParam():
                 filter = None
                 k = 1
                 filename, file_extension = os.path.splitext(filepath)
-                if file_extension[1:].lower() == FILE_TYPE_XLS or file_extension[1:].lower() == FILE_TYPE_XLSX:
+                if file_extension[1:].lower() in [FILE_TYPE_XLS,FILE_TYPE_XLSX,FILE_TYPE_CSV,FILE_TYPE_XML]:# or file_extension[1:].lower() == FILE_TYPE_XLSX
                     if len(fileinfo) == 2 :
                         if fileinfo[1].find(HYPHEN) != -1:
                             filters = fileinfo[1].split(HYPHEN)
@@ -616,7 +651,8 @@ class GetParam():
                         #Reporting part
                         reporting_obj.name=GETPARAM
                         self.add_report_step_getparam(reporting_obj,step_description)
-                        step_description='Read file: '+str(input[0])+', Sheet name: '+str(input[1])
+                        if len(input)>1:
+                            step_description='Read file: '+str(input[0])+', Sheet name: '+str(input[1])
                         self.add_report_step_getparam(reporting_obj,step_description)
                         step_description='Start Loop'
                         self.add_report_step_getparam(reporting_obj,step_description)
@@ -637,8 +673,6 @@ class GetParam():
                                     iterations = len(data.values()[0])
                                     while (paramindex < endlopnum):
                                         input = self.retrievestaticvariable(data,paramindex,i-1)
-                                        if i > iterations:
-                                            input=['']
                                         paramindex =con.methodinvocation(paramindex,input)
                                         if paramindex in [TERMINATE,BREAK_POINT,STOP]:
                                             return paramindex
@@ -665,7 +699,10 @@ class GetParam():
                         #Reporting part
                         reporting_obj.name=GETPARAM
                         self.add_report_step_getparam(reporting_obj,step_description)
-                        step_description='Read file: '+str(input)+str(input[1])+' :Dataparam'
+                        if len(input)>1:
+                            step_description='Read file: '+str(input[0])+str(input[1])+' :Dataparam'
+                        else:
+                            step_description='Read file: '+str(input[0])+' :Dataparam'
                         self.add_report_step_getparam(reporting_obj,step_description)
                         step_description='Start Loop'
                         self.add_report_step_getparam(reporting_obj,step_description)
@@ -687,8 +724,6 @@ class GetParam():
                                 iterations = len(data.values()[0])
                                 while (paramindex < endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,filter)
-                                    if filter > iterations:
-                                        input=['']
                                     paramindex =con.methodinvocation(paramindex,input)
                                     if paramindex in [TERMINATE,BREAK_POINT,STOP]:
                                         return paramindex
@@ -713,7 +748,10 @@ class GetParam():
                     #Reporting part
                     reporting_obj.name=GETPARAM
                     self.add_report_step_getparam(reporting_obj,step_description)
-                    step_description='Read file: '+str(input[0])+str(input[1])+' :Dataparam'
+                    if len(input)>1:
+                        step_description='Read file: '+str(input[0])+str(input[1])+' :Dataparam'
+                    else:
+                        step_description='Read file: '+str(input[0])+' :Dataparam'
                     self.add_report_step_getparam(reporting_obj,step_description)
                     step_description='Start Loop'
                     self.add_report_step_getparam(reporting_obj,step_description)
@@ -774,12 +812,4 @@ class GetParam():
 
             log.error(e)
             logger.print_on_console(e)
-            import traceback
-            tracback.print_exc()
         return return_value
-
-
-
-
-
-
