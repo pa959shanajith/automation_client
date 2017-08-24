@@ -183,7 +183,8 @@ class Controller():
             self.sap_dispatcher_obj = sap_dispatcher.SAPDispatcher()
             #logger.print_on_console('sap_dispatcher_obj.exception_flag before :'sap_dispatcher_obj.exception_flag)
             self.sap_dispatcher_obj.exception_flag=exception_flag
-            #ogger.print_on_console('sap_dispatcher_obj.exception_flag after :'sap_dispatcher_obj.exception_flag)
+            #logger.print_on_console('sap_dispatcher_obj.exception_flag after :'sap_dispatcher_obj.exception_flag)
+            self.sap_dispatcher_obj.action=self.action
         except Exception as e:
             import traceback
             traceback.print_exc()

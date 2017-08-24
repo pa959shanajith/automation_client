@@ -35,7 +35,6 @@ import core_utils
 import time
 from sendfunction_keys import SendFunctionKeys as SF
 pid_set = set()
-url_save=""
 configobj = readconfig.readConfig()
 configvalues = configobj.readJson()
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
@@ -181,7 +180,6 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
     def navigateToURL(self ,webelement, url , *args):
-        global url_save
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -194,7 +192,6 @@ class BrowserKeywords():
                     url='http://'+url
                 driver_obj.get(url)
                 #ignore certificate implementation
-                url_save=url
                 try:
                     ignore_certificate = configvalues['ignore_certificate']
                     if ((ignore_certificate.lower() == 'yes') and ((driver_obj.title !=None) and ('Certificate' in driver_obj.title))):

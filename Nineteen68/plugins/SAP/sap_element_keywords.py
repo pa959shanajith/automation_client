@@ -277,6 +277,9 @@ class ElementKeywords():
             top =  elem.ScreenTop
             height = elem.Height
             y= top + height/2
+            if(elem.type=='GuiTab'):
+                    x=left + width*0.75
+                    y=top+height*0.25
             pywinauto.mouse.double_click(button="left", coords = (int(x), int(y)))
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
@@ -320,6 +323,9 @@ class ElementKeywords():
                 top =  elem.__getattr__("ScreenTop")
                 height = elem.__getattr__("Height")
                 y= top + height/2
+                if(elem.type=='GuiTab'):
+                    x=left + width*0.75
+                    y=top+height*0.25
                 pywinauto.mouse.click(button='left', coords=(int(x), int(y)))
                 status=sap_constants.TEST_RESULT_PASS
                 result=sap_constants.TEST_RESULT_TRUE

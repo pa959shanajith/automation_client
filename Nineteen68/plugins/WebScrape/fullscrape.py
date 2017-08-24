@@ -244,12 +244,19 @@ class Fullscrape():
                 try:
                     total_width = driver.execute_script("return document.body.offsetWidth")
                     total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
-                    viewport_width = driver.execute_script("return document.body.clientWidth")
+                    viewport_width = driver.execute_script("return window.innerWidth")
                     viewport_height = driver.execute_script("return window.innerHeight")
                     rectangles = []
                     screen = None
                     if(total_width == 0):
                         total_width = driver.execute_script("return document.documentElement.offsetWidth")
+
+                    if total_height < viewport_height:
+                        total_height = viewport_height
+
+                    if total_width  < viewport_width:
+                        total_width = viewport_width
+
                     if(total_width > 0 and total_height > 0 and viewport_width > 0 and viewport_height > 0):
 
                         i = 0

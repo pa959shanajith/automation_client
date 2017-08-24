@@ -49,6 +49,20 @@ class Screenshot():
                         filePath=str(inputval) + '//'+ filename
                 except Exception as e:
                     logger.print_on_console( e)
+            elif len(args)==1:
+                try:
+                    import readconfig
+                    configobj = readconfig.readConfig()
+                    configvalues = configobj.readJson()
+                    path = configvalues['screenShot_PathName']
+                    if not os.path.exists(path):
+                        os.makedirs(path)
+                    filename=self.generateUniqueFileName()
+                    filePath = path + filename
+                    output = filePath+'.png'
+                    logger.print_on_console("The Specified path is not found, hence screenshot captured and saved in default path")
+                except Exception as e:
+                    logger.print_on_console( e)
             else:
                 try:
                     import readconfig

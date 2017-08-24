@@ -480,7 +480,8 @@ class UtilWebKeywords:
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            err_msg=self.__web_driver_exception(e)
+            ##err_msg=self.__web_driver_exception(e)
+            logger.print_on_console("Cannot perform mouseHover operation.")
         return status,methodoutput,output,err_msg
 
 

@@ -47,7 +47,7 @@ class Weboccular():
         try:
             new_url = urljoin(url, new_url)
         except Exception as e:
-            print e
+
             return None
         if '#' in new_url :
             pos = new_url.index('#')
@@ -178,8 +178,8 @@ class Weboccular():
         except Exception as e:
             obj['error'] = str(e)
             self.nodedata.append(obj)
-            print e
-            print "error url" , url
+            #print e
+            #print "error url" , url
             self.crawlStatus = False
 
     def runCrawler(self,url,level,agent,socketIO) :
@@ -199,7 +199,6 @@ class Weboccular():
             self.crawlStatus = True
         except Exception as e:
             log.info("Something went wrong")
-            print e
         sdata = { "nodes" : self.nodedata, "links" : self.extraLinks }
 
         time_taken = time.clock() - start

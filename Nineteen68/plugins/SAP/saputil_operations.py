@@ -79,7 +79,11 @@ class SapUtilKeywords:
         result = None
         try:
             if(id != None):
-                if(ses.FindById(id).Changeable == True):
+                if(ses.FindById(id).type == "GuiLabel"):
+                    result = True
+                    status=sap_constants.TEST_RESULT_PASS
+                    result=sap_constants.TEST_RESULT_TRUE
+                elif(ses.FindById(id).Changeable == True):
                     result = True
                     status=sap_constants.TEST_RESULT_PASS
                     result=sap_constants.TEST_RESULT_TRUE
@@ -99,7 +103,9 @@ class SapUtilKeywords:
         result = None
         try:
             if(id != None):
-                if(ses.FindById(id).Changeable == False):
+                if(ses.FindById(id).type == "GuiLabel"):
+                    result = False
+                elif(ses.FindById(id).Changeable == False):
                     result = True
                     status=sap_constants.TEST_RESULT_PASS
                     result=sap_constants.TEST_RESULT_TRUE
