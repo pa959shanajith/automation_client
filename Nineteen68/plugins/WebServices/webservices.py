@@ -490,7 +490,7 @@ class WSkeywords:
         response=''
         socketIO = args[1]
 
-        #data size verification
+        #data size check
         import sys
         try:
             if(result[2] != None):
@@ -502,7 +502,7 @@ class WSkeywords:
                     datasize = sys.getsizeof(res[1])
                     kilobytes = datasize/1024
                     megabytes = kilobytes/1024
-                    if megabytes > 5:
+                    if megabytes > 10:
                         response = headerresp+'rEsPONseBOdY: Response Body exceeds max. Limit., please use writeToFile keyword.'
 ##                        res[1]='Data length is '+str(megabytes)+', please use writeToFile'
 ##                        result[2]=headerresp+res[1]
