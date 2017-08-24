@@ -19,6 +19,7 @@ from constants import *
 import core_utils
 import logging
 
+
 log = logging.getLogger('util_operations.py')
 class UtilOperations:
 
@@ -34,6 +35,20 @@ class UtilOperations:
         except Exception as e:
             log.error(e)
 
+    def check_input(self,input):
+        """
+        def : check_input
+        purpose : input validation for typecast.
+        param : input
+        output : modified input
+        """
+
+        import re
+        if len(re.sub("[0-9.,]","",input))!=0 or input.count('.') >=2:
+            raise Exception('Please provide valid value for conversion')
+        input =re.sub("[^0-9.]", "", input)
+        return input
+
     def type_cast(self,input,to_type,*args):
         """
         def : create_folder
@@ -46,7 +61,8 @@ class UtilOperations:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         log.debug('reading the inputs')
-        input=str(input)
+        if  not isinstance(input,unicode):
+            input=str(input)
         to_type=str(to_type)
         fmt_type=None
         output=None
@@ -65,6 +81,7 @@ class UtilOperations:
                     output=input
                 elif to_type=='int':
                     log.debug('converting into int')
+                    input=self.check_input(input)
                     output=float(input)
                     if fmt_type!=None and fmt_type.strip().lower()=='roundoff':
                         output=round(output)
@@ -72,10 +89,12 @@ class UtilOperations:
                         output=int(output)
                 elif to_type=='float':
                     log.debug('converting into float')
+                    input=self.check_input(input)
                     output=np.float32(input)
 
                 elif to_type=='double':
                     log.debug('converting into double')
+                    input=self.check_input(input)
                     output=np.float64(input)
                 elif to_type=='date':
                     #Supported date formats are
@@ -117,6 +136,7 @@ class UtilOperations:
                 status=TEST_RESULT_PASS
                 log.info('Result is ',output)
                 logger.print_on_console('Result is ',output)
+
             except Exception as e:
                 log.error(e)
                 logger.print_on_console(e)
@@ -141,7 +161,7 @@ class UtilOperations:
                 #img1 = Image.open(file1)
                 #img2 = Image.open(file2)
                 log.debug('comparing the images')
-                if self.verify_image_obj != None: 
+                if self.verify_image_obj != None:
                 	#Meaning user has advanced image processing plugin
                     if self.verify_image_obj.imagecomparison(file1,file2):
                         info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
