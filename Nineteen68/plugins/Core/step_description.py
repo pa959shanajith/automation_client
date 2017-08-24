@@ -408,6 +408,10 @@ class StepDescription:
         return locals()[keyword]()
 
     def sap(self,keyword,tsp,inputval,input,output,con,reporting_obj):
+        #-----------------------------------Added this step as input was returned as a string
+        if type(input) is str:                  #----checking if input is a string
+            if "," in input:                    #----checking if the string has a ","
+                input = input.split(",")        #--------spliting the input by checking for "," then store the result in list input
         #Launch keywords
         def LaunchApplication():
             return ' The application present in the path '+ inputval[0]+ ' is launched'+ '.'
@@ -502,7 +506,7 @@ class StepDescription:
         def VerifyCellValue():
             return 'Verify cell value of element in row number ' + input[0] +' and column number '+input[1] +' against the input value '+input[2]+' present in ' +"'" + tsp.custname + "'"+'.'
         def VerifyTextExists():
-            return 'Verify Text '+ input[2]+' exists in row number '+input[0]+' and column number '+input[1]+' of '+"'" + tsp.custname + "'"+'.'
+            return 'Verify Text '+ input+' exists in table '+"'"+ tsp.custname +"'"+"and  save the result as "+ output + ' in '+ tsp.outputval+'.'
 ##        def CellClick():
 ##            return 'Click on '+ "'" + tsp.custname + "'"+'.'
         def SelectValueByIndex():
