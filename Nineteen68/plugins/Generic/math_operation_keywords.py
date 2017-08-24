@@ -141,19 +141,15 @@ class NumericStringParser(object):
                 log.debug('Evaluating the expression')
                 #logger.print_on_console('Evaluating the expression')
                 output=self.evaluateStack( self.exprStack[:] )
-                if (output/10**17)>1:
-                    err_msg='Output value exceeds seventeen digits'
-                    output=None
-                else:
-                    if isinstance(output,float):
-                        if output % 1 == 0.0:
-                            output = int(output)
-                    elif isinstance(output,long):
-                        output=str(output)
-                    log.debug('Got the result : %s', output)
-                    #logger.print_on_console('Got the result : ', output)
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
+                if isinstance(output,float):
+                    if output % 1 == 0.0:
+                        output = int(output)
+                elif isinstance(output,long):
+                    output=str(output)
+                log.debug('Got the result : %s', output)
+                #logger.print_on_console('Got the result : ', output)
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
             else:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
