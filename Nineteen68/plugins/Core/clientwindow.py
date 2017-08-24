@@ -56,7 +56,7 @@ class MainNamespace(BaseNamespace):
 
             browsername = '1'
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
-
+            print wxObject.GetId()
 ##            time.sleep(5)
         elif str(args[0]) == 'OPEN BROWSER IE':
 
@@ -903,7 +903,6 @@ class ClientWindow(wx.Frame):
 
 
     def OnClose(self, event):
-
         print 'KILLING THE THREAD'
         controller.terminate_flag=True
         global socketIO
@@ -915,6 +914,7 @@ class ClientWindow(wx.Frame):
 ##            self.new.Close()
 ##        self.Close()
         self.Destroy()
+        controller.kill_process()
          # you may also do:  event.Skip()
                         # since the default event handler does call Destroy(), too
 
