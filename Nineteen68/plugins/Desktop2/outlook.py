@@ -119,7 +119,7 @@ class OutlookKeywords:
                     error_msg='Check the path given'
             except Exception as e:
                 log.error(e)
-                logger.print_on_console('Check the path given')
+                logger.print_on_console('Check the given path')
             return status,method_output,result,error_msg
 
 
