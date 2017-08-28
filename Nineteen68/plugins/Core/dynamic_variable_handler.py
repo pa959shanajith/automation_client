@@ -159,11 +159,15 @@ class DynamicVariables:
     #To simplify expression for IF, ELSEIF and EVALUATE keywords
     def simplify_expression(self,input_var,keyword,con_obj):
         k=-1
+        dv_dict=dict()
         if keyword.lower() in [IF,ELSE_IF]:
             k=1
+            if len(input_var)>1:
+                dv_dict=dict(input_var[1])
+            input_var=input_var[0]
         elif keyword.lower() == EVALUATE:
             k=2
-            input_var='('+input_var+')'
+            input_var='('+input_var[0]+')'
         else:
             return [INVALID,None]
         log.debug('___INPUT: ',input_var)
@@ -171,7 +175,9 @@ class DynamicVariables:
         invalid_flag=False
         invalid_msg=''
         input_var=input_var.strip()
-        if not(input_var[0]=='(' and input_var[-1]==')'):
+        #if input_var=='':
+        #    return [input_var,ERROR_CODE_DICT['ERR_INVALID_INPUT']]
+        if not(input_var.startswith('(') and input_var.endswith(')')):
             invalid_msg=keyword+': Expression must be enclosed within "(" and ")"\n'
             log.error(keyword+': Expression must be enclosed within "(" and ")"')
             return [input_var,invalid_msg]
@@ -236,7 +242,6 @@ class DynamicVariables:
             log.debug('Stage 2: ',exp)
             inp_err_list=exp.split('~')
             exp=exp.split('~')
-            dv_dict=dict()
             log.debug('Stage 3: ',exp)
             for i in range(len(exp)):
                 if exp[i][0]=='$' and exp[i][-1]!='$':

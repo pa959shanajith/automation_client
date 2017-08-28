@@ -369,16 +369,21 @@ class Controller():
         return index
     def split_input(self,input,keyword):
         ignore_status = False
+        staticNone='{#@#n_o_n_e#@#}'
         inpval = []
         input_list=[]
         input_list = input[0].split(SEMICOLON)
         if IGNORE_THIS_STEP in input_list:
             ignore_status=True
         if keyword.lower() in [IF,ELSE_IF,EVALUATE]:
-            inpval=self.dynamic_var_handler_obj.simplify_expression(input[0],keyword,self)
+            inpval=self.dynamic_var_handler_obj.simplify_expression(input,keyword,self)
         elif keyword in WS_KEYWORDS or keyword == 'navigateToURL':
+            if staticNone in input[0]:
+                input[0]=''
             inpval=[input[0]]
         elif keyword in DYNAMIC_KEYWORDS:
+            if staticNone in input[0]:
+                input[0]=input[0].replace(staticNone,'')
             string=input[0]
             index=string.find(';')
             if index >-1:
@@ -393,7 +398,10 @@ class Controller():
         else:
             #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
             for x in input_list:
-                x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
+                if staticNone in x:
+                    x=None
+                else:
+                    x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
                 inpval.append(x)
         return inpval,ignore_status
     def store_result(self,result_temp,tsp):

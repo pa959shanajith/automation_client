@@ -225,7 +225,9 @@ class ElementKeywords():
         #------------------------------Condition to check if its a table element
             if(elem.type=='GuiTableControl'):
                 arg=args[1]
-                if len(arg) > 0 and len(arg)==2 :
+                if(len(arg)==1 and arg[0]==''):
+                    pass
+                elif len(arg)==2 :
                     row=int(arg[0])-1
                     col=int(arg[1])-1
                     elem = elem.GetCell(row, col)
@@ -262,7 +264,9 @@ class ElementKeywords():
         #------------------------------Condition to check if its a table element
             if(elem.type=='GuiTableControl'):
                 arg=args[1]
-                if len(arg) > 0 and len(arg)==2:
+                if(len(arg)==1 and arg[0]==''):
+                    pass
+                elif len(arg)==2:
                     row=int(arg[0])-1
                     col=int(arg[1])-1
                     elem = elem.GetCell(row, col)
@@ -308,7 +312,9 @@ class ElementKeywords():
             #------------------------------Condition to check if its a table element
                 if(elem.type=='GuiTableControl'):
                     arg=args[1]
-                    if len(arg) > 0 and len(arg)==2:
+                    if(len(arg)==1 and arg[0]==''):
+                        pass
+                    elif len(arg)==2:
                         row=int(arg[0])-1
                         col=int(arg[1])-1
                         elem = elem.GetCell(row, col)
@@ -349,7 +355,9 @@ class ElementKeywords():
                 #------------------------------Condition to check if its a table element
                     if(elem.type=='GuiTableControl'):
                         arg=args[1]
-                        if len(arg) > 0 and len(arg)==2:
+                        if(len(arg)==1 and arg[0]==''):
+                            pass
+                        elif len(arg)==2:
                             row=int(arg[0])-1
                             col=int(arg[1])-1
                             elem = elem.GetCell(row, col)
@@ -389,7 +397,9 @@ class ElementKeywords():
         #------------------------------Condition to check if its a table element
             if(elem.type=='GuiTableControl'):
                 arg=args[1]
-                if len(arg) > 0 and len(arg)==2 :
+                if(len(arg)==1 and arg[0]==''):
+                    pass
+                elif len(arg)==2 :
                     row=int(arg[0])-1
                     col=int(arg[1])-1
                     elem = elem.GetCell(row, col)

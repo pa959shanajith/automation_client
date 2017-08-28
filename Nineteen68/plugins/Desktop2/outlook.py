@@ -181,7 +181,10 @@ class OutlookKeywords:
                                         self.Subject = msg.Subject
                                         self.Body= msg.Body
                                         if msg.SenderEmailType=='EX':
-                                             self.FromMailId= msg.Sender.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS)
+                                            try:
+                                                self.FromMailId= msg.Sender.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS)
+                                            except:
+                                                pass
                                         else:
                                             self.FromMailId=msg.SenderEmailAddress
                                         for recipient in  msg.Recipients:

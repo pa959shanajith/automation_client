@@ -16,6 +16,7 @@ log = logging.getLogger('clientwindow.py')
 from socketIO_client import SocketIO,BaseNamespace
 import readconfig
 import httplib
+
 i = 0
 wxObject = None
 browsername = None
@@ -28,6 +29,8 @@ mobileWebScrapeFlag=False
 debugFlag = False
 oebsScrapeFlag = False
 
+
+
 parser = argparse.ArgumentParser(description="Nineteen68 Platform")
 parser.add_argument('--NINETEEN68_HOME', type=str, help='A Required path to Nineteen68 root location')
 args = parser.parse_args()
@@ -39,6 +42,12 @@ os.environ["NINETEEN68_HOME"] = args.NINETEEN68_HOME
 IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images"
 CERTIFICATE_PATH = os.environ["NINETEEN68_HOME"] + "/Scripts/CA_BUNDLE"
 
+"""
+Setting Logging configuration file path
+
+"""
+
+LOGCONFIG_PATH = os.environ["NINETEEN68_HOME"] + "/logging.conf"
 configobj = readconfig.readConfig()
 #747 check for syntax error in config.json
 try:
@@ -46,6 +55,29 @@ try:
     jsonSyntaxErrorFlag = False
 except:
     jsonSyntaxErrorFlag = True
+
+"""
+This code snippet blocks the inheritance of file handlers from
+parent process to child process. We are applying the same for only on file
+ which is our log file.
+
+"""
+if sys.platform == 'win32':
+    from ctypes import *
+    import msvcrt
+
+    __builtins__open = __builtins__.open
+
+    def __open_inheritance_hack(*args, **kwargs):
+        #print(args)
+        result = __builtins__open(*args, **kwargs)
+        handle = msvcrt.get_osfhandle(result.fileno())
+        if configvalues["logFile_Path"] in args:
+            windll.kernel32.SetHandleInformation(handle, 1, 0)
+        return result
+
+    __builtins__.open = __open_inheritance_hack
+
 
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
@@ -56,7 +88,7 @@ class MainNamespace(BaseNamespace):
 
             browsername = '1'
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
-
+            print wxObject.GetId()
 ##            time.sleep(5)
         elif str(args[0]) == 'OPEN BROWSER IE':
 
@@ -613,7 +645,9 @@ class RedirectText(object):
 
 class ClientWindow(wx.Frame):
     #----------------------------------------------------------------------
+
     def __init__(self):
+        global log
         wx.Frame.__init__(self, parent=None,id=-1, title="ICE Engine",
                    pos=(300, 150),  size=(800, 730),style=wx.DEFAULT_FRAME_STYLE & ~ (wx.MAXIMIZE_BOX)  )
 ##        self.SetBackgroundColour(   (245,222,179))
@@ -638,36 +672,30 @@ class ClientWindow(wx.Frame):
         ID_FILE_NEW = 1
         self.iconpath = IMAGES_PATH +"/slk.ico"
 
-        # set up logging to file - see previous section for more details
+        """
+        Creating Root Logger using logger file config and setting logfile path,which is in config.json
+
+        """
+
         try:
-            logging.basicConfig(level=logging.INFO,
-                            format='%(asctime)s %(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s',
-                            datefmt='%y-%m-%d %H:%M:%S',
-                            filename=configvalues['logFile_Path'] + 'TestautoV2.log',
-                            filemode='a')
-        # define a Handler which writes INFO messages or higher to the sys.stderr
-            self.logfilename_error_flag = False
+            logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': configvalues["logFile_Path"]})
         except:
             self.logfilename_error_flag = True
 
-        ##747 Screenshot path validity check (Himanshu)
+        self.logger = logging.getLogger(__name__)
+        log=self.logger
+
+        """
+        #747 Screenshot path validity check (Himanshu)
+
+        """
+
         if not(jsonSyntaxErrorFlag):
             spath = configvalues['screenShot_PathName']
             self.screenshotPath_error_flag = False
-
             if not os.path.exists(spath):
                 self.screenshotPath_error_flag = True
 
-        console = logging.StreamHandler()
-        console.setLevel(logging.INFO)
-        logging.addLevelName('INFO','i')
-        # set a format which is simpler for console use
-        formatter = logging.Formatter('%(asctime)s %(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s')
-        # tell the handler to use this format
-        console.setFormatter(formatter)
-
-
-        self.logger = logging.getLogger("Nineteen68")
         self.panel = wx.Panel(self)
         self.sizer = wx.GridBagSizer(6, 5)
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
@@ -792,75 +820,39 @@ class ClientWindow(wx.Frame):
             self.connectbutton.Disable()
             self.rbox.Disable()
 
+    """
+
+    Modifying Logger and Handlers Level dynamically without creating a new logger object
+    When logging level is changed from Client window using "File" button.
+
+    """
 
     def menuhandler(self, event):
-      id = event.GetId()
+        id = event.GetId()
 
-      if id == 100:
-        logger.print_on_console( '--Logger level : INFO selected--')
-
-
-
-
-
-        for handler in logging.root.handlers[:]:
-            logging.root.removeHandler(handler)
-        # set up logging to file - see previous section for more details
-        logging.basicConfig(level=logging.INFO,
-                            format='[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s',
-                            datefmt='%y-%m-%d %H:%M:%S',
-                            filename=configvalues['logFile_Path'] + 'TestautoV2.log',
-                            filemode='a')
-        # define a Handler which writes INFO messages or higher to the sys.stderr
-        console = logging.StreamHandler()
-        console.setLevel(logging.INFO)
-        logging.addLevelName('INFO','i')
-        # set a format which is simpler for console use
-        formatter = logging.Formatter('%(asctime)s %(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s')
-        # tell the handler to use this format
-        console.setFormatter(formatter)
-      elif id == 101:
-        logger.print_on_console( '--Logger level : DEBUG selected--')
-
-        for handler in logging.root.handlers[:]:
-            logging.root.removeHandler(handler)
-        # set up logging to file - see previous section for more details
-        logging.basicConfig(level=logging.DEBUG,
-                            format='%(asctime)s %(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s',
-                            datefmt='%y-%m-%d %H:%M:%S',
-                            filename=configvalues['logFile_Path'] + 'TestautoV2.log',
-                            filemode='a')
-        # define a Handler which writes INFO messages or higher to the sys.stderr
-        console = logging.StreamHandler()
-        console.setLevel(logging.DEBUG)
-        logging.addLevelName('DEBUG','d')
-        # set a format which is simpler for console use
-        formatter = logging.Formatter('%(asctime)s %(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s')
-        # tell the handler to use this format
-        console.setFormatter(formatter)
-      elif id ==102:
-        logger.print_on_console( '--Logger level : ERROR selected--')
-
-        for handler in logging.root.handlers[:]:
-            logging.root.removeHandler(handler)
-        # set up logging to file - see previous section for more details
-        logging.basicConfig(level=logging.ERROR,
-                            format='%(asctime)s %(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s',
-                            datefmt='%y-%m-%d %H:%M:%S',
-                            filename=configvalues['logFile_Path'] + 'TestautoV2.log',
-                            filemode='a')
-        # define a Handler which writes INFO messages or higher to the sys.stderr
-        console = logging.StreamHandler()
-        logging.addLevelName('ERROR','e')
-        console.setLevel(logging.ERROR)
-        # set a format which is simpler for console use
-        formatter = logging.Formatter('%(asctime)s %(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s')
-        # tell the handler to use this format
-        console.setFormatter(formatter)
+        #When user selects INFO level
+        if id == 100:
+            logger.print_on_console( '--Logger level : INFO selected--')
+            logging.getLogger().setLevel(logging.INFO)
+            for handler in logging.root.handlers[:]:
+                    handler.setLevel(logging.INFO)
+        #When user selects DEBUG level
+        elif id == 101:
+            logger.print_on_console( '--Logger level : DEBUG selected--')
+            logging.getLogger().setLevel(logging.DEBUG)
+            for handler in logging.root.handlers[:]:
+                handler.setLevel(logging.DEBUG)
+        #When user selects ERROR level
+        elif id ==102:
+            logger.print_on_console( '--Logger level : ERROR selected--')
+            logging.getLogger().setLevel(logging.ERROR)
+            for handler in logging.root.handlers[:]:
+                    handler.setLevel(logging.ERROR)
 
 ##    def OnRadiogroup(self, e):
 ##        rb = e.GetEventObject()
 ##        print rb.GetLabel(),' is clicked from Radio Group'
+
 
     def onRadioBox(self,e):
         self.choice=self.rbox.GetStringSelection()
@@ -903,7 +895,6 @@ class ClientWindow(wx.Frame):
 
 
     def OnClose(self, event):
-
         print 'KILLING THE THREAD'
         controller.terminate_flag=True
         global socketIO
@@ -915,6 +906,7 @@ class ClientWindow(wx.Frame):
 ##            self.new.Close()
 ##        self.Close()
         self.Destroy()
+        controller.kill_process()
          # you may also do:  event.Skip()
                         # since the default event handler does call Destroy(), too
 

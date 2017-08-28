@@ -357,10 +357,8 @@ class Reporting:
                 step_num=''
                 if (step_description[0:10]).lower() == 'dataparam:' and (step_description[23:]).lower()== 'started':
                     step_num='Start iteration'
-                    print "yess"
                 elif (step_description[0:10]).lower() == 'dataparam:' and (step_description[23:]).lower()== 'executed':
                     step_num='End iteration'
-                    print "yes"
             name=self.name
             ##            Added this line to remove status for conditional keyword in reports
             status = ''

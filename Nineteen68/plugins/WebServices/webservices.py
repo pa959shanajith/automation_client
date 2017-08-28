@@ -490,7 +490,7 @@ class WSkeywords:
         response=''
         socketIO = args[1]
 
-        #data size verification
+        #data size check
         import sys
         try:
             if(result[2] != None):
@@ -502,7 +502,7 @@ class WSkeywords:
                     datasize = sys.getsizeof(res[1])
                     kilobytes = datasize/1024
                     megabytes = kilobytes/1024
-                    if megabytes > 5:
+                    if megabytes > 10:
                         response = headerresp+'rEsPONseBOdY: Response Body exceeds max. Limit., please use writeToFile keyword.'
 ##                        res[1]='Data length is '+str(megabytes)+', please use writeToFile'
 ##                        result[2]=headerresp+res[1]
@@ -536,7 +536,11 @@ class WSkeywords:
                     log.debug(STATUS_METHODOUTPUT_UPDATE)
                     status = ws_constants.TEST_RESULT_PASS
                     methodoutput = ws_constants.TEST_RESULT_TRUE
-                    output=self.baseResHeader[key]
+                    if self.baseResHeader is not None and  key in self.baseResHeader:
+                        output=self.baseResHeader[key]
+                    else:
+                        output = 'null'
+                        logger.print_on_console('Please provide valid Input - Invalid Header Key ='+key)
                 else:
 ##                    logger.print_on_console(ws_constants.RESULT,str(self.baseResHeader))
                     log.debug(STATUS_METHODOUTPUT_UPDATE)
@@ -553,17 +557,25 @@ class WSkeywords:
                         log.debug(STATUS_METHODOUTPUT_UPDATE)
                         status = ws_constants.TEST_RESULT_PASS
                         methodoutput = ws_constants.TEST_RESULT_TRUE
-                        output.append(self.baseResHeader[key])
+                        if self.baseResHeader is not None and key in self.baseResHeader:
+                            output.append(self.baseResHeader[key])
+                        else:
+                            output.append('null')
+                            logger.print_on_console('Please provide valid Input - Invalid Header Key ='+key)
                     else:
     ##                    logger.print_on_console(ws_constants.RESULT,str(self.baseResHeader))
                         log.debug(STATUS_METHODOUTPUT_UPDATE)
                         if self.baseResHeader != None:
                             status = ws_constants.TEST_RESULT_PASS
                             methodoutput = ws_constants.TEST_RESULT_TRUE
-                        output.append(self.baseResHeader[key])
+                        if self.baseResHeader is not None and key in self.baseResHeader:
+                            output.append(self.baseResHeader[key])
+                        else:
+                            output.append('null')
+                            logger.print_on_console('Please provide valid Input - Invalid Header Key ='+key)
         except Exception as e:
             log.error(e)
-            err_msg=ws_constants.ERR_MSG1+'getBody'
+            err_msg=ws_constants.ERR_MSG1+'getHeader'
             logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
@@ -580,15 +592,23 @@ class WSkeywords:
 ##                    logger.print_on_console(ws_constants.RESULT,self.baseResBody)
                     log.debug(STATUS_METHODOUTPUT_UPDATE)
                     try:
+                        flag=0
                         if self.baseResBody != None:
-                            status = ws_constants.TEST_RESULT_PASS
-                            methodoutput = ws_constants.TEST_RESULT_TRUE
+##                            status = ws_constants.TEST_RESULT_PASS
+##                            methodoutput = ws_constants.TEST_RESULT_TRUE
                             if 'soap:Envelope' in self.baseResBody:
                                 from lxml import etree as et
                                 root = et.fromstring(self.baseResBody)
                                 respBody = et.tostring(root,pretty_print=True)
-                                self.baseResBody = respBody
-                        output= self.baseResBody
+                                if respBody.find(args[0])==-1:
+                                    logger.print_on_console("Input error: please provide the valid input")
+                                    flag=1
+                                else:
+                                    status = ws_constants.TEST_RESULT_PASS
+                                    methodoutput = ws_constants.TEST_RESULT_TRUE
+                                    self.baseResBody = respBody
+                        if not flag:
+                            output= self.baseResBody
                     except Exception as e:
                         log.error(e)
                         output= self.baseResBody

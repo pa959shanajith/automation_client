@@ -264,7 +264,7 @@ class DropdownKeywords():
             if webelement.is_displayed():
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
-                    if ((input is not None) and (len(input) == 1)) :
+                    if ((input is not None) and (len(input) == 1) and input[0] != '') :
 ##                        if not(visibilityFlag and isvisble):
                         select = Select(webelement)
                         first_value = select.first_selected_option.text
@@ -311,7 +311,7 @@ class DropdownKeywords():
             if webelement.is_displayed():
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
-                    if (input is not None) :
+                    if (input is not None and input[0] != '') :
 ##                        if not(visibilityFlag and isvisble):
                         select = Select(webelement)
                         all_value = select.all_selected_options
@@ -376,7 +376,7 @@ class DropdownKeywords():
             if webelement.is_displayed():
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
-                    if ((input is not None) and (len(input) == 1)) :
+                    if ((input is not None) and (len(input) == 1) and input[0] != '') :
                         log.info('Input is not none')
 ##                        if not(visibilityFlag and isvisble):
                         select = Select(webelement)
@@ -487,7 +487,7 @@ class DropdownKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if input is not None:
+            if input is not None and input[0] != '':
                 log.info('Input is not none')
                 if webelement is not None:
                     log.info('Recieved web element from the web dispatcher')
@@ -529,6 +529,10 @@ class DropdownKeywords():
                         err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
                         logger.print_on_console(err_msg)
                         log.error(err_msg)
+            elif input[0]=='':
+               logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+               log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+               err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
 
             else:
                 err_msg='Provided input not present in element'
@@ -839,8 +843,6 @@ class DropdownKeywords():
                                 err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
 
                 except Exception as e:
-                    import traceback
-                    traceback.print_exc()
                     log.error(e)
 
                     logger.print_on_console(e)
