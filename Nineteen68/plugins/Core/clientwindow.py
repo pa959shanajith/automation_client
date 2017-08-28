@@ -88,7 +88,6 @@ class MainNamespace(BaseNamespace):
 
             browsername = '1'
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
-            print wxObject.GetId()
 ##            time.sleep(5)
         elif str(args[0]) == 'OPEN BROWSER IE':
 

@@ -385,8 +385,9 @@ class Launch_Keywords():
                      time.sleep(2)
                      app.Close()
                 except:
-                     logger.print_on_console("SAP Logon 740 has is not able to close,please close manually.")
-                logger.print_on_console("SAP Logon 740 has encountered a problem . Please close manually ")
+                     import os
+                     os.system("TASKKILL /F /IM saplogon.exe")
+                     #logger.print_on_console("SAP Logon 740 has is not able to close,please close manually.")
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
