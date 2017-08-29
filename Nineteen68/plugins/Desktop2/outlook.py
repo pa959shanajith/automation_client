@@ -72,7 +72,7 @@ class OutlookKeywords:
             error_msg=None
             result=OUTPUT_CONSTANT
             try:
-                logger.print_on_console('switching to the folder')
+                ##logger.print_on_console('switching to the folder')
                 folderPath=input[0]
                 folderPath=folderPath.strip('\\')
                 folders=folderPath.split('\\')
@@ -108,7 +108,7 @@ class OutlookKeywords:
                                     error_msg='Unable to find the target folder'
                                     break
                                 else:
-                                    logger.print_on_console('Switched to folder')
+                                    ##logger.print_on_console('Switched to folder')
                                     status=desktop_constants.TEST_RESULT_PASS
                                     method_output=desktop_constants.TEST_RESULT_TRUE
 
