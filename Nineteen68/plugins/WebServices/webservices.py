@@ -594,18 +594,18 @@ class WSkeywords:
                     try:
                         flag=0
                         if self.baseResBody != None:
-##                            status = ws_constants.TEST_RESULT_PASS
-##                            methodoutput = ws_constants.TEST_RESULT_TRUE
+                            status = ws_constants.TEST_RESULT_PASS
+                            methodoutput = ws_constants.TEST_RESULT_TRUE
                             if 'soap:Envelope' in self.baseResBody:
                                 from lxml import etree as et
                                 root = et.fromstring(self.baseResBody)
                                 respBody = et.tostring(root,pretty_print=True)
                                 if respBody.find(args[0])==-1:
+                                    status = ws_constants.TEST_RESULT_FAIL
+                                    methodoutput = ws_constants.TEST_RESULT_FALSE
                                     logger.print_on_console("Input error: please provide the valid input")
                                     flag=1
                                 else:
-                                    status = ws_constants.TEST_RESULT_PASS
-                                    methodoutput = ws_constants.TEST_RESULT_TRUE
                                     self.baseResBody = respBody
                         if not flag:
                             output= self.baseResBody

@@ -258,6 +258,22 @@ class GetParam():
 
             logger.print_on_console(e)
 
+    def xmlTreeReader(self,xroot,sdata):
+        """
+        Reading XML element Tree Recursively
+
+        """
+        if len(xroot.getchildren())==0:
+            tagname= re.sub('\{.*\}','',xroot.tag)
+            if tagname in sdata:
+                sdata[tagname].append(xroot.text)
+            else:
+                sdata[tagname]=[]
+                sdata[tagname].append(xroot.text)
+            return sdata
+        for child in xroot:
+            self.xmlTreeReader(child,sdata)
+        return sdata
 
     def readxmlfile(self,fileinfo):
         """
@@ -291,20 +307,9 @@ class GetParam():
                         log.info(filter)
                         logger.print_on_console('Data Param  row: ',filter)
                 xroot = xtree.getroot()
-                for topchild in xroot:
-                    topch =  topchild
-                    for child in topch:
-                        sdata[child.tag] = []
-    ##                        break
-                for topchild in xroot:
-                    topch =  topchild
-                    log.debug('Reading data started')
-                    for child in topch:
-                        if child.text == None:
-                            sdata[child.tag].append('')
-                        else:
-                            sdata[child.tag].append(child.text)
-                    log.debug('Reading data completed')
+                log.debug('Reading data started')
+                sdata = self.xmlTreeReader(xroot,sdata)
+                log.debug('Reading data completed')
                 log.info('Returning the output dictionary')
                 return sdata
         except Exception as e:
@@ -565,7 +570,7 @@ class GetParam():
                 filter = None
                 k = 1
                 filename, file_extension = os.path.splitext(filepath)
-                if file_extension[1:].lower() in [FILE_TYPE_XLS,FILE_TYPE_XLSX,FILE_TYPE_CSV,FILE_TYPE_XML]:# or file_extension[1:].lower() == FILE_TYPE_XLSX
+                if file_extension[1:].lower() in [FILE_TYPE_XLS,FILE_TYPE_XLSX]:# or file_extension[1:].lower() == FILE_TYPE_XLSX
                     if len(fileinfo) == 2 :
                         if fileinfo[1].find(HYPHEN) != -1:
                             filters = fileinfo[1].split(HYPHEN)
@@ -618,6 +623,12 @@ class GetParam():
                             log.info('Data Param end row: ')
                             log.info(endRow)
                             logger.print_on_console('Data Param end row: ',endRow)
+                        else:
+                            filter1 = fileinfo[1]
+                            filter = int(filter1)
+                            log.info('Data Param  row: ')
+                            log.info(filter)
+                            logger.print_on_console('Data Param  row: ',filter)
                     elif len(fileinfo) == 3 :
                         if fileinfo[2].find(HYPHEN) != -1:
                             filters = fileinfo[2].split(HYPHEN)

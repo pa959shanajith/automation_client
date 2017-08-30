@@ -229,6 +229,7 @@ class Dropdown_Keywords():
         length = int(input_val[0])
         verb = OUTPUT_CONSTANT
         value=OUTPUT_CONSTANT
+        err_msg=''
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         count = 0
@@ -244,8 +245,8 @@ class Dropdown_Keywords():
 ##                            err_msg = sap_constants.ERROR_MSG
                             break
                     if(length == count):
-                     status=sap_constants.TEST_RESULT_PASS
-                     result=sap_constants.TEST_RESULT_TRUE
+                        status=sap_constants.TEST_RESULT_PASS
+                        result=sap_constants.TEST_RESULT_TRUE
                     else:
                         err_msg = sap_constants.ERROR_MSG
                         log.info('Count Verify has failed ')
