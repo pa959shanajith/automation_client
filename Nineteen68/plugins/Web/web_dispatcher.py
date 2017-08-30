@@ -308,6 +308,9 @@ class Dispatcher:
                     ## Issue #190 Driver control won't switch back to parent window
                     self.browser_object.validate_current_window_handle()
                     result= dict[keyword](webelement,input)
+                    ## To terminate debug/execution if requested browser is not available in the system (Defect #846)
+                    if(result[1] == TERMINATE):
+                        result = TERMINATE
                     if keyword in window_ops_list:
                         self.browser_object.update_window_handles()
                     driver=browser_Keywords.driver_obj

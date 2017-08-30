@@ -104,39 +104,42 @@ class BrowserKeywords():
             elif browser_num[-1] == EXECUTE:
                 driver_obj=obj.getBrowser(self.browser_num)
                 del drivermap[:]
-            if platform.system()!='Darwin':
-                utilobject = utils_web.Utils()
-                pid = None
-                if (self.browser_num == '1'):
-                    #logic to the pid of chrome window
-                    p = psutil.Process(driver_obj.service.process.pid)
-                    pidchrome = p.children()[0]
-                    pid = pidchrome.pid
-                    pid_set.add(pid)
-                elif(self.browser_num == '2'):
-                    #logic to get the pid of the firefox window
-                    try:
-                        pid = driver_obj.binary.process.pid
-                    except Exception as e:
+            if(driver_obj == None):
+                result = TERMINATE
+            else:
+                if platform.system()!='Darwin':
+                    utilobject = utils_web.Utils()
+                    pid = None
+                    if (self.browser_num == '1'):
+                        #Logic to the pid of chrome window
                         p = psutil.Process(driver_obj.service.process.pid)
                         pidchrome = p.children()[0]
                         pid = pidchrome.pid
                         pid_set.add(pid)
-                elif(self.browser_num == '3'):
-                    #Logic to get the pid of the ie window
-                    p = psutil.Process(driver_obj.iedriver.process.pid)
-                    pidie = p.children()[0]
-                    pid = pidie.pid
-                    pid_set.add(pid)
-                hwndg = utilobject.bring_Window_Front(pid)
-            webdriver_list.append(driver_obj)
-            parent_handle = driver_obj.current_window_handle
-            self.update_recent_handle(parent_handle)
-            all_handles.append(parent_handle)
-            logger.print_on_console('Browser opened')
-            log.info('Browser opened')
-            status=webconstants.TEST_RESULT_PASS
-            result=webconstants.TEST_RESULT_TRUE
+                    elif(self.browser_num == '2'):
+                        #logic to get the pid of the firefox window
+                        try:
+                            pid = driver_obj.binary.process.pid
+                        except Exception as e:
+                            p = psutil.Process(driver_obj.service.process.pid)
+                            pidchrome = p.children()[0]
+                            pid = pidchrome.pid
+                            pid_set.add(pid)
+                    elif(self.browser_num == '3'):
+                        #Logic to get the pid of the ie window
+                        p = psutil.Process(driver_obj.iedriver.process.pid)
+                        pidie = p.children()[0]
+                        pid = pidie.pid
+                        pid_set.add(pid)
+                    hwndg = utilobject.bring_Window_Front(pid)
+                webdriver_list.append(driver_obj)
+                parent_handle = driver_obj.current_window_handle
+                self.update_recent_handle(parent_handle)
+                all_handles.append(parent_handle)
+                logger.print_on_console('Browser opened')
+                log.info('Browser opened')
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
@@ -152,14 +155,17 @@ class BrowserKeywords():
             global webdriver_list
             driver = Singleton_DriverUtil()
             driver_obj=driver.getBrowser(self.browser_num)
-            webdriver_list.append(driver_obj)
-            parent_handle = driver_obj.current_window_handle
-            self.update_recent_handle(parent_handle)
-            all_handles.append(parent_handle)
-            logger.print_on_console('Opened new browser')
-            log.info('Opened new browser')
-            status=webconstants.TEST_RESULT_PASS
-            result=webconstants.TEST_RESULT_TRUE
+            if(driver_obj == None):
+                result = TERMINATE
+            else:
+                webdriver_list.append(driver_obj)
+                parent_handle = driver_obj.current_window_handle
+                self.update_recent_handle(parent_handle)
+                all_handles.append(parent_handle)
+                logger.print_on_console('Opened new browser')
+                log.info('Opened new browser')
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
@@ -697,21 +703,25 @@ class Singleton_DriverUtil():
         logger.print_on_console( 'BROWSER NUM: ',browser_num)
 
         if (browser_num == '1'):
-            chrome_path = configvalues['chrome_path']
-            exec_path = webconstants.CHROME_DRIVER_PATH
-            if ((str(chrome_path).lower()) == 'default'):
-                choptions = webdriver.ChromeOptions()
-                choptions.add_argument('start-maximized')
-                choptions.add_argument('--disable-extensions')
-                driver = webdriver.Chrome(chrome_options=choptions, executable_path=exec_path)
-            else:
-                choptions = webdriver.ChromeOptions()
-                choptions.add_argument('start-maximized')
-                choptions.add_argument('--disable-extensions')
-                driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
-            drivermap.append(driver)
-            logger.print_on_console('Chrome browser started')
-            log.info('Chrome browser started')
+            try:
+                chrome_path = configvalues['chrome_path']
+                exec_path = webconstants.CHROME_DRIVER_PATH
+                if ((str(chrome_path).lower()) == 'default'):
+                    choptions = webdriver.ChromeOptions()
+                    choptions.add_argument('start-maximized')
+                    choptions.add_argument('--disable-extensions')
+                    driver = webdriver.Chrome(chrome_options=choptions, executable_path=exec_path)
+                else:
+                    choptions = webdriver.ChromeOptions()
+                    choptions.add_argument('start-maximized')
+                    choptions.add_argument('--disable-extensions')
+                    driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
+                drivermap.append(driver)
+                logger.print_on_console('Chrome browser started')
+                log.info('Chrome browser started')
+            except Exception as e:
+                logger.print_on_console("Requested browser is not available")
+                log.info('Requested browser is not available')
 
         elif(browser_num == '2'):
             import re
@@ -773,45 +783,62 @@ class Singleton_DriverUtil():
                     logger.print_on_console('Firefox browser started using geckodriver')
                     log.info('Firefox browser started using geckodriver ')
             except Exception as e:
-                logger.print_on_console(e)
+                logger.print_on_console("Requested browser is not available")
+                log.info('Requested browser is not available')
 
         elif(browser_num == '3'):
-            caps = webdriver.DesiredCapabilities.INTERNETEXPLORER
-            caps['INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS'] = True
-            caps['ignoreProtectedModeSettings'] = True
-            caps['IE_ENSURE_CLEAN_SESSION'] = True
-            caps['ignoreZoomSetting'] = True
-            caps['NATIVE_EVENTS'] = True
-            bit_64 = configvalues['bit_64']
-            if ((str(bit_64).lower()) == 'no'):
-                iepath = webconstants.IE_DRIVER_PATH_32
-            else:
-                iepath = webconstants.IE_DRIVER_PATH_64
-            driver = webdriver.Ie(capabilities=caps,executable_path=iepath)
-            drivermap.append(driver)
-            driver.maximize_window()
-            logger.print_on_console('IE browser started')
-            log.info('IE browser started')
+            try:
+                caps = webdriver.DesiredCapabilities.INTERNETEXPLORER
+                caps['INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS'] = True
+                caps['ignoreProtectedModeSettings'] = True
+                caps['IE_ENSURE_CLEAN_SESSION'] = True
+                caps['ignoreZoomSetting'] = True
+                caps['NATIVE_EVENTS'] = True
+                bit_64 = configvalues['bit_64']
+                if ((str(bit_64).lower()) == 'no'):
+                    iepath = webconstants.IE_DRIVER_PATH_32
+                else:
+                    iepath = webconstants.IE_DRIVER_PATH_64
+                driver = webdriver.Ie(capabilities=caps,executable_path=iepath)
+                drivermap.append(driver)
+                driver.maximize_window()
+                logger.print_on_console('IE browser started')
+                log.info('IE browser started')
+            except Exception as e:
+                logger.print_on_console("Requested browser is not available")
+                log.info('Requested browser is not available')
 
         elif(browser_num == '4'):
-            driver = webdriver.Opera()
-            drivermap.append(driver)
-            logger.print_on_console('Opera browser started')
+            try:
+                driver = webdriver.Opera()
+                drivermap.append(driver)
+                logger.print_on_console('Opera browser started')
+            except Exception as e:
+                logger.print_on_console("Requested browser is not available")
+                log.info('Requested browser is not available')
 
         elif(browser_num == '5'):
-            driver = webdriver.PhantomJS(executable_path=webconstants.PHANTOM_DRIVER_PATH)
-            drivermap.append(driver)
-            logger.print_on_console('Phantom browser started')
+            try:
+                driver = webdriver.PhantomJS(executable_path=webconstants.PHANTOM_DRIVER_PATH)
+                drivermap.append(driver)
+                logger.print_on_console('Phantom browser started')
+            except Exception as e:
+                logger.print_on_console("Requested browser is not available")
+                log.info('Requested browser is not available')
 
         elif(browser_num == '6'):
-            print 'This will be our new safari'
-            driver = webdriver.Safari()
-            drivermap.append(driver)
+            try:
+                print 'This will be our new safari'
+                driver = webdriver.Safari()
+                drivermap.append(driver)
 
-            
-            logger.print_on_console('Safari browser started')
-            log.info('Safari browser started')
-##        print __driver
+
+                logger.print_on_console('Safari browser started')
+                log.info('Safari browser started')
+    ##        print __driver
+            except Exception as e:
+                logger.print_on_console("Requested browser is not available")
+                log.info('Requested browser is not available')
         return driver
 
 
