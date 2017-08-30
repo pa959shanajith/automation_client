@@ -28,12 +28,13 @@ from PIL import Image
 log = logging.getLogger('clickandadd.py')
 currenthandle = ''
 status = domconstants.STATUS_FAIL
+browserops_obj=browserops.BrowserOperations()
 
 class Clickandadd():
     def startclickandadd(self):
+        driver = browserops.driver
         try:
             log.info('Inside startclickandadd method .....')
-            driver = browserops.driver
             browser = browserops.browser
             log.info('Obtained browser handle and driver from browserops.py class .....')
             toolwindow = win32gui.GetForegroundWindow()
@@ -43,6 +44,7 @@ class Clickandadd():
             log.info('Minimizing the foreground window i.e tool and assuming AUT on top .....')
             javascript_hasfocus = """return(document.hasFocus());"""
             time.sleep(6)
+            browserops_obj.checkPopups()
             for eachdriverhand in driver.window_handles:
                 log.info('Iterating through the number of windows open by the driver')
                 driver.switch_to.window(eachdriverhand)

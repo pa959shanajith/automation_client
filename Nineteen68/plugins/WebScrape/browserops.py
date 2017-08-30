@@ -48,6 +48,30 @@ class BrowserOperations():
 
 
     """
+    def: checkPopups
+    param : None
+    """
+    def checkPopups(self):
+        print 'checkPopbox'
+        global driver
+        try:
+            alertObj=driver.switch_to_alert()
+            alertObj.accept()
+            print 'Popbox accepted and closed'
+            log.info('Popbox accepted and closed')
+        except:
+            print 'no popup'
+            log.info('No popup found')
+        try:
+            win_handles=driver.window_handles
+            print win_handles
+            if len(win_handles)>0:
+                driver.switch_to_window(win_handles[-1])
+        except:
+            print 'Error while switching to any window handle'
+            log.info('Error while switching to any window handle')
+
+    """
     def: openBrowser
     param : Browser name such as CH - Chrome, IE - Internet Explorer and FX - Firefox
     """
