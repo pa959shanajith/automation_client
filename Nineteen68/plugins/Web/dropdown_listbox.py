@@ -443,7 +443,10 @@ class DropdownKeywords():
                         temp = []
                         flag = True
                         for x in range(0,opt_len):
-                            internal_val = select.options[x].text
+                            if input[0] == "1":
+                                internal_val= select.options[x].text.strip()
+                            elif input[0]!="1":
+                                internal_val = select.options[x].text
                             temp.append(internal_val)
                         log.info('temp value')
                         log.info(temp)

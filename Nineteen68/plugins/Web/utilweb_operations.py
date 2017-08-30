@@ -669,43 +669,49 @@ class UtilWebKeywords:
             if webelement !=None:
                 log.info(INPUT_IS)
                 log.info(input)
-                if not(input is None ):
+                if not(input is None):
                     row_num=int(input[0])
                     col_num=int(input[1])
                     table_keywords_obj=table_keywords.TableOperationKeywords()
                     actual_xpath=table_keywords_obj.getElemntXpath(webelement)
                     element = browser_Keywords.driver_obj.find_element_by_xpath(actual_xpath)
                     cell=table_keywords_obj.javascriptExecutor(element,row_num-1,col_num-1)
-                    ele_coordinates=cell.location_once_scrolled_into_view
-                    log.debug(ele_coordinates)
-                    hwnd=win32gui.GetForegroundWindow()
-                    log.debug('Handle found ')
-                    log.debug(hwnd)
-                    if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
-                        info_msg='Firefox browser'
-                        log.info(info_msg)
-                        logger.print_on_console(info_msg)
-                        javascript = "return window.mozInnerScreenY"
-                        value=browser_Keywords.driver_obj.execute_script(javascript)
-                        offset=int(value)
-                        robot=pyrobot.Robot()
-                        robot.set_mouse_pos(ele_coordinates.get('x')+9,ele_coordinates.get('y')+offset)
-                        log.debug('Setting the mouse position')
-                        robot.mouse_down('left')
-                        log.debug('Mouse click performed')
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
-                    else:
-                        utils=Utils()
-                        utils.enumwindows()
-                        rect=utils.rect
-                        robot=pyrobot.Robot()
-                        log.debug('Setting the mouse position')
-                        robot.set_mouse_pos(ele_coordinates.get('x')+9,ele_coordinates.get('y')+rect[0])
-                        robot.mouse_down('left')
-                        log.debug('Mouse click performed')
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                    if webelement.is_displayed():
+                        ele_coordinates =element.location
+                        hwnd=win32gui.GetForegroundWindow()
+                        log.debug('Handle found ')
+                        log.debug(hwnd)
+
+                        if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
+                            info_msg='Firefox browser'
+                            log.info(info_msg)
+                            logger.print_on_console(info_msg)
+                            javascript = "return window.mozInnerScreenY"
+                            value=browser_Keywords.driver_obj.execute_script(javascript)
+                            logger.print_on_console(value)
+                            offset=int(value)
+                            robot=pyrobot.Robot()
+                            robot.set_mouse_pos(int(ele_coordinates.get('x'))+9,int(ele_coordinates.get('y'))+offset)
+                            log.debug('Setting the mouse position')
+                            robot.mouse_down('left')
+                            log.debug('Mouse click performed')
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                        else:
+                            utils=Utils()
+                            utils.enumwindows()
+                            logger.print_on_console("UTIL WIND")
+                            rect=utils.rect
+                            robot=pyrobot.Robot()
+                            log.debug('Setting the mouse position')
+                            if rect != '':
+                                robot.set_mouse_pos(ele_coordinates.get('x')+9,ele_coordinates.get('y')+rect[0])
+                            else:
+                                robot.set_mouse_pos(ele_coordinates.get('x')+9,ele_coordinates.get('y'))
+                            robot.mouse_down('left')
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
@@ -771,6 +777,3 @@ class UtilWebKeywords:
         window_handles=browser_Keywords.all_handles
         logger.print_on_console('Window handles size '+str(len(window_handles)))
         return window_handles
-
-
-
