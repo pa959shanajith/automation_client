@@ -69,7 +69,6 @@ if sys.platform == 'win32':
     __builtins__open = __builtins__.open
 
     def __open_inheritance_hack(*args, **kwargs):
-        #print(args)
         result = __builtins__open(*args, **kwargs)
         handle = msvcrt.get_osfhandle(result.fileno())
         if configvalues["logFile_Path"] in args:
@@ -675,10 +674,10 @@ class ClientWindow(wx.Frame):
         Creating Root Logger using logger file config and setting logfile path,which is in config.json
 
         """
-
         try:
-            logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': configvalues["logFile_Path"]})
-        except:
+            logfilename = configvalues["logFile_Path"].replace("\\","\\\\")
+            logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename})
+        except Exception as e:
             self.logfilename_error_flag = True
 
         self.logger = logging.getLogger(__name__)
