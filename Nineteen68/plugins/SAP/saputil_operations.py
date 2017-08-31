@@ -38,8 +38,8 @@ class SapUtilKeywords:
         ses=''
         try:
             SapGui = self.getSapObject()
-            scrappingObj=Scrape()                                   #calling scrape class
-            wnd = scrappingObj.getWindow(SapGui)                      #calling window method
+            scrapingObj=Scrape()                                   #calling scrape class
+            wnd = scrapingObj.getWindow(SapGui)                      #calling window method
             #logger.print_on_console( 'wnd--------------------',wnd)
             wndId =  wnd.__getattr__('id')                         # windowid from name
 ##            i = wndId.index('wnd')
@@ -139,8 +139,8 @@ class SapUtilKeywords:
             wnd_id = id[:26]
             wnd = ses.FindById(wnd_id)
             wnd_title = wnd.__getattr__("Text")
-            scrappingObj=Scrape()
-            data = scrappingObj.full_scrape(reference_elem, wnd_title)
+            scrapingObj=Scrape()
+            data = scrapingObj.full_scrape(reference_elem, wnd_title)
             for elem in data:
                 if elem['tag'].lower() == eleType.strip().lower():
                     eleIndex = int(eleIndex) - 1
