@@ -18,6 +18,7 @@ import file_operations
 from constants import *
 import core_utils
 import logging
+import ast
 
 
 log = logging.getLogger('util_operations.py')
@@ -246,6 +247,33 @@ class UtilOperations:
         import handler
         output=len(handler.tspList)
         return status,methodoutput,output,err_msg
+    def getIndexCount(self,variable):
+        try:
+            variable = ast.literal_eval(variable)
+            status=TEST_RESULT_FAIL
+            result=TEST_RESULT_FALSE
+            err_msg=None
+            output=OUTPUT_CONSTANT
+            if any(isinstance(el, list) for el in variable):
+                output=str(len(variable)-1)+'@'+str(len(variable[0])-1)
+                status=TEST_RESULT_PASS
+                result=TEST_RESULT_TRUE
+                methodoutput=TEST_RESULT_TRUE
+                logger.print_on_console("getIndexCount has performed for Two-Dimensional Array")
+            elif isinstance(variable,list):
+                output=len(variable)-1
+                status=TEST_RESULT_PASS
+                result=TEST_RESULT_TRUE
+                methodoutput=TEST_RESULT_TRUE
+                logger.print_on_console("getIndexCount has performed for One-Dimensional Array")
+            else:
+                logger.print_on_console("The Dynamic Varibale has OverWritten")
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
+        return status,result,output,err_msg
 
 
 
