@@ -174,9 +174,9 @@ class Highlight():
                             element_properties = []
                             element_properties = driver.execute_script(properties_script,webElement[0],url)
                             new_properties=element_properties[0];
-                            if cmp(element['xpath'],new_properties['xpath'])!=0:
+                            highlight1(webElement[0])
+                            if cmp(element,new_properties)!=0:
                                 self.changedobject.append(new_properties)
-                                highlight1(webElement[0])
                             else:
                                  self.notchangedobject.append(element)
                     else:
@@ -232,9 +232,9 @@ class Highlight():
                             element_properties = []
                             element_properties = driver.execute_script(properties_script,webElement[0],url)
                             new_properties=element_properties[0];
-                            highlight1(webElement[0])
-                            if cmp(element,new_properties)!=0:
+                            if cmp(element['xpath'],new_properties['xpath'])!=0:
                                 self.changedobject.append(new_properties)
+                                highlight1(webElement[0])
                             else:
                                 self.notchangedobject.append(element)
                     else:
