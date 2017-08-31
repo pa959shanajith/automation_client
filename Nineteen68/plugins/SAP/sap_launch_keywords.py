@@ -73,8 +73,8 @@ class Launch_Keywords():
                 SapGui=self.uk.getSapObject()
             except Exception as e:
                 logger.print_on_console( 'no instance open error :',e)
-            scrappingObj=Scrape()
-            wnd = scrappingObj.getWindow(SapGui)
+            scrapingObj=Scrape()
+            wnd = scrapingObj.getWindow(SapGui)
             wndId =  wnd.__getattr__('id')
             i = wndId.index('wnd')
             wndNumber = wndId[i+4]
@@ -89,8 +89,8 @@ class Launch_Keywords():
         try:
             time.sleep(2)
             SapGui=self.uk.getSapObject()
-            scrappingObj=Scrape()
-            wnd = scrappingObj.getWindow(SapGui)
+            scrapingObj=Scrape()
+            wnd = scrapingObj.getWindow(SapGui)
             wndId =  wnd.__getattr__('id')
             i = wndId.index('wnd')
             wndNumber = wndId[i+4]
@@ -329,8 +329,8 @@ class Launch_Keywords():
         err_msg=None
         value=OUTPUT_CONSTANT
         from sap_scraping import Scrape
-        scrappingObj=Scrape()
-        data = scrappingObj.full_scrape(wnd, wnd_title)
+        scrapingObj=Scrape()
+        data = scrapingObj.full_scrape(wnd, wnd_title)
         try:
             for elem in data:
                 if elem['tag'] == "input":
