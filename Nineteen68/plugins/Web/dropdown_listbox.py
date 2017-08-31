@@ -444,6 +444,8 @@ class DropdownKeywords():
                         flag = True
                         for x in range(0,opt_len):
                             internal_val = select.options[x].text
+                            if input[0] == "1":
+                                internal_val= select.options[x].text.strip()
                             temp.append(internal_val)
                         log.info('temp value')
                         log.info(temp)
@@ -705,6 +707,8 @@ class DropdownKeywords():
                         temp = []
                         for x in range(0,len(index)):
                             value = select.all_selected_options[x].text
+                            if input[0] == "1":
+                                output = output.strip()
 ##                            value = str(out)
                             temp.append(value)
                         output = ';'.join(temp)
@@ -1038,6 +1042,8 @@ class DropdownKeywords():
                                 for i in range(0,iListSize):
                                     if(input_val == i):
                                         output=select.options[input_val].text
+                                        if input[0] == "1":
+                                            output=select.options[input_val].text.strip()
                                         status=webconstants.TEST_RESULT_PASS
                                         result=webconstants.TEST_RESULT_TRUE
                                         log.info(STATUS_METHODOUTPUT_UPDATE)
