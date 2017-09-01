@@ -102,7 +102,6 @@ class If():
                 self.parent_id=reporting_obj.get_pid()
                 reporting_obj.add_pid(self.name)
                 #Reporting part ends
-
                 self.status=True
                 logger.print_on_console('***Started executing:'+self.name+'***\n')
                 return self.index+1
@@ -110,10 +109,11 @@ class If():
                 if self.name==IF:
                     self.parent_id=reporting_obj.get_pid()
                     reporting_obj.add_pid(self.name)
-
+                self.status=False
                 logger.print_on_console('Invalid conditional expression\n')
                 return last_target.keys()[0]
             else:
+                self.status=False
                 return next_target.keys()[0]
 
 

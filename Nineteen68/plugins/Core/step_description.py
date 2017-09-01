@@ -174,7 +174,11 @@ class StepDescription:
         def getData():
             return "Execute SQL Query '"+ inputval[5]+" and save resultset in " + output
         def getIndexCount():
-            return "The index count for the dynamic variable '"+ input+ "' is '"+ inputval[1] + "'"
+            if '@' in output:
+                row,col=output.split('@')
+                return "The index count for the dynamic variable "+ inputval[0] + " is " + "Row: "+str(row) + " and Column: "+str(col)
+            else:
+                return "The index count for the dynamic variable "+ inputval[0] + " is " + output
         def getLineNumber():
             return "Get the line number of content '"+ input+ "' from file '"+ inputval[1]+ "' and save the value '" + output + "' in "+tsp.outputval
         def getParam():
@@ -814,7 +818,7 @@ class StepDescription:
         def SelectViewByText():
             return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']'
         def GetMultipleViewsByIndexes():
-            return 'Get values with indexes ' + input + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + output + ' in  '+ test.ouput_val
+            return 'Get values with indexes ' + input + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + output + ' in  '+ tsp.ouputval
 
         def GetAllViews():
             return 'getAllValues ' + output + ' are present in the' + "'" + tsp.custname + "'"

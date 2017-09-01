@@ -136,7 +136,8 @@ class GenericKeywordDispatcher:
                   'modifyValue':self.dyn_var_obj.modify_value,
                   'deleteDynVariable':self.dyn_var_obj.delete_dyn_value,
                   'displayVariableValue':self.generic_delay.display_variable_value,
-                  'verifyValues':self.util_operation_obj.verify_values
+                  'verifyValues':self.util_operation_obj.verify_values,
+                  'getIndexCount':self.util_operation_obj.getIndexCount
 
 
                 }

@@ -349,15 +349,15 @@ class Reporting:
                 step_testcase_name=endfor_step.testscript_name
             if name.lower() in [FOR,ENDFOR]:
                 step_num=''
-                if (step_description[0:9]).lower() == 'iteration' and (step_description[13:]).lower()== 'started':
+                if (step_description[0:9]).lower() == 'iteration' and (step_description[-7:]).lower()== 'started':
                     step_num='Start iteration'
-                elif (step_description[0:9]).lower() == 'iteration' and (step_description[13:]).lower()== 'executed':
+                elif (step_description[0:9]).lower() == 'iteration' and (step_description[-8:]).lower()== 'executed':
                     step_num='End iteration'
             if name.lower() in [GETPARAM,ENDLOOP,STARTLOOP]:
                 step_num=''
-                if (step_description[0:10]).lower() == 'dataparam:' and (step_description[23:]).lower()== 'started':
+                if (step_description[0:10]).lower() == 'dataparam:' and (step_description[-7:]).lower()== 'started':
                     step_num='Start iteration'
-                elif (step_description[0:10]).lower() == 'dataparam:' and (step_description[23:]).lower()== 'executed':
+                elif (step_description[0:10]).lower() == 'dataparam:' and (step_description[-8:]).lower()== 'executed':
                     step_num='End iteration'
             name=self.name
             ##            Added this line to remove status for conditional keyword in reports
