@@ -120,7 +120,14 @@ class MainNamespace(BaseNamespace):
 
 
         if(str(args[0]) == 'connected'):
-            print('Connection to the Node Server established')
+            logger.print_on_console('Normal Mode: Connection to the Node Server established')
+            log.info('Normal Mode: Connection to the Node Server established')
+        elif(str(args[0]) == 'reconnected'):
+            logger.print_on_console('Schedule Mode:Connection to the Node Server established')
+            log.info('Schedule Mode:Connection to the Node Server established')
+        elif(str(args[0]) == 'connectionExists'):
+            logger.print_on_console('Conenction Already Exists')
+            log.info('Conenction Already Exists')
 
     def on_webscrape(self,*args):
         global action,wxObject,browsername,desktopScrapeFlag,data
@@ -423,7 +430,13 @@ class SocketThread(threading.Thread):
         global socketIO
         server_IP = configvalues['server_ip']
         temp_server_IP = 'https://' + server_IP
-        socketIO = SocketIO(temp_server_IP,int(configvalues['server_port']),MainNamespace,verify= CERTIFICATE_PATH +'/server.crt',cert=(CERTIFICATE_PATH + '/client.crt', CERTIFICATE_PATH + '/client.key'))
+        key='username'
+        if(not(os.environ.has_key(key))):
+            key='user'
+        username=os.environ[key]
+        params={'username':username}
+        socketIO = SocketIO(temp_server_IP,int(configvalues['server_port']),MainNamespace,verify= CERTIFICATE_PATH +'/server.crt',cert=(CERTIFICATE_PATH + '/client.crt', CERTIFICATE_PATH + '/client.key'),params=params)
+##        socketIO = SocketIO(temp_server_IP,int(configvalues['server_port']),MainNamespace,verify= CERTIFICATE_PATH +'/server.crt',cert=(CERTIFICATE_PATH + '/client.crt', CERTIFICATE_PATH + '/client.key'))
 ##        socketIO = SocketIO(temp_server_IP,int(configvalues['server_port']),MainNamespace,verify='D:\\CA_BUNDLE\\server.crt',cert=('D:\\CA_BUNDLE\\client.crt', 'D:\\CA_BUNDLE\\client.key'))
         ##socketIO = SocketIO('localhost',8124)
 ##        socketIO.send('I am ready to process the request')
@@ -736,6 +749,13 @@ class ClientWindow(wx.Frame):
         self.log.SetForegroundColour((0,50,250))
         self.log.SetFont(font1)
 
+        self.schedule = wx.CheckBox(self.panel, label = 'Schedule',pos=(120, 10), size=(100, 25))
+        self.schedule.SetToolTip(wx.ToolTip("Enable Scheduling Mode"))
+        self.schedule.Bind(wx.EVT_CHECKBOX,self.onChecked_Schedule)
+        self.schedule.Disable()
+        self.schedule.Hide()
+
+
         box.Add(self.log, 1, wx.ALL|wx.EXPAND, 5)
 ##        size=(90, 28)
 
@@ -851,6 +871,12 @@ class ClientWindow(wx.Frame):
 ##    def OnRadiogroup(self, e):
 ##        rb = e.GetEventObject()
 ##        print rb.GetLabel(),' is clicked from Radio Group'
+
+
+    def onChecked_Schedule(self, e):
+        mode=self.schedule.GetValue()
+        global socketIO
+        socketIO.emit('reconnect',mode)
 
 
     def onRadioBox(self,e):
@@ -1034,6 +1060,7 @@ class ClientWindow(wx.Frame):
             conn.close()
             self.mythread = SocketThread(self)
             self.connectbutton.Disable()
+##            self.schedule.Enable()
         except Exception as e:
             print 'Forbidden request, Connection refused, please check the server ip and server port in Config.json, and restart the client window.'
             #747 Disable buttons if port or ip is invalid in config.json (Himanshu)
