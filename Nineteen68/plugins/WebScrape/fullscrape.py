@@ -28,16 +28,17 @@ from selenium import webdriver
 log = logging.getLogger('fullscrape.py')
 currenthandle = ''
 status = domconstants.STATUS_FAIL
+browserops_obj=browserops.BrowserOperations()
 
 class Fullscrape():
     def fullscrape(self):
 ##        vie = {}
         data = {}
         pathlist = list()
+        driver = browserops.driver
         try:
             log.info(' Inside fullscrape method .....')
 ##            vie = {}
-            driver = browserops.driver
             hwndg = browserops.hwndg
             maindir = os.environ["NINETEEN68_HOME"]
             screen_shot_path = maindir + '/Nineteen68/plugins/WebScrape' + domconstants.SCREENSHOT_IMG
@@ -50,6 +51,7 @@ class Fullscrape():
             if platform.system() != 'Darwin':
                 actwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
+            browserops_obj.checkPopups()
             javascript_hasfocus = """return(document.hasFocus());"""
 ##            time.sleep(6)
             for eachdriverhand in driver.window_handles:

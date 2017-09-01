@@ -174,7 +174,11 @@ class StepDescription:
         def getData():
             return "Execute SQL Query '"+ inputval[5]+" and save resultset in " + output
         def getIndexCount():
-            return "The index count for the dynamic variable '"+ input+ "' is '"+ inputval[1] + "'"
+            if '@' in output:
+                row,col=output.split('@')
+                return "The index count for the dynamic variable "+ inputval[0] + " is " + "Row: "+str(row) + " and Column: "+str(col)
+            else:
+                return "The index count for the dynamic variable "+ inputval[0] + " is " + output
         def getLineNumber():
             return "Get the line number of content '"+ input+ "' from file '"+ inputval[1]+ "' and save the value '" + output + "' in "+tsp.outputval
         def getParam():
@@ -361,11 +365,11 @@ class StepDescription:
         def getValueByIndex():
             return 'Get value with index ' + input + ' in the '     + "'" + tsp.custname + "'" + ' and save the value \'' + output + '\' in ' + tsp.outputval
         def selectMultipleValuesByIndexes():
-            return 'Select values ' + mulInputValin.toString() + ' in the '+ "'" + "'" + tsp.custname + "'" + "'"
+            return 'Select values with index values ' + input + ' in the '+ "'" + "'" + tsp.custname + "'" + "'"
         def selectMultipleValuesByText():
-            return 'Select values ' + mulInputValin.toString() + ' in the '+ "'" + "'" + tsp.custname + "'" + "'"
+            return 'Select values ' + input + ' in the '+ "'" + "'" + tsp.custname + "'" + "'"
         def getMultipleValuesByIndexes():
-            return 'Get values with indexes ' + inputValsb.toString() + ' in the ' + "'" + tsp.custname + "'" +  ' and save the value ' + TestAutomationController.multipleOutputResult + ' in  '+ tsp.outputval
+            return 'Get values with indexes ' + input + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + output + ' in  '+ tsp.outputval
         def selectAllValues():
             return 'Select all values in the ' + "'" + tsp.custname + "'"
         def deselectAll():
@@ -469,9 +473,9 @@ class StepDescription:
         def VerifyAllValues():
             return 'Verify values ' + input + ' are present in the '+ "'" + tsp.custname + "'"+'.'
         def VerifyCount():
-            return 'Verify ' + input + ' is the list count of the ' +"'" + tsp.custname + "'"+'.'
-##        def SelectValueByIndex():
-##            return 'Select the value '+ input+' of the '+"'" + tsp.custname + "'"+' with the index '+input+' present in the table cell  '+"'" + tsp.custname + "'"+'-['+input+']['+input+']'+'.'
+            return 'Verify ' + input + ' is the list count of the ' +"'" + tsp.custname + "'"
+        def SelectValueByIndex():
+            return ' Select value with index value '+ input+' in the '+"'" + tsp.custname + "'"
         def GetCount():
             return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' + output + ' in ' +tsp.outputval+'.'
         #Element Keywords
@@ -510,7 +514,7 @@ class StepDescription:
 ##        def CellClick():
 ##            return 'Click on '+ "'" + tsp.custname + "'"+'.'
         def SelectValueByIndex():
-            return 'Select the value '+ input+' of the '+"'" + tsp.custname + "'"+' with the index '+input+' present in the table cell  '+"'" + tsp.custname + "'"+'-['+input+']['+input+']'
+            return ' Select value with index value '+ input+' in the '+"'" + tsp.custname + "'"
         def SelectValueByText():
             return 'Select the value '+ input+' of the '+"'" + tsp.custname + "'"+' with the Text '+input+' present in the table cell  '+"'" + tsp.custname + "'"+'-['+input+']['+input+']'
         def GetSelected():
@@ -528,7 +532,7 @@ class StepDescription:
         def UnSelectRow():
             return 'Unselect the row  '+input+' of '+ "'" + tsp.custname + "'"+ '.'
         def GetStatus():
-            return 'Get Status of '
+            return 'Get the status of the ' + "'" + tsp.custname + "'"+ ' and save the status ' + output + ' in '+ tsp.outputval
 
         return locals()[keyword]()
 
@@ -592,7 +596,7 @@ class StepDescription:
         def SelectValueByText():
             return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']',
         def SelectValueByIndex():
-            return 'Select value by index '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']',
+            return ' Select value with index value '+ input+' in the '+"'" + tsp.custname + "'"
         def GetCount():
             return 'Get the count of the values present in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + output + ' in '+ tsp.outputval,
         def SelectMultipleValuesByText():
@@ -600,7 +604,7 @@ class StepDescription:
         def SelectMultipleValuesByText():
             return 'Select values ' + input + 'in the '+ "'" + tsp.custname + "'"
         def VerifyCount():
-            return 'Verify the count of the values present in the ' + "'" + tsp.custname + "'" + ' with the '+ input
+            return 'Verify ' + input + ' is the list count of the ' +"'" + tsp.custname + "'"
         def SelectAllValues():
             return 'Select all values in the '+ "'" + tsp.custname + "'"
         def VerifySelectedValue():
@@ -608,7 +612,7 @@ class StepDescription:
         def GetSelected():
             return 'Get selected value from the '+ "'" + tsp.custname + "'"+ ' and save the value ' + output+ ' in '+ tsp.outputval
         def GetMultipleValuesByIndexes():
-            return 'Get values with indexes ' + input + ' in the '+ "'" + tsp.custname + "'" +'and save the value ' + input+ ' in  ' +tsp.outputval
+            return 'Get values with indexes ' + input + ' in the '+ "'" + tsp.custname + "'" +'and save the value ' + output+ ' in  ' +tsp.outputval
         def VerifyAllValues():
             return 'Verify the values from the '+ "'" + tsp.custname + "'" +' with '+ input
 
@@ -632,7 +636,7 @@ class StepDescription:
         def SelectRadioButton():
             return 'Select '+ "'" + tsp.custname + "'"
         def GetStatus():
-            return 'Get the status of the ' + "'" + tsp.custname + "'"+ ' and save the status ' + output + ' in '+ tsp.outputval + ')'
+            return 'Get the status of the ' + "'" + tsp.custname + "'"+ ' and save the status ' + output + ' in '+ tsp.outputval
 
         #Application keywords
         def LaunchApplication():
@@ -790,7 +794,7 @@ class StepDescription:
         def SelectValueByText():
             return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']'
         def GetMultipleValuesByIndexes():
-            return 'Get values with indexes ' + inputValsb.toString() + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + TestAutomationController.multipleOutputResult + ' in  '+ output_list
+            return 'Get values with indexes ' + input + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + output + ' in  '+ tsp.oututval
 
         def GetAllValues():
             return 'getAllValues ' + output + ' are present in the' + "'" + tsp.custname + "'"
@@ -802,7 +806,7 @@ class StepDescription:
             return 'Verify ' + input + ' is the list count of the ' +"'" + tsp.custname + "'"
 
         def SelectValueByIndex():
-            return 'Select the value '+ input+' of the '+"'" + tsp.custname + "'"+' with the index '+input+' present in the table cell  '+"'" + tsp.custname + "'"+'-['+input+']['+input+']'
+            return ' Select value with index value '+ input+' in the '+"'" + tsp.custname + "'"
         def GetCount():
             return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' + output + ' in ' +output_list
         def GetViewByIndex():
@@ -814,14 +818,14 @@ class StepDescription:
         def SelectViewByText():
             return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']'
         def GetMultipleViewsByIndexes():
-            return 'Get values with indexes ' + inputValsb.toString() + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + TestAutomationController.multipleOutputResult + ' in  '+ output_list
+            return 'Get values with indexes ' + input + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + output + ' in  '+ tsp.ouputval
 
         def GetAllViews():
             return 'getAllValues ' + output + ' are present in the' + "'" + tsp.custname + "'"
         def VerifyAllViews():
             return 'Verify values ' + input + ' are present in the '+ "'" + tsp.custname + "'"
         def SelectMultipleViewsByIndexes():
-            return 'Select values ' + mulInputValin.toString() + ' in the '+ "'" + "'" + tsp.custname + "'" + "'"
+            return 'Select values ' + input + ' in the '+ "'" + "'" + tsp.custname + "'" + "'"
 
         def VerifyListCount():
             return 'Verify ' + input + ' is the list count of the ' +"'" + tsp.custname + "'"
@@ -866,8 +870,8 @@ class StepDescription:
             return 'Accept the Popup'
         def getPopUpText():
             return 'Get the text of the Popup and save the text ' + output+ ' in ' + tsp.outputval
-
-
+        def sendFunctionKeys():
+            return 'Press ' + tsp.inputval[0] + ' key'
         #Textbox keywords
         def setText():
             return 'Enter text '+ inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
@@ -898,7 +902,7 @@ class StepDescription:
         def getSelected():
             return 'Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save value ' + output + ' in '+ tsp.outputval
         def selectMultipleValuesByText():
-            return 'Select values ' + mulInputVal.toString() + ' in the '+ "'" + tsp.custname + "'"
+            return 'Select values ' + input + ' in the '+ "'" + tsp.custname + "'"
         def deselectAll():
             return 'Deselect all values in the '+ "'" + tsp.custname + "'"
         def getValueByIndex():
@@ -908,7 +912,7 @@ class StepDescription:
         def selectValueByText():
             return 'Select value '+input+' in ' + tsp.custname
         def getMultipleValuesByIndexes():
-            return 'Get values with indexes ' + inputValsb.toString() + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + TestAutomationController.multipleOutputResult + ' in  '+ tsp.outputval
+            return 'Get values with indexes ' + input + ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + output + ' in  '+ tsp.outputval
         def verifySelectedValue():
             return 'Verify value ' + input + ' are selected in the '+ "'" + tsp.custname + "'"
         def verifySelectedValues():
@@ -918,7 +922,7 @@ class StepDescription:
         def verifyAllValues():
             return 'Verify values ' + input + ' are present in the '+ "'" + tsp.custname + "'"
         def selectMultipleValuesByIndexes():
-            return 'Select values ' + mulInputValin.toString() + ' in the '+ "'" + tsp.custname + "'"
+            return 'Select values with index values ' + input + ' in the '+ "'" + tsp.custname + "'"
         def selectAllValues():
             return 'Select all values in the ' +"'" + tsp.custname + "'"
         def verifyCount():
@@ -990,7 +994,7 @@ class StepDescription:
         def verifyDoesNotExists():
             return ' Verify '+ "'" + tsp.custname + "'" + '  does not exists '
         def tab():
-            return 'Perform tab on '+ "'" + tsp.custname + "'" + ')'
+            return 'Perform tab on '+ "'" + tsp.custname + "'"
 
         def rightClick():
             return 'Perform right click on element '+ "'" + tsp.custname + "'"

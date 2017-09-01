@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        Sap_scrapping
+# Name:        Sap_scraping
 # Purpose:     Module for full scrape and ClickAndAdd . ClickAndAdd is not supported as of now
 #
 # Author:      anas.ahmed1,kavyashree,sakshi.goyal,saloni.goyal

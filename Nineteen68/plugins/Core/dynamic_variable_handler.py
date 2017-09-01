@@ -18,6 +18,7 @@ import core_utils
 dynamic_variable_map=OrderedDict()
 import logging
 log = logging.getLogger('dynamic_variable_handler.py')
+import ast
 
 class DynamicVariables:
 
@@ -80,6 +81,8 @@ class DynamicVariables:
             variable=variable[0:len(variable)-1]
             for i in range(len(value)):
                 dynamic_variable_map[variable+'['+str(i)+']}']=value[i]
+            dynamic_variable_map[variable+'}'] = value
+
         else:
             variable=variable[0:len(variable)-1]
             for i in range(len(value)):
@@ -87,11 +90,11 @@ class DynamicVariables:
                 for j in range(len(value[i])):
                     q=j+1
                     dynamic_variable_map[variable+'['+str(p)+']['+str(q)+']}']=value[i][j]
+            dynamic_variable_map[variable+'}'] = value
 
 
      #To Store the output from keyword as an array if it is single value
     def store_dynamic_value(self,output_var,output_value,keyword):
-
         if self.check_for_dynamicvariables(output_var)==TEST_RESULT_TRUE:
             if isinstance(output_value,list):
                 if not(keyword.lower() in DATABASE_KEYWORDS):
@@ -101,6 +104,7 @@ class DynamicVariables:
                     dynamic_variable_map[DB_VAR]=output_value
             else:
                 dynamic_variable_map[output_var]=output_value
+
 
      #To Check if the given pattern of the variable matches '{a}'
     def check_for_dynamicvariables(self,outputval):
@@ -119,6 +123,7 @@ class DynamicVariables:
     #To get the value of given dynamic variable
     def get_dynamic_value(self,variable):
         #returns the value of the dynamic variable if it exists otherwise returns None
+
         value=None
         if dynamic_variable_map.has_key(variable):
             value=dynamic_variable_map.get(variable)

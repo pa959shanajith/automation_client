@@ -377,10 +377,6 @@ class Controller():
             ignore_status=True
         if keyword.lower() in [IF,ELSE_IF,EVALUATE]:
             inpval=self.dynamic_var_handler_obj.simplify_expression(input,keyword,self)
-        elif keyword in WS_KEYWORDS or keyword == 'navigateToURL':
-            if staticNone in input[0]:
-                input[0]=''
-            inpval=[input[0]]
         elif keyword in DYNAMIC_KEYWORDS:
             if staticNone in input[0]:
                 input[0]=input[0].replace(staticNone,'')
@@ -396,6 +392,10 @@ class Controller():
             if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE]:
                 inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self)
         else:
+            if keyword in WS_KEYWORDS or keyword == 'navigateToURL':
+                if staticNone in input[0]:
+                    input[0]=''
+                input_list=[input[0]]
             #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
             for x in input_list:
                 if staticNone in x:
