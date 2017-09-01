@@ -429,9 +429,9 @@ class SocketThread(threading.Thread):
         global socketIO
         server_IP = configvalues['server_ip']
         temp_server_IP = 'https://' + server_IP
-        key='username'
+        key='USERNAME'
         if(not(os.environ.has_key(key))):
-            key='user'
+            key='USER'
         username=os.environ[key]
         params={'username':username}
         socketIO = SocketIO(temp_server_IP,int(configvalues['server_port']),MainNamespace,verify= CERTIFICATE_PATH +'/server.crt',cert=(CERTIFICATE_PATH + '/client.crt', CERTIFICATE_PATH + '/client.key'),params=params)
