@@ -76,14 +76,16 @@ class Spinner_Keywords():
                                     text.append(i.text)
                                     obj.append(i)
                             length2=len(text)
+                            import time
                             time.sleep(3)
-                            driver.scroll(scrollele1,scrollele2)
+##                            driver.scroll(scrollele1,scrollele2)
 
                             if (length1==length2):
                                 output=length1
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
+
                         if className == 'CheckedTextView' :
                             driver.back()
 
@@ -156,9 +158,11 @@ class Spinner_Keywords():
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
+
                             length2=len(text)
+                            import time
                             time.sleep(3)
-                            driver.scroll(scrollele1,scrollele2)
+##                            driver.scroll(scrollele1,scrollele2)
 
                             if (length1==length2):
                                 count=length1
@@ -271,6 +275,7 @@ class Spinner_Keywords():
                                     log.error('invalid input')
                                     logger.print_on_console(err_msg)
                             length2=len(text)
+                            import time
                             time.sleep(3)
                             driver.scroll(scrollele1,scrollele2)
 
@@ -380,6 +385,7 @@ class Spinner_Keywords():
                                     log.error('invalid input')
                                     logger.print_on_console(err_msg)
                             length2=len(text)
+                            import time
                             time.sleep(3)
                             driver.scroll(scrollele1,scrollele2)
 
@@ -488,6 +494,7 @@ class Spinner_Keywords():
                                     log.error('invalid input')
                                     logger.print_on_console(err_msg)
                             length2=len(text)
+                            import time
                             time.sleep(3)
                             driver.scroll(scrollele1,scrollele2)
 
@@ -712,6 +719,7 @@ class Spinner_Keywords():
                             if length1 >4 :
                                 scrollele1=obj[length1-1]
                                 scrollele2=obj[length1-2]
+                                import time
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
@@ -733,10 +741,11 @@ class Spinner_Keywords():
                                         temp.append(text[k])
                                         count=count+1
                             length2=len(text)
-                            time.sleep(3)
-                            driver.scroll(scrollele1,scrollele2)
+##                            import time
+##                            time.sleep(3)
+##                            driver.scroll(scrollele1,scrollele2)
                             if (length1==length2):
-                                
+
                                 if len(input) == len(temp):
                                     output=temp[0]
                                     status=TEST_RESULT_PASS
@@ -901,6 +910,7 @@ class Spinner_Keywords():
                             if length1 >4 :
                                 scrollele1=obj[length1-1]
                                 scrollele2=obj[length1-2]
+                                import time
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
@@ -922,8 +932,9 @@ class Spinner_Keywords():
                                         temp.append(text[k])
                                         count=count+1
                             length2=len(text)
+                            import time
                             time.sleep(3)
-                            driver.scroll(scrollele1,scrollele2)
+##                            driver.scroll(scrollele1,scrollele2)
 
                             if (length1==length2):
 
@@ -954,8 +965,8 @@ class Spinner_Keywords():
                     log.error('element is not visible')
                     logger.print_on_console(err_msg)
         except Exception as e:
-                import traceback
-                print traceback.format_exc()
+
+
 
                 log.error(e)
 
@@ -987,7 +998,6 @@ class Spinner_Keywords():
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                             count= len(element)
-
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
@@ -1004,8 +1014,8 @@ class Spinner_Keywords():
                                 import time
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            count= len(element)
+                                element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                                count= len(element)
 
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
@@ -1017,8 +1027,9 @@ class Spinner_Keywords():
                                     text.append(i.text)
                                     obj.append(i)
                             length2=len(text)
-                            time.sleep(3)
-                            driver.scroll(scrollele1,scrollele2)
+##                            import time
+##                            time.sleep(3)
+##                            driver.scroll(scrollele1,scrollele2)
 
                             if (length1==length2):
                                 output=text
@@ -1097,9 +1108,9 @@ class Spinner_Keywords():
                                     text.append(i.text)
                                     obj.append(i)
                             length2=len(text)
+                            import time
                             time.sleep(3)
-                            driver.scroll(scrollele1,scrollele2)
-
+##                            driver.scroll(scrollele1,scrollele2)
                             if (length1==length2):
                                 if len(input) == len(text):
                                     for k in input :
