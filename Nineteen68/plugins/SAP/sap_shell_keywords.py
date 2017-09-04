@@ -165,9 +165,9 @@ class Shell_Keywords():
                     if(elem.type == 'GuiShell'):
                         if elem.rowCount!=0:
                             #----------------------------------function to append columnorder
-                            for i in range(0,imax-1):
-                                        b=elem.columnorder(i)
-                                        bList.append(b)
+                            for i in range(0,imax):
+                                b=elem.columnorder(i)
+                                bList.append(b)
                             #----------------------------------function to append columnorder
                             if index>=0 and row >=0:
                                 column=str(bList[index])
@@ -281,9 +281,9 @@ class Shell_Keywords():
                     if(elem.type == 'GuiShell'):
                         if elem.rowCount!=0:
                             #----------------------------------function to append columnorder
-                            for i in range(0,imax-1):
-                                        b=elem.columnorder(i)
-                                        bList.append(b)
+                            for i in range(0,imax):
+                                b=elem.columnorder(i)
+                                bList.append(b)
                             #----------------------------------function to append columnorder
                             if index>=0 and row >=0:
                                 column=str(bList[index])
@@ -330,9 +330,9 @@ class Shell_Keywords():
                     if(elem.type == 'GuiShell'):
                         if elem.rowCount!=0:
                             #----------------------------------function to append columnorder
-                            for i in range(0,imax-1):
-                                        b=elem.columnorder(i)
-                                        bList.append(b)
+                            for i in range(0,imax):
+                                b=elem.columnorder(i)
+                                bList.append(b)
                             #----------------------------------function to append columnorder
                             if index>=0 and row >=0:
                                 column=str(bList[index])
