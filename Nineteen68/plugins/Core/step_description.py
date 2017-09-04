@@ -874,7 +874,7 @@ class StepDescription:
             return 'Press ' + tsp.inputval[0] + ' key'
         #Textbox keywords
         def setText():
-            return 'Enter text '+ inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
+            return 'Enter text '+ input+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
         def clearText():
             return 'Clear text from the ' + "'" + tsp.custname + "'"
         def getText():
