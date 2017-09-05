@@ -32,6 +32,7 @@ import threading
 from datetime import datetime
 import logging
 import time
+import platform
 #index for iterating the teststepproperty for executor
 i = 0
 #Terminate Flag
@@ -1047,69 +1048,80 @@ def kill_process():
     import tempfile
     import psutil
     import os,shutil
-    try:
-        import win32com.client
-        my_processes = ['chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe','geckodriver.exe']
-        wmi=win32com.client.GetObject('winmgmts:')
-        for p in wmi.InstancesOf('win32_process'):
-            if p.Name in my_processes:
-                os.system("TASKKILL /F /IM " + p.Name )
+    if platform.system() == 'Darwin':
         try:
-            processes = psutil.net_connections()
-            for line in processes:
-                p =  line.laddr
-                if p[1] == 4723:
-                    log.info( 'Pid Found' )
-                    log.info(line.pid)
-                    os.system("TASKKILL /F /PID " + str(line.pid))
+            import os
+            os.system("killall -9 node")
         except Exception as e:
+            logger.print_on_console('Exception in stopping server')
             log.error(e)
         log.info('Stale processes killed')
-        logger.print_on_console( 'Stale processes killed')
-    except Exception as e:
-        log.error(e)
-        logger.print_on_console(e)
-##    import os, shutil
-    try:
-        import browser_Keywords
-        pidset = browser_Keywords.pid_set
-##        processes = psutil.net_connections()
-        for pid in pidset:
-            log.info( 'Pid Found' )
-            log.info(pid)
-            os.system("TASKKILL /F /PID " + str(pid))
-        browser_Keywords.pid_set.clear()
-    except Exception as e:
-        log.error(e)
-    try:
-        time.sleep(3)
+        logger.print_on_console('Stale processes killed')
+    else:
         try:
-            folder = tempfile.gettempdir()
-            profdir = ["~DF","scoped_dir","IE","chrome_","anonymous", "userprofile",
-    							"seleniumSslSupport","webdriver-ie", "Low", "screenshot", "_MEI", "CVR","tmp",
-    							"jar_cache","DMI","~nsu","moz-","gen"]
-            for the_file in os.listdir(folder):
-                folderwithnum = ''
-                try:
-                    folderwithnum = int(the_file[0:3])
-                except Exception as e:
-                    p = 1
-                for name in profdir:
-                    if the_file.startswith(name) or isinstance(folderwithnum,int):
-                        try:
-                            file_path = os.path.join(folder, the_file)
-                            if os.path.isfile(file_path):
-                                os.unlink(file_path)
-                                break
-                            elif os.path.isdir(file_path):
-                                shutil.rmtree(file_path,ignore_errors=True)
-                                break
-                        except Exception as e:
-                            m=1
+            import win32com.client
+            my_processes = ['chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe','geckodriver.exe']
+            wmi=win32com.client.GetObject('winmgmts:')
+            for p in wmi.InstancesOf('win32_process'):
+                if p.Name in my_processes:
+                    os.system("TASKKILL /F /IM " + p.Name )
+            try:
+                processes = psutil.net_connections()
+                for line in processes:
+                    p =  line.laddr
+                    if p[1] == 4723:
+                        log.info( 'Pid Found' )
+                        log.info(line.pid)
+                        os.system("TASKKILL /F /PID " + str(line.pid))
+            except Exception as e:
+                log.error(e)
+            log.info('Stale processes killed')
+            logger.print_on_console( 'Stale processes killed')
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+    ##    import os, shutil
+
+        try:
+            import browser_Keywords
+            pidset = browser_Keywords.pid_set
+    ##        processes = psutil.net_connections()
+            for pid in pidset:
+                log.info( 'Pid Found' )
+                log.info(pid)
+                os.system("TASKKILL /F /PID " + str(pid))
+            browser_Keywords.pid_set.clear()
+        except Exception as e:
+            log.error(e)
+        try:
+            time.sleep(3)
+            try:
+                folder = tempfile.gettempdir()
+                profdir = ["~DF","scoped_dir","IE","chrome_","anonymous", "userprofile",
+                                    "seleniumSslSupport","webdriver-ie", "Low", "screenshot", "_MEI", "CVR","tmp",
+                                    "jar_cache","DMI","~nsu","moz-","gen"]
+                for the_file in os.listdir(folder):
+                    folderwithnum = ''
+                    try:
+                        folderwithnum = int(the_file[0:3])
+                    except Exception as e:
+                        p = 1
+                    for name in profdir:
+                        if the_file.startswith(name) or isinstance(folderwithnum,int):
+                            try:
+                                file_path = os.path.join(folder, the_file)
+                                if os.path.isfile(file_path):
+                                    os.unlink(file_path)
+                                    break
+                                elif os.path.isdir(file_path):
+                                    shutil.rmtree(file_path,ignore_errors=True)
+                                    break
+                            except Exception as e:
+                                m=1
+            except Exception as e:
+                log.error('Error while deleting file/folder')
         except Exception as e:
             log.error('Error while deleting file/folder')
-    except Exception as e:
-        log.error('Error while deleting file/folder')
 #main method
 if __name__ == '__main__':
 ##    kill_process()
