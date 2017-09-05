@@ -123,10 +123,12 @@ class LaunchAndInstall():
                 import os
                 processes = psutil.net_connections()
                 for line in processes:
-                    p = line.laddr
+                    p =  line.laddr
                     if p[1] == 4723:
+                        log.info( 'Pid Found' )
+                        log.info(line.pid)
                         os.system("TASKKILL /F /PID " + str(line.pid))
-                        ##                        logger.print_on_console('Server stopped')
+
             else:
                 import os
                 os.system("killall -9 node")
