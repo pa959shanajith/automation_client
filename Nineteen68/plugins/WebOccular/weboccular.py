@@ -24,7 +24,8 @@ import logging.config
 import logging
 import time
 log = logging.getLogger(__name__)
-
+import controller
+import weboccular_constants
 class Weboccular():
 
     def __init__(self):
@@ -83,7 +84,7 @@ class Weboccular():
         threads = []
         logger.print_on_console("crawling in progress...")
         self.subdomain = tldextract.extract(start_url).subdomain
-        while(self.queue) :
+        while(self.queue and not controller.terminate_flag) :
             obj = self.queue.pop(0)
             url = obj['name']
             t = threading.Thread(target = self.parse, args = (url, obj, level,agent,socketIO))
@@ -98,15 +99,20 @@ class Weboccular():
             thread.join()
 
     def parse(self,url, obj, lev,agent,socketIO) :
-        agents = { "safari" : "Mozilla/5.0 AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A",
-        "firefox" : "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/53.09",
-        "chrome" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36",
-        "ie": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"}
+
+        if controller.terminate_flag:
+            return
+
+        agents = {  "safari" : weboccular_constants.SAFARI_AGENT,
+                    "firefox" : weboccular_constants.FX_AGENT,
+                    "chrome" : weboccular_constants.CHROME_AGENT,
+                    "ie": weboccular_constants.IE_AGENT
+                }
         try:
             headers = {'User-Agent': agents[agent]}
             #if URL is for file type .pdf, .docx or .zip we will send only header request, will not download entire content
 
-
+            #print "processing URL : ", url
             if not url.endswith('.pdf') and not url.endswith('.docx') and not url.endswith('.zip'):
                 r = requests.get(url, headers = headers,verify = False)
                 rurl = r.url
@@ -203,9 +209,32 @@ class Weboccular():
 
         time_taken = time.clock() - start
 
-        log.info("crawling request completed succesfully in " +  str(time_taken)  +  " seconds")
+        crawling_status = "succesfully"
+        if controller.terminate_flag:
+            logger.print_on_console("---------crawling request Terminated---------")
+            log.info("---------crawling request Terminated---------")
+            crawling_status = "partially"
+
+        seconds = 0
+        minutes = 0
+        time_str = ""
+
+        #Compute time taken string
+        if time_taken > 60:
+            minutes =  int(time_taken / 60)
+            seconds = time_taken % 60
+            if seconds != 0:
+                time_str = str(minutes) + " mins, " + str("%.2f" % seconds) + " seconds"
+            else:
+                time_str = str(minutes) + " mins"
+        else:
+            time_str = str("%.2f" % time_taken) + " seconds"
+
+        log.info("crawling request completed " + crawling_status +" in " +  time_str)
         completetionObj = json.dumps({"progress" : "complete" , "status": "success" ,"subdomains":  self.subdomains, "others" : self.others, "notParsedURLs" : self.notParsedURLs, "time_taken" : str(time_taken) +  " seconds"})
         socketIO.emit('result_web_crawler_finished',completetionObj)
         logger.print_on_console("--------------------")
-        logger.print_on_console("crawling request completed succesfully in " +  str(time_taken)  +  " seconds")
+
+        logger.print_on_console("crawling request completed " + crawling_status +" in " +  time_str)
         logger.print_on_console("--------------------")
+        controller.terminate_flag = False
