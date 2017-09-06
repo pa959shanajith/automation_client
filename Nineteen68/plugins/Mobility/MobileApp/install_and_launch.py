@@ -32,6 +32,7 @@ class LaunchAndInstall():
                 import appium
 ##                import time
                 from appium import webdriver
+                LaunchAndInstall().start_server()
                 desired_caps = {}
                 desired_caps['platformName'] = 'iOS'
                 desired_caps['appiumVersion'] = '1.6.5'
@@ -96,15 +97,20 @@ class LaunchAndInstall():
             import subprocess
             import os
             curdir = os.environ["NINETEEN68_HOME"]
-            path= curdir + '\\Nineteen68\\plugins\\Mobility\\MobileApp\\node_modules\\appium\\build\\lib\\main.js'
-            nodePath = os.environ["NINETEEN68_HOME"] + "\\Drivers"+'\\node.exe'
-##            print ' logic to start server'
-##            file_path = 'D:\\mobile_python\\node_modules\\appium\\build\\lib\\main.js'
-            proc = subprocess.Popen([nodePath, path], shell=True,stdin=None, stdout=None, stderr=None, close_fds=True)
+
+            if (platform.system() != 'Darwin'):
+                path = curdir + '\\Nineteen68\\plugins\\Mobility\\MobileApp\\node_modules\\appium\\build\\lib\\main.js'
+                nodePath = os.environ["NINETEEN68_HOME"] + "\\Drivers" + '\\node.exe'
+                proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None,
+                                        close_fds=True)
+            else:
+                path = curdir + '/Nineteen68/plugins/Mobility/node_modules/appium/build/lib/main.js'
+                proc = subprocess.Popen(path, shell=False, stdin=None, stdout=None, stderr=None,
+                                        close_fds=True)
+
             import time
             time.sleep(15)
             logger.print_on_console('Server started')
-##            os.chdir(maindir)
         except Exception as e:
             log.error(e)
             logger.print_on_console('Exception in starting server')
@@ -112,15 +118,20 @@ class LaunchAndInstall():
 
     def stop_server(self):
         try:
-            import psutil
-            import os
-            processes = psutil.net_connections()
-            for line in processes:
-                p =  line.laddr
-                if p[1] == 4723:
-                    log.info( 'Pid Found' )
-                    log.info(line.pid)
-                    os.system("TASKKILL /F /PID " + str(line.pid))
+            if platform.system() != 'Darwin':
+                import psutil
+                import os
+                processes = psutil.net_connections()
+                for line in processes:
+                    p =  line.laddr
+                    if p[1] == 4723:
+                        log.info( 'Pid Found' )
+                        log.info(line.pid)
+                        os.system("TASKKILL /F /PID " + str(line.pid))
+
+            else:
+                import os
+                os.system("killall -9 node")
         except Exception as e:
             log.error(e)
             logger.print_on_console('Exception in stoping server')
@@ -160,8 +171,7 @@ class LaunchAndInstall():
 
             self.driver_obj.close_app()
 
-            if platform.system()!='Darwin':
-                self.stop_server()
+            self.stop_server()
             status=mobile_app_constants.TEST_RESULT_PASS
             result=mobile_app_constants.TEST_RESULT_TRUE
         except Exception as e:

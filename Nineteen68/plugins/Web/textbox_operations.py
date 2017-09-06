@@ -172,9 +172,13 @@ class TextboxKeywords:
     def __get_text(self,webelement):
         text=''
         text=webelement.get_attribute('value')
+        if text == '':
+            id = webelement.get_attribute('id')
+            if(id != ''):
+                text = browser_Keywords.driver_obj.execute_script("return document.getElementById(arguments[0]).value",id)
         if text is None or text is '':
             text=webelement.get_attribute('placeholder')
-        log.debug('Text retruning from __get_text is '+text)
+        log.debug('Text returning from __get_text is '+text)
         return text
 
     def __clear_text(self,webelement):

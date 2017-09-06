@@ -47,32 +47,47 @@ class InstallAndLaunch():
 
      def start_server(self):
         try:
-            print 'server started'
             import subprocess
             import os
+            ##            maindir = os.getcwd()
+            ##            os.chdir('..')
             curdir = os.environ["NINETEEN68_HOME"]
-            path= curdir + '\\Nineteen68\\plugins\\Mobility\\MobileApp\\node_modules\\appium\\build\\lib\\main.js'
-            nodePath = os.environ["NINETEEN68_HOME"] + "\\Drivers"+'\\node.exe'
-            proc = subprocess.Popen([nodePath, path], shell=True,stdin=None, stdout=None, stderr=None, close_fds=True)
+
+            if (platform.system() != 'Darwin'):
+                path = curdir + '\\Nineteen68\\plugins\\Mobility\\MobileApp\\node_modules\\appium\\build\\lib\\main.js'
+                nodePath = os.environ["NINETEEN68_HOME"] + "\\Drivers" + '\\node.exe'
+                proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None,
+                                        close_fds=True)
+            else:
+                path = curdir + '/Nineteen68/plugins/Mobility/node_modules/appium/build/lib/main.js'
+                proc = subprocess.Popen(path, shell=False, stdin=None, stdout=None, stderr=None,
+                                        close_fds=True)
+
             import time
             time.sleep(15)
             logger.print_on_console('Server started')
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             logger.print_on_console('Exception in starting server')
 
 
      def stop_server(self):
-            try:
+          try:
+            if platform.system() != 'Darwin':
                 import psutil
                 import os
                 processes = psutil.net_connections()
                 for line in processes:
-                    p =  line.laddr
+                    p = line.laddr
                     if p[1] == 4723:
                         os.system("TASKKILL /F /PID " + str(line.pid))
-                        logger.print_on_console('Server stopped')
-            except Exception as e:
-                logger.print_on_console('Exception in stopping server')
+                        ##                        logger.print_on_console('Server stopped')
+            else:
+                import os
+                os.system("killall -9 node")
+          except Exception as e:
+            logger.print_on_console('Exception in stopping server')
 
      def installApplication(self, apk_path, platform_version, device_name, udid, *args):
         self.driver=None
@@ -83,6 +98,7 @@ class InstallAndLaunch():
                 print 'darwin'
                 import time
                 from appium import webdriver
+                self.start_server()
                 desired_caps = {}
                 desired_caps['platformName'] = 'iOS'
                 desired_caps['appiumVersion'] = '1.6.5'
@@ -151,8 +167,7 @@ class InstallAndLaunch():
             import traceback
             traceback.print_exc()
             logger.print_on_console("Error occured in scraping")
-          if platform.system()!='Darwin':
-            self.stop_server()
+          self.stop_server()
           return finalJson
 
 

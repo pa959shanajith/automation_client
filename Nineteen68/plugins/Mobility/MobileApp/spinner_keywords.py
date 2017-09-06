@@ -307,6 +307,7 @@ class Spinner_Keywords():
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        var=''
         input=input[0]
         className=''
         text=[]
@@ -346,8 +347,15 @@ class Spinner_Keywords():
                                         if input == j.text :
                                             status=TEST_RESULT_PASS
                                             result=TEST_RESULT_TRUE
+                                            if status == TEST_RESULT_PASS :
+                                                driver.back()
+                                                var='true'
                                             global flag
                                             flag=True
+                                        else:
+                                            if var=='' :
+                                                driver.back()
+                                                var='true'
                                 else :
                                     err_msg='invalid input'
                                     log.error('invalid input')
@@ -378,8 +386,16 @@ class Spinner_Keywords():
                                         if input == j.text :
                                             status=TEST_RESULT_PASS
                                             result=TEST_RESULT_TRUE
+                                            if var=='' :
+                                                driver.back()
+                                                var='true'
                                             global flag
                                             flag=True
+                                        else :
+                                            if var=='' :
+                                                driver.back()
+                                                var='true'
+
                                 else :
                                     err_msg='invalid input'
                                     log.error('invalid input')
@@ -394,12 +410,19 @@ class Spinner_Keywords():
                                     err_msg='invalid input'
                                     log.error('invalid input')
                                     logger.print_on_console(err_msg)
-                                    if className == 'CheckedTextView' :
+                                    if var=='':
                                         driver.back()
-                                break
-                        if className == 'CheckedTextView' :
-                            driver.back()
+                                        var='true'
 
+                                break
+
+##                        if className == 'CheckedTextView' :
+##                            print '2222222'
+##                            driver.back()
+
+                        if var=='' :
+                            driver.back()
+                            var='true'
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')

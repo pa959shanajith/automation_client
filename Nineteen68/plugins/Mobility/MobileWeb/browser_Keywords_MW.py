@@ -66,9 +66,16 @@ class BrowserKeywords():
 ##            maindir = os.getcwd()
 ##            os.chdir('..')
             curdir = os.environ["NINETEEN68_HOME"]
-            path= curdir + '\\Nineteen68\\plugins\\Mobility\\MobileApp\\node_modules\\appium\\build\\lib\\main.js'
-            nodePath = os.environ["NINETEEN68_HOME"] + "\\Drivers"+'\\node.exe'
-            proc = subprocess.Popen([nodePath, path], shell=True,stdin=None, stdout=None, stderr=None, close_fds=True)
+
+            if(platform.system()!='Darwin'):
+                path = curdir + '\\Nineteen68\\plugins\\Mobility\\MobileApp\\node_modules\\appium\\build\\lib\\main.js'
+                nodePath = os.environ["NINETEEN68_HOME"] + "\\Drivers" + '\\node.exe'
+                proc = subprocess.Popen([nodePath, path], shell=True,stdin=None, stdout=None, stderr=None, close_fds=True)
+            else:
+                path = curdir + '/Nineteen68/plugins/Mobility/node_modules/appium/build/lib/main.js'
+                proc = subprocess.Popen( path, shell=False, stdin=None, stdout=None, stderr=None,
+                                        close_fds=True)
+
             import time
             time.sleep(15)
             logger.print_on_console('Server started')
@@ -84,6 +91,7 @@ class BrowserKeywords():
             ##        self.browser_num=browser_num[0]
             try:
                 if platform.system()== 'Darwin':
+                    self.start_server()
                     global driver_obj
                     global driver
                     global webdriver_list
@@ -393,14 +401,18 @@ class BrowserKeywords():
 
     def stop_server(self):
             try:
-                import psutil
-                import os
-                processes = psutil.net_connections()
-                for line in processes:
-                    p =  line.laddr
-                    if p[1] == 4723:
-                        os.system("TASKKILL /F /PID " + str(line.pid))
-##                        logger.print_on_console('Server stopped')
+                if platform.system()!= 'Darwin':
+                    import psutil
+                    import os
+                    processes = psutil.net_connections()
+                    for line in processes:
+                        p =  line.laddr
+                        if p[1] == 4723:
+                            os.system("TASKKILL /F /PID " + str(line.pid))
+    ##                        logger.print_on_console('Server stopped')
+                else:
+                    import os
+                    os.system("killall -9 node")
             except Exception as e:
                 logger.print_on_console('Exception in stopping server')
 
@@ -431,8 +443,7 @@ class BrowserKeywords():
 ##                    webdriver_list.pop(len(webdriver_list)-1)
 ##                    print 'Kill driver logic'
           driver_obj.close()
-          if platform.system()!= "Darwin":
-            self.stop_server()
+          self.stop_server()
           status=webconstants_MW.TEST_RESULT_PASS
           result=webconstants_MW.TEST_RESULT_TRUE
 
