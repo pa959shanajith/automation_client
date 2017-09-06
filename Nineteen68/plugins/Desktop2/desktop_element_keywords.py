@@ -16,6 +16,7 @@ import pywinauto
 import logging
 from constants import *
 import logger
+import win32api
 log = logging.getLogger('desktop_element_keywords.py')
 
 class ElementKeywords():
@@ -113,7 +114,9 @@ class ElementKeywords():
                 if (check):
                     log.info('Parent matched')
                     if(element.is_enabled()):
+                        cursor_x,cursor_y = win32api.GetCursorPos()#handling cursor move
                         element.set_focus()
+                        win32api.SetCursorPos((cursor_x,cursor_y))#handling cursor move
                         element.click()
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
