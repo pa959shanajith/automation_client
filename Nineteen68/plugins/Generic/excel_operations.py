@@ -27,6 +27,8 @@ from constants import *
 log = logging.getLogger('excel_operations.py')
 import core_utils
 from xlrd.sheet import ctype_text
+import itertools
+import csv
 
 
 class ExcelFile:
@@ -1174,7 +1176,7 @@ class ExcelXLSX:
         return : bool
 
         """
-        logger.print_on_console(generic_constants.INPUT_IS+input_path1+' '+input_path2)
+        #logger.print_on_console(generic_constants.INPUT_IS+input_path1+' '+input_path2)
         obj=ExcelXLS()
         #same functionality as compare_content_xlsx
         status=obj.compare_content_xls(input_path1,sheetname1,input_path2,sheetname2)
@@ -1429,4 +1431,57 @@ class ExcelXLSX:
             logger.print_on_console(err_msg)
         return status,err_msg
 
+class ExcelCSV:
+
+    def compare_content_csv(self,input_path1,input_path2,*args): # To compare the content for verifying data for csv files
+        """
+        def : compare_content_csv
+        purpose : compares the data of given sheets of 2 different excel files
+        param : input_path1,input_path2,Sheet1,Sheet2
+        return : bool
+
+        """
+        status=False
+        err_msg=None
+        x = False
+        log.debug('Comparing content of .csv files')
+        try:
+            data_file1=[]
+            data_file2=[]
+            x = False
+            status = False
+            try :
+                with open(input_path1 , 'rt') as file1:
+                    reader =csv.reader(file1)
+                    for i in reader:
+                        data_file1.append(i)
+                with open(input_path2 ,'rt') as file2:
+                    reader =csv.reader(file2)
+                    for i in reader:
+                        data_file2.append(i)
+            except Exception as e:
+                logger.print_on_console(e)
+            finally:
+                file1.close()
+                file2.close()
+            try:
+                for file1_row, file2_row in itertools.izip(data_file1, data_file2):
+                    if file1_row == file2_row:
+                        x = True
+                        break
+                if(x):
+                    status = True
+                else:
+                    status = False
+
+            except Exception as e:
+                log.error(e)
+                err_msg = str(e)
+
+        except Exception as e:
+            err_msg='Error occured in compare content of .csv files'
+            log.error(e)
+
+        log.info('Status is '+str(status))
+        return status,err_msg
 
