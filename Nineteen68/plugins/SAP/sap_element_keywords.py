@@ -620,4 +620,23 @@ class ElementKeywords():
             err_msg = sap_constants.ERROR_MSG
         return status,result,value,err_msg
 
+    def selectTab(self, sap_id,url, input_val,*args):
+        self.lk.setWindowToForeground(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            elem=ses.FindById(id)
+            if(elem.type=='GuiTab'):
+                elem.Select()
+                status=sap_constants.TEST_RESULT_PASS
+                result=sap_constants.TEST_RESULT_TRUE
+        except:
+            err_msg=sap_constants.ERROR_MSG
+            import traceback
+            traceback.print_exc()
+        return status,result,value,err_msg
+
 
