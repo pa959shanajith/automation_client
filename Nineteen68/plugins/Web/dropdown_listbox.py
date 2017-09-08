@@ -444,7 +444,7 @@ class DropdownKeywords():
                         flag = True
                         for x in range(0,opt_len):
                             internal_val = select.options[x].text
-                            if input[0] == "1":
+                            if len(input)!=0 and input[0] == "1":
                                 internal_val= select.options[x].text.strip()
                             temp.append(internal_val)
                         log.info('temp value')

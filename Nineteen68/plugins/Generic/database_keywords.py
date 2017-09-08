@@ -202,31 +202,54 @@ class DatabaseOperation():
         verb = OUTPUT_CONSTANT
         err_msg=None
         try:
-            file_path=self.create_file()
+            ext = self.get_ext(inp_file)
+            if ext == '.xls':
+                file_path=self.create_file_xls()
+            elif ext == '.xlsx':
+                file_path=self.create_file_xlsx()
+            else:
+                file_path=self.create_file_csv()
+
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
             cursor = cnxn.cursor()
             cursor.execute(query)
             rows = cursor.fetchall()
-            verify = os.path.isfile(inp_file)
+            columns = [column[0] for column in cursor.description]
+            verify = os.path.isfile(file_path)
             if (verify == True):
-                ext = self.get_ext(inp_file)
-                if (ext == '.xls'):
-                    obj=excel_operations.ExcelFile()
-                    obj.set_excel_path(file_path,generic_constants.DATABASE_SHEET)
-                    columns = [column[0] for column in cursor.description]
+                ext = self.get_ext(file_path)
+                if (ext == '.xls' or ext == '.xlsx'):
+                    work_book = xlwt.Workbook(encoding="utf-8")
+                    work_sheet = work_book.add_sheet(generic_constants.DATABASE_SHEET)
                     i=1
                     j=1
                     for x in columns:
-                        obj.write_cell(i,j,x)
-                        j+=1
-                    b =0
+                        work_sheet.write(i,j,x)
+                        j=j+1
+                    b=0
                     k=2
                     for row in rows:
                         l=1
                         for y in row:
-                            obj.write_cell(k,l,y)
+                            try:
+                                work_sheet.write(k,l,y)
+                            except Exception as e:
+                                if 'character' in str(e):
+                                    i = str(e).index('character')
+                                    err_new=str(e)[:i+len('character')]
+                                    if err_new==generic_constants.UNICODE_ERR:
+                                        newrow=[]
+                                        for ele in row:
+                                            if type(ele) == unicode:
+                                                 ele = ele.encode('utf-8')
+                                                 newrow.append(ele)
+                                            else:
+                                                newrow.append(ele)
+                                    row = tuple(newrow)
+                                    work_sheet.write(k,l,y)
                             l+=1
                         k+=1
+                    work_book.save(file_path)
                     obj = file_operations.FileOperations()
                     output = obj.compare_content(file_path,generic_constants.DATABASE_SHEET,inp_file,inp_sheet)
                     if output[1] == "True":
@@ -235,7 +258,44 @@ class DatabaseOperation():
                     else:
                         status=generic_constants.TEST_RESULT_FAIL
                         result=generic_constants.TEST_RESULT_FALSE
+                elif (ext == '.csv'):
+                    try:
+                        columns = [column[0] for column in cursor.description]
+                        path = file_path
+                        with open(path,'w') as csvfile:
+                            writer = csv.writer(csvfile,lineterminator='\n')
+                            writer.writerow(columns)
 
+                            for row in rows:
+                                try:
+                                    writer.writerow(row)
+                                    num=num+1
+                                except Exception as e:
+                                    if 'character' in str(e):
+                                        i = str(e).index('character')
+                                        err_new=str(e)[:i+len('character')]
+                                        if err_new==generic_constants.UNICODE_ERR:
+                                            newrow=[]
+                                            for ele in row:
+                                                if type(ele) == unicode:
+                                                     ele = ele.encode('utf-8')
+                                                     newrow.append(ele)
+                                                else:
+                                                    newrow.append(ele)
+                                        row = tuple(newrow)
+                                        writer.writerow(row)
+                        csvfile.close()
+                    except Exception as e:
+                        log.error(e)
+                        err_msg = e
+                    obj = file_operations.FileOperations()
+                    output = obj.compare_content(file_path,inp_file)
+                    if output[1] == "True":
+                        status=generic_constants.TEST_RESULT_PASS
+                        result=generic_constants.TEST_RESULT_TRUE
+                    else:
+                        status=generic_constants.TEST_RESULT_FAIL
+                        result=generic_constants.TEST_RESULT_FALSE
                 else:
                     logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                     log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -297,52 +357,89 @@ class DatabaseOperation():
 ##            verify = os.path.isfile(fields)
 ##            if (verify == True):
             ext = self.get_ext(fields)
-            if (ext == '.xls'):
+            if (ext == '.xls' or ext == '.xlsx'):
                 verify = os.path.isfile(fields)
-                if(verify == False):
-                    try:
-                       wb = xlwt.Workbook()
-                       if(inp_sheet is None or inp_sheet == ''):
-                            inp_sheet = 'Sheet0'
-                            ws = wb.add_sheet(inp_sheet)
-                       else:
-                            ws = wb.add_sheet(inp_sheet)
-                            log.debug('Input Sheet and file path while creating file :')
-                            log.debug(inp_sheet)
-                            log.debug(fields)
-                       wb.save(fields)
-                    except Exception as e:
-                        log.error(e)
-                        logger.print_on_console(e)
-                        err_msg = e
-                if(inp_sheet is None or inp_sheet == ''):
-                    inp_sheet = 'Sheet0'
-                log.debug('Input Sheet is :')
-                log.debug(inp_sheet)
-                obj=excel_operations.ExcelFile()
-                obj.set_excel_path(fields,inp_sheet)
-                i=1
-                j=1
-                for x in columns:
-                    obj.write_cell(i,j,x)
-                    j+=1
-                b =0
-                k=2
-                for row in rows:
-                    l=1
-                    for y in row:
-                        obj.write_cell(k,l,y)
-                        l+=1
-                    k+=1
+                try:
+                    if(verify == False):
+                        try:
+                            work_book = xlwt.Workbook(encoding="utf-8") #Changed code
+                            if(inp_sheet is None or inp_sheet == ''):
+                                inp_sheet = generic_constants.DATABASE_SHEET
+                                work_sheet = work_book.add_sheet(inp_sheet)
+                            else:
+                                work_sheet = work_book.add_sheet(inp_sheet)
+                                log.debug('Input Sheet and file path while creating file :')
+                                log.debug(inp_sheet)
+                                log.debug(fields)
+                        except Exception as e:
+                            log.error(e)
+                            logger.print_on_console(e)
+                            err_msg = e
+                    if(inp_sheet is None or inp_sheet == ''):
+                        inp_sheet = generic_constants.DATABASE_SHEET
+                        log.debug('Input Sheet is :')
+                        log.debug(inp_sheet)
+                        work_book = xlwt.Workbook(encoding="utf-8")
+                        work_sheet = work_book.add_sheet(inp_sheet)
+                    i=1
+                    j=1
+                    for x in columns:
+                        work_sheet.write(i,j,x)
+                        j=j+1
+                    b=0
+                    k=2
+                    for row in rows:
+                        l=1
+                        for y in row:
+                            try:
+                                work_sheet.write(k,l,y)
+                            except Exception as e:
+                                if 'character' in str(e):
+                                    i = str(e).index('character')
+                                    err_new=str(e)[:i+len('character')]
+                                    if err_new==generic_constants.UNICODE_ERR:
+                                        newrow=[]
+                                        for ele in row:
+                                            if type(ele) == unicode:
+                                                 ele = ele.encode('utf-8')
+                                                 newrow.append(ele)
+                                            else:
+                                                newrow.append(ele)
+                                    row = tuple(newrow)
+                                    work_sheet.write(k,l,y)
+                            l+=1
+                        k+=1
+                    work_book.save(fields)
+                except Exception as e:
+                    err_msg = e
+                    logger.print_on_console(e)
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
-            elif(ext == '.csv'):
-                path = inp_file
+
+            elif(ext == '.csv'): #Code changed to write csv files
+                path = fields
                 with open(path,'w') as csvfile:
                     writer = csv.writer(csvfile)
                     writer.writerow(columns)
                     for row in rows:
-                        writer.writerow(row)
+                        try:
+                            writer.writerow(row)
+                        except Exception as e:
+                            if 'character' in str(e):
+                                i = str(e).index('character')
+                                err_new=str(e)[:i+len('character')]
+                                if err_new==generic_constants.UNICODE_ERR:
+                                    newrow=[]
+                                    for ele in row:
+                                        if type(ele) == unicode:
+                                             ele = ele.encode('utf-8')
+                                             newrow.append(ele)
+                                        else:
+                                            newrow.append(ele)
+
+                                row = tuple(newrow)
+                                writer.writerow(row)
+                csvfile.close()
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
             else:
@@ -420,21 +517,60 @@ class DatabaseOperation():
             logger.print_on_console(err_msg)
         return '',status
 
-    def create_file(self):
+    def create_file_xls(self): #Method to create xls file
         """
         def : create_file
         purpose : creates a xls file inside generic folder directory
         param :
         return : path
         """
+        path = None
+        try:
+            wb = xlwt.Workbook()
+            ws = wb.add_sheet(generic_constants.DATABASE_SHEET)
+            maindir = os.environ["NINETEEN68_HOME"]
+            path = maindir +'//Nineteen68//plugins//Generic' + generic_constants.DATABASE_FILE_XLS
+            wb.save(path)
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg = e
+        return path
+
+    def create_file_xlsx(self): #Method to create xlsx file
+        """
+        def : create_file
+        purpose : creates a xlsx file inside generic folder directory
+        param :
+        return : path
+        """
         path=None
         try:
-           wb = xlwt.Workbook()
-           ws = wb.add_sheet(generic_constants.DATABASE_SHEET)
-           maindir = os.environ["NINETEEN68_HOME"]
-           path = maindir +'//Nineteen68//plugins//Generic' + generic_constants.DATABASE_FILE
-##           path = 'D:\db5.xls'
-           wb.save(path)
+            wb = xlwt.Workbook()
+            ws = wb.add_sheet(generic_constants.DATABASE_SHEET)
+            maindir = os.environ["NINETEEN68_HOME"]
+            path = maindir +'//Nineteen68//plugins//Generic' + generic_constants.DATABASE_FILE_XLSX
+            wb.save(path)
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg = e
+        return path
+
+    def create_file_csv(self): #Method to create csv file
+        """
+        def : create_file
+        purpose : creates a csv file inside generic folder directory
+        param :
+        return : path
+        """
+        path=None
+        try:
+            maindir = os.environ["NINETEEN68_HOME"]
+            path = maindir +'//Nineteen68//plugins//Generic' + generic_constants.DATABASE_FILE_CSV
+            with open(path,'wb') as file:
+                pass
+            file.close()
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)

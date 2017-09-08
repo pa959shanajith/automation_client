@@ -37,6 +37,7 @@ class FileOperations:
         self.folder=folder_operations.FolderOperations()
         self.xls_obj=excel_operations.ExcelXLS()
         self.xlsx_obj=excel_operations.ExcelXLSX()
+        self.csv_obj=excel_operations.ExcelCSV()
 
         """Mapping of keywords to its respective methods"""
         self.dict={'.txt_write_to_file':self.txt.write_to_file,
@@ -53,6 +54,7 @@ class FileOperations:
               '.xls_compare_content':self.xls_obj.compare_content_xls,
               '.xlsx_compare_content':self.xlsx_obj.compare_content_xlsx,
               '.pdf_compare_content':self.pdf.compare_content,
+              '.csv_compare_content':self.csv_obj.compare_content_csv,
 
               '.txt_clear_content':self.txt.clear_content,
               '.xls_clear_content':self.xls_obj.clear_content_xls,

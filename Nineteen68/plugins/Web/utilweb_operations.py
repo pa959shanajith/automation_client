@@ -677,7 +677,7 @@ class UtilWebKeywords:
                     element = browser_Keywords.driver_obj.find_element_by_xpath(actual_xpath)
                     cell=table_keywords_obj.javascriptExecutor(element,row_num-1,col_num-1)
                     if webelement.is_displayed():
-                        ele_coordinates =element.location
+                        ele_coordinates=cell.location
                         hwnd=win32gui.GetForegroundWindow()
                         log.debug('Handle found ')
                         log.debug(hwnd)
@@ -691,7 +691,7 @@ class UtilWebKeywords:
                             logger.print_on_console(value)
                             offset=int(value)
                             robot=pyrobot.Robot()
-                            robot.set_mouse_pos(int(ele_coordinates.get('x'))+9,int(ele_coordinates.get('y'))+offset)
+                            robot.set_mouse_pos(int(ele_coordinates.get('x'))+9,int(ele_coordinates.get('y')))
                             log.debug('Setting the mouse position')
                             robot.mouse_down('left')
                             log.debug('Mouse click performed')
@@ -705,7 +705,7 @@ class UtilWebKeywords:
                             robot=pyrobot.Robot()
                             log.debug('Setting the mouse position')
                             if rect != '':
-                                robot.set_mouse_pos(ele_coordinates.get('x')+9,ele_coordinates.get('y')+rect[0])
+                                robot.set_mouse_pos(ele_coordinates.get('x')+9,ele_coordinates.get('y'))
                             else:
                                 robot.set_mouse_pos(ele_coordinates.get('x')+9,ele_coordinates.get('y'))
                             robot.mouse_down('left')

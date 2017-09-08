@@ -79,7 +79,7 @@ class Clickandadd():
                         else:
                             log.info('It is  iframe')
                         try:
-                            if (driver.find_elements_by_tag_name(frame_iframe)[int(j)]).is_displayed():
+                            if (driver.find_elements_by_tag_name(frame_iframe)[int(j)]):
                                 driver.switch_to.frame(driver.find_elements_by_tag_name(frame_iframe)[int(j)])
                                 log.info('Switched to frame/iframe')
                                 cond_flag_cna = True
@@ -237,7 +237,7 @@ class Clickandadd():
                         else:
                             log.info('It is iframe')
                         try:
-                            if (driver.find_elements_by_tag_name(frame_iframe)[int(j)]).is_displayed():
+                            if (driver.find_elements_by_tag_name(frame_iframe)[int(j)]):
                                 driver.switch_to.frame(driver.find_elements_by_tag_name(frame_iframe)[int(j)])
                                 log.info('Switched to frame/iframe')
                                 cond_flag_scna = True

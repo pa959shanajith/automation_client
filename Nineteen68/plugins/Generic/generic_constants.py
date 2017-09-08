@@ -43,7 +43,11 @@ INP_VAL_EXCEEDS = 'Given length should be greater than 0'
 
 DATE_FORMAT = '%d/%m/%Y'
 
-DATABASE_FILE ='//Ninteen68Database_verify.xls'
+DATABASE_FILE_XLS ='//Ninteen68Database_verify.xls'
+
+DATABASE_FILE_XLSX ='Ninteen68Database_verify.xlsx'
+
+DATABASE_FILE_CSV ='//Ninteen68Database_verify.csv'
 
 DATABASE_SHEET = 'Sheet0'
 
@@ -96,3 +100,4 @@ ERR_XML='Invalid tag/missing tag/blockcount in XML input'
 
 ERR_XML_BLOCK='Block number should be a number'
 
+UNICODE_ERR="'ascii' codec can't encode character"
