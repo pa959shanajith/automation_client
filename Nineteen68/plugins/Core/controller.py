@@ -208,20 +208,20 @@ class Controller():
                     if tsp.name.lower() in [IF]:
                         status= info_dict[-1].values()[0].lower() == ENDIF
                         if not(status):
-                            errormsg="Execution Terminated : EndIf is missing"
+                            errormsg="Execution Terminated : Dangling if/for/getparam in testcase"
                     elif tsp.name.lower() in [ELSE_IF,ELSE]:
                         status1= info_dict[-1].values()[0] == ENDIF
                         status2= info_dict[0].keys()[0] != index
                         status = status1 and status2
                         if not(status1) and status2:
-                            errormsg="Execution Terminated : EndIf is missing"
+                            errormsg="Execution Terminated : Dangling if/for/getparam in testcase"
                     elif tsp.name.lower() in [ENDIF]:
                         index=info_dict[-1].keys()[0]
                         status=self.dangling_status(index)
             else:
                 status=False
                 if tsp.name.lower() == FOR:
-                    errormsg="Execution Terminated : EndFor is missing"
+                    errormsg="Execution Terminated : Dangling if/for/getparam in testcase"
             if tsp.name.lower()==ENDLOOP and len(info_dict)<2:
                 status=False
         if not(status) and len(errormsg)>0:

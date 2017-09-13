@@ -292,7 +292,8 @@ class Handler():
             if keyword == constants.ENDFOR:
                 self.insert_into_fordict(keyword_index,keyword,start_index)
             elif keyword== constants.ENDFOR:
-                logger.print_on_console('For is missing: Invalid script ')
+                log.error('For is missing: Invalid testcase ')
+                logger.print_on_console('For is missing: Invalid testcase ')
                 flag=False
             elif keyword==constants.FOR:
                 self.insert_into_fordict(keyword_index,keyword,None)
@@ -333,6 +334,7 @@ class Handler():
                         self.insert_into_ifdict(start_index[0],start_index[1],(keyword_index,keyword))
                         condition_keywords.popitem()
                     else:
+                        log.error('IF is missing: Invalid Testcase ')
                         logger.print_on_console('IF is missing: Invalid script ')
                         flag=False
                         break
@@ -372,7 +374,8 @@ class Handler():
                         self.insert_into_getParamdict(start_index[0],start_index[1],(keyword_index,keyword))
                         getparam_keywords.popitem()
                     else:
-                        logger.print_on_console('Getparam is missing: Invalid script ')
+                        log.error('Getparam is missing: Invalid testcase ')
+                        logger.print_on_console('Getparam is missing: Invalid testcase ')
                         flag=False
                         break
         else:
@@ -461,43 +464,52 @@ class Handler():
 
         key_lower=keyword.lower()
         key=(index,key_lower)
+        tsp_step=None
+        try:
+            #block which creates the step of instances of (for,endFor)
+            if key_lower in for_array:
+                if not(for_info.has_key(key)):
+                    self.insert_into_fordict(index,key_lower,None)
+                    log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
+##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
+                tsp_step=for_step.For(index,keyword,inputval,outputval,stepnum,testscript_name,for_info[key],False,apptype,additionalinfo,i)
 
-        #block which creates the step of instances of (for,endFor)
-        if key_lower in for_array:
-            if for_info[key] is None:
-                logger.print_on_console(str(start_end_dict[key_lower])+' missing in script:'+str(testscript_name))
-            tsp_step=for_step.For(index,keyword,inputval,outputval,stepnum,testscript_name,for_info[key],False,apptype,additionalinfo,i)
+            #block which creates the step of instances (if,elseIf,else,endIf)
+            elif key_lower in if_array:
+                if not(if_info.has_key(key)):
+                    self.insert_into_ifdict(index,key_lower,None)
+                    log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
+##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
 
-        #block which creates the step of instances (if,elseIf,else,endIf)
-        elif key_lower in if_array:
-            if not(if_info.has_key(key)):
-                self.insert_into_ifdict(index,key_lower,None)
-                logger.print_on_console(str(start_end_dict[key_lower])+' keyword missing in script:'+str(testscript_name))
+                tsp_step=if_step.If(index,keyword,inputval,outputval,stepnum,testscript_name,if_info[key],False,apptype,additionalinfo,i)
 
-            tsp_step=if_step.If(index,keyword,inputval,outputval,stepnum,testscript_name,if_info[key],False,apptype,additionalinfo,i)
+            #block which creates the step of instances of (getparam,startloop,endloop)
+            elif key_lower in get_param:
+                if not(get_param_info.has_key(key)):
+                    self.insert_into_getParamdict(index,key_lower,None)
+                    log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
+##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
 
-        #block which creates the step of instances of (getparam,startloop,endloop)
-        elif key_lower in get_param:
-            if not(get_param_info.has_key(key)):
-                self.insert_into_getParamdict(index,key_lower,None)
-                logger.print_on_console(key_lower+' keyword missing in script:'+str(testscript_name))
+                if(extract_path==None):
+                    tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i)
+                else:
+                    tsp_step=getparam.GetParam(index,keyword,extract_path,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i)
 
-            if(extract_path==None):
-                tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i)
+            #block which creates the step of instances of (jumpBy)
+            elif key_lower == constants.JUMP_BY:
+                tsp_step=jumpBy.JumpBy(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype,additionalinfo,i)
+
+            #block which creates the step of instances of (jumpTo)
+            elif key_lower == constants.JUMP_TO:
+                tsp_step=jumpTo.JumpTo(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype,additionalinfo,i)
+
+            #block which creates the step of instances of (Keywords)
             else:
-                tsp_step=getparam.GetParam(index,keyword,extract_path,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i)
+                tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i)
 
-        #block which creates the step of instances of (jumpBy)
-        elif key_lower == constants.JUMP_BY:
-            tsp_step=jumpBy.JumpBy(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype,additionalinfo,i)
-
-        #block which creates the step of instances of (jumpTo)
-        elif key_lower == constants.JUMP_TO:
-            tsp_step=jumpTo.JumpTo(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype,additionalinfo,i)
-
-        #block which creates the step of instances of (Keywords)
-        else:
-            tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i)
+        except Exception as e:
+            logger.print_on_console(e)
+            log.error(e)
         return tsp_step
 
     def extract_field(self,step,index,testscript_name,i,extract_path = None):
