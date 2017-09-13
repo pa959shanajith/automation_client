@@ -316,8 +316,15 @@ class Dropdown_Keywords():
                             i = i + 1
                         except Exception as e:
                             break
-                    if(cmp(dd_entries,val) == 0):
-
+                    flag=True
+                    if len(dd_entries)==len(val):
+                        for dd in dd_entries:
+                            if dd not in val:
+                                flag=False
+                    else:
+                        flag=False
+                    #if(cmp(dd_entries,val) == 0):
+                    if flag==True:
                         status =sap_constants.TEST_RESULT_PASS
                         result =sap_constants.TEST_RESULT_TRUE
                     else:
