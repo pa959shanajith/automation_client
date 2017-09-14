@@ -73,7 +73,7 @@ class Shell_Keywords():
             logger.print_on_console('Error occured in GETCOLUMNCOUNT and is a :',e)
         return status,result,value,err_msg
 
-    def selectRows(self, sap_id,url,input_val,*args):
+    def selectRows(self, sap_id,input_val,*args):
             self.lk.setWindowToForeground(sap_id)
             id,ses=self.uk.getSapElement(sap_id)
             status=sap_constants.TEST_RESULT_FAIL
@@ -113,7 +113,7 @@ class Shell_Keywords():
                 traceback.print_exc()
             return status,result,value,err_msg
 
-    def toolBarActionKeys(self, sap_id,url,input_val,*args):
+    def toolBarActionKeys(self, sap_id,input_val,*args):
             self.lk.setWindowToForeground(sap_id)
             id,ses=self.uk.getSapElement(sap_id)
             status=sap_constants.TEST_RESULT_FAIL
@@ -146,7 +146,7 @@ class Shell_Keywords():
                 traceback.print_exc()
             return status,result,value,err_msg
 
-    def getCellText(self, sap_id,url,input_val,*args):
+    def getCellText(self, sap_id,input_val,*args):
             self.lk.setWindowToForeground(sap_id)
             id,ses=self.uk.getSapElement(sap_id)
             status=sap_constants.TEST_RESULT_FAIL
@@ -192,7 +192,7 @@ class Shell_Keywords():
                 traceback.print_exc()
             return status,result,value,err_msg
 
-    def pressToolBarButton(self, sap_id,url,input_val,*args):
+    def pressToolBarButton(self, sap_id,input_val,*args):
             self.lk.setWindowToForeground(sap_id)
             id,ses=self.uk.getSapElement(sap_id)
             status=sap_constants.TEST_RESULT_FAIL
@@ -262,7 +262,7 @@ class Shell_Keywords():
                 traceback.print_exc()
             return status,result,value,err_msg
 
-    def clickCell(self, sap_id,url,input_val,*args):
+    def clickCell(self, sap_id,input_val,*args):
             self.lk.setWindowToForeground(sap_id)
             id,ses=self.uk.getSapElement(sap_id)
             status=sap_constants.TEST_RESULT_FAIL
@@ -311,7 +311,7 @@ class Shell_Keywords():
                 traceback.print_exc()
             return status,result,value,err_msg
 
-    def doubleClickCell(self, sap_id,url,input_val,*args):
+    def doubleClickCell(self, sap_id,input_val,*args):
             self.lk.setWindowToForeground(sap_id)
             id,ses=self.uk.getSapElement(sap_id)
             status=sap_constants.TEST_RESULT_FAIL
