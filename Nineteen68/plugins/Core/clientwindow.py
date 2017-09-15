@@ -400,7 +400,8 @@ class MainNamespace(BaseNamespace):
             args=list(args)
             global socketIO
 
-            wo.runCrawler(args[0],args[1],args[2],socketIO)
+            #args[0] is URL, args[1] is level, args[2] is agent
+            wo.runCrawler(args[0],args[1],args[2],socketIO,wxObject)
 
         except Exception as e:
             import traceback
