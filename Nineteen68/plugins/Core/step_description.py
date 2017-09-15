@@ -1031,7 +1031,6 @@ class StepDescription:
             return ' Select value with index value '+ input+' in the '+"'" + tsp.custname + "'"
         def getCount():
             return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' + output + ' in ' +tsp.outputval
-
         #Radio checkbox keywords
         def selectRadioButton():
             return 'Select '+ "'" + tsp.custname + "'"
@@ -1102,6 +1101,7 @@ class StepDescription:
             return 'Wait until the element '+ "'" + tsp.custname + "'" +'is visible'
         def dropFile():
             return 'Drop file executed'
+
         #Button link keywords
         def click():
             return ' Click on the '+ "'" + tsp.custname + "'"
@@ -1141,6 +1141,8 @@ class StepDescription:
             return 'Perform drag on element '+ "'" + tsp.custname + "'"
         def drop():
             return 'Perform drop on element '+ "'" + tsp.custname + "'"
+        def selectByAbsoluteValue():
+            return 'Select value with exact text'+ "  "+"'" +input + "'"+"  " + ' present in the '+ "'" + tsp.custname + "'"
 
         #Table keywords
         def getCellToolTip():
@@ -1160,4 +1162,5 @@ class StepDescription:
             return 'Get row number of ' + "'" + tsp.custname + "'" + ' by text '+input +' and save the row number ' + output + ' in '+ tsp.outputval
         def getCellValue():
             return 'Get row number of ' + "'" + tsp.custname + "'" + ' by text '+input +' and save the row number ' + output + ' in '+ tsp.outputval
+
         return locals()[keyword]()

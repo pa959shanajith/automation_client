@@ -194,7 +194,6 @@ class Dispatcher:
                   'getRowNumByText' : self.table_object.getRowNumByText,
                   'getColNumByText' : self.table_object.getColNumByText,
                   'getInnerTable' : self.table_object.getInnerTable,
-                  'selectByAbsoluteValue':self.table_object.selectByAbsoluteValue,
                   #author : arpitha.b.v
                   #added mapping of 'getCellToolTip' and 'verifyCellToolTip' to table object
                   'getCellToolTip' : self.table_object.getCellToolTip,
@@ -229,7 +228,6 @@ class Dispatcher:
                   'selectMultipleValuesByText':self.dropdown_list_object.selectMultipleValuesByText,
                   'getMultipleValuesByIndexes':self.dropdown_list_object.getMultipleValuesByIndexes,
                   'verifyAllValues':self.dropdown_list_object.verifyAllValues,
-                  'selectbyAbsoluteValue':self.dropdown_list_object.selectByAbsoluteValue,
 
                   #author :arpitha.b.v
                 #Added mapping of "getAllValues" keyword values to dropdown's object
@@ -255,7 +253,7 @@ class Dispatcher:
                   'mouseClick':self.util_object.mouse_click,
                   'verifyWebImages':self.util_object.verify_web_images,
                   'waitForElementVisible':self.element_object.waitforelement_visible,
-
+                  'selectByAbsoluteValue':self.util_object.selectByAbsoluteValue,
 
 
                   'openBrowser':self.browser_object.openBrowser,
