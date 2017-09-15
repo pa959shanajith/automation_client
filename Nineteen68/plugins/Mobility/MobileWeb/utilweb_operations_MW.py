@@ -572,7 +572,7 @@ class UtilWebKeywords:
             if file1 != None and file2 != None and  file2 != '' and os.path.exists(file2) :
                 log.debug('comparing the images')
                 if self.verify_image_obj != None: #Meaning user has advanced image processing plugin
-                    print 'Entered advanced'
+                    #print 'Entered advanced'
                     if self.verify_image_obj.imagecomparison(file1,file2):
                         info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
                         log.info(info_msg)
@@ -580,20 +580,26 @@ class UtilWebKeywords:
                         methodoutput=TEST_RESULT_TRUE
                         status=TEST_RESULT_PASS
                     else:
+                		#using MSE
                         from PIL import Image
                         import numpy as np
-                        size=(128,128)
+
                         img1 = Image.open(file1)
                         img2 = Image.open(file2)
+                        width1, height1 = img1.size
+                        width2, height2 = img2.size
+                        size=(min(width1,width2,1024),min(height1,height2,800))
                         img1 = img1.convert('RGB')
                         img2 = img2.convert('RGB')
-                        img1 = img1.resize(size);
-                        img2 = img2.resize(size);
+                        img1 = img1.resize(size)
+                        img2 = img2.resize(size)
                         imageA = np.asarray(img1)
                         imageB = np.asarray(img2)
                         err = np.sum((imageA.astype("float") - imageB.astype("float"))**2)
-                        err /= float(imageA.shape[0] * imageA.shape[1])
-                        if(err<1000):
+                        #print 'err: ',err
+                        err /= float(size[0]*size[1]*3*255*255);
+                        #print 'err %: ',err*100,'%'
+                        if(err<0.0005):
                             info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
                             log.info(info_msg)
                             logger.print_on_console(info_msg)
