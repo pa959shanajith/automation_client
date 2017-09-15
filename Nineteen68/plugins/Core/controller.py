@@ -727,7 +727,8 @@ class Controller():
             for k in range(len(tsplist)):
                 if tsplist[k].name.lower() == 'openbrowser':
                     if tsplist[k].apptype.lower()=='web':
-                        tsplist[k].inputval = browser_type
+                        if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
+                            tsplist[k].inputval = browser_type
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
@@ -849,7 +850,8 @@ class Controller():
                                     for k in range(len(tsplist)):
                                         if tsplist[k].name.lower() == 'openbrowser':
                                             if tsplist[k].apptype.lower()=='web':
-                                                tsplist[k].inputval = [browser]
+                                                if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
+                                                        tsplist[k].inputval = [browser]
 ##                            if len(handler.tspList)==0:
 ##                                execute_flag=False
 ##                                logger.print_on_console('Scenario '+str((i  + 1 ) )+' is empty')
