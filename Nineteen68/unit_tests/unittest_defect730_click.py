@@ -11,13 +11,18 @@
 import pywinauto
 
 def click(args):
+    import os
+    dir = os.path.dirname(__file__)
+    filename = os.path.join(dir, 'unittest_defect730_input.txt')
     result = False
-    id = "/app/con[0]/ses[0]/wnd[1]/usr/tblSAPLMGMMTC_VIEW"
     import win32com.client
     SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
     ses = SapGui.FindById("ses[0]")
+    f = open(filename, 'r+')
+    id = f.readline()
+    if(id[-1]=="\n"):
+        id = id[:-1]
     elem=ses.FindById(id)
-    print args[0]
     try:
         #------------------------------Condition to check if its a table element
             if(elem.type=='GuiTableControl'):
