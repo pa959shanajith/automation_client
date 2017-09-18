@@ -1,5 +1,3 @@
-#pytest script for imageverification unit testing
-
 def func(file1,file2):
     from PIL import Image
     import numpy as np
@@ -29,49 +27,28 @@ def func(file1,file2):
         #logger.print_on_console(info_msg)
         #methodoutput=TEST_RESULT_TRUE
         #status=TEST_RESULT_PASS
-							status='true'
+        status='true'
     else:
-							status='false'
+        status='false'
         #err_msg=ERROR_CODE_DICT['ERR_IMAGE_COMPARE_FAIL']
     return status
 
-path='D:\\Himanshu\\imgs\\'
 
-class TestClass(object):
-    def test_same(self):
-        file1=path+'testimg.jpg'
-        file2=path+'testimg.jpg'
-        assert func(file1,file2) == 'true'
-    def test_jpg_png(self):
-        x = "this"
-        file1=path+'testimg.jpg'
-        file2=path+'testimg.png'
-        assert func(file1,file2) == 'true'
-    def test_jpg_gif(self):
-        file1=path+'testimg.jpg'
-        file2=path+'testimg.gif'
-        assert func(file1,file2) == 'true'
-    def test_lines(self):
-        file1=path+'testimg.jpg'
-        file2=path+'testimg_lines.jpg'
-        assert func(file1,file2) == 'false'
-    def test_lines_png(self):
-        file1=path+'testimg.jpg'
-        file2=path+'testimg_lines.png'
-        assert func(file1,file2) == 'false'
-    def test_diff(self):
-        file1=path+'testimg.jpg'
-        file2=path+'testimg_diff.jpg'
-        assert func(file1,file2) == 'false'
-    def tes_resize(self):
-        file1=path+'testimg.jpg'
-        file2=path+'testimg_resize.jpg'
-        assert func(file1,file2) == 'true'
-    def test_resolution(self):
-        file1=path+'testimg.jpg'
-        file2=path+'testimg_resolution.jpg'
-        assert func(file1,file2) == 'true'
-    def test_diff_gif(self):
-        file1=path+'testimg.jpg'
-        file2=path+'loader.gif'
-        assert func(file1,file2) == 'false'
+var_name=[]
+with open("unit_test_Imageverification_input.txt") as f:
+    for line in f:
+        if(line.strip()!=''):
+            if(line.find('$')!=-1):
+                path=line[line.find('=')+1:].strip()
+#               print path
+            elif(line.find('#')==-1):
+                eq_index = line.find(',')
+                eq_index1 = line.find(' ')
+                var_name.append((path+line[:eq_index].strip(),path+line[eq_index+1:eq_index1].strip(),line[eq_index1:].strip()))
+#               print(var_name)
+
+# content of test_expectation.py
+import pytest
+@pytest.mark.parametrize("input1,input2,expected", var_name)
+def test_myfunc(input1,input2, expected):
+    assert func(input1,input2) == expected
