@@ -456,7 +456,12 @@ class Controller():
             #data size check
             if self.core_utilsobject.getdatasize(display_keyword_response,'mb') < 10:
                 if not isinstance(display_keyword_response,list):
-                    logger.print_on_console('Result obtained is ',display_keyword_response)
+                    if tsp.name == 'getIndexCount':
+                        if '@' in display_keyword_response:
+                            row,col=display_keyword_response.split('@')
+                        logger.print_on_console("The index count for the dynamic variable is " + "Row: "+str(row) + " and Column: "+str(col))
+                    else:
+                        logger.print_on_console('Result obtained is ',display_keyword_response)
                 else:
                     logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i])
                     if not isinstance(display_keyword_response[i],basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
