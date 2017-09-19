@@ -48,7 +48,7 @@ class ElementKeywords():
         #log.info(RETURN_RESULT)
         return status,result,value,err_msg
 
-    def verify_element_text(self, sap_id,url,input_val, *args):
+    def verify_element_text(self, sap_id,input_val, *args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
@@ -181,7 +181,7 @@ class ElementKeywords():
             if(id != None):
                         #------------------------------Condition to check if its a table element
                         if(elem.type=='GuiTableControl'):
-                            arg=args[1]
+                            arg=args[0]
                             if len(arg) > 0 and len(arg)==2 :
                                 row=int(arg[0])-1
                                 col=int(arg[1])-1
@@ -190,7 +190,7 @@ class ElementKeywords():
                                 elem=None
                                 logger.print_on_console('Invalid Arguments Passed')
 
-                        if(elem.type == "GuiTextField" or elem.type == "GuiCTextField" or elem.type == "GuiRadioButton" or elem.type == "GuiCheckBox"):
+                        if(elem.type == "GuiTextField" or elem.type == "GuiCTextField"):
                             elem.SetFocus()
                             sendfnt.sendfunction_keys("F4")
                             d1,d2,error,d3=self.lk.getErrorMessage()
@@ -224,7 +224,7 @@ class ElementKeywords():
         try:
         #------------------------------Condition to check if its a table element
             if(elem.type=='GuiTableControl'):
-                arg=args[1]
+                arg=args[0]
                 if(len(arg)==1 and arg[0]==''):
                     pass
                 elif len(arg)==2 :
@@ -263,7 +263,7 @@ class ElementKeywords():
         try:
         #------------------------------Condition to check if its a table element
             if(elem.type=='GuiTableControl'):
-                arg=args[1]
+                arg=args[0]
                 if(len(arg)==1 and arg[0]==''):
                     pass
                 elif len(arg)==2:
@@ -311,12 +311,19 @@ class ElementKeywords():
 
             #------------------------------Condition to check if its a table element
                 if(elem.type=='GuiTableControl'):
-                    arg=args[1]
+                    arg=args[0]
                     if(len(arg)==1 and arg[0]==''):
                         pass
-                    elif len(arg)==2:
-                        row=int(arg[0])-1
-                        col=int(arg[1])-1
+                    elif (len(arg)==2):
+                        if(isinstance(arg[0],int) and isinstance(arg[1],int)):
+                            row=int(arg[0])-1
+                            col=int(arg[1])-1
+                            elem = elem.GetCell(row, col)
+                        else:
+                            pass
+                    elif(len(arg)>2):
+                        row=int(arg[2])-1
+                        col=int(arg[3])-1
                         elem = elem.GetCell(row, col)
                     else:
                         elem=None
@@ -354,7 +361,7 @@ class ElementKeywords():
 
                 #------------------------------Condition to check if its a table element
                     if(elem.type=='GuiTableControl'):
-                        arg=args[1]
+                        arg=args[0]
                         if(len(arg)==1 and arg[0]==''):
                             pass
                         elif len(arg)==2:
@@ -396,7 +403,7 @@ class ElementKeywords():
         try:
         #------------------------------Condition to check if its a table element
             if(elem.type=='GuiTableControl'):
-                arg=args[1]
+                arg=args[0]
                 if(len(arg)==1 and arg[0]==''):
                     pass
                 elif len(arg)==2 :
@@ -422,7 +429,7 @@ class ElementKeywords():
             err_msg = sap_constants.ERROR_MSG
         return status,result,value,err_msg
 #-----------------------------------------------------------------Scroll_Bar_related_keywords
-    def scrollUp(self, sap_id,url, input_val,*args):
+    def scrollUp(self, sap_id, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
@@ -457,7 +464,7 @@ class ElementKeywords():
             err_msg=sap_constants.INVALID_INPUT
         return status,result,value,err_msg
 
-    def scrollDown(self, sap_id,url, input_val,*args):
+    def scrollDown(self, sap_id, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
@@ -490,7 +497,7 @@ class ElementKeywords():
             err_msg=sap_constants.INVALID_INPUT
         return status,result,value,err_msg
 
-    def scrollLeft(self, sap_id,url, input_val,*args):
+    def scrollLeft(self, sap_id, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
@@ -523,7 +530,7 @@ class ElementKeywords():
             err_msg=sap_constants.INVALID_INPUT
         return status,result,value,err_msg
 
-    def scrollRight(self, sap_id,url, input_val,*args):
+    def scrollRight(self, sap_id, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
@@ -603,7 +610,7 @@ class ElementKeywords():
 #----------------------------------------------------------Scroll bar operations
 
 #-----------------------------------------------------------------Tabs_Related_related_keywords
-    def moveTabs(self, sap_id,url, input_val,*args):
+    def moveTabs(self, sap_id,*args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
@@ -620,7 +627,7 @@ class ElementKeywords():
             err_msg = sap_constants.ERROR_MSG
         return status,result,value,err_msg
 
-    def selectTab(self, sap_id,url, input_val,*args):
+    def selectTab(self, sap_id,*args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL

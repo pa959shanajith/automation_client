@@ -708,8 +708,7 @@ class DropdownKeywords():
                         for x in range(0,len(index)):
                             value = select.all_selected_options[x].text
                             if input[0] == "1":
-                                output = output.strip()
-##                            value = str(out)
+                                value = value.strip()
                             temp.append(value)
                         output = ';'.join(temp)
                         logger.print_on_console(output)
@@ -1093,14 +1092,13 @@ class DropdownKeywords():
                         temp = []
                         flag = True
                         for x in range(0,opt_len):
-                            internal_val = select.options[x].text
-##                            str(internal_val)
+                            internal_val = select.options[x].text.strip()
                             temp.append(internal_val)
                         log.debug('temp value obtained')
                         log.debug(temp)
                         count = 0
                         for y in range(0,inp_val_len):
-                            input_temp = input[y]
+                            input_temp = input[y].strip()
                             if (input_temp in temp):
                                 count+=1
                             else:
@@ -1165,3 +1163,4 @@ class DropdownKeywords():
                 log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
         return status,result,verb,err_msg
+

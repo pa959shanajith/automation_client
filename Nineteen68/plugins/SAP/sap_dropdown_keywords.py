@@ -122,7 +122,7 @@ class Dropdown_Keywords():
 ##            log.error(err_msg,e)
 ##        return status,result,value,err_msg
 
-    def selectValueByText(self,sap_id,url,input_val, *args):
+    def selectValueByText(self,sap_id,input_val, *args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
@@ -162,7 +162,7 @@ class Dropdown_Keywords():
 
 
 
-    def verifySelectedValue(self,sap_id,url,input_val ,*args):
+    def verifySelectedValue(self,sap_id,input_val ,*args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         val=input_val[0]
@@ -223,7 +223,7 @@ class Dropdown_Keywords():
               err_msg = sap_constants.ERROR_MSG
         return status,result,value,err_msg
 
-    def verifyCount(self,sap_id,url,input_val, *args):
+    def verifyCount(self,sap_id,input_val, *args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         length = int(input_val[0])
@@ -260,7 +260,7 @@ class Dropdown_Keywords():
               err_msg = sap_constants.ERROR_MSG
         return status,result,verb,err_msg
 
-    def verifyValuesExists(self,sap_id,url,input_val, *args):
+    def verifyValuesExists(self,sap_id,input_val, *args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
@@ -296,7 +296,7 @@ class Dropdown_Keywords():
         return status,result,verb,err_msg
 
 
-    def verifyAllValues(self,sap_id,url,input_val, *args):
+    def verifyAllValues(self,sap_id,input_val, *args):
         self.lk.setWindowToForeground(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -316,8 +316,15 @@ class Dropdown_Keywords():
                             i = i + 1
                         except Exception as e:
                             break
-                    if(cmp(dd_entries,val) == 0):
-
+                    flag=True
+                    if len(dd_entries)==len(val):
+                        for dd in dd_entries:
+                            if dd not in val:
+                                flag=False
+                    else:
+                        flag=False
+                    #if(cmp(dd_entries,val) == 0):
+                    if flag==True:
                         status =sap_constants.TEST_RESULT_PASS
                         result =sap_constants.TEST_RESULT_TRUE
                     else:

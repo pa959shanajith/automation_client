@@ -15,6 +15,7 @@ from selenium.common.exceptions import *
 import logger
 import browser_Keywords
 from utils_web import Utils
+import webconstants
 from webconstants import *
 import platform
 if platform.system()!='Darwin':
@@ -24,8 +25,11 @@ if platform.system()!='Darwin':
 import table_keywords
 import time
 import urllib, cStringIO
+import core_utils
+from selenium.webdriver.support.ui import Select
 import logging
 from constants import *
+from  selenium.webdriver.common import action_chains
 
 log = logging.getLogger('utilweb_operations.py')
 
@@ -670,50 +674,62 @@ class UtilWebKeywords:
                 log.info(INPUT_IS)
                 log.info(input)
                 if not(input is None):
-                    row_num=int(input[0])
-                    col_num=int(input[1])
-                    table_keywords_obj=table_keywords.TableOperationKeywords()
-                    actual_xpath=table_keywords_obj.getElemntXpath(webelement)
-                    element = browser_Keywords.driver_obj.find_element_by_xpath(actual_xpath)
-                    cell=table_keywords_obj.javascriptExecutor(element,row_num-1,col_num-1)
-                    if webelement.is_displayed():
-                        ele_coordinates=cell.location
-                        hwnd=win32gui.GetForegroundWindow()
-                        log.debug('Handle found ')
-                        log.debug(hwnd)
+                    row_num=int(input[0])-1
+                    col_num=int(input[1])-1
+                    from table_keywords import TableOperationKeywords
+                    tableops = TableOperationKeywords()
+                    cell=tableops.javascriptExecutor(webelement,row_num,col_num)
+                    element_list=cell.find_elements_by_xpath('.//*')
+                    if len(list(element_list))>0:
+                        xpath=tableops.getElemntXpath(element_list[0])
+                        cell=browser_Keywords.driver_obj.find_element_by_xpath(xpath)
 
-                        if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
-                            info_msg='Firefox browser'
-                            log.info(info_msg)
-                            logger.print_on_console(info_msg)
-                            javascript = "return window.mozInnerScreenY"
-                            value=browser_Keywords.driver_obj.execute_script(javascript)
-                            logger.print_on_console(value)
-                            offset=int(value)
-                            robot=pyrobot.Robot()
-                            robot.set_mouse_pos(int(ele_coordinates.get('x'))+9,int(ele_coordinates.get('y')))
-                            log.debug('Setting the mouse position')
-                            robot.mouse_down('left')
-                            log.debug('Mouse click performed')
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
-                        else:
-                            utils=Utils()
-                            utils.enumwindows()
-                            logger.print_on_console("UTIL WIND")
-                            rect=utils.rect
-                            robot=pyrobot.Robot()
-                            log.debug('Setting the mouse position')
-                            if rect != '':
-                                robot.set_mouse_pos(ele_coordinates.get('x')+9,ele_coordinates.get('y'))
+                    if(cell!=None):
+                        log.debug('checking for element enabled')
+                        webelement=cell
+                        if cell.is_enabled():
+                            ele_coordinates=cell.location
+                            logger.print_on_console(ele_coordinates)
+                            hwnd=win32gui.GetForegroundWindow()
+                            log.debug('Handle found ')
+                            log.debug(hwnd)
+                            if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
+                                info_msg='Firefox browser'
+                                log.info(info_msg)
+                                logger.print_on_console(info_msg)
+                                javascript = "return window.mozInnerScreenY"
+                                value=browser_Keywords.driver_obj.execute_script(javascript)
+                                logger.print_on_console(value)
+                                offset=int(value)
+                                robot=pyrobot.Robot()
+                                robot.set_mouse_pos(int(ele_coordinates.get('x')+9),int(ele_coordinates.get('y')+offset-5))
+                                log.debug('Setting the mouse position')
+                                robot.mouse_down('left')
+                                log.debug('Mouse click performed')
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+
                             else:
-                                robot.set_mouse_pos(ele_coordinates.get('x')+9,ele_coordinates.get('y'))
-                            robot.mouse_down('left')
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
+                                utils=Utils()
+                                utils.enumwindows()
+                                logger.print_on_console("UTIL WIND")
+                                rect=utils.rect
+                                robot=pyrobot.Robot()
+                                log.debug('Setting the mouse position')
+                                logger.print_on_console('before loc')
+                                location=utils.get_element_location(webelement)
+                                logger.print_on_console(location)
+                                robot.set_mouse_pos(int(location.get('x'))+9,int(location.get('y')+rect[1]+6))
+                                logger.print_on_console('after loc')
+                                robot.mouse_down('left')
+                                logger.print_on_console('button press')
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
 
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
+
+
         return status,methodoutput,output,err_msg
 
     def verify_web_images(self,webelement,input,*args):
@@ -777,3 +793,110 @@ class UtilWebKeywords:
         window_handles=browser_Keywords.all_handles
         logger.print_on_console('Window handles size '+str(len(window_handles)))
         return window_handles
+
+        """
+        Match with Exact text for table with dropdown and  dropdown
+
+        """
+
+    def selectByAbsoluteValue(self,webelement,input,*args):
+        status=webconstants.TEST_RESULT_FAIL
+        result=webconstants.TEST_RESULT_FALSE
+        visibilityFlag=True
+        verb = OUTPUT_CONSTANT
+        err_msg=None
+        if webelement is not None:
+            if (input is not None) :
+                if len(input)==5:
+                    if webelement.tag_name=='table':
+                        dropVal=input[2]
+                        row_num=int(input[0])-1
+                        col_num=int(input[1])-1
+                        inp_val = input[4]
+                        try:
+                            if dropVal.lower()=='dropdown':
+                                driver=browser_Keywords.driver_obj
+                                log.debug('got the driver instance from browser keyword')
+                                visibleFlag=True
+                                if visibleFlag==True:
+                                    from table_keywords import TableOperationKeywords
+                                    tableops = TableOperationKeywords()
+                                    cell=tableops.javascriptExecutor(webelement,row_num,col_num)
+                                    element_list=cell.find_elements_by_xpath('.//*')
+                                    if len(list(element_list))>0:
+                                        xpath=tableops.getElemntXpath(element_list[0])
+                                        cell=browser_Keywords.driver_obj.find_element_by_xpath(xpath)
+                                        log.debug('checking for element not none')
+                                        if(cell!=None):
+                                            log.debug('checking for element enabled')
+                                            if cell.is_enabled():
+                                                if len(inp_val.strip()) != 0:
+                                                    select = Select(cell)
+                                                    iList = select.options
+                                                else:
+                                                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                                    log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                    else:
+                                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                        except Exception as e:
+                            log.error(e)
+
+                            logger.print_on_console(e)
+                            err_msg=e
+                elif (len(input) == 1):
+                    if input[0] != '':
+                        try:
+                            inp_val = input[0]
+                            log.info('Input value obtained')
+                            log.info(inp_val)
+                            coreutilsobj=core_utils.CoreUtils()
+                            inp_val=coreutilsobj.get_UTF_8(inp_val)
+                            if len(inp_val.strip()) != 0:
+                                select = Select(webelement)
+                                iList = select.options
+                            else:
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                        except Exception as e:
+                            log.error(e)
+                            logger.print_on_console(e)
+                            err_msg=e
+                    else:
+                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                else:
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                try:
+                    if inp_val !='':
+                        temp=[]
+                        for i in range (0,len(iList)):
+                            internal_val = iList[i].text
+                            temp.append(internal_val)
+                        if (inp_val in temp):
+                            status=webconstants.TEST_RESULT_PASS
+                            result=webconstants.TEST_RESULT_TRUE
+                            log.info('Values Match')
+                        else:
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                            log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                            err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                    else:
+                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+
+                except Exception as e:
+                    log.error(e)
+                    logger.print_on_console(e)
+                    err_msg=e
+        return status,result,verb,err_msg
+
+
+

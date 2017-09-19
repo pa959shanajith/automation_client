@@ -79,7 +79,6 @@ class SAPDispatcher:
         output = teststepproperty.outputval
         objectname = objectname.strip()
         keyword = teststepproperty.name.lower()
-        url = teststepproperty.url
         err_msg=None
         result=[sap_constants.TEST_RESULT_FAIL,sap_constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
 #-----------------------------------------------------------------for custom objects
@@ -183,7 +182,7 @@ class SAPDispatcher:
                 if keyword=='serverconnect' or keyword=='launchapplication' or keyword=='starttransaction' or keyword=='toolbaraction' :
                     result= dict[keyword](input,output)
                 else:
-                    result= dict[keyword](objectname,url,input,output)
+                    result= dict[keyword](objectname,input,output)
                 if not(sap_constants.ELEMENT_FOUND) and self.exception_flag:
                     logger.print_on_console('Element not found terminating')
                     result=constants.TERMINATE

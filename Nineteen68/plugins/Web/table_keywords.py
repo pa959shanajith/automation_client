@@ -18,6 +18,7 @@ import logger
 import json
 from  selenium.webdriver.common import action_chains
 import time
+from selenium.webdriver.support.ui import Select
 import browser_Keywords
 driver=''
 import logging
@@ -725,6 +726,74 @@ class TableOperationKeywords():
                     logger.print_on_console(e)
                     err_msg=E
             return status,methodoutput,web_element,err_msg
+
+
+        """
+        Match with Exact text
+
+        """
+
+        def selectByAbsoluteValue(self,webelement,input,*args):
+            status=webconstants.TEST_RESULT_FAIL
+            result=webconstants.TEST_RESULT_FALSE
+            visibilityFlag=True
+            verb = OUTPUT_CONSTANT
+            err_msg=None
+            if webelement is not None:
+                if webelement.tag_name=='table':
+                    if (input is not None) :
+                        if len(input)==5:
+                            dropVal=input[2]
+                            row_num=int(input[0])
+                            col_num=int(input[1])
+                            inp_val = input[4]
+                    if dropVal.lower()=='dropdown':
+                        driver=browser_Keywords.driver_obj
+                        log.debug('got the driver instance from browser keyword')
+                        visibleFlag=True
+                        if visibleFlag==True:
+                            try:
+                                cell=self.javascriptExecutor(webelement,row_num,col_num)
+                                element_list=cell.find_elements_by_xpath('.//*')
+                                if len(list(element_list))>0:
+                                    xpath=self.getElemntXpath(element_list[0])
+                                    cell=browser_Keywords.driver_obj.find_element_by_xpath(xpath)
+                                try:
+                                    log.debug('checking for element not none')
+                                    if(cell!=None):
+                                        log.debug('checking for element enabled')
+                                        if cell.is_enabled():
+                                            if len(inp_val.strip()) != 0:
+                                                select = Select(cell)
+                                                iList = select.options
+                                                temp=[]
+                                                for i in range (0,len(iList)):
+                                                    internal_val = iList[i].text
+                                                    temp.append(internal_val)
+                                                if (inp_val in temp):
+                                                    status=webconstants.TEST_RESULT_PASS
+                                                    result=webconstants.TEST_RESULT_TRUE
+                                                    log.info('Values Match')
+                                                else:
+                                                    logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                                    log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                                            else:
+                                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                except Exception as e:
+                                    log.error(e)
+                                    logger.print_on_console(e)
+                                    err_msg=E
+                            except Exception as e:
+                                log.error(e)
+
+                                logger.print_on_console(e)
+                                err_msg=E
+            return status,result,verb,err_msg
+
+
 
 
 ##if __name__ == '__main__':

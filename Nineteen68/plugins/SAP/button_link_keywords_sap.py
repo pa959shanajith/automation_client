@@ -55,7 +55,7 @@ class ButtonLinkKeyword():
 ##            log.error(e)
 ##        return status,result,value,err_msg
 
-    def get_button_name(self,  sap_id ,url, input_val, *args):
+    def get_button_name(self,  sap_id , *args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
@@ -63,7 +63,6 @@ class ButtonLinkKeyword():
         log.debug('Got window name after launching application')
         #log.debug(sap_launch_keywords.window_name)
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        name=input_val[0]
         #verb = OUTPUT_CONSTANT
         value=OUTPUT_CONSTANT
         err_msg=None
@@ -87,7 +86,7 @@ class ButtonLinkKeyword():
 
         return status,result,value,err_msg
 
-    def verify_button_name(self,  sap_id ,url, input_val, *args):
+    def verify_button_name(self,  sap_id , input_val, *args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
@@ -118,7 +117,7 @@ class ButtonLinkKeyword():
 
         return status,result,value,err_msg
 
-    def button_uploadFile(self,sap_id, url, input_val, *args):
+    def button_uploadFile(self,sap_id, input_val, *args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL

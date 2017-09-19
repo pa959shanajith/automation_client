@@ -82,7 +82,7 @@ class Table_keywords():
         return status,result,value,err_msg
 
 
-    def getColNumByText(self, sap_id,url, input_val,*args):
+    def getColNumByText(self, sap_id, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         colText=input_val[0]
         id,ses=self.uk.getSapElement(sap_id)
@@ -118,7 +118,7 @@ class Table_keywords():
 
 
 
-    def getRowNumByText(self, sap_id,url, input_val,*args):
+    def getRowNumByText(self, sap_id, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         rowText=input_val[0]
         id,ses=self.uk.getSapElement(sap_id)
@@ -154,7 +154,7 @@ class Table_keywords():
 
 
 
-    def getCellValue(self, sap_id,url, input_val,*args):
+    def getCellValue(self, sap_id, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-1
         col=int(input_val[1])-1
@@ -175,7 +175,7 @@ class Table_keywords():
 
 
 
-    def verifyCellValue(self, sap_id,url, input_val,*args):
+    def verifyCellValue(self, sap_id, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-1
         col=int(input_val[1])-1
@@ -200,7 +200,7 @@ class Table_keywords():
 
 
 
-    def verifyTextExists(self, sap_id,url, input_val,*args):
+    def verifyTextExists(self, sap_id, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         text=input_val[0]
         id,ses=self.uk.getSapElement(sap_id)
@@ -281,7 +281,7 @@ class Table_keywords():
 
 
 
-    def selectValueByIndex(self, sap_id,url, input_val,*args):
+    def selectValueByIndex(self, sap_id, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-1
         col=int(input_val[1])-1
@@ -311,7 +311,7 @@ class Table_keywords():
 
 
 
-    def selectValueByText(self, sap_id, url,input_val,*args):
+    def selectValueByText(self, sap_id, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-1
         col=int(input_val[1])-1
@@ -340,7 +340,7 @@ class Table_keywords():
 
 
 
-    def getSelected(self, sap_id,url, input_val,*args):
+    def getSelected(self, sap_id, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-1
         col=int(input_val[1])-1
@@ -368,7 +368,7 @@ class Table_keywords():
 
 
 
-    def getStatus(self, sap_id, url,input_val,*args):
+    def getStatus(self, sap_id,input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-1
         col=int(input_val[1])-1
@@ -396,7 +396,7 @@ class Table_keywords():
         return status,result,value,err_msg
 
 
-    def selectRow(self, sap_id,url, input_val,*args):
+    def selectRow(self, sap_id, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         rowNum=int(input_val[0])-1
         id,ses=self.uk.getSapElement(sap_id)
@@ -422,7 +422,7 @@ class Table_keywords():
 
 
 
-    def unselectRow(self, sap_id,url, input_val,*args):
+    def unselectRow(self, sap_id, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         rowNum=int(input_val[0])-1
         id,ses=self.uk.getSapElement(sap_id)

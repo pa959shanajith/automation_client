@@ -208,20 +208,20 @@ class Controller():
                     if tsp.name.lower() in [IF]:
                         status= info_dict[-1].values()[0].lower() == ENDIF
                         if not(status):
-                            errormsg="Execution Terminated : EndIf is missing"
+                            errormsg="Execution Terminated : Dangling if/for/getparam in testcase"
                     elif tsp.name.lower() in [ELSE_IF,ELSE]:
                         status1= info_dict[-1].values()[0] == ENDIF
                         status2= info_dict[0].keys()[0] != index
                         status = status1 and status2
                         if not(status1) and status2:
-                            errormsg="Execution Terminated : EndIf is missing"
+                            errormsg="Execution Terminated : Dangling if/for/getparam in testcase"
                     elif tsp.name.lower() in [ENDIF]:
                         index=info_dict[-1].keys()[0]
                         status=self.dangling_status(index)
             else:
                 status=False
                 if tsp.name.lower() == FOR:
-                    errormsg="Execution Terminated : EndFor is missing"
+                    errormsg="Execution Terminated : Dangling if/for/getparam in testcase"
             if tsp.name.lower()==ENDLOOP and len(info_dict)<2:
                 status=False
         if not(status) and len(errormsg)>0:
@@ -456,7 +456,12 @@ class Controller():
             #data size check
             if self.core_utilsobject.getdatasize(display_keyword_response,'mb') < 10:
                 if not isinstance(display_keyword_response,list):
-                    logger.print_on_console('Result obtained is ',display_keyword_response)
+                    if tsp.name == 'getIndexCount':
+                        if '@' in display_keyword_response:
+                            row,col=display_keyword_response.split('@')
+                        logger.print_on_console("The index count for the dynamic variable is " + "Row: "+str(row) + " and Column: "+str(col))
+                    else:
+                        logger.print_on_console('Result obtained is ',display_keyword_response)
                 else:
                     logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i])
                     if not isinstance(display_keyword_response[i],basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
@@ -727,7 +732,8 @@ class Controller():
             for k in range(len(tsplist)):
                 if tsplist[k].name.lower() == 'openbrowser':
                     if tsplist[k].apptype.lower()=='web':
-                        tsplist[k].inputval = browser_type
+                        if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
+                            tsplist[k].inputval = browser_type
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
@@ -849,7 +855,8 @@ class Controller():
                                     for k in range(len(tsplist)):
                                         if tsplist[k].name.lower() == 'openbrowser':
                                             if tsplist[k].apptype.lower()=='web':
-                                                tsplist[k].inputval = [browser]
+                                                if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
+                                                        tsplist[k].inputval = [browser]
 ##                            if len(handler.tspList)==0:
 ##                                execute_flag=False
 ##                                logger.print_on_console('Scenario '+str((i  + 1 ) )+' is empty')

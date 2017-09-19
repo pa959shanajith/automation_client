@@ -23,7 +23,7 @@ class Text_Keywords():
         self.uk = SapUtilKeywords()
         self.lk =Launch_Keywords()
 
-    def getText(self, sap_id,url, *args):
+    def getText(self, sap_id, *args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
@@ -51,10 +51,10 @@ class Text_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
             Exceptions.error(e)
-            logger.print_on_console('Error cooured in getText and is a :',e)
+            logger.print_on_console('Error occured in getText and is a :',e)
         return status,result,value,err_msg
 
-    def setText(self, sap_id,url,input_val, *args):
+    def setText(self, sap_id,input_val, *args):
         ses=''
         id=''
         self.lk.setWindowToForeground(sap_id)
@@ -91,7 +91,7 @@ class Text_Keywords():
             traceback.print_exc()
         return status,result,value,err_msg
 
-    def setSecureText(self, sap_id,url, input_val,*args):
+    def setSecureText(self, sap_id, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         if(len(input_val)>1):
             text = input_val[2]
@@ -125,7 +125,7 @@ class Text_Keywords():
             logger.print_on_console(err_msg,e)
         return status,result,value,err_msg
 
-    def clearText(self, sap_id,url, *args):
+    def clearText(self, sap_id, *args):
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         status=sap_constants.TEST_RESULT_FAIL
@@ -153,7 +153,7 @@ class Text_Keywords():
             logger.print_on_console('Error occurred in getText and is a :',e)
         return status,result,value,err_msg
 
-    def verifyText(self, sap_id,url,input_val, *args):
+    def verifyText(self, sap_id,input_val, *args):
         self.lk.setWindowToForeground(sap_id)
         text=input_val[0]
         id,ses=self.uk.getSapElement(sap_id)
@@ -199,11 +199,11 @@ class Text_Keywords():
                   logger.print_on_console('element not present on the page where operation is trying to be performed')
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console('Error cooured in getText and is a :',e)
+            logger.print_on_console('Error occured in getText and is a :',e)
         return status,result,value,err_msg
 
 
-    def verifyTextboxLength(self, sap_id,url,input_val, *args):
+    def verifyTextboxLength(self, sap_id,input_val, *args):
         self.lk.setWindowToForeground(sap_id)
         length=int(input_val[0])
         id,ses=self.uk.getSapElement(sap_id)
