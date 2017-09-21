@@ -1,0 +1,1 @@
+/app/con[0]/ses[0]/wnd[1]/usr/tblSAPLMGMMTC_VIEW

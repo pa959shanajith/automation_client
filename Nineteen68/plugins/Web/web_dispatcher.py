@@ -338,8 +338,8 @@ class Dispatcher:
                 result=list(result)
                 result[3]=err_msg
             screen_shot_obj = screenshot_keywords.Screenshot()
-            if self.action == 'execute':
-                if result !=constants.TERMINATE:
+            if self.action == EXECUTE:
+                if result != TERMINATE:
                     result=list(result)
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':

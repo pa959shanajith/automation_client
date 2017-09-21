@@ -221,15 +221,15 @@ class DatabaseOperation():
                 if (ext == '.xls' or ext == '.xlsx'):
                     work_book = xlwt.Workbook(encoding="utf-8")
                     work_sheet = work_book.add_sheet(generic_constants.DATABASE_SHEET)
-                    i=1
-                    j=1
+                    i=0
+                    j=0
                     for x in columns:
                         work_sheet.write(i,j,x)
                         j=j+1
                     b=0
-                    k=2
+                    k=1
                     for row in rows:
-                        l=1
+                        l=0
                         for y in row:
                             try:
                                 work_sheet.write(k,l,y)
@@ -381,15 +381,15 @@ class DatabaseOperation():
                         log.debug(inp_sheet)
                         work_book = xlwt.Workbook(encoding="utf-8")
                         work_sheet = work_book.add_sheet(inp_sheet)
-                    i=1
-                    j=1
+                    i=0
+                    j=0
                     for x in columns:
                         work_sheet.write(i,j,x)
                         j=j+1
                     b=0
-                    k=2
+                    k=1
                     for row in rows:
-                        l=1
+                        l=0
                         for y in row:
                             try:
                                 work_sheet.write(k,l,y)
@@ -419,7 +419,7 @@ class DatabaseOperation():
             elif(ext == '.csv'): #Code changed to write csv files
                 path = fields
                 with open(path,'w') as csvfile:
-                    writer = csv.writer(csvfile)
+                    writer = csv.writer(csvfile,lineterminator='\n')
                     writer.writerow(columns)
                     for row in rows:
                         try:
