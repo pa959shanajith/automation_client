@@ -381,13 +381,16 @@ class MainNamespace(BaseNamespace):
         try:
             global socketIO
             filepath = args[0]
-            encoded_string = ''
-            with open(filepath, "rb") as image_file:
-                encoded_string = base64.b64encode(image_file.read())
-            base64_data =encoded_string.encode('UTF-8').strip()
-            socketIO.emit('render_screenshot',base64_data)
+            data_URIs=[]
+            for path in filepath:
+                encoded_string = ''
+                with open(path, "rb") as image_file:
+                    encoded_string = base64.b64encode(image_file.read())
+                base64_data=encoded_string.encode('UTF-8').strip()
+                data_URIs.append(base64_data)
+            socketIO.emit('render_screenshot',data_URIs)
         except Exception as e:
-            print 'Eror while sending screenshot data'
+            print 'Error while sending screenshot data'
             socketIO.emit('render_screenshot','fail')
 
     def on_webCrawlerGo(self,*args):
