@@ -86,6 +86,11 @@ class Highlight():
                             time.sleep(sec)
                     log.info('Before getting the original style .....')
                     original_style = element.get_attribute('style')
+
+                    original_style_background = element.value_of_css_property('background')
+                    original_style_border = element.value_of_css_property('border')
+                    original_style_outline = element.value_of_css_property('outline')
+
                     log.info('Original style obtained.....')
                     log.info('Before highlighting .....')
                     apply_style(str(original_style) + "background: #fff300 !important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;", 3)
@@ -100,7 +105,16 @@ class Highlight():
                     else:
                         log.info('Before removing the style for other browsers .....')
                         if(action!='OBJECTMAPPER'):
-                            apply_style(str(original_style) + "background: 0; border: 0px none 0; outline: none", 0)
+                            extra_style = ""
+                            if original_style_background is None:
+                                extra_style = extra_style + "background: 0; "
+                            if original_style_border is None:
+                                extra_style = extra_style + "border: 0px none; "
+                            if original_style_outline is None:
+                                extra_style = extra_style + "outline: none"
+
+
+                            apply_style(str(original_style) + extra_style, 0)
                             log.info('Removed the style for other browsers .....')
 
             def is_int(url):
