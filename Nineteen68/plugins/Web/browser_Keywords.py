@@ -830,6 +830,7 @@ class Singleton_DriverUtil():
             try:
                 print 'This will be our new safari'
                 driver = webdriver.Safari()
+                driver.set_window_size(1024, 768)
                 drivermap.append(driver)
 
 
