@@ -1,0 +1,6 @@
+['Standard Accessibility'];true
+['Standard Accessibility '];true
+['standard accessibility'];false
+['None ','Screen Reader Optimized ','Standard Accessibility '];true
+[''];false
+['Insert'];false

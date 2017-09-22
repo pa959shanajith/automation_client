@@ -30,7 +30,7 @@ from selenium.webdriver.support.ui import Select
 import logging
 from constants import *
 from  selenium.webdriver.common import action_chains
-
+from selenium.webdriver.common.action_chains import ActionChains
 log = logging.getLogger('utilweb_operations.py')
 
 class UtilWebKeywords:
@@ -468,19 +468,24 @@ class UtilWebKeywords:
                     if eleStatus==True:
                         webelement = cellChild
                         break
-
             if webelement is not None:
-                obj=Utils()
-                 #find the location of the element w.r.t viewport
-                location=obj.get_element_location(webelement)
-                logger.print_on_console('location is '+str(location))
+                location=webelement.location
                 if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
-                    yoffset=browser_Keywords.driver_obj.execute_script(MOUSE_HOVER_FF)
-                    logger.print_on_console('y offset is '+str(yoffset))
-                    obj.mouse_move(int(location.get('x')+9),int(location.get('y')+yoffset))
+                    javascript = "return window.mozInnerScreenY"
+                    value=browser_Keywords.driver_obj.execute_script(javascript)
+                    logger.print_on_console(value)
+                    offset=int(value)
+                    robot=pyrobot.Robot()
+                    robot.set_mouse_pos(int(location.get('x')+9),int(location.get('y')+offset))
+                    log.debug('hover performed')
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
                 else:
+                    obj=Utils()
+                    location=obj.get_element_location(webelement)
                     obj.enumwindows()
-                    obj.mouse_move(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6))
+                    obj.mouse_move(int(location.get('x')),int(location.get('y')-6)+120)
+                    log.debug('hover performed')
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
@@ -566,12 +571,29 @@ class UtilWebKeywords:
             if webelement is not None:
                 if webelement.is_enabled():
                     log.debug(WEB_ELEMENT_ENABLED)
-                    from selenium.webdriver.common.action_chains import ActionChains
-                    action_obj=ActionChains(browser_Keywords.driver_obj)
-                    action_obj.context_click(webelement).perform()
-                    log.debug('Performed Right click')
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
+                    if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
+                        info_msg='Firefox browser'
+                        log.info(info_msg)
+                        logger.print_on_console(info_msg)
+                        javascript = "return window.mozInnerScreenY"
+                        value=browser_Keywords.driver_obj.execute_script(javascript)
+                        logger.print_on_console(value)
+                        offset=int(value)
+                        location = webelement.location
+                        robot=pyrobot.Robot()
+                        robot.set_mouse_pos(int(location.get('x')+9),int(location.get('y')+offset))
+                        log.debug('Setting the mouse position')
+                        robot.click_mouse('right')
+                        log.debug('Performed Right click')
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                    else:
+                        from selenium.webdriver.common.action_chains import ActionChains
+                        action_obj=ActionChains(browser_Keywords.driver_obj)
+                        action_obj.context_click(webelement).perform()
+                        log.debug('Performed Right click')
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg

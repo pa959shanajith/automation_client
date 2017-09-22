@@ -1,0 +1,6 @@
+#usage: element_ids;expectedresult
+
+cp1_search1_dl1_furnacedocs;true
+cp1_search1_dl1_modelNumber;true
+cp1_search1_dl1_modelStatus;true
+cp1_search1_dl1;true
