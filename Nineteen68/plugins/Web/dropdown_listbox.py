@@ -13,7 +13,7 @@ from selenium.webdriver.support.ui import Select
 from selenium import webdriver
 import browser_Keywords
 import webconstants
-from utilweb_operations import UtilWebKeywords
+import  utilweb_operations
 import logger
 import radio_checkbox_operations
 import core_utils
@@ -26,7 +26,7 @@ class DropdownKeywords():
 
     def __init__(self):
         self.radioKeywordsObj=radio_checkbox_operations.RadioCheckboxKeywords()
-
+        self.util = utilweb_operations.UtilWebKeywords()
     def selectValueByIndex(self,webelement,input,*args):
         """
         def : selectValueByIndex
@@ -48,7 +48,7 @@ class DropdownKeywords():
                         webelement=self.radioKeywordsObj.getActualElement(webelement,input)
                         index = input[4]
 
-                if ((webelement.is_enabled()) or webelement.is_displayed()):
+                if ((webelement.is_enabled()) or self.util.is_visible(webelement)):
                     log.debug(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
                     log.debug(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                     if (input is not None) :
@@ -101,6 +101,8 @@ class DropdownKeywords():
 
         return status,result,verb,err_msg
 
+
+
     def getCount(self,webelement,*args):
         """
         def : getCount
@@ -116,7 +118,8 @@ class DropdownKeywords():
         err_msg=None
         if webelement is not None:
             log.info('Recieved web element from the web dispatcher')
-            if webelement.is_displayed():
+            visible=self.util.is_visible(webelement)
+            if visible:
                 log.debug(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
                     select = Select(webelement)
@@ -167,7 +170,7 @@ class DropdownKeywords():
                             webelement=self.radioKeywordsObj.getActualElement(webelement,input)
                         else:
                             webelement=self.radioKeywordsObj.getActualElement(webelement,input)
-            if ((webelement.is_enabled()) or webelement.is_displayed()):
+            if ((webelement.is_enabled()) or self.util.is_visible(webelement)):
                 try:
                     if (input is not None) :
 ##                        if not(visibilityFlag and isvisble):
@@ -261,11 +264,11 @@ class DropdownKeywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             log.info('Recieved web element from the web dispatcher')
-            if webelement.is_displayed():
+            if self.util.is_visible(webelement):
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
                     if ((input is not None) and (len(input) == 1) and input[0] != '') :
-##                        if not(visibilityFlag and isvisble):
+##                        if not(visibilityFlag and self.util.is_visible(webelement)):
                         select = Select(webelement)
                         first_value = select.first_selected_option.text
                         inp_val = input[0]
@@ -308,7 +311,7 @@ class DropdownKeywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             log.info('Recieved web element from the web dispatcher')
-            if webelement.is_displayed():
+            if self.util.is_visible(webelement):
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
                     if (input is not None and input[0] != '') :
@@ -373,12 +376,13 @@ class DropdownKeywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             log.info('Recieved web element from the web dispatcher')
-            if webelement.is_displayed():
+            visible = self.util.is_visible(webelement)
+            if visible:
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
                     if ((input is not None) and (len(input) == 1) and input[0] != '') :
                         log.info('Input is not none')
-##                        if not(visibilityFlag and isvisble):
+##                        if not(visibilityFlag and self.util.is_visible(webelement)):
                         select = Select(webelement)
                         iList = select.options
                         iListSize = len(iList)
@@ -432,7 +436,7 @@ class DropdownKeywords():
                 log.info('Input is not none')
                 if webelement is not None:
                     log.info('Recieved web element from the web dispatcher')
-                    if webelement.is_displayed():
+                    if self.util.is_visible(webelement):
                         log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                         select = Select(webelement)
                         option_len = select.options
@@ -493,7 +497,7 @@ class DropdownKeywords():
                 log.info('Input is not none')
                 if webelement is not None:
                     log.info('Recieved web element from the web dispatcher')
-                    if webelement.is_displayed():
+                    if self.util.is_visible(webelement):
                         log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                         select = Select(webelement)
                         option_len = select.options
@@ -567,7 +571,7 @@ class DropdownKeywords():
                         log.info('Input is not none')
                         if webelement is not None:
                             log.info('Recieved web element from the web dispatcher')
-                            if ((webelement.is_enabled()) and webelement.is_displayed()):
+                            if ((webelement.is_enabled()) and self.util.is_visible(webelement)):
                                 log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
                                 log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                                 count= len(input)
@@ -614,7 +618,7 @@ class DropdownKeywords():
                     log.info('Input is not none')
                     if webelement is not None:
                             log.info('Recieved web element from the web dispatcher')
-                            if ((webelement.is_enabled()) and webelement.is_displayed()):
+                            if ((webelement.is_enabled()) and self.util.is_visible(webelement)):
                                 log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
                                 log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                                 count= len(input)
@@ -690,7 +694,7 @@ class DropdownKeywords():
                 log.info('Recieved web element from the web dispatcher')
                 if webelement.tag_name=='table':
                     webelement=self.radioKeywordsObj.getActualElement(webelement,input)
-                if webelement.is_displayed():
+                if self.util.is_visible(webelement):
                     log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                     select = Select(webelement)
                     index = select.all_selected_options
@@ -739,7 +743,7 @@ class DropdownKeywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             log.info('Recieved web element from the web dispatcher')
-            if ((webelement.is_enabled()) and webelement.is_displayed()):
+            if ((webelement.is_enabled()) and self.util.is_visible(webelement)):
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
@@ -871,7 +875,7 @@ class DropdownKeywords():
                             if webelement is not None:
                                 log.info('Recieved web element from the web dispatcher')
                                 log.debug(webelement)
-                                if webelement.is_displayed():
+                                if self.util.is_visible(webelement):
                                     log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                                     count = len(input)
                                     log.info('count is')
@@ -914,7 +918,7 @@ class DropdownKeywords():
                     if webelement is not None:
                         log.info('Recieved web element from the web dispatcher')
                         log.debug(webelement)
-                        if webelement.is_displayed():
+                        if self.util.is_visible(webelement):
                             log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                             count = len(input)
                             log.info('count is')
@@ -969,7 +973,7 @@ class DropdownKeywords():
         if webelement is not None:
             log.info('Recieved web element from the web dispatcher')
             log.debug(webelement)
-            if ((webelement.is_enabled()) and webelement.is_displayed()):
+            if ((webelement.is_enabled()) and self.util.is_visible(webelement)):
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
@@ -1027,11 +1031,11 @@ class DropdownKeywords():
         if webelement is not None:
             log.info('Recieved web element from the web dispatcher')
             log.debug(webelement)
-            if webelement.is_displayed():
+            if self.util.is_visible(webelement):
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
                     if input is not None:
-##                        if not(visibilityFlag and isvisble):
+##                        if not(visibilityFlag and self.util.is_visible(webelement)):
                         if len(input[0].strip()) != 0:
                             input_val = int(input[0])
                             select = Select(webelement)
@@ -1081,7 +1085,7 @@ class DropdownKeywords():
                 if webelement is not None:
                     log.info('Recieved web element from the web dispatcher')
                     log.debug(webelement)
-                    if webelement.is_displayed():
+                    if self.util.is_visible(webelement):
                         log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                         select = Select(webelement)
                         option_len = select.options
@@ -1133,7 +1137,7 @@ class DropdownKeywords():
         if webelement is not None:
             log.info('Recieved web element from the web dispatcher')
             log.debug(webelement)
-            if ((webelement.is_enabled()) and webelement.is_displayed()):
+            if ((webelement.is_enabled()) and self.util.is_visible(webelement)):
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
                 log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                 try:
