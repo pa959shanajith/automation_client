@@ -260,7 +260,7 @@ class Weboccular():
                #send desc also
                 #reversedLink['level'] = self.nodedata[reversedLink['name']]['level']
             else:
-                reversedLinks.remove(reversedLink)
+                self.reversedLinks.remove(reversedLink)
         sdata = { "nodes" : self.nodedata, "links" : self.reversedLinks }
         time_taken = time.clock() - start
 
