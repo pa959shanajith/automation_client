@@ -148,7 +148,7 @@ class Textbox_keywords():
 ##                            user_input=self.validate_input(webelement,input_val)
 ##                            if user_input is not None:
 ##                                input_val=user_input
-                            webelement.send_keys(input_val)
+                            webelement.set_value(input_val)
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:
