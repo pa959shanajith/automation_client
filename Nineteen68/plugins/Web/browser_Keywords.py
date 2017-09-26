@@ -18,7 +18,6 @@ all_handles=[]
 recent_handles=[]
 webdriver_list = []
 import threading
-import time
 import os
 from constants import *
 import logging
@@ -63,6 +62,7 @@ class BrowserKeywords():
         log.error(e)
         logger.print_on_console(e)
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        logger.print_on_console(err_msg)
         return err_msg
     def openBrowser(self,webelement,browser_num,*args):
         status=webconstants.TEST_RESULT_FAIL
@@ -549,8 +549,6 @@ class BrowserKeywords():
         global recent_handles
         if driver_obj is not None:
             try:
-                delay_time=float(configvalues['delay'])
-                time.sleep(delay_time)
                 winHandles=list(driver_obj.window_handles)
                 new_handles=[]
                 invalid_handles=[]
@@ -830,6 +828,7 @@ class Singleton_DriverUtil():
             try:
                 print 'This will be our new safari'
                 driver = webdriver.Safari()
+                driver.set_window_size(1024, 768)
                 drivermap.append(driver)
 
 

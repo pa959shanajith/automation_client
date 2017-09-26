@@ -662,7 +662,6 @@ class ClientWindow(wx.Frame):
     #----------------------------------------------------------------------
 
     def __init__(self):
-        global log
         wx.Frame.__init__(self, parent=None,id=-1, title="ICE Engine",
                    pos=(300, 150),  size=(800, 730),style=wx.DEFAULT_FRAME_STYLE & ~ (wx.MAXIMIZE_BOX)  )
 ##        self.SetBackgroundColour(   (245,222,179))
@@ -693,18 +692,19 @@ class ClientWindow(wx.Frame):
         """
         try:
             logfilename = configvalues["logFile_Path"].replace("\\","\\\\")
-            logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename})
+            logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename},disable_existing_loggers=False)
         except Exception as e:
             self.logfilename_error_flag = True
 
-        self.logger = logging.getLogger(__name__)
-        log=self.logger
+        self.logger = logging.getLogger("Nineteen68")
 
         """
         #747 Screenshot path validity check (Himanshu)
 
         """
-
+        log.info('Started')
+        requests_log = logging.getLogger("requests")
+        requests_log.setLevel(logging.CRITICAL)
         if not(jsonSyntaxErrorFlag):
             spath = configvalues['screenShot_PathName']
             self.screenshotPath_error_flag = False
@@ -855,18 +855,21 @@ class ClientWindow(wx.Frame):
         #When user selects INFO level
         if id == 100:
             logger.print_on_console( '--Logger level : INFO selected--')
+            log.info('--Logger level : INFO selected--')
             logging.getLogger().setLevel(logging.INFO)
             for handler in logging.root.handlers[:]:
                     handler.setLevel(logging.INFO)
         #When user selects DEBUG level
         elif id == 101:
             logger.print_on_console( '--Logger level : DEBUG selected--')
+            log.info('--Logger level : DEBUG selected--')
             logging.getLogger().setLevel(logging.DEBUG)
             for handler in logging.root.handlers[:]:
                 handler.setLevel(logging.DEBUG)
         #When user selects ERROR level
         elif id ==102:
             logger.print_on_console( '--Logger level : ERROR selected--')
+            log.info( '--Logger level : ERROR selected--')
             logging.getLogger().setLevel(logging.ERROR)
             for handler in logging.root.handlers[:]:
                     handler.setLevel(logging.ERROR)
