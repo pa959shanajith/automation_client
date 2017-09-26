@@ -18,7 +18,6 @@ all_handles=[]
 recent_handles=[]
 webdriver_list = []
 import threading
-import time
 import os
 from constants import *
 import logging
@@ -549,8 +548,6 @@ class BrowserKeywords():
         global recent_handles
         if driver_obj is not None:
             try:
-                delay_time=float(configvalues['delay'])
-                time.sleep(delay_time)
                 winHandles=list(driver_obj.window_handles)
                 new_handles=[]
                 invalid_handles=[]

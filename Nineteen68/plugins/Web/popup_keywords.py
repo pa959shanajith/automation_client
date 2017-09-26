@@ -147,9 +147,18 @@ class PopupKeywords():
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
-
-
-
-
+    def check_if_no_popup_exists(self):
+        driver = browser_Keywords.driver_obj
+        if driver is not None:
+            log.debug('Got the driver object from browser keyword class')
+            log.debug(driver)
+            try:
+                text = driver.switch_to_alert().text
+                log.debug('Popup exists with text : ' , text)
+                return False
+            except Exception as e:
+                return True
+        else:
+            return False
 
 
