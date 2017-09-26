@@ -27,6 +27,7 @@ import screenshot_keywords
 from collections import OrderedDict
 from constants import *
 import requests
+import time
 import re
 import readconfig
 import logging
@@ -163,7 +164,7 @@ class Dispatcher:
 
 
         try:
-            window_ops_list=['click','press','doubleClick','rightClick','uploadFile','acceptPopUp','dismissPopUp','getPopUpText','selectRadioButton','selectCheckbox','unselectCheckbox','cellClick','clickElement','drag','drop','setText','sendValue','clearText','setSecureText','sendSecureValue','selectValueByIndex','selectValueByText','selectAllValues','selectMultipleValuesByIndexes','selectMultipleValuesByText','verifyValuesExists','deselectAll','setFocus','mouseHover','tab','sendFunctionKeys','rightClick','mouseClick','openBrowser','navigateToURL','openNewBrowser','refresh','closeBrowser','closeSubWindows','switchToWindow','clearCache','navigateWithAuthenticate']
+            window_ops_list=['click','press','doubleClick','rightClick','uploadFile','acceptPopUp','dismissPopUp','selectRadioButton','selectCheckbox','unselectCheckbox','cellClick','clickElement','drag','drop','setText','sendValue','clearText','setSecureText','sendSecureValue','selectValueByIndex','selectValueByText','selectAllValues','selectMultipleValuesByIndexes','selectMultipleValuesByText','verifyValuesExists','deselectAll','setFocus','mouseHover','tab','sendFunctionKeys','rightClick','mouseClick','openBrowser','navigateToURL','openNewBrowser','refresh','closeBrowser','closeSubWindows','switchToWindow','clearCache','navigateWithAuthenticate']
             dict={'getObjectCount':self.custom_object.get_object_count,
                   'click': self.button_link_object.click,
                   'verifyButtonName' : self.button_link_object.verify_button_name,
@@ -306,15 +307,19 @@ class Dispatcher:
                     if(keyword.lower() == "sendfunctionkeys"):
                         input.extend(actual_input)
                     ## Issue #190 Driver control won't switch back to parent window
-                    self.browser_object.validate_current_window_handle()
+                    if self.popup_object.check_if_no_popup_exists():
+                        self.browser_object.validate_current_window_handle()
                     result= dict[keyword](webelement,input)
                     ## To terminate debug/execution if requested browser is not available in the system (Defect #846)
                     if(result[1] == TERMINATE):
                         result = TERMINATE
                     if keyword in window_ops_list:
-                        self.browser_object.update_window_handles()
+                        delay_time=float(configvalues['delay'])
+                        time.sleep(delay_time)
+                        if self.popup_object.check_if_no_popup_exists():
+                            self.browser_object.update_window_handles()
                     driver=browser_Keywords.driver_obj
-                    if keyword not in [GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
+                    if self.popup_object.check_if_no_popup_exists() and (keyword not in [GET_POPUP_TEXT,VERIFY_POPUP_TEXT]):
                         driver.switch_to.default_content()
                     if flag and webelement==None and teststepproperty.custname!='@Browser':
                         result=list(result)
