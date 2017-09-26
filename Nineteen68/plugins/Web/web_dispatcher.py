@@ -488,4 +488,3 @@ class Dispatcher:
                 log.error(err_msg)
 
         return webElement
-
