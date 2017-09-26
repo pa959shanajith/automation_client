@@ -429,7 +429,7 @@ class DateOperation:
                 #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
-            err_msg=generic_constants.ERR_MSG1+' dateCompare'
+            err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
             log.error(e)
         if err_msg!=None:
             logger.print_on_console(err_msg)
