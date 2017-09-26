@@ -60,7 +60,6 @@ class BrowserKeywords():
         self.browser_num=''
     def __web_driver_exception(self,e):
         log.error(e)
-        logger.print_on_console(e)
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         logger.print_on_console(err_msg)
         return err_msg
