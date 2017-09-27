@@ -373,7 +373,7 @@ class Dispatcher:
             log.info('checking for the url error')
             try:
                 urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', browser_Keywords.driver_obj.current_url)
-                response=requests.get(urls[0])
+                response=requests.get(urls[0],verify=False)
                 status_code=response.status_code
                 log.info(status_code)
                 if status_code in STATUS_CODE_DICT:
