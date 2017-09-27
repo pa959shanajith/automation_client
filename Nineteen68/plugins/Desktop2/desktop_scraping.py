@@ -229,6 +229,9 @@ class Scrape:
             for i in range (len(ch)):
                  hiddentag = 'Yes'
                  text = ''
+                 new_text=''
+                 text_initial=''
+                 text_old=''
                  parent = ''
                  coordinates = ''
                  children = ch[i]
@@ -274,14 +277,16 @@ class Scrape:
                          properties['control_id'] = children.element_info.control_id
                          properties['parent'] = children.element_info.parent.class_name
                          handle = children.handle
-                         text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
+                         text_initial = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
+                         text=text_initial
                          if text =='':
                             t = children.texts()
                             if len(t) >= 2:
                                 text = t[1]
                          if text == '':
                             text = children.friendly_class_name()
-                         text = text.strip()
+                         text_old = text.strip()
+                         text=text_old
                          url = properties['url']
                          parent = properties['parent']
                          rectangle = properties['rectangle']
@@ -312,6 +317,9 @@ class Scrape:
                          elif tag == 'TabControl':
                             tag = 'tab'
                             text= str(text) + '_tab'
+                         elif tag == 'TreeView':
+                            tag = 'tree'
+                            text= str(text) + '_tree'
                          elif tag == 'DateTimePicker':
                             tag = 'datepicker'
                             text= str(text) + '_dtp'
@@ -345,8 +353,17 @@ class Scrape:
                                 if ne[k]['xpath'] == path:
                                     flag = True
                             new_path=''
+                            #----------------------------------------------------
                             className=children.friendly_class_name()
-                            new_path=path+';'+className+';'+str(control_id)
+                            if text_initial!='':
+                                try:
+                                    new_text=str(text_initial)
+                                except:
+                                    new_text=text_initial.encode('ascii', 'replace')
+                            else :
+                                new_text=text_old
+                            new_path=path+';'+className+';'+str(control_id)+";"+new_text
+                            #----------------------------------------------------
                             if not flag:
                                 ne.append({"custname":text,
                                         "tag":tag,
