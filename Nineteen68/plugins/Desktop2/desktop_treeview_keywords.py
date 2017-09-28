@@ -394,11 +394,13 @@ class Tree_View_Keywords():
         err_msg=None
         flag=False
         tree_elm=''
+        slash='\ '
         if len(input_val)==0:
             flag=True
         else:
-            input_val=input_val[0]
+##            input_val=input_val[0]
             #------------------------------------------------ replacing ";" with "\"
+            input_val=slash.join(input_val)
             if "\\" in input_val:
                 input_val=string.replace(input_val ,'\\','\ ')
             input_val="\ "+input_val
@@ -416,7 +418,7 @@ class Tree_View_Keywords():
                     if (check):
                         log.info('Parent matched')
                         if(element.is_enabled()):
-                                tree_elm=element.Item(input_val, exact=False)
+                                tree_elm=element.Item(input_val, exact=True)
                                 tree_elm.ClickInput(button='left', double=False, wheel_dist=0, where='text', pressed='')
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
@@ -563,5 +565,61 @@ class Tree_View_Keywords():
                 log.error(exception)
                 logger.print_on_console(exception)
                 err_msg="Unable to perform Mouse Hover"
+        return status,result,verb,err_msg
+
+    def getElementTextByIndex(self, element , parent , input_val , *args):
+        status=desktop_constants.TEST_RESULT_FAIL
+        result=desktop_constants.TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            if desktop_launch_keywords.window_name!=None:
+                verify_obj = Text_Box()
+                log.info('Recieved element from the desktop dispatcher')
+                check = verify_obj.verify_parent(element,parent)
+                log.debug('Parent of element while scraping')
+                log.debug(parent)
+                log.debug('Parent check status')
+                log.debug(check)
+                if (check):
+                    log.info('Parent matched')
+                    if(element.is_enabled()):
+                        try:
+                            roots=element.Roots()
+                            root_elem=roots[int(input_val[0])-1]
+                            if len(input_val)>1:
+                                input_val=input_val[1:]
+                                new_elem=root_elem
+                                def recur(elem,index):
+                                    children=elem.Children()
+                                    return children[index]
+                                for i in input_val:
+                                    index=int(i)-1
+                                    new_elem=recur(new_elem,index)
+                                verb=new_elem.Text()
+                                status = desktop_constants.TEST_RESULT_PASS
+                                result = desktop_constants.TEST_RESULT_TRUE
+                            else:
+                                verb=root_elem.Text()
+                                status = desktop_constants.TEST_RESULT_PASS
+                                result = desktop_constants.TEST_RESULT_TRUE
+                        except Exception as e:
+                            import traceback
+                            traceback.print_exc()
+                            err_msg =e
+                            #logger.print_on_console(e)
+                            log.info(e)
+                    else:
+                      log.info('Element state does not allow to perform the operation')
+                      logger.print_on_console('Element state does not allow to perform the operation')
+                      err_msg= 'Element state does not allow to perform the operation'
+                else:
+                   log.info('Element not present on the page where operation is trying to be performed')
+                   err_msg='Element not present on the page where operation is trying to be performed'
+                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
+        except Exception as exception:
+            log.error(exception)
+            logger.print_on_console(exception)
+            err_msg="Unable to perform action on this element."
         return status,result,verb,err_msg
 

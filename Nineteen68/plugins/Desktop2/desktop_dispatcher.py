@@ -189,7 +189,8 @@ class DesktopDispatcher:
                     'getrootelements':self.tree_keywords_obj.get_root_elements,
                     'selectelement':self.tree_keywords_obj.select_element,
                     'clicktreeelement':self.tree_keywords_obj.click_tree_element,
-                    'doubleclicktreeelement':self.tree_keywords_obj.double_click_tree_element
+                    'doubleclicktreeelement':self.tree_keywords_obj.double_click_tree_element,
+                    'getelementtextbyindex':self.tree_keywords_obj.getElementTextByIndex
 
 
                 }
