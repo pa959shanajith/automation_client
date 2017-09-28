@@ -117,7 +117,6 @@ class MainNamespace(BaseNamespace):
             print 'on_debugTestCase_message'
             wxObject.mythread = TestThread(wxObject,DEBUG,args[1])
 
-
         if(str(args[0]) == 'connected'):
             logger.print_on_console('Normal Mode: Connection to the Node Server established')
             log.info('Normal Mode: Connection to the Node Server established')
@@ -383,14 +382,18 @@ class MainNamespace(BaseNamespace):
             filepath = args[0]
             data_URIs=[]
             for path in filepath:
-                encoded_string = ''
-                with open(path, "rb") as image_file:
-                    encoded_string = base64.b64encode(image_file.read())
-                base64_data=encoded_string.encode('UTF-8').strip()
-                data_URIs.append(base64_data)
+                if not (os.path.exists(path)):
+                    data_URIs.append(None)
+                    log.error("File \""+path+"\" not found!")
+                else:
+                    encoded_string = ''
+                    with open(path, "rb") as image_file:
+                        encoded_string = base64.b64encode(image_file.read())
+                    base64_data=encoded_string.encode('UTF-8').strip()
+                    data_URIs.append(base64_data)
             socketIO.emit('render_screenshot',data_URIs)
         except Exception as e:
-            print 'Error while sending screenshot data'
+            logger.print_on_console('Error while sending screenshot data')
             socketIO.emit('render_screenshot','fail')
 
     def on_webCrawlerGo(self,*args):
@@ -410,6 +413,15 @@ class MainNamespace(BaseNamespace):
             import traceback
             traceback.print_exc()
 
+    def on_update_screenshot_path(self,*args):
+        spath=args[0]
+        import constants
+        if os.path.exists(spath):
+            constants.SCREENSHOT_PATH=spath
+        else:
+            constants.SCREENSHOT_PATH="Disabled"
+            logger.print_on_console("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
+            log.info("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
 
 socketIO = None
 
@@ -669,10 +681,6 @@ class ClientWindow(wx.Frame):
 ##        self.ShowFullScreen(True,wx.ALL)
 ##        self.SetBackgroundColour('#D0D0D0')
         self.logfilename_error_flag = False
-
-		#747 Screenshot path flag (Himanshu)
-        self.screenshotPath_error_flag = False
-
         self.debugwindow = None
         self.id =id
         self.mainclass = self
@@ -705,11 +713,6 @@ class ClientWindow(wx.Frame):
         log.info('Started')
         requests_log = logging.getLogger("requests")
         requests_log.setLevel(logging.CRITICAL)
-        if not(jsonSyntaxErrorFlag):
-            spath = configvalues['screenShot_PathName']
-            self.screenshotPath_error_flag = False
-            if not os.path.exists(spath):
-                self.screenshotPath_error_flag = True
 
         self.panel = wx.Panel(self)
         self.sizer = wx.GridBagSizer(6, 5)
@@ -835,7 +838,7 @@ class ClientWindow(wx.Frame):
         style = self.GetWindowStyle()
         self.Show()
 		#747 disable buttons if any flag raised (Himanshu)
-        if (self.logfilename_error_flag or self.screenshotPath_error_flag):
+        if (self.logfilename_error_flag):
             self.cancelbutton.Disable()
             self.terminatebutton.Disable()
             self.clearbutton.Disable()
@@ -1236,11 +1239,6 @@ def main():
         logger.print_on_console( "[Error]: Please provide a valid logfile path in config.json file and restart the client window.")
         log.info("[Error]: Please provide a valid logfile path in config.json file and restart the client window.")
         cw.logfilename_error_flag = False
-        app.MainLoop()
-    elif cw.screenshotPath_error_flag:
-        logger.print_on_console( "[Error]: Please provide a valid Screenshot path in config.json file and restart the client window.")
-        log.info("[Error]: Please provide a valid Screenshot path in config.json file and restart the client window.")
-        cw.screenshotPath_error_flag = False
         app.MainLoop()
     else:
         app.MainLoop()

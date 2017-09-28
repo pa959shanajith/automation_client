@@ -266,6 +266,7 @@ ERROR_CODE_DICT ={
                     'ERR_KILL_CHROMEDRIVER':'Unable to terminate the chrome driver instance',
                     'ERR_ENCOUNTERED_DANGLING_START':'Encountered Dangling Pointer startLoop',
                     'ERR_CONTROLLER_IO':'Generating Json report failed\n',
+                    'ERR_SCREENSHOT_PATH':'Screenshot not captured - User does not have sufficient privileges for screenshot folder\n',
                     #Excel error messages
                     'ERR_ROW_NUMBER':'Invalid row number',
                     """ERR_ROW_DOESN'T_EXIST""": """Row doesn't exist""",

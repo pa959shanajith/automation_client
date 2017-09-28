@@ -50,37 +50,38 @@ class Screenshot():
                     logger.print_on_console( e)
             else:
                 try:
-                    import readconfig
-                    configobj = readconfig.readConfig()
-                    configvalues = configobj.readJson()
-                    path = configvalues['screenShot_PathName']
-                    if not os.path.exists(path):
-                        os.makedirs(path)
-                    filename=self.generateUniqueFileName()
-                    filePath = path + filename
-                    output = filePath+'.png'
+                    import constants
+                    path = constants.SCREENSHOT_PATH
+                    if path=="Disabled":
+                        logger.print_on_console(ERROR_CODE_DICT['ERR_SCREENSHOT_PATH'])
+                        output=None
+                    else:
+                        filename=self.generateUniqueFileName()
+                        filePath = path + filename
+                        output = filePath+'.png'
                 except Exception as e:
                     logger.print_on_console( e)
 
-
-            log.debug('screenshot captured')
-
-            if install_and_launch.driver==None:
-                img=ImageGrab.grab()
-                img.save(filePath+'.png')
-##                logger.print_on_console('screenshot captured')
+            if output==None:
+                log.debug('screenshot capture failed')
+                output=OUTPUT_CONSTANT
             else:
-                img=install_and_launch.driver.save_screenshot(filePath+'.png')
-##                logger.print_on_console('screenshot captured')
-
-            status=TEST_RESULT_PASS
-            methodoutput=TEST_RESULT_TRUE
-##            log.debug('screenshot captured and saved in : ',filePath+'.png')
-##            logger.print_on_console('The Specified path is not found, hence screenshot captured and saved in default path')
+                log.debug('screenshot captured')
+                if install_and_launch.driver==None:
+                    img=ImageGrab.grab()
+                    img.save(filePath+'.png')
+##                    logger.print_on_console('screenshot captured')
+                else:
+                    img=install_and_launch.driver.save_screenshot(filePath+'.png')
+##                    logger.print_on_console('screenshot captured')
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+##                log.debug('screenshot captured and saved in : ',filePath+'.png')
+##                logger.print_on_console('The Specified path is not found, hence screenshot captured and saved in default path')
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            err_msg="Screenshot not captured - You do not have write permission to screenshot folder!!! - "
+            err_msg=ERROR_CODE_DICT['ERR_SCREENSHOT_PATH']
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 

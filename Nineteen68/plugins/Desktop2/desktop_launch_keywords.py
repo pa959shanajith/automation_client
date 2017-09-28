@@ -435,19 +435,18 @@ class Launch_Keywords():
 
     def save_screeenshot(self):
         try:
-            import readconfig
-            configobj = readconfig.readConfig()
-            configvalues = configobj.readJson()
-            path = configvalues['screenShot_PathName']
-            if not os.path.exists(path):
-                os.makedirs(path)
-            filename=self.generateUniqueFileName()
-            filePath = path + filename
-            img=self.captureScreenshot()
-            img.save(filePath + 'out.png')
-            logger.print_on_console ('Screen captured and stored in location :' +filePath)
+            import constants
+            path = constants.SCREENSHOT_PATH
+            if path=="Disabled":
+                logger.print_on_console(ERROR_CODE_DICT['ERR_SCREENSHOT_PATH'])
+            else:
+                filename=self.generateUniqueFileName()
+                filePath = path + filename
+                img=self.captureScreenshot()
+                img.save(filePath + 'out.png')
+                logger.print_on_console ('Screen captured and stored in location :' +filePath)
         except Exception as e:
-            logger.print_on_console( e)
+            logger.print_on_console(e)
 
     def generateUniqueFileName(self):
         filename=datetime.datetime.now().strftime("%Y-%m-%d-%H_%M_%S_"+str(time.strftime("%Y%m%d%H%M%S")))

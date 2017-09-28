@@ -10,6 +10,7 @@
 #-------------------------------------------------------------------------------
 from constants import *
 import json
+import os
 import reporting_pojo
 import logger
 import logging
@@ -369,6 +370,8 @@ class Reporting:
                     comments= result_tuple[3]
                 if(len(result_tuple) == 5):
                     screenshot_path = result_tuple[4]
+                    if (not os.path.exists(result_tuple[4])):
+                        screenshot_path = None
                 else:
                     screenshot_path = None
 
