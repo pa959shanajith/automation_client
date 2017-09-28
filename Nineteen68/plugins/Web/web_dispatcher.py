@@ -314,8 +314,10 @@ class Dispatcher:
                     if(result[1] == TERMINATE):
                         result = TERMINATE
                     if keyword in window_ops_list:
-                        delay_time=float(configvalues['delay'])
-                        time.sleep(delay_time)
+                        delay_time=configvalues['delay']
+                        if delay_time.strip()=="":
+                            delay_time=0
+                        time.sleep(float(delay_time))
                         if self.popup_object.check_if_no_popup_exists():
                             self.browser_object.update_window_handles()
                     driver=browser_Keywords.driver_obj
