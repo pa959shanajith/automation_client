@@ -172,7 +172,9 @@ class SAPDispatcher:
                   'presstoolbarbutton':self.shell_keywords_obj.pressToolBarButton,
                   'getcelltext': self.shell_keywords_obj.getCellText,
                   'clickcell':self.shell_keywords_obj.clickCell,
-                  'doubleclickcell':self.shell_keywords_obj.doubleClickCell
+                  'doubleclickcell':self.shell_keywords_obj.doubleClickCell,
+                  'selecttreenode':self.shell_keywords_obj.selectTreeNode,
+                  'getnodetextbyindex':self.shell_keywords_obj.getNodeTextByIndex
                    }
 
 

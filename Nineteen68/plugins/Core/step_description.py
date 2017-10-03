@@ -590,6 +590,16 @@ class StepDescription:
             return ' Get column count of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
         def GetCellText():
             return ' Get cell text of row '+"'"+input[0]+"'"+'and column '+"'"+input[1]+"'"+' and store the output as '+"'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
+        def SelectTreeNode():
+            inp = input
+            if(len(inputval)>1):
+                inp = '->'.join(inputval)
+            return ' Select node '+"'"+inp+"'"+' in '+"'"+tsp.custname+"'"+'.'
+        def GetNodeTextByIndex():
+            inp = input
+            if(len(inputval)>1):
+                inp = '->'.join(inputval)
+            return ' Get text of node at index'+"'"+inp+"'"+' and store the output as '+"'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
         return locals()[keyword]()
 
 
