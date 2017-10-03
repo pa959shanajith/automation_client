@@ -765,6 +765,20 @@ class StepDescription:
         def verifyExists():
             return ' Verify if '+"'"+tsp.custname+"'."+' is exists.'
 
+        #Tree Keywords(2):
+        def GetNodeTextByIndex():
+            try:
+                input1="->".join(listInput)
+            except:
+                input1=input
+            return 'Get node text from index path '+"'"+input1+"'"+' and save the value '+"'"+output+"'"+" in '"+ tsp.outputval+"'."
+        def ClickTreeNode():
+            try:
+                input1="->".join(listInput)
+            except:
+                input1=input
+            return 'Click on tree node  '+"'"+input1+"'."
+
         return locals()[keyword]()
 
     def mobileapp(self,keyword,tsp,inputval,input,output,con,reporting_obj):

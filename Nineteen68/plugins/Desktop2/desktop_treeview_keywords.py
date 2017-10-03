@@ -9,6 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import desktop_launch_keywords
+import pywinauto
 from desktop_editable_text import Text_Box
 import logger
 import desktop_constants
@@ -394,16 +395,17 @@ class Tree_View_Keywords():
         err_msg=None
         flag=False
         tree_elm=''
-        slash='\ '
-        if len(input_val)==0:
-            flag=True
+        slash='\\'
+        if len(input_val)==1:
+            if input_val[0]=='':
+                flag=True
         else:
 ##            input_val=input_val[0]
-            #------------------------------------------------ replacing ";" with "\"
+            #------------------------------------------------ replacing ";" with "\\"
             input_val=slash.join(input_val)
-            if "\\" in input_val:
-                input_val=string.replace(input_val ,'\\','\ ')
-            input_val="\ "+input_val
+##            if "\\" in input_val:
+##                input_val=string.replace(input_val ,'\\','\ ')
+            input_val="\\"+input_val
             #-------------------------------------------------
         if flag!=True:
             try:
@@ -606,7 +608,6 @@ class Tree_View_Keywords():
                         except Exception as e:
                             import traceback
                             traceback.print_exc()
-                            err_msg =e
                             #logger.print_on_console(e)
                             log.info(e)
                     else:

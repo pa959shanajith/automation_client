@@ -180,17 +180,17 @@ class DesktopDispatcher:
                     'getbody' : self.outook_obj.GetBody,
                     'verifyemail' : self.outook_obj.VerifyEmail,
                     'switchtofolder':self.outook_obj.switchToFolder,
-                    'getitemcount':self.tree_keywords_obj.get_item_count,
-                    'verifyitemcount':self.tree_keywords_obj.verify_item_count,
+                    'getnodecount':self.tree_keywords_obj.get_item_count,
+                    'verifynodecount':self.tree_keywords_obj.verify_item_count,
                     'expandall':self.tree_keywords_obj.expand_all,
                     'collapseall':self.tree_keywords_obj.collapse_all,
                     'getchildren':self.tree_keywords_obj.get_children,
                     'verifychildren':self.tree_keywords_obj.verify_children,
-                    'getrootelements':self.tree_keywords_obj.get_root_elements,
-                    'selectelement':self.tree_keywords_obj.select_element,
-                    'clicktreeelement':self.tree_keywords_obj.click_tree_element,
-                    'doubleclicktreeelement':self.tree_keywords_obj.double_click_tree_element,
-                    'getelementtextbyindex':self.tree_keywords_obj.getElementTextByIndex
+                    'getrootnodes':self.tree_keywords_obj.get_root_elements,
+                    'selecttreenode':self.tree_keywords_obj.select_element,
+                    'clicktreenode':self.tree_keywords_obj.click_tree_element,
+                    'doubleclicktreenode':self.tree_keywords_obj.double_click_tree_element,
+                    'getnodetextbyindex':self.tree_keywords_obj.getElementTextByIndex
 
 
                 }
