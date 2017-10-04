@@ -180,7 +180,14 @@ class DesktopDispatcher:
                     'getbody' : self.outook_obj.GetBody,
                     'verifyemail' : self.outook_obj.VerifyEmail,
                     'switchtofolder':self.outook_obj.switchToFolder,
-                    'getnodecount':self.tree_keywords_obj.get_item_count,
+                    'settomailid':self.outook_obj.send_to_mail,
+                    'setcc':self.outook_obj.send_CC,
+                    'setbbc':self.outook_obj.send_BCC,
+                    'setsubject':self.outook_obj.send_subject,
+                    'setbody':self.outook_obj.send_body,
+                    'setattachments':self.outook_obj.send_attachments,
+                    'sendemail':self.outook_obj.send_mail,
+##                    'getnodecount':self.tree_keywords_obj.get_item_count,
 ##                    'verifynodecount':self.tree_keywords_obj.verify_item_count,
 ##                    'expandall':self.tree_keywords_obj.expand_all,
 ##                    'collapseall':self.tree_keywords_obj.collapse_all,
@@ -202,7 +209,14 @@ class DesktopDispatcher:
                   'gettomailid'  : 5,
                   'getbody' : 6,
                   'verifyemail' : 7,
-                  'switchtofolder':8
+                  'switchtofolder':8,
+                  'settomailid' : 9,
+                  'setcc'    : 10,
+                  'setbbc'     :11,
+                  'setsubject'  : 12,
+                  'setbody' : 13,
+                  'setattachments' : 14,
+                  'sendemail':15
                 }
             keyword=keyword.lower()
             ele = None

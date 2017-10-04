@@ -45,6 +45,9 @@ class OutlookKeywords:
             self.targetFolder=None
             self.outlook=None
             self.store=None
+            #----------------------sendmail
+            self.sendFlag=False
+            self.Msg=''
 
         def getOutlookComObj(self,optflag):
             import pythoncom
@@ -58,6 +61,11 @@ class OutlookKeywords:
                 try:
                     from win32com.client.gencache import EnsureDispatch
                     outlookObj=EnsureDispatch('Outlook.Application').GetNamespace('MAPI')
+                except Exception as e:
+                    logger.print_on_console(e)
+            elif optflag==3:
+                try:
+                    outlookObj = Dispatch("Outlook.Application")
                 except Exception as e:
                     logger.print_on_console(e)
 
@@ -363,5 +371,172 @@ class OutlookKeywords:
             except Exception as error:
                 logger.print_on_console( "Looks like we had an issue accessing the searchIn object")
                 return None
+
+#------------------------------------------------------------------------------------------------------------Send email function
+
+        def send_to_mail(self,input,*args):
+            status=desktop_constants.TEST_RESULT_FAIL
+            method_output=desktop_constants.TEST_RESULT_FALSE
+            result=OUTPUT_CONSTANT
+            error_msg=None
+            self.sendFlag=False
+            self.Msg=''
+            MsgObj=''
+            outlookobj=self.getOutlookComObj(3)
+            if len(input)>1:
+                input=";".join(input)
+            else:
+                input=input[0]
+            try:
+                self.Msg = outlookobj.CreateItem(0)
+                MsgObj=self.Msg
+                MsgObj.To = input
+                self.sendFlag=True
+                status=desktop_constants.TEST_RESULT_PASS
+                method_output=desktop_constants.TEST_RESULT_TRUE
+            except Exception as e:
+                error_msg="ERROR OCCURED "
+                import traceback
+                traceback.print_exc()
+            return status,method_output,result,error_msg
+
+        def send_CC(self,input,*args):
+            status=desktop_constants.TEST_RESULT_FAIL
+            method_output=desktop_constants.TEST_RESULT_FALSE
+            result=OUTPUT_CONSTANT
+            error_msg=None
+            MsgObj=''
+            if len(input)>1:
+                input=";".join(input)
+            else:
+                input=input[0]
+            if self.sendFlag==True:
+                try:
+                    MsgObj=self.Msg
+                    MsgObj.CC = input
+                    status=desktop_constants.TEST_RESULT_PASS
+                    method_output=desktop_constants.TEST_RESULT_TRUE
+                except Exception as e:
+                    error_msg="ERROR OCCURED "
+                    import traceback
+                    traceback.print_exc()
+            else:
+                error_msg="Please set the to mail ID"
+            return status,method_output,result,error_msg
+
+        def send_BCC(self,input,*args):
+            status=desktop_constants.TEST_RESULT_FAIL
+            method_output=desktop_constants.TEST_RESULT_FALSE
+            result=OUTPUT_CONSTANT
+            error_msg=None
+            MsgObj=''
+            if len(input)>1:
+                input=";".join(input)
+            else:
+                input=input[0]
+            if self.sendFlag==True:
+                try:
+                    MsgObj=self.Msg
+                    MsgObj.BCC = input
+                    status=desktop_constants.TEST_RESULT_PASS
+                    method_output=desktop_constants.TEST_RESULT_TRUE
+                except Exception as e:
+                    error_msg="ERROR OCCURED "
+                    import traceback
+                    traceback.print_exc()
+            else:
+                error_msg="Please set the to mail ID"
+            return status,method_output,result,error_msg
+
+        def send_subject(self,input,*args):
+            status=desktop_constants.TEST_RESULT_FAIL
+            method_output=desktop_constants.TEST_RESULT_FALSE
+            result=OUTPUT_CONSTANT
+            error_msg=None
+            MsgObj=''
+            sendSubject=input[0]
+            if self.sendFlag==True:
+                try:
+                    MsgObj=self.Msg
+                    MsgObj.Subject = sendSubject
+                    status=desktop_constants.TEST_RESULT_PASS
+                    method_output=desktop_constants.TEST_RESULT_TRUE
+                except Exception as e:
+                    error_msg="ERROR OCCURED "
+                    import traceback
+                    traceback.print_exc()
+            else:
+                error_msg="Please set the to mail ID"
+            return status,method_output,result,error_msg
+
+        def send_body(self,input,*args):
+            status=desktop_constants.TEST_RESULT_FAIL
+            method_output=desktop_constants.TEST_RESULT_FALSE
+            result=OUTPUT_CONSTANT
+            error_msg=None
+            MsgObj=''
+            body=input[0]
+            if self.sendFlag==True:
+                try:
+                    MsgObj=self.Msg
+                    MsgObj.Body = body
+                    status=desktop_constants.TEST_RESULT_PASS
+                    method_output=desktop_constants.TEST_RESULT_TRUE
+                except Exception as e:
+                    error_msg="ERROR OCCURED "
+                    import traceback
+                    traceback.print_exc()
+            else:
+                error_msg="Please set the to mail ID"
+            return status,method_output,result,error_msg
+
+        def send_attachments(self,input,*args):
+            status=desktop_constants.TEST_RESULT_FAIL
+            method_output=desktop_constants.TEST_RESULT_FALSE
+            result=OUTPUT_CONSTANT
+            error_msg=None
+            MsgObj=''
+            Flg=True
+            if self.sendFlag==True:
+                try:
+                    MsgObj=self.Msg
+                    for i in input:
+                        try:
+                            MsgObj.Attachments.Add(i)
+                        except:
+                            Flg=False
+                    if Flg==True:
+                        status=desktop_constants.TEST_RESULT_PASS
+                        method_output=desktop_constants.TEST_RESULT_TRUE
+                except Exception as e:
+                    error_msg="ERROR OCCURED "
+                    import traceback
+                    traceback.print_exc()
+            else:
+                error_msg="Please set the to mail ID"
+            return status,method_output,result,error_msg
+
+        def send_mail(self,*args):
+            status=desktop_constants.TEST_RESULT_FAIL
+            method_output=desktop_constants.TEST_RESULT_FALSE
+            result=OUTPUT_CONSTANT
+            error_msg=None
+            MsgObj=''
+            if self.sendFlag==True:
+                try:
+                    MsgObj=self.Msg
+                    MsgObj.Display()
+                    import time
+                    time.sleep(5)
+                    MsgObj.Send()
+                    status=desktop_constants.TEST_RESULT_PASS
+                    method_output=desktop_constants.TEST_RESULT_TRUE
+                except Exception as e:
+                    error_msg="ERROR OCCURED "
+                    import traceback
+                    traceback.print_exc()
+            else:
+                error_msg="Please set the to mail ID"
+            return status,method_output,result,error_msg
 
 
