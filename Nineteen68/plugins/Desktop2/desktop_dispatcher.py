@@ -181,16 +181,16 @@ class DesktopDispatcher:
                     'verifyemail' : self.outook_obj.VerifyEmail,
                     'switchtofolder':self.outook_obj.switchToFolder,
                     'getnodecount':self.tree_keywords_obj.get_item_count,
-                    'verifynodecount':self.tree_keywords_obj.verify_item_count,
-                    'expandall':self.tree_keywords_obj.expand_all,
-                    'collapseall':self.tree_keywords_obj.collapse_all,
-                    'getchildren':self.tree_keywords_obj.get_children,
-                    'verifychildren':self.tree_keywords_obj.verify_children,
-                    'getrootnodes':self.tree_keywords_obj.get_root_elements,
-                    'selecttreenode':self.tree_keywords_obj.select_element,
-                    'clicktreenode':self.tree_keywords_obj.click_tree_element,
-                    'doubleclicktreenode':self.tree_keywords_obj.double_click_tree_element,
-                    'getnodetextbyindex':self.tree_keywords_obj.getElementTextByIndex
+##                    'verifynodecount':self.tree_keywords_obj.verify_item_count,
+##                    'expandall':self.tree_keywords_obj.expand_all,
+##                    'collapseall':self.tree_keywords_obj.collapse_all,
+##                    'getchildren':self.tree_keywords_obj.get_children,
+##                    'verifychildren':self.tree_keywords_obj.verify_children,
+##                    'getrootnodes':self.tree_keywords_obj.get_root_elements,
+##                    'selecttreeelement':self.tree_keywords_obj.select_element,
+                    'selecttreenode':self.tree_keywords_obj.click_tree_element,
+##                    'doubleclicktreenode':self.tree_keywords_obj.double_click_tree_element,
+                    'getnodenamebyindex':self.tree_keywords_obj.getElementTextByIndex
 
 
                 }
