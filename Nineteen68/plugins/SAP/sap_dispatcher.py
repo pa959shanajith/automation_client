@@ -174,7 +174,7 @@ class SAPDispatcher:
                   'clickcell':self.shell_keywords_obj.clickCell,
                   'doubleclickcell':self.shell_keywords_obj.doubleClickCell,
                   'selecttreenode':self.shell_keywords_obj.selectTreeNode,
-                  'getnodetextbyindex':self.shell_keywords_obj.getNodeTextByIndex
+                  'getnodenamebyindex':self.shell_keywords_obj.getNodeNameByIndex
                    }
 
 

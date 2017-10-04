@@ -595,11 +595,11 @@ class StepDescription:
             if(len(inputval)>1):
                 inp = '->'.join(inputval)
             return ' Select node '+"'"+inp+"'"+' in '+"'"+tsp.custname+"'"+'.'
-        def GetNodeTextByIndex():
+        def GetNodeNameByIndex():
             inp = input
             if(len(inputval)>1):
                 inp = '->'.join(inputval)
-            return ' Get text of node at index'+"'"+inp+"'"+' and store the output as '+"'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
+            return ' Get name of node at index'+"'"+inp+"'"+' and store the output as '+"'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
         return locals()[keyword]()
 
 

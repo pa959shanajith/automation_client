@@ -406,7 +406,7 @@ class Shell_Keywords():
             logger.print_on_console('Error occured in SelectTreeNode :',e)
         return status,result,value,err_msg
 
-    def getNodeTextByIndex(self,sap_id,input_val,*args):
+    def getNodeNameByIndex(self,sap_id,input_val,*args):
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -463,7 +463,7 @@ class Shell_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
             log.error(e)
-            logger.print_on_console('Error occured in GetNodeTextByIndex :',e)
+            logger.print_on_console('Error occured in GetNodeNameByIndex :',e)
         return status,result,value,err_msg
 
 
