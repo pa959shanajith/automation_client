@@ -43,7 +43,7 @@ class Shell_Keywords():
                   err_msg = sap_constants.ERROR_MSG
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            Exception.error(e)
+            log.error(e)
             logger.print_on_console('Error occured in GETROWCOUNT and is a :',e)
         return status,result,value,err_msg
 
@@ -69,7 +69,7 @@ class Shell_Keywords():
                   err_msg = sap_constants.ERROR_MSG
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            Exception.error(e)
+            log.error(e)
             logger.print_on_console('Error occured in GETCOLUMNCOUNT and is a :',e)
         return status,result,value,err_msg
 
@@ -107,10 +107,8 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exception.error(e)
+                log.error(e)
                 logger.print_on_console('Error occured in SELECTROWS and is a :',e)
-                import traceback
-                traceback.print_exc()
             return status,result,value,err_msg
 
     def toolBarActionKeys(self, sap_id,input_val,*args):
@@ -140,10 +138,8 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exception.error(e)
-                logger.print_on_console('Error occured in SELECTROWS and is a :',e)
-                import traceback
-                traceback.print_exc()
+                log.error(e)
+                logger.print_on_console('Error occured in ToolbarActionKeys and is a :',e)
             return status,result,value,err_msg
 
     def getCellText(self, sap_id,input_val,*args):
@@ -186,10 +182,8 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exception.error(e)
+                log.error(e)
                 logger.print_on_console('Error occured in GetCellText and is a :',e)
-                import traceback
-                traceback.print_exc()
             return status,result,value,err_msg
 
     def pressToolBarButton(self, sap_id,input_val,*args):
@@ -256,10 +250,8 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exception.error(e)
-                logger.print_on_console('Error occured in readGridCells and is a :',e)
-                import traceback
-                traceback.print_exc()
+                log.error(e)
+                logger.print_on_console('Error occured in PressToolbarButton and is a :',e)
             return status,result,value,err_msg
 
     def clickCell(self, sap_id,input_val,*args):
@@ -305,10 +297,8 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exception.error(e)
-                logger.print_on_console('Error occured in GetCellText and is a :',e)
-                import traceback
-                traceback.print_exc()
+                log.error(e)
+                logger.print_on_console('Error occured in ClickCell and is a :',e)
             return status,result,value,err_msg
 
     def doubleClickCell(self, sap_id,input_val,*args):
@@ -351,10 +341,8 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exception.error(e)
-                logger.print_on_console('Error occured in GetCellText and is a :',e)
-                import traceback
-                traceback.print_exc()
+                log.error(e)
+                logger.print_on_console('Error occured in DoubleClickCell and is a :',e)
             return status,result,value,err_msg
 
     def selectTreeNode(self, sap_id,input_val,*args):

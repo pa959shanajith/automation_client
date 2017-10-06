@@ -267,29 +267,27 @@ class Dropdown_Keywords():
         result = sap_constants.TEST_RESULT_FALSE
         err_msg=None
         verb = OUTPUT_CONSTANT
-        #value=OUTPUT_CONSTANT
-        val=input_val[0]
+        dd_entries = []
         i = 0
+        flag=True
         try:
-
             if(id != None):
-##                if(ses.FindById(id).Changeable == True):
-                    entries = ses.FindById(id).Entries
-                    while True:
-                        try:
-                            value = entries(i).value
-                            i = i + 1
-                            if(value == val):
-                                status=sap_constants.TEST_RESULT_PASS
-                                result=sap_constants.TEST_RESULT_TRUE
-                        except Exception as e:
-##                            err_msg = sap_constants.ERROR_MSG
-                            break
-##                else:
-##                    logger.print_on_console( "Element is not changeable")
-##                    err_msg = "Element is not changeable"
-##                    log.info(err_msg)
-
+                entries = ses.FindById(id).Entries
+                while True:
+                    try:
+                        dd_entries.append(str(entries(i).value).lower())
+                        i = i + 1
+                    except Exception as e:
+                        break
+                for inp in input_val:
+                    if(inp.lower().strip() not in dd_entries):
+                        flag = False
+                        break
+                if flag==True:
+                    status =sap_constants.TEST_RESULT_PASS
+                    result =sap_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg = sap_constants.ERROR_MSG
         except Exception as e:
               log.error('Error occured',e)
               err_msg = sap_constants.ERROR_MSG
