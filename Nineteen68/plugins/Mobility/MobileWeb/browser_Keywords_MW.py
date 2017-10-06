@@ -56,7 +56,7 @@ class BrowserKeywords():
 
     def __web_driver_exception(self,e):
         log.error(e)
-        err_msg=ERROR_CODE_DICT['ERROR OCURRED WHILE OPENING BROWSER']
+        err_msg='ERROR OCURRED WHILE OPENING BROWSER'
         logger.print_on_console(err_msg)
         return err_msg
     def start_server(self):
