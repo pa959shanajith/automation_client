@@ -119,6 +119,7 @@ class MainNamespace(BaseNamespace):
 
         if(str(args[0]) == 'connected'):
             logger.print_on_console('Normal Mode: Connection to the Node Server established')
+            wxObject.schedule.Enable()
             log.info('Normal Mode: Connection to the Node Server established')
         elif(str(args[0]) == 'reconnected'):
             logger.print_on_console('Schedule Mode:Connection to the Node Server established')
@@ -759,7 +760,7 @@ class ClientWindow(wx.Frame):
         self.schedule.SetToolTip(wx.ToolTip("Enable Scheduling Mode"))
         self.schedule.Bind(wx.EVT_CHECKBOX,self.onChecked_Schedule)
         self.schedule.Disable()
-        self.schedule.Hide()
+##        self.schedule.Hide()
 
 
         box.Add(self.log, 1, wx.ALL|wx.EXPAND, 5)
@@ -1069,7 +1070,7 @@ class ClientWindow(wx.Frame):
             conn.close()
             self.mythread = SocketThread(self)
             self.connectbutton.Disable()
-##            self.schedule.Enable()
+
         except Exception as e:
             print 'Forbidden request, Connection refused, please check the server ip and server port in Config.json, and restart the client window.'
             #747 Disable buttons if port or ip is invalid in config.json (Himanshu)
