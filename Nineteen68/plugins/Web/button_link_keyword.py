@@ -68,6 +68,25 @@ class ButtonLinkKeyword():
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
+
+                    elif platform.system() == 'Darwin':
+                        try:
+                            clickinfo = browser_Keywords.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
+                            print 'clickinfo222', clickinfo
+                            log.info('Click operation performed using javascript click')
+                            log.debug('click operation info: ')
+                            log.debug(clickinfo)
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                            status = webconstants.TEST_RESULT_PASS
+                            methodoutput = webconstants.TEST_RESULT_TRUE
+                        except Exception as e:
+                            log.debug('Going to perform click operation')
+                            time.sleep(0.5)
+                            webelement.click()
+                            log.info('Click operation performed using selenium click')
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                            status = webconstants.TEST_RESULT_PASS
+                            methodoutput = webconstants.TEST_RESULT_TRUE
                     else:
                         try:
                             log.debug('Going to perform click operation')

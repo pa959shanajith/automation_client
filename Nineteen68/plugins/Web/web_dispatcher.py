@@ -314,8 +314,10 @@ class Dispatcher:
                     if(result[1] == TERMINATE):
                         result = TERMINATE
                     if keyword in window_ops_list:
-                        delay_time=float(configvalues['delay'])
-                        time.sleep(delay_time)
+                        delay_time=configvalues['delay']
+                        if delay_time.strip()=="":
+                            delay_time=0
+                        time.sleep(float(delay_time))
                         if self.popup_object.check_if_no_popup_exists():
                             self.browser_object.update_window_handles()
                     driver=browser_Keywords.driver_obj
@@ -373,7 +375,7 @@ class Dispatcher:
             log.info('checking for the url error')
             try:
                 urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', browser_Keywords.driver_obj.current_url)
-                response=requests.get(urls[0])
+                response=requests.get(urls[0],verify=False)
                 status_code=response.status_code
                 log.info(status_code)
                 if status_code in STATUS_CODE_DICT:

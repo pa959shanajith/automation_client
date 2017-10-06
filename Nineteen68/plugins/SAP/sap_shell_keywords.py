@@ -43,7 +43,7 @@ class Shell_Keywords():
                   err_msg = sap_constants.ERROR_MSG
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            Exception.error(e)
+            log.error(e)
             logger.print_on_console('Error occured in GETROWCOUNT and is a :',e)
         return status,result,value,err_msg
 
@@ -69,7 +69,7 @@ class Shell_Keywords():
                   err_msg = sap_constants.ERROR_MSG
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            Exception.error(e)
+            log.error(e)
             logger.print_on_console('Error occured in GETCOLUMNCOUNT and is a :',e)
         return status,result,value,err_msg
 
@@ -107,10 +107,8 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exception.error(e)
+                log.error(e)
                 logger.print_on_console('Error occured in SELECTROWS and is a :',e)
-                import traceback
-                traceback.print_exc()
             return status,result,value,err_msg
 
     def toolBarActionKeys(self, sap_id,input_val,*args):
@@ -140,10 +138,8 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exception.error(e)
-                logger.print_on_console('Error occured in SELECTROWS and is a :',e)
-                import traceback
-                traceback.print_exc()
+                log.error(e)
+                logger.print_on_console('Error occured in ToolbarActionKeys and is a :',e)
             return status,result,value,err_msg
 
     def getCellText(self, sap_id,input_val,*args):
@@ -186,10 +182,8 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exception.error(e)
+                log.error(e)
                 logger.print_on_console('Error occured in GetCellText and is a :',e)
-                import traceback
-                traceback.print_exc()
             return status,result,value,err_msg
 
     def pressToolBarButton(self, sap_id,input_val,*args):
@@ -256,10 +250,8 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exception.error(e)
-                logger.print_on_console('Error occured in readGridCells and is a :',e)
-                import traceback
-                traceback.print_exc()
+                log.error(e)
+                logger.print_on_console('Error occured in PressToolbarButton and is a :',e)
             return status,result,value,err_msg
 
     def clickCell(self, sap_id,input_val,*args):
@@ -305,10 +297,8 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exception.error(e)
-                logger.print_on_console('Error occured in GetCellText and is a :',e)
-                import traceback
-                traceback.print_exc()
+                log.error(e)
+                logger.print_on_console('Error occured in ClickCell and is a :',e)
             return status,result,value,err_msg
 
     def doubleClickCell(self, sap_id,input_val,*args):
@@ -351,8 +341,127 @@ class Shell_Keywords():
                       err_msg = sap_constants.ERROR_MSG
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
-                Exception.error(e)
-                logger.print_on_console('Error occured in GetCellText and is a :',e)
-                import traceback
-                traceback.print_exc()
+                log.error(e)
+                logger.print_on_console('Error occured in DoubleClickCell and is a :',e)
             return status,result,value,err_msg
+
+    def selectTreeNode(self, sap_id,input_val,*args):
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
+        err_msg=None
+        value=OUTPUT_CONSTANT
+        self.lk.setWindowToForeground(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
+        elem = ses.FindById(id)
+        node = ''
+        try:
+            if(id != None):
+                if(elem.type == 'GuiShell' and elem.SubType == 'Tree'):
+                    for i in range(0,len(input_val)):
+                        if(i==0):
+                            node = elem.TopNode
+                            try:
+                                while (elem.GetNodeTextByKey(node)).lower() != input_val[i].lower():
+                                    node = elem.GetNextNodeKey(node)
+                            except:
+                                pass
+                        else:
+                            child_nodes = elem.GetSubNodesCol(node)
+                            j = 0
+                            try:
+                                node = child_nodes[j]
+                                while (elem.GetNodeTextByKey(child_nodes[j])).lower() != input_val[i].lower():
+                                    node = elem.GetNextNodeKey(child_nodes[j])
+                                    j = j + 1
+                            except:
+                                pass
+                    if(elem.GetNodeTextByKey(node) == input_val[len(input_val)-1]):
+                        elem.DoubleClickNode(node)
+                        status = sap_constants.TEST_RESULT_PASS
+                        result = sap_constants.TEST_RESULT_TRUE
+                    else:
+                        logger.print_on_console('Invalid input')
+                        err_msg = sap_constants.ERROR_MSG
+                else:
+                    logger.print_on_console('Element is not a tree object')
+                    err_msg = sap_constants.ERROR_MSG
+            else:
+                logger.print_on_console('Element not present on the page where operation is trying to be performed')
+                err_msg = sap_constants.ERROR_MSG
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG
+            log.error(e)
+            logger.print_on_console('Error occured in SelectTreeNode :',e)
+        return status,result,value,err_msg
+
+    def getNodeNameByIndex(self,sap_id,input_val,*args):
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
+        err_msg=None
+        value=OUTPUT_CONSTANT
+        self.lk.setWindowToForeground(sap_id)
+        id,ses=self.uk.getSapElement(sap_id)
+        elem = ses.FindById(id)
+        node = ''
+        flag = True
+        try:
+            if(id != None):
+                if(elem.type == 'GuiShell' and elem.SubType == 'Tree'):
+                    for i in range(0,len(input_val)):
+                        count = int(input_val[i])
+                        if(i==0):
+                            node = elem.TopNode
+                            c = self.getFirstLevelNodeCount(elem)
+                            if(count>c):
+                                flag = False
+                                break
+                            try:
+                                while (count-1):
+                                    node = elem.GetNextNodeKey(node)
+                                    count = count - 1
+                            except:
+                                pass
+                        else:
+                            child_nodes = elem.GetSubNodesCol(node)
+                            if(count>len(child_nodes)):
+                                flag = False
+                                break
+                            j = 0
+                            try:
+                                node = child_nodes[j]
+                                while (count-1):
+                                    node = elem.GetNextNodeKey(child_nodes[j])
+                                    count = count - 1
+                                    j = j + 1
+                            except Exception as e:
+                                pass
+                    if(flag):
+                        value = elem.GetNodeTextByKey(node)
+                        status = sap_constants.TEST_RESULT_PASS
+                        result = sap_constants.TEST_RESULT_TRUE
+                    else:
+                        logger.print_on_console('Invalid input')
+                        err_msg = sap_constants.ERROR_MSG
+                else:
+                    logger.print_on_console('Element is not a tree object')
+                    err_msg = sap_constants.ERROR_MSG
+            else:
+                logger.print_on_console('Element not present on the page where operation is trying to be performed')
+                err_msg = sap_constants.ERROR_MSG
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG
+            log.error(e)
+            logger.print_on_console('Error occured in GetNodeNameByIndex :',e)
+        return status,result,value,err_msg
+
+
+    def getFirstLevelNodeCount(self, tree):
+        c = 1
+        n = tree.TopNode
+        while True:
+            try:
+                n = tree.GetNextNodeKey(n)
+                c = c + 1
+            except:
+                break
+        return c

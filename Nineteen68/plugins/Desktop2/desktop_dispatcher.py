@@ -17,6 +17,7 @@ import desktop_util_keywords
 import desktop_dropdown_keywords
 import desktop_tab_control_keywords
 import desktop_date_control_keywords
+import desktop_treeview_keywords
 import screenshot_keywords
 import logger
 import desktop_constants
@@ -27,6 +28,7 @@ import logging
 import readconfig
 import desktop_custom_object
 from pywinauto.application import Application
+import pywinauto
 
 log = logging.getLogger('desktop_dispatcher.py')
 
@@ -41,6 +43,7 @@ class DesktopDispatcher:
     tab_control_keywords_obj = desktop_tab_control_keywords.Tab_Control_Keywords()
     date_control_keywords_obj = desktop_date_control_keywords.DateControlKeywords()
     desktop_custom_object_obj =desktop_custom_object.CustomObjectHandler()
+    tree_keywords_obj=desktop_treeview_keywords.Tree_View_Keywords()
 ##    outook_obj=outlook.OutlookKeywords()
 
     def __init__(self):
@@ -176,7 +179,25 @@ class DesktopDispatcher:
                     'gettomailid'  : self.outook_obj.GetToMailID,
                     'getbody' : self.outook_obj.GetBody,
                     'verifyemail' : self.outook_obj.VerifyEmail,
-                    'switchtofolder':self.outook_obj.switchToFolder
+                    'switchtofolder':self.outook_obj.switchToFolder,
+                    'settomailid':self.outook_obj.send_to_mail,
+                    'setcc':self.outook_obj.send_CC,
+                    'setbbc':self.outook_obj.send_BCC,
+                    'setsubject':self.outook_obj.send_subject,
+                    'setbody':self.outook_obj.send_body,
+                    'setattachments':self.outook_obj.send_attachments,
+                    'sendemail':self.outook_obj.send_mail,
+##                    'getnodecount':self.tree_keywords_obj.get_item_count,
+##                    'verifynodecount':self.tree_keywords_obj.verify_item_count,
+##                    'expandall':self.tree_keywords_obj.expand_all,
+##                    'collapseall':self.tree_keywords_obj.collapse_all,
+##                    'getchildren':self.tree_keywords_obj.get_children,
+##                    'verifychildren':self.tree_keywords_obj.verify_children,
+##                    'getrootnodes':self.tree_keywords_obj.get_root_elements,
+##                    'selecttreeelement':self.tree_keywords_obj.select_element,
+                    'selecttreenode':self.tree_keywords_obj.click_tree_element,
+##                    'doubleclicktreenode':self.tree_keywords_obj.double_click_tree_element,
+                    'getnodenamebyindex':self.tree_keywords_obj.getElementTextByIndex
 
 
                 }
@@ -188,7 +209,14 @@ class DesktopDispatcher:
                   'gettomailid'  : 5,
                   'getbody' : 6,
                   'verifyemail' : 7,
-                  'switchtofolder':8
+                  'switchtofolder':8,
+                  'settomailid' : 9,
+                  'setcc'    : 10,
+                  'setbbc'     :11,
+                  'setsubject'  : 12,
+                  'setbody' : 13,
+                  'setattachments' : 14,
+                  'sendemail':15
                 }
             keyword=keyword.lower()
             ele = None
@@ -241,6 +269,7 @@ class DesktopDispatcher:
         return result
 
     def get_desktop_element(self,xPath,url,app):
+        app2=app
         index=None
         ele = ''
         prev_flag=False
@@ -249,6 +278,8 @@ class DesktopDispatcher:
             xpath=x_var[0]
             xclass=x_var[1]
             xconID=int(x_var[2])
+            if len(x_var)==4:
+                xname=x_var[3]
         else:
             xpath=xPath
             prev_flag=True # setting prev_flag to True since the xpath recieved is of an old test case.
@@ -269,10 +300,33 @@ class DesktopDispatcher:
             try:
                 if ele!='':     #checking if element is not empty
                     if xclass==ele.friendly_class_name(): #comparing top window element class with the one obtained from TSP
-                        if xconID!=ele.control_id(): #comparing if the control ID of top window element is same as one from TSP
-                            #-------element dosent handles matched
-                            ele=''
+                        if ele.friendly_class_name()=='TabControl':
+                            if xconID!=ele.control_id(): #comparing if the control ID of top window element is same as one from TSP
+                                #-------element dosent handles matched
+                                ele=''
+                        else:
+                            #-------------------------------------getting text and comparing with xname
+                            handle= ele.handle
+                            try:
+                                element_text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
+                            except:
+                                pass
+                            if element_text!='':
+                                try:
+                                    comp_text=str(element_text)
+                                except:
+                                    comp_text=element_text.encode('ascii', 'replace')
+                            else :
+                                comp_text=ele.texts()
+                            try:
+                                comp_text=comp_text.strip()
+                            except:
+                                comp_text=comp_text[0].strip()
+                            #----------------------------------------------------------------------------------
+                            if xname!=comp_text:
+                                ele=''
                     else:
+                        #print "friendly class name does not match",ele.friendly_class_name()
                         ele=''
             except Exception as e:
                 if prev_flag==False:#checking if previous test case flag is True or not.
@@ -284,9 +338,17 @@ class DesktopDispatcher:
             traceback.print_exc()
         if ele=='':
             #logger.print_on_console("Warning! AUT Structure has changed")
-            ele=self.get_desktop_static_element(xclass,xconID,app)
-        if ele=='':
-            logger.print_on_console("Unable to get desktop elements because :")
+            try:
+                ele=self.get_element_if_empty(xclass,xname,app2)
+            except:# only for tables
+                ele=self.get_desktop_static_element(xclass,xconID,app)
+        if ele=='':#last attempt if the element is still empty, then find element using original index
+            try:
+                ele = ch[int(index)]
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                logger.print_on_console("Unable to get desktop element because :")
         return ele
 
     def get_desktop_static_element(self,xclass,xconID,app):
@@ -296,15 +358,15 @@ class DesktopDispatcher:
         #logic to find the desktop element using custname of the element returned from UI
         ele = ''
         try:
-            win = app.top_window()
-            ch = win.children()
-            for i in range(0,len(ch)):
+            win1 = app.top_window()
+            ch1 = win1.children()
+            for i in range(0,len(ch1)):
                 try:
-                    conID = ch[i].control_id()
-                    className=ch[i].friendly_class_name()
+                    conID = ch1[i].control_id()
+                    className=ch1[i].friendly_class_name()
                     if xclass==className:
                         if xconID==conID:
-                            ele=ch[i]
+                            ele=ch1[i]
                 except:
                     import traceback
                     traceback.print_exc()
@@ -312,6 +374,50 @@ class DesktopDispatcher:
             import traceback
             traceback.print_exc()
         return ele
-
+    def get_element_if_empty(self,xclass,xname,app):
+        """This method was added as a check, The name of the element is passed as an argument,it
+        comes to this method only when the friendly class name does not match"""
+        #logic to find the desktop element using custname of the element returned from UI
+        import pythoncom
+        pythoncom.CoInitialize()
+        ele = ''
+        className=''
+        comp_text=''
+        element_text=''
+        try:
+            win2 = app.top_window()
+            ch2 = win2.children()
+            for i in range(0,len(ch2)):
+                try:
+                    #------------------------------------------------
+                    handle= ch2[i].handle
+                    try:
+                        element_text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
+                    except:
+                        pass
+                    if element_text!='':
+                                try:
+                                    comp_text=str(element_text)
+                                except:
+                                    comp_text=element_text.encode('ascii', 'replace')
+                    else :
+                        comp_text=ch2[i].texts()
+                    #------------------------------------------------
+                    className=ch2[i].friendly_class_name()
+                    try:
+                        comp_text=comp_text.strip()
+                    except:
+                        comp_text=comp_text[0].strip()
+                    if xclass==className:
+                        if xname==comp_text:
+                            ele=ch2[i]
+                            break
+                except:
+                    import traceback
+                    traceback.print_exc()
+        except :
+            import traceback
+            traceback.print_exc()
+        return ele
 
 

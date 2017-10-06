@@ -56,7 +56,7 @@ class BrowserKeywords():
 
     def __web_driver_exception(self,e):
         log.error(e)
-        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        err_msg='ERROR OCURRED WHILE OPENING BROWSER'
         logger.print_on_console(err_msg)
         return err_msg
     def start_server(self):
@@ -176,7 +176,14 @@ class BrowserKeywords():
                     result = webconstants_MW.TEST_RESULT_TRUE
                     status = webconstants_MW.TEST_RESULT_PASS
             except Exception as e:
-                err_msg = self.__web_driver_exception(e)
+                err_msg = 'ERROR OCURRED WHILE OPENING BROWSER'
+                if platform.system() == 'Darwin':
+                    curdir = os.environ["NINETEEN68_HOME"]
+                    path_node_modules = curdir + '/Nineteen68/plugins/Mobility/node_modules'
+                    if not os.path.exists(path_node_modules):
+                        logger.print_on_console(
+                            "node_modules Directory not Found in /Nineteen68/plugins/Mobility/")
+                logger.print_on_console("ERROR OCURRED WHILE OPENING BROWSER")
             return status, result, output, err_msg
 
     def openNewBrowser(self,*args):
@@ -442,7 +449,10 @@ class BrowserKeywords():
 ##                if(len(winHandles) == 1):
 ##                    webdriver_list.pop(len(webdriver_list)-1)
 ##                    print 'Kill driver logic'
-          driver_obj.close()
+          if platform.system()== 'Darwin':
+            driver_obj.quit()
+          else:
+            driver_obj.close()
           self.stop_server()
           status=webconstants_MW.TEST_RESULT_PASS
           result=webconstants_MW.TEST_RESULT_TRUE

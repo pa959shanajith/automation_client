@@ -1058,6 +1058,44 @@ def kill_process():
     if platform.system() == 'Darwin':
         try:
             import os
+            import browserops_MW
+            browserops_MW.driver.quit()
+
+
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+
+            logger.print_on_console('Error in stopping scraping driver as driver is already closed')
+            log.error(e)
+        try:
+            import os
+            import browser_Keywords_MW
+            browser_Keywords_MW.driver_obj.quit()
+
+
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+
+            logger.print_on_console('Error in stopping browser driver as driver is already closed')
+            log.error(e)
+        try:
+            import os
+            import install_and_launch
+            install_and_launch.driver.quit()
+
+
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            logger.print_on_console('Error in stopping application driver as driver is already closed')
+            log.error(e)
+        try:
+            import os
             os.system("killall -9 node")
         except Exception as e:
             logger.print_on_console('Exception in stopping server')

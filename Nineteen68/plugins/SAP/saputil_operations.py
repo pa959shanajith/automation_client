@@ -28,7 +28,7 @@ class SapUtilKeywords:
             pythoncom.CoInitialize()
             self.SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
         except Exception as e:
-            logger.print_on_console( 'Not able to find window to getSapElement',e)
+            #logger.print_on_console( 'Not able to find window to getSapElement',e)
             import traceback
             traceback.print_exc()
         return self.SapGui

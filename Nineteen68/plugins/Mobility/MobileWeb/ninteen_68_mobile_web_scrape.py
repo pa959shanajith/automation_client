@@ -121,6 +121,9 @@ class ScrapeWindow(wx.Frame):
             self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
 
         self.Close()
-        print 'Full scrape  completed'
+        if d != 'FAIL':
+            print 'Full scrape  completed'
+        else:
+            print 'Full scrape not Done'
 
 

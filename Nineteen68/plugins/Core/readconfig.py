@@ -41,7 +41,7 @@ class readConfig():
         params=config['configuration']
         configvalues['server_ip']=params['server_ip']
         configvalues['server_port']=params['server_port']
-        configvalues['screenShot_PathName']=params['screenShot_PathName']
+        ##configvalues['screenShot_PathName']=params['screenShot_PathName']
         configvalues['ignore_certificate']=params['ignore_certificate']
         configvalues['chrome_path']=params['chrome_path']
         configvalues['bit_64']=params['bit_64']

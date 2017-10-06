@@ -196,6 +196,7 @@ class BrowserOperations():
        try:
            if platform.system() == "Darwin":
                global driver
+               self.stop_server()
                self.start_server()
                input_list = inputs.split(';')
                time.sleep(5)
@@ -259,9 +260,14 @@ class BrowserOperations():
                     logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
                     status = domconstants_MW.STATUS_SUCCESS
        except Exception as e:
-            mobile_key_objects.custom_msg.append("ERR_WEB_DRIVER")
+            mobile_key_objects.custom_msg.append("ERROR OCURRED WHILE OPENING BROWSER")
             status = domconstants_MW.STATUS_FAIL
-            logger.print_on_console("ERR_WEB_DRIVER")
+            if platform.system() == 'Darwin':
+                curdir = os.environ["NINETEEN68_HOME"]
+                path_node_modules = curdir + '/Nineteen68/plugins/Mobility/node_modules'
+                if not os.path.exists(path_node_modules):
+                    logger.print_on_console("node_modules Directory not Found in /Nineteen68/plugins/Mobility/")
+            logger.print_on_console("ERROR OCURRED WHILE OPENING BROWSER")
             ##Exceptions_MW.error(e)
        return status
 
