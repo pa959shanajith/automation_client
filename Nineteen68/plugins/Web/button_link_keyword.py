@@ -72,7 +72,6 @@ class ButtonLinkKeyword():
                     elif platform.system() == 'Darwin':
                         try:
                             clickinfo = browser_Keywords.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
-                            print 'clickinfo222', clickinfo
                             log.info('Click operation performed using javascript click')
                             log.debug('click operation info: ')
                             log.debug(clickinfo)
