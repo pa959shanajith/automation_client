@@ -1096,6 +1096,8 @@ def kill_process():
             log.error(e)
         try:
             import os
+            os.system("killall -9 Safari")
+            os.system("killall -9 safaridriver")
             os.system("killall -9 node")
         except Exception as e:
             logger.print_on_console('Exception in stopping server')
