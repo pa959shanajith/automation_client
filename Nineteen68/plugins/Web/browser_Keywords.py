@@ -425,6 +425,12 @@ class BrowserKeywords():
                         break
                 count = count - 2
                 webdriver_list[driver_instance].quit()
+                if platform.system() == 'Darwin':
+
+                        import os
+                        os.system("killall -9 Safari")
+
+
                 logger.print_on_console('browser closed')
                 log.info('browser closed')
                 ## Issue #190 Driver control won't switch back to parent window
