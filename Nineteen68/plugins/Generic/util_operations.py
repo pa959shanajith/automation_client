@@ -260,7 +260,7 @@ class UtilOperations:
             err_msg=None
             output=OUTPUT_CONSTANT
             if any(isinstance(el, list) for el in variable):
-                output=str(len(variable)-1)+'@'+str(len(variable[0])-1)
+                output=str(len(variable))+'@'+str(len(variable[0]))
                 status=TEST_RESULT_PASS
                 result=TEST_RESULT_TRUE
                 methodoutput=TEST_RESULT_TRUE
