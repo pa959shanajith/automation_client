@@ -450,7 +450,7 @@ class SocketThread(threading.Thread):
         if(not(os.environ.has_key(key))):
             key='USER'
         username=os.environ[key]
-        params={'username':username}
+        params={'username':username.lower()}
         socketIO = SocketIO(temp_server_IP,int(configvalues['server_port']),MainNamespace,verify= CERTIFICATE_PATH +'/server.crt',cert=(CERTIFICATE_PATH + '/client.crt', CERTIFICATE_PATH + '/client.key'),params=params)
 ##        socketIO = SocketIO(temp_server_IP,int(configvalues['server_port']),MainNamespace,verify= CERTIFICATE_PATH +'/server.crt',cert=(CERTIFICATE_PATH + '/client.crt', CERTIFICATE_PATH + '/client.key'))
 ##        socketIO = SocketIO(temp_server_IP,int(configvalues['server_port']),MainNamespace,verify='D:\\CA_BUNDLE\\server.crt',cert=('D:\\CA_BUNDLE\\client.crt', 'D:\\CA_BUNDLE\\client.key'))

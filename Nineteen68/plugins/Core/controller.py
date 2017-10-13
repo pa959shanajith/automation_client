@@ -457,11 +457,11 @@ class Controller():
             if self.core_utilsobject.getdatasize(display_keyword_response,'mb') < 10:
                 if not isinstance(display_keyword_response,list):
                     if tsp.name == 'getIndexCount':
-                        if '@' in display_keyword_response:
+                        if '@' in str(display_keyword_response):
                             row,col=display_keyword_response.split('@')
-                        logger.print_on_console("The index count for the dynamic variable is " + "Row: "+str(row) + " and Column: "+str(col))
-                    else:
-                        logger.print_on_console('Result obtained is ',display_keyword_response)
+                            logger.print_on_console("The index count for the dynamic variable is " + "Row: "+str(row) + " and Column: "+str(col))
+                        else:
+                            logger.print_on_console('Result obtained is ',display_keyword_response)
                 else:
                     logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i])
                     if not isinstance(display_keyword_response[i],basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
@@ -1096,6 +1096,8 @@ def kill_process():
             log.error(e)
         try:
             import os
+            os.system("killall -9 Safari")
+            os.system("killall -9 safaridriver")
             os.system("killall -9 node")
         except Exception as e:
             logger.print_on_console('Exception in stopping server')
