@@ -135,7 +135,7 @@ class Text_Keywords():
         try:
             if(id != None):
               if(ses.FindById(id).Changeable == True):
-                    if(ses.FindById(id).type == 'GuiCTextField' or 'GuiTextField'):
+                    if(ses.FindById(id).type == 'GuiCTextField' or 'GuiTextField' or 'GuiPasswordField'):
                         ses.FindById(id).text = ""
                         status = sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
@@ -144,13 +144,12 @@ class Text_Keywords():
               else:
                     logger.print_on_console( "Element is not changeable")
                     err_msg = "Element is not changeable"
-                    log.info(err_msg)
+                    #log.info(err_msg)
             else:
                   logger.print_on_console('element not present on the page where operation is trying to be performed')
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-##            Exceptions.error(e)
-            logger.print_on_console('Error occurred in getText and is a :',e)
+            logger.print_on_console('Error occurred in clearText and is a :',e)
         return status,result,value,err_msg
 
     def verifyText(self, sap_id,input_val, *args):
@@ -169,6 +168,7 @@ class Text_Keywords():
                         logger.print_on_console('The text obtained is ',result)
                     else:
                         logger.print_on_console('Element text does not match input text')
+                        err_msg='Element text does not match input text'
             else:
                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
         except Exception as e:
