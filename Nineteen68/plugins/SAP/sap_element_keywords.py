@@ -83,90 +83,133 @@ class ElementKeywords():
         #log.info(RETURN_RESULT)
         return status,result,value,err_msg
 
-##    def getTooltipText(self, sap_id,*args):
-##        self.lk.setWindowToForeground(sap_id)
-##        status = sap_constants.TEST_RESULT_FAIL
-##        result = sap_constants.TEST_RESULT_FALSE
-##        value = OUTPUT_CONSTANT
-##        err_msg=None
-##        id,ses=self.uk.getSapElement(sap_id)
-##        elem = ses.FindById(id)
-##
-##        try:
-##            #------------------------------Condition to check if its a table element
-##            if(elem.type=='GuiTableControl'):
-##                arg=args[1]
-##                if len(arg) > 0 and len(arg)==2 :
-##                    row=int(arg[0])-2
-##                    col=int(arg[1])-2
-##                    elem = elem.GetCell(row, col)
-##                else:
-##                    elem=None
-##                    logger.print_on_console('Invalid Arguments Passed')
-##            #------------------------------Condition to check if its a table element
-##            if(id != None):
-##                    value = elem.tooltip
-##                    if value== '':
-##                        value = elem.DefaultTooltip
-##                        if value =='':
-##                            value ="Null"
-##                    if(value != None or value =="Null"):
-##                        status=sap_constants.TEST_RESULT_PASS
-##                        result = sap_constants.TEST_RESULT_TRUE
-##                    else:
-##                        value=OUTPUT_CONSTANT
-##                        logger.print_on_console('ToolTipText not avaliable for the element ')
-##            else:
-##                err_msg = sap_constants.ERROR_MSG
-##                logger.print_on_console('Element does not exist')
-##
-##        except Exception as e:
-##            err_msg = sap_constants.ERROR_MSG
-##            logger.print_on_console('Error cooured in getTooltipText and is :',e)
-##        return status,result,value,err_msg
-##
-##    def verifyTooltipText(self, sap_id,*args):
-##        self.lk.setWindowToForeground(sap_id)
-##        status = sap_constants.TEST_RESULT_FAIL
-##        result = sap_constants.TEST_RESULT_FALSE
-##        value = OUTPUT_CONSTANT
-##        err_msg=None
-##        id,ses=self.uk.getSapElement(sap_id)
-##        elem = ses.FindById(id)
-##        input_val=args[1]
-##        try:
-##            #------------------------------Condition to check if its a table element
-##            if(elem.type=='GuiTableControl'):
-##                arg=args[1]
-##                if len(arg) > 0 and len(arg)==2 :
-##                    row=int(arg[0])-2
-##                    col=int(arg[1])-2
-##                    input_val=arg[2]
-##                    elem = elem.GetCell(row, col)
-##                else:
-##                    elem=None
-##                    logger.print_on_console('Invalid Arguments Passed')
-##            #------------------------------Condition to check if its a table element
-##            if(id != None):
-##                    value = elem.tooltip
-##                    if value== '':
-##                        value = elem.DefaultTooltip
-##                        if value =='':
-##                            value ="Null"
-##                    if(value==input_val):
-##                        status=sap_constants.TEST_RESULT_PASS
-##                        result = sap_constants.TEST_RESULT_TRUE
-##                    else:
-##                        value=OUTPUT_CONSTANT
-##                        logger.print_on_console('ToolTipText does not match verify text ')
-##            else:
-##                err_msg = sap_constants.ERROR_MSG
-##                logger.print_on_console('Element does not exist')
-##
-##        except Exception as e:
-##            err_msg = sap_constants.ERROR_MSG
-##            logger.print_on_console('Error cooured in getTooltipText and is :',e)
-##        return status,result,value,err_msg
+    def getTooltipText(self, sap_id,*args):
+        self.lk.setWindowToForeground(sap_id)
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg=None
+        id,ses=self.uk.getSapElement(sap_id)
+        elem = ses.FindById(id)
+
+        try:
+            #------------------------------Condition to check if its a table element
+            if(elem.type=='GuiTableControl'):
+                arg=args[0]
+                if(len(arg)==1 and arg[0]==''):
+                    pass
+                elif len(arg)==2 :
+                    row=int(arg[0])-1
+                    col=int(arg[1])-1
+                    elem = elem.GetCell(row, col)
+                else:
+                    elem=None
+                    logger.print_on_console('Invalid Arguments Passed')
+            #------------------------------Condition to check if its a table element
+            if(id != None):
+                    value = elem.tooltip
+                    if value== '':
+                        value = elem.DefaultTooltip
+                        if value =='':
+                            value ="Null"
+                    if(value != None or value =="Null"):
+                        status=sap_constants.TEST_RESULT_PASS
+                        result = sap_constants.TEST_RESULT_TRUE
+                    else:
+                        value=OUTPUT_CONSTANT
+                        logger.print_on_console('ToolTipText not avaliable for the element ')
+            else:
+                err_msg = sap_constants.ERROR_MSG
+                logger.print_on_console('Element does not exist')
+
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG
+            logger.print_on_console('Error occoured in getTooltipText and is :',e)
+        return status,result,value,err_msg
+
+    def verifyTooltipText(self, sap_id,*args):
+        self.lk.setWindowToForeground(sap_id)
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg=None
+        id,ses=self.uk.getSapElement(sap_id)
+        elem = ses.FindById(id)
+        input_val=args[1]
+        try:
+            #------------------------------Condition to check if its a table element
+            if(elem.type=='GuiTableControl'):
+                arg=args[0]
+                if(len(arg)==1 and arg[0]==''):
+                    pass
+                elif len(arg)==3 :
+                    row=int(arg[0])-1
+                    col=int(arg[1])-1
+                    input_val=arg[2]
+                    elem = elem.GetCell(row, col)
+                else:
+                    elem=None
+                    logger.print_on_console('Invalid Arguments Passed')
+            #--------------------changing Null to ''
+            if input_val.strip()=="Null":
+                input_val=''
+            #------------------------------Condition to check if its a table element
+            if(id != None):
+                if input_val.strip()==elem.tooltip.strip() or input_val.strip()==elem.DefaultTooltip.strip():
+                    status=sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    value=OUTPUT_CONSTANT
+                    logger.print_on_console('ToolTipText does not match input text ')
+            else:
+                err_msg = sap_constants.ERROR_MSG
+                logger.print_on_console('Element does not exist')
+
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG
+            logger.print_on_console('Error occoured in verifyTooltipText and is :',e)
+        return status,result,value,err_msg
+
+    def getIconName(self, sap_id,*args):
+        self.lk.setWindowToForeground(sap_id)
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg=None
+        id,ses=self.uk.getSapElement(sap_id)
+        elem = ses.FindById(id)
+        #input_val=args[1]
+        try:
+            #------------------------------Condition to check if its a table element
+            if(elem.type=='GuiTableControl'):
+                arg=args[0]
+                if(len(arg)==1 and arg[0]==''):
+                    pass
+                elif len(arg)==2 :
+                    row=int(arg[0])-1
+                    col=int(arg[1])-1
+                    elem = elem.GetCell(row, col)
+                else:
+                    elem=None
+                    logger.print_on_console('Invalid Arguments Passed')
+            #------------------------------Condition to check if its a table element
+            if(id != None):
+                if elem.IconName!='' or elem.IconName!=None :
+                        value = elem.IconName
+                        if value in sap_constants.ICON_BITMAP:
+                            value=sap_constants.ICON_BITMAP[value]
+                        status=sap_constants.TEST_RESULT_PASS
+                        result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    logger.print_on_console('Icon name does not exist for the element.')
+            else:
+                err_msg = sap_constants.ERROR_MSG
+                logger.print_on_console('Element does not exist')
+
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG
+            logger.print_on_console('Error occoured in getIconName and is :',e)
+        return status,result,value,err_msg
 
     def getInputHelp(self, sap_id,*args):
         self.lk.setWindowToForeground(sap_id)

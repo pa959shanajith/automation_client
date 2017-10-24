@@ -92,3 +92,17 @@ ELEMENT_FOUND=True
 ERROR_MSG = 'Error occured'
 
 APPLICATION_KEYWORDS=['serverconnect','launchapplication','starttransaction','closeapplication']
+
+#refer this to find more icon and the significance
+#https://experience.sap.com/files/guidelines/icons_sap/icons_e1_4.htm
+ICON_BITMAP={'S_OKAY':'CHECKED',
+             'S_NONO':'INCOMPLETE',
+             'S_ERRO':'FAILURE',
+             'S_POSI':'POSITIVE',
+             'S_NEGA':'NEGATIVE',
+             'S_LOCL':'LOCKED',
+             'S_LOOP':'UNLOCKED',
+             'STA_OK':'STATUS_OK',
+             'STABST':'STATUS_BEST',
+             'B_SPCE':'SPACE'
+             }
