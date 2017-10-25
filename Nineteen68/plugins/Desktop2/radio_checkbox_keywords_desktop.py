@@ -189,6 +189,8 @@ class Radio_Checkbox_keywords():
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
 
         except Exception as exception:
-            Exceptions.error(exception)
+            import traceback
+            traceback.print_exc()
+            #Exceptions.error(exception)
             err_msg = desktop_constants.ERROR_MSG
         return status,result,flag,err_msg
