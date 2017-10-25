@@ -208,6 +208,11 @@ class RadioCheckboxOperations:
                     flag = 'UnSelected'
                     keywordresponse = flag
                     oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
+            elif radiocheckboxrole == 'push button':
+                    flag=objstates
+                    keywordresult=MSG_PASS
+                    keywordresponse = flag
+                    oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
