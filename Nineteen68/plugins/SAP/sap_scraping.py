@@ -68,7 +68,7 @@ class Scrape:
                         custname = elem.__getattr__("Name") + "_btn"
                         tag="button"
                     elif(elem.__getattr__("Type") == "GuiTextField" or elem.__getattr__("Type") == "GuiCTextField" or elem.__getattr__("Type") == "GuiPasswordField") :
-                        custname = elem.__getattr__("Name") + "_txt"
+                        custname = elem.__getattr__("Name") + "_txtbox"
                         tag="input"
                     elif(elem.__getattr__("Type") == "GuiComboBox" or elem.__getattr__("Type") == "GuiBox"):
                         custname = elem.__getattr__("Name") + "_select"
@@ -95,7 +95,7 @@ class Scrape:
                         custname = elem.__getattr__("Name") + "_shl"
                         tag="shell"
                     else:
-                        custname = elem.__getattr__("Name")
+                        custname = elem.__getattr__("Name") + "_elmnt"
                         tag=elem.__getattr__("Type")
 
                     """ Python dictionary to store the properties associated with the objects."""
@@ -202,7 +202,7 @@ class Scrape:
                                 custname = elem.__getattr__("Name") + "_btn"
                                 tag="button"
                             elif(elem.__getattr__("Type") == "GuiTextField" or elem.__getattr__("Type") == "GuiCTextField" or elem.__getattr__("Type") == "GuiPasswordField") :
-                                custname = elem.__getattr__("Name") + "_txt"
+                                custname = elem.__getattr__("Name") + "_txtbox"
                                 tag="input"
                             elif(elem.__getattr__("Type") == "GuiComboBox" or elem.__getattr__("Type") == "GuiBox"):
                                 custname = elem.__getattr__("Name") + "_select"
@@ -229,7 +229,7 @@ class Scrape:
                                 custname = elem.__getattr__("Name") + "_shl"
                                 tag="shell"
                             else:
-                                custname = elem.__getattr__("Name")
+                                custname = elem.__getattr__("Name") + "_elmnt"
                                 tag=elem.__getattr__("Type")
                             dict = {
                                     'xpath': path,
