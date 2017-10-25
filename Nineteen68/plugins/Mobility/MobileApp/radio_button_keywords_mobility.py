@@ -104,6 +104,9 @@ class Radio_Button_Keywords():
                                 output='Checked'
                             else:
                                 output="UnChecked"
+                        else :
+                            output=webelement.get_attribute("checked")
+
                         if output!=None:
                             log.info(output)
                             status=TEST_RESULT_PASS
