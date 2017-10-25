@@ -178,6 +178,10 @@ class Radio_Checkbox_keywords():
                             flag = 'UnSelected'
                             status=desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
+                    elif(tag == 'Button'):
+                        flag = status
+                        status=desktop_constants.TEST_RESULT_PASS
+                        result = desktop_constants.TEST_RESULT_TRUE
 
                 else:
                    log.info('Element not present on the page where operation is trying to be performed')
