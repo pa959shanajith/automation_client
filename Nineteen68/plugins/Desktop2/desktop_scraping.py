@@ -229,9 +229,9 @@ class Scrape:
             for i in range (len(ch)):
                  hiddentag = 'Yes'
                  text = ''
-                 new_text=''
-                 text_initial=''
-                 text_old=''
+##                 new_text=''
+##                 text_initial=''
+##                 text_old=''
                  parent = ''
                  coordinates = ''
                  children = ch[i]
@@ -277,16 +277,18 @@ class Scrape:
                          properties['control_id'] = children.element_info.control_id
                          properties['parent'] = children.element_info.parent.class_name
                          handle = children.handle
-                         text_initial = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
-                         text=text_initial
+                         text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
+##                         text_initial = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
+##                         text=text_initial
                          if text =='':
                             t = children.texts()
                             if len(t) >= 2:
                                 text = t[1]
                          if text == '':
                             text = children.friendly_class_name()
-                         text_old = text.strip()
-                         text=text_old
+                         text = text.strip()
+##                         text_old = text.strip()
+##                         text=text_old
                          url = properties['url']
                          parent = properties['parent']
                          rectangle = properties['rectangle']
@@ -302,18 +304,18 @@ class Scrape:
                             text= str(text) + '_radiobtn'
                          elif tag == 'ComboBox':
                             tag = 'select'
-                            text= str(text) + '_dropdown'
+                            text= str(text) + '_select'
                          elif tag == 'CheckBox':
                             tag ='checkbox'
                             text= str(text) + '_chkbox'
                          elif tag == 'ListView':
                             tag = 'list'
                             canselectmultiple="true"
-                            text= str(text) + '_list'
+                            text= str(text) + '_lst'
                          elif tag == 'ListBox':
                             tag = 'list'
                             canselectmultiple="true"
-                            text= str(text) + '_list'
+                            text= str(text) + '_lst'
                          elif tag == 'TabControl':
                             tag = 'tab'
                             text= str(text) + '_tab'
@@ -326,9 +328,9 @@ class Scrape:
                          else:
                             tag = 'label'
                             if not isinstance(text,basestring):
-                                text=str(text)+'_lbl'
+                                text=str(text)+'_elmnt'
                             else:
-                                text=text+'_lbl'
+                                text=text+'_elmnt'
 
 
                          left = 0
@@ -352,17 +354,17 @@ class Scrape:
                             for k in range(len(ne)):
                                 if ne[k]['xpath'] == path:
                                     flag = True
-                            new_path=''
-                            #----------------------------------------------------
-                            className=children.friendly_class_name()
-                            if text_initial!='':
-                                try:
-                                    new_text=str(text_initial)
-                                except:
-                                    new_text=text_initial.encode('ascii', 'replace')
-                            else :
-                                new_text=text_old
-                            new_path=path+';'+className+';'+str(control_id)+";"+new_text
+                            #-----------------------appending to xpath --control id-,-classname--,-text-of --element----------------------
+##                            new_path=''
+##                            className=children.friendly_class_name()
+##                            if text_initial!='':
+##                                try:
+##                                    new_text=str(text_initial)
+##                                except:
+##                                    new_text=text_initial.encode('ascii', 'replace')
+##                            else :
+##                                new_text=text_old
+##                            new_path=path+';'+className+';'+str(control_id)+";"+new_text
                             #----------------------------------------------------
                             if not flag:
                                 ne.append({"custname":text,
@@ -370,7 +372,7 @@ class Scrape:
                                         "url":url,
                                         'control_id':control_id,
                                         'parent':parent,
-                                        'xpath' : new_path,
+                                        'xpath' : path,
                                         'hiddentag':hiddentag,
                                         'top': top,
                                         'left': left,
