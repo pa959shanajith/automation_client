@@ -244,6 +244,31 @@ class BrowserKeywords():
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+
+        try:
+            inputURL = url[0]
+            if not (inputURL is None and inputURL is ''):
+                inputURL.strip()
+                if inputURL[0:4].lower()!='http' and inputURL[0:4].lower()!='file':
+                    inputURL='http://'+inputURL
+                driver_obj.get(inputURL)
+                #ignore certificate implementation23
+
+                try:
+                    ignore_certificate = configvalues['ignore_certificate']
+                    if ((ignore_certificate.lower() == 'yes') and ((driver_obj.title !=None) and ('Certificate' in driver_obj.title))):
+                        driver_obj.execute_script("""document.getElementById('overridelink').click();""")
+                except Exception as k:
+                    logger.print_on_console('Exception while ignoring the certificate')
+                logger.print_on_console('Navigated to URL')
+                log.info('Navigated to URL')
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
+            else:
+                logger.print_on_console(webconstants.INVALID_INPUT)
+        except Exception as e:
+            err_msg=self.__web_driver_exception(e)
+
         try:
             if (url[0] is not None and url[0] != '')\
              and (url[1] is not None and url[1] != '')\
