@@ -30,17 +30,17 @@ def get_status(sap_id, *args):
                 if(elem.type == "GuiRadioButton"):
                     value = ses.FindById(id).selected
                     if(value==True):
-                        value=sap_constants.SELECTED_CHECK
+                        value='Selected'
                     else:
-                        value=sap_constants.UNSELECTED_CHECK
+                        value="Unselected"
                     result='True'
                 #----------------------------------------------------------Check for Checkbox
                 elif(elem.type == "GuiCheckBox"):
                     value = ses.FindById(id).selected
                     if(value ==True):
-                        value=sap_constants.CHECKED_CHECK
+                        value="Checked"
                     else:
-                        value=sap_constants.UNCHECKED_CHECK
+                        value="Unchecked"
                     result='True'
                 #----------------------------------------------------------Check for Button
                 elif(elem.type == "GuiButton"):
