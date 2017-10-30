@@ -229,9 +229,9 @@ class Scrape:
             for i in range (len(ch)):
                  hiddentag = 'Yes'
                  text = ''
-##                 new_text=''
-##                 text_initial=''
-##                 text_old=''
+                 new_text=''
+                 text_initial=''
+                 text_old=''
                  parent = ''
                  coordinates = ''
                  children = ch[i]
@@ -277,18 +277,16 @@ class Scrape:
                          properties['control_id'] = children.element_info.control_id
                          properties['parent'] = children.element_info.parent.class_name
                          handle = children.handle
-                         text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
-##                         text_initial = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
-##                         text=text_initial
+                         text_initial = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
+                         text=text_initial
                          if text =='':
                             t = children.texts()
                             if len(t) >= 2:
                                 text = t[1]
                          if text == '':
                             text = children.friendly_class_name()
-                         text = text.strip()
-##                         text_old = text.strip()
-##                         text=text_old
+                         text_old = text.strip()
+                         text=text_old
                          url = properties['url']
                          parent = properties['parent']
                          rectangle = properties['rectangle']
@@ -354,17 +352,17 @@ class Scrape:
                             for k in range(len(ne)):
                                 if ne[k]['xpath'] == path:
                                     flag = True
-                            #-----------------------appending to xpath --control id-,-classname--,-text-of --element----------------------
-##                            new_path=''
-##                            className=children.friendly_class_name()
-##                            if text_initial!='':
-##                                try:
-##                                    new_text=str(text_initial)
-##                                except:
-##                                    new_text=text_initial.encode('ascii', 'replace')
-##                            else :
-##                                new_text=text_old
-##                            new_path=path+';'+className+';'+str(control_id)+";"+new_text
+                            #----------------------------------------------------
+                            new_path=''
+                            className=children.friendly_class_name()
+                            if text_initial!='':
+                                try:
+                                    new_text=str(text_initial)
+                                except:
+                                    new_text=text_initial.encode('ascii', 'replace')
+                            else :
+                                new_text=text_old
+                            new_path=path+';'+className+';'+str(control_id)+";"+new_text
                             #----------------------------------------------------
                             if not flag:
                                 ne.append({"custname":text,
@@ -372,7 +370,7 @@ class Scrape:
                                         "url":url,
                                         'control_id':control_id,
                                         'parent':parent,
-                                        'xpath' : path,
+                                        'xpath' : new_path,
                                         'hiddentag':hiddentag,
                                         'top': top,
                                         'left': left,

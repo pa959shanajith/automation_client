@@ -249,9 +249,9 @@ class Text_Box:
             if(parent in real_parent ):
                 status= True
             else:
-                status=True
-                #logger.log('verify parent is false')
-                #status= False # we are changing this to true as in some cases the window name may change inspite of elements being constant
+                logger.log('verify parent is false')
+                logger.print_on_console('verify parent is false')
+                status= False
 
         except Exception as e:
             log.error(e)
