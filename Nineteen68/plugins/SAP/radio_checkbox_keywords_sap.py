@@ -142,6 +142,14 @@ class Radio_Checkbox_keywords():
                             value=sap_constants.UNCHECKED_CHECK
                         status=sap_constants.TEST_RESULT_PASS
                         result=sap_constants.TEST_RESULT_TRUE
+                    #----------------------------------------------------------Check for Button
+                    elif(ses.FindById(id).type == "GuiButton"):
+                        try:
+                            value = ses.FindById(id).selected
+                            status=sap_constants.TEST_RESULT_PASS
+                            result=sap_constants.TEST_RESULT_TRUE
+                        except:
+                            logger.print_on_console('Button element does not have status')
 ##                else:
 ##                    logger.print_on_console('Element state does not allow to perform the operation')
 ##                    err_msg = sap_constants.ERROR_MSG

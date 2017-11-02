@@ -302,18 +302,18 @@ class Scrape:
                             text= str(text) + '_radiobtn'
                          elif tag == 'ComboBox':
                             tag = 'select'
-                            text= str(text) + '_dropdown'
+                            text= str(text) + '_select'
                          elif tag == 'CheckBox':
                             tag ='checkbox'
                             text= str(text) + '_chkbox'
                          elif tag == 'ListView':
                             tag = 'list'
                             canselectmultiple="true"
-                            text= str(text) + '_list'
+                            text= str(text) + '_lst'
                          elif tag == 'ListBox':
                             tag = 'list'
                             canselectmultiple="true"
-                            text= str(text) + '_list'
+                            text= str(text) + '_lst'
                          elif tag == 'TabControl':
                             tag = 'tab'
                             text= str(text) + '_tab'
@@ -326,9 +326,9 @@ class Scrape:
                          else:
                             tag = 'label'
                             if not isinstance(text,basestring):
-                                text=str(text)+'_lbl'
+                                text=str(text)+'_elmnt'
                             else:
-                                text=text+'_lbl'
+                                text=text+'_elmnt'
 
 
                          left = 0
@@ -352,8 +352,8 @@ class Scrape:
                             for k in range(len(ne)):
                                 if ne[k]['xpath'] == path:
                                     flag = True
-                            new_path=''
                             #----------------------------------------------------
+                            new_path=''
                             className=children.friendly_class_name()
                             if text_initial!='':
                                 try:

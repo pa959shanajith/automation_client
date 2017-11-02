@@ -250,6 +250,7 @@ class Text_Box:
                 status= True
             else:
                 logger.log('verify parent is false')
+                logger.print_on_console('verify parent is false')
                 status= False
 
         except Exception as e:
