@@ -361,8 +361,11 @@ class MainframeKeywords:
         output=OUTPUT_CONSTANT
         try:
             #check for the exact inputs
-            if len(inputs) == 1:
+            if len(inputs) == 1 or len(inputs) == 2 :
                 function_key = self.keys[inputs[0].lower()]
+                number = 1
+                if len(inputs) == 2:
+                    number = inputs[1]
                 # Log the input details in log file
                 log.info("Input recieved")
                 log.info("Function key : %s ",function_key)
@@ -378,7 +381,7 @@ class MainframeKeywords:
                     #Logic to launch Extra Emulator goes here
                     print "Extra Emulator code"
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
-                    result,output,err_msg =  self.bluezone_object.send_function_keys(function_key)
+                    result,output,err_msg =  self.bluezone_object.send_function_keys(function_key,number)
                 elif self.emulator_type == MAINFRAME_PCOMM:
                     print "Pcomm Emulator code"
                 if result:

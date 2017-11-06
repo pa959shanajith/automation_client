@@ -186,16 +186,18 @@ class BluezoneKeywords:
             logger.print_on_console("Error: Unable to set text to the Emulator screen.")
         return (return_value == 1),output,err_msg
 
-    def send_function_keys(self,function_key):
+    def send_function_keys(self,function_key,number):
         #Logic for send_function_keys
         err_msg=None
         output=OUTPUT_CONSTANT
         return_value = 0
         try:
-            self.host.Waitready(10,1000)
-            self.host.Focus
-            self.host.SendKeys(function_key)
-            log.info(MAINFRAME_PRESS_FUNCTION_KEY)
+            number = int(number)
+            for i in range(number):
+                self.host.Waitready(10,1000)
+                self.host.Focus
+                self.host.SendKeys(function_key)
+                log.info(MAINFRAME_PRESS_FUNCTION_KEY)
             return_value = 1
 
         except Exception as e:
