@@ -406,4 +406,8 @@ EVALUATE='evaluate'
 
 ENDFOR_DESCRIPTION='EndFor: completed'
 
+ACTION_1 = 'loginToJira'
+
+ACTION_2 = 'createIssueInJira'
+
 

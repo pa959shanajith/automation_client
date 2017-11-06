@@ -414,6 +414,22 @@ class MainNamespace(BaseNamespace):
             import traceback
             traceback.print_exc()
 
+    def on_jiralogin(self,*args):
+        try:
+            con = controller.Controller()
+            con.get_all_the_imports('Jira')
+            import jiracontroller
+            obj = jiracontroller.JiraWindow()
+            global socketIO
+            if args[0] == ACTION_1:
+                data = args[1]
+                obj.getAllAutoDetails(data,socketIO)
+            elif args[0] == ACTION_2:
+                data = args[1]
+                obj.createIssue(data,socketIO)
+        except Exception as e:
+            logger.print_on_console('Exception in jira emit')
+
     def on_update_screenshot_path(self,*args):
         spath=args[0]
         import constants

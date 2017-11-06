@@ -282,6 +282,7 @@ class PcommKeywords:
             self.host.SendKeys(MAINFRAME_KEY_E)
             self.host.WaitReady(10,1000)
             file_status =  self.host.WaitForText((job_path), (8, 11, 5000))
+            jobno = None
             if file_status== True:
                 self.host.Setcursor(8,2)
                 self.host.SendKeys(MAINFRAME_KEY_V)
