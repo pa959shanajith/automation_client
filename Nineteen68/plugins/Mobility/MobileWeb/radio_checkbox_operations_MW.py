@@ -161,9 +161,15 @@ class RadioCheckboxKeywords():
             input_type=webelement.get_attribute('type').lower();
             log.debug('Type is '+input_type)
             if webelement.is_selected():
-                status=self.status[input_type]
+                if input_type in ['submit','button','reset']:
+                    status=webelement.is_selected()
+                else:
+                    status=self.status[input_type]
             else:
-                status='Un'+self.status[input_type].lower()
+                if input_type in ['submit','button','reset']:
+                    status=webelement.is_selected()
+                else:
+                    status='Un'+self.status[input_type].lower()
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status
@@ -179,7 +185,7 @@ class RadioCheckboxKeywords():
             tag_name=input[2]
             cell=driver.execute_script(webconstants_MW.GET_CELL_JS,webelement,row_num-1,col_num-1)
             element_list=cell.find_elements_by_xpath('.//*')
-            if tag_name=='radio' or tag_name=='checkbox':
+            if tag_name=='radio' or tag_name=='checkbox' or tag_name in ['submit','button','reset']:
                 log.debug('Tagname is',tag_name)
                 for element in element_list:
                     element_xpath=driver.execute_script(webconstants_MW.GET_XPATH_JS,element)
@@ -190,6 +196,8 @@ class RadioCheckboxKeywords():
                         if tag_name=='input' and tag_type=='radio':
                             status_list.append(self.__fetch_status(child))
                         elif tag_name=='input' and tag_type=='checkbox':
+                            status_list.append(self.__fetch_status(child))
+                        elif tag_name=='input' and tag_type in ['submit','button','reset']:
                             status_list.append(self.__fetch_status(child))
 
         except Exception as e:

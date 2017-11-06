@@ -130,6 +130,51 @@ class SapUtilKeywords:
              log.error('Error occured',e)
         return status,result,value,err_msg
 
+    def verifyHidden(self, sap_id, *args):
+        #time.sleep(2)
+        id,ses=self.getSapElement(sap_id)
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
+        err_msg=None
+        value=OUTPUT_CONSTANT
+        try:
+            if(id != None):
+                try:
+                    ses.FindById(id)
+                    err_msg="Element is visible"
+                    logger.print_on_console("Element is visible")
+                except Exception as e:
+##                    if e[2][2]=='The control could not be found by id.':
+##                        logger.print_on_console("Element is hidden")
+                    logger.print_on_console("Element is hidden")
+                    status=sap_constants.TEST_RESULT_PASS
+                    result=sap_constants.TEST_RESULT_TRUE
+        except Exception as e:
+            logger.print_on_console(e)
+        return status,result,value,err_msg
+
+    def verifyVisible(self, sap_id, *args):
+        #time.sleep(2)
+        id,ses=self.getSapElement(sap_id)
+        status=sap_constants.TEST_RESULT_FAIL
+        result=sap_constants.TEST_RESULT_FALSE
+        err_msg=None
+        value=OUTPUT_CONSTANT
+        try:
+            if(id != None):
+                try:
+                    ses.FindById(id)
+                    status=sap_constants.TEST_RESULT_PASS
+                    result=sap_constants.TEST_RESULT_TRUE
+                    logger.print_on_console("Element is visible")
+                except Exception as e:
+                    err_msg="Element is hidden"
+                    if e[2][2]=='The control could not be found by id.':
+                        logger.print_on_console("Element is hidden")
+        except Exception as e:
+            logger.print_on_console(e)
+        return status,result,value,err_msg
+
     def getobjectforcustom(self, sap_id, eleType, eleIndex):
         data = []
         xpath = None

@@ -178,6 +178,10 @@ class Radio_Checkbox_keywords():
                             flag = 'UnSelected'
                             status=desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
+                    elif(tag == 'Button'):
+                        flag = status
+                        status=desktop_constants.TEST_RESULT_PASS
+                        result = desktop_constants.TEST_RESULT_TRUE
 
                 else:
                    log.info('Element not present on the page where operation is trying to be performed')
@@ -185,6 +189,8 @@ class Radio_Checkbox_keywords():
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
 
         except Exception as exception:
-            Exceptions.error(exception)
+            import traceback
+            traceback.print_exc()
+            #Exceptions.error(exception)
             err_msg = desktop_constants.ERROR_MSG
         return status,result,flag,err_msg

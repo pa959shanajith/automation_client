@@ -79,7 +79,6 @@ class Controller():
     desktop_dispatcher_obj = None
     sap_dispatcher_obj = None
     mobile_app_dispatcher_obj = None
-    mainframe_dispatcher_obj = None
     def __init__(self):
         self.get_all_the_imports(CORE)
         self.__load_generic()
@@ -191,20 +190,6 @@ class Controller():
             import traceback
             traceback.print_exc()
             logger.print_on_console('Error loading SAP plugin',e)
-    #--------------------------------------------------------------------------------SAP change
-
-         #--------------------------------------------------------------------------------SAP change
-    def __load_mainframe(self):
-        try:
-            self.get_all_the_imports('Mainframe')
-            import mainframe_dispatcher
-            self.mainframe_dispatcher_obj = mainframe_dispatcher.MainframeDispatcher()
-            self.mainframe_dispatcher_obj.exception_flag=exception_flag
-            self.mainframe_dispatcher_obj.action=self.action
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
-            logger.print_on_console('Error loading Mainframe plugin',e)
     #--------------------------------------------------------------------------------SAP change
     def dangling_status(self,index):
         step=handler.tspList[index]
@@ -587,13 +572,6 @@ class Controller():
                     if self.oebs_dispatcher_obj == None:
                         self.__load_oebs()
                     result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
-            #----------------------------------------------------------------------------------------------Mainframe change
-                elif teststepproperty.apptype.lower() == APPTYPE_MAINFRAME:
-                    #Mainframe apptype module call
-                    if self.mainframe_dispatcher_obj == None:
-                        self.__load_mainframe()
-                    result = self.invokemainframekeyword(teststepproperty,self.mainframe_dispatcher_obj,inpval)
-                #----------------------------------------------------------------------------------------------Mainframe change
 			#Fixed issue num #389 (Taiga)
             temp_result=result
             if result!=TERMINATE:
@@ -662,8 +640,6 @@ class Controller():
                             self.counter.pop()
                 except Exception as e:
                     log.error(e)
-                    import traceback
-                    traceback.print_exc()
                     logger.print_on_console(e)
                     status=False
                     i=i+1
@@ -722,15 +698,7 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
         ##logger.print_on_console('res in invoke method :',res)
         return res
-  #-----------------------------------------------------------------------------------------SAP change
-
-  #-----------------------------------------------------------------------------------------Mainframe change
-    def invokemainframekeyword(self,teststepproperty,dispatcher_obj,inputval):
-        keyword = teststepproperty.name
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval)
-        ##logger.print_on_console('res in invoke method :',res)
-        return res
-  #-----------------------------------------------------------------------------------------Mainframe change
+    #-----------------------------------------------------------------------------------------SAP change
     def get_all_the_imports(self,plugin_path):
         path= os.environ["NINETEEN68_HOME"] + '//Nineteen68//plugins//'+plugin_path
         sys.path.append(path)

@@ -419,5 +419,3 @@ class DesktopDispatcher:
             import traceback
             traceback.print_exc()
         return ele
-
-
