@@ -28,12 +28,6 @@ class JiraWindow():
         except Exception as e:
             print 'Failed to connect to JIRA'
 
-    def endSession():
-        try:
-            jira.kill_session()
-        except Exception as e:
-            print 'Failed to end session'
-
     def createIssue(self,data,socket):
         """
             Method to create issue in JIRA
@@ -143,7 +137,11 @@ class JiraWindow():
 ##                data['issuetype'] = {'id': issue.id , 'name':issue.name }
 ##                data['priority'] = {'id': priority.id , 'name':priority.name }
 
-
+##def endSession():
+##        try:
+##            jira.kill_session()
+##        except Exception as e:
+##            print 'Failed to end session'
 
 
 
