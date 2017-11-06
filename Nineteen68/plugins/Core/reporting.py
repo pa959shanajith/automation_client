@@ -106,7 +106,8 @@ class Reporting:
             'webservices':self.step_description_obj.webservices,
             'desktop':self.step_description_obj.desktop,
             'sap':self.step_description_obj.sap,
-            'desktopjava':self.step_description_obj.oebs}
+            'desktopjava':self.step_description_obj.oebs,
+            'mainframe':self.step_description_obj.mainframe}
             description=apptype_description[apptype.lower()](*params)
             description=self.core_utilsobject.get_UTF_8(description)
 ##            description=description.encode('utf-8')
