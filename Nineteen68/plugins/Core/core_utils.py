@@ -13,6 +13,14 @@
 import sys
 import logging
 log = logging.getLogger("core_utils.py")
+
+from Crypto.Cipher import AES
+BS=16
+iv='0'*16
+##key='Nineeteen68@ScrapeNineeteen68@Sc'
+#key='Nineeteen68@SecureScrapeDataPath'
+ice_ndac_key = 'ajkdfiHFEow#DjgLIqocn^8sjp2hfY&d'
+
 class CoreUtils():
 
     #definition to fetch the data size in bytes/kilobytes/megabytes
@@ -52,5 +60,21 @@ class CoreUtils():
         except Exception as e:
             log.info(e)
 
+    def pad(self,data):
+        data=data.encode('utf-8')
+        padding = BS - len(data) % BS
+        return data + padding * chr(padding)
 
+    def unpad(self,data):
+        data=data.decode('utf-8')
+        return data[0:-ord(data[-1])]
+
+    def unwrap(self,hex_data):
+        data = ''.join(map(chr, bytearray.fromhex(hex_data)))
+        aes = AES.new(ice_ndac_key, AES.MODE_CBC, iv)
+        return self.unpad(aes.decrypt(data))
+
+    def wrap(self,data):
+        aes = AES.new(ice_ndac_key, AES.MODE_CBC, iv)
+        return aes.encrypt(self.pad(data)).encode('hex')
 
