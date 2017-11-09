@@ -9,6 +9,14 @@ import logging.config
 import argparse
 import base64
 
+import uuid
+from datetime import datetime
+import core_utils
+import ast
+allow_connect = False
+icesession = None
+plugins_list = []
+
 import logger
 import threading
 from values_from_ui import *
@@ -81,8 +89,7 @@ if sys.platform == 'win32':
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
 ##        print 'Inside debugTestCase method'
-        ##print '------------------',args
-        global action,wxObject,browsername,desktopScrapeFlag
+        global action,wxObject,browsername,desktopScrapeFlag,allow_connect
         if str(args[0]) == 'OPEN BROWSER CH':
 
             browsername = '1'
@@ -118,15 +125,52 @@ class MainNamespace(BaseNamespace):
             wxObject.mythread = TestThread(wxObject,DEBUG,args[1])
 
         if(str(args[0]) == 'connected'):
-            logger.print_on_console('Normal Mode: Connection to the Node Server established')
-            wxObject.schedule.Enable()
-            log.info('Normal Mode: Connection to the Node Server established')
+            if(allow_connect):
+                logger.print_on_console('Normal Mode: Connection to the Node Server established')
+                wxObject.schedule.Enable()
+                log.info('Normal Mode: Connection to the Node Server established')
+            else:
+                if socketIO != None:
+                    log.info('Closing the socket')
+                    socketIO.disconnect()
+                    log.info(socketIO)
         elif(str(args[0]) == 'reconnected'):
             logger.print_on_console('Schedule Mode:Connection to the Node Server established')
             log.info('Schedule Mode:Connection to the Node Server established')
         elif(str(args[0]) == 'connectionExists'):
             logger.print_on_console('Conenction Already Exists')
             log.info('Conenction Already Exists')
+        elif(str(args[0]) == 'checkConnection'):
+            try:
+                global icesession,plugins_list
+                core_utils_obj = core_utils.CoreUtils()
+                response = {}
+                response = ast.literal_eval(core_utils_obj.unwrap(str(args[1])))
+                ice = ast.literal_eval(icesession)
+                plugins_list = response['plugins']
+                err_res=""
+                if(response['id'] != ice['ice_id'] and response['connect_time'] != ice['connect_time']):
+                    err_res="Invalid response received"
+                if(response['res'] != 'success'):
+                    if(response.has_key('same_user')):
+                        err_res="Connection exists with same username"
+                    else:
+                        err_res="All ice sessions are in use"
+                else:
+                    allow_connect = True
+                    wxObject.connectbutton.SetLabel("Disconnect")
+                if(len(err_res)!=0):
+                    wxObject.connectbutton.SetLabel("Connect")
+                    wxObject.connectbutton.SetValue(False)
+                    if socketIO != None:
+                        log.info('Closing the socket')
+                        socketIO.disconnect()
+                        log.info(socketIO)
+                    logger.print_on_console(err_res)
+                    log.info(err_res)
+            except Exception as e:
+                logger.print_on_console('Error while checking connection request')
+                log.info('Error while checking connection request')
 
     def on_webscrape(self,*args):
         global action,wxObject,browsername,desktopScrapeFlag,data
@@ -440,6 +484,20 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
             log.info("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
 
+##    def on_logOut(self,*args):
+##        try:
+##            print "Inside on logout"
+##            if socketIO != None:
+##                print "Closing the socket"
+##                log.info('Closing the socket')
+##                socketIO.disconnect()
+##                log.info(socketIO)
+##            print "Destroying client window"
+##            wxObject.Destroy()
+##            controller.kill_process()
+##        except Exception as e:
+##            print "Logout exception",e
+
 socketIO = None
 
 class SocketThread(threading.Thread):
@@ -460,30 +518,18 @@ class SocketThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO
+        global icesession,timer
         server_IP = configvalues['server_ip']
         temp_server_IP = 'https://' + server_IP
         key='USERNAME'
         if(not(os.environ.has_key(key))):
             key='USER'
         username=os.environ[key]
-        params={'username':username.lower()}
+        core_utils_obj = core_utils.CoreUtils()
+        icesession = "{'ice_id':'"+str(uuid.uuid4())+"','connect_time':'"+str(datetime.now())+"','username':'"+username.lower()+"'}"
+        icesession_enc = core_utils_obj.wrap(icesession)
+        params={'username':username.lower(),'icesession':icesession_enc}
         socketIO = SocketIO(temp_server_IP,int(configvalues['server_port']),MainNamespace,verify= CERTIFICATE_PATH +'/server.crt',cert=(CERTIFICATE_PATH + '/client.crt', CERTIFICATE_PATH + '/client.key'),params=params)
-##        socketIO = SocketIO(temp_server_IP,int(configvalues['server_port']),MainNamespace,verify= CERTIFICATE_PATH +'/server.crt',cert=(CERTIFICATE_PATH + '/client.crt', CERTIFICATE_PATH + '/client.key'))
-##        socketIO = SocketIO(temp_server_IP,int(configvalues['server_port']),MainNamespace,verify='D:\\CA_BUNDLE\\server.crt',cert=('D:\\CA_BUNDLE\\client.crt', 'D:\\CA_BUNDLE\\client.key'))
-        ##socketIO = SocketIO('localhost',8124)
-##        socketIO.send('I am ready to process the request')
-        socketIO.emit('news')
-        socketIO.emit('focus')
-        socketIO.emit('debugTestCase')
-        socketIO.emit('executeTestSuite')
-        socketIO.emit('LAUNCH_DESKTOP')
-        socketIO.emit('LAUNCH_SAP')
-        socketIO.emit('LAUNCH_MOBILE')
-        socketIO.emit('wsdl_listOfOperation')
-        socketIO.emit('wsdl_ServiceGenerator')
-        socketIO.emit('LAUNCH_MOBILE_WEB')
-        socketIO.emit('LAUNCH_OEBS')
-        socketIO.emit('webscrape')
         socketIO.wait()
 
 
@@ -633,7 +679,17 @@ class TestThread(threading.Thread):
             self.con = controller.Controller()
             self.wxObject.terminatebutton.Enable()
             self.con.configvalues=configvalues
-            status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO)
+            status = ''
+            apptype = ''
+            if(self.action == DEBUG):
+                apptype = (self.json_data)[0]['apptype']
+            else:
+                apptype =(self.json_data)['apptype']
+            if(apptype.lower() not in plugins_list):
+                logger.print_on_console('This app type is not part of the license.')
+                status=TERMINATE
+            else:
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO)
             logger.print_on_console('Execution status',status)
 
 
@@ -763,9 +819,11 @@ class ClientWindow(wx.Frame):
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
         connect_img=wx.Image(IMAGES_PATH +"/connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        self.connectbutton = wx.BitmapButton(self.panel, bitmap=connect_img,pos=(10, 10), size=(100, 25))
+        self.connectbutton = wx.ToggleButton(self.panel, label='Connect',pos=(10, 10), size=(100, 25))
+        #self.connectbutton = wx.BitmapButton(self.panel, bitmap=connect_img,pos=(10, 10), size=(100, 25))
 ##        self.connectbutton = wx.Button(self.panel, label="Connect" ,pos=(10, 10), size=(100, 28))
-        self.connectbutton.Bind(wx.EVT_BUTTON, self.OnNodeConnect)
+        self.connectbutton.Bind(wx.EVT_TOGGLEBUTTON, self.OnNodeConnect)
+        #self.connectbutton.Bind(wx.EVT_BUTTON, self.OnNodeConnect)
         self.connectbutton.SetToolTip(wx.ToolTip("Connect to node Server"))
         self.log = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_MULTILINE|wx.TE_READONLY)
         font1 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL,  False, u'Consolas')
@@ -950,6 +1008,7 @@ class ClientWindow(wx.Frame):
         controller.terminate_flag=True
         global socketIO
         print 'SocketIO : ',socketIO
+        logger.print_on_console('Disconnected from node server')
         if socketIO != None:
             log.info('Closing the socket')
             socketIO.disconnect()
@@ -1080,12 +1139,20 @@ class ClientWindow(wx.Frame):
 
     def OnNodeConnect(self,event):
         try:
-            port = int(configvalues['server_port'])
-            conn  = httplib.HTTPConnection(configvalues['server_ip'],port)
-            conn.connect()
-            conn.close()
-            self.mythread = SocketThread(self)
-            self.connectbutton.Disable()
+            state = event.GetEventObject().GetValue()
+            if(state == True):
+                port = int(configvalues['server_port'])
+                conn = httplib.HTTPConnection(configvalues['server_ip'],port)
+                conn.connect()
+                conn.close()
+                self.mythread = SocketThread(self)
+            else:
+                logger.print_on_console('Disconnected from node server')
+                self.connectbutton.SetLabel("Connect")
+                self.connectbutton.SetValue(False)
+                if socketIO != None:
+                    log.info('Sending Socket disconnect request')
+                    socketIO.disconnect()
 
         except Exception as e:
             print 'Forbidden request, Connection refused, please check the server ip and server port in Config.json, and restart the client window.'
@@ -1161,8 +1228,6 @@ class ClientWindow(wx.Frame):
                 elif flag == 'display':
                     #call display logic
                     self.new = pause_display_operation.Display(parent = self,id = -1, title="SLK Nineteen68 - Display Variable",input = inputvalue)
-
-
 
 
 class DebugWindow(wx.Frame):
