@@ -152,17 +152,20 @@ class MainNamespace(BaseNamespace):
                 if(response['id'] != ice['ice_id'] and response['connect_time'] != ice['connect_time']):
                     err_res="Invalid response received"
                 if(response['res'] != 'success'):
-                    err_res="All ice sessions are in use"
+                    if(response.has_key('same_user')):
+                        err_res="Connection exists with same username"
+                    else:
+                        err_res="All ice sessions are in use"
                 else:
                     allow_connect = True
                     wxObject.connectbutton.SetLabel("Disconnect")
                 if(len(err_res)!=0):
+                    wxObject.connectbutton.SetLabel("Connect")
+                    wxObject.connectbutton.SetValue(False)
                     if socketIO != None:
                         log.info('Closing the socket')
                         socketIO.disconnect()
                         log.info(socketIO)
-                    wxObject.connectbutton.SetLabel("Connect")
-                    wxObject.connectbutton.SetValue(False)
                     logger.print_on_console(err_res)
                     log.info(err_res)
             except Exception as e:
@@ -1005,6 +1008,7 @@ class ClientWindow(wx.Frame):
         controller.terminate_flag=True
         global socketIO
         print 'SocketIO : ',socketIO
+        logger.print_on_console('Disconnected from node server')
         if socketIO != None:
             log.info('Closing the socket')
             socketIO.disconnect()
@@ -1143,6 +1147,7 @@ class ClientWindow(wx.Frame):
                 conn.close()
                 self.mythread = SocketThread(self)
             else:
+                logger.print_on_console('Disconnected from node server')
                 self.connectbutton.SetLabel("Connect")
                 self.connectbutton.SetValue(False)
                 if socketIO != None:
