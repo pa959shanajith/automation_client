@@ -13,7 +13,7 @@ import logger
 from utils_web_MW import Utils
 from button_link_keyword_MW import ButtonLinkKeyword
 from webconstants_MW import *
-
+import readconfig
 
 import logging
 from constants import *
@@ -305,9 +305,11 @@ class ElementKeywords:
         err_msg=None
         output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        configobj = readconfig.readConfig()
+        configvalues = configobj.readJson()
         try:
             if objectname is not None:
-                delay=3
+                delay=int(configvalues['timeOut'])
                 from selenium.webdriver.support.ui import WebDriverWait
                 from selenium.webdriver.support import expected_conditions as EC
                 from selenium.common.exceptions import TimeoutException
