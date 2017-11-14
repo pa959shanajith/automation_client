@@ -333,6 +333,7 @@ class Handler():
                         self.insert_into_ifdict(keyword_index,keyword,start_index)
                         self.insert_into_ifdict(start_index[0],start_index[1],(keyword_index,keyword))
                         condition_keywords.popitem()
+                        flag=constants.ENDIF
                     else:
                         log.error('IF is missing: Invalid Testcase ')
                         logger.print_on_console('IF is missing: Invalid script ')
@@ -437,7 +438,8 @@ class Handler():
                     flag=self.find_start_index(keyword,tspIndex,2)
                     if flag==False:
                         return flag
-                    condition_keywords[tspIndex]=keyword
+                    if flag!=constants.ENDIF:
+                        condition_keywords[tspIndex]=keyword
                     copy_condition_keywords[tspIndex]=keyword
 
                 #getting 'getParam' info
