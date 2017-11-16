@@ -343,7 +343,7 @@ class TableOperationKeywords():
                     try:
                         if len(input_arr)==2:
                             log.info('normal cell click')
-                            logger.print_on_console('normal cell click inside the cell')
+                            #logger.print_on_console('normal cell click inside the cell')
                             cell=self.javascriptExecutor(webElement,row_number,col_number)
                             element_list=cell.find_elements_by_xpath('.//*')
                             if len(list(element_list))>0:
@@ -360,8 +360,9 @@ class TableOperationKeywords():
                                                 js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
                                                 click=browser_Keywords.driver_obj.execute_script(js,webElement)
                                                 status=webconstants.TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
                                                 log.info('click action performed successfully')
-                                                logger.print_on_console('click action performed successfully')
+                                                #logger.print_on_console('click action performed successfully')
                                             except Exception as e:
                                                 log.debug('error occured so trying action events')
                                                 action=action_chains.ActionChains(browser_Keywords.driver_obj)
@@ -369,7 +370,7 @@ class TableOperationKeywords():
                                                 status=TEST_RESULT_PASS
                                                 methodoutput=TEST_RESULT_TRUE
                                                 log.info('click action performed successfully')
-                                                logger.print_on_console('click action performed successfully')
+                                                #logger.print_on_console('click action performed successfully')
                                         else:
                                             try:
                                                 log.debug('performing click')
@@ -377,14 +378,14 @@ class TableOperationKeywords():
                                                 status=TEST_RESULT_PASS
                                                 methodoutput=TEST_RESULT_TRUE
                                                 log.info('click action performed successfully')
-                                                logger.print_on_console('click action performed successfully')
+                                                #logger.print_on_console('click action performed successfully')
                                             except Exception as e:
                                                 js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
                                                 click=browser_Keywords.driver_obj.execute_script(js,webElement)
                                                 status=TEST_RESULT_PASS
                                                 methodoutput=TEST_RESULT_TRUE
                                                 log.info('click action performed successfully')
-                                                logger.print_on_console('click action performed successfully')
+                                                #logger.print_on_console('click action performed successfully')
                             except Exception as e:
                                 log.error(e)
 
@@ -392,7 +393,7 @@ class TableOperationKeywords():
                                 err_msg=E
                         elif len(input_arr)>2:
                             log.info('click on an element inside a cell')
-                            logger.print_on_console('click on an element inside a cell')
+                            #logger.print_on_console('click on an element inside a cell')
                             tag=input_arr[2].lower()
                             index=int(input_arr[3])
                             eleStatus=False
@@ -400,6 +401,11 @@ class TableOperationKeywords():
                             log.debug('fiding the cell with given inputs')
                             cell=self.javascriptExecutor(webElement,row_number,col_number)
                             element_list=cell.find_elements_by_xpath('.//*')
+                            #---------------------------condition when element list returns empty
+                            if len(element_list)==0:
+                                element_list.append(cell)
+                                #print element_list
+                            #---------------------------condition when element list returns empty
                             for member in element_list:
                                   js1='function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();'
                                   xpath=browser_Keywords.driver_obj.execute_script(js1,member)
@@ -551,11 +557,13 @@ class TableOperationKeywords():
                     log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                     err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
                     logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
-                return status,methodoutput,output_val,err_msg
+                #return status,methodoutput,output_val,err_msg
             else:
                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                
+            return status,methodoutput,output_val,err_msg
 
 
 
