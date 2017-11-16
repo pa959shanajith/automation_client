@@ -20,6 +20,7 @@ from collections import OrderedDict
 import constants
 import logger
 import logging
+from core_utils import CoreUtils
 
 
 
@@ -87,6 +88,9 @@ log = logging.getLogger('handler.py')
 
 
 class Handler():
+
+    def __init__(self):
+        self.utils_obj=CoreUtils()
 
     def parse_json(self,test_data,data_param_path=None):
         """
@@ -507,6 +511,18 @@ class Handler():
 
             #block which creates the step of instances of (Keywords)
             else:
+                #Implementation of Decryption of Xpath and url
+                #Currenlty implemented only for WEB apptype
+                if(apptype.lower() == constants.APPTYPE_WEB):
+                    try:
+                        url=self.utils_obj.scrape_unwrap(url)
+                        if(objectname.strip() != '' and not(objectname.startswith('@'))):
+                            xpath_string=objectname.split(';')
+                            left_part=self.utils_obj.scrape_unwrap(xpath_string[0])
+                            right_part=self.utils_obj.scrape_unwrap(xpath_string[2])
+                            objectname = left_part+';'+xpath_string[1]+';'+right_part
+                    except Exception as e:
+                        log.error(e)
                 tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i)
 
         except Exception as e:

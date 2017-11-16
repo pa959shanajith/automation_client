@@ -19,6 +19,7 @@ import objectspy
 from selenium import webdriver
 status =domconstants.STATUS_FAIL
 currentdriverhandle = None
+from core_utils import CoreUtils
 import logging
 import logging.config
 log = logging.getLogger('highlight.py')
@@ -26,12 +27,13 @@ class Highlight():
     changedobject = []
     notchangedobject = []
     notfoundobject= []
+    obj=CoreUtils()
 
     def __init__(self):
         self.changedobject=[]
         self.notchangedobject=[]
         self.notfoundobject=[]
-    def highlight(self,data,element,handle):
+    def highlight(self,data,element,handle,*args):
         try:
             action=''
             log.info('Inside highlight method .....')
@@ -58,11 +60,19 @@ class Highlight():
             # find out if the highele[1] has id or name attrib
             if  highele[0] == 'OBJECTMAPPER':
                 action='OBJECTMAPPER'
-                identifiers = highele[1].split(';')
-                url = highele[len(highele) - 1]
-            else:
-                identifiers = highele[0].split(';')
+                new_data= highele[1]
                 url = highele[len(highele) - 2]
+                orig_element=args[0]
+            else:
+                #XPath decryption logic implemented
+                new_data= highele[0]
+                xpath_string=new_data.split(';')
+                left_part=self.obj.scrape_unwrap(xpath_string[0])
+                right_part=self.obj.scrape_unwrap(xpath_string[2])
+                new_data = left_part+';'+xpath_string[1]+';'+right_part
+                url = self.obj.scrape_unwrap(highele[len(highele) - 2])
+
+            identifiers = new_data.split(';')
 
             def highlight1(element):
                 log.info(' Inside highlight1 method .....')
@@ -191,14 +201,20 @@ class Highlight():
                             element_properties = driver.execute_script(properties_script,webElement[0],url)
                             new_properties=element_properties[0];
                             if cmp(element['xpath'],new_properties['xpath'])!=0:
+                                #Xpath Encryption logic implemented
+                                new_properties['url']= self.obj.scrape_wrap(new_properties['url'])
+                                xpath_string=new_properties['xpath'].split(';')
+                                left_part=self.obj.scrape_wrap(';'.join(xpath_string[:2]))
+                                right_part=self.obj.scrape_wrap(';'.join(xpath_string[3:]))
+                                new_properties['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
                                 self.changedobject.append(new_properties)
                                 highlight1(webElement[0])
                             else:
-                                 self.notchangedobject.append(element)
+                                 self.notchangedobject.append(orig_element)
                     else:
                         highlight1(webElement[0])
                 else:
-                    self.notfoundobject.append(element)
+                    self.notfoundobject.append(orig_element)
                 try:
                     if currentdriverhandle!= None:
                         driver.switch_to.window(currentdriverhandle)
@@ -249,10 +265,16 @@ class Highlight():
                             element_properties = driver.execute_script(properties_script,webElement[0],url)
                             new_properties=element_properties[0];
                             if cmp(element['xpath'],new_properties['xpath'])!=0:
+                                #Xpath Encryption logic implemented
+                                new_properties['url']= self.obj.scrape_wrap(new_properties['url'])
+                                xpath_string=new_properties['xpath'].split(';')
+                                left_part=self.obj.scrape_wrap(';'.join(xpath_string[:2]))
+                                right_part=self.obj.scrape_wrap(';'.join(xpath_string[3:]))
+                                new_properties['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
                                 self.changedobject.append(new_properties)
                                 highlight1(webElement[0])
                             else:
-                                self.notchangedobject.append(element)
+                                self.notchangedobject.append(orig_element)
                     else:
                         highlight1(webElement[0])
                     try:
@@ -263,7 +285,7 @@ class Highlight():
                     except Exception as e4:
                         evb = e4
                 else:
-                    self.notfoundobject.append(element)
+                    self.notfoundobject.append(orig_element)
 
             status = domconstants.STATUS_SUCCESS
         except Exception as e:

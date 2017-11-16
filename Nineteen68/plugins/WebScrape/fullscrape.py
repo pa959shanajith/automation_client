@@ -29,6 +29,7 @@ log = logging.getLogger('fullscrape.py')
 currenthandle = ''
 status = domconstants.STATUS_FAIL
 browserops_obj=browserops.BrowserOperations()
+from core_utils import CoreUtils
 
 class Fullscrape():
     def fullscrape(self):
@@ -318,6 +319,17 @@ class Fullscrape():
                 driver.switch_to.window(currenthandle)
             tempne = json.dumps(tempne)
             tempne = json.loads(tempne)
+            new_obj=[]
+            obj=CoreUtils()
+            #XPath Encryption logic implemented
+            for a in tempne:
+                a['url']= obj.scrape_wrap(a['url'])
+                xpath_string=a['xpath'].split(';')
+                left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))
+                right_part=obj.scrape_wrap(';'.join(xpath_string[3:]))
+                a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
+                new_obj.append(a)
+            tempne=new_obj
             log.info('json opertions dumps and loads are performed on the return data')
 ##            win32gui.ShowWindow(hwndg, win32con.SW_MINIMIZE)
 ##            global vie
