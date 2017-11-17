@@ -685,6 +685,8 @@ class TestThread(threading.Thread):
                 apptype = (self.json_data)[0]['apptype']
             else:
                 apptype =(self.json_data)['apptype']
+            if(apptype == "DesktopJava"):
+                apptype = "oebs"
             if(apptype.lower() not in plugins_list):
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE
@@ -714,7 +716,7 @@ class TestThread(threading.Thread):
             if self.action==DEBUG:
                 if self.wxObject.debugwindow != None:
                     self.wxObject.debugwindow.Close()
-                if len(testcasename) > 0:
+                if (len(testcasename) > 0 or apptype.lower() not in plugins_list):
                     socketIO.emit('result_debugTestCase',status)
                 else:
                     socketIO.emit('result_debugTestCaseWS',status)
