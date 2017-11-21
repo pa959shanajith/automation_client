@@ -399,7 +399,7 @@ class Dispatcher:
 
 
     def getwebelement(self,driver,objectname):
-        objectname = str(objectname)
+##        objectname = str(objectname)
         webElement = None
         if objectname.strip() != '':
 

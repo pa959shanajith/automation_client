@@ -11,6 +11,7 @@
 
 import browserops
 import platform
+from core_utils import CoreUtils
 if platform.system()!='Darwin':
     import win32gui
     import win32con
@@ -490,6 +491,17 @@ class Clickandadd():
 ##            data.append(screenshot)
             data['scrapetype'] = 'cna'
             data['scrapedin'] = scrapedin
+            #XPath encryption logic implemented
+            new_obj=[]
+            obj=CoreUtils()
+            for a in tempne_stopclicknadd:
+                a['url']= obj.scrape_wrap(a['url'])
+                xpath_string=a['xpath'].split(';')
+                left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))
+                right_part=obj.scrape_wrap(';'.join(xpath_string[3:]))
+                a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
+                new_obj.append(a)
+            tempne_stopclicknadd=new_obj
             data['view'] = tempne_stopclicknadd
             data['mirror'] = screen
 
