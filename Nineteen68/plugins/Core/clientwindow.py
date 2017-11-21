@@ -88,22 +88,9 @@ if sys.platform == 'win32':
 
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
-##        print 'Inside debugTestCase method'
         global action,wxObject,browsername,desktopScrapeFlag,allow_connect
-        if str(args[0]) == 'OPEN BROWSER CH':
-            browsername = '1'
-            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
-        elif str(args[0]) == 'OPEN BROWSER IE':
-            browsername = '3'
-            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
-        elif str(args[0]) == 'OPEN BROWSER FX':
-            browsername = '2'
-            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
-        elif str(args[0]) == 'OPEN BROWSER SF':
-            browsername = '6'
-            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
-        elif(str(args[0]) == 'connected'):
+        if(str(args[0]) == 'connected'):
             if(allow_connect):
                 logger.print_on_console('Normal Mode: Connection to the Node Server established')
                 wxObject.schedule.Enable()
@@ -117,6 +104,7 @@ class MainNamespace(BaseNamespace):
         elif(str(args[0]) == 'schedulingEnabled'):
             logger.print_on_console('Schedule Mode Enabled')
             log.info('Schedule Mode Enabled')
+
         elif(str(args[0]) == 'schedulingDisabled'):
             logger.print_on_console('Schedule Mode Disabled')
             log.info('Schedule Mode Disabled')
@@ -286,7 +274,6 @@ class MainNamespace(BaseNamespace):
     def on_qclogin(self, *args):
         con = controller.Controller()
         global qcdata
-##        con = controller.Controller()
         import json
         qcdata = args[0]
         con.get_all_the_imports('Qc')
@@ -333,11 +320,8 @@ class MainNamespace(BaseNamespace):
         else:
             con.get_all_the_imports('Mobility')
         import ninteen_68_mobile_web_scrape
-
         mobileWebScrapeObj=ninteen_68_mobile_web_scrape
-
         mobileWebScrapeFlag=True
-        ##print mobileWebScrapeFlag
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_LAUNCH_OEBS(self, *args):
@@ -469,9 +453,6 @@ class SocketThread(threading.Thread):
         threading.Thread.__init__(self)
         self.wxobject = wxObject
         self.start()
-
-
-
 
     #----------------------------------------------------------------------
     def run(self):
@@ -811,16 +792,10 @@ class ClientWindow(wx.Frame):
 ##        self.continue_debugbutton.Bind(wx.EVT_LEFT_DOWN, self.Resume)
 ##        self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution"))
 ##        self.continue_debugbutton.Hide()
-##
-##
-##
 ##        self.continuebutton = wx.StaticBitmap(self.rbox, -1, wx.Bitmap("step.png", wx.BITMAP_TYPE_ANY), (105, 50), (35, 28))
 ##        self.continuebutton.Bind(wx.EVT_LEFT_DOWN, self.OnContinue)
 ##        self.continuebutton.SetToolTip(wx.ToolTip("To Resume the execution "))
 ##        self.continuebutton.Hide()
-
-
-
 
         self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(230, 598), size=(60,20), style = wx.TE_RICH)
         box.Add(self.breakpoint, 1, wx.ALL|wx.EXPAND, 5)
@@ -838,25 +813,14 @@ class ClientWindow(wx.Frame):
         self.terminatebutton.SetToolTip(wx.ToolTip("To Terminate the execution"))
         self.terminate_label=wx.StaticText(self.panel, -1, 'Terminate', (470, 600), (100, 70))
 
-
-
-
         self.clearbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/clear.png", wx.BITMAP_TYPE_ANY), (590, 548), (50, 40))
         self.clearbutton.Bind(wx.EVT_LEFT_DOWN, self.OnClear)
         self.clearbutton.SetToolTip(wx.ToolTip("To clear the console area"))
         self.clear_label=wx.StaticText(self.panel, -1, 'Clear', (600, 600), (100, 70))
 
-
-
-
-
-
-
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 
         box.AddStretchSpacer()
-
-
 
         # redirect text here
         redir=RedirectText(self.log)
@@ -926,52 +890,48 @@ class ClientWindow(wx.Frame):
             if self.debugwindow != None:
                 self.debugwindow.Close()
                 self.debugwindow = None
-
-
         self.debug_mode=False
         self.breakpoint.Disable()
         if self.choice in ['Stepwise','RunfromStep']:
             self.debug_mode=True
-##            if self.debugwindow == None:
-##                self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
-##            self.continue_debugbutton.Show()
-##            self.continuebutton.Show()
+            ##if self.debugwindow == None:
+            ##    self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
+            ##self.continue_debugbutton.Show()
+            ##self.continuebutton.Show()
             if self.choice=='RunfromStep':
                 self.breakpoint.Enable()
             else:
                 self.breakpoint.Clear()
                 self.breakpoint.Disable()
-
-##            if self.mythread==None:
-##                self.continue_debugbutton.Disable()
-##                self.continuebutton.Disable()
-##        else:
-##            self.continuebutton.Hide()
-##            self.continue_debugbutton.Hide()
-
-
-
-
-
-
-
+            ##    if self.mythread==None:
+            ##        self.continue_debugbutton.Disable()
+            ##        self.continuebutton.Disable()
+            ##else:
+            ##    self.continuebutton.Hide()
+            ##    self.continue_debugbutton.Hide()
 
     def OnClose(self, event):
         print 'KILLING THE THREAD'
         controller.terminate_flag=True
         global socketIO
-        print 'SocketIO : ',socketIO
         logger.print_on_console('Disconnected from node server')
         if socketIO != None:
             log.info('Closing the socket')
             socketIO.disconnect()
             log.info(socketIO)
-##            self.new.Close()
-##        self.Close()
+        #Close the debug window
+        if self.debugwindow != None:
+            self.debugwindow.Close()
+            self.debugwindow = None
+        #Close the scrape window
+        if self.new != None:
+            self.new.Close()
+            self.new = None
+        ##self.Close()
         self.Destroy()
         controller.kill_process()
          # you may also do:  event.Skip()
-                        # since the default event handler does call Destroy(), too
+         # since the default event handler does call Destroy(), too
 
 ##    def closeScrapeWindow(self):
 ##        global socketIO
@@ -984,14 +944,14 @@ class ClientWindow(wx.Frame):
 
     def OnExit(self, event):
         controller.kill_process()
-##        global socketIO
-##        print 'SocketIO : ',socketIO
-##        if socketIO != None:
-##            log.info('Closing the socket')
-##            socketIO.disconnect()
-##            log.info(socketIO)
-####            self.new.Close()
-##        self.Close()
+        ##global socketIO
+        ##print 'SocketIO : ',socketIO
+        ##if socketIO != None:
+        ##    log.info('Closing the socket')
+        ##    socketIO.disconnect()
+        ##    log.info(socketIO)
+        ##    self.new.Close()
+        ##self.Close()
 
 
         #----------------------------------------------------------------------
@@ -1027,25 +987,31 @@ class ClientWindow(wx.Frame):
     #----------------------------------------------------------------------
     def OnTerminate(self, event, *args):
         if(len(args) > 0 and args[0]=="term_exec"):
-            logger.print_on_console('---------Terminating any active execution-------')
+            print ""
+            logger.print_on_console('---------Terminating all active actions-------')
         else:
             logger.print_on_console('---------Termination Started-------')
         controller.terminate_flag=True
-        #Close the debug window
-        if self.debugwindow != None:
-            self.debugwindow.Close()
-            self.debugwindow = None
-        #Handling the case where user clicks terminate when the execution is paused
-        #Resume the execution
-        if controller.pause_flag:
-            self.resume(False)
+        try:
+            #Close the debug window
+            if self.debugwindow != None:
+                self.debugwindow.Close()
+                self.debugwindow = None
+            #Close the scrape window
+            if self.new != None:
+                self.new.Close()
+                self.new = None
+            #Handling the case where user clicks terminate when the execution is paused
+            #Resume the execution
+            if controller.pause_flag:
+                self.resume(False)
+        except Exception as e:
+            log.error("Exception occured while termination")
 
 
     #----------------------------------------------------------------------
     def OnClear(self,event):
-##        self.test()
         self.log.Clear()
-
 
     #-----------------------------------------------------------------------
     def OnExecute(self,event):
@@ -1062,36 +1028,6 @@ class ClientWindow(wx.Frame):
             self.mythread=Parallel(self)
         else:
             logger.print_on_console('Please provide valid execution mode')
-
-    def OnDebug(self,event):
-        self.debug()
-##        global action
-##        self.action=STEP_BY_SETP_DEBUG
-##        self.mythread = TestThread(self,self.action)
-
-##    def OnNodeConnect(self,event):
-##        self.mythread = SocketThread(self)
-##        self.connectbutton.Disable()
-
-    def test(self,event):
-##        print 'Self',self
-        global browsername
-        print 'Browser name : ',browsername
-        con = controller.Controller()
-        con.get_all_the_imports('WebScrape')
-        import Nineteen68_WebScrape
-        global socketIO
-        self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id =None, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO)
-
-##    def debug(self):
-##
-##        import debug_window
-##        global socketIO,action
-##        self.action=STEP_BY_SETP_DEBUG
-##        self.mythread = TestThread(self,self.action)
-##        thread_obj=self.mythread
-##        self.debug = debug_window.DebugWindow(parent = None,id = -1, title="SLK Nineteen68 - Debug Window",browser = browsername,socketIO = socketIO,thread=self.mythread)
-####        self.new.Show()
 
     def OnNodeConnect(self,event):
         try:
@@ -1113,6 +1049,7 @@ class ClientWindow(wx.Frame):
                 self.schedule.Disable()
                 if socketIO != None:
                     log.info('Sending Socket disconnect request')
+                    socketIO.emit('unavailableLocalServer')
                     socketIO.disconnect()
                     del socketIO
                     socketIO = None
@@ -1128,7 +1065,6 @@ class ClientWindow(wx.Frame):
             self.rbox.Disable()
 
     def test(self,event):
-##        print 'Self',self
         global mobileScrapeFlag
         global qcConFlag
         global mobileWebScrapeFlag
@@ -1141,36 +1077,29 @@ class ClientWindow(wx.Frame):
         global data
         global oebsScrapeFlag
         if mobileScrapeFlag==True:
-##            global socketIO
             self.new = mobileScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
             mobileScrapeFlag=False
         elif qcConFlag==True:
             #print 'For QC'
-##            global socketIO
             self.new = qcConObj.QcWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = qcdata,socketIO = socketIO)
             qcConFlag=False
         elif mobileWebScrapeFlag==True:
-##            global socketIO
             self.new = mobileWebScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",browser = browsername,socketIO = socketIO)
             mobileWebScrapeFlag=False
         elif desktopScrapeFlag==True:
-##            global socketIO
             self.new = desktopScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO)
             desktopScrapeFlag=False
             browsername = ''
         elif sapScrapeFlag==True:
-##            global socketIO
             self.new = sapScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO)
             sapScrapeFlag=False
         elif oebsScrapeFlag==True:
-##            global socketIO
             self.new = oebsScrapeObj.ScrapeDispatcher(parent = None,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO)
             oebsScrapeFlag=False
         elif debugFlag == True:
             self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
             debugFlag = False
         else:
-##            global browsername
             browsernumbers = ['1','2','3','6']
             if browsername in browsernumbers:
                 print 'Browser name : ',browsername
@@ -1178,7 +1107,6 @@ class ClientWindow(wx.Frame):
                 con.get_all_the_imports('Web')
                 con.get_all_the_imports('WebScrape')
                 import Nineteen68_WebScrape
-##                global socketIO
                 self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data)
                 browsername = ''
             else:
