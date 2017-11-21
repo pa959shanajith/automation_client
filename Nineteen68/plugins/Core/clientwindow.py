@@ -91,40 +91,19 @@ class MainNamespace(BaseNamespace):
 ##        print 'Inside debugTestCase method'
         global action,wxObject,browsername,desktopScrapeFlag,allow_connect
         if str(args[0]) == 'OPEN BROWSER CH':
-
             browsername = '1'
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
-##            time.sleep(5)
         elif str(args[0]) == 'OPEN BROWSER IE':
-
             browsername = '3'
-##
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
-
-##            time.sleep(5)
-##            print 'Importing done'
         elif str(args[0]) == 'OPEN BROWSER FX':
-##
             browsername = '2'
-##
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
-
-##            time.sleep(5)
-            print 'Importing done'
         elif str(args[0]) == 'OPEN BROWSER SF':
-##
             browsername = '6'
-##
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
-##            time.sleep(5)
-            print 'Importing done'
-
-        elif str(args[0]) == 'debugTestCase':
-            print 'on_debugTestCase_message'
-            wxObject.mythread = TestThread(wxObject,DEBUG,args[1])
-
-        if(str(args[0]) == 'connected'):
+        elif(str(args[0]) == 'connected'):
             if(allow_connect):
                 logger.print_on_console('Normal Mode: Connection to the Node Server established')
                 wxObject.schedule.Enable()
@@ -134,15 +113,18 @@ class MainNamespace(BaseNamespace):
                     log.info('Closing the socket')
                     socketIO.disconnect()
                     log.info(socketIO)
-        elif(str(args[0]) == 'reconnected'):
-            logger.print_on_console('Schedule Mode:Connection to the Node Server established')
-            log.info('Schedule Mode:Connection to the Node Server established')
-        elif(str(args[0]) == 'connectionExists'):
-            logger.print_on_console('Conenction Already Exists')
-            log.info('Conenction Already Exists')
+
+        elif(str(args[0]) == 'schedulingEnabled'):
+            logger.print_on_console('Schedule Mode Enabled')
+            log.info('Schedule Mode Enabled')
+        elif(str(args[0]) == 'schedulingDisabled'):
+            logger.print_on_console('Schedule Mode Disabled')
+            log.info('Schedule Mode Disabled')
+
         elif(str(args[0]) == 'checkConnection'):
             try:
                 global icesession,plugins_list
+                wxObject.connectbutton.Enable()
                 core_utils_obj = core_utils.CoreUtils()
                 response = {}
                 response = ast.literal_eval(core_utils_obj.unwrap(str(args[1])))
@@ -162,6 +144,7 @@ class MainNamespace(BaseNamespace):
                 if(len(err_res)!=0):
                     wxObject.connectbutton.SetLabel("Connect")
                     wxObject.connectbutton.SetValue(False)
+                    wxObject.schedule.Disable()
                     if socketIO != None:
                         log.info('Closing the socket')
                         socketIO.disconnect()
@@ -204,13 +187,7 @@ class MainNamespace(BaseNamespace):
                 browsername = '2'
                 wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
-
-    def on_emit(self, *args):
-        if str(args[0]) == 'connected':
-            print 'Connected'
-
     def on_focus(self, *args):
-
         appType=args[2]
         appType=appType.lower()
         if appType==APPTYPE_WEB:
@@ -288,9 +265,7 @@ class MainNamespace(BaseNamespace):
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_LAUNCH_SAP(self, *args):
-
         try:
-
             con = controller.Controller()
             global browsername
             browsername = args[0]
@@ -302,7 +277,6 @@ class MainNamespace(BaseNamespace):
             global sapScrapeFlag
             sapScrapeFlag=True
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
-
         except Exception as e:
             import traceback
             traceback.print_exc()
@@ -484,20 +458,6 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
             log.info("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
 
-##    def on_logOut(self,*args):
-##        try:
-##            print "Inside on logout"
-##            if socketIO != None:
-##                print "Closing the socket"
-##                log.info('Closing the socket')
-##                socketIO.disconnect()
-##                log.info(socketIO)
-##            print "Destroying client window"
-##            wxObject.Destroy()
-##            controller.kill_process()
-##        except Exception as e:
-##            print "Logout exception",e
-
 socketIO = None
 
 class SocketThread(threading.Thread):
@@ -665,15 +625,6 @@ class TestThread(threading.Thread):
                 self.wxObject.rbox.Disable()
             else:
                 self.wxObject.rbox.Disable()
-
-
-
-
-
-
-
-##
-
             self.wxObject.breakpoint.Disable()
 ##            controller.kill_process()
             self.con = controller.Controller()
@@ -726,15 +677,15 @@ class TestThread(threading.Thread):
             #  To check for empty testcase Bug #246 (Himanshu)
                 socketIO.emit('result_executeTestSuite',status)
         except Exception as e:
-            print e
-            status=TERMINATE
-            if self.action==DEBUG:
-##                if self.wxObject.debugwindow != None:
-##                    self.wxObject.debugwindow.Close()
-                socketIO.emit('result_debugTestCase',status)
-            elif self.action==EXECUTE:
-                socketIO.emit('result_executeTestSuite',status)
             log.error(e)
+            status=TERMINATE
+            if socketIO is not None:
+                if self.action==DEBUG:
+                    ##if self.wxObject.debugwindow != None:
+                    ##    self.wxObject.debugwindow.Close()
+                    socketIO.emit('result_debugTestCase',status)
+                elif self.action==EXECUTE:
+                    socketIO.emit('result_executeTestSuite',status)
 
 
 
@@ -1074,8 +1025,11 @@ class ClientWindow(wx.Frame):
 ##        self.continuebutton.Hide()
 ##        self.pausebutton.Show()
     #----------------------------------------------------------------------
-    def OnTerminate(self, event):
-        logger.print_on_console('---------Termination Started-------')
+    def OnTerminate(self, event, *args):
+        if(len(args) > 0 and args[0]=="term_exec"):
+            logger.print_on_console('---------Terminating any active execution-------')
+        else:
+            logger.print_on_console('---------Termination Started-------')
         controller.terminate_flag=True
         #Close the debug window
         if self.debugwindow != None:
@@ -1141,20 +1095,27 @@ class ClientWindow(wx.Frame):
 
     def OnNodeConnect(self,event):
         try:
+            global socketIO
             state = event.GetEventObject().GetValue()
             if(state == True):
+                self.connectbutton.Disable()
                 port = int(configvalues['server_port'])
                 conn = httplib.HTTPConnection(configvalues['server_ip'],port)
                 conn.connect()
                 conn.close()
                 self.mythread = SocketThread(self)
             else:
+                self.OnTerminate(event,"term_exec")
                 logger.print_on_console('Disconnected from node server')
                 self.connectbutton.SetLabel("Connect")
                 self.connectbutton.SetValue(False)
+                self.schedule.SetValue(False)
+                self.schedule.Disable()
                 if socketIO != None:
                     log.info('Sending Socket disconnect request')
                     socketIO.disconnect()
+                    del socketIO
+                    socketIO = None
 
         except Exception as e:
             print 'Forbidden request, Connection refused, please check the server ip and server port in Config.json, and restart the client window.'

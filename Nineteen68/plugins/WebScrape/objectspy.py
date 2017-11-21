@@ -27,6 +27,7 @@ import logging
 import os
 from PIL import Image
 from selenium import webdriver
+from core_utils import CoreUtils
 log = logging.getLogger('objectspy.py')
 currenthandle=''
 
@@ -34,6 +35,7 @@ class Object_Mapper():
     temp_changedobject = None
     temp_notchangedobject = None
     temp_notfoundobject = None
+    obj=CoreUtils()
     def compare(self,data):
         find_ele=highlight.Highlight()
         maindir = os.environ["NINETEEN68_HOME"]
@@ -54,7 +56,14 @@ class Object_Mapper():
                     global currenthandle
                     currenthandle = eachdriverhand
         for element  in data:
-                updated_ele=find_ele.highlight('OBJECTMAPPER'+','+element['xpath']+','+element['url'],element,currenthandle)
+            orig_element=element
+            xpath_string=element['xpath'].split(';')
+            #Xpath Decryption logic implemented
+            left_part=self.obj.scrape_unwrap(xpath_string[0])
+            right_part=self.obj.scrape_unwrap(xpath_string[2])
+            element['xpath'] = left_part+';'+xpath_string[1]+';'+right_part
+            element['url']=self.obj.scrape_unwrap(element['url'])
+            updated_ele=find_ele.highlight('OBJECTMAPPER'+','+element['xpath']+','+element['url'],element,currenthandle,orig_element)
         Object_Mapper.temp_changedobject = find_ele.changedobject
         Object_Mapper.temp_notchangedobject = find_ele.notchangedobject
         Object_Mapper.temp_notfoundobject = find_ele.notfoundobject

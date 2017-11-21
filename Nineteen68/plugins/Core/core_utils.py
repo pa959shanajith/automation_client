@@ -18,7 +18,7 @@ from Crypto.Cipher import AES
 BS=16
 iv='0'*16
 ##key='Nineeteen68@ScrapeNineeteen68@Sc'
-#key='Nineeteen68@SecureScrapeDataPath'
+scrape_key='Nineeteen68@SecureScrapeDataPath'
 ice_ndac_key = 'ajkdfiHFEow#DjgLIqocn^8sjp2hfY&d'
 
 class CoreUtils():
@@ -78,3 +78,12 @@ class CoreUtils():
         aes = AES.new(ice_ndac_key, AES.MODE_CBC, iv)
         return aes.encrypt(self.pad(data)).encode('hex')
 
+
+    def scrape_unwrap(self,hex_data):
+        data = ''.join(map(chr, bytearray.fromhex(hex_data)))
+        aes = AES.new(scrape_key, AES.MODE_CBC, iv)
+        return self.unpad(aes.decrypt(data))
+
+    def scrape_wrap(self,data):
+        aes = AES.new(scrape_key, AES.MODE_CBC, iv)
+        return aes.encrypt(self.pad(data)).encode('hex')
