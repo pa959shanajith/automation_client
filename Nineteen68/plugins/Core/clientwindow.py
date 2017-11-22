@@ -112,7 +112,6 @@ class MainNamespace(BaseNamespace):
         elif(str(args[0]) == 'checkConnection'):
             try:
                 global icesession,plugins_list
-                wxObject.connectbutton.Enable()
                 core_utils_obj = core_utils.CoreUtils()
                 response = {}
                 response = ast.literal_eval(core_utils_obj.unwrap(str(args[1])))
@@ -128,10 +127,9 @@ class MainNamespace(BaseNamespace):
                         err_res="All ice sessions are in use"
                 else:
                     allow_connect = True
-                    wxObject.connectbutton.SetLabel("Disconnect")
+                    wxObject.connectbutton.SetBitmapLabel(wxObject.disconnect_img)
+                    wxObject.connectbutton.SetName("disconnect")
                 if(len(err_res)!=0):
-                    wxObject.connectbutton.SetLabel("Connect")
-                    wxObject.connectbutton.SetValue(False)
                     wxObject.schedule.Disable()
                     if socketIO != None:
                         log.info('Closing the socket')
@@ -139,6 +137,7 @@ class MainNamespace(BaseNamespace):
                         log.info(socketIO)
                     logger.print_on_console(err_res)
                     log.info(err_res)
+                wxObject.connectbutton.Enable()
             except Exception as e:
                 logger.print_on_console('Error while checking connection request')
                 log.info('Error while checking connection request')
@@ -689,6 +688,7 @@ class ClientWindow(wx.Frame):
 ##        self.SetBackgroundColour('#D0D0D0')
         self.logfilename_error_flag = False
         self.debugwindow = None
+        self.new = None
         self.id =id
         self.mainclass = self
         self.mythread = None
@@ -700,6 +700,8 @@ class ClientWindow(wx.Frame):
         curdir = os.getcwd()
         ID_FILE_NEW = 1
         self.iconpath = IMAGES_PATH +"/slk.ico"
+        self.connect_img=wx.Image(IMAGES_PATH +"/connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.disconnect_img=wx.Image(IMAGES_PATH +"/disconnect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
 
         """
         Creating Root Logger using logger file config and setting logfile path,which is in config.json
@@ -752,12 +754,8 @@ class ClientWindow(wx.Frame):
         self.SetMenuBar(self.menubar)
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
-        connect_img=wx.Image(IMAGES_PATH +"/connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        self.connectbutton = wx.ToggleButton(self.panel, label='Connect',pos=(10, 10), size=(100, 25))
-        #self.connectbutton = wx.BitmapButton(self.panel, bitmap=connect_img,pos=(10, 10), size=(100, 25))
-##        self.connectbutton = wx.Button(self.panel, label="Connect" ,pos=(10, 10), size=(100, 28))
-        self.connectbutton.Bind(wx.EVT_TOGGLEBUTTON, self.OnNodeConnect)
-        #self.connectbutton.Bind(wx.EVT_BUTTON, self.OnNodeConnect)
+        self.connectbutton = wx.BitmapButton(self.panel, bitmap=self.connect_img,pos=(10, 10), size=(100, 25), name='connect')
+        self.connectbutton.Bind(wx.EVT_BUTTON, self.OnNodeConnect)
         self.connectbutton.SetToolTip(wx.ToolTip("Connect to node Server"))
         self.log = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_MULTILINE|wx.TE_READONLY)
         font1 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL,  False, u'Consolas')
@@ -911,7 +909,6 @@ class ClientWindow(wx.Frame):
             ##    self.continue_debugbutton.Hide()
 
     def OnClose(self, event):
-        print 'KILLING THE THREAD'
         controller.terminate_flag=True
         global socketIO
         logger.print_on_console('Disconnected from node server')
@@ -944,15 +941,6 @@ class ClientWindow(wx.Frame):
 
     def OnExit(self, event):
         controller.kill_process()
-        ##global socketIO
-        ##print 'SocketIO : ',socketIO
-        ##if socketIO != None:
-        ##    log.info('Closing the socket')
-        ##    socketIO.disconnect()
-        ##    log.info(socketIO)
-        ##    self.new.Close()
-        ##self.Close()
-
 
         #----------------------------------------------------------------------
     def OnPause(self, event):
@@ -988,26 +976,22 @@ class ClientWindow(wx.Frame):
     def OnTerminate(self, event, *args):
         if(len(args) > 0 and args[0]=="term_exec"):
             print ""
-            logger.print_on_console('---------Terminating all active actions-------')
+            logger.print_on_console('---------Terminating all active operations-------')
         else:
             logger.print_on_console('---------Termination Started-------')
         controller.terminate_flag=True
-        try:
-            #Close the debug window
-            if self.debugwindow != None:
-                self.debugwindow.Close()
-                self.debugwindow = None
-            #Close the scrape window
-            if self.new != None:
-                self.new.Close()
-                self.new = None
-            #Handling the case where user clicks terminate when the execution is paused
-            #Resume the execution
-            if controller.pause_flag:
-                self.resume(False)
-        except Exception as e:
-            log.error("Exception occured while termination")
-
+        #Close the debug window
+        if self.debugwindow != None:
+            self.debugwindow.Close()
+            self.debugwindow = None
+        #Close the scrape window
+        if self.new != None:
+            self.new.Close()
+            self.new = None
+        #Handling the case where user clicks terminate when the execution is paused
+        #Resume the execution
+        if controller.pause_flag:
+            self.resume(False)
 
     #----------------------------------------------------------------------
     def OnClear(self,event):
@@ -1032,9 +1016,11 @@ class ClientWindow(wx.Frame):
     def OnNodeConnect(self,event):
         try:
             global socketIO
-            state = event.GetEventObject().GetValue()
-            if(state == True):
-                self.connectbutton.Disable()
+            name = self.connectbutton.GetName()
+            self.connectbutton.Disable()
+            if(name == 'connect'):
+                self.connectbutton.SetBitmapLabel(self.disconnect_img)
+                self.connectbutton.SetName('disconnect')
                 port = int(configvalues['server_port'])
                 conn = httplib.HTTPConnection(configvalues['server_ip'],port)
                 conn.connect()
@@ -1043,16 +1029,17 @@ class ClientWindow(wx.Frame):
             else:
                 self.OnTerminate(event,"term_exec")
                 logger.print_on_console('Disconnected from node server')
-                self.connectbutton.SetLabel("Connect")
-                self.connectbutton.SetValue(False)
-                self.schedule.SetValue(False)
-                self.schedule.Disable()
                 if socketIO != None:
                     log.info('Sending Socket disconnect request')
                     socketIO.emit('unavailableLocalServer')
                     socketIO.disconnect()
                     del socketIO
                     socketIO = None
+                self.connectbutton.SetBitmapLabel(self.connect_img)
+                self.connectbutton.SetName('connect')
+                self.schedule.SetValue(False)
+                self.schedule.Disable()
+                self.connectbutton.Enable()
 
         except Exception as e:
             print 'Forbidden request, Connection refused, please check the server ip and server port in Config.json, and restart the client window.'
