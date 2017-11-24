@@ -87,9 +87,8 @@ class TableOperationKeywords():
                             logger.print_on_console('Column count is : ',coloumn_count)
                 except Exception as e:
                     log.error(e)
-
-                    logger.print_on_console(e)
-                    err_msg=E
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             else:
                 log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                 err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
@@ -137,9 +136,8 @@ class TableOperationKeywords():
                     logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
             except Exception as e:
                 log.error(e)
-
-                logger.print_on_console(e)
-                err_msg=E
+                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             return status,methodoutput,cellVal,err_msg
 
 #   verifies the cell value with the given text input, if the table found with the given xpath
@@ -195,9 +193,8 @@ class TableOperationKeywords():
                     logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
             except Exception as e:
                 log.error(e)
-
-                logger.print_on_console(e)
-                err_msg=E
+                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             return status,methodoutput,output_res,err_msg
 
 #   returns the  tooltip text  of given cell, if the table found with the given xpath
@@ -240,9 +237,8 @@ class TableOperationKeywords():
 
                 except Exception as e:
                     log.error(e)
-
-                    logger.print_on_console(e)
-                    err_msg=E
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             else:
                 log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                 err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
@@ -312,9 +308,8 @@ class TableOperationKeywords():
                                                 logger.print_on_console('click action performed successfully')
                             except Exception as e:
                                 log.error(e)
-
-                                logger.print_on_console(e)
-                                err_msg=E
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
                         elif len(input_arr)>2:
                             log.info('click on an element inside a cell')
                             logger.print_on_console('click on an element inside a cell')
@@ -448,19 +443,15 @@ class TableOperationKeywords():
                                                     status=TEST_RESULT_PASS
                                                     methodoutput=TEST_RESULT_TRUE
                                                     break
-
-
                                         except Exception as e:
                                              log.error(e)
-
-                                             logger.print_on_console(e)
-                                             err_msg=E
+                                             logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
 
                     except Exception as e:
                        log.error(e)
-
-                       logger.print_on_console(e)
-                       err_msg=E
+                       logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                       err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
                 else:
                     log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                     err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
@@ -495,9 +486,8 @@ class TableOperationKeywords():
                     logger.print_on_console('Got the result : ',row_number)
                 except Exception as e:
                     log.error(e)
-
-                    logger.print_on_console(e)
-                    err_msg=E
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             else:
                 log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                 err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
@@ -629,9 +619,8 @@ class TableOperationKeywords():
 ##                        web_element = browser_Keywords_MW.driver_obj.execute_script(script)
                 except Exception as e:
                     log.error(e)
-
-                    logger.print_on_console(e)
-                    err_msg=E
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             return status,methodoutput,web_element,err_msg
 
 

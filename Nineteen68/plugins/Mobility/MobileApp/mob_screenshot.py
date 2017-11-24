@@ -16,6 +16,7 @@ import logger
 
 ##import generic_constants
 import os
+import uuid
 from constants import *
 import install_and_launch
 
@@ -42,12 +43,12 @@ class Screenshot():
                     if filename!=None:
                         if '.' in filename:
                             filename=filename.split('.')[0]
-                        filePath=str(inputval) + '//'+ filename
+                        filePath=str(inputval) + '/'+ filename
                     else:
                         filename=self.generateUniqueFileName()
-                        filePath=str(inputval) + '//'+ filename
+                        filePath=str(inputval) + '/'+ filename
                 except Exception as e:
-                    logger.print_on_console( e)
+                    log.error(e)
             else:
                 try:
                     import constants
@@ -60,7 +61,7 @@ class Screenshot():
                         filePath = path + filename
                         output = filePath+'.png'
                 except Exception as e:
-                    logger.print_on_console( e)
+                    log.error(e)
 
             if output==None:
                 log.debug('screenshot capture failed')
@@ -86,5 +87,5 @@ class Screenshot():
         return status,methodoutput,output,err_msg
 
     def generateUniqueFileName(self):
-        filename=datetime.datetime.now().strftime("%Y-%m-%d-%H_%M_%S_"+str(time.strftime("%Y%m%d%H%M%S")))
+        filename=datetime.datetime.now().strftime("%Y-%m-%d-%H_%M_%S_"+str(uuid.uuid4()))
         return filename

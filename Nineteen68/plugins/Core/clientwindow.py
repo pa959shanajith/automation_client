@@ -8,7 +8,7 @@ import logging
 import logging.config
 import argparse
 import base64
-
+import platform
 import uuid
 from datetime import datetime
 import core_utils
@@ -129,6 +129,7 @@ class MainNamespace(BaseNamespace):
                     allow_connect = True
                     wxObject.connectbutton.SetBitmapLabel(wxObject.disconnect_img)
                     wxObject.connectbutton.SetName("disconnect")
+                    wxObject.connectbutton.SetToolTip(wxObject.disconnectTooltip)
                 if(len(err_res)!=0):
                     wxObject.schedule.Disable()
                     if socketIO != None:
@@ -295,7 +296,6 @@ class MainNamespace(BaseNamespace):
         elif str(args[0]).endswith('ipa'):
             browsername = args[0] + ";" + args[2] + ";" + args[3]+";" + args[4]
         con =controller.Controller()
-        import platform
         if platform.system()=='Darwin':
             con.get_all_the_imports('Mobility/MobileApp')
         else:
@@ -313,7 +313,6 @@ class MainNamespace(BaseNamespace):
         global browsername
         browsername = args[0]+";"+args[1]
         con =controller.Controller()
-        import platform
         if platform.system()=='Darwin':
             con.get_all_the_imports('Mobility/MobileWeb')
         else:
@@ -386,6 +385,7 @@ class MainNamespace(BaseNamespace):
             for path in filepath:
                 if not (os.path.exists(path)):
                     data_URIs.append(None)
+                    logger.print_on_console("Error while rendering Screenshot: File \""+path+"\" not found!")
                     log.error("File \""+path+"\" not found!")
                 else:
                     encoded_string = ''
@@ -434,6 +434,10 @@ class MainNamespace(BaseNamespace):
     def on_update_screenshot_path(self,*args):
         spath=args[0]
         import constants
+        if(platform.system()=='Darwin'):
+            spath=os.environ["NINETEEN68_HOME"]+"/screenshots"
+            if not os.path.exists(spath):
+                os.makedirs(spath)
         if os.path.exists(spath):
             constants.SCREENSHOT_PATH=spath
         else:
@@ -702,6 +706,8 @@ class ClientWindow(wx.Frame):
         self.iconpath = IMAGES_PATH +"/slk.ico"
         self.connect_img=wx.Image(IMAGES_PATH +"/connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.disconnect_img=wx.Image(IMAGES_PATH +"/disconnect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.connectTooltip = wx.ToolTip("Connect to node Server")
+        self.disconnectTooltip = wx.ToolTip("Disconnect from node Server")
 
         """
         Creating Root Logger using logger file config and setting logfile path,which is in config.json
@@ -756,7 +762,7 @@ class ClientWindow(wx.Frame):
         self.Bind(wx.EVT_MENU, self.menuhandler)
         self.connectbutton = wx.BitmapButton(self.panel, bitmap=self.connect_img,pos=(10, 10), size=(100, 25), name='connect')
         self.connectbutton.Bind(wx.EVT_BUTTON, self.OnNodeConnect)
-        self.connectbutton.SetToolTip(wx.ToolTip("Connect to node Server"))
+        self.connectbutton.SetToolTip(self.connectTooltip)
         self.log = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_MULTILINE|wx.TE_READONLY)
         font1 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL,  False, u'Consolas')
         self.log.SetForegroundColour((0,50,250))
@@ -801,21 +807,20 @@ class ClientWindow(wx.Frame):
 
 
         killprocess_img = wx.Image(IMAGES_PATH +"/killStaleProcess.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/killStaleProcess.png", wx.BITMAP_TYPE_ANY), (360, 548), (50, 40))
+        self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/killStaleProcess.png", wx.BITMAP_TYPE_ANY), wx.Point(360, 555), wx.Size(50, 42))
         self.cancelbutton.Bind(wx.EVT_LEFT_DOWN, self.OnExit)
         self.cancelbutton.SetToolTip(wx.ToolTip("To kill Stale process"))
-        self.cancel_label=wx.StaticText(self.panel, -1, 'Kill Stale Process', (340, 600), (100, 70))
+        self.cancel_label=wx.StaticText(self.panel, -1, 'Kill Stale Process', wx.Point(340, 600), wx.Size(100, 70))
 
-        self.terminatebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/terminate.png", wx.BITMAP_TYPE_ANY), (470, 548), (50, 40))
+        self.terminatebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/terminate.png", wx.BITMAP_TYPE_ANY), wx.Point(475, 555), wx.Size(50, 42))
         self.terminatebutton.Bind(wx.EVT_LEFT_DOWN, self.OnTerminate)
         self.terminatebutton.SetToolTip(wx.ToolTip("To Terminate the execution"))
-        self.terminate_label=wx.StaticText(self.panel, -1, 'Terminate', (470, 600), (100, 70))
+        self.terminate_label=wx.StaticText(self.panel, -1, 'Terminate', wx.Point(475, 600), wx.Size(100, 70))
 
-        self.clearbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/clear.png", wx.BITMAP_TYPE_ANY), (590, 548), (50, 40))
+        self.clearbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/clear.png", wx.BITMAP_TYPE_ANY), wx.Point(590, 555), wx.Size(50, 42))
         self.clearbutton.Bind(wx.EVT_LEFT_DOWN, self.OnClear)
         self.clearbutton.SetToolTip(wx.ToolTip("To clear the console area"))
-        self.clear_label=wx.StaticText(self.panel, -1, 'Clear', (600, 600), (100, 70))
-
+        self.clear_label=wx.StaticText(self.panel, -1, 'Clear', wx.Point(600, 600), wx.Size(100, 70))
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 
         box.AddStretchSpacer()
@@ -916,14 +921,7 @@ class ClientWindow(wx.Frame):
             log.info('Closing the socket')
             socketIO.disconnect()
             log.info(socketIO)
-        #Close the debug window
-        if self.debugwindow != None:
-            self.debugwindow.Close()
-            self.debugwindow = None
-        #Close the scrape window
-        if self.new != None:
-            self.new.Close()
-            self.new = None
+        self.killChildWindows()
         ##self.Close()
         self.Destroy()
         controller.kill_process()
@@ -947,8 +945,8 @@ class ClientWindow(wx.Frame):
         logger.print_on_console('Event Triggered to Pause')
         log.info('Event Triggered to Pause')
         controller.pause_flag=True
-##        self.pausebutton.Hide()
-##        self.continuebutton.Show()
+        ##self.pausebutton.Hide()
+        ##self.continuebutton.Show()
 
 
     def Resume(self, event):
@@ -956,8 +954,8 @@ class ClientWindow(wx.Frame):
         log.info('Event Triggered to Resume Debug')
         controller.pause_flag=False
         self.mythread.resume(False)
-##        self.continuebutton.Hide()
-##        self.continue_debugbutton.Hide()
+        ##self.continuebutton.Hide()
+        ##self.continue_debugbutton.Hide()
 
 
 
@@ -970,8 +968,8 @@ class ClientWindow(wx.Frame):
     def resume(self,debug_mode):
         controller.pause_flag=False
         self.mythread.resume(debug_mode)
-##        self.continuebutton.Hide()
-##        self.pausebutton.Show()
+        ##self.continuebutton.Hide()
+        ##self.pausebutton.Show()
     #----------------------------------------------------------------------
     def OnTerminate(self, event, *args):
         if(len(args) > 0 and args[0]=="term_exec"):
@@ -980,14 +978,7 @@ class ClientWindow(wx.Frame):
         else:
             logger.print_on_console('---------Termination Started-------')
         controller.terminate_flag=True
-        #Close the debug window
-        if self.debugwindow != None:
-            self.debugwindow.Close()
-            self.debugwindow = None
-        #Close the scrape window
-        if self.new != None:
-            self.new.Close()
-            self.new = None
+        self.killChildWindows()
         #Handling the case where user clicks terminate when the execution is paused
         #Resume the execution
         if controller.pause_flag:
@@ -1019,8 +1010,6 @@ class ClientWindow(wx.Frame):
             name = self.connectbutton.GetName()
             self.connectbutton.Disable()
             if(name == 'connect'):
-                self.connectbutton.SetBitmapLabel(self.disconnect_img)
-                self.connectbutton.SetName('disconnect')
                 port = int(configvalues['server_port'])
                 conn = httplib.HTTPConnection(configvalues['server_ip'],port)
                 conn.connect()
@@ -1029,7 +1018,7 @@ class ClientWindow(wx.Frame):
             else:
                 self.OnTerminate(event,"term_exec")
                 logger.print_on_console('Disconnected from node server')
-                if socketIO != None:
+                if socketIO is not None:
                     log.info('Sending Socket disconnect request')
                     socketIO.emit('unavailableLocalServer')
                     socketIO.disconnect()
@@ -1037,6 +1026,7 @@ class ClientWindow(wx.Frame):
                     socketIO = None
                 self.connectbutton.SetBitmapLabel(self.connect_img)
                 self.connectbutton.SetName('connect')
+                self.connectbutton.SetToolTip(self.connectTooltip)
                 self.schedule.SetValue(False)
                 self.schedule.Disable()
                 self.connectbutton.Enable()
@@ -1050,6 +1040,23 @@ class ClientWindow(wx.Frame):
             self.clearbutton.Disable()
             self.connectbutton.Disable()
             self.rbox.Disable()
+
+    def killChildWindows(self):
+        #Close the debug window
+        try:
+            if self.debugwindow != None:
+                self.debugwindow.Close()
+                self.debugwindow = None
+        except Exception as e:
+            pass
+        #Close the scrape window
+        try:
+            if self.new != None:
+                self.new.Close()
+                self.new = None
+        except Exception as e:
+            log.error("Error while killing child windows")
+            log.error(e)
 
     def test(self,event):
         global mobileScrapeFlag
@@ -1114,44 +1121,36 @@ class DebugWindow(wx.Frame):
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(200, 75) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
-##        style = wx.CAPTION|wx.CLIP_CHILDREN
+        ##style = wx.CAPTION|wx.CLIP_CHILDREN
         curdir = os.getcwd()
         self.iconpath = IMAGES_PATH +"/slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         self.panel = wx.Panel(self)
         #Radio buttons
-##        lblList = ['Normal', 'Stepwise', 'RunfromStep']
-##        self.rbox = wx.RadioBox(self.panel,label = 'Debug options', pos = (10, 548), choices = lblList ,size=(300, 100),
-##        majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-
-##        self.Bind(wx.EVT_RADIOBUTTON, self.OnRadiogroup)
-##        self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
-##        self.rbox.SetBackgroundColour('#9f64e2')
+        ##lblList = ['Normal', 'Stepwise', 'RunfromStep']
+        ##self.rbox = wx.RadioBox(self.panel,label = 'Debug options', pos = (10, 548), choices = lblList ,size=(300, 100),
+        ##majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        ##self.Bind(wx.EVT_RADIOBUTTON, self.OnRadiogroup)
+        ##self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
+        ##self.rbox.SetBackgroundColour('#9f64e2')
 
         paly_img = wx.Image(IMAGES_PATH +"/play.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         terminate_img=wx.Image(IMAGES_PATH +"/terminate.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         step_img=wx.Image(IMAGES_PATH +"/step.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-
-
         self.continue_debugbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/play.png", wx.BITMAP_TYPE_ANY), (65, 15), (35, 28))
         self.continue_debugbutton.Bind(wx.EVT_LEFT_DOWN, self.Resume)
         self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution"))
-##        self.continue_debugbutton.Hide()
-
-
-
+        ##self.continue_debugbutton.Hide()
         self.continuebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/step.png", wx.BITMAP_TYPE_ANY), (105, 15), (35, 28))
         self.continuebutton.Bind(wx.EVT_LEFT_DOWN, self.OnContinue)
         self.continuebutton.SetToolTip(wx.ToolTip("To Resume the execution "))
-##        self.continuebutton.Hide()
-
+        ##self.continuebutton.Hide()
         self.Centre()
         style = self.GetWindowStyle()
         self.SetWindowStyle( style|wx.STAY_ON_TOP )
         wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
         self.Show()
-
 
     def Resume(self, event):
         logger.print_on_console('Event Triggered to Resume Debug')
@@ -1160,10 +1159,8 @@ class DebugWindow(wx.Frame):
         wxObject.mythread.resume(False)
         self.Close()
         wxObject.debugwindow = None
-##        self.continuebutton.Hide()
-##        self.continue_debugbutton.Hide()
-
-
+        ##self.continuebutton.Hide()
+        ##self.continue_debugbutton.Hide()
 
     #----------------------------------------------------------------------
     def OnContinue(self, event):
