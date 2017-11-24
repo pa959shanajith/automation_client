@@ -49,6 +49,7 @@ class Weboccular():
         self.start_url=""
         self.crawlStatus = True
         self.notParsedURLs = []
+        self.socketIO=None
         #self.driver = webdriver.PhantomJS(executable_path="D:\\NikunjWorkspace\\Nineteen68\\Drivers\\phantomjs.exe")
 
     def get_complete_url(self,url, new_url) :
@@ -82,7 +83,7 @@ class Weboccular():
         return imglinks
 
 
-    def crawl(self,start_url, level,agent,socketIO) :
+    def crawl(self,start_url, level,agent) :
         self.domain = tldextract.extract(str(start_url)).domain
 
         #create a start object to initiate the process
@@ -92,12 +93,12 @@ class Weboccular():
 
         i=1
         threads = []
-        logger.print_on_console("crawling in progress...")
+        logger.print_on_console("Crawling in progress...")
         self.subdomain = tldextract.extract(start_url).subdomain
         while(self.queue and not controller.terminate_flag) :
             obj = self.queue.pop(0)
             url = obj['name']
-            t = threading.Thread(target = self.parse, args = (url, obj, level,agent,socketIO))
+            t = threading.Thread(target = self.parse, args = (url, obj, level,agent))
             t.start()
             threads.append(t)
             if i == 1 :
@@ -109,7 +110,7 @@ class Weboccular():
             thread.join()
 
 
-    def parse(self,url, obj, lev,agent,socketIO) :
+    def parse(self,url, obj, lev,agent) :
 
         if controller.terminate_flag:
             return
@@ -176,7 +177,7 @@ class Weboccular():
 
                 self.nodedata[url] = obj
                 data = json.dumps(obj)
-                socketIO.emit('result_web_crawler',data)
+                self.socketIO.emit('result_web_crawler',data)
                 if obj['level'] < lev :
                     if (tldextract.extract(rurl).domain == self.domain) and (tldextract.extract(rurl).subdomain == self.subdomain):
                         if rurl not in self.visited:
@@ -205,7 +206,7 @@ class Weboccular():
                                             self.reversedLinks.append({"name" : new_url, "parent" :rurl, "level" : obj['level']+1 })
 ##                                             reversedObj = {"type" : "reverse" }
 ##                                             data = json.dumps(reversedObj)
-##                                             socketIO.emit('result_web_crawler',data)
+##                                             self.socketIO.emit('result_web_crawler',data)
 
             else:
                 headerResponse = requests.get(url,headers = headers,verify = False,stream = True)
@@ -213,7 +214,7 @@ class Weboccular():
                 obj['type'] = "others"
                 self.nodedata[url] = obj
                 data = json.dumps(obj)
-                socketIO.emit('result_web_crawler',data)
+                self.socketIO.emit('result_web_crawler',data)
 
         except Exception as e:
             obj['error'] = str(e)
@@ -226,30 +227,31 @@ class Weboccular():
             self.crawlStatus = False
 
     def runCrawler(self,url,level,agent,socketIO,mainwxobj) :
-
-
-
-
+        self.socketIO=socketIO
         log.debug("inside runCrawler method")
         level  = int(level)
         start_url = url
         self.rooturl = start_url
         start = time.clock()
-        log.info("starting new crawling request with following parameters: [URL] : " + start_url  +  " [LEVEL] : "  +  str(level) + " [Agent] : " + str(agent) )
-        logger.print_on_console("--------------------")
-        logger.print_on_console("starting new crawling request with following parameters: [URL] : " + start_url  +  " [LEVEL] : "  +  str(level) + " [Agent] : " + str(agent) )
-        logger.print_on_console("--------------------")
+        log.info("Starting new crawling request with following parameters: [URL] : " + start_url  +  " [LEVEL] : "  +  str(level) + " [Agent] : " + str(agent) )
+        logger.print_on_console("Starting new crawling request with following parameters: [URL] : " + start_url  +  " [LEVEL] : "  +  str(level) + " [Agent] : " + str(agent) )
         try:
             #Check if terminate flag is true or not:
             if controller.terminate_flag:
                 controller.terminate_flag = False
+            if controller.disconnect_flag:
+                controller.disconnect_flag=False
             mainwxobj.terminatebutton.Enable()
-            t = threading.Thread(target = self.crawl, args = (start_url, level,agent,socketIO))
+            t = threading.Thread(target = self.crawl, args = (start_url, level,agent))
             t.start()
             t.join()
             self.crawlStatus = True
         except Exception as e:
             log.info("Something went wrong")
+
+        # Stop everything in the case of disconnection from server
+        if controller.disconnect_flag:
+            return True
 
         #process all reverse links
         for reversedLink in self.reversedLinks:
@@ -266,8 +268,8 @@ class Weboccular():
 
         crawling_status = "succesfully"
         if controller.terminate_flag:
-            logger.print_on_console("---------crawling request Terminated---------")
-            log.info("---------crawling request Terminated---------")
+            logger.print_on_console("---------Crawling request Terminated---------")
+            log.info("---------Crawling request Terminated---------")
             crawling_status = "partially"
 
         seconds = 0
@@ -285,15 +287,12 @@ class Weboccular():
         else:
             time_str = str("%.2f" % time_taken) + " seconds"
 
-        log.info("crawling request completed " + crawling_status +" in " +  time_str)
+        log.info("Crawling request completed " + crawling_status +" in " +  time_str)
 
         #send the completion object to Node
         completetionObj = json.dumps({"progress" : "complete" ,"sdata" : sdata, "status": "success" ,"subdomains":  self.subdomains, "others" : self.others, "notParsedURLs" : self.notParsedURLs, "time_taken" : str(time_taken) +  " seconds"})
-        socketIO.emit('result_web_crawler_finished',completetionObj)
-        logger.print_on_console("--------------------")
-
-        logger.print_on_console("crawling request completed " + crawling_status +" in " +  time_str)
-        logger.print_on_console("--------------------")
+        self.socketIO.emit('result_web_crawler_finished',completetionObj)
+        logger.print_on_console("Crawling request completed " + crawling_status +" in " +  time_str)
 
         #finally reset the controller's terminate flag to False and Disable the terminate button
         controller.terminate_flag = False

@@ -129,7 +129,8 @@ class MainNamespace(BaseNamespace):
                     allow_connect = True
                     wxObject.connectbutton.SetBitmapLabel(wxObject.disconnect_img)
                     wxObject.connectbutton.SetName("disconnect")
-                    wxObject.connectbutton.SetToolTip(wxObject.disconnectTooltip)
+                    wxObject.connectbutton.SetToolTip(wx.ToolTip("Disconnect from node Server"))
+                    controller.disconnect_flag=False
                 if(len(err_res)!=0):
                     wxObject.schedule.Disable()
                     if socketIO != None:
@@ -706,8 +707,6 @@ class ClientWindow(wx.Frame):
         self.iconpath = IMAGES_PATH +"/slk.ico"
         self.connect_img=wx.Image(IMAGES_PATH +"/connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.disconnect_img=wx.Image(IMAGES_PATH +"/disconnect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        self.connectTooltip = wx.ToolTip("Connect to node Server")
-        self.disconnectTooltip = wx.ToolTip("Disconnect from node Server")
 
         """
         Creating Root Logger using logger file config and setting logfile path,which is in config.json
@@ -762,7 +761,7 @@ class ClientWindow(wx.Frame):
         self.Bind(wx.EVT_MENU, self.menuhandler)
         self.connectbutton = wx.BitmapButton(self.panel, bitmap=self.connect_img,pos=(10, 10), size=(100, 25), name='connect')
         self.connectbutton.Bind(wx.EVT_BUTTON, self.OnNodeConnect)
-        self.connectbutton.SetToolTip(self.connectTooltip)
+        self.connectbutton.SetToolTip(wx.ToolTip("Connect to node Server"))
         self.log = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_MULTILINE|wx.TE_READONLY)
         font1 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL,  False, u'Consolas')
         self.log.SetForegroundColour((0,50,250))
@@ -915,6 +914,7 @@ class ClientWindow(wx.Frame):
 
     def OnClose(self, event):
         controller.terminate_flag=True
+        controller.disconnect_flag=True
         global socketIO
         logger.print_on_console('Disconnected from node server')
         if socketIO != None:
@@ -973,6 +973,7 @@ class ClientWindow(wx.Frame):
     #----------------------------------------------------------------------
     def OnTerminate(self, event, *args):
         if(len(args) > 0 and args[0]=="term_exec"):
+            controller.disconnect_flag=True
             print ""
             logger.print_on_console('---------Terminating all active operations-------')
         else:
@@ -1026,7 +1027,7 @@ class ClientWindow(wx.Frame):
                     socketIO = None
                 self.connectbutton.SetBitmapLabel(self.connect_img)
                 self.connectbutton.SetName('connect')
-                self.connectbutton.SetToolTip(self.connectTooltip)
+                self.connectbutton.SetToolTip(wx.ToolTip("Connect to node Server"))
                 self.schedule.SetValue(False)
                 self.schedule.Disable()
                 self.connectbutton.Enable()
@@ -1048,14 +1049,15 @@ class ClientWindow(wx.Frame):
                 self.debugwindow.Close()
                 self.debugwindow = None
         except Exception as e:
-            pass
+            log.error("Error while killing debug window")
+            log.error(e)
         #Close the scrape window
         try:
             if self.new != None:
                 self.new.Close()
                 self.new = None
         except Exception as e:
-            log.error("Error while killing child windows")
+            log.error("Error while killing scrape window")
             log.error(e)
 
     def test(self,event):
