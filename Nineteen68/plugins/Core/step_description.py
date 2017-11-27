@@ -714,17 +714,25 @@ class StepDescription:
         def VerifyEmail():
             return ' Verify email from the path '+"'"+input+"'."
         def SetToMailID():
-            return ' Set '+"'"+'To Mail ID'+"'"+' for the email and save the value in variable '+tsp.outputval+'.'
+            if len(listInput)>0:
+                input = ", ".join(listInput)
+            return ' Set '+"'"+'To Mail ID'+"'"+' as '+"'"+input+"'"+'for the email and save the value in variable '+tsp.outputval+'.'
         def SetCC():
-            return ' Set '+"'"+'CC'+"'"+' for the email and save the value in variable '+tsp.outputval+'.'
+            if len(listInput)>0:
+                input = ", ".join(listInput)
+            return ' Set '+"'"+'CC'+"'"+' as '+"'"+input+"'"+' for the email and save the value in variable '+tsp.outputval+'.'
         def SetBCC():
-            return ' Set '+"'"+'BCC'+"'"+' for the email and save the value in variable '+tsp.outputval+'.'
+            if len(listInput)>0:
+                input = ", ".join(listInput)
+            return ' Set '+"'"+'BCC'+"'"+' as '+"'"+input+"'"+' for the email and save the value in variable '+tsp.outputval+'.'
         def SetSubject():
-            return ' Set '+"'"+'Subject'+"'"+' for the email and save the value in variable '+tsp.outputval+'.'
+            return ' Set '+"'"+'Subject'+"'"+' as '+"'"+input+"'"+' for the email and save the value in variable '+tsp.outputval+'.'
         def SetBody():
-            return ' Set '+"'"+'Body'+"'"+' for the email and save the value in variable '+tsp.outputval+ '.'
+            return ' Set '+"'"+'Body'+"'"+' as '+"'"+input+"'"+' for the email and save the value in variable '+tsp.outputval+ '.'
         def SetAttachments():
-            return ' Set attachment/attachments for the email and save the value in variable '+tsp.outputval+ '.'
+            if len(listInput)>0:
+                input = ", ".join(listInput)
+            return ' Set attachment/attachments from the path '+"'"+input+"'"+' for the email and save the value in variable '+tsp.outputval+ '.'
         def SendEmail():
             return ' Send the email and save the value in variable '+tsp.outputval+ '.'
 

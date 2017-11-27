@@ -220,6 +220,8 @@ class MainNamespace(BaseNamespace):
     def on_executeTestSuite(self, *args):
         global wxObject
         args=list(args)
+        global socketIO
+        socketIO.emit('return_status_executeTestSuite','success')
         wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode)
 
     def on_debugTestCase(self, *args):
