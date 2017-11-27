@@ -455,6 +455,8 @@ class OutlookKeywords:
             error_msg=None
             MsgObj=''
             sendSubject=input[0]
+            if len(sendSubject)==0:
+                sendSubject=" "
             if self.sendFlag==True:
                 try:
                     MsgObj=self.Msg
