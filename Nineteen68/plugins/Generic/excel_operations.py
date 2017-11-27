@@ -1504,4 +1504,3 @@ class ExcelCSV:
 
         log.info('Status is '+str(status))
         return status,err_msg
-
