@@ -30,7 +30,6 @@ class TableOperationKeywords():
 
 #   returns the row count of table if the table found with the given xpath
         def getRowCount(self,webElement,*args):
-
             logger.print_on_console('Executing keyword : getRowCount')
             driver=browser_Keywords.driver_obj
             log.debug('got the driver instance from browser keyword')
@@ -66,7 +65,6 @@ class TableOperationKeywords():
 
 #   returns the no of coloumns of the table if the table found with the given xpath
         def getColoumnCount(self,webElement,*args):
-
             logger.print_on_console('Executing keyword : getColoumnCount')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
@@ -89,9 +87,8 @@ class TableOperationKeywords():
                             logger.print_on_console('Column count is : ',coloumn_count)
                 except Exception as e:
                     log.error(e)
-
-                    logger.print_on_console(e)
-                    err_msg=E
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             else:
                 log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                 err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
@@ -139,9 +136,8 @@ class TableOperationKeywords():
                     logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
             except Exception as e:
                 log.error(e)
-
-                logger.print_on_console(e)
-                err_msg=E
+                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             return status,methodoutput,cellVal,err_msg
 
 #   verifies the cell value with the given text input, if the table found with the given xpath
@@ -199,9 +195,8 @@ class TableOperationKeywords():
                     logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
             except Exception as e:
                 log.error(e)
-
-                logger.print_on_console(e)
-                err_msg=E
+                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             return status,methodoutput,output_res,err_msg
 
 #   returns the  tooltip text  of given cell, if the table found with the given xpath
@@ -247,9 +242,8 @@ class TableOperationKeywords():
 
                 except Exception as e:
                     log.error(e)
-
-                    logger.print_on_console(e)
-                    err_msg=E
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             else:
                 log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                 err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
@@ -314,9 +308,8 @@ class TableOperationKeywords():
 
                 except Exception as e:
                     log.error(e)
-
-                    logger.print_on_console(e)
-                    err_msg=E
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             else:
                 log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                 err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
@@ -388,9 +381,8 @@ class TableOperationKeywords():
                                                 #logger.print_on_console('click action performed successfully')
                             except Exception as e:
                                 log.error(e)
-
-                                logger.print_on_console(e)
-                                err_msg=E
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
                         elif len(input_arr)>2:
                             log.info('click on an element inside a cell')
                             #logger.print_on_console('click on an element inside a cell')
@@ -544,15 +536,12 @@ class TableOperationKeywords():
 
                                         except Exception as e:
                                              log.error(e)
-
-                                             logger.print_on_console(e)
-                                             err_msg=E
-
+                                             logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
                     except Exception as e:
                         log.error(e)
-
-                        logger.print_on_console(e)
-                        err_msg=E
+                        logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
                 else:
                     log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                     err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
@@ -562,13 +551,12 @@ class TableOperationKeywords():
                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                
+
             return status,methodoutput,output_val,err_msg
 
 
 
         def getRowNumByText(self,webElement,text,*args):
-
             logger.print_on_console('Executing keyword : getRowNumByText')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
@@ -581,27 +569,28 @@ class TableOperationKeywords():
             driver=browser_Keywords.driver_obj
             log.debug('got the driver instance from browser keyword')
             visibleFlag=True
-            if visibleFlag==True:
-                try:
-                    js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return yyy + cell.rowSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return yyy + cell.rowSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return yyy + cell.rowSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
-                    row_number=browser_Keywords.driver_obj.execute_script(js,webElement,text)
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
-                    log.info('Got the result : %s',row_number)
-                    logger.print_on_console('Got the result : ',row_number)
-                except Exception as e:
-                    log.error(e)
-
-                    logger.print_on_console(e)
-                    err_msg=E
+            if (webElement is not None):
+                if visibleFlag==True:
+                    try:
+                        js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return yyy + cell.rowSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return yyy + cell.rowSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return yyy + cell.rowSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
+                        row_number=browser_Keywords.driver_obj.execute_script(js,webElement,text)
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                        log.info('Got the result : %s',row_number)
+                        logger.print_on_console('Got the result : ',row_number)
+                    except Exception as e:
+                        log.error(e)
+                        logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                else:
+                    log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
+                    err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
             else:
-                log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
-                err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
-                logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
+                err_msg = ERROR_CODE_DICT['MSG_ELEMENT_NOT_FOUND']
             return status,methodoutput,row_number,err_msg
 
         def getColNumByText(self,webElement,text,*args):
-
             logger.print_on_console('Executing keyword : getColNumByText')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
@@ -614,22 +603,25 @@ class TableOperationKeywords():
             text=text[0].strip()
             coreutilsobj=core_utils.CoreUtils()
             text=coreutilsobj.get_UTF_8(text)
-            if visibleFlag==True:
-                try:
-                    js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return xx + cell.colSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return xx + cell.colSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return xx + cell.colSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
-                    col_number=driver.execute_script(js,webElement,text)
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
-                    log.info('Got the result : %s',col_number)
-                    logger.print_on_console('Got the result : ',col_number)
-                except Exception as e:
-                    log.error(e)
-                    logger.print_on_console(e)
-                    err_msg=e
+            if (webElement is not None):
+                if visibleFlag==True:
+                    try:
+                        js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return xx + cell.colSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return xx + cell.colSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return xx + cell.colSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
+                        col_number=driver.execute_script(js,webElement,text)
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                        log.info('Got the result : %s',col_number)
+                        logger.print_on_console('Got the result : ',col_number)
+                    except Exception as e:
+                        log.error(e)
+                        logger.print_on_console(e)
+                        err_msg=e
+                else:
+                    log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
+                    err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
             else:
-                log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
-                err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
-                logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
+                err_msg = ERROR_CODE_DICT['MSG_ELEMENT_NOT_FOUND']
             return status,methodoutput,col_number,err_msg
 
 
@@ -640,8 +632,6 @@ class TableOperationKeywords():
                 contents = browser_Keywords.driver_obj.execute_script(js,webElement)
             except Exception as e:
                 log.error(e)
-##            print contents
-##            print type(contents)
             return contents
 
         def getRowCountJs(self,webElement):
@@ -686,12 +676,10 @@ class TableOperationKeywords():
 
 
         def getInnerTable(self,webElement,input_val,*args):
-
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             web_element=None
             err_msg=None
-
             if((webElement is not None) and (input_val is not None)):
                 try:
                     if(len(input_val) == 2):
@@ -730,9 +718,8 @@ class TableOperationKeywords():
 ##                        web_element = browser_Keywords.driver_obj.execute_script(script)
                 except Exception as e:
                     log.error(e)
-
-                    logger.print_on_console(e)
-                    err_msg=E
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             return status,methodoutput,web_element,err_msg
 
 
@@ -792,13 +779,12 @@ class TableOperationKeywords():
                                                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                                 except Exception as e:
                                     log.error(e)
-                                    logger.print_on_console(e)
-                                    err_msg=E
+                                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
                             except Exception as e:
                                 log.error(e)
-
-                                logger.print_on_console(e)
-                                err_msg=E
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             return status,result,verb,err_msg
 
 
