@@ -358,7 +358,7 @@ class TableOperationKeywords():
                                             try:
                                                 log.debug('performing java script click')
                                                 js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
-                                                click=browser_Keywords.driver_obj.execute_script(js,webElement)
+                                                click=browser_Keywords.driver_obj.execute_script(js,cell)
                                                 status=webconstants.TEST_RESULT_PASS
                                                 methodoutput=TEST_RESULT_TRUE
                                                 log.info('click action performed successfully')
@@ -557,13 +557,13 @@ class TableOperationKeywords():
                     log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                     err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
                     logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
-                #return status,methodoutput,output_val,err_msg
+                return status,methodoutput,output_val,err_msg
             else:
                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                
-            return status,methodoutput,output_val,err_msg
+##                
+##            return status,methodoutput,output_val,err_msg
 
 
 
