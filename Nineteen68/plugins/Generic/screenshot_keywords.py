@@ -17,10 +17,10 @@ import logger
 
 import generic_constants
 import os
+import uuid
 from constants import *
 import constants
 import logging
-
 
 log = logging.getLogger('screenshot_keywords.py')
 class Screenshot():
@@ -42,10 +42,10 @@ class Screenshot():
                     if filename!=None:
                         if '.' in filename:
                             filename=filename.split('.')[0]
-                        filePath=str(inputval) + '//'+ filename
+                        filePath=str(inputval) + '/'+ filename
                     else:
                         filename=self.generateUniqueFileName()
-                        filePath=str(inputval) + '//'+ filename
+                        filePath=str(inputval) + '/'+ filename
                 except Exception as e:
                     logger.print_on_console( e)
             else:
@@ -57,32 +57,26 @@ class Screenshot():
                         filename=self.generateUniqueFileName()
                         filePath = path + filename
                         output = filePath+'.png'
-                        if len(args[0])>0:
-                            logger.print_on_console("The Specified path is not found, hence screenshot captured and saved in default path")
                 except Exception as e:
-                    logger.print_on_console( e)
-
-
+                    log.error(e)
             if output==None:
                 log.debug('screenshot capture failed')
                 output=OUTPUT_CONSTANT
             else:
                 log.debug('screenshot captured')
-                logger.print_on_console('screenshot captured')
+                logger.print_on_console('Screenshot captured')
                 img=ImageGrab.grab()
                 img.save(filePath+'.png')
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
-##                log.debug('screenshot captured and saved in : ',filePath+'.png')
-##                logger.print_on_console('The Specified path is not found, hence screenshot captured and saved in default path')
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
+            logger.print_on_console("Error while capturing screenshot")
             err_msg=ERROR_CODE_DICT['ERR_SCREENSHOT_PATH']
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
     def generateUniqueFileName(self):
-        filename=datetime.datetime.now().strftime("%Y-%m-%d-%H_%M_%S_"+str(time.strftime("%Y%m%d%H%M%S")))
+        filename=datetime.datetime.now().strftime("%Y-%m-%d-%H_%M_%S_"+str(uuid.uuid4()))
         return filename
 
