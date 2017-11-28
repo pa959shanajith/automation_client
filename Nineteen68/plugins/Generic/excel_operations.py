@@ -191,8 +191,12 @@ class ExcelFile:
                     info_msg='Row is '+str(row)+' and col is '+str(col)
                     logger.print_on_console(info_msg)
                     log.info(info_msg)
-                    row=int(row)
-                    col=int(col)
+                    try:
+                        row=int(row)
+                        col=int(col)
+                    except Exception as e:
+                        row=int(row)
+                        col=self.convertStringToInt(col)
                     if row>0 and col>0:
                         res,value,err_msg=self.dict['read_cell_'+file_ext](row,col,self.excel_path,self.sheetname,*args)
                     #872 added unicode support for info (Himanshu)
@@ -258,8 +262,12 @@ class ExcelFile:
                         info_msg='Row is '+str(row)+' col is '+str(col)+' and Value: '+value
                     log.info(info_msg)
 ##                    logger.print_on_console(info_msg)
-                    row=int(row)
-                    col=int(col)
+                    try:
+                        row=int(row)
+                        col=int(col)
+                    except Exception as e:
+                        row=int(row)
+                        col=self.convertStringToInt(col)
                     if row>0 and col>0:
                         res,err_msg=self.dict['write_cell_'+file_ext](row,col,value,self.excel_path,self.sheetname,*args)
                         if res:
@@ -305,8 +313,12 @@ class ExcelFile:
                     info_msg='Row is '+str(row)+' and col is '+str(col)
                     logger.print_on_console(info_msg)
                     log.info(info_msg)
-                    row=int(row)
-                    col=int(col)
+                    try:
+                        row=int(row)
+                        col=int(col)
+                    except Exception as e:
+                        row=int(row)
+                        col=self.convertStringToInt(col)
                     if row>0 and col>0:
                         res,err_msg=self.dict['clear_cell_'+file_ext](row,col,self.excel_path,self.sheetname)
                         if res:
@@ -423,6 +435,14 @@ class ExcelFile:
             log.error(err_msg)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
+
+    def convertStringToInt(self,col):
+        num=0
+        import string
+        for c in col:
+            if c in string.ascii_letters:
+                num = num * 26 + (ord(c.upper()) - ord('A')) + 1
+        return num
 
 
 class ExcelXLS:
@@ -1484,4 +1504,3 @@ class ExcelCSV:
 
         log.info('Status is '+str(status))
         return status,err_msg
-
