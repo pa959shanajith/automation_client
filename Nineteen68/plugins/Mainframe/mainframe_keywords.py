@@ -27,9 +27,10 @@ import time
 import os
 from mainframe_constants import *
 from bluezone_keywords import *
-
+from encryption_utility import AESCipher
 import logger
 import logging
+
 log = logging.getLogger('mainframe_keywords.py')
 
 class MainframeKeywords:
@@ -161,6 +162,60 @@ class MainframeKeywords:
                     print "Extra Emulator code"
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg =  self.bluezone_object.login(self.region,self.userID,self.password)
+                elif self.emulator_type == MAINFRAME_PCOMM:
+                    print "Pcomm Emulator code"
+                if result:
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
+            else:
+                log.error("Error: Invalid input!!! - login need 3 paramemters, 1. Region 2. UserID 3. Password.")
+                err_msg = "Error: Invalid input!!! - login need 3 paramemters, 1. Region 2. UserID 3. Password."
+                logger.print_on_console("Error: Invalid input!!! - login need 3 paramemters, 1. Region 2. UserID 3. Password.")
+        except Exception as e:
+            log.error("Error: Unable to login in to mainframe.")
+            log.error(e)
+            err_msg = "Error: Unable to login in to mainframe."
+            logger.print_on_console("Error: Unable to login in to mainframe.")
+        return status,methodoutput,output,err_msg
+
+    def secure_login(self,inputs):
+        """
+        method name : login
+        inputs      : User can provide input value to login either from excel sheet or through dynamic variable.
+                        1. region - Region to login into  emulator
+                        2. userID - Userid to login into  emulator
+                        3. password - Password to login into emulator (Encrypted using AES)
+        Purpose     : This keyword or action specifies the Tool to Login to the Mainframe Region using userID and password.
+        Support     : Supported Emulators are Bluezone, EXTRA and Pcomm.
+        """
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        try:
+            #check for the exact inputs
+            if len(inputs) == 3:
+                self.region = inputs[0]
+                self.userID = inputs[1]
+                self.password = inputs[2]
+                encryption_obj = AESCipher()
+                password = encryption_obj.decrypt(self.password)
+                # Log the input details in log file
+                log.info("Input recieved")
+                log.info("Region : %s \t UserID : %s \t Password : %s",self.region,self.userID,password)
+                # Print the input details on ICE console
+                logger.print_on_console("Input recieved : ")
+                #logger.print_on_console("Region : "+self.region + "\t" + "UserID :" + self.userID + "\t" + "Password :" + password)
+                if self.emulator_type in self.emulator_types:
+                    #Log the state of  keyword in log file
+                    log.info("Logging to %s emulator...",self.emulator_type)
+                    #Print the state of keyword on ICE console
+                    logger.print_on_console("Logging to " + self.emulator_type +" emulator...",)
+                if self.emulator_type == MAINFRAME_EXTRA:
+                    #Logic to launch Extra Emulator goes here
+                    print "Extra Emulator code"
+                elif self.emulator_type == MAINFRAME_BLUEZONE:
+                    result,output,err_msg =  self.bluezone_object.login(self.region,self.userID,password)
                 elif self.emulator_type == MAINFRAME_PCOMM:
                     print "Pcomm Emulator code"
                 if result:

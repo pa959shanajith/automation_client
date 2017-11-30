@@ -97,7 +97,53 @@ class BluezoneKeywords:
             logger.print_on_console("Error: Unable to login in to mainframe.")
         return (return_value == 1),output,err_msg
 
-
+    def secure_login(self,region,userID,password):
+        #Logic to Login to Bluezone Emulator goes here
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        return_value = 0
+        try:
+            self.host.sendkeys(region)
+            self.host.Waitready(10,2000)
+            self.host.sendkeys(MAINFRAME_KEY_E)
+            self.host.Waitready(10,2000)
+            self.host.sendkeys(userID)
+            self.host.Waitready(10,1000)
+            self.host.sendkeys(MAINFRAME_KEY_E)
+            self.host.Waitready(10,1000)
+            self.host.sendkeys(password)
+            self.host.Waitready(10,1000)
+            self.host.sendkeys(MAINFRAME_KEY_E)
+            self.host.Waitready(10,1000)
+            self.host.sendkeys(MAINFRAME_KEY_E)
+            self.host.Waitready(10,1000)
+            uidchk = self.host.WaitForText(userID, (6, 20,5000))
+            if uidchk == 4:
+                 self.host.Waitready(10,2000)
+                 self.host.sendkeys(password)
+                 self.host.Waitready(10,2000)
+                 self.host.sendkeys(MAINFRAME_KEY_ENTER)
+                 pwdchk = self.host.WaitForText(MAINFRAME_NOT_AUTHORISED, (02, 21,5000))
+                 if pwdchk.value:
+                    self.host.Waitready(10,2000)
+                    self.host.sendkeys(MAINFRAME_KEY_3)
+                    self.host.Waitready(10,2000)
+                    err_msg=MAINFRAME_LOGIN_FAIL
+                 else:
+                    self.host.Waitready(10,2000)
+                    self.host.sendkeys(MAINFRAME_KEY_ENTER)
+                    return_value = 1
+            else:
+                 self.host.Waitready(10,2000)
+                 self.host.sendkeys(MAINFRAME_KEY_3)
+                 log.info(MAINFRAME_WRONG_USERID)
+                 err_msg=MAINFRAME_WRONG_USERID
+        except Exception as e:
+            log.error("Error: Unable to login in to mainframe.")
+            log.error(e)
+            err_msg = "Error: Unable to login in to mainframe."
+            logger.print_on_console("Error: Unable to login in to mainframe.")
+        return (return_value == 1),output,err_msg
     def logoff(self,option):
         #Logic to Login to Bluezone Emulator goes here
         err_msg=None

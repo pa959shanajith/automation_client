@@ -1216,70 +1216,79 @@ class StepDescription:
 #==========================================================================================================#
 
     def mainframe(self,keyword,tsp,inputval,input,output,con,reporting_obj):
+        #-----------------------------------Added this step as input was returned as a string
+        if type(input) is str:                  #----checking if input is a string
+            if "," in input:                    #----checking if the string has a ","
+                listInput = input.split(",")        #--------spliting the input by checking for "," then store the result in list input
         def LaunchMainframe():
             print input
-            if len(inputval) == 2:
-                return "Launch Mainframe through emulator '" + inputval[1] + "' present in the path '" + inputval[0] +"'"
+            if len(listInput) == 2:
+                return "Launch Mainframe through emulator '" + listInput[1] + "' present in the path '" + listInput[0] +"'"
             else:
                 return "Launch mainframe failed due to insufficient parameter(s)"
 
         def Login():
-            if len(inputval) == 3:
-                return "Login to the Mainframe using Region : '"+inputval[0] + "' UserID : '"+inputval[1] + "' and Password : '"+inputval[2] + "'"
+            if len(listInput) == 3:
+                return "Login to the Mainframe using Region : '"+listInput[0] + "' UserID : '"+listInput[1] + "' and Password : '"+listInput[2] + "'"
             else:
-                return "failed failed due to insufficient parameter(s)"
+                return "Login failed due to insufficient parameter(s)"
+
+        def SecureLogin():
+            if len(listInput) == 3:
+                return "Login to the Mainframe using Region : '"+listInput[0] + "' UserID : '"+listInput[1] + "' and Password : '"+listInput[2] + "'"
+            else:
+                return "SecureLogin failed due to insufficient parameter(s)"
 
         def LogOff():
-            if len(inputval) == 1:
-                print len(inputval), "inputval:",inputval
-                return "Logoff from Mainframe using option'"+inputval[0] +"'"
+            if len(listInput) == 1:
+                return "Logoff from Mainframe using option'"+listInput +"'"
             else:
                 return "Logoff failed due to insufficient parameter(s)"
 
         def SendValue():
-            if len(inputval) == 1:
-                return "Enter value : '" + inputval[0] + "'"
+            if len(listInput) == 1:
+                return "Enter value : '" + listInput + "'"
             else:
                 return "SendValue failed due to insufficient parameter(s)"
 
         def SubmitJob():
-            if len(inputval) == 2:
-                return "Submit the job present in file : '" + inputval[0] + "' with member name '" + inputval[1] + "'"
+            if len(listInput) == 2:
+                return "Submit the job present in file : '" + listInput[0] + "' with member name '" + listInput[1] + "'"
             else:
                 return "SubmitJob failed due to insufficient parameter(s)"
         def JobStatus():
-            if len(inputval) == 1:
-                return "Status of the Job with the Job ID : '" + inputval[0] + "'" + "is '" + output + "'"
+            if len(listInput) == 1:
+                return "Status of the Job with the Job ID : '" + listInput[0] + "'" + "is '" + output + "'"
             else:
                 return "JobStatus failed due to insufficient parameter(s)"
 
         def SendFunctionKeys():
-            if len(inputval) == 1:
-                return "Execute Function key  : '" + inputval[0] + "'"
+            if len(listInput) == 1:
+                return "Execute Function key  : '" + listInput[0] + "'"
             else:
                 return "SendFunctionKeys failed due to insufficient parameter(s)"
 
         def GetText():
-            if len(inputval) == 3:
-                return "Get the text from row  : '" + inputval[0] + "'" + " column :'"+inputval[1] + "' of length : '" + inputval[2] +"'"
+            if len(listInput) == 3:
+                return "Get the text from row  : '" + listInput[0] + "'" + " column :'"+listInput[1] + "' of length : '" + listInput[2] +"'"
             else:
                 return "GetText failed due to insufficient parameter(s)"
 
         def SetText():
-            if len(inputval) == 3:
-                return "Enter the text '"+ inputval[2] + "' at row  : '" + inputval[0] + "'" + " column :'"+inputval[1] + "'"
+            if len(listInput) == 3:
+                return "Enter the text '"+ listInput[2] + "' at row  : '" + listInput[0] + "'" + " column :'"+listInput[1] + "'"
             else:
                 return "SetText failed due to insufficient parameter(s)"
 
         def SetCursor():
-            if len(inputval) == 2:
-                return "Set the cursor at at row  : '" + inputval[0] + "'" + " column :'"+inputval[1] + "'"
+            if len(listInput) == 2:
+                return "Set the cursor at at row  : '" + listInput[0] + "'" + " column :'"+listInput[1] + "'"
             else:
                 return "SetCursor failed due to insufficient parameter(s)"
 
         def VerifyTextExists():
-            if len(inputval) == 1:
-                return "Verify text : '" + inputval[0] + "'present in Emulator screen "
+            if len(listInput) == 1:
+                return "Verify text : '" + listInput[0] + "'present in Emulator screen "
             else:
                 return "VerifyTextExists failed due to insufficient parameter(s)"
         return locals()[keyword]()
