@@ -47,6 +47,7 @@ class OutlookKeywords:
             self.store=None
             #----------------------sendmail
             self.sendFlag=False
+            self.subjectFlag=False
             self.Msg=''
 
         def getOutlookComObj(self,optflag):
@@ -411,15 +412,18 @@ class OutlookKeywords:
             else:
                 input=input[0]
             if self.sendFlag==True:
-                try:
-                    MsgObj=self.Msg
-                    MsgObj.CC = input
-                    status=desktop_constants.TEST_RESULT_PASS
-                    method_output=desktop_constants.TEST_RESULT_TRUE
-                except Exception as e:
-                    error_msg="ERROR OCCURED "
-                    import traceback
-                    traceback.print_exc()
+                if len(input)>0:
+                    try:
+                        MsgObj=self.Msg
+                        MsgObj.CC = input
+                        status=desktop_constants.TEST_RESULT_PASS
+                        method_output=desktop_constants.TEST_RESULT_TRUE
+                    except Exception as e:
+                        error_msg="ERROR OCCURED "
+                        import traceback
+                        traceback.print_exc()
+                else:
+                    error_msg="Please set CC"
             else:
                 error_msg="Please set the to mail ID"
             return status,method_output,result,error_msg
@@ -435,15 +439,18 @@ class OutlookKeywords:
             else:
                 input=input[0]
             if self.sendFlag==True:
-                try:
-                    MsgObj=self.Msg
-                    MsgObj.BCC = input
-                    status=desktop_constants.TEST_RESULT_PASS
-                    method_output=desktop_constants.TEST_RESULT_TRUE
-                except Exception as e:
-                    error_msg="ERROR OCCURED "
-                    import traceback
-                    traceback.print_exc()
+                if len(input)>0:
+                    try:
+                        MsgObj=self.Msg
+                        MsgObj.BCC = input
+                        status=desktop_constants.TEST_RESULT_PASS
+                        method_output=desktop_constants.TEST_RESULT_TRUE
+                    except Exception as e:
+                        error_msg="ERROR OCCURED "
+                        import traceback
+                        traceback.print_exc()
+                else:
+                    error_msg="Please set BCC"
             else:
                 error_msg="Please set the to mail ID"
             return status,method_output,result,error_msg
@@ -456,17 +463,22 @@ class OutlookKeywords:
             MsgObj=''
             sendSubject=input[0]
             if len(sendSubject)==0:
-                sendSubject=" "
+                self.subjectFlag=False
+            else:
+                self.subjectFlag=True
             if self.sendFlag==True:
-                try:
-                    MsgObj=self.Msg
-                    MsgObj.Subject = sendSubject
-                    status=desktop_constants.TEST_RESULT_PASS
-                    method_output=desktop_constants.TEST_RESULT_TRUE
-                except Exception as e:
-                    error_msg="ERROR OCCURED "
-                    import traceback
-                    traceback.print_exc()
+                if self.subjectFlag==True:
+                    try:
+                        MsgObj=self.Msg
+                        MsgObj.Subject = sendSubject
+                        status=desktop_constants.TEST_RESULT_PASS
+                        method_output=desktop_constants.TEST_RESULT_TRUE
+                    except Exception as e:
+                        error_msg="ERROR OCCURED "
+                        import traceback
+                        traceback.print_exc()
+                else:
+                    error_msg="Please set the subject of the mail"
             else:
                 error_msg="Please set the to mail ID"
             return status,method_output,result,error_msg
@@ -479,15 +491,18 @@ class OutlookKeywords:
             MsgObj=''
             body=input[0]
             if self.sendFlag==True:
-                try:
-                    MsgObj=self.Msg
-                    MsgObj.Body = body
-                    status=desktop_constants.TEST_RESULT_PASS
-                    method_output=desktop_constants.TEST_RESULT_TRUE
-                except Exception as e:
-                    error_msg="ERROR OCCURED "
-                    import traceback
-                    traceback.print_exc()
+                if len(body)>0:
+                    try:
+                        MsgObj=self.Msg
+                        MsgObj.Body = body
+                        status=desktop_constants.TEST_RESULT_PASS
+                        method_output=desktop_constants.TEST_RESULT_TRUE
+                    except Exception as e:
+                        error_msg="ERROR OCCURED "
+                        import traceback
+                        traceback.print_exc()
+                else:
+                    error_msg="Please set the body of the mail"
             else:
                 error_msg="Please set the to mail ID"
             return status,method_output,result,error_msg
@@ -500,14 +515,51 @@ class OutlookKeywords:
             MsgObj=''
             Flg=True
             if self.sendFlag==True:
+                if len(input)>0:
+                    try:
+                        MsgObj=self.Msg
+                        for i in input:
+                            try:
+                                MsgObj.Attachments.Add(i)
+                            except:
+                                Flg=False
+                        if Flg==True:
+                            status=desktop_constants.TEST_RESULT_PASS
+                            method_output=desktop_constants.TEST_RESULT_TRUE
+                    except Exception as e:
+                        error_msg="ERROR OCCURED "
+                        import traceback
+                        traceback.print_exc()
+                else:
+                    error_msg="Please set the attachment path"
+            else:
+                error_msg="Please set the to mail ID"
+            return status,method_output,result,error_msg
+
+        def send_mail(self,input,*args):
+            status=desktop_constants.TEST_RESULT_FAIL
+            method_output=desktop_constants.TEST_RESULT_FALSE
+            result=OUTPUT_CONSTANT
+            error_msg=None
+            input=str(input[0]).lower().strip()
+            MsgObj=''
+            if self.sendFlag==True:
                 try:
                     MsgObj=self.Msg
-                    for i in input:
-                        try:
-                            MsgObj.Attachments.Add(i)
-                        except:
-                            Flg=False
-                    if Flg==True:
+                    if input =="ignore subject":
+                        d1,d2,d3,d4=self.send_subject(" ")
+                        if self.subjectFlag==True:
+                            MsgObj.Display()
+                            import time
+                            time.sleep(5)
+                            MsgObj.Send()
+                            status=desktop_constants.TEST_RESULT_PASS
+                            method_output=desktop_constants.TEST_RESULT_TRUE
+                    else:
+                        MsgObj.Display()
+                        import time
+                        time.sleep(5)
+                        MsgObj.Send()
                         status=desktop_constants.TEST_RESULT_PASS
                         method_output=desktop_constants.TEST_RESULT_TRUE
                 except Exception as e:
@@ -517,28 +569,3 @@ class OutlookKeywords:
             else:
                 error_msg="Please set the to mail ID"
             return status,method_output,result,error_msg
-
-        def send_mail(self,*args):
-            status=desktop_constants.TEST_RESULT_FAIL
-            method_output=desktop_constants.TEST_RESULT_FALSE
-            result=OUTPUT_CONSTANT
-            error_msg=None
-            MsgObj=''
-            if self.sendFlag==True:
-                try:
-                    MsgObj=self.Msg
-                    MsgObj.Display()
-                    import time
-                    time.sleep(5)
-                    MsgObj.Send()
-                    status=desktop_constants.TEST_RESULT_PASS
-                    method_output=desktop_constants.TEST_RESULT_TRUE
-                except Exception as e:
-                    error_msg="ERROR OCCURED "
-                    import traceback
-                    traceback.print_exc()
-            else:
-                error_msg="Please set the to mail ID"
-            return status,method_output,result,error_msg
-
-

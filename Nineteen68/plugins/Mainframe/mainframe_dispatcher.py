@@ -15,11 +15,18 @@ import mainframe_keywords
 import logger
 from mainframe_constants import *
 import logging
-
+import readconfig
+import constants
+import screenshot_keywords
 log = logging.getLogger('Dispatcher.py')
 
 class MainframeDispatcher:
+
     mainframe_obj=mainframe_keywords.MainframeKeywords()
+
+    def __init__(self):
+        self.exception_flag=''
+        self.action = None
 
     def dispatcher(self,teststepproperty,input):
         objectname = teststepproperty.objectname
@@ -32,6 +39,7 @@ class MainframeDispatcher:
         try:
             dict={'LaunchMainframe' : self.mainframe_obj.launch_mainframe,
                   'Login' : self.mainframe_obj.login,
+                  'SecureLogin' : self.mainframe_obj.secure_login,
                   'LogOff' : self.mainframe_obj.logoff,
                   'SendValue' : self.mainframe_obj.send_value,
                   'SubmitJob' : self.mainframe_obj.submit_job,
@@ -49,6 +57,19 @@ class MainframeDispatcher:
                 err_msg=INVALID_KEYWORD
                 logger.print_on_console(err_msg)
                 result[3]=err_msg
+            configobj = readconfig.readConfig()
+            configvalues = configobj.readJson()
+            screen_shot_obj = screenshot_keywords.Screenshot()
+            if self.action == constants.EXECUTE:
+                if result !=constants.TERMINATE:
+                    result=list(result)
+                    if configvalues['screenShot_Flag'].lower() == 'fail':
+                        if result[0].lower() == 'fail':
+                            file_path = screen_shot_obj.captureScreenshot()
+                            result.append(file_path[2])
+                    elif configvalues['screenShot_Flag'].lower() == 'all':
+                        file_path = screen_shot_obj.captureScreenshot()
+                        result.append(file_path[2])
         except Exception as e:
             log.error(e)
             import traceback
