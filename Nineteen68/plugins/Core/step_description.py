@@ -606,6 +606,7 @@ class StepDescription:
     def desktop(self,keyword,tsp,inputval,input,output,con,reporting_obj):
         #-----------------------------------Added this step as input was returned as a string
         if type(input) is str:                  #----checking if input is a string
+            listInput=[]
             if "," in input:                    #----checking if the string has a ","
                 listInput = input.split(",")        #--------spliting the input by checking for "," then store the result in list input
         #-----------------------------------------if  more than one dynamic variable is given as output , considers only the first one
@@ -716,14 +717,20 @@ class StepDescription:
         def SetToMailID():
             if len(listInput)>0:
                 input = ", ".join(listInput)
+            else:
+                input =str(inputval[0])
             return ' Set '+"'"+'To Mail ID'+"'"+' as '+"'"+input+"'"+'for the email and save the value in variable '+tsp.outputval+'.'
         def SetCC():
             if len(listInput)>0:
                 input = ", ".join(listInput)
+            else:
+                input =str(inputval[0])
             return ' Set '+"'"+'CC'+"'"+' as '+"'"+input+"'"+' for the email and save the value in variable '+tsp.outputval+'.'
         def SetBCC():
             if len(listInput)>0:
                 input = ", ".join(listInput)
+            else:
+                input =str(inputval[0])
             return ' Set '+"'"+'BCC'+"'"+' as '+"'"+input+"'"+' for the email and save the value in variable '+tsp.outputval+'.'
         def SetSubject():
             return ' Set '+"'"+'Subject'+"'"+' as '+"'"+input+"'"+' for the email and save the value in variable '+tsp.outputval+'.'
@@ -732,6 +739,8 @@ class StepDescription:
         def SetAttachments():
             if len(listInput)>0:
                 input = ", ".join(listInput)
+            else:
+                input =str(inputval[0])
             return ' Set attachment/attachments from the path '+"'"+input+"'"+' for the email and save the value in variable '+tsp.outputval+ '.'
         def SendEmail():
             return ' Send the email and save the value in variable '+tsp.outputval+ '.'
