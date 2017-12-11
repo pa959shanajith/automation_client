@@ -1226,6 +1226,7 @@ class StepDescription:
 
     def mainframe(self,keyword,tsp,inputval,input,output,con,reporting_obj):
         #-----------------------------------Added this step as input was returned as a string
+        listInput = input
         if type(input) is str:                  #----checking if input is a string
             if "," in input:                    #----checking if the string has a ","
                 listInput = input.split(",")        #--------spliting the input by checking for "," then store the result in list input
@@ -1249,14 +1250,14 @@ class StepDescription:
                 return "SecureLogin failed due to insufficient parameter(s)"
 
         def LogOff():
-            if len(listInput) == 1:
-                return "Logoff from Mainframe using option'"+listInput +"'"
+            if input is not None:
+                return "Logoff from Mainframe using option'"+input +"'"
             else:
                 return "Logoff failed due to insufficient parameter(s)"
 
         def SendValue():
-            if len(listInput) == 1:
-                return "Enter value : '" + listInput + "'"
+            if input is not None:
+                return "Enter value : '" + input + "'"
             else:
                 return "SendValue failed due to insufficient parameter(s)"
 
@@ -1266,20 +1267,20 @@ class StepDescription:
             else:
                 return "SubmitJob failed due to insufficient parameter(s)"
         def JobStatus():
-            if len(listInput) == 1:
-                return "Status of the Job with the Job ID : '" + listInput[0] + "'" + "is '" + output + "'"
+            if input is not None:
+                return "Status of the Job with the Job ID : '" + input + "'" + "is '" + output + "'"
             else:
                 return "JobStatus failed due to insufficient parameter(s)"
 
         def SendFunctionKeys():
-            if len(listInput) == 1:
+            if input is not None:
                 return "Execute Function key  : '" + listInput[0] + "'"
             else:
                 return "SendFunctionKeys failed due to insufficient parameter(s)"
 
         def GetText():
             if len(listInput) == 3:
-                return "Get the text from row  : '" + listInput[0] + "'" + " column :'"+listInput[1] + "' of length : '" + listInput[2] +"'"
+                return "Get the text from row  : '" + listInput[0] + "'" + " column :'"+listInput[1] + "' of length : '" + listInput[2] +"' and store the text '" + output + "' in " + tsp.outputval
             else:
                 return "GetText failed due to insufficient parameter(s)"
 
@@ -1296,8 +1297,8 @@ class StepDescription:
                 return "SetCursor failed due to insufficient parameter(s)"
 
         def VerifyTextExists():
-            if len(listInput) == 1:
-                return "Verify text : '" + listInput[0] + "'present in Emulator screen "
+            if input is not None:
+                return "Verify text : '" + input + "' present in Emulator screen "
             else:
                 return "VerifyTextExists failed due to insufficient parameter(s)"
         return locals()[keyword]()
