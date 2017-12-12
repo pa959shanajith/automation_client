@@ -5,15 +5,16 @@
 #Keyword Available to Automate :
 """         1. launch_mainframe - This keyword or action specifies the Tool to launch the emulator.
 #           2. login            - This keyword or action specifies the Tool to Login to the Mainframe Region using userID and password.
-#           3. logoff          - This keyword or action specifies the Tool to Log off from the Mainframe.
-#           4. set_text         - This keyword or action specifies the Tool to enter the text at the location specified by the user.
-#           5. send_value       - This keyword or action specifies the Tool to send the individual keystrokes to the location where the cursor is present at the point of execution.
-#           6. get_text         - This keyword or action specifies the Tool to fetch the text and save the results in the output variable.
-#           7. verify_text_exists - This keyword or action specifies the Tool to verify whether the given Text exists in the screen.
-#           8. submit_job       - This keyword or action specifies the Tool to submit the specified job to the mainframe and stores the Job ID in the output variable.
-#           9. job_status       - This keyword or action specifies the Tool to fetch the job status along with the Job ID based on "SubmitJob" output variable provided as input.
-#           10.send_function_keys - This keyword or action specifies the Tool to send the function keys to the application.
-#           11.set_cursor       - This keyword or action specifies the Tool to set the cursor at the specified location. The location is identified by the row and column mentioned in the input.
+#           3. secure_login     - This keyword or action specifies the Tool to Login to the Mainframe Region using userID and password (Using encrypted password).
+#           4. logoff          - This keyword or action specifies the Tool to Log off from the Mainframe.
+#           5. set_text         - This keyword or action specifies the Tool to enter the text at the location specified by the user.
+#           6. send_value       - This keyword or action specifies the Tool to send the individual keystrokes to the location where the cursor is present at the point of execution.
+#           7. get_text         - This keyword or action specifies the Tool to fetch the text and save the results in the output variable.
+#           8. verify_text_exists - This keyword or action specifies the Tool to verify whether the given Text exists in the screen.
+#           9. submit_job       - This keyword or action specifies the Tool to submit the specified job to the mainframe and stores the Job ID in the output variable.
+#           10. job_status       - This keyword or action specifies the Tool to fetch the job status along with the Job ID based on "SubmitJob" output variable provided as input.
+#           11.send_function_keys - This keyword or action specifies the Tool to send the function keys to the application.
+#           12.set_cursor       - This keyword or action specifies the Tool to set the cursor at the specified location. The location is identified by the row and column mentioned in the input.
 """
 # Author:      wasimakram.sutar
 # Created:     08-09-2016
@@ -52,7 +53,30 @@ class MainframeKeywords:
         self.keys = {
                     "enter" : "<Enter>",
                     "tab" : "<Tab>",
-                    "home" : "<Home>"
+                    "home" : "<Home>",
+                    "insert" : "<Insert>",
+                    "alt" : "<Alt>",
+                    "backspace" : "<Backspace>",
+                    "delete":"<Delete>",
+                    "end" : "<End>",
+                    "pageup" : "<PageUp>",
+                    "pagedown" : "<PageDown>",
+                    "ctrl" : "<Ctrl>",
+                    "capslock" : "<CapsLock>",
+                    "shift" : "<Shift>",
+                    "esc" : "<Esc>",
+                    "pf1" : "<F1>",
+                    "pf2" : "<F2>",
+                    "pf3" : "<F3>",
+                    "pf4" : "<F4>",
+                    "pf5" : "<F5>",
+                    "pf6" : "<F6>",
+                    "pf7" : "<F7>",
+                    "pf8" : "<F8>",
+                    "pf9" : "<F9>",
+                    "pf10" : "<F10>",
+                    "pf11" : "<F11>",
+                    "pf12" : "<F12>"
                     }
         self.logoff_options = {
                     "1": "Prints the data set and Logoff (Not recommended)",
@@ -180,7 +204,7 @@ class MainframeKeywords:
 
     def secure_login(self,inputs):
         """
-        method name : login
+        method name : secure_login
         inputs      : User can provide input value to login either from excel sheet or through dynamic variable.
                         1. region - Region to login into  emulator
                         2. userID - Userid to login into  emulator
