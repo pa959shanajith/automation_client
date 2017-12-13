@@ -385,17 +385,20 @@ class Controller():
         return index
     def split_input(self,input,keyword):
         ignore_status = False
-        staticNone='{#@#n_o_n_e#@#}'
         inpval = []
-        input_list=[]
         input_list = input[0].split(SEMICOLON)
         if IGNORE_THIS_STEP in input_list:
             ignore_status=True
         if keyword.lower() in [IF,ELSE_IF,EVALUATE]:
             inpval=self.dynamic_var_handler_obj.simplify_expression(input,keyword,self)
+        elif keyword == DISPALY_VARIABLE_VALUE:
+            for i in range(0,len(input_list)):
+                if input_list[i].find(STATIC_SEPARATOR) != -1:
+                    input_list[i] = input_list[i].replace(STATIC_SEPARATOR,SEMICOLON)
+            inpval = input_list
         elif keyword in DYNAMIC_KEYWORDS:
-            if staticNone in input[0]:
-                input[0]=input[0].replace(staticNone,'')
+            if STATIC_NONE in input[0]:
+                input[0]=input[0].replace(STATIC_NONE,'')
             string=input[0]
             index=string.find(';')
             if index >-1:
@@ -403,20 +406,23 @@ class Controller():
                 inpval.append(string[index+1:len(string)])
             elif string != '':
                 inpval.append(string)
+            for i in range(0,len(inpval)):
+                if inpval[i].find(STATIC_SEPARATOR) != -1:
+                    inpval[i] = inpval.replace(STATIC_SEPARATOR,SEMICOLON)
             if keyword.lower() not in [CREATE_DYN_VARIABLE]:
                 inpval[0]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[0],keyword,self)
             if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE]:
                 inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self)
         else:
             if keyword in WS_KEYWORDS or keyword == 'navigateToURL':
-                if staticNone in input[0]:
-                    input[0]=''
                 input_list=[input[0]]
             #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
             for x in input_list:
-                if staticNone in x:
+                if STATIC_NONE in x:
                     x=None
                 else:
+                    if x.find(STATIC_SEPARATOR) != -1:
+                        x = x.replace(STATIC_SEPARATOR,SEMICOLON)
                     x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
                 inpval.append(x)
         return inpval,ignore_status

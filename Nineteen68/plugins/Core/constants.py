@@ -396,7 +396,7 @@ COMPLETED='success'
 
 MULTIPLE_OUTPUT_KEYWORDS=['getSelected','split']
 
-GENERIC_KEYWORD='displayVariableValue'
+DISPALY_VARIABLE_VALUE='displayVariableValue'
 
 DATE_COMPARE='dateCompare'
 
@@ -410,4 +410,6 @@ ACTION_1 = 'loginToJira'
 
 ACTION_2 = 'createIssueInJira'
 
+STATIC_NONE= "{#@#n_o_n_e#@#}"
 
+STATIC_SEPARATOR= "{#@#s_e_m_i#@#}"

@@ -95,7 +95,7 @@ class Reporting:
             output = ','.join(output_list)
 
             #output=con.dynamic_var_handler_obj.replace_dynamic_variable(tsp.outputval,tsp.name,con)
-            if (tsp.name in MULTIPLE_OUTPUT_KEYWORDS and output != '' and output != None) or tsp.name==GENERIC_KEYWORD  :
+            if (tsp.name in MULTIPLE_OUTPUT_KEYWORDS and output != '' and output != None) or tsp.name==DISPALY_VARIABLE_VALUE:
                 output=tsp.additionalinfo
             apptype=tsp.apptype
             params=tsp.name,tsp,inputVal,input,output,con,self
