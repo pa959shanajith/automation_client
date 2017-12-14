@@ -71,7 +71,6 @@ class Delay_keywords:
         display_input=''
         try:
             if not (args is None or args is ''):
-                import time
                 input_list=list(args)
                 index=input_list.index(';')
                 values=input_list[0:index]

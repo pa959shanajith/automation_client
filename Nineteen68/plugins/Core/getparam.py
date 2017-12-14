@@ -440,18 +440,21 @@ class GetParam():
                 arr=[]
                 if teststepproperty.name.lower() in [IF,ELSE_IF]:
                     static_var_list=re.findall("\|(.*?)\|", inputvalstring)
-                    statDict={'{#@#n_o_n_e#@#}':None}
+                    statDict={}
+                    statDict[STATIC_NONE]=None
                     statCnt=0
                     for var in static_var_list:
                         inputresult=self.get_static_value(data,row,var)
                         #if isinstance(inputresult,ValueError):
                         #    return inputresult
                         if inputresult is None:
-                            resultinput = resultinput.replace('|'+var+'|','{#@#n_o_n_e#@#}')
+                            resultinput = resultinput.replace('|'+var+'|',STATIC_NONE)
                         else:
                             if isinstance(inputresult,float):
                                 if inputresult%1 == 0.0:
                                     inputresult= int(inputresult)
+                            elif inputresult.find(';') != -1:
+                                inputresult = inputresult.replace(';',STATIC_SEPARATOR)
                             temp='{#@#'+str(statCnt)+'#@#}'
                             statDict[temp]=inputresult
                             resultinput = resultinput.replace('|'+var+'|',temp)
@@ -479,12 +482,13 @@ class GetParam():
                                 #if isinstance(inputresult,ValueError):
                                 #    return inputresult
                                 if inputresult is None:
-                                    inputresult='{#@#n_o_n_e#@#}'
-                                    #inputresult=''
+                                    inputresult=STATIC_NONE
                                 else:
                                     if isinstance(inputresult,float):
                                         if inputresult%1 == 0.0:
                                             inputresult = int(inputresult)
+                                    elif inputresult.find(';') != -1:
+                                        inputresult = inputresult.replace(SEMICOLON,STATIC_SEPARATOR)
                                 resultinput = resultinput.replace(variable,str(inputresult))
                                 inputlistwithval.insert(i,resultinput)
         except Exception as e:

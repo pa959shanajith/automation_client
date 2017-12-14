@@ -383,22 +383,29 @@ class OutlookKeywords:
             self.sendFlag=False
             self.Msg=''
             MsgObj=''
+            failFlag=True
             outlookobj=self.getOutlookComObj(3)
             if len(input)>1:
                 input=";".join(input)
             else:
                 input=input[0]
-            try:
-                self.Msg = outlookobj.CreateItem(0)
-                MsgObj=self.Msg
-                MsgObj.To = input
-                self.sendFlag=True
-                status=desktop_constants.TEST_RESULT_PASS
-                method_output=desktop_constants.TEST_RESULT_TRUE
-            except Exception as e:
-                error_msg="ERROR OCCURED "
-                import traceback
-                traceback.print_exc()
+                if len(input)==0:
+                    failFlag=False
+            if failFlag==True:
+                try:
+                    self.Msg = outlookobj.CreateItem(0)
+                    MsgObj=self.Msg
+                    MsgObj.To = input
+                    self.sendFlag=True
+                    status=desktop_constants.TEST_RESULT_PASS
+                    method_output=desktop_constants.TEST_RESULT_TRUE
+                except Exception as e:
+                    error_msg="ERROR OCCURED "
+                    #import traceback
+                    #traceback.print_exc()
+            else:
+                error_msg="'To...' field is not set"
+                logger.print_on_console(error_msg)
             return status,method_output,result,error_msg
 
         def send_CC(self,input,*args):
@@ -420,8 +427,8 @@ class OutlookKeywords:
                         method_output=desktop_constants.TEST_RESULT_TRUE
                     except Exception as e:
                         error_msg="ERROR OCCURED "
-                        import traceback
-                        traceback.print_exc()
+                        #import traceback
+                        #traceback.print_exc()
                 else:
                     error_msg="Please set CC"
             else:
@@ -447,8 +454,8 @@ class OutlookKeywords:
                         method_output=desktop_constants.TEST_RESULT_TRUE
                     except Exception as e:
                         error_msg="ERROR OCCURED "
-                        import traceback
-                        traceback.print_exc()
+                        #import traceback
+                        #traceback.print_exc()
                 else:
                     error_msg="Please set BCC"
             else:
@@ -475,8 +482,8 @@ class OutlookKeywords:
                         method_output=desktop_constants.TEST_RESULT_TRUE
                     except Exception as e:
                         error_msg="ERROR OCCURED "
-                        import traceback
-                        traceback.print_exc()
+                        #import traceback
+                        #traceback.print_exc()
                 else:
                     error_msg="Please set the subject of the mail"
             else:
@@ -499,8 +506,8 @@ class OutlookKeywords:
                         method_output=desktop_constants.TEST_RESULT_TRUE
                     except Exception as e:
                         error_msg="ERROR OCCURED "
-                        import traceback
-                        traceback.print_exc()
+                        #import traceback
+                        #traceback.print_exc()
                 else:
                     error_msg="Please set the body of the mail"
             else:
@@ -528,8 +535,8 @@ class OutlookKeywords:
                             method_output=desktop_constants.TEST_RESULT_TRUE
                     except Exception as e:
                         error_msg="ERROR OCCURED "
-                        import traceback
-                        traceback.print_exc()
+                        #import traceback
+                        #traceback.print_exc()
                 else:
                     error_msg="Please set the attachment path"
             else:
@@ -564,8 +571,8 @@ class OutlookKeywords:
                         method_output=desktop_constants.TEST_RESULT_TRUE
                 except Exception as e:
                     error_msg="ERROR OCCURED "
-                    import traceback
-                    traceback.print_exc()
+                    #import traceback
+                    #traceback.print_exc()
             else:
                 error_msg="Please set the to mail ID"
             return status,method_output,result,error_msg
