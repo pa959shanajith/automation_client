@@ -391,11 +391,6 @@ class Controller():
             ignore_status=True
         if keyword.lower() in [IF,ELSE_IF,EVALUATE]:
             inpval=self.dynamic_var_handler_obj.simplify_expression(input,keyword,self)
-        elif keyword == DISPALY_VARIABLE_VALUE:
-            for i in range(0,len(input_list)):
-                if input_list[i].find(STATIC_SEPARATOR) != -1:
-                    input_list[i] = input_list[i].replace(STATIC_SEPARATOR,SEMICOLON)
-            inpval = input_list
         elif keyword in DYNAMIC_KEYWORDS:
             if STATIC_NONE in input[0]:
                 input[0]=input[0].replace(STATIC_NONE,'')
