@@ -117,32 +117,31 @@ class MainNamespace(BaseNamespace):
                 response = ast.literal_eval(core_utils_obj.unwrap(str(args[1])))
                 ice = ast.literal_eval(icesession)
                 plugins_list = response['plugins']
-                err_res=""
+                err_res = None
                 if(response['id'] != ice['ice_id'] and response['connect_time'] != ice['connect_time']):
                     err_res="Invalid response received"
                 if(response['res'] != 'success'):
-                    if(response.has_key('same_user')):
-                        err_res="Connection exists with same username"
-                    else:
-                        err_res="All ice sessions are in use"
+                    if(response.has_key('err_msg')):
+                        err_res=response['err_msg']
+                if(err_res is not None):
+                    wxObject.schedule.Disable()
+                    ##if socketIO != None:
+                    ##    log.info('Closing the socket')
+                    ##    socketIO.disconnect()
+                    ##    log.info(socketIO)
+                    logger.print_on_console(err_res)
+                    log.info(err_res)
                 else:
                     allow_connect = True
                     wxObject.connectbutton.SetBitmapLabel(wxObject.disconnect_img)
                     wxObject.connectbutton.SetName("disconnect")
                     wxObject.connectbutton.SetToolTip(wx.ToolTip("Disconnect from node Server"))
                     controller.disconnect_flag=False
-                if(len(err_res)!=0):
-                    wxObject.schedule.Disable()
-                    if socketIO != None:
-                        log.info('Closing the socket')
-                        socketIO.disconnect()
-                        log.info(socketIO)
-                    logger.print_on_console(err_res)
-                    log.info(err_res)
                 wxObject.connectbutton.Enable()
             except Exception as e:
                 logger.print_on_console('Error while checking connection request')
                 log.info('Error while checking connection request')
+                log.error(e)
 
     def on_webscrape(self,*args):
         global action,wxObject,browsername,desktopScrapeFlag,data
@@ -277,7 +276,6 @@ class MainNamespace(BaseNamespace):
     def on_qclogin(self, *args):
         con = controller.Controller()
         global qcdata
-        import json
         qcdata = args[0]
         con.get_all_the_imports('Qc')
         import QcController
@@ -400,6 +398,7 @@ class MainNamespace(BaseNamespace):
         except Exception as e:
             logger.print_on_console('Error while sending screenshot data')
             socketIO.emit('render_screenshot','fail')
+            log.error(e)
 
     def on_webCrawlerGo(self,*args):
         try:
@@ -407,16 +406,14 @@ class MainNamespace(BaseNamespace):
             con.get_all_the_imports('WebOccular')
             import weboccular
             wo = weboccular.Weboccular()
-
             args=list(args)
             global socketIO
 
             #args[0] is URL, args[1] is level, args[2] is agent
             wo.runCrawler(args[0],args[1],args[2],socketIO,wxObject)
-
         except Exception as e:
-            import traceback
-            traceback.print_exc()
+            logger.print_on_console('Error in Webocular')
+            log.error(e)
 
     def on_jiralogin(self,*args):
         try:
@@ -433,6 +430,7 @@ class MainNamespace(BaseNamespace):
                 obj.createIssue(data,socketIO)
         except Exception as e:
             logger.print_on_console('Exception in jira emit')
+            log.error(e)
 
     def on_update_screenshot_path(self,*args):
         spath=args[0]
@@ -471,11 +469,11 @@ class SocketThread(threading.Thread):
         key='USERNAME'
         if(not(os.environ.has_key(key))):
             key='USER'
-        username=os.environ[key]
+        username=str(os.environ[key]).lower()
         core_utils_obj = core_utils.CoreUtils()
-        icesession = "{'ice_id':'"+str(uuid.uuid4())+"','connect_time':'"+str(datetime.now())+"','username':'"+username.lower()+"'}"
+        icesession = "{'ice_id':'"+str(uuid.uuid4())+"','connect_time':'"+str(datetime.now())+"','username':'"+username+"'}"
         icesession_enc = core_utils_obj.wrap(icesession)
-        params={'username':username.lower(),'icesession':icesession_enc}
+        params={'username':username,'icesession':icesession_enc}
         socketIO = SocketIO(temp_server_IP,int(configvalues['server_port']),MainNamespace,verify= CERTIFICATE_PATH +'/server.crt',cert=(CERTIFICATE_PATH + '/client.crt', CERTIFICATE_PATH + '/client.key'),params=params)
         socketIO.wait()
 
@@ -704,8 +702,6 @@ class ClientWindow(wx.Frame):
         self.choice='Normal'
         global wxObject
         wxObject = self
-        curdir = os.getcwd()
-        ID_FILE_NEW = 1
         self.iconpath = IMAGES_PATH +"/slk.ico"
         self.connect_img=wx.Image(IMAGES_PATH +"/connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.disconnect_img=wx.Image(IMAGES_PATH +"/disconnect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
@@ -719,13 +715,9 @@ class ClientWindow(wx.Frame):
             logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename},disable_existing_loggers=False)
         except Exception as e:
             self.logfilename_error_flag = True
+            log.error(e)
 
         self.logger = logging.getLogger("Nineteen68")
-
-        """
-        #747 Screenshot path validity check (Himanshu)
-
-        """
         log.info('Started')
         requests_log = logging.getLogger("requests")
         requests_log.setLevel(logging.CRITICAL)
@@ -789,7 +781,7 @@ class ClientWindow(wx.Frame):
 ##        self.rbox.SetBackgroundColour('#9f64e2')
 
 ##        paly_img = wx.Image("play.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        terminate_img=wx.Image(IMAGES_PATH +"/terminate.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+##        terminate_img=wx.Image(IMAGES_PATH +"/terminate.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
 ##        step_img=wx.Image("step.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
 
 
@@ -807,7 +799,7 @@ class ClientWindow(wx.Frame):
         self.breakpoint.Disable()
 
 
-        killprocess_img = wx.Image(IMAGES_PATH +"/killStaleProcess.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+##        killprocess_img = wx.Image(IMAGES_PATH +"/killStaleProcess.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/killStaleProcess.png", wx.BITMAP_TYPE_ANY), wx.Point(360, 555), wx.Size(50, 42))
         self.cancelbutton.Bind(wx.EVT_LEFT_DOWN, self.OnExit)
         self.cancelbutton.SetToolTip(wx.ToolTip("To kill Stale process"))
@@ -881,7 +873,7 @@ class ClientWindow(wx.Frame):
     def onChecked_Schedule(self, e):
         mode=self.schedule.GetValue()
         global socketIO
-        socketIO.emit('reconnect',mode)
+        socketIO.emit('toggle_schedule',mode)
 
 
     def onRadioBox(self,e):
@@ -1043,6 +1035,7 @@ class ClientWindow(wx.Frame):
             self.clearbutton.Disable()
             self.connectbutton.Disable()
             self.rbox.Disable()
+            log.error(e)
 
     def killChildWindows(self):
         #Close the debug window
@@ -1126,7 +1119,6 @@ class DebugWindow(wx.Frame):
                    pos=(300, 150),  size=(200, 75) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
         ##style = wx.CAPTION|wx.CLIP_CHILDREN
-        curdir = os.getcwd()
         self.iconpath = IMAGES_PATH +"/slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
@@ -1139,9 +1131,9 @@ class DebugWindow(wx.Frame):
         ##self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
         ##self.rbox.SetBackgroundColour('#9f64e2')
 
-        paly_img = wx.Image(IMAGES_PATH +"/play.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        terminate_img=wx.Image(IMAGES_PATH +"/terminate.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        step_img=wx.Image(IMAGES_PATH +"/step.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        ##paly_img = wx.Image(IMAGES_PATH +"/play.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        ##terminate_img=wx.Image(IMAGES_PATH +"/terminate.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        ##step_img=wx.Image(IMAGES_PATH +"/step.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.continue_debugbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/play.png", wx.BITMAP_TYPE_ANY), (65, 15), (35, 28))
         self.continue_debugbutton.Bind(wx.EVT_LEFT_DOWN, self.Resume)
         self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution"))
