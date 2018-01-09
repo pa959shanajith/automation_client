@@ -436,9 +436,9 @@ class MainNamespace(BaseNamespace):
         spath=args[0]
         import constants
         if(platform.system()=='Darwin'):
-            spath=os.environ["NINETEEN68_HOME"]+"/screenshots"
-            if not os.path.exists(spath):
-                os.makedirs(spath)
+            spath=spath["mac"]
+        else:
+            spath=spath["default"]
         if os.path.exists(spath):
             constants.SCREENSHOT_PATH=spath
         else:
