@@ -862,8 +862,11 @@ class ClientWindow(wx.Frame):
         global socketIO
         logger.print_on_console('Disconnected from node server')
         if socketIO != None:
-            log.info('Closing the socket')
+            log.info('Sending Socket disconnect request')
+            socketIO.emit('unavailableLocalServer')
             socketIO.disconnect()
+            del socketIO
+            socketIO = None
         self.killDebugWindow()
         self.killScrapeWindow()
         self.Destroy()
@@ -880,14 +883,11 @@ class ClientWindow(wx.Frame):
         log.info('Event Triggered to Pause')
         controller.pause_flag=True
 
-
     def Resume(self, event):
         logger.print_on_console('Event Triggered to Resume Debug')
         log.info('Event Triggered to Resume Debug')
         controller.pause_flag=False
         self.mythread.resume(False)
-
-
 
     #----------------------------------------------------------------------
     def OnContinue(self, event):
