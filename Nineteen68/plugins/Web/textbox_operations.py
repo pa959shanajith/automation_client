@@ -397,24 +397,22 @@ class TextboxKeywords:
                     if input is not None:
                         readonly_value=webelement.get_attribute("readonly")
                         if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
-                            user_input=self.validate_input(webelement,input)
+                            encryption_obj = AESCipher()
+                            input_val = encryption_obj.decrypt(input)
+                            user_input=self.validate_input(webelement,input_val)
                             if user_input is not None:
-                                input=user_input
+                                input_val=user_input
                             if not(visibilityFlag and isvisble):
-                                encryption_obj = AESCipher()
-                                input_val = encryption_obj.decrypt(input)
                                 self.clear_text(webelement)
                                 log.debug('Sending the value via part 1')
                                 browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
                             else:
-                                encryption_obj = AESCipher()
-                                input_val = encryption_obj.decrypt(input)
                                 webelement.clear()
                                 configobj = readconfig.readConfig()
                                 configvalues = configobj.readJson()
                                 bit64 = configvalues['bit_64']
                                 if(isinstance(browser_Keywords.driver_obj,selenium.webdriver.Ie) and bit64.lower() == "yes"):
-                                    for i in range (0,len(input)+1):
+                                    for i in range (0,len(input_val)+1):
                                         browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val[0:i])
                                 else:
                                     webelement.send_keys(input_val)
