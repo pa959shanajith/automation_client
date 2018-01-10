@@ -252,6 +252,7 @@ class UtilOperations:
         import handler
         output=len(handler.tspList)
         return status,methodoutput,output,err_msg
+
     def getIndexCount(self,variable):
         try:
             variable = ast.literal_eval(variable)
@@ -266,7 +267,7 @@ class UtilOperations:
                 methodoutput=TEST_RESULT_TRUE
                 logger.print_on_console("getIndexCount has performed for Two-Dimensional Array")
             elif isinstance(variable,list):
-                output=len(variable)-1
+                output=len(variable)
                 status=TEST_RESULT_PASS
                 result=TEST_RESULT_TRUE
                 methodoutput=TEST_RESULT_TRUE
