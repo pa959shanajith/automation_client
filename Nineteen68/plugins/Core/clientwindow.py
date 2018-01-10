@@ -230,9 +230,7 @@ class MainNamespace(BaseNamespace):
         wxObject.choice=wxObject.rbox.GetStringSelection()
         print wxObject.choice,' is Selected'
         if wxObject.choice == 'Normal':
-            if wxObject.debugwindow != None:
-                wxObject.debugwindow.Close()
-                wxObject.debugwindow = None
+            wxObject.killDebugWindow()
 
         wxObject.debug_mode=False
         wxObject.breakpoint.Disable()
@@ -570,7 +568,6 @@ class TestThread(threading.Thread):
 
         self.start()    # start the thread
 
-
     #should just resume the thread
     def resume(self,debug_mode):
         if not(debug_mode):
@@ -595,11 +592,6 @@ class TestThread(threading.Thread):
                 self.wxObject.breakpoint.Disable()
                 if self.wxObject.choice in ['Stepwise','RunfromStep']:
                     self.debug_mode=True
-##                    self.wxObject.continue_debugbutton.Show()
-##                    self.wxObject.continuebutton.Show()
-##                    self.wxObject.continue_debugbutton.Enable()
-##                    self.wxObject.continuebutton.Enable()
-
                     if self.wxObject.choice=='RunfromStep':
                         self.wxObject.breakpoint.Enable()
                         try:
@@ -611,7 +603,6 @@ class TestThread(threading.Thread):
             else:
                 self.wxObject.rbox.Disable()
             self.wxObject.breakpoint.Disable()
-##            controller.kill_process()
             self.con = controller.Controller()
             self.wxObject.terminatebutton.Enable()
             self.con.configvalues=configvalues
@@ -630,28 +621,20 @@ class TestThread(threading.Thread):
                 status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO)
             logger.print_on_console('Execution status',status)
 
-
             if status==TERMINATE:
                 logger.print_on_console('---------Termination Completed-------')
 
-
-##            controller.kill_process()
             #Removed execute,debug button
-##            self.wxObject.debugbutton.Enable()
-##            self.wxObject.executebutton.Enable()
             self.wxObject.breakpoint.Clear()
             self.wxObject.rbox.Enable()
             self.wxObject.breakpoint.Enable()
             self.wxObject.cancelbutton.Enable()
             self.wxObject.terminatebutton.Disable()
-##            self.wxObject.continuebutton.Hide()
-##            self.wxObject.continue_debugbutton.Hide()
             self.wxObject.mythread=None
             import handler
             testcasename = handler.testcasename
             if self.action==DEBUG:
-                if self.wxObject.debugwindow != None:
-                    self.wxObject.debugwindow.Close()
+                self.wxObject.killDebugWindow()
                 if (len(testcasename) > 0 or apptype.lower() not in plugins_list):
                     socketIO.emit('result_debugTestCase',status)
                 else:
@@ -666,8 +649,7 @@ class TestThread(threading.Thread):
             status=TERMINATE
             if socketIO is not None:
                 if self.action==DEBUG:
-                    ##if self.wxObject.debugwindow != None:
-                    ##    self.wxObject.debugwindow.Close()
+                    self.wxObject.killDebugWindow()
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
                     socketIO.emit('result_executeTestSuite',status)
@@ -765,41 +747,20 @@ class ClientWindow(wx.Frame):
         self.schedule.SetToolTip(wx.ToolTip("Enable Scheduling Mode"))
         self.schedule.Bind(wx.EVT_CHECKBOX,self.onChecked_Schedule)
         self.schedule.Disable()
-##        self.schedule.Hide()
-
 
         box.Add(self.log, 1, wx.ALL|wx.EXPAND, 5)
-##        size=(90, 28)
 
         #Radio buttons
         lblList = ['Normal', 'Stepwise', 'RunfromStep']
         self.rbox = wx.RadioBox(self.panel,label = 'Debug options', pos = (10, 548), choices = lblList ,size=(300, 100),
         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
 
-##        self.Bind(wx.EVT_RADIOBUTTON, self.OnRadiogroup)
         self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
 ##        self.rbox.SetBackgroundColour('#9f64e2')
-
-##        paly_img = wx.Image("play.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-##        terminate_img=wx.Image(IMAGES_PATH +"/terminate.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-##        step_img=wx.Image("step.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-
-
-##        self.continue_debugbutton = wx.StaticBitmap(self.rbox, -1, wx.Bitmap("play.png", wx.BITMAP_TYPE_ANY), (75, 50), (35, 28))
-##        self.continue_debugbutton.Bind(wx.EVT_LEFT_DOWN, self.Resume)
-##        self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution"))
-##        self.continue_debugbutton.Hide()
-##        self.continuebutton = wx.StaticBitmap(self.rbox, -1, wx.Bitmap("step.png", wx.BITMAP_TYPE_ANY), (105, 50), (35, 28))
-##        self.continuebutton.Bind(wx.EVT_LEFT_DOWN, self.OnContinue)
-##        self.continuebutton.SetToolTip(wx.ToolTip("To Resume the execution "))
-##        self.continuebutton.Hide()
-
         self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(230, 598), size=(60,20), style = wx.TE_RICH)
         box.Add(self.breakpoint, 1, wx.ALL|wx.EXPAND, 5)
         self.breakpoint.Disable()
 
-
-##        killprocess_img = wx.Image(IMAGES_PATH +"/killStaleProcess.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/killStaleProcess.png", wx.BITMAP_TYPE_ANY), wx.Point(360, 555), wx.Size(50, 42))
         self.cancelbutton.Bind(wx.EVT_LEFT_DOWN, self.OnExit)
         self.cancelbutton.SetToolTip(wx.ToolTip("To kill Stale process"))
@@ -823,7 +784,6 @@ class ClientWindow(wx.Frame):
         sys.stdout=redir
         self.panel.SetSizer(self.sizer)
         self.Centre()
-        style = self.GetWindowStyle()
         self.Show()
 		#747 disable buttons if any flag raised (Himanshu)
         if (self.logfilename_error_flag):
@@ -883,28 +843,18 @@ class ClientWindow(wx.Frame):
         if self.choice == 'Normal':
             self.breakpoint.Clear()
             self.breakpoint.Disable()
-            if self.debugwindow != None:
-                self.debugwindow.Close()
-                self.debugwindow = None
+            self.killDebugWindow()
         self.debug_mode=False
         self.breakpoint.Disable()
         if self.choice in ['Stepwise','RunfromStep']:
             self.debug_mode=True
             ##if self.debugwindow == None:
             ##    self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
-            ##self.continue_debugbutton.Show()
-            ##self.continuebutton.Show()
             if self.choice=='RunfromStep':
                 self.breakpoint.Enable()
             else:
                 self.breakpoint.Clear()
                 self.breakpoint.Disable()
-            ##    if self.mythread==None:
-            ##        self.continue_debugbutton.Disable()
-            ##        self.continuebutton.Disable()
-            ##else:
-            ##    self.continuebutton.Hide()
-            ##    self.continue_debugbutton.Hide()
 
     def OnClose(self, event):
         controller.terminate_flag=True
@@ -914,22 +864,12 @@ class ClientWindow(wx.Frame):
         if socketIO != None:
             log.info('Closing the socket')
             socketIO.disconnect()
-            log.info(socketIO)
-        self.killChildWindows()
-        ##self.Close()
+        self.killDebugWindow()
+        self.killScrapeWindow()
         self.Destroy()
         controller.kill_process()
          # you may also do:  event.Skip()
          # since the default event handler does call Destroy(), too
-
-##    def closeScrapeWindow(self):
-##        global socketIO
-##        print 'SocketIO : ',socketIO
-##        if socketIO != None:
-##            log.info('Closing the socket')
-##            socketIO.disconnect()
-##            log.info(socketIO)
-##            self.new.Close()
 
     def OnExit(self, event):
         controller.kill_process()
@@ -939,8 +879,6 @@ class ClientWindow(wx.Frame):
         logger.print_on_console('Event Triggered to Pause')
         log.info('Event Triggered to Pause')
         controller.pause_flag=True
-        ##self.pausebutton.Hide()
-        ##self.continuebutton.Show()
 
 
     def Resume(self, event):
@@ -948,8 +886,6 @@ class ClientWindow(wx.Frame):
         log.info('Event Triggered to Resume Debug')
         controller.pause_flag=False
         self.mythread.resume(False)
-        ##self.continuebutton.Hide()
-        ##self.continue_debugbutton.Hide()
 
 
 
@@ -962,8 +898,6 @@ class ClientWindow(wx.Frame):
     def resume(self,debug_mode):
         controller.pause_flag=False
         self.mythread.resume(debug_mode)
-        ##self.continuebutton.Hide()
-        ##self.pausebutton.Show()
     #----------------------------------------------------------------------
     def OnTerminate(self, event, *args):
         if(len(args) > 0 and args[0]=="term_exec"):
@@ -973,7 +907,8 @@ class ClientWindow(wx.Frame):
         else:
             logger.print_on_console('---------Termination Started-------')
         controller.terminate_flag=True
-        self.killChildWindows()
+        self.killDebugWindow()
+        self.killScrapeWindow()
         #Handling the case where user clicks terminate when the execution is paused
         #Resume the execution
         if controller.pause_flag:
@@ -1037,20 +972,22 @@ class ClientWindow(wx.Frame):
             self.rbox.Disable()
             log.error(e)
 
-    def killChildWindows(self):
+    def killDebugWindow(self):
         #Close the debug window
         try:
-            if self.debugwindow != None:
+            if (self.debugwindow != None) and (bool(self.debugwindow) != False):
                 self.debugwindow.Close()
-                self.debugwindow = None
+            self.debugwindow = None
         except Exception as e:
             log.error("Error while killing debug window")
             log.error(e)
+
+    def killScrapeWindow(self):
         #Close the scrape window
         try:
-            if self.new != None:
+            if (self.new != None) and (bool(self.new) != False):
                 self.new.Close()
-                self.new = None
+            self.new = None
         except Exception as e:
             log.error("Error while killing scrape window")
             log.error(e)
@@ -1123,25 +1060,13 @@ class DebugWindow(wx.Frame):
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         self.panel = wx.Panel(self)
-        #Radio buttons
-        ##lblList = ['Normal', 'Stepwise', 'RunfromStep']
-        ##self.rbox = wx.RadioBox(self.panel,label = 'Debug options', pos = (10, 548), choices = lblList ,size=(300, 100),
-        ##majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        ##self.Bind(wx.EVT_RADIOBUTTON, self.OnRadiogroup)
-        ##self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
-        ##self.rbox.SetBackgroundColour('#9f64e2')
 
-        ##paly_img = wx.Image(IMAGES_PATH +"/play.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        ##terminate_img=wx.Image(IMAGES_PATH +"/terminate.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        ##step_img=wx.Image(IMAGES_PATH +"/step.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.continue_debugbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/play.png", wx.BITMAP_TYPE_ANY), (65, 15), (35, 28))
         self.continue_debugbutton.Bind(wx.EVT_LEFT_DOWN, self.Resume)
         self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution"))
-        ##self.continue_debugbutton.Hide()
         self.continuebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/step.png", wx.BITMAP_TYPE_ANY), (105, 15), (35, 28))
         self.continuebutton.Bind(wx.EVT_LEFT_DOWN, self.OnContinue)
         self.continuebutton.SetToolTip(wx.ToolTip("To Resume the execution "))
-        ##self.continuebutton.Hide()
         self.Centre()
         style = self.GetWindowStyle()
         self.SetWindowStyle( style|wx.STAY_ON_TOP )
@@ -1155,8 +1080,6 @@ class DebugWindow(wx.Frame):
         wxObject.mythread.resume(False)
         self.Close()
         wxObject.debugwindow = None
-        ##self.continuebutton.Hide()
-        ##self.continue_debugbutton.Hide()
 
     #----------------------------------------------------------------------
     def OnContinue(self, event):

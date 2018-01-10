@@ -33,7 +33,7 @@ class AESCipher:
 
     def encrypt( self, raw ):
         try:
-            if not (raw is None and raw is ''):
+            if not (raw is None or raw is ''):
                 raw = pad(raw)
                 cipher = AES.new( self.key, AES.MODE_ECB)
                 return base64.b64encode(cipher.encrypt( raw ) )
@@ -42,12 +42,11 @@ class AESCipher:
                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
         except Exception as e:
             log.error(e)
-            
             logger.print_on_console(e)
 
     def decrypt( self, enc ):
         try:
-            if not (enc is None and enc is ''):
+            if not (enc is None or enc is ''):
                 enc = base64.b64decode(enc)
                 cipher = AES.new(self.key, AES.MODE_ECB )
                 return unpad(cipher.decrypt( enc))
@@ -56,12 +55,11 @@ class AESCipher:
                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
         except Exception as e:
             log.error(e)
-            
             logger.print_on_console(e)
 
     def encrypt_md5(self,input):
         try:
-            if not (input is None and input is ''):
+            if not (input is None or input is ''):
                 encrypted_md5_output = hashlib.md5(input.encode("utf")).hexdigest()
                 return encrypted_md5_output
             else:
@@ -69,12 +67,11 @@ class AESCipher:
                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
         except Exception as e:
             log.error(e)
-            
             logger.print_on_console(e)
 
     def encrypt_base64(self,input):
         try:
-            if not (input is None and input is ''):
+            if not (input is None or input is ''):
                 encrypted_base64_output  = base64.b64encode(input)
                 return encrypted_base64_output
             else:
@@ -82,13 +79,12 @@ class AESCipher:
                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
         except Exception as e:
             log.error(e)
-            
             logger.print_on_console(e)
 
     def fieldEncrypt(self,input,*args):
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
-        if not (input is None and input is ''):
+        if not (input is None or input is ''):
             try:
                 encryptedValue=self.encrypt(input)
                 logger.print_on_console('field encrypt')
@@ -101,7 +97,7 @@ class AESCipher:
     def fieldDecrypt(self,input,*args):
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
-        if not (input is None and input is ''):
+        if not (input is None or input is ''):
             try:
                 decryptedValue=self.decrypt(input)
                 logger.print_on_console('field Decrypt')
