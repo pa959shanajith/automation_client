@@ -47,8 +47,7 @@ class Highlight():
             try:
                 if currentdriverhandle!= None:
                     driver.switch_to.window(currentdriverhandle)
-                else:
-                    driver.switch_to.default_content()
+                driver.switch_to.default_content()
             except Exception as e4:
                 evb = e4
 
@@ -142,8 +141,7 @@ class Highlight():
                 try:
                     if currentdriverhandle!= None:
                         driver.switch_to.window(currentdriverhandle)
-                    else:
-                        driver.switch_to.default_content()
+                    driver.switch_to.default_content()
                 except Exception as e4:
                     evb = e4
 ##                driver.switch_to.default_content()
@@ -160,7 +158,16 @@ class Highlight():
                         if j=='':
                             continue
 ##                        print 'Driver url befor switch :', driver.current_url
-                        driver.switch_to.frame(driver.find_elements_by_tag_name(frame_iframe)[int(j)])
+                        try:
+                            if (driver.find_elements_by_tag_name(frame_iframe)[int(j)]).is_displayed():
+                                driver.switch_to.frame(driver.find_elements_by_tag_name(frame_iframe)[int(j)])
+                                log.info('Switched to frame/iframe')
+                            else:
+                                log.info('Can\'t highlight because frame/iframe is not displayed')
+                                break
+                        except Exception as e:
+                            log.info("exception occurred while switching into frame/iframe in highlight")
+                            evb = e
 ##                        print 'Driver urlafter switch:', driver.current_url
                         log.info('Switched to frame/iframe')
 
@@ -218,8 +225,7 @@ class Highlight():
                 try:
                     if currentdriverhandle!= None:
                         driver.switch_to.window(currentdriverhandle)
-                    else:
-                        driver.switch_to.default_content()
+                    driver.switch_to.default_content()
                 except Exception as e4:
                     evb = e4
 
@@ -227,8 +233,7 @@ class Highlight():
                 try:
                     if currentdriverhandle!= None:
                         driver.switch_to.window(currentdriverhandle)
-                    else:
-                        driver.switch_to.default_content()
+                    driver.switch_to.default_content()
                 except Exception as e4:
                     evb = e4
                 try:
@@ -280,8 +285,7 @@ class Highlight():
                     try:
                         if currentdriverhandle!= None:
                             driver.switch_to.window(currentdriverhandle)
-                        else:
-                            driver.switch_to.default_content()
+                        driver.switch_to.default_content()
                     except Exception as e4:
                         evb = e4
                 else:
