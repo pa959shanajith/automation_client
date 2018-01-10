@@ -76,8 +76,12 @@ class Fullscrape():
                 cond_flag = False
                 log.info('Splitting Iframe/frame url by /')
                 indiframes = mypath.split("/")
+                # switching to focused tab
                 driver.switch_to.window(currenthandle)
-                log.info(' Switched to current window handle')
+                log.info('Switched to current window handle')
+                # switching to outer page of the focused tab
+                driver.switch_to_default_content()
+                log.info('Switched to default content')
                 for i in indiframes:
                     if i is not '':
                         frame_iframe = domconstants.IFRAME
@@ -88,7 +92,7 @@ class Fullscrape():
                         else:
                             log.info('It is iframe')
                         try:
-                            if (driver.find_elements_by_tag_name(frame_iframe)[int(j)]).is_displayed():
+                            if (driver.find_elements_by_tag_name(frame_iframe)[int(j)]):
                                 driver.switch_to.frame(driver.find_elements_by_tag_name(frame_iframe)[int(j)])
                                 log.info('MSG: Switched to frame/iframe')
                                 cond_flag = True
@@ -182,66 +186,66 @@ class Fullscrape():
                     #custom switchtoframe:
                     path = myipath + str(iframes) + 'f' +  '/'
                     pathlist.append(path)
-                    if switchtoframe_scrape1(path):
-                        if pathlist.count(path) == 1:
+                    if pathlist.count(path) == 1:
+                        if switchtoframe_scrape1(path):
                             temp = driver.execute_script(javascript_scrape, path)
                             if temp is not None:
                                 log.info('full scrape operation on frame page is done and data is obtained')
                                 tempne.extend(temp)
-                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
-                            inpath = path + str(frames) + 'i' +  '/'
-                            pathlist.append(inpath)
-                            if switchtoframe_scrape1(inpath):
+                            for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                                inpath = path + str(frames) + 'i' +  '/'
+                                pathlist.append(inpath)
                                 if pathlist.count(inpath) == 1:
-                                    itemp = driver.execute_script(javascript_scrape, inpath)
-                                    if itemp is not None:
-                                        log.info('full scrape operation on iframe page is done and data is obtained')
-                                        tempne.extend(itemp)
-                            callback_scrape2(inpath, tempne)
-                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
-                            inpath = path + str(frames) + 'f' +  '/'
-                            pathlist.append(inpath)
-                            if switchtoframe_scrape1(inpath):
+                                    if switchtoframe_scrape1(inpath):
+                                            itemp = driver.execute_script(javascript_scrape, inpath)
+                                            if itemp is not None:
+                                                log.info('full scrape operation on iframe page is done and data is obtained')
+                                                tempne.extend(itemp)
+                                    callback_scrape2(inpath, tempne)
+                            for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                                inpath = path + str(frames) + 'f' +  '/'
+                                pathlist.append(inpath)
                                 if pathlist.count(inpath) == 1:
-                                    itemp = driver.execute_script(javascript_scrape, inpath)
-                                    if itemp is not None:
-                                        log.info(' full scrape operation on frame page is done and data is obtained')
-                                        tempne.extend(itemp)
-                            callback_scrape1(inpath, tempne)
-                        callback_scrape2(path, tempne)
+                                    if switchtoframe_scrape1(inpath):
+                                            itemp = driver.execute_script(javascript_scrape, inpath)
+                                            if itemp is not None:
+                                                log.info(' full scrape operation on frame page is done and data is obtained')
+                                                tempne.extend(itemp)
+                                    callback_scrape1(inpath, tempne)
+                            callback_scrape2(path, tempne)
                 for iframes in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
                     # check if it is really a valid iframe before performing any further actions!
     ##                            if (driver.find_elements_by_tag_name('iframe')[iframes]).is_displayed():
                     #custom switchtoframe:
                     path = myipath + str(iframes) + 'i' +  '/'
                     pathlist.append(path)
-                    if switchtoframe_scrape1(path):
-                        if pathlist.count(path) == 1:
+                    if pathlist.count(path) == 1:
+                        if switchtoframe_scrape1(path):
                             temp = driver.execute_script(javascript_scrape, path)
                             if temp is not None:
                                 log.info('full scrape operation on frame page is done and data is obtained')
                                 tempne.extend(temp)
-                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
-                            inpath = path + str(frames) + 'i' +  '/'
-                            pathlist.append(inpath)
-                            if switchtoframe_scrape1(inpath):
+                            for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                                inpath = path + str(frames) + 'i' +  '/'
+                                pathlist.append(inpath)
                                 if pathlist.count(inpath) == 1:
-                                    itemp = driver.execute_script(javascript_scrape, inpath)
-                                    if itemp is not None:
-                                        log.info('full scrape operation on iframe page is done and data is obtained')
-                                        tempne.extend(itemp)
-                            callback_scrape2(inpath, tempne)
-                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
-                            inpath = path + str(frames) + 'f' +  '/'
-                            pathlist.append(inpath)
-                            if switchtoframe_scrape1(inpath):
+                                    if switchtoframe_scrape1(inpath):
+                                            itemp = driver.execute_script(javascript_scrape, inpath)
+                                            if itemp is not None:
+                                                log.info('full scrape operation on iframe page is done and data is obtained')
+                                                tempne.extend(itemp)
+                                    callback_scrape2(inpath, tempne)
+                            for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                                inpath = path + str(frames) + 'f' +  '/'
+                                pathlist.append(inpath)
                                 if pathlist.count(inpath) == 1:
-                                    itemp = driver.execute_script(javascript_scrape, inpath)
-                                    if itemp is not None:
-                                        log.info(' full scrape operation on frame page is done and data is obtained')
-                                        tempne.extend(itemp)
-                            callback_scrape1(inpath, tempne)
-                        callback_scrape2(path, tempne)
+                                    if switchtoframe_scrape1(inpath):
+                                            itemp = driver.execute_script(javascript_scrape, inpath)
+                                            if itemp is not None:
+                                                log.info(' full scrape operation on frame page is done and data is obtained')
+                                                tempne.extend(itemp)
+                                    callback_scrape1(inpath, tempne)
+                            callback_scrape2(path, tempne)
 
             def fullpage_screenshot(driver, screen_shot_path):
                 try:
@@ -317,6 +321,7 @@ class Fullscrape():
                 callback_scrape2('', tempne)
                 log.info('full scrape operation on iframe/frame pages is completed')
                 driver.switch_to.window(currenthandle)
+                driver.switch_to_default_content()
             tempne = json.dumps(tempne)
             tempne = json.loads(tempne)
             new_obj=[]

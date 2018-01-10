@@ -62,7 +62,6 @@ class BrowserOperations():
             log.info('No popup found')
         try:
             win_handles=driver.window_handles
-            print win_handles
             if len(win_handles)>0:
                 driver.switch_to_window(win_handles[-1])
         except:
