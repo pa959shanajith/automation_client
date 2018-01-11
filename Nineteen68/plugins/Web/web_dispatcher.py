@@ -254,7 +254,7 @@ class Dispatcher:
                   'mouseClick':self.util_object.mouse_click,
                   'verifyWebImages':self.util_object.verify_web_images,
                   'waitForElementVisible':self.element_object.waitforelement_visible,
-                  'selectByAbsoluteValue':self.util_object.selectByAbsoluteValue,
+                  'selectbyAbsoluteValue':self.util_object.selectByAbsoluteValue,
 
 
                   'openBrowser':self.browser_object.openBrowser,
