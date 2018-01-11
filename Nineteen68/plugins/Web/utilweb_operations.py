@@ -902,6 +902,7 @@ class UtilWebKeywords:
                             internal_val = iList[i].text
                             temp.append(internal_val)
                         if (inp_val in temp):
+                            select.select_by_visible_text(inp_val)
                             status=webconstants.TEST_RESULT_PASS
                             result=webconstants.TEST_RESULT_TRUE
                             log.info('Values Match')
