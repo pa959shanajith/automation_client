@@ -233,22 +233,34 @@ class BrowserOperations():
                 if input_list[1] == 'wifi':
                     self.wifi_connect()
                 else :
+                    from decimal import *
+                    import subprocess
                     global driver
                     self.start_server()
 
                     time.sleep(5)
                     desired_caps = {}
                     desired_caps['platformName'] = 'Android'
-                    ##desired_caps['platformVersion'] =input_list[1]
+                    desired_caps['platformVersion'] =input_list[1]
                     desired_caps['deviceName'] = input_list[0]
                     desired_caps['udid'] = input_list[0]
                     desired_caps['browserName'] = 'Chrome'
                     ##desired_caps['appium-version'] = '1.4.0'
                     desired_caps['clearSystemFiles']=True
                     desired_caps['newCommandTimeout'] = '36000'
-                    driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
-                    logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
-                    driver.get(domconstants_MW.BLANK_PAGE)
+                    device_version= subprocess.check_output(["adb", "shell", "getprop ro.build.version.release"])
+                    if Decimal(input_list[1]) == Decimal(device_version):
+                        driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
+                        logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
+                        driver.get(domconstants_MW.BLANK_PAGE)
+                        logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
+                        status = domconstants_MW.STATUS_SUCCESS
+                    else:
+                        logger.log('Invalid Input')
+                        mobile_key_objects.custom_msg.append("Invalid Input")
+                        status = domconstants_MW.STATUS_FAIL
+                        logger.print_on_console("Invalid Input")
+
             ##            p = psutil.Process(driver.service.process.pid)
             ##            # logging.warning(p.get_children(recursive=True))
             ##            pidchrome = p.children()[0]
@@ -257,8 +269,7 @@ class BrowserOperations():
             ##            global hwndg
             ##            hwndg = util.bring_Window_Front(pidchrome.pid)
             ##            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Using Pid handle is obtained')
-                    logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
-                    status = domconstants_MW.STATUS_SUCCESS
+
        except Exception as e:
             mobile_key_objects.custom_msg.append("ERROR OCURRED WHILE OPENING BROWSER")
             status = domconstants_MW.STATUS_FAIL
