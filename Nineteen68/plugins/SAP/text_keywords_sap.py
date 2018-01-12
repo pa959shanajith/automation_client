@@ -50,7 +50,7 @@ class Text_Keywords():
                   err_msg = sap_constants.ERROR_MSG
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            Exceptions.error(e)
+            log.error(e)
             logger.print_on_console('Error occured in getText and is a :',e)
         return status,result,value,err_msg
 

@@ -230,33 +230,39 @@ class Launch_Keywords():
 
     def set_to_foreground(self):
         try:
-            aut_handle=window_handle
-            if aut_handle> 0:
-                foreground=win32gui.GetForegroundWindow()
-                application_pid=win32process.GetWindowThreadProcessId(aut_handle)
-                foreground_pid=win32process.GetWindowThreadProcessId(foreground)
-                if application_pid!=foreground_pid:
-                    process_id=    win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
-                    i= win32gui.GetWindowRect(aut_handle)
-                    pid = self.get_window_pid(window_name)
-                    rect = self.getParentRectangle(pid,window_name)
-                    if i[0] <= -32000:
-                        fg_thread, fg_process = win32process.GetWindowThreadProcessId(foreground)
-                        aut_thread, aut_process = win32process.GetWindowThreadProcessId(aut_handle)
-                        win32process.AttachThreadInput(aut_thread, fg_thread, True)
-                        self.bring_to_top(aut_handle,5)
-                        return True
-                    else:
-                        self.bring_to_top(aut_handle,5)
-                        self.hide_always_on_top_windows()
-                        win32gui.SetForegroundWindow(aut_handle)
-                        return True
-                else:
-                    self.bring_to_top(aut_handle,5)
-                    return True
+            app = Application()
+            app.connect(handle=window_handle)
+            app_dialog = app.top_window_()
+            app_dialog.Minimize()
+            app_dialog.Restore()
+            pid = self.get_window_pid(window_name)
+            rect = self.getParentRectangle(pid,window_name)
+##            aut_handle=window_handle
+##            if aut_handle> 0:
+##                foreground=win32gui.GetForegroundWindow()
+##                application_pid=win32process.GetWindowThreadProcessId(aut_handle)
+##                foreground_pid=win32process.GetWindowThreadProcessId(foreground)
+##                if application_pid!=foreground_pid:
+##                    process_id=win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
+##                    i= win32gui.GetWindowRect(aut_handle)
+##                    pid = self.get_window_pid(window_name)
+##                    rect = self.getParentRectangle(pid,window_name)
+##                    if i[0] <= -32000:
+##                        fg_thread, fg_process = win32process.GetWindowThreadProcessId(foreground)
+##                        aut_thread, aut_process = win32process.GetWindowThreadProcessId(aut_handle)
+##                        win32process.AttachThreadInput(aut_thread, fg_thread, True)
+##                        self.bring_to_top(aut_handle,5)
+##                        return True
+##                    else:
+##                        self.bring_to_top(aut_handle,5)
+##                        self.hide_always_on_top_windows()
+##                        win32gui.SetForegroundWindow(aut_handle)
+##                        return True
+##                else:
+##                    self.bring_to_top(aut_handle,5)
+##                    return True
         except Exception as e:
             err_msg = desktop_constants.ERROR_MSG
-
         return False
 
     def hide_always_on_top_windows(self):
@@ -305,7 +311,6 @@ class Launch_Keywords():
                         tup_list.append(i)
                         min_val = min(x[1] for x in tup_list)
                         max_val = max(b for b in tup_list if b[1] == min_val)
-                        global win_rect
                         if winname==win32gui.GetWindowText(hwnd):
                             win_rect = max_val
                             compFlag =0

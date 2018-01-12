@@ -148,7 +148,7 @@ class OutlookKeywords:
                 error_msg=None
                 self.senderEmail=input[0]
                 self.subject=input[2]
-                self.toMail=input[1]
+                self.toMail=input[1].strip()
                 #clearing all the variables before fetching the values
                 self.Subject=''
                 self.ToMailID=''

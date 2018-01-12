@@ -38,9 +38,9 @@ class Scrape:
         window_name=desktop_launch_keywords.window_name
         app_uia=desktop_launch_keywords.app_uia
         obj = desktop_launch_keywords.Launch_Keywords()
-        obj.set_to_foreground()
         obj.bring_Window_Front()
         if operation == 'STARTCLICKANDADD':
+            obj.set_to_foreground()
             global view
             view = []
             try:
@@ -103,9 +103,9 @@ class Scrape:
                             a = ''
                             ne = []
                             obj = desktop_launch_keywords.Launch_Keywords()
-                            obj.set_to_foreground()
+                            #obj.set_to_foreground()
                             obj.bring_Window_Front()
-                            winrect = desktop_launch_keywords.win_rect;
+                            winrect = desktop_launch_keywords.win_rect
                             scrape_obj=Scrape()
                             a =  scrape_obj.get_all_children(ch,ne,0,'',win,winrect)
                             #import json

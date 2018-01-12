@@ -127,7 +127,7 @@ class ElementKeywords():
             logger.print_on_console('Error occoured in getTooltipText and is :',e)
         return status,result,value,err_msg
 
-    def verifyTooltipText(self, sap_id,*args):
+    def verifyTooltipText(self, sap_id,input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -135,25 +135,24 @@ class ElementKeywords():
         err_msg=None
         id,ses=self.uk.getSapElement(sap_id)
         elem = ses.FindById(id)
-        input_val=args[1]
         try:
             #------------------------------Condition to check if its a table element
             if(elem.type=='GuiTableControl'):
-                arg=args[0]
-                if(len(arg)==1 and arg[0]==''):
-                    pass
-                elif len(arg)==3 :
-                    row=int(arg[0])-1
-                    col=int(arg[1])-1
-                    input_val=arg[2]
+                if len(input_val) == 3:
+                    row = int(input_val[0])-1
+                    col = int(input_val[1])-1
+                    input_val = input_val[2]
                     elem = elem.GetCell(row, col)
+                elif len(input_val) == 1:
+                    pass
                 else:
-                    elem=None
+                    id=None
                     logger.print_on_console('Invalid Arguments Passed')
+            else:
+                input_val = input_val[0]
             #--------------------changing Null to ''
             if input_val.strip()=="Null":
                 input_val=''
-            #------------------------------Condition to check if its a table element
             if(id != None):
                 if input_val.strip()==elem.tooltip.strip() or input_val.strip()==elem.DefaultTooltip.strip():
                     status=sap_constants.TEST_RESULT_PASS
@@ -167,7 +166,7 @@ class ElementKeywords():
 
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console('Error occoured in verifyTooltipText and is :',e)
+            logger.print_on_console('Error occoured in verifyTooltipText')
         return status,result,value,err_msg
 
     def getIconName(self, sap_id,*args):

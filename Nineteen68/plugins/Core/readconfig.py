@@ -53,6 +53,7 @@ class readConfig():
         configvalues['displayVariableTimeOut'] = params['displayVariableTimeOut']
         configvalues['retrieveURL']=params['retrieveURL']
         configvalues['delay']=params['delay']
+        configvalues['ignoreVisibilityCheck']=params['ignoreVisibilityCheck']
         return configvalues
 ##        Config=readConfig(node_ip,node_port,screenShot_PathName,ignore_certificate,chrome_path,bit_64,logFile_Path,screenShot_Flag,queryTimeOut,timeOut,stepExecutionWait)
 
