@@ -62,11 +62,11 @@ class SapUtilKeywords:
                 i = sap_id.index("/")
                 #-----------------------------------------------------
             id = wndId + sap_id[i:]
-            return id,ses
         except Exception as e:
             logger.print_on_console( 'No instance open error :',e)
         except AttributeError as e1:
             logger.print_on_console( ' Attribute  error :',e1)
+        return id,ses
 
 
     def verifyEnabled(self, sap_id, *args):
