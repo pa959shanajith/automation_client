@@ -233,7 +233,7 @@ class BrowserOperations():
                 if input_list[1] == 'wifi':
                     self.wifi_connect()
                 else :
-                    from decimal import *
+                    from decimal import Decimal
                     import subprocess
                     global driver
                     self.start_server()
