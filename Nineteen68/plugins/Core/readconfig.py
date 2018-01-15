@@ -19,45 +19,33 @@ import os
 
 class readConfig():
 
-##    def __init__(self,node_ip,node_port,screenShot_PathName,ignore_certificate,chrome_path,bit_64,logFile_Path,screenShot_Flag,queryTimeOut,timeOut,stepExecutionWait):
-##        self.node_ip=node_ip
-##        self.node_port=node_port
-##        self.screenShot_PathName=screenShot_PathName
-##        self.ignore_certificate=ignore_certificate
-##        self.chrome_path=chrome_path
-##        self.bit_64=bit_64
-##        self.logFile_Path=logFile_Path
-##        self.screenShot_Flag=screenShot_Flag
-##        self.queryTimeOut=queryTimeOut
-##        self.timeOut=timeOut
-##        self.stepExecutionWait = stepExecutionWait
-
+    def __init__(self):
+        self.config_path = os.environ["NINETEEN68_HOME"] + '/config.json'
 
     def readJson(self):
-##        global configvalues
-        config_path = os.environ["NINETEEN68_HOME"] + '/config.json'
-        configvalues={}
-        config = json.loads(open(config_path).read())
-        params=config['configuration']
-        configvalues['server_ip']=params['server_ip']
-        configvalues['server_port']=params['server_port']
-        ##configvalues['screenShot_PathName']=params['screenShot_PathName']
-        configvalues['ignore_certificate']=params['ignore_certificate']
-        configvalues['chrome_path']=params['chrome_path']
-        configvalues['bit_64']=params['bit_64']
-        configvalues['logFile_Path']=params['logFile_Path']
-        configvalues['screenShot_Flag']=params['screenShot_Flag']
-        configvalues['queryTimeOut']=params['queryTimeOut']
-        configvalues['timeOut']=params['timeOut']
-        configvalues['stepExecutionWait']=params['stepExecutionWait']
-        configvalues['displayVariableTimeOut'] = params['displayVariableTimeOut']
-        configvalues['retrieveURL']=params['retrieveURL']
-        configvalues['delay']=params['delay']
-        configvalues['ignoreVisibilityCheck']=params['ignoreVisibilityCheck']
+        configvalues={"server_ip":"", "server_port":"", "ignore_certificate":"",
+        "chrome_path":"", "bit_64":"", "logFile_Path":"", "screenShot_Flag":"",
+        "queryTimeOut":"", "timeOut":"", "stepExecutionWait":"", "displayVariableTimeOut":"",
+        "retrieveURL":"", "delay":"", "ignoreVisibilityCheck":"", "server_cert":""}
+        try:
+            config = json.loads(open(self.config_path).read())
+            params = config['configuration']
+            configvalues['server_ip']=params['server_ip']
+            configvalues['server_port']=params['server_port']
+            configvalues['ignore_certificate']=params['ignore_certificate']
+            configvalues['chrome_path']=params['chrome_path']
+            configvalues['bit_64']=params['bit_64']
+            configvalues['logFile_Path']=params['logFile_Path']
+            configvalues['screenShot_Flag']=params['screenShot_Flag']
+            configvalues['queryTimeOut']=params['queryTimeOut']
+            configvalues['timeOut']=params['timeOut']
+            configvalues['stepExecutionWait']=params['stepExecutionWait']
+            configvalues['displayVariableTimeOut'] = params['displayVariableTimeOut']
+            configvalues['retrieveURL']=params['retrieveURL']
+            configvalues['delay']=params['delay']
+            configvalues['ignoreVisibilityCheck']=params['ignoreVisibilityCheck']
+            configvalues['server_cert']=params['server_cert']
+        except Exception as e:
+            configvalues['errorflag']=e
         return configvalues
-##        Config=readConfig(node_ip,node_port,screenShot_PathName,ignore_certificate,chrome_path,bit_64,logFile_Path,screenShot_Flag,queryTimeOut,timeOut,stepExecutionWait)
-
-
-
-
 

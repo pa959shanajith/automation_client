@@ -57,11 +57,10 @@ Setting Logging configuration file path
 
 LOGCONFIG_PATH = os.environ["NINETEEN68_HOME"] + "/logging.conf"
 configobj = readconfig.readConfig()
+configvalues = configobj.readJson()
 #747 check for syntax error in config.json
-try:
-    configvalues = configobj.readJson()
-    jsonSyntaxErrorFlag = False
-except:
+jsonSyntaxErrorFlag = False
+if configvalues.has_key('errorflag'):
     jsonSyntaxErrorFlag = True
 
 """
@@ -460,9 +459,13 @@ class SocketThread(threading.Thread):
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
-        global socketIO
-        global icesession,timer
+        global socketIO, icesession
+        server_port = int(configvalues['server_port'])
         server_IP = configvalues['server_ip']
+        server_cert = configvalues['server_cert']
+        if os.path.exists(server_cert) == False:
+            server_cert = CERTIFICATE_PATH +'/server.crt'
+        client_cert = (CERTIFICATE_PATH + '/client.crt', CERTIFICATE_PATH + '/client.key')
         temp_server_IP = 'https://' + server_IP
         key='USERNAME'
         if(not(os.environ.has_key(key))):
@@ -472,7 +475,7 @@ class SocketThread(threading.Thread):
         icesession = "{'ice_id':'"+str(uuid.uuid4())+"','connect_time':'"+str(datetime.now())+"','username':'"+username+"'}"
         icesession_enc = core_utils_obj.wrap(icesession)
         params={'username':username,'icesession':icesession_enc}
-        socketIO = SocketIO(temp_server_IP,int(configvalues['server_port']),MainNamespace,verify= CERTIFICATE_PATH +'/server.crt',cert=(CERTIFICATE_PATH + '/client.crt', CERTIFICATE_PATH + '/client.key'),params=params)
+        socketIO = SocketIO(temp_server_IP,server_port,MainNamespace,verify=server_cert,cert=client_cert,params=params)
         socketIO.wait()
 
 
@@ -1109,15 +1112,12 @@ def main():
     if jsonSyntaxErrorFlag:
         logger.print_on_console( "[Error]: Syntax error in config.json file, please check and restart the client window.")
         log.info("[Error]: Syntax error in config.json file, and please check and restart the client window.")
-        jsonSyntaxErrorFlag = False
-        app.MainLoop()
+        log.error(configvalues['errorflag'])
     elif cw.logfilename_error_flag:
         logger.print_on_console( "[Error]: Please provide a valid logfile path in config.json file and restart the client window.")
         log.info("[Error]: Please provide a valid logfile path in config.json file and restart the client window.")
         cw.logfilename_error_flag = False
-        app.MainLoop()
-    else:
-        app.MainLoop()
+    app.MainLoop()
 
 if __name__ == "__main__":
     main()
