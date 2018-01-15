@@ -204,7 +204,12 @@ class UtilWebKeywords:
             if webelement is not None:
                 #call to highlight the webelement
                 self.highlight(webelement)
-                if webelement.is_enabled():
+                res=self.is_visible(webelement)
+                if webelement.is_enabled() and not(res):
+                    info_msg=ERROR_CODE_DICT['The object is Hidden']
+                    logger.print_on_console(err_msg)
+                    log.info(info_msg)
+                elif webelement.is_enabled() and res:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                     info_msg=ERROR_CODE_DICT['MSG_OBJECT_ENABLED']
@@ -910,7 +915,6 @@ class UtilWebKeywords:
                             internal_val = iList[i].text
                             temp.append(internal_val)
                         if (inp_val in temp):
-                            select.select_by_visible_text(inp_val)
                             status=webconstants.TEST_RESULT_PASS
                             result=webconstants.TEST_RESULT_TRUE
                             log.info('Values Match')
