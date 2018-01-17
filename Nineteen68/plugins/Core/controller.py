@@ -26,7 +26,6 @@ import dynamic_variable_handler
 import reporting
 import core_utils
 import readconfig
-from values_from_ui import *
 from concurrent.futures import ThreadPoolExecutor
 import threading
 from datetime import datetime
@@ -40,6 +39,7 @@ terminate_flag=False
 pause_flag=False
 break_point=-1
 socket_object = None
+exception_flag = False
 thread_tracker = []
 log = logging.getLogger("controller.py")
 class TestThread(threading.Thread):
@@ -1019,10 +1019,11 @@ class Controller():
 
     def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,wxObject,socketIO,*args):
         status = COMPLETED
-        global terminate_flag,break_point,pause_flag,socket_object
+        global terminate_flag,break_point,pause_flag,socket_object,exception_flag
         self.conthread=mythread
         self.clear_data()
         socket_object = socketIO
+        exception_flag = self.configvalues["exception_flag"]
         #Logic to make sure that logic of usage of existing driver is not applicable to execution
         if self.web_dispatcher_obj != None:
             self.web_dispatcher_obj.action=action
@@ -1088,45 +1089,33 @@ def kill_process():
     import os,shutil
     if platform.system() == 'Darwin':
         try:
-            import os
             import browserops_MW
             browserops_MW.driver.quit()
-
-
-
         except Exception as e:
             import traceback
             traceback.print_exc()
-
             logger.print_on_console('Error in stopping scraping driver as driver is already closed')
             log.error(e)
+
         try:
-            import os
             import browser_Keywords_MW
             browser_Keywords_MW.driver_obj.quit()
-
-
-
         except Exception as e:
             import traceback
             traceback.print_exc()
-
             logger.print_on_console('Error in stopping browser driver as driver is already closed')
             log.error(e)
+
         try:
-            import os
             import install_and_launch
             install_and_launch.driver.quit()
-
-
-
         except Exception as e:
             import traceback
             traceback.print_exc()
             logger.print_on_console('Error in stopping application driver as driver is already closed')
             log.error(e)
+
         try:
-            import os
             os.system("killall -9 Safari")
             os.system("killall -9 safaridriver")
             os.system("killall -9 node")
@@ -1157,8 +1146,6 @@ def kill_process():
             logger.print_on_console( 'Stale processes killed')
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
-    ##    import os, shutil
 
         try:
             import browser_Keywords
@@ -1176,8 +1163,8 @@ def kill_process():
             try:
                 folder = tempfile.gettempdir()
                 profdir = ["~DF","scoped_dir","IE","chrome_","anonymous", "userprofile",
-                                    "seleniumSslSupport","webdriver-ie", "Low", "screenshot", "_MEI", "CVR","tmp",
-                                    "jar_cache","DMI","~nsu","moz-","gen"]
+                            "seleniumSslSupport","webdriver-ie", "Low", "screenshot",
+                            "_MEI", "CVR","tmp","jar_cache","DMI","~nsu","moz-","gen"]
                 for the_file in os.listdir(folder):
                     folderwithnum = ''
                     try:

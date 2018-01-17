@@ -1,31 +1,24 @@
 import wx
 import sys
 import os
-import controller
 import time
-from constants import *
+import httplib
 import logging
 import logging.config
-import argparse
 import base64
 import platform
 import uuid
 from datetime import datetime
 import core_utils
 import ast
-allow_connect = False
-icesession = None
-plugins_list = []
-
 import logger
 import threading
-from values_from_ui import *
-log = logging.getLogger('clientwindow.py')
 from socketIO_client import SocketIO,BaseNamespace
+from constants import *
+import controller
 import readconfig
-import httplib
 
-i = 0
+log = logging.getLogger('clientwindow.py')
 wxObject = None
 browsername = None
 qcdata = None
@@ -36,53 +29,14 @@ mobileScrapeFlag=False
 mobileWebScrapeFlag=False
 debugFlag = False
 oebsScrapeFlag = False
-
-
-
-parser = argparse.ArgumentParser(description="Nineteen68 Platform")
-parser.add_argument('--NINETEEN68_HOME', type=str, help='A Required path to Nineteen68 root location')
-args = parser.parse_args()
-
-if args.NINETEEN68_HOME < 1:
-    parser.error("Required at least 1 argument")
-
-os.environ["NINETEEN68_HOME"] = args.NINETEEN68_HOME
+socketIO = None
+allow_connect = False
+icesession = None
+plugins_list = []
+configvalues = None
 IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images"
 CERTIFICATE_PATH = os.environ["NINETEEN68_HOME"] + "/Scripts/CA_BUNDLE"
-
-"""
-Setting Logging configuration file path
-
-"""
-
 LOGCONFIG_PATH = os.environ["NINETEEN68_HOME"] + "/logging.conf"
-configobj = readconfig.readConfig()
-configvalues = configobj.readJson()
-#747 check for syntax error in config.json
-jsonSyntaxErrorFlag = False
-if configvalues.has_key('errorflag'):
-    jsonSyntaxErrorFlag = True
-
-"""
-This code snippet blocks the inheritance of file handlers from
-parent process to child process. We are applying the same for only on file
- which is our log file.
-
-"""
-if sys.platform == 'win32':
-    from ctypes import *
-    import msvcrt
-
-    __builtins__open = __builtins__.open
-
-    def __open_inheritance_hack(*args, **kwargs):
-        result = __builtins__open(*args, **kwargs)
-        handle = msvcrt.get_osfhandle(result.fileno())
-        if configvalues["logFile_Path"] in args:
-            windll.kernel32.SetHandleInformation(handle, 1, 0)
-        return result
-
-    __builtins__.open = __open_inheritance_hack
 
 
 class MainNamespace(BaseNamespace):
@@ -181,44 +135,38 @@ class MainNamespace(BaseNamespace):
             import highlight
             light =highlight.Highlight()
             res = light.highlight(args,None,None)
-            print 'Highlight result: ',res
+            logger.print_on_console('Highlight result: '+str(res))
         if appType==APPTYPE_MOBILE.lower():
             import highlight_MW
             light =highlight_MW.Highlight()
             res = light.highlight(args,None,None)
-            print 'Highlight result: ',res
+            logger.print_on_console('Highlight result: '+str(res))
         if appType==APPTYPE_DESKTOP_JAVA.lower():
             con =controller.Controller()
             con.get_all_the_imports('Oebs')
             import utils
             light =utils.Utils()
             res = light.highlight(args[0],args[1])
-            print 'Highlight result: ',res
+            logger.print_on_console('Highlight result: '+str(res))
         elif appType==APPTYPE_DESKTOP.lower():
             con =controller.Controller()
             con.get_all_the_imports('Desktop2')
             import desktop_highlight
             highlightObj=desktop_highlight.highLight()
             highlightObj.highLiht_element(args[0],args[1])
-
-  #--------------------------------------------------------------------------------------------------sap change
         elif appType==APPTYPE_SAP.lower():
             con =controller.Controller()
             con.get_all_the_imports('SAP')
             import sap_highlight
             highlightObj=sap_highlight.highLight()
-            print 'calling highlight'
 ##            i = args[0].rfind(",")
 ##            var = args[0][:i]
             highlightObj.highlight_element(args[0])
-            print 'highlight called'
-#--------------------------------------------------------------------------------------------------sap change
 
 
     def on_executeTestSuite(self, *args):
-        global wxObject
+        global wxObject,socketIO
         args=list(args)
-        global socketIO
         socketIO.emit('return_status_executeTestSuite','success')
         wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode)
 
@@ -227,10 +175,9 @@ class MainNamespace(BaseNamespace):
         args=list(args)
         wxObject.mythread = TestThread(wxObject,DEBUG,args[0],wxObject.debug_mode)
         wxObject.choice=wxObject.rbox.GetStringSelection()
-        print wxObject.choice,' is Selected'
+        logger.print_on_console(str(wxObject.choice)+' is Selected')
         if wxObject.choice == 'Normal':
             wxObject.killDebugWindow()
-
         wxObject.debug_mode=False
         wxObject.breakpoint.Disable()
         if wxObject.choice in ['Stepwise','RunfromStep']:
@@ -265,10 +212,8 @@ class MainNamespace(BaseNamespace):
             sapScrapeFlag=True
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
         except Exception as e:
-            import traceback
-            traceback.print_exc()
-            print e
-
+            logger.print_on_console('Error in SAP')
+            log.error(e)
 
     def on_qclogin(self, *args):
         con = controller.Controller()
@@ -281,7 +226,6 @@ class MainNamespace(BaseNamespace):
         global qcConFlag
         qcConFlag=True
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
-
 
     def on_LAUNCH_MOBILE(self, *args):
         con = controller.Controller()
@@ -322,20 +266,14 @@ class MainNamespace(BaseNamespace):
 
     def on_LAUNCH_OEBS(self, *args):
         global oebsScrapeObj,oebsScrapeFlag
-        print("Entering inside OEBS")
         con = controller.Controller()
         global browsername
         browsername = args[0]
-        print("Entering inside OEBS : ",browsername)
         con =controller.Controller()
-
         con.get_all_the_imports('Oebs')
         import scrape_dispatcher
-
         oebsScrapeObj=scrape_dispatcher
-
         oebsScrapeFlag=True
-        ##print mobileWebScrapeFlag
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_wsdl_listOfOperation(self, *args):
@@ -347,7 +285,7 @@ class MainNamespace(BaseNamespace):
         wsdl_object = wsdlgenerator.WebservicesWSDL()
         response = wsdl_object.listOfOperation(wsdlurl)
         response=str(response)
-        print response
+        log.debug(response)
         socketIO.emit('result_wsdl_listOfOperation',response)
 
     def on_wsdl_ServiceGenerator(self, *args):
@@ -436,14 +374,13 @@ class MainNamespace(BaseNamespace):
             spath=spath["mac"]
         else:
             spath=spath["default"]
-        if os.path.exists(spath):
+        if len(spath) != 0 and os.path.exists(spath):
             constants.SCREENSHOT_PATH=spath
         else:
             constants.SCREENSHOT_PATH="Disabled"
             logger.print_on_console("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
             log.info("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
 
-socketIO = None
 
 class SocketThread(threading.Thread):
     """Test Worker Thread Class."""
@@ -503,7 +440,6 @@ class Parallel(threading.Thread):
     def resume(self):
         self.con.resume_execution()
 
-
     #----------------------------------------------------------------------
     def run(self):
         global socketIO
@@ -517,8 +453,6 @@ class Parallel(threading.Thread):
             self.wxObject.cancelbutton.Disable()
             self.wxObject.terminatebutton.Enable()
 ##            self.wxObject.pausebutton.Show()
-
-            import time
             time.sleep(2)
 ##            controller.kill_process()
             self.con = controller.Controller()
@@ -526,25 +460,17 @@ class Parallel(threading.Thread):
             #Removed breakpoint
 ##            value= self.wxObject.breakpoint.GetValue()
             value=''
-
             status = self.con.invoke_parralel_exe(EXECUTE,value,self)
-
             if status==TERMINATE:
-                print '---------Termination Completed-------'
-
+                logger.print_on_console('---------Termination Completed-------')
             else:
                 logger.print_on_console('***SUITE EXECUTION COMPLETED***')
-
 ##            self.wxObject.debugbutton.Enable()
 ##            self.wxObject.executebutton.Enable()
             self.wxObject.cancelbutton.Enable()
             socketIO.emit('result_executeTestSuite',status)
-##
         except Exception as m:
-            print m
-
-
-
+            log.error(m)
 
 
 class TestThread(threading.Thread):
@@ -568,7 +494,6 @@ class TestThread(threading.Thread):
         self.action=action
         self.json_data=json_data
         self.debug_mode=debug_mode
-
         self.start()    # start the thread
 
     #should just resume the thread
@@ -577,16 +502,12 @@ class TestThread(threading.Thread):
             self.con.debug_mode=False
         self.con.resume_execution()
 
-
-
     #----------------------------------------------------------------------
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO
         try:
-            #Removed execute,debug button
-
             self.wxObject.cancelbutton.Disable()
             self.wxObject.terminatebutton.Enable()
             runfrom_step=1
@@ -666,16 +587,15 @@ class RedirectText(object):
     def write(self,string):
         wx.CallAfter(self.out.AppendText, string)
 
-class ClientWindow(wx.Frame):
-    #----------------------------------------------------------------------
 
+
+class ClientWindow(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, parent=None,id=-1, title="ICE Engine",
                    pos=(300, 150),  size=(800, 730),style=wx.DEFAULT_FRAME_STYLE & ~ (wx.MAXIMIZE_BOX)  )
-##        self.SetBackgroundColour(   (245,222,179))
         self.SetBackgroundColour('#e6e7e8')
-##        self.ShowFullScreen(True,wx.ALL)
-##        self.SetBackgroundColour('#D0D0D0')
+        ##self.ShowFullScreen(True,wx.ALL)
+        ##self.SetBackgroundColour('#D0D0D0')
         self.logfilename_error_flag = False
         self.debugwindow = None
         self.new = None
@@ -693,7 +613,6 @@ class ClientWindow(wx.Frame):
 
         """
         Creating Root Logger using logger file config and setting logfile path,which is in config.json
-
         """
         try:
             logfilename = configvalues["logFile_Path"].replace("\\","\\\\")
@@ -716,12 +635,9 @@ class ClientWindow(wx.Frame):
         self.fileMenu = wx.Menu()
         #own event
         self.Bind( wx.EVT_CHOICE, self.test)
+        ##self.Bind(wx.EVT_CHOICE, self.debug)
+        ##self.Bind(wx.EVT_CLOSE, self.closeScrapeWindow)
         #own event
-
-        #own event
-##        self.Bind(wx.EVT_CHOICE, self.debug)
-        #own event
-##        self.Bind(wx.EVT_CLOSE, self.closeScrapeWindow)
         self.configMenu = wx.Menu()
         self.infoItem = wx.MenuItem(self.configMenu, 100,text = "Info",kind = wx.ITEM_NORMAL)
         self.configMenu.AppendItem(self.infoItem)
@@ -759,7 +675,7 @@ class ClientWindow(wx.Frame):
         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
 
         self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
-##        self.rbox.SetBackgroundColour('#9f64e2')
+        ##self.rbox.SetBackgroundColour('#9f64e2')
         self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(230, 598), size=(60,20), style = wx.TE_RICH)
         box.Add(self.breakpoint, 1, wx.ALL|wx.EXPAND, 5)
         self.breakpoint.Disable()
@@ -797,15 +713,12 @@ class ClientWindow(wx.Frame):
             self.rbox.Disable()
 
     """
-
     Modifying Logger and Handlers Level dynamically without creating a new logger object
     When logging level is changed from Client window using "File" button.
 
     """
-
     def menuhandler(self, event):
         id = event.GetId()
-
         #When user selects INFO level
         if id == 100:
             logger.print_on_console( '--Logger level : INFO selected--')
@@ -826,23 +739,16 @@ class ClientWindow(wx.Frame):
             log.info( '--Logger level : ERROR selected--')
             logging.getLogger().setLevel(logging.ERROR)
             for handler in logging.root.handlers[:]:
-                    handler.setLevel(logging.ERROR)
-
-##    def OnRadiogroup(self, e):
-##        rb = e.GetEventObject()
-##        print rb.GetLabel(),' is clicked from Radio Group'
-
+                handler.setLevel(logging.ERROR)
 
     def onChecked_Schedule(self, e):
         mode=self.schedule.GetValue()
         global socketIO
         socketIO.emit('toggle_schedule',mode)
 
-
     def onRadioBox(self,e):
         self.choice=self.rbox.GetStringSelection()
-        print self.choice,' is Selected'
-
+        logger.print_on_console(str(self.choice)+' is Selected')
         if self.choice == 'Normal':
             self.breakpoint.Clear()
             self.breakpoint.Disable()
@@ -880,62 +786,25 @@ class ClientWindow(wx.Frame):
     def OnExit(self, event):
         controller.kill_process()
 
-        #----------------------------------------------------------------------
-    def OnPause(self, event):
-        logger.print_on_console('Event Triggered to Pause')
-        log.info('Event Triggered to Pause')
-        controller.pause_flag=True
-
-    def Resume(self, event):
-        logger.print_on_console('Event Triggered to Resume Debug')
-        log.info('Event Triggered to Resume Debug')
-        controller.pause_flag=False
-        self.mythread.resume(False)
-
-    #----------------------------------------------------------------------
-    def OnContinue(self, event):
-        logger.print_on_console('Event Triggered to Resume')
-        log.info('Event Triggered to Resume')
-        self.resume(True)
-
-    def resume(self,debug_mode):
-        controller.pause_flag=False
-        self.mythread.resume(debug_mode)
-    #----------------------------------------------------------------------
     def OnTerminate(self, event, *args):
+        self.killDebugWindow()
+        scrape_window_open=self.killScrapeWindow()
         if(len(args) > 0 and args[0]=="term_exec"):
             controller.disconnect_flag=True
             print ""
             logger.print_on_console('---------Terminating all active operations-------')
         else:
             logger.print_on_console('---------Termination Started-------')
+            if scrape_window_open == True:
+                socketIO.emit('scrape','Terminate')
         controller.terminate_flag=True
-        self.killDebugWindow()
-        self.killScrapeWindow()
         #Handling the case where user clicks terminate when the execution is paused
         #Resume the execution
         if controller.pause_flag:
             self.resume(False)
 
-    #----------------------------------------------------------------------
     def OnClear(self,event):
         self.log.Clear()
-
-    #-----------------------------------------------------------------------
-    def OnExecute(self,event):
-        global action
-        self.action=EXECUTE
-        if execution_mode.lower() == 'serial':
-            print( '=======================================================================================================')
-            logger.print_on_console('Execution mode : SERIAL')
-            print( '=======================================================================================================')
-            self.mythread=TestThread(self,self.action)
-        elif execution_mode.lower() == 'parallel':
-            logger.print_on_console('Execution mode : PARALLEL')
-            print( '=======================================================================================================')
-            self.mythread=Parallel(self)
-        else:
-            logger.print_on_console('Please provide valid execution mode')
 
     def OnNodeConnect(self,event):
         try:
@@ -963,11 +832,10 @@ class ClientWindow(wx.Frame):
                 self.schedule.SetValue(False)
                 self.schedule.Disable()
                 self.connectbutton.Enable()
-
         except Exception as e:
-            print 'Forbidden request, Connection refused, please check the server ip and server port in Config.json, and restart the client window.'
-            #747 Disable buttons if port or ip is invalid in config.json (Himanshu)
-            log.info('Forbidden request, Connection refused, please check the server ip and server port in Config.json, and restart the client window.')
+            emsg="Forbidden request, Connection refused, please check the server ip and server port in Config.json, and restart the client window."
+            logger.print_on_console(emsg)
+            log.error(emsg)
             self.cancelbutton.Disable()
             self.terminatebutton.Disable()
             self.clearbutton.Disable()
@@ -977,41 +845,38 @@ class ClientWindow(wx.Frame):
 
     def killDebugWindow(self):
         #Close the debug window
+        flag=False
         try:
             if (self.debugwindow != None) and (bool(self.debugwindow) != False):
                 self.debugwindow.Close()
+                flag=True
             self.debugwindow = None
         except Exception as e:
             log.error("Error while killing debug window")
             log.error(e)
+        return flag
 
     def killScrapeWindow(self):
         #Close the scrape window
+        flag=False
         try:
             if (self.new != None) and (bool(self.new) != False):
                 self.new.Close()
+                flag=True
             self.new = None
         except Exception as e:
             log.error("Error while killing scrape window")
             log.error(e)
+        return flag
 
     def test(self,event):
-        global mobileScrapeFlag
-        global qcConFlag
-        global mobileWebScrapeFlag
-        global desktopScrapeFlag
-        global sapScrapeFlag
-        global debugFlag
-        global socketIO
-        global browsername
-        global action
-        global data
-        global oebsScrapeFlag
+        global mobileScrapeFlag,qcConFlag,mobileWebScrapeFlag,desktopScrapeFlag
+        global sapScrapeFlag,debugFlag,browsername,action,oebsScrapeFlag
+        global socketIO,data
         if mobileScrapeFlag==True:
             self.new = mobileScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
             mobileScrapeFlag=False
         elif qcConFlag==True:
-            #print 'For QC'
             self.new = qcConObj.QcWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = qcdata,socketIO = socketIO)
             qcConFlag=False
         elif mobileWebScrapeFlag==True:
@@ -1033,7 +898,7 @@ class ClientWindow(wx.Frame):
         else:
             browsernumbers = ['1','2','3','6']
             if browsername in browsernumbers:
-                print 'Browser name : ',browsername
+                logger.print_on_console('Browser name : '+str(browsername))
                 con = controller.Controller()
                 con.get_all_the_imports('Web')
                 con.get_all_the_imports('WebScrape')
@@ -1053,17 +918,15 @@ class ClientWindow(wx.Frame):
 
 
 class DebugWindow(wx.Frame):
-    #----------------------------------------------------------------------
     def __init__(self, parent,id, title):
-        wx.Frame.__init__(self, parent, title=title,
-                   pos=(300, 150),  size=(200, 75) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
+        wx.Frame.__init__(self, parent, title=title, pos=(300, 150),  size=(200, 75),
+            style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
         ##style = wx.CAPTION|wx.CLIP_CHILDREN
         self.iconpath = IMAGES_PATH +"/slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         self.panel = wx.Panel(self)
-
         self.continue_debugbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/play.png", wx.BITMAP_TYPE_ANY), (65, 15), (35, 28))
         self.continue_debugbutton.Bind(wx.EVT_LEFT_DOWN, self.Resume)
         self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution"))
@@ -1084,13 +947,11 @@ class DebugWindow(wx.Frame):
         self.Close()
         wxObject.debugwindow = None
 
-    #----------------------------------------------------------------------
     def OnContinue(self, event):
         logger.print_on_console('Event Triggered to Resume')
         log.info('Event Triggered to Resume')
         self.resume(True)
 
-    #----------------------------------------------------------------------
     def resume(self,debug_mode):
         controller.pause_flag=False
         wxObject.mythread.resume(debug_mode)
@@ -1098,26 +959,3 @@ class DebugWindow(wx.Frame):
     def OnExit(self, event):
         self.Close()
         wxObject.debugwindow = None
-
-#----------------------------------------------------------------------
-def main():
-	#747 json syntax error flag (Himanshu)
-    global jsonSyntaxErrorFlag
-    app = wx.App()
-    cw = ClientWindow()
-    print( '*******************************************************************************************************')
-    print( '=========================================Nineteen68 Client Window======================================')
-    print( '*******************************************************************************************************')
-	#747 user friendly messages if any flag raised (Himanshu)
-    if jsonSyntaxErrorFlag:
-        logger.print_on_console( "[Error]: Syntax error in config.json file, please check and restart the client window.")
-        log.info("[Error]: Syntax error in config.json file, and please check and restart the client window.")
-        log.error(configvalues['errorflag'])
-    elif cw.logfilename_error_flag:
-        logger.print_on_console( "[Error]: Please provide a valid logfile path in config.json file and restart the client window.")
-        log.info("[Error]: Please provide a valid logfile path in config.json file and restart the client window.")
-        cw.logfilename_error_flag = False
-    app.MainLoop()
-
-if __name__ == "__main__":
-    main()
