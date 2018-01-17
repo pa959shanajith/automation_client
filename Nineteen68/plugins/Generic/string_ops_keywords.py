@@ -270,9 +270,11 @@ class StringOperation:
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
             else:
-                #log.error(INVALID_INPUT)
-                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                #logger.print_on_console(INVALID_INPUT)
+                output = len(input)
+                log.info('Result : ')
+                log.info(output)
+                status=generic_constants.TEST_RESULT_PASS
+                result=generic_constants.TEST_RESULT_TRUE
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
