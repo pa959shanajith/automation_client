@@ -530,6 +530,7 @@ class TestThread(threading.Thread):
             self.con = controller.Controller()
             self.wxObject.terminatebutton.Enable()
             self.con.configvalues=configvalues
+            self.con.exception_flag=configvalues["exception_flag"]
             status = ''
             apptype = ''
             if(self.action == DEBUG):

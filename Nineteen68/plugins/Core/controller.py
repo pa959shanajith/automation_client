@@ -25,7 +25,6 @@ import pause_execution
 import dynamic_variable_handler
 import reporting
 import core_utils
-import readconfig
 from concurrent.futures import ThreadPoolExecutor
 import threading
 from datetime import datetime
@@ -39,9 +38,10 @@ terminate_flag=False
 pause_flag=False
 break_point=-1
 socket_object = None
-exception_flag = False
 thread_tracker = []
 log = logging.getLogger("controller.py")
+
+
 class TestThread(threading.Thread):
     """Test Worker Thread Class."""
     #----------------------------------------------------------------------
@@ -60,7 +60,6 @@ class TestThread(threading.Thread):
         try:
             time.sleep(2)
             con = Controller()
-##            print 'Controller object created'
             con.conthread=self.thread
             status = con.invoke_controller(EXECUTE,'',con.conthread,self.browser)
             if status==TERMINATE:
@@ -68,7 +67,9 @@ class TestThread(threading.Thread):
             else:
                 logger.print_on_console('***SUITE EXECUTION COMPLETED***')
         except Exception as m:
-            print m
+            log.error(m)
+
+
 class Controller():
     generic_dispatcher_obj = None
     mobile_web_dispatcher_obj = None
@@ -104,6 +105,7 @@ class Controller():
         self.debugfrom_step=1
         self.configvalues={}
         self.core_utilsobject = core_utils.CoreUtils()
+
     def __load_generic(self):
         try:
             if self.generic_dispatcher_obj==None:
@@ -113,6 +115,8 @@ class Controller():
                 self.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
         except Exception as e:
             logger.print_on_console('Error loading Generic plugin')
+            log.error(e)
+
     def __load_mobile_web(self):
         try:
             if self.mobile_web_dispatcher_obj==None:
@@ -126,6 +130,8 @@ class Controller():
                 self.mobile_web_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading MobileWeb plugin')
+            log.error(e)
+
     def __load_mobile_app(self):
         try:
             if self.mobile_app_dispatcher_obj==None:
@@ -138,7 +144,9 @@ class Controller():
                 self.mobile_app_dispatcher_obj = mobile_app_dispatcher.MobileDispatcher()
                 self.mobile_app_dispatcher_obj.action=self.action
         except Exception as e:
-           logger.print_on_console('Error loading MobileApp plugin')
+            logger.print_on_console('Error loading MobileApp plugin')
+            log.error(e)
+
     def __load_webservice(self):
         try:
             self.get_all_the_imports('WebServices')
@@ -146,15 +154,19 @@ class Controller():
             self.webservice_dispatcher_obj = websevice_dispatcher.Dispatcher()
         except Exception as e:
             logger.print_on_console('Error loading Web services plugin')
+            log.error(e)
+
     def __load_oebs(self):
         try:
             self.get_all_the_imports('Oebs')
             import oebs_dispatcher
             self.oebs_dispatcher_obj = oebs_dispatcher.OebsDispatcher()
-            self.oebs_dispatcher_obj.exception_flag=exception_flag
+            self.oebs_dispatcher_obj.exception_flag=self.exception_flag
             self.oebs_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading OEBS plugin')
+            log.error(e)
+
     def __load_web(self):
         try:
 ##            self.get_all_the_imports('ImageProcessing')
@@ -162,54 +174,49 @@ class Controller():
             self.get_all_the_imports('Web')
             import web_dispatcher
             self.web_dispatcher_obj = web_dispatcher.Dispatcher()
-            self.web_dispatcher_obj.exception_flag=exception_flag
+            self.web_dispatcher_obj.exception_flag=self.exception_flag
             self.web_dispatcher_obj.action=self.action
         except Exception as e:
-             logger.print_on_console('Error loading Web plugin')
+            logger.print_on_console('Error loading Web plugin')
+            log.error(e)
+
     def __load_desktop(self):
         try:
             self.get_all_the_imports('Desktop2')
             import desktop_dispatcher
             self.desktop_dispatcher_obj = desktop_dispatcher.DesktopDispatcher()
-            self.desktop_dispatcher_obj.exception_flag=exception_flag
+            self.desktop_dispatcher_obj.exception_flag=self.exception_flag
             self.desktop_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading Desktop plugin')
-            #--------------------------------------------------------------------------------SAP change
+            log.error(e)
+
     def __load_sap(self):
         try:
             self.get_all_the_imports('SAP')
-            #logger.print_on_console('all imports',get_all_the_imports('SAP'))
             import sap_dispatcher
-            #logger.print_on_console('sap_dispatcher.SAPDispatcher()',sap_dispatcher.SAPDispatcher())
             self.sap_dispatcher_obj = sap_dispatcher.SAPDispatcher()
-            #logger.print_on_console('sap_dispatcher_obj.exception_flag before :'sap_dispatcher_obj.exception_flag)
-            self.sap_dispatcher_obj.exception_flag=exception_flag
-            #logger.print_on_console('sap_dispatcher_obj.exception_flag after :'sap_dispatcher_obj.exception_flag)
+            self.sap_dispatcher_obj.exception_flag=self.exception_flag
             self.sap_dispatcher_obj.action=self.action
         except Exception as e:
-            import traceback
-            traceback.print_exc()
-            logger.print_on_console('Error loading SAP plugin',e)
-    #--------------------------------------------------------------------------------SAP change
+            logger.print_on_console('Error loading SAP plugin')
+            log.error(e)
 
-         #--------------------------------------------------------------------------------SAP change
     def __load_mainframe(self):
         try:
             self.get_all_the_imports('Mainframe')
             import mainframe_dispatcher
             self.mainframe_dispatcher_obj = mainframe_dispatcher.MainframeDispatcher()
-            self.mainframe_dispatcher_obj.exception_flag=exception_flag
+            self.mainframe_dispatcher_obj.exception_flag=self.exception_flag
             self.mainframe_dispatcher_obj.action=self.action
         except Exception as e:
-            import traceback
-            traceback.print_exc()
-            logger.print_on_console('Error loading Mainframe plugin',e)
-    #--------------------------------------------------------------------------------SAP change
+            logger.print_on_console('Error loading Mainframe plugin')
+            log.error(e)
+
     def dangling_status(self,index):
         step=handler.tspList[index]
         return step.executed
-    ## Issue #157 Missing endif  messge updated
+
     def check_dangling(self,tsp,index):
         status=True
         errormsg=""
@@ -246,6 +253,7 @@ class Controller():
             logger.print_on_console('Dangling: '+tsp.name +' in '+tsp.testscript_name+'\n')
             log.error('Dangling: '+tsp.name +' in '+tsp.testscript_name)
         return status
+
     def __print_details(self,tsp,input,inpval):
         keyowrd='Keyword : '+tsp.name
         input_val='Input :'+str(input)
@@ -257,11 +265,13 @@ class Controller():
         log.info(apptype)
         for i in range(len(inpval)):
             log.info('Input: '+str(i + 1)+ '= '+repr(inpval[i]))
-            ##logger.print_on_console('Input: '+str(i + 1)+ '= ',inpval[i])
+
     def clear_data(self):
         global terminate_flag,pause_flag
         terminate_flag=pause_flag=False
+
     def resume_execution(self):
+        global pause_flag
         logger.print_on_console('=======Resuming=======')
         log.info('=======Resuming=======')
         self.conthread.paused = False
@@ -274,6 +284,8 @@ class Controller():
         except Exception as e:
             log.error('Debug is not paused to Resume')
             logger.print_on_console('Debug is not paused to Resume')
+            log.error(e)
+
     def pause_execution(self):
         logger.print_on_console('=======Pausing=======')
         log.info('=======Pausing=======')
@@ -283,6 +295,7 @@ class Controller():
             while self.conthread.paused:
                 self.conthread.pause_cond.wait()
         log.debug('Wait is sover')
+
     def methodinvocation(self,index,*args):
         global pause_flag
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
@@ -296,15 +309,15 @@ class Controller():
             pause_flag=True
         keyword_flag=True
         ignore_stat=False
+        inpval=[]
+        start_time = datetime.now()
         #Check for 'terminate_flag' before execution
         if not(terminate_flag):
             #Check for 'pause_flag' before executionee
             if pause_flag:
                 self.pause_execution()
-            start_time = datetime.now()
             if(self.check_dangling(tsp,index)):
                 input = tsp.inputval[0]
-                addtionalinfo = tsp.additionalinfo
                 #Logic to split input and handle dynamic variables
                 rawinput = tsp.inputval
                 if len(args) > 0:
@@ -362,7 +375,6 @@ class Controller():
             end_time = datetime.now()
             end_time_string=end_time.strftime(TIME_FORMAT)
             logger.print_on_console('Step Execution end time is : '+end_time_string)
-##            logger.print_on_console( "----Keyword :",tsp.name,' execution Completed----')
             ellapsed_time=end_time-start_time
             logger.print_on_console('Step Elapsed time is : ',str(ellapsed_time)+'\n')
             #Changing the overallstatus of the scenario if it's Fail or Terminate
@@ -383,6 +395,7 @@ class Controller():
         if len(self.counter)>0 and self.counter[-1]>-1 and self.counter[-1]-index==0:
             return JUMP_TO
         return index
+
     def split_input(self,input,keyword):
         ignore_status = False
         inpval = []
@@ -421,6 +434,7 @@ class Controller():
                     x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
                 inpval.append(x)
         return inpval,ignore_status
+
     def store_result(self,result_temp,tsp):
         output=tsp.outputval.split(SEMICOLON)
         result=result_temp
@@ -489,8 +503,8 @@ class Controller():
             self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response,tsp.name)
         if len(output)>1:
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
+
     def keywordinvocation(self,index,inpval,*args):
-        #configobj = readconfig.readConfig()
         global socket_object
         configvalues = self.configvalues
         try:
@@ -499,6 +513,7 @@ class Controller():
         except Exception as e:
             log.error('stepExecutionWait should be a integer, please change it in config.json')
             logger.print_on_console('stepExecutionWait should be a integer, please change it in config.json')
+            log.error(e)
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
         #Check for 'terminate_flag' before execution
         if not(terminate_flag):
@@ -543,7 +558,6 @@ class Controller():
                         result=list(result)
                         result[3]='Drop Keyword is missing'
             #get the output varible from the teststep property
-            outputstring = teststepproperty.outputval
             if teststepproperty.execute_flag:
                 #Check the apptype and pass to perticular module
                 if teststepproperty.apptype.lower() == APPTYPE_GENERIC:
@@ -620,7 +634,6 @@ class Controller():
             #Fixing issue #382
             logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n')
             log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
-##            print '\n'
             #Checking for stop keyword
             if teststepproperty.name==STOP:
                 ## Issue #160
@@ -628,6 +641,7 @@ class Controller():
             return index,result
         else:
             return index,TERMINATE
+
     def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread):
         i=0
         status=True
@@ -636,7 +650,6 @@ class Controller():
         logger.print_on_console('Scenario Execution start time is : '+start_time_string,'\n')
         global pause_flag
         while (i < len(tsplist)):
-            tsp = tsplist[i]
             #Check for 'terminate_flag' before execution
             if not(terminate_flag):
                 #Check for 'pause_flag' before execution
@@ -663,7 +676,7 @@ class Controller():
                             self.counter.pop()
                 except Exception as e:
                     log.error(e)
-                    logger.print_on_console(e)
+                    logger.print_on_console("Error encountered during Execution")
                     status=False
                     i=i+1
             else:
@@ -682,14 +695,15 @@ class Controller():
         self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
         logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
         return status
+
     def invokegenerickeyword(self,teststepproperty,dispatcher_obj,inputval):
-        keyword = teststepproperty.name
         res = dispatcher_obj.dispatcher(teststepproperty,self.wx_object,self.conthread,*inputval)
         return res
+
     def invokeoebskeyword(self,teststepproperty,dispatcher_obj,inputval):
-        keyword = teststepproperty.name
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
         return res
+
     def invokewebservicekeyword(self,teststepproperty,dispatcher_obj,inputval,socket_object):
         keyword = teststepproperty.name
         if keyword == 'setTagValue' or keyword == 'setTagAttribute':
@@ -699,37 +713,31 @@ class Controller():
                 handler.ws_template=''
         res = dispatcher_obj.dispatcher(teststepproperty,socket_object,*inputval)
         return res
-    def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
-        keyword = teststepproperty.name
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
-        return res
-    def invokemobilekeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
-        keyword = teststepproperty.name
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
-        return res
-    def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
-        keyword = teststepproperty.name
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
-        return res
-    def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval):
-        keyword = teststepproperty.name
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval)
-        return res
-  #-----------------------------------------------------------------------------------------SAP change
-    def invokeSAPkeyword(self,teststepproperty,dispatcher_obj,inputval):
-        keyword = teststepproperty.name
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval)
-        ##logger.print_on_console('res in invoke method :',res)
-        return res
-  #-----------------------------------------------------------------------------------------SAP change
 
-  #-----------------------------------------------------------------------------------------Mainframe change
-    def invokemainframekeyword(self,teststepproperty,dispatcher_obj,inputval):
-        keyword = teststepproperty.name
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval)
-        ##logger.print_on_console('res in invoke method :',res)
+    def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
         return res
-  #-----------------------------------------------------------------------------------------Mainframe change
+
+    def invokemobilekeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
+        return res
+
+    def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
+        return res
+
+    def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval)
+        return res
+
+    def invokeSAPkeyword(self,teststepproperty,dispatcher_obj,inputval):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval)
+        return res
+
+    def invokemainframekeyword(self,teststepproperty,dispatcher_obj,inputval):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval)
+        return res
+
     def get_all_the_imports(self,plugin_path):
         path= os.environ["NINETEEN68_HOME"] + '//Nineteen68//plugins//'+plugin_path
         sys.path.append(path)
@@ -737,18 +745,13 @@ class Controller():
             for d in dirs:
                 p = path + '\\' + d
                 sys.path.append(p)
+
     def invoke_debug(self,mythread,runfrom_step,json_data):
         status=COMPLETED
         global break_point
         obj = handler.Handler()
         self.action=DEBUG
         handler.tspList=[]
-        #______reading from file
-##        t = test_debug.Test()
-##        scenario,flag = t.gettsplist()
-##        flag=True
-##        scenario1=json_data
-        #______reading from file
         scenario=[json_data]
         print( '=======================================================================================================')
         log.info('***DEBUG STARTED***')
@@ -826,21 +829,6 @@ class Controller():
                         con.configvalues=configvalues
                         con.wx_object=wxObject
                         handler.tspList=[]
-
-##                        #Custom logic here to check empty testcase and if empty, terminate the scnerio execution
-##                        for d in [eval(scenario[scenario_id])]:
-##                            if terminate_flag:
-##                                break
-##                            flag,browser_temp,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(d,dataparam_path_value)
-##                            if(testcase_empty_flag):
-##                                terminate_flag = True
-##                                condition_check_flag = True
-##                                info_msg=str("Scenario cannot be executed, since the following testcases are empty: "+','.join(empty_testcase_names))
-##                                logger.print_on_console(info_msg)
-##                                log.info(info_msg)
-##                                status = TERMINATE
-
-
                         #condition check for scenario execution and reporting for condition check
                         if not(condition_check_flag):
                              #check for temrinate flag before printing loggers
@@ -888,10 +876,6 @@ class Controller():
                                             if tsplist[k].apptype.lower()=='web':
                                                 if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
                                                         tsplist[k].inputval = [browser]
-##                            if len(handler.tspList)==0:
-##                                execute_flag=False
-##                                logger.print_on_console('Scenario '+str((i  + 1 ) )+' is empty')
-##                                log.info('Scenario '+str((i  + 1 ) )+' is empty')
                             if flag and execute_flag :
                                 #check for temrinate flag before execution
                                 tsplist = obj.read_step()
@@ -903,8 +887,6 @@ class Controller():
                                     print( '=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
                                     print( '=======================================================================================================')
-##                            else:
-##                                print 'Invalid script'
                             if execute_flag:
                                 #Saving the report for the scenario
                                 logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
@@ -929,10 +911,7 @@ class Controller():
                                         qc_update_status='Failed'
                                     else:
                                         qc_update_status='Not Completed'
-    ##                                qc_status='http://srv03wap121:8080/qcbin,Chethan,Chethan1,ENTERPRISE,DimensionLab,root\TestFolder1,TestSet1,[1]QC-2,'+str(qc_update_status)
-
                                     qc_status=qc_url+','+qc_username+','+qc_password+','+qc_domain+','+qc_project+','+qc_folder+','+qc_tsList+','+qc_testrunname+','+str(qc_update_status)
-
                                     status_qc=qc_json.update_qc_details(str(qc_status))
 
                                 #Check is made to fix issue #401
@@ -945,7 +924,6 @@ class Controller():
                                             condition_check_flag = True
                                             logger.print_on_console('Condition Check: Terminated by program ')
                             elif (True in testcase_empty_flag):
-
                                 logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
                                 log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                                 os.chdir(self.cur_dir)
@@ -954,31 +932,17 @@ class Controller():
                                 socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck_testcase_empty(suite_id,scenario_id,con,execution_id))
                                 obj.clearList(con)
                                 i+=1
-
                         else:
-##                            if (testcase_empty_flag):
-##                                logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
-##                                log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
-##                                os.chdir(self.cur_dir)
-##                                filename='Scenario'+str(i  + 1)+'.json'
-##                                con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg)
-##
-##                                socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck_testcase_empty(suite_id,scenario_id,con,execution_id))
-##                                obj.clearList(con)
-##                                i+=1
-##                                #logic for condition check
-##                                report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-##                            else:
-                                logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
-                                log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
-                                os.chdir(self.cur_dir)
-                                filename='Scenario'+str(i  + 1)+'.json'
-                                con.reporting_obj.save_report_json_conditioncheck(filename)
-                                socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck(suite_id,scenario_id,con,execution_id))
-                                obj.clearList(con)
-                                i+=1
-                                #logic for condition check
-                                report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+                            logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
+                            log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
+                            os.chdir(self.cur_dir)
+                            filename='Scenario'+str(i  + 1)+'.json'
+                            con.reporting_obj.save_report_json_conditioncheck(filename)
+                            socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck(suite_id,scenario_id,con,execution_id))
+                            obj.clearList(con)
+                            i+=1
+                            #logic for condition check
+                            report_json=con.reporting_obj.report_json[OVERALLSTATUS]
             log.info('---------------------------------------------------------------------')
             print( '=======================================================================================================')
             log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
@@ -993,6 +957,7 @@ class Controller():
             logger.print_on_console( '***Terminating the Execution***')
             print( '=======================================================================================================')
         return status
+
     #Building of Dictionary to send back toserver to save the data
     def getreport_data(self,testsuite_id,scenario_id,con,execution_id):
         obj={'testsuiteId':testsuite_id,
@@ -1019,11 +984,10 @@ class Controller():
 
     def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,wxObject,socketIO,*args):
         status = COMPLETED
-        global terminate_flag,break_point,pause_flag,socket_object,exception_flag
+        global terminate_flag,break_point,pause_flag,socket_object
         self.conthread=mythread
         self.clear_data()
         socket_object = socketIO
-        exception_flag = self.configvalues["exception_flag"]
         #Logic to make sure that logic of usage of existing driver is not applicable to execution
         if self.web_dispatcher_obj != None:
             self.web_dispatcher_obj.action=action
@@ -1031,13 +995,13 @@ class Controller():
         if action.lower()==EXECUTE:
             self.execution_mode=SERIAL
             #Parallel Execution
-            obj=handler.Handler()
-##            kill_process()
-##            if execution_mode.lower() == PARALLEL:
-##                status=self.invoke_execution(mythread,json_data)
+            ##obj=handler.Handler()
+            ##kill_process()
+            ##if execution_mode.lower() == PARALLEL:
+            ##    status=self.invoke_execution(mythread,json_data)
             if self.execution_mode.lower() == SERIAL:
                 status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues)
-##            kill_process()
+            ##kill_process()
         elif action.lower()==DEBUG:
             self.debug_mode=debug_mode
             self.wx_object=wxObject
@@ -1070,6 +1034,7 @@ class Controller():
                 executor.shutdown()
                 break
         logger.print_on_console ('Parallel execution completed')
+
     def step_execution_status(self,teststepproperty):
         #325 : Report - Skip status in report by providing value 0 in the output column in testcase grid is not handled.
         outputstring = teststepproperty.outputval
@@ -1077,12 +1042,13 @@ class Controller():
         if len(outputstring) > 0  and outputstring != None:
             if (outputstring.find(';') > 0):
                 index = outputstring.rfind(';')
-##                print outputstring[index + 1:]
                 if outputstring[index + 1:] == STEPSTATUS_INREPORTS_ZERO:
                     nostatusflag = True
             elif outputstring== STEPSTATUS_INREPORTS_ZERO:
                 nostatusflag = True
         return nostatusflag
+
+
 def kill_process():
     import tempfile
     import psutil
@@ -1092,8 +1058,6 @@ def kill_process():
             import browserops_MW
             browserops_MW.driver.quit()
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             logger.print_on_console('Error in stopping scraping driver as driver is already closed')
             log.error(e)
 
@@ -1101,8 +1065,6 @@ def kill_process():
             import browser_Keywords_MW
             browser_Keywords_MW.driver_obj.quit()
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             logger.print_on_console('Error in stopping browser driver as driver is already closed')
             log.error(e)
 
@@ -1110,8 +1072,6 @@ def kill_process():
             import install_and_launch
             install_and_launch.driver.quit()
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             logger.print_on_console('Error in stopping application driver as driver is already closed')
             log.error(e)
 
@@ -1150,7 +1110,7 @@ def kill_process():
         try:
             import browser_Keywords
             pidset = browser_Keywords.pid_set
-    ##        processes = psutil.net_connections()
+            ##processes = psutil.net_connections()
             for pid in pidset:
                 log.info( 'Pid Found' )
                 log.info(pid)
@@ -1170,7 +1130,7 @@ def kill_process():
                     try:
                         folderwithnum = int(the_file[0:3])
                     except Exception as e:
-                        p = 1
+                        log.error(e)
                     for name in profdir:
                         if the_file.startswith(name) or isinstance(folderwithnum,int):
                             try:
@@ -1182,97 +1142,10 @@ def kill_process():
                                     shutil.rmtree(file_path,ignore_errors=True)
                                     break
                             except Exception as e:
-                                m=1
+                                log.error(e)
             except Exception as e:
                 log.error('Error while deleting file/folder')
+                log.error(e)
         except Exception as e:
             log.error('Error while deleting file/folder')
-#main method
-if __name__ == '__main__':
-##    kill_process()
-##    #To debug from main method
-##    obj = handler.Handler()
-##    obj1=Controller()
-##    obj1.get_all_the_imports(CORE)
-##    print 'Controller object created'
-##    t = test_debug.Test()
-##    list_data,flag = t.gettsplist()
-##    for d in list_data:
-##        flag,browsers,last_num=obj.parse_json(d)
-##        if flag == False:
-##            break
-##        print '\n'
-##        tsplist = obj.read_step()
-##        for k in range(len(tsplist)):
-##            if tsplist[k].name.lower() == 'openbrowser':
-##                tsplist[k].inputval = browsers
-##        if flag:
-##            debugfrom_step=2
-##            status = obj1.executor(tsplist,DEBUG,last_num,debugfrom_step)
-##
-##        else:
-##            print 'Invalid script'
-    #To execute from main method
-    #obj=Controller()
-    json_data={
-	"suitedetails": [{
-		"ts1": [{
-			"f432bd8c-ccc3-462f-9281-40fded159eeb": [{
-				"template": "",
-				"testcase": "[{ \"outputVal\": \"\", \"keywordVal\": \"openBrowser\", \"objectName\": \" \", \"_id_\": \"1\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 1, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [\"this is first remark\", \"this is second remark\"] }, { \"outputVal\": \"\", \"keywordVal\": \"navigateToURL\", \"objectName\": \" \", \"_id_\": \"2\", \"inputVal\": [\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\"], \"appType\": \"Web\", \"stepNo\": 2, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"3\", \"inputVal\": [\"{a};D:\\\\OEBS\"], \"appType\": \"Generic\", \"stepNo\": 3, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"4\", \"inputVal\": [\"{b};txt\"], \"appType\": \"Generic\", \"stepNo\": 4, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"{1}\", \"keywordVal\": \"verifyExists\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"5\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 5, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"displayVariableValue\", \"objectName\": \" \", \"_id_\": \"6\", \"inputVal\": [\"{1}\"], \"appType\": \"Generic\", \"stepNo\": 6, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"click\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"7\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 7, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"sendFunctionKeys\", \"objectName\": \" \", \"_id_\": \"8\", \"inputVal\": [\"ctrl+s\"], \"appType\": \"Generic\", \"stepNo\": 8, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"saveFile\", \"objectName\": \" \", \"_id_\": \"9\", \"inputVal\": [\"{a};{b}\"], \"appType\": \"Generic\", \"stepNo\": 9, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }]",
-				"testcasename": "Dev_Testing1"
-			}, {
-				"template": "",
-				"testcase": "[{\"stepNo\":1,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"doubleClick\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Comments updated\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"1\"},{\"stepNo\":2,\"objectName\":\" \",\"custname\":\"@Generic\",\"keywordVal\":\"captureScreenshot\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Remarks for step 2\",\"url\":\" \",\"appType\":\"Generic\",\"_id_\":\"2\"},{\"stepNo\":3,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"getElementText\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 3\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"3\"},{\"stepNo\":4,\"objectName\":\" \",\"custname\":\"@Browser\",\"keywordVal\":\"getCurrentURL\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 4\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"4\"}]",
-				"testcasename": "Dev_Testing"
-			}]
-		}],
-		"scenarioIds": ["f432bd8c-ccc3-462f-9281-40fded159eeb"],
-		"browserType": ["1",'3']
-	}, {
-		"ts2": [{
-			"f432bd8c-ccc3-462f-9281-40fded159ccb": [{
-				"template": "",
-				"testcase": "[{ \"outputVal\": \"\", \"keywordVal\": \"openBrowser\", \"objectName\": \" \", \"_id_\": \"1\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 1, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [\"this is first remark\", \"this is second remark\"] }, { \"outputVal\": \"\", \"keywordVal\": \"navigateToURL\", \"objectName\": \" \", \"_id_\": \"2\", \"inputVal\": [\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\"], \"appType\": \"Web\", \"stepNo\": 2, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"3\", \"inputVal\": [\"{a};D:\\\\OEBS\"], \"appType\": \"Generic\", \"stepNo\": 3, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"4\", \"inputVal\": [\"{b};txt\"], \"appType\": \"Generic\", \"stepNo\": 4, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"{1}\", \"keywordVal\": \"verifyExists\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"5\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 5, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"displayVariableValue\", \"objectName\": \" \", \"_id_\": \"6\", \"inputVal\": [\"{1}\"], \"appType\": \"Generic\", \"stepNo\": 6, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"click\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"7\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 7, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"sendFunctionKeys\", \"objectName\": \" \", \"_id_\": \"8\", \"inputVal\": [\"ctrl+s\"], \"appType\": \"Generic\", \"stepNo\": 8, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"saveFile\", \"objectName\": \" \", \"_id_\": \"9\", \"inputVal\": [\"{a};{b}\"], \"appType\": \"Generic\", \"stepNo\": 9, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }]",
-				"testcasename": "Dev_Testing1"
-			}, {
-				"template": "",
-				"testcase": "[{\"stepNo\":1,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"doubleClick\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Comments updated\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"1\"},{\"stepNo\":2,\"objectName\":\" \",\"custname\":\"@Generic\",\"keywordVal\":\"captureScreenshot\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Remarks for step 2\",\"url\":\" \",\"appType\":\"Generic\",\"_id_\":\"2\"},{\"stepNo\":3,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"getElementText\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 3\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"3\"},{\"stepNo\":4,\"objectName\":\" \",\"custname\":\"@Browser\",\"keywordVal\":\"getCurrentURL\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 4\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"4\"}]",
-				"testcasename": "Dev_Testing"
-			}]
-		}],
-		"scenarioIds": ["f432bd8c-ccc3-462f-9281-40fded159ccb"],
-		"browserType": ["3"]
-	}],
-	"testsuiteIds": ["ts1", "ts2"]
-    }
-##json_data1=[{
-##                "f432bd8c-ccc3-462f-9281-40fded159778": [{
-##                                "f432bd8c-ccc3-462f-9281-40fded159eeb": [{
-##                                                "template": "",
-##                                                "testcase": "[{ \"outputVal\": \"\", \"keywordVal\": \"openBrowser\", \"objectName\": \" \", \"_id_\": \"1\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 1, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [\"this is first remark\", \"this is second remark\"] }, { \"outputVal\": \"\", \"keywordVal\": \"navigateToURL\", \"objectName\": \" \", \"_id_\": \"2\", \"inputVal\": [\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\"], \"appType\": \"Web\", \"stepNo\": 2, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"3\", \"inputVal\": [\"{a};D:\\\\OEBS\"], \"appType\": \"Generic\", \"stepNo\": 3, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"4\", \"inputVal\": [\"{b};txt\"], \"appType\": \"Generic\", \"stepNo\": 4, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"{1}\", \"keywordVal\": \"verifyExists\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"5\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 5, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"displayVariableValue\", \"objectName\": \" \", \"_id_\": \"6\", \"inputVal\": [\"{1}\"], \"appType\": \"Generic\", \"stepNo\": 6, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"click\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"7\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 7, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"sendFunctionKeys\", \"objectName\": \" \", \"_id_\": \"8\", \"inputVal\": [\"ctrl+s\"], \"appType\": \"Generic\", \"stepNo\": 8, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"saveFile\", \"objectName\": \" \", \"_id_\": \"9\", \"inputVal\": [\"{a};{b}\"], \"appType\": \"Generic\", \"stepNo\": 9, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }]",
-##                                                "testcasename": "Dev_Testing1"
-##                                }, {
-##                                                "template": "",
-##                                                "testcase": "[{\"stepNo\":1,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"doubleClick\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Comments updated\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"1\"},{\"stepNo\":2,\"objectName\":\" \",\"custname\":\"@Generic\",\"keywordVal\":\"captureScreenshot\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Remarks for step 2\",\"url\":\" \",\"appType\":\"Generic\",\"_id_\":\"2\"},{\"stepNo\":3,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"getElementText\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 3\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"3\"},{\"stepNo\":4,\"objectName\":\" \",\"custname\":\"@Browser\",\"keywordVal\":\"getCurrentURL\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 4\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"4\"}]",
-##                                                "testcasename": "Dev_Testing"
-##                                }],
-##                                "f432bd8c-ccc3-462f-9281-40fded159eec": [{
-##                                                "template": "",
-##                                                "testcase": "[{ \"outputVal\": \"\", \"keywordVal\": \"openBrowser\", \"objectName\": \" \", \"_id_\": \"1\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 1, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [\"this is first remark\", \"this is second remark\"] }, { \"outputVal\": \"\", \"keywordVal\": \"navigateToURL\", \"objectName\": \" \", \"_id_\": \"2\", \"inputVal\": [\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\"], \"appType\": \"Web\", \"stepNo\": 2, \"url\": \" \", \"custname\": \"@Browser\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"3\", \"inputVal\": [\"{a};D:\\\\OEBS\"], \"appType\": \"Generic\", \"stepNo\": 3, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"createDynVariable\", \"objectName\": \" \", \"_id_\": \"4\", \"inputVal\": [\"{b};txt\"], \"appType\": \"Generic\", \"stepNo\": 4, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"{1}\", \"keywordVal\": \"verifyExists\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"5\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 5, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"displayVariableValue\", \"objectName\": \" \", \"_id_\": \"6\", \"inputVal\": [\"{1}\"], \"appType\": \"Generic\", \"stepNo\": 6, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"click\", \"objectName\": \"//*[@id=\\\"wsite-content\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\", \"_id_\": \"7\", \"inputVal\": [\"\"], \"appType\": \"Web\", \"stepNo\": 7, \"url\": \"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\", \"custname\": \"Download File\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"sendFunctionKeys\", \"objectName\": \" \", \"_id_\": \"8\", \"inputVal\": [\"ctrl+s\"], \"appType\": \"Generic\", \"stepNo\": 8, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }, { \"outputVal\": \"\", \"keywordVal\": \"saveFile\", \"objectName\": \" \", \"_id_\": \"9\", \"inputVal\": [\"{a};{b}\"], \"appType\": \"Generic\", \"stepNo\": 9, \"url\": \" \", \"custname\": \"@Generic\", \"remarks\": [] }]",
-##                                                "testcasename": "Dev_Testing1"
-##                                }, {
-##                                                "template": "",
-##                                                "testcase": "[{\"stepNo\":1,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"doubleClick\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Comments updated\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"1\"},{\"stepNo\":2,\"objectName\":\" \",\"custname\":\"@Generic\",\"keywordVal\":\"captureScreenshot\",\"inputVal\":[\"\"],\"outputVal\":\"##\",\"remarks\":\"Remarks for step 2\",\"url\":\" \",\"appType\":\"Generic\",\"_id_\":\"2\"},{\"stepNo\":3,\"objectName\":\"@Custom\",\"custname\":\"@Custom\",\"keywordVal\":\"getElementText\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 3\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"3\"},{\"stepNo\":4,\"objectName\":\" \",\"custname\":\"@Browser\",\"keywordVal\":\"getCurrentURL\",\"inputVal\":[\"\"],\"outputVal\":\"\",\"remarks\":\"Remarks for step 4\",\"url\":\" \",\"appType\":\"Web\",\"_id_\":\"4\"}]",
-##                                                "testcasename": "Dev_Testing"
-##                                }]
-##                }],
-####                "scenarioIds": ["f432bd8c-ccc3-462f-9281-40fded159eeb","f432bd8c-ccc3-462f-9281-40fded159eec"],
-##                "browserType": ["1","2"]
-##}]
-##    obj1=handler.Handler()
-##    suiteId_list,suite_details=obj1.parse_json_execute(json_data)
-##    json_data={u'suitedetails': [{u'13bbacaf-82c7-4c4a-9f91-0933462b10d4': [{u'f432bd8c-ccc3-462f-9281-40fded159eeb': u'[{"template":"","testcase":"[{ \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"openBrowser\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"1\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 1, \\"url\\": \\" \\", \\"custname\\": \\"@Browser\\", \\"remarks\\": [\\"this is first remark\\", \\"this is second remark\\"] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"navigateToURL\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"2\\", \\"inputVal\\": [\\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 2, \\"url\\": \\" \\", \\"custname\\": \\"@Browser\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"createDynVariable\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"3\\", \\"inputVal\\": [\\"{a};D:\\\\\\\\OEBS\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 3, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"createDynVariable\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"4\\", \\"inputVal\\": [\\"{b};txt\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 4, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"{1}\\", \\"keywordVal\\": \\"verifyExists\\", \\"objectName\\": \\"//*[@id=\\\\\\"wsite-content\\\\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\\", \\"_id_\\": \\"5\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 5, \\"url\\": \\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\", \\"custname\\": \\"Download File\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"displayVariableValue\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"6\\", \\"inputVal\\": [\\"{1}\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 6, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"click\\", \\"objectName\\": \\"//*[@id=\\\\\\"wsite-content\\\\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\\", \\"_id_\\": \\"7\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 7, \\"url\\": \\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\", \\"custname\\": \\"Download File\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"sendFunctionKeys\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"8\\", \\"inputVal\\": [\\"ctrl+s\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 8, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"saveFile\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"9\\", \\"inputVal\\": [\\"{a};{b}\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 9, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }]","testcasename":"Dev_Testing1"},{"template":"","testcase":"[{\\"stepNo\\":1,\\"objectName\\":\\"@Custom\\",\\"custname\\":\\"@Custom\\",\\"keywordVal\\":\\"doubleClick\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"##\\",\\"remarks\\":\\"Comments updated\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"1\\"},{\\"stepNo\\":2,\\"objectName\\":\\" \\",\\"custname\\":\\"@Generic\\",\\"keywordVal\\":\\"captureScreenshot\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"##\\",\\"remarks\\":\\"Remarks for step 2\\",\\"url\\":\\" \\",\\"appType\\":\\"Generic\\",\\"_id_\\":\\"2\\"},{\\"stepNo\\":3,\\"objectName\\":\\"@Custom\\",\\"custname\\":\\"@Custom\\",\\"keywordVal\\":\\"getElementText\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarks\\":\\"Remarks for step 3\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"3\\"},{\\"stepNo\\":4,\\"objectName\\":\\" \\",\\"custname\\":\\"@Browser\\",\\"keywordVal\\":\\"getCurrentURL\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarks\\":\\"Remarks for step 4\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"4\\"}]","testcasename":"Dev_Testing"}]', u'72bcc08e-15a7-4de6-ad59-389aee2230cb': u'[{"template":"","testcase":"[{ \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"openBrowser\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"1\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 1, \\"url\\": \\" \\", \\"custname\\": \\"@Browser\\", \\"remarks\\": [\\"this is first remark\\", \\"this is second remark\\"] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"navigateToURL\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"2\\", \\"inputVal\\": [\\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 2, \\"url\\": \\" \\", \\"custname\\": \\"@Browser\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"createDynVariable\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"3\\", \\"inputVal\\": [\\"{a};D:\\\\\\\\OEBS\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 3, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"createDynVariable\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"4\\", \\"inputVal\\": [\\"{b};txt\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 4, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"{1}\\", \\"keywordVal\\": \\"verifyExists\\", \\"objectName\\": \\"//*[@id=\\\\\\"wsite-content\\\\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\\", \\"_id_\\": \\"5\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 5, \\"url\\": \\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\", \\"custname\\": \\"Download File\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"displayVariableValue\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"6\\", \\"inputVal\\": [\\"{1}\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 6, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"click\\", \\"objectName\\": \\"//*[@id=\\\\\\"wsite-content\\\\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\\", \\"_id_\\": \\"7\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 7, \\"url\\": \\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\", \\"custname\\": \\"Download File\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"sendFunctionKeys\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"8\\", \\"inputVal\\": [\\"ctrl+s\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 8, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"saveFile\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"9\\", \\"inputVal\\": [\\"{a};{b}\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 9, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }]","testcasename":"Dev_Testing1"},{"template":"","testcase":"[{\\"stepNo\\":1,\\"objectName\\":\\"@Custom\\",\\"custname\\":\\"@Custom\\",\\"keywordVal\\":\\"doubleClick\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"##\\",\\"remarks\\":\\"Comments updated\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"1\\"},{\\"stepNo\\":2,\\"objectName\\":\\" \\",\\"custname\\":\\"@Generic\\",\\"keywordVal\\":\\"captureScreenshot\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"##\\",\\"remarks\\":\\"Remarks for step 2\\",\\"url\\":\\" \\",\\"appType\\":\\"Generic\\",\\"_id_\\":\\"2\\"},{\\"stepNo\\":3,\\"objectName\\":\\"@Custom\\",\\"custname\\":\\"@Custom\\",\\"keywordVal\\":\\"getElementText\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarks\\":\\"Remarks for step 3\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"3\\"},{\\"stepNo\\":4,\\"objectName\\":\\" \\",\\"custname\\":\\"@Browser\\",\\"keywordVal\\":\\"getCurrentURL\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarks\\":\\"Remarks for step 4\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"4\\"}]","testcasename":"Dev_Testing"}]'}, {u'f432bd8c-ccc3-462f-9281-40fded159eeb': u'[{"template":"","testcase":"[{ \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"openBrowser\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"1\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 1, \\"url\\": \\" \\", \\"custname\\": \\"@Browser\\", \\"remarks\\": [\\"this is first remark\\", \\"this is second remark\\"] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"navigateToURL\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"2\\", \\"inputVal\\": [\\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 2, \\"url\\": \\" \\", \\"custname\\": \\"@Browser\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"createDynVariable\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"3\\", \\"inputVal\\": [\\"{a};D:\\\\\\\\OEBS\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 3, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"createDynVariable\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"4\\", \\"inputVal\\": [\\"{b};txt\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 4, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"{1}\\", \\"keywordVal\\": \\"verifyExists\\", \\"objectName\\": \\"//*[@id=\\\\\\"wsite-content\\\\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\\", \\"_id_\\": \\"5\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 5, \\"url\\": \\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\", \\"custname\\": \\"Download File\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"displayVariableValue\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"6\\", \\"inputVal\\": [\\"{1}\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 6, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"click\\", \\"objectName\\": \\"//*[@id=\\\\\\"wsite-content\\\\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\\", \\"_id_\\": \\"7\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 7, \\"url\\": \\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\", \\"custname\\": \\"Download File\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"sendFunctionKeys\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"8\\", \\"inputVal\\": [\\"ctrl+s\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 8, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"saveFile\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"9\\", \\"inputVal\\": [\\"{a};{b}\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 9, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }]","testcasename":"Dev_Testing1"},{"template":"","testcase":"[{\\"stepNo\\":1,\\"objectName\\":\\"@Custom\\",\\"custname\\":\\"@Custom\\",\\"keywordVal\\":\\"doubleClick\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"##\\",\\"remarks\\":\\"Comments updated\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"1\\"},{\\"stepNo\\":2,\\"objectName\\":\\" \\",\\"custname\\":\\"@Generic\\",\\"keywordVal\\":\\"captureScreenshot\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"##\\",\\"remarks\\":\\"Remarks for step 2\\",\\"url\\":\\" \\",\\"appType\\":\\"Generic\\",\\"_id_\\":\\"2\\"},{\\"stepNo\\":3,\\"objectName\\":\\"@Custom\\",\\"custname\\":\\"@Custom\\",\\"keywordVal\\":\\"getElementText\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarks\\":\\"Remarks for step 3\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"3\\"},{\\"stepNo\\":4,\\"objectName\\":\\" \\",\\"custname\\":\\"@Browser\\",\\"keywordVal\\":\\"getCurrentURL\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarks\\":\\"Remarks for step 4\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"4\\"}]","testcasename":"Dev_Testing"}]', u'72bcc08e-15a7-4de6-ad59-389aee2230cb': u'[{"template":"","testcase":"[{ \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"openBrowser\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"1\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 1, \\"url\\": \\" \\", \\"custname\\": \\"@Browser\\", \\"remarks\\": [\\"this is first remark\\", \\"this is second remark\\"] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"navigateToURL\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"2\\", \\"inputVal\\": [\\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 2, \\"url\\": \\" \\", \\"custname\\": \\"@Browser\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"createDynVariable\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"3\\", \\"inputVal\\": [\\"{a};D:\\\\\\\\OEBS\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 3, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"createDynVariable\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"4\\", \\"inputVal\\": [\\"{b};txt\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 4, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"{1}\\", \\"keywordVal\\": \\"verifyExists\\", \\"objectName\\": \\"//*[@id=\\\\\\"wsite-content\\\\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\\", \\"_id_\\": \\"5\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 5, \\"url\\": \\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\", \\"custname\\": \\"Download File\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"displayVariableValue\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"6\\", \\"inputVal\\": [\\"{1}\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 6, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"click\\", \\"objectName\\": \\"//*[@id=\\\\\\"wsite-content\\\\\\"]/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;/html/body/div[1]/div[2]/div/div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]/div[1]/div/div/a;null;null;null\\", \\"_id_\\": \\"7\\", \\"inputVal\\": [\\"\\"], \\"appType\\": \\"Web\\", \\"stepNo\\": 7, \\"url\\": \\"http://lucky13markee.weebly.com/tagalog-stories-by-various-authors.html\\", \\"custname\\": \\"Download File\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"sendFunctionKeys\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"8\\", \\"inputVal\\": [\\"ctrl+s\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 8, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }, { \\"outputVal\\": \\"\\", \\"keywordVal\\": \\"saveFile\\", \\"objectName\\": \\" \\", \\"_id_\\": \\"9\\", \\"inputVal\\": [\\"{a};{b}\\"], \\"appType\\": \\"Generic\\", \\"stepNo\\": 9, \\"url\\": \\" \\", \\"custname\\": \\"@Generic\\", \\"remarks\\": [] }]","testcasename":"Dev_Testing1"},{"template":"","testcase":"[{\\"stepNo\\":1,\\"objectName\\":\\"@Custom\\",\\"custname\\":\\"@Custom\\",\\"keywordVal\\":\\"doubleClick\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"##\\",\\"remarks\\":\\"Comments updated\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"1\\"},{\\"stepNo\\":2,\\"objectName\\":\\" \\",\\"custname\\":\\"@Generic\\",\\"keywordVal\\":\\"captureScreenshot\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"##\\",\\"remarks\\":\\"Remarks for step 2\\",\\"url\\":\\" \\",\\"appType\\":\\"Generic\\",\\"_id_\\":\\"2\\"},{\\"stepNo\\":3,\\"objectName\\":\\"@Custom\\",\\"custname\\":\\"@Custom\\",\\"keywordVal\\":\\"getElementText\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarks\\":\\"Remarks for step 3\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"3\\"},{\\"stepNo\\":4,\\"objectName\\":\\" \\",\\"custname\\":\\"@Browser\\",\\"keywordVal\\":\\"getCurrentURL\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarks\\":\\"Remarks for step 4\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\",\\"_id_\\":\\"4\\"}]","testcasename":"Dev_Testing"}]'}], u'browserType': [u'1', u'3'], u'scenarioIds': [u'72bcc08e-15a7-4de6-ad59-389aee2230cb', u'f432bd8c-ccc3-462f-9281-40fded159eeb']}], u'testsuiteIds': [u'13bbacaf-82c7-4c4a-9f91-0933462b10d4'],u'executionId': [u'13bbacaf-82c7-4c4a-9f91-0933462b10d4']}
-##    json_data={u'executionId': u'7d0eea8c-c8d2-4f81-b9ff-04abeb14444e', u'suitedetails': [{u'13bbacaf-82c7-4c4a-9f91-0933462b10d4': [{u'72bcc08e-15a7-4de6-ad59-389aee2230cb': u'[{"template":"","testcase":"[{\\"stepNo\\":1,\\"objectName\\":\\" \\",\\"custname\\":\\"@Browser\\",\\"keywordVal\\":\\"openBrowser\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"\\",\\"remarksStatus\\":\\"<img src=\\\\\\"imgs/ic-remarks-inactive.png\\\\\\" class=\\\\\\"remarksIcon\\\\\\">\\",\\"remarks\\":\\"\xa0\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\"},{\\"stepNo\\":2,\\"objectName\\":\\" \\",\\"custname\\":\\"@Browser\\",\\"keywordVal\\":\\"navigateToURL\\",\\"inputVal\\":[\\"https://www.google.co.in/?gfe_rd=cr&ei=etWhWMOVMeKK8Qey0r2oAg\\"],\\"outputVal\\":\\"\\",\\"remarksStatus\\":\\"<img src=\\\\\\"imgs/ic-remarks-inactive.png\\\\\\" class=\\\\\\"remarksIcon\\\\\\">\\",\\"remarks\\":\\"\xa0\\",\\"url\\":\\" \\",\\"appType\\":\\"Web\\"},{\\"stepNo\\":3,\\"objectName\\":\\"//*[@id=\\\\\\"lst-ib\\\\\\"];lst-ib;/html/body/div[1]/div[3]/form/div[2]/div[2]/div[1]/div[1]/div[3]/div/div/div[3]/div/input[1];null;null;null\\",\\"custname\\":\\"q_txtbox\\",\\"keywordVal\\":\\"verifyExists\\",\\"inputVal\\":[\\"\\"],\\"outputVal\\":\\"{a}\\",\\"remarksStatus\\":\\"<img src=\\\\\\"imgs/ic-remarks-inactive.png\\\\\\" class=\\\\\\"remarksIcon\\\\\\">\\",\\"remarks\\":\\"\xa0\\",\\"url\\":\\"https://www.google.co.in/?gfe_rd=cr&ei=GyKHWLHOJM2L8Qflo7bwCw&gws_rd=ssl\\",\\"appType\\":\\"Web\\"},{\\"stepNo\\":4,\\"objectName\\":\\"//*[@id=\\\\\\"lst-ib\\\\\\"];lst-ib;/html/body/div[1]/div[3]/form/div[2]/div[2]/div[1]/div[1]/div[3]/div/div/div[3]/div/input[1];null;null;null\\",\\"custname\\":\\"q_txtbox\\",\\"keywordVal\\":\\"setSecureText\\",\\"inputVal\\":[\\"selenium\\"],\\"outputVal\\":\\"\\",\\"remarksStatus\\":\\"<img src=\\\\\\"imgs/ic-remarks-inactive.png\\\\\\" class=\\\\\\"remarksIcon\\\\\\">\\",\\"remarks\\":\\"\xa0\\",\\"url\\":\\"https://www.google.co.in/?gfe_rd=cr&ei=GyKHWLHOJM2L8Qflo7bwCw&gws_rd=ssl\\",\\"appType\\":\\"Web\\"},{\\"stepNo\\":5,\\"objectName\\":\\" \\",\\"custname\\":\\"@Generic\\",\\"keywordVal\\":\\"displayVariableValue\\",\\"inputVal\\":[\\"{a}\\"],\\"outputVal\\":\\"\\",\\"remarksStatus\\":\\"<img src=\\\\\\"imgs/ic-remarks-inactive.png\\\\\\" class=\\\\\\"remarksIcon\\\\\\">\\",\\"remarks\\":\\"\xa0\\",\\"url\\":\\" \\",\\"appType\\":\\"Generic\\"}]","testcasename":"Dev_Testing"}]'}], u'dataparampath': [None], u'browserType': [u'1',u'3'], u'condition': ['0'], u'scenarioIds': [u'72bcc08e-15a7-4de6-ad59-389aee2230cb']}], u'testsuiteIds': [u'13bbacaf-82c7-4c4a-9f91-0933462b10d4']}
-##    obj.invoke_execution('',json_data,'')
-##    kill_process()
+            log.error(e)
