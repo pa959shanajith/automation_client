@@ -26,7 +26,8 @@ class readConfig():
         configvalues={"server_ip":"", "server_port":"", "ignore_certificate":"",
         "chrome_path":"", "bit_64":"", "logFile_Path":"", "screenShot_Flag":"",
         "queryTimeOut":"", "timeOut":"", "stepExecutionWait":"", "displayVariableTimeOut":"",
-        "retrieveURL":"", "delay":"", "ignoreVisibilityCheck":"", "server_cert":""}
+        "retrieveURL":"", "delay":"", "ignoreVisibilityCheck":"", "exception_flag":"",
+        "server_cert":""}
         try:
             config = json.loads(open(self.config_path).read())
             params = config['configuration']
@@ -44,6 +45,7 @@ class readConfig():
             configvalues['retrieveURL']=params['retrieveURL']
             configvalues['delay']=params['delay']
             configvalues['ignoreVisibilityCheck']=params['ignoreVisibilityCheck']
+            configvalues['exception_flag']=params['exception_flag']
             configvalues['server_cert']=params['server_cert']
         except Exception as e:
             configvalues['errorflag']=e
