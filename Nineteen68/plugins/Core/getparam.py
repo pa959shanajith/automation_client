@@ -445,16 +445,12 @@ class GetParam():
                     statCnt=0
                     for var in static_var_list:
                         inputresult=self.get_static_value(data,row,var)
-                        #if isinstance(inputresult,ValueError):
-                        #    return inputresult
                         if inputresult is None:
                             resultinput = resultinput.replace('|'+var+'|',STATIC_NONE)
                         else:
                             if isinstance(inputresult,float):
                                 if inputresult%1 == 0.0:
                                     inputresult= int(inputresult)
-                            elif inputresult.find(';') != -1:
-                                inputresult = inputresult.replace(';',STATIC_SEPARATOR)
                             temp='{#@#'+str(statCnt)+'#@#}'
                             statDict[temp]=inputresult
                             resultinput = resultinput.replace('|'+var+'|',temp)
@@ -479,8 +475,6 @@ class GetParam():
                                 variable = PIPE + columnname + PIPE
                                 p = p + len(variable)
                                 inputresult=self.get_static_value(data,row,columnname)
-                                #if isinstance(inputresult,ValueError):
-                                #    return inputresult
                                 if inputresult is None:
                                     inputresult=STATIC_NONE
                                 else:

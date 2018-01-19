@@ -11,33 +11,30 @@
 import win32com
 from win32com.client import Dispatch
 import json
-import wx
-from socketIO_client import SocketIO,BaseNamespace
+#import wx
+
+import socket
+#from socketIO_client import SocketIO,BaseNamespace
 ##import launch_keywords
 ##desktop_scraping_obj = desktop_scraping.Scrape()
 import os
-import logger
+import time
+#import logger
 obj=None
 TD=None
 loginflag=False
 urlflag=False
 dictFolderJson=None
-import core_utils
-class QcWindow(wx.Frame):
+con = None
+sent=0
+#import core_utils
+class QcWindow():
 
-    def __init__(self, parent,id, title,filePath,socketIO):
+    def __init__(self,filePath):
         status=None
-        #print ' in the main qc'
         try:
-            wx.Frame.__init__(self, parent, title=title,
-                       pos=(300, 150),  size=(200, 150) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
-            self.SetBackgroundColour('#e6e7e8')
-            self.iconpath = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images" + "/slk.ico"
-            self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
-            self.core_utilsobject = core_utils.CoreUtils()
-            global obj
-            self.socketIO = socketIO
-
+            global obj,sent
+            flag=0
             if(filePath["qcaction"]=='domain'):
                 try:
                     user_name=filePath["qcUsername"]
@@ -49,47 +46,57 @@ class QcWindow(wx.Frame):
                     global loginflag
                     loginflag=False
                     global TD
+                    print(user_name,pass_word,Qc_Url)
                     TD = win32com.client.Dispatch("TDApiOle80.TDConnection")
+                    print("Connection Build - ",TD)
                     global urlflag
                     urlflag=False
                     TD.InitConnectionEx(str(Qc_Url))
-
                     urlflag=True
-##                    print TD.connected
                     un=str(user_name)
                     pw=str(pass_word)
-##                    print user_name,',',pass_word
                     TD.Login(un,pw)
                     loginflag=True
                     status = self.getDomain(filePath)
                 except Exception as eqc:
+                    print('Connection Failed..')
                     self.quit_qc()
-                    logger.print_on_console('Please provide valid credentials - Connection not established / Login unsuccessful')
+                    flag=1;
+                    #self.quit_qc()
+                    #logger.print_on_console('Please provide valid credentials - Connection not established / Login unsuccessful')
             elif(filePath["qcaction"]=='project'):
                 status = self.getProjects(filePath)
             elif(filePath["qcaction"]=='folder'):
                 status = self.ListTestSetFolder(filePath)
             elif(filePath["qcaction"]=='testcase'):
                 status = self.test_case_generator(filePath)
+            elif(filePath["qcaction"]=='qcupdate'):
+                status = self.update_qc_details(filePath)
             elif(filePath["qcaction"]=='qcquit'):
                 status = self.quit_qc()
-            if status!=None:
-                self.emit_data()
+                flag=1
+            if not flag:
+                if status!=None:
+                    self.emit_data()
+                else:
+                    con.send("Fail"+"\n")
             else:
-                self.socketIO.emit('scrape','Fail')
+                pass
         except Exception as e:
-            import traceback
-            traceback.print_exc()
-            logger.print_on_console('Something went wrong - Lost Connection with QC')
+            print 'Error in Qc actions...'
+            con.send('Error in qc')
+            sent=1
+           # logger.print_on_console('Something went wrong - Lost Connection with QC')
 
     def getDomain(self,filePath):
         try:
-            logger.print_on_console('Fetching the list of Domains')
+            print('Fetching the list of Domains')
             domain_dict={}
             key="domain"
             domain_dict.setdefault(key, [])
             if(TD.connected==True):
-##                logger.print_on_console('Connection Successful')
+                print('Connection Successful')
+                domain_dict['login_status']=True
                 listDomains=TD.VisibleDomains
                 if(len(listDomains)>0):
                     for dom in listDomains:
@@ -98,16 +105,16 @@ class QcWindow(wx.Frame):
             dictFolder = json.dumps(domain_dict)
             global dictFolderJson
             dictFolderJson=json.loads(dictFolder)
-            logger.print_on_console('Fetched Domains Successfully')
+            print('Fetched Domains Successfully')
         except Exception as e:
-            logger.print_on_console('Something went wrong - Lost Connection with QC')
+            print('Something went wrong - Lost Connection with QC')
             dictFolderJson=None
 
         return dictFolderJson
 
 
     def getProjects(self,filePath):
-        logger.print_on_console('Fetching the list of Projects')
+        print('Fetching the list of Projects')
         try:
             domain_name=filePath["domain"]
 ##            print domain_name,' domain name'
@@ -116,7 +123,7 @@ class QcWindow(wx.Frame):
             projects_dict.setdefault(key, [])
 ##            print TD.connected,'wats the status'
             if(TD.connected==True):
-                logger.print_on_console('Connection Successful')
+                print('Connection Successful')
                 list_projects=TD.VisibleProjects(domain_name)
                 if(len(list_projects)>0):
                     for pro in list_projects:
@@ -125,13 +132,14 @@ class QcWindow(wx.Frame):
                     dictFolder = json.dumps(projects_dict)
                     global dictFolderJson
                     dictFolderJson=json.loads(dictFolder)
-                    logger.print_on_console('Fetched Projects Successfully')
+                    print('Fetched Projects Successfully')
                 else:
-                    logger.print_on_console('Please select valid domain')
+                    print('Please select valid domain')
         except Exception as eproject:
+            print('Error in fetching projects')
             import traceback
             traceback.print_exc()
-            logger.print_on_console('Something went wrong - Lost Connection with QC')
+##            logger.print_on_console('Something went wrong - Lost Connection with QC')
             dictFolderJson=None
         return dictFolderJson
 
@@ -168,7 +176,7 @@ class QcWindow(wx.Frame):
 ##                        print testset.name,' : ',testset.id,':',testset.status,':',testset.modified
                         TestSet_dict[keyTS].append(str(testset.name)+";"+str(testset.id))
                 else:
-                    logger.print_on_console('NO FOLDERS EXIST')
+                    print('NO FOLDERS EXIST')
                     tsList = testset_folder.FindTestSets("")
                     if(len(tsList)>0):
                         for testset in tsList:
@@ -191,7 +199,7 @@ class QcWindow(wx.Frame):
                                 ice_list=TestSet_dict['TestSet']
                                 ice_list.remove(remID)
             else:
-                logger.print_on_console(' invalid connection')
+                print('invalid connection')
 ##                self.quit_qc()
 ##                self.socketIO.emit('scrape','Fail')
 ##            print TestSet_dict,'no',folder_dict
@@ -214,7 +222,7 @@ class QcWindow(wx.Frame):
         except Exception as e:
             import traceback
             traceback.print_exc()
-            logger.print_on_console('Something went wrong - Unable to fetch the TestSet(s)')
+            #logger.print_on_console('Something went wrong - Unable to fetch the TestSet(s)')
             dictFolderJson=None
         finally:
             return dictFolderJson
@@ -223,6 +231,7 @@ class QcWindow(wx.Frame):
 
     def test_case_generator(self,filePath):
         try:
+            print 'Inside ....'
             test_case_dict={}
             key="testcase"
 ##            print filePath
@@ -240,6 +249,7 @@ class QcWindow(wx.Frame):
                 if str(test_case_ind.name)==str(test_set_name):
 ##                   print i
                    abc=listTC[i].tsTestFactory
+                   print abc
                    qc_ts=abc.NewList("")
                    for tsname in qc_ts:
 ##                       print tsname.name
@@ -252,35 +262,162 @@ class QcWindow(wx.Frame):
             dictFolderJson = json.dumps(OverallList)
             dictFolderJson=json.loads(dictFolderJson)
         except Exception as e:
-            logger.print_on_console('Something went wrong - Unable to fetch the TestCase(s)')
+            #logger.print_on_console('Something went wrong - Unable to fetch the TestCase(s)')
+            import traceback
+            traceback.print_exc()
             dictFolderJson=None
         return dictFolderJson
 
+    def update_qc_details(self,data):
+        print('****Updating QCDetails****')
+        status = False
+        try:
+
+            #Get the details (comma separated )- QC url, username and password
+##            data="http://srv03wap121:8080/qcbin,Chethan,Chethan1,ENTERPRISE,DimensionLab,root\TestFolder1,TestSet1,[1]QC-2,Failed"
+            #logger.log('Getting the details with comma separated')
+            #print 'Getting the details with comma separated'
+            qcDomain =  data['qc_domain']
+            qcProject = data['qc_project']
+            tsFolder = data['qc_folder']
+            tsList = data['qc_tsList']
+            testrunname = data['qc_testrunname']
+            result =  data['qc_update_status']
+            #print TD.connected
+            if(TD.connected==True):
+                TD.Connect(qcDomain,qcProject)
+                #Connection Established
+                #logger.log('Connection Established')
+                TSetFact = TD.TestSetFactory
+                #Getting the test set factory
+                #logger.log('Getting the test set factory')
+                tsTreeMgr = TD.testsettreemanager
+                tsFolder = tsTreeMgr.NodeByPath(tsFolder)
+                tsList = tsFolder.FindTestSets(tsList)
+                #Getting the test lists
+                #logger.log('Getting the test lists')
+                theTestSet = tsList.Item(1)
+                #Getting the test set
+                #logger.log('Getting the test set')
+                tsFolder = theTestSet.TestSetFolder
+                tsTestFactory = theTestSet.tsTestFactory
+                tsTestList = tsTestFactory.NewList("")
+                print tsFolder,tsTestFactory,tsTestList
+                for tsTest in tsTestList:
+                    #Iterate the Test list
+                    #logger.log('Iterate the Test list')
+                    print tsTest.Name
+                    print testrunname
+                    if tsTest.Name == testrunname:
+                        #logger.log('Test runname matched')
+                        RunFactory = tsTest.RunFactory
+                        #RunFactory object created
+                        #logger.log('RunFactory object created')
+                        obj_theRun = RunFactory.AddItem(testrunname)
+                        #Updating the details in QC
+                        #print result
+                        #logger.log('Updating the details in QC')
+                        obj_theRun.Status = result
+                        #Scenario execution status updated
+                        #logger.log('Scenario execution status updated')
+                        obj_theRun.Post()
+                        obj_theRun.Refresh()
+                        status = True
+                        #QC Details updated successfully
+                        #logger.log('QC Details updated successfully')
+                        print('****Updated QCDetails Successfully****')
+            else:
+                print('Qc is disconnected..')
+        except Exception as e:
+            print('Something went wrong - Connection not established/ Login unsuccessful/Domain/Project/Folder/Testset/Testrun name wrong')
+            status = False
+##            print status
+        global dictFolderJson
+        if(status):
+            dictFolderJson = {'QC_UpdateStatus':True}
+            TD.Logout()
+            TD.releaseconnection()
+            print 'closing_connection'
+        else:
+            dictFolderJson = {'QC_UpdateStatus':False}
+        return status
 
     def quit_qc(self):
 ##        print 'quiting qc'
 ##        print urlflag
-        if TD.connected==True and loginflag==True:
-            self.socketIO.emit('qcresponse','closedqc')
-            logger.print_on_console('Closing QC Connection')
-            TD.Logout()
-            TD.releaseconnection()
-        elif urlflag==False:
-            self.socketIO.emit('qcresponse','invalidurl')
-        else:
-            self.socketIO.emit('qcresponse','invalidcredentials')
-            logger.print_on_console('Releasing QC Connection')
-            TD.releaseconnection()
-        global dictFolderJson
-        dictFolderJson=None
+        global sent
+        try:
+            sent=1
+            if TD.connected==True and loginflag==True:
+                con.send('closedqc#E&D@Q!C#')
+                print('Closing QC Connection')
+                TD.Logout()
+                TD.releaseconnection()
+                print 'Logout S'
+            elif urlflag==False:
+                con.send('invalidurl#E&D@Q!C#')
+            else:
+                con.send('invalidcredentials#E&D@Q!C#')
+                print('Releasing QC Connection')
+                TD.releaseconnection()
+            global dictFolderJson
+            dictFolderJson=None
+            return True
+        except Exception as e:
+            print 'Erro in Quit_qc'
+            con.send('Error in qc')
 
     def emit_data(self):
-        d = dictFolderJson
 ##        print d,' in emit data'
+        global dictFolderJson,sent
+        data_to_send = json.dumps(dictFolderJson).encode('utf-8')
+        print data_to_send
+        data_to_send+='#E&D@Q!C#'
+        print data_to_send
+        sent=1
+        con.send(data_to_send)
         # 10 is the limit of MB set as per Nineteen68 standards
+        """
         if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
             self.socketIO.emit('qcresponse',d)
         else:
             print 'Scraped data exceeds max. Limit.'
             self.socketIO.emit('qcresponse','Response Body exceeds max. Limit.')
         logger.print_on_console('Fetched data successfully')
+        """
+
+if __name__ == '__main__':
+##    logging.basicConfig(filename='python-deskscrappy.log', level=logging.WARNING, format='%(asctime)s %(message)s')
+    host = 'localhost'
+    port = 10000
+    print('Qc Started...')
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind((host, port))
+        s.listen(30)
+        con, addr = s.accept()
+        client_data =''
+        while(True):
+            try:
+                data_stream = con.recv(1024)
+                client_data+=data_stream
+                if('#E&D@Q!C#' in data_stream):
+                    print data_stream
+                    parsed_data = client_data[:client_data.find('#E&D@Q!C#')]
+                    data_to_use = json.loads(parsed_data.decode('utf-8'))
+                    #print data_to_use
+                    qc_ref = QcWindow(data_to_use)
+                    client_data=''
+                    if(sent!=1):
+                        con.send('Error in qc')
+                    else:
+                        sent=0
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                print 'Error in data receiving'
+                con.send('Error in qc / Something went wrong,Qc Stopped')
+                break
+    except Exception as e:
+        print 'Error in running Qc'
+
