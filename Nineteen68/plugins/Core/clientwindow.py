@@ -17,11 +17,17 @@ from socketIO_client import SocketIO,BaseNamespace
 from constants import *
 import controller
 import readconfig
+import httplib
+import json
+import socket
+
+
 
 log = logging.getLogger('clientwindow.py')
 wxObject = None
 browsername = None
 qcdata = None
+soc=None
 qcConFlag=False
 desktopScrapeFlag=False
 sapScrapeFlag=False
@@ -216,16 +222,41 @@ class MainNamespace(BaseNamespace):
             log.error(e)
 
     def on_qclogin(self, *args):
-        con = controller.Controller()
         global qcdata
-        qcdata = args[0]
-        con.get_all_the_imports('Qc')
-        import QcController
-        global qcConObj
-        qcConObj=QcController
-        global qcConFlag
-        qcConFlag=True
-        wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+        global soc
+        global socketIO
+        import time
+        server_data=''
+        data_stream=None
+        client_data=None
+        try:
+            if len(args) > 0:
+                qcdata = args[0]
+                if soc is None:
+                    import subprocess
+                    path = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Qc/QcController.exe"
+                    pid = subprocess.Popen(path, shell=True)
+                    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    soc.connect(("localhost",10000))
+
+                data_to_send = json.dumps(qcdata).encode('utf-8')
+                data_to_send+='#E&D@Q!C#'
+                soc.send(data_to_send)
+                while True:
+                    data_stream= soc.recv(1024)
+                    server_data+=data_stream
+                    if '#E&D@Q!C#' in server_data:
+                        break
+                client_data= server_data[:server_data.find('#E&D@Q!C#')]
+                if('Error in qc' in client_data):
+                    logger.print_on_console('Error occurred in QC')
+                socketIO.emit('qcresponse',client_data)
+            else:
+                socketIO.emit('qcresponse','Error:data recevied empty')
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            socketIO.emit('qcresponse','Error:Qc Operations')
 
     def on_LAUNCH_MOBILE(self, *args):
         con = controller.Controller()
@@ -533,6 +564,7 @@ class TestThread(threading.Thread):
             self.con.exception_flag=configvalues["exception_flag"]
             status = ''
             apptype = ''
+            qc_status=None
             if(self.action == DEBUG):
                 apptype = (self.json_data)[0]['apptype']
             else:
@@ -543,7 +575,23 @@ class TestThread(threading.Thread):
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE
             else:
-                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO)
+                status,qc_status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO)
+
+            if(qc_status is not None):
+                logger.print_on_console('****Updating QCDetails****')
+                #logger.print_on_console(qc_status)
+                data_to_send = json.dumps(qc_status).encode('utf-8')
+                data_to_send+='#E&D@Q!C#'
+                soc.send(data_to_send)
+                data_stream= soc.recv(1024)
+                server_data = data_stream[:data_stream.find('#E&D@Q!C#')]
+                parsed_data = json.loads(server_data.decode('utf-8'))
+                if parsed_data['QC_UpdateStatus']:
+                    logger.print_on_console('****Updated QCDetails****')
+                else:
+                    logger.print_on_console('****Failed to Update QCDetails****')
+
+
             logger.print_on_console('Execution status',status)
 
             if status==TERMINATE:
