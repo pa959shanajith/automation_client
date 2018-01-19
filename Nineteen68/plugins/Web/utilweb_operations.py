@@ -113,13 +113,6 @@ class UtilWebKeywords:
         return err_msg
 
     def is_visible(self,webelement):
-        #Check if the user wants to ignore the visibility check for the element
-        configobj = readconfig.readConfig()
-        configvalues = configobj.readJson()
-        ignoreVisibilityCheck = configvalues['ignoreVisibilityCheck']
-        if ignoreVisibilityCheck.strip().lower() == "yes":
-            log.debug("Visibility check for the element is ignored as per the config")
-            return True
         flag=False
         log.debug('Checking the visibility of element')
         try:
