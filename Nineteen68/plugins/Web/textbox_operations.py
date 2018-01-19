@@ -72,7 +72,6 @@ class TextboxKeywords:
         """
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        visibilityFlag=True
         output=OUTPUT_CONSTANT
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -82,8 +81,6 @@ class TextboxKeywords:
                     log.debug(WEB_ELEMENT_ENABLED)
                     utilobj=UtilWebKeywords()
                     is_visble=utilobj.is_visible(webelement)
-                    if len(args)>0 and args[0] != '':
-                        visibilityFlag=args[0]
                     input=input[0]
                     coreutilsobj=core_utils.CoreUtils()
                     input=coreutilsobj.get_UTF_8(input)
@@ -96,7 +93,7 @@ class TextboxKeywords:
                             user_input=self.validate_input(webelement,input)
                             if user_input is not None:
                                 input=user_input
-                            if not(visibilityFlag and is_visble):
+                            if not(is_visble) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
                                 self.clear_text(webelement)
                             else:
                                 webelement.clear()
@@ -119,7 +116,6 @@ class TextboxKeywords:
     def send_value(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        visibilityFlag=True
         output=OUTPUT_CONSTANT
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -129,8 +125,6 @@ class TextboxKeywords:
                     log.debug(WEB_ELEMENT_ENABLED)
                     utilobj=UtilWebKeywords()
                     isvisble=utilobj.is_visible(webelement)
-                    if len(args)>0 and args[0] != '':
-                        visibilityFlag=args[0]
                     input=input[0]
                     coreutilsobj=core_utils.CoreUtils()
                     input=coreutilsobj.get_UTF_8(input)
@@ -143,7 +137,7 @@ class TextboxKeywords:
                             user_input=self.validate_input(webelement,input)
                             if user_input is not None:
                                 input=user_input
-                            if not(visibilityFlag and isvisble):
+                            if not(isvisble) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
                                 self.clear_text(webelement)
                                 log.debug('Sending the value via part 1')
                                 browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
@@ -152,7 +146,7 @@ class TextboxKeywords:
                                 configobj = readconfig.readConfig()
                                 configvalues = configobj.readJson()
                                 bit64 = configvalues['bit_64']
-                                if(isinstance(browser_Keywords.driver_obj,selenium.webdriver.Ie) and bit64.lower() == "yes"):
+                                if(isinstance(browser_Keywords.driver_obj,selenium.webdriver.Ie) and bit64.strip().lower() == "yes"):
                                     for i in range (0,len(input)+1):
                                         browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input[0:i])
                                 else:
@@ -231,7 +225,6 @@ class TextboxKeywords:
                 logger.print_on_console(ACTUAL,text)
                 log.info(ACTUAL)
                 log.info(text)
-
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
@@ -326,7 +319,6 @@ class TextboxKeywords:
     def setsecuretext(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        visibilityFlag=True
         output=OUTPUT_CONSTANT
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -336,19 +328,16 @@ class TextboxKeywords:
                     log.debug(WEB_ELEMENT_ENABLED)
                     utilobj=UtilWebKeywords()
                     is_visble=utilobj.is_visible(webelement)
-                    if len(args)>0 and args[0] != '':
-                        visibilityFlag=args[0]
                     input=input[0]
-##                    logger.print_on_console(INPUT_IS+str(input))
                     coreutilsobj=core_utils.CoreUtils()
                     input=coreutilsobj.get_UTF_8(input)
-                    logger.print_on_console(INPUT_IS,input)
+                    logger.print_on_console(INPUT_IS+input)
                     log.info(INPUT_IS)
                     log.info(input)
                     if input is not None:
                         readonly_value=webelement.get_attribute("readonly")
                         if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
-                            if not(visibilityFlag and is_visble):
+                            if not(is_visble) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
                                 self.clear_text(webelement)
                             else:
                                 webelement.clear()
@@ -376,7 +365,6 @@ class TextboxKeywords:
     def sendSecureValue(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        visibilityFlag=True
         output=OUTPUT_CONSTANT
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -386,8 +374,6 @@ class TextboxKeywords:
                     log.debug(WEB_ELEMENT_ENABLED)
                     utilobj=UtilWebKeywords()
                     isvisble=utilobj.is_visible(webelement)
-                    if len(args)>0 and args[0] != '':
-                        visibilityFlag=args[0]
                     input=input[0]
                     coreutilsobj=core_utils.CoreUtils()
                     input=coreutilsobj.get_UTF_8(input)
@@ -402,7 +388,7 @@ class TextboxKeywords:
                             user_input=self.validate_input(webelement,input_val)
                             if user_input is not None:
                                 input_val=user_input
-                            if not(visibilityFlag and isvisble):
+                            if not(isvisble) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
                                 self.clear_text(webelement)
                                 log.debug('Sending the value via part 1')
                                 browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
@@ -411,7 +397,7 @@ class TextboxKeywords:
                                 configobj = readconfig.readConfig()
                                 configvalues = configobj.readJson()
                                 bit64 = configvalues['bit_64']
-                                if(isinstance(browser_Keywords.driver_obj,selenium.webdriver.Ie) and bit64.lower() == "yes"):
+                                if(isinstance(browser_Keywords.driver_obj,selenium.webdriver.Ie) and bit64.strip().lower() == "yes"):
                                     for i in range (0,len(input_val)+1):
                                         browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val[0:i])
                                 else:
