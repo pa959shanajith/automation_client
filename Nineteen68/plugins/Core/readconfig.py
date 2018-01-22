@@ -47,6 +47,7 @@ class readConfig():
             configvalues['ignoreVisibilityCheck']=params['ignoreVisibilityCheck']
             configvalues['exception_flag']=params['exception_flag']
             configvalues['server_cert']=params['server_cert']
+            configvalues['enableSecurityCheck'] = params['enableSecurityCheck']
         except Exception as e:
             configvalues['errorflag']=e
         return configvalues
