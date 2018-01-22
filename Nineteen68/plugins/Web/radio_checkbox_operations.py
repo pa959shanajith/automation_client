@@ -17,6 +17,7 @@ import table_keywords
 import webconstants
 from constants import *
 import logging
+import readconfig
 
 log = logging.getLogger('radio_checkbox_operations.py')
 
@@ -39,24 +40,26 @@ class RadioCheckboxKeywords():
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         return err_msg
 
+    def __check_visibility_from_config(self):
+        return readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes"
 
     def select_radiobutton(self,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
-        visibilityFlag=True
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
                 if webelement.is_enabled():
                     log.debug(WEB_ELEMENT_ENABLED)
-                    is_visible=self.utilobj.is_visible(webelement)
-                    if len(args)>0:
-                        visibilityFlag=args[0]
-                    if not(visibilityFlag and is_visible):
+                    if not (self.utilobj.is_visible(webelement) and self.__check_visibility_from_config()):
+                        # performing js code
+                        log.debug('element is invisible, performing js code')
                         browser_Keywords.driver_obj.execute_script(webconstants.CLICK_RADIO_CHECKBOX,webelement)
                     else:
+                        # performing selenium code
+                        log.debug('element is visible, performing selenium code')
                         webelement.click()
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
@@ -64,14 +67,12 @@ class RadioCheckboxKeywords():
                     err_msg=self.__element_disabled()
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
-
         return status,methodoutput,output,err_msg
 
 
     def select_checkbox(self,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        visibilityFlag=True
         output=OUTPUT_CONSTANT
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -80,12 +81,13 @@ class RadioCheckboxKeywords():
                 if webelement.is_enabled():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if not(webelement.is_selected()):
-                        is_visble=self.utilobj.is_visible(webelement)
-                        if len(args)>0:
-                            visibilityFlag=args[0]
-                        if not(visibilityFlag and is_visble ):
+                        if not (self.utilobj.is_visible(webelement) and self.__check_visibility_from_config()):
+                            # performing js code
+                            log.debug('element is invisible, performing js code')
                             browser_Keywords.driver_obj.execute_script(webconstants.CLICK_RADIO_CHECKBOX,webelement)
                         else:
+                            # performing selenium code
+                            log.debug('element is visible, performing selenium code')
                             webelement.click()
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -103,7 +105,6 @@ class RadioCheckboxKeywords():
     def unselect_checkbox(self,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        visibilityFlag=True
         output=OUTPUT_CONSTANT
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -112,12 +113,13 @@ class RadioCheckboxKeywords():
                 if webelement.is_enabled():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if webelement.is_selected():
-                        is_visible=self.utilobj.is_visible(webelement)
-                        if len(args)>0:
-                            visibilityFlag=args[0]
-                        if not(visibilityFlag and is_visible ):
+                        if not (self.utilobj.is_visible(webelement) and self.__check_visibility_from_config()):
+                            # performing js code
+                            log.debug('element is invisible, performing js code')
                             browser_Keywords.driver_obj.execute_script(webconstants.CLICK_RADIO_CHECKBOX,webelement)
                         else:
+                            # performing selenium code
+                            log.debug('element is visible, performing selenium code')
                             webelement.click()
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -134,7 +136,6 @@ class RadioCheckboxKeywords():
     def get_status(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        visibilityFlag=True
         output=OUTPUT_CONSTANT
         err_msg=None
         status=None
