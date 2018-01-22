@@ -105,6 +105,7 @@ class Controller():
         self.debugfrom_step=1
         self.configvalues={}
         self.core_utilsobject = core_utils.CoreUtils()
+        self.exception_flag=None
 
     def __load_generic(self):
         try:
@@ -847,7 +848,6 @@ class Controller():
                                 qc_username=qc_details_creds['qcusername']
                                 qc_password=qc_details_creds['qcpassword']
                                 qc_url=qc_details_creds['qcurl']
-
                                 qc_sceanrio_data=scenario['qcdetails']
                                 qc_domain=qc_sceanrio_data['qcdomain']
                                 qc_project=qc_sceanrio_data['qcproject']
@@ -916,7 +916,7 @@ class Controller():
                                     else:
                                         qc_update_status='Not Completed'
 
-    ##                                qc_status='http://srv03wap121:8080/qcbin,Chethan,Chethan1,ENTERPRISE,DimensionLab,root\TestFolder1,TestSet1,[1]QC-2,'+str(qc_update_status)
+                                    ##qc_status='http://srv03wap121:8080/qcbin,Chethan,Chethan1,ENTERPRISE,DimensionLab,root\TestFolder1,TestSet1,[1]QC-2,'+str(qc_update_status)
                                     qc_status = {}
                                     qc_status['qcaction']='qcupdate'
                                     qc_status['qc_domain']=qc_domain
@@ -925,11 +925,9 @@ class Controller():
                                     qc_status['qc_tsList']=qc_tsList
                                     qc_status['qc_testrunname']=qc_testrunname
                                     qc_status['qc_update_status'] = qc_update_status
-                                    #qc_status=qc_url+','+qc_username+','+qc_password+','+qc_domain+','+qc_project+','+qc_folder+','+qc_tsList+','+qc_testrunname+','+str(qc_update_status)
-
-                                    #status_qc=qc_json.update_qc_details(str(qc_status))
-                                elif(scenario['qccredentials']['qcpassword']!='' and scenario['qccredentials']['qcusername']!=''
-                                        and scenario['qccredentials']['qcurl']!=''):
+                                    ##qc_status=qc_url+','+qc_username+','+qc_password+','+qc_domain+','+qc_project+','+qc_folder+','+qc_tsList+','+qc_testrunname+','+str(qc_update_status)
+                                    ##status_qc=qc_json.update_qc_details(str(qc_status))
+                                elif (qc_url!='' and qc_password!='' and  qc_username!=''):
                                     logger.print_on_console('****Failed to Update QCDetails****')
 
                                 #Check is made to fix issue #401
@@ -1003,6 +1001,7 @@ class Controller():
 
     def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,wxObject,socketIO,*args):
         status = COMPLETED
+        qc_status = None
         global terminate_flag,break_point,pause_flag,socket_object
         self.conthread=mythread
         self.clear_data()
@@ -1019,11 +1018,7 @@ class Controller():
             ##if execution_mode.lower() == PARALLEL:
             ##    status=self.invoke_execution(mythread,json_data)
             if self.execution_mode.lower() == SERIAL:
-
-            ##kill_process()
                 status,qc_status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues)
-##            kill_process()
-
         elif action.lower()==DEBUG:
             self.debug_mode=debug_mode
             self.wx_object=wxObject
@@ -1151,8 +1146,8 @@ def kill_process():
                     folderwithnum = ''
                     try:
                         folderwithnum = int(the_file[0:3])
-                    except Exception as e:
-                        log.error(e)
+                    except:
+                        pass
                     for name in profdir:
                         if the_file.startswith(name) or isinstance(folderwithnum,int):
                             try:
@@ -1163,8 +1158,8 @@ def kill_process():
                                 elif os.path.isdir(file_path):
                                     shutil.rmtree(file_path,ignore_errors=True)
                                     break
-                            except Exception as e:
-                                log.error(e)
+                            except:
+                                pass
             except Exception as e:
                 log.error('Error while deleting file/folder')
                 log.error(e)

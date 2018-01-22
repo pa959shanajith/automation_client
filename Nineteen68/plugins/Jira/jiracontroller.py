@@ -122,10 +122,11 @@ class JiraWindow():
                 data['priority'].append({'id': item.id , 'name':item.name})
             if(jira != None):
                 x =jira.kill_session()
+            socket.emit('auto_populate',data)
         except Exception as e:
+            log.error(e)
             socket.emit('auto_populate','Fail')
             logger.print_on_console('Exception in login and auto populating data')
-        socket.emit('auto_populate',data)
 
 
 ##obj = Nineteen68Jira()

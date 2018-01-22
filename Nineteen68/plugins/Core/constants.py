@@ -406,9 +406,9 @@ EVALUATE='evaluate'
 
 ENDFOR_DESCRIPTION='EndFor: completed'
 
-ACTION_1 = 'loginToJira'
+JIRA_ACTION_1 = 'loginToJira'
 
-ACTION_2 = 'createIssueInJira'
+JIRA_ACTION_2 = 'createIssueInJira'
 
 STATIC_NONE= "{#@#n_o_n_e#@#}"
 

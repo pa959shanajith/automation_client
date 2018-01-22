@@ -25,7 +25,7 @@ path1 = os.environ["NINETEEN68_HOME"]
 sys.path.append(path1+"\\Nineteen68\\plugins\\ImageProcessing\\ImageProcessing")
 
 import numpy as np
-import cv2
+#import cv2
 from PIL import Image
 import urllib
 import os

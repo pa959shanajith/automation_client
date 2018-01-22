@@ -515,7 +515,8 @@ class Handler():
                 #Currenlty implemented only for WEB apptype
                 if(apptype.lower() == constants.APPTYPE_WEB):
                     try:
-                        url=self.utils_obj.scrape_unwrap(url)
+                        if len(url.strip())!=0:
+                            url=self.utils_obj.scrape_unwrap(url)
                         if(objectname.strip() != '' and not(objectname.startswith('@'))):
                             xpath_string=objectname.split(';')
                             left_part=self.utils_obj.scrape_unwrap(xpath_string[0])
@@ -524,7 +525,6 @@ class Handler():
                     except Exception as e:
                         log.error(e)
                 tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i)
-
         except Exception as e:
             logger.print_on_console(e)
             log.error(e)
