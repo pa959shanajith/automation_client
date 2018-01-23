@@ -537,6 +537,9 @@ class FileOperations:
                     if linenumbers is not None and len(linenumbers) > 0:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
+                    #ref: https://10.41.31.131/nineteen68v2.0/Nineteen68/issues/1274
+                    else:
+                        linenumbers = None
             else:
                 err_msg=result[3]
         except TypeError as e:
