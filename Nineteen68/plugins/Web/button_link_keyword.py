@@ -472,16 +472,23 @@ class ButtonLinkKeyword():
                 log.debug(webelement)
                 log.debug('Check for the element enable')
                 if webelement.is_enabled():
-                    if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
-                        log.debug('Mozilla Firefox Instance')
-                        clickinfo = browser_Keywords.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
-                        log.info('upload_file click info')
-                        log.info(clickinfo)
-                        filestatus = self.__upload_operation(inputfile)
-                        log.info(STATUS_METHODOUTPUT_UPDATE)
-                        status = webconstants.TEST_RESULT_PASS
-                        methodoutput = webconstants.TEST_RESULT_TRUE
-                    else:
+                    if platform.system() != 'Darwin':
+                        if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
+                            log.debug('Mozilla Firefox Instance')
+                            clickinfo = browser_Keywords.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
+                            log.info('upload_file click info')
+                            log.info(clickinfo)
+                            filestatus = self.__upload_operation(inputfile)
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                            status = webconstants.TEST_RESULT_PASS
+                            methodoutput = webconstants.TEST_RESULT_TRUE
+                        else:
+                            if  self.__click_for_file_upload(browser_Keywords.driver_obj,webelement):
+                                filestatus =self.__upload_operation(inputfile)
+                                log.info(STATUS_METHODOUTPUT_UPDATE)
+                                status = webconstants.TEST_RESULT_PASS
+                                methodoutput = webconstants.TEST_RESULT_TRUE
+                    elif platform.system() == 'Darwin':
                         if  self.__click_for_file_upload(browser_Keywords.driver_obj,webelement):
                             filestatus =self.__upload_operation(inputfile)
                             log.info(STATUS_METHODOUTPUT_UPDATE)
