@@ -476,26 +476,39 @@ class UtilWebKeywords:
                         break
             if webelement is not None:
                 location=webelement.location
-                if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
-                    javascript = "return window.mozInnerScreenY"
-                    value=browser_Keywords.driver_obj.execute_script(javascript)
-                    logger.print_on_console(value)
-                    offset=int(value)
-                    robot=pyrobot.Robot()
-                    robot.set_mouse_pos(int(location.get('x')+9),int(location.get('y')+offset))
-                    log.debug('hover performed')
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
-                else:
-                    obj=Utils()
-                    location=obj.get_element_location(webelement)
-                    obj.enumwindows()
-                    obj.mouse_move(int(location.get('x')),int(location.get('y')-6)+120)
-                    log.debug('hover performed')
+                if platform.system() != 'Darwin':
+                    if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
+                        javascript = "return window.mozInnerScreenY"
+                        value=browser_Keywords.driver_obj.execute_script(javascript)
+                        logger.print_on_console(value)
+                        offset=int(value)
+                        robot=pyrobot.Robot()
+                        robot.set_mouse_pos(int(location.get('x')+9),int(location.get('y')+offset))
+                        log.debug('hover performed')
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                    else:
+                        obj=Utils()
+                        location=obj.get_element_location(webelement)
+                        obj.enumwindows()
+                        obj.mouse_move(int(location.get('x')),int(location.get('y')-6)+120)
+                        log.debug('hover performed')
+                if platform.system() == 'Darwin':
+                    try:
+                        ##clickinfo = browser_Keywords.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
+                        hover = webdriver.ActionChains(browser_Keywords.driver_obj).move_to_element(webelement)
+                        hover.perform()
+                        log.info('Hover operation performed')
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                    except Exception as e:
+                        print "e1: ", e
+                        logger.print_on_console("Cannot perform mouseHover operation.")
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            ##err_msg=self.__web_driver_exception(e)
+            print "e: ",e
+            err_msg=self.__web_driver_exception(e)
             logger.print_on_console("Cannot perform mouseHover operation.")
         return status,methodoutput,output,err_msg
 

@@ -103,7 +103,7 @@ class Reporting:
             'web':self.step_description_obj.web,
             'mobileapp':self.step_description_obj.mobileapp,
             'mobileweb':self.step_description_obj.web,
-            'webservices':self.step_description_obj.webservices,
+            'webservice':self.step_description_obj.webservices,
             'desktop':self.step_description_obj.desktop,
             'sap':self.step_description_obj.sap,
             'desktopjava':self.step_description_obj.oebs,

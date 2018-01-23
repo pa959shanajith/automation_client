@@ -388,10 +388,10 @@ class MainNamespace(BaseNamespace):
             import jiracontroller
             obj = jiracontroller.JiraWindow()
             global socketIO
-            if args[0] == ACTION_1:
+            if args[0] == JIRA_ACTION_1:
                 data = args[1]
                 obj.getAllAutoDetails(data,socketIO)
-            elif args[0] == ACTION_2:
+            elif args[0] == JIRA_ACTION_2:
                 data = args[1]
                 obj.createIssue(data,socketIO)
         except Exception as e:
@@ -613,9 +613,6 @@ class TestThread(threading.Thread):
                 else:
                     socketIO.emit('result_debugTestCaseWS',status)
             elif self.action==EXECUTE:
-#                if len(testcasename) > 0:
-#                    socketIO.emit('result_executeTestSuite',status)
-            #  To check for empty testcase Bug #246 (Himanshu)
                 socketIO.emit('result_executeTestSuite',status)
         except Exception as e:
             log.error(e)

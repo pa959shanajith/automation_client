@@ -273,7 +273,8 @@ class StepDescription:
             return 'Fetch the Server certificate and save it in '+ inputval[1] + '.'
         def executeRequest():
             return 'Execute the request.'
-        return locals()[key](keyword)
+        #return locals()[key](keyword)
+        return locals()[keyword]()
 
     def oebs(self,keyword,tsp,inputval,input,output,con,reporting_obj):
         def LaunchApplication():
@@ -683,7 +684,7 @@ class StepDescription:
 
         #Application keywords(@Window keywords- 7 keywords)
         def LaunchApplication():
-            return ' The application present in the path  '+ inputval[0]+ 'is launched.'
+            return ' The application present in the path  '+ inputval[0]+ ' is launched.'
         def GetPageTitle():
             return ' Get the title of Application and  save the title in ' +tsp.outputval+"."
         def CloseApplication():
@@ -703,7 +704,7 @@ class StepDescription:
         def GetBody():
             return ' Fetch '+"'"+'Body'+"'"+' from email and save the value in variable '+tsp.outputval+ '.'
         def GetEmail():
-            return ' Fetch the email  which is having '+"'"+'From'+"'"+' as '+"'"+listInput[0]+"'"+', '+"'"+'To'+"'" +' as '+"'"+listInput[1]+"'"+' and '+"'"+'Subject'+"'"+ ' as '+"'"+listInput[2]+"'"
+            return ' Fetch the email  which is having '+"'"+'From'+"'"+' as '+"'"+listInput[0]+"'"+', '+"'"+' To '+"'" +' as '+"'"+listInput[1]+"'"+' and '+"'"+'Subject'+"'"+ ' as '+"'"+listInput[2]+"'"
         def GetFromMailID():
             return ' Fetch '+"'"+'From Mail ID'+"'"+' from email and save the value in variable '+tsp.outputval+ '.'
         def GetSubject():
@@ -719,7 +720,7 @@ class StepDescription:
                 input = ", ".join(listInput)
             else:
                 input =str(inputval[0])
-            return ' Set '+"'"+'To Mail ID'+"'"+' as '+"'"+input+"'"+'for the email and save the value in variable '+tsp.outputval+'.'
+            return ' Set '+"'"+'To Mail ID'+"'"+' as '+"'"+input+"'"+' for the email and save the value in variable '+tsp.outputval+'.'
         def SetCC():
             if len(listInput)>0:
                 input = ", ".join(listInput)
@@ -779,9 +780,9 @@ class StepDescription:
         def DoubleClick():
             return ' Double click on the '+"'"+tsp.custname + "'."
         def VerifyButtonName():
-            return ' Verify button name '+"'"+tsp.custname + "'" +'and save the value ' + output + ' in '+"'" + tsp.outputval+ "'."
+            return ' Verify button name '+"'"+tsp.custname + "'" +' and save the value ' + output + ' in '+"'" + tsp.outputval+ "'."
         def GetButtonName():
-            return ' Get button name '+"'"+tsp.custname + "'" +'and save the value ' + output + ' in '+"'" + tsp.outputval+ "'."
+            return ' Get button name '+"'"+tsp.custname + "'" +' and save the value ' + output + ' in '+"'" + tsp.outputval+ "'."
         def RightClick():
             return ' Right click on the '+"'" + tsp.custname + "'."
         #link Keywords(2 keywords but not in use)
