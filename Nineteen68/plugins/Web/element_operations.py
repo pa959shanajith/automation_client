@@ -11,7 +11,9 @@
 import logger
 
 from utils_web import Utils
+from utilweb_operations import UtilWebKeywords
 from button_link_keyword import ButtonLinkKeyword
+import browser_Keywords
 from webconstants import *
 import readconfig
 
@@ -87,13 +89,29 @@ class ElementKeywords:
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
-               text=self.__getelement_text(webelement)
-               logger.print_on_console('Element text: ',text)
-               log.info('Element text: ')
-               log.info(text)
-               log.info(STATUS_METHODOUTPUT_UPDATE)
-               status=TEST_RESULT_PASS
-               methodoutput=TEST_RESULT_TRUE
+                util = UtilWebKeywords()
+                if not(util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                    log.debug('element is invisible, performing js code')
+                    text = browser_Keywords.driver_obj.execute_script("""return arguments[0].innerText""",webelement)
+                    logger.print_on_console('Element text: ',text)
+                    log.info('Element text: ')
+                    log.info(text)
+                    status=TEST_RESULT_PASS
+                    result=TEST_RESULT_TRUE
+                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                else:
+                    if(util.is_visible(webelement)):
+                        text=self.__getelement_text(webelement)
+                        logger.print_on_console('Element text: ',text)
+                        log.info('Element text: ')
+                        log.info(text)
+                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                    else:
+                        err_msg = 'Element is not displayed'
+                        logger.print_on_console('Element is not displayed')
+                        log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
             except Exception as e:
                 log.error(e)
                 logger.print_on_console(e)
@@ -111,14 +129,18 @@ class ElementKeywords:
             try:
                 input=input[0]
                 if input is not None:
-                   text=self.__getelement_text(webelement)
-                   if text==input:
+                    util = UtilWebKeywords()
+                    if not(util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                        text = browser_Keywords.driver_obj.execute_script("""return arguments[0].innerText""",webelement)
+                    else:
+                        text=self.__getelement_text(webelement)
+                    if text==input:
                        logger.print_on_console('Element Text matched')
                        log.info('Element Text matched')
                        log.info(STATUS_METHODOUTPUT_UPDATE)
                        status=TEST_RESULT_PASS
                        methodoutput=TEST_RESULT_TRUE
-                   else:
+                    else:
                         logger.print_on_console('Element Text mismatched')
                         log.info('Element Text mismatched')
                         logger.print_on_console('Expected: ',text)
@@ -133,7 +155,6 @@ class ElementKeywords:
                     logger.print_on_console(INVALID_INPUT)
             except Exception as e:
                 log.error(e)
-
                 logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
@@ -287,7 +308,6 @@ class ElementKeywords:
                logger.print_on_console('Tool tip text: ',tool_tip)
             except Exception as e:
                 log.error(e)
-
                 logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput

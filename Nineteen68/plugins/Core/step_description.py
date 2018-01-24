@@ -1045,6 +1045,8 @@ class StepDescription:
             return 'Enter secure text ' +inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"
         def sendSecureValue():
             return 'Enter secure value ' +inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"
+        def iosSendkey():
+            return 'Press '+input+" Key"
 
 
 

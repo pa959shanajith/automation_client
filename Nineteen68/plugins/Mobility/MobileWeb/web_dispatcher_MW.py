@@ -262,7 +262,8 @@ class Dispatcher:
                   'verifyTextExists':self.statict_text_object.verify_text_exists,
                   'verifyPageTitle':self.browser_object.verify_page_title,
                   'clearCache':self.browser_object.clear_cache,
-                  'navigateWithAuthenticate':self.browser_object.navigate_with_authenticate
+                  'navigateWithAuthenticate':self.browser_object.navigate_with_authenticate,
+                  'iosSendkey': self.util_object.iossendkey
                 }
 
             if keyword in dict.keys():

@@ -387,6 +387,53 @@ class UtilWebKeywords:
                 methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output,err_msg
 
+    def iossendkey(self, webelement,input,*args):
+        #print "send"
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        if webelement is not None:
+            try:
+                #print "webele"
+                #print "inputt::",input
+                input=input[0]
+                if input is not None:
+                    print "none"
+                    if input.lower() == "enter":
+                        #print "enter"
+                        webelement.send_keys(Keys.ENTER)
+                    elif input.lower() == "tab":
+                        webelement.send_keys(Keys.TAB)
+                    elif input.lower() == "backspace":
+                        webelement.send_keys(Keys.BACKSPACE)
+                    elif input.lower() == "uparrow":
+                        webelement.send_keys(Keys.ARROW_UP)
+                    elif input.lower() == "downarrow":
+                        webelement.send_keys(Keys.ARROW_DOWN)
+                    elif input.lower() == "leftarrow":
+                        webelement.send_keys(Keys.ARROW_LEFT)
+                    elif input.lower() == "rightarrow":
+                        webelement.send_keys(Keys.ARROW_RIGHT)
+                    elif input.lower() == "a":
+                        webelement.send_keys("a")
+                    elif input.lower() == "b":
+                        webelement.send_keys("b")
+                    # elif input.lower() == "ctrl":
+                    #     webelement.send_keys()
+                    #key_down(Keys.CONTROL).send_keys('c').key_up(Keys.CONTROL).perform()
+                    logger.print_on_console("Given "+str(input))
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
+            except Exception as e:
+                log.error(e)
+                logger.print_on_console(e)
+
+                err_msg = ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        log.info(RETURN_RESULT)
+        return status, methodoutput, output, err_msg
+
     def generic_sendfucntion_keys(self,input,*args):
         from sendfunction_keys import SendFunctionKeys
         obj=SendFunctionKeys()
