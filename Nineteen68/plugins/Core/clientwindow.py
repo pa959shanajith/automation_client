@@ -369,14 +369,13 @@ class MainNamespace(BaseNamespace):
     def on_webCrawlerGo(self,*args):
         try:
             con = controller.Controller()
-            con.get_all_the_imports('WebOccular')
-            import weboccular
-            wo = weboccular.Weboccular()
+            con.get_all_the_imports('WebOcular')
+            import webocular
+            wobj = webocular.Webocular()
             args=list(args)
             global socketIO
-
             #args[0] is URL, args[1] is level, args[2] is agent
-            wo.runCrawler(args[0],args[1],args[2],socketIO,wxObject)
+            wobj.runCrawler(args[0],args[1],args[2],socketIO,wxObject)
         except Exception as e:
             logger.print_on_console('Error in Webocular')
             log.error(e)

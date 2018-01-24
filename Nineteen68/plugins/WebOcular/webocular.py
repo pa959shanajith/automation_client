@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
-# Name:        weboccular.py
-# Purpose:      Provides serivces to the weboccular plugin
+# Name:        webocular.py
+# Purpose:      Provides serivces to the webocular plugin
 #
 # Author:      nikunj.jain
 #
@@ -13,26 +13,20 @@ from urlparse import urljoin, urlparse
 import requests
 import tldextract
 from bs4 import BeautifulSoup
-from datetime import datetime
 import threading
-from concurrent.futures import ThreadPoolExecutor
-import time
 import json
-import html5lib
 import logger
-import logging.config
 import logging
 import time
 log = logging.getLogger(__name__)
 import controller
-import Queue
 #from selenium import webdriver
-import weboccular_constants
+import webocular_constants
 #import readconfig
 #import webconstants
 #configobj = readconfig.readConfig()
 #configvalues = configobj.readJson()
-class Weboccular():
+class Webocular():
 
     def __init__(self):
         self.queue = []
@@ -56,7 +50,6 @@ class Weboccular():
         try:
             new_url = urljoin(url, new_url)
         except Exception as e:
-
             return None
         if '#' in new_url :
             pos = new_url.index('#')
@@ -82,10 +75,8 @@ class Weboccular():
 
         return imglinks
 
-
     def crawl(self,start_url, level,agent) :
         self.domain = tldextract.extract(str(start_url)).domain
-
         #create a start object to initiate the process
         start_obj = {"name" : start_url, "parent" : "None", "level" : 0 }
         self.discovered.add(start_url)
@@ -93,7 +84,7 @@ class Weboccular():
 
         i=1
         threads = []
-        logger.print_on_console("Crawling in progress...")
+        logger.print_on_console("Request in progress...")
         self.subdomain = tldextract.extract(start_url).subdomain
         while(self.queue and not controller.terminate_flag) :
             obj = self.queue.pop(0)
@@ -105,39 +96,34 @@ class Weboccular():
                 time.sleep(6)
                 i += 1
             time.sleep(1)
-
         for thread in threads :
             thread.join()
-
 
     def parse(self,url, obj, lev,agent) :
 
         if controller.terminate_flag:
             return
 
-        agents = {  "safari" : weboccular_constants.SAFARI_AGENT,
-                    "firefox" : weboccular_constants.FX_AGENT,
-                    "chrome" : weboccular_constants.CHROME_AGENT,
-                    "ie": weboccular_constants.IE_AGENT
+        agents = {  "safari" : webocular_constants.SAFARI_AGENT,
+                    "firefox" : webocular_constants.FX_AGENT,
+                    "chrome" : webocular_constants.CHROME_AGENT,
+                    "ie": webocular_constants.IE_AGENT
                 }
         try:
             headers = {'User-Agent': agents[agent]}
             #if URL is for file type .pdf, .docx or .zip we will send only header request, will not download entire content
 
-            #print "processing URL : ", url
             if not url.endswith('.pdf') and not url.endswith('.docx') and not url.endswith('.zip'):
                 r = requests.get(url, headers = headers,verify = False,timeout = 40)
                 rurl = r.url
 
                 #Check whether this URL redirects to some other URL
-                if rurl == url :
+                if rurl == url:
                     obj["redirected"] = "no"
-                else :
-
+                else:
                     obj["redirected"] = rurl
                 status = r.status_code
                 obj["status"] = status
-                response = r.text
                 #screen capture
 ##                if screenCapture == "failed":
 ##                    if status != 200:
@@ -157,7 +143,7 @@ class Weboccular():
 ##                        curr_url = curr_url.replace("|","_")
 ##                        filename = curr_url
 ##                        self.driver.save_screenshot(filename + ".png")
-                soup = BeautifulSoup(response, "lxml")
+                soup = BeautifulSoup(r.text, "lxml")
                 if soup.title :
                     obj["title"] = soup.title.text
                 else :
@@ -176,13 +162,14 @@ class Weboccular():
                     obj['type'] = 'page'
 
                 self.nodedata[url] = obj
-                data = json.dumps(obj)
-                self.socketIO.emit('result_web_crawler',data)
+                self.socketIO.emit('result_web_crawler',json.dumps(obj))
                 if obj['level'] < lev :
                     if (tldextract.extract(rurl).domain == self.domain) and (tldextract.extract(rurl).subdomain == self.subdomain):
                         if rurl not in self.visited:
                             self.visited.add(rurl)
                             links = soup.find_all('a')
+                            frames = soup.find_all('frame')
+                            iframes = soup.find_all('iframe')
                             buttons = self.get_buttonlinks(soup)
                             images = self.get_imagelinks(soup)
                             pagelinks = set()
@@ -199,7 +186,6 @@ class Weboccular():
                                             pagelinks.add(new_url)
                                             self.discovered.add(new_url)
                                             self.queue.append({"name" : new_url, "parent" : rurl, "desc" : url_text, "level" : obj['level']+1  })
-                                            leveln = obj['level']+1
                                             self.edgedata.append({"source" : rurl, "target" : new_url })
                                     else :
                                         if new_url not in pagelinks :
@@ -207,23 +193,70 @@ class Weboccular():
 ##                                             reversedObj = {"type" : "reverse" }
 ##                                             data = json.dumps(reversedObj)
 ##                                             self.socketIO.emit('result_web_crawler',data)
+                            for frame in frames:
+                                new_url = frame.attrs['src']
+                                try:
+                                    if frame.attrs['name'] is not None:
+                                        url_text = frame.attrs['name']
+                                        url_text = url_text.strip()
+                                    else:
+                                        url_text = None
+                                except Exception as nameNotPresentInFrame:
+                                    url_text = None
 
+                                new_url = self.get_complete_url(rurl, new_url)
+                                if new_url != None:
+                                    if new_url not in self.discovered:
+                                        # if new_url not in self.visited:
+                                        pagelinks.add(new_url)
+                                        self.discovered.add(new_url)
+                                        self.queue.append({"name": new_url, "parent": rurl, "desc": url_text,
+                                                           "level": obj['level'] + 1})
+                                        self.edgedata.append({"source": rurl, "target": new_url})
+                                    else:
+                                        if new_url not in pagelinks:
+                                            self.reversedLinks.append(
+                                                {"name": new_url, "parent": rurl, "level": obj['level'] + 1})
+                            for iframe in iframes:
+                                new_url = iframe.attrs['src']
+                                try:
+                                    if iframe.attrs['name'] is not None:
+                                        url_text = iframe.attrs['name']
+                                        url_text = url_text.strip()
+                                    else:
+                                        url_text = None
+                                except Exception as nameNotPresentIniFrame:
+                                    url_text = None
+                                new_url = self.get_complete_url(rurl, new_url)
+
+                                if new_url != None:
+                                    if new_url not in self.discovered:
+                                        # if new_url not in self.visited:
+                                        pagelinks.add(new_url)
+                                        self.discovered.add(new_url)
+                                        self.queue.append({"name": new_url, "parent": rurl, "desc": url_text,
+                                                           "level": obj['level'] + 1})
+                                        leveln = obj['level'] + 1
+                                        self.edgedata.append({"source": rurl, "target": new_url})
+                                    else:
+                                        if new_url not in pagelinks:
+                                            self.reversedLinks.append(
+                                                {"name": new_url, "parent": rurl, "level": obj['level'] + 1})
             else:
                 headerResponse = requests.get(url,headers = headers,verify = False,stream = True)
                 obj["status"] = headerResponse.status_code
                 obj['type'] = "others"
                 self.nodedata[url] = obj
-                data = json.dumps(obj)
-                self.socketIO.emit('result_web_crawler',data)
+                self.socketIO.emit('result_web_crawler',json.dumps(obj))
 
         except Exception as e:
             obj['error'] = str(e)
             obj['status'] = 400
             self.nodedata[url] = obj
-            #print e
+            print e
             print "error url" , url
             #import traceback
-            #traceback.print_exc()
+            #traceback.format_exc()
             self.crawlStatus = False
 
     def runCrawler(self,url,level,agent,socketIO,mainwxobj) :
@@ -233,8 +266,8 @@ class Weboccular():
         start_url = url
         self.rooturl = start_url
         start = time.clock()
-        log.info("Starting new crawling request with following parameters: [URL] : " + start_url  +  " [LEVEL] : "  +  str(level) + " [Agent] : " + str(agent) )
-        logger.print_on_console("Starting new crawling request with following parameters: [URL] : " + start_url  +  " [LEVEL] : "  +  str(level) + " [Agent] : " + str(agent) )
+        log.info("\nNew Webocular request has started with following parameters: [URL] : " + start_url  +  " [LEVEL] : "  +  str(level) + " [Agent] : " + str(agent) )
+        logger.print_on_console("New Webocular request has started with following parameters: [URL] : " + start_url  +  " [LEVEL] : "  +  str(level) + " [Agent] : " + str(agent) )
         try:
             #Check if terminate flag is true or not:
             if controller.terminate_flag:
@@ -268,8 +301,8 @@ class Weboccular():
 
         crawling_status = "succesfully"
         if controller.terminate_flag:
-            logger.print_on_console("---------Crawling request Terminated---------")
-            log.info("---------Crawling request Terminated---------")
+            logger.print_on_console("---------Webocular request Terminated---------")
+            log.info("---------Webocular request Terminated---------")
             crawling_status = "partially"
 
         seconds = 0
@@ -287,12 +320,12 @@ class Weboccular():
         else:
             time_str = str("%.2f" % time_taken) + " seconds"
 
-        log.info("Crawling request completed " + crawling_status +" in " +  time_str)
+        log.info("Webocular request completed " + crawling_status +" in " +  time_str)
 
         #send the completion object to Node
         completetionObj = json.dumps({"progress" : "complete" ,"sdata" : sdata, "status": "success" ,"subdomains":  self.subdomains, "others" : self.others, "notParsedURLs" : self.notParsedURLs, "time_taken" : str(time_taken) +  " seconds"})
         self.socketIO.emit('result_web_crawler_finished',completetionObj)
-        logger.print_on_console("Crawling request completed " + crawling_status +" in " +  time_str)
+        logger.print_on_console("Webocular request completed " + crawling_status +" in " +  time_str)
 
         #finally reset the controller's terminate flag to False and Disable the terminate button
         controller.terminate_flag = False
