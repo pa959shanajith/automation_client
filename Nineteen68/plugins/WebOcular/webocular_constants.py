@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
-# Name:        weboccular_constants.py
-# Purpose:     Defines constants used in the weboccular plugin
+# Name:        webocular_constants.py
+# Purpose:     Defines constants used in the webocular plugin
 #
 # Author:      nikunj.jain
 #
@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 
 """
-This file contains all the constants used in Weboccular plugin
+This file contains all the constants used in Webocular plugin
 
 """
 
