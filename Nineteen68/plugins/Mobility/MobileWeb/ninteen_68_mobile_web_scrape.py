@@ -63,7 +63,7 @@ class ScrapeWindow(wx.Frame):
         state = event.GetEventObject().GetValue()
         if state == True:
             self.fullscrape_MWbutton.Disable()
-            self.comparebutton.Disable()
+            #self.comparebutton.Disable()
             clickandadd_MWoj.startclickandadd_MW()
             event.GetEventObject().SetLabel("Stop clickandadd")
 ##            wx.MessageBox('clickandadd_MW: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
