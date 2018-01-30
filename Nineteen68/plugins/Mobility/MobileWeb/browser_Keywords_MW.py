@@ -83,6 +83,8 @@ class BrowserKeywords():
             logger.print_on_console('Exception in starting server')
 
     def openBrowser(self, webelement, inputs, *args):
+
+
             ##self.start_server()
             status = webconstants_MW.TEST_RESULT_FAIL
             result = webconstants_MW.TEST_RESULT_FALSE
@@ -135,6 +137,8 @@ class BrowserKeywords():
                     result = webconstants_MW.TEST_RESULT_TRUE
                     status = webconstants_MW.TEST_RESULT_PASS
                 else:
+                    from decimal import Decimal
+                    import subprocess
                     self.start_server()
                     global driver_obj
                     global driver
@@ -152,17 +156,28 @@ class BrowserKeywords():
                     time.sleep(5)
                     desired_caps = {}
                     desired_caps['platformName'] = 'Android'
-                    ##            desired_caps['platformVersion'] =input_list[1]
+                    desired_caps['platformVersion'] =input_list[1]
                     global input_list
                     desired_caps['deviceName'] = input_list[0]
                     desired_caps['udid'] = input_list[0]
                     desired_caps['browserName'] = 'Chrome'
                     ##            desired_caps['appium-version'] = '1.4.0'
                     desired_caps['newCommandTimeout'] = '36000'
-                    driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
-                    logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
-                    driver.get(domconstants_MW.BLANK_PAGE)
-                    driver_obj = driver
+                    device_version= subprocess.check_output(["adb", "shell", "getprop ro.build.version.release"])
+                    if Decimal(input_list[1]) == Decimal(device_version):
+                        driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
+                        logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
+                        driver.get(domconstants_MW.BLANK_PAGE)
+                        driver_obj = driver
+                        logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
+                        result = webconstants_MW.TEST_RESULT_TRUE
+                        status = webconstants_MW.TEST_RESULT_PASS
+                    else:
+                        logger.log('Invalid Input')
+                        mobile_key_objects.custom_msg.append("Invalid Input")
+                        status = webconstants_MW.TEST_RESULT_FAIL
+                        logger.print_on_console("Invalid Input")
+
                     ##            p = psutil.Process(driver.service.process.pid)
                     ##            # logging.warning(p.get_children(recursive=True))
                     ##            pidchrome = p.children()[0]
@@ -171,10 +186,6 @@ class BrowserKeywords():
                     ##            global hwndg
                     ##            hwndg = util.bring_Window_Front(pidchrome.pid)
                     ##            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Using Pid handle is obtained')
-                    logger.log(
-                        'FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
-                    result = webconstants_MW.TEST_RESULT_TRUE
-                    status = webconstants_MW.TEST_RESULT_PASS
             except Exception as e:
                 err_msg = 'ERROR OCURRED WHILE OPENING BROWSER'
                 if platform.system() == 'Darwin':
