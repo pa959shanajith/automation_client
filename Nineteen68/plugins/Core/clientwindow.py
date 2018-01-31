@@ -10,7 +10,6 @@ import platform
 import uuid
 from datetime import datetime
 import core_utils
-import ast
 import logger
 import threading
 from socketIO_client import SocketIO,BaseNamespace
@@ -20,7 +19,6 @@ import readconfig
 import httplib
 import json
 import socket
-
 
 
 log = logging.getLogger('clientwindow.py')
@@ -72,12 +70,10 @@ class MainNamespace(BaseNamespace):
             try:
                 global icesession,plugins_list
                 core_utils_obj = core_utils.CoreUtils()
-                response = {}
-                response = ast.literal_eval(core_utils_obj.unwrap(str(args[1])))
-                ice = ast.literal_eval(icesession)
+                response = json.loads(core_utils_obj.unwrap(str(args[1])))
                 plugins_list = response['plugins']
                 err_res = None
-                if(response['id'] != ice['ice_id'] and response['connect_time'] != ice['connect_time']):
+                if(response['id'] != icesession['ice_id'] and response['connect_time'] != icesession['connect_time']):
                     err_res="Invalid response received"
                 if(response['res'] != 'success'):
                     if(response.has_key('err_msg')):
@@ -225,7 +221,6 @@ class MainNamespace(BaseNamespace):
         global qcdata
         global soc
         global socketIO
-        import time
         server_data=''
         data_stream=None
         client_data=None
@@ -254,8 +249,7 @@ class MainNamespace(BaseNamespace):
             else:
                 socketIO.emit('qcresponse','Error:data recevied empty')
         except Exception as e:
-            import traceback
-            traceback.print_exc()
+            log.error(e)
             socketIO.emit('qcresponse','Error:Qc Operations')
 
     def on_LAUNCH_MOBILE(self, *args):
@@ -439,8 +433,12 @@ class SocketThread(threading.Thread):
             key='USER'
         username=str(os.environ[key]).lower()
         core_utils_obj = core_utils.CoreUtils()
-        icesession = "{'ice_id':'"+str(uuid.uuid4())+"','connect_time':'"+str(datetime.now())+"','username':'"+username+"'}"
-        icesession_enc = core_utils_obj.wrap(icesession)
+        icesession = {
+            'ice_id':str(uuid.uuid4()),
+            'connect_time':str(datetime.now()),
+            'username':username
+        }
+        icesession_enc = core_utils_obj.wrap(json.dumps(icesession))
         params={'username':username,'icesession':icesession_enc}
         socketIO = SocketIO(temp_server_IP,server_port,MainNamespace,verify=server_cert,cert=client_cert,params=params)
         socketIO.wait()
@@ -726,7 +724,7 @@ class ClientWindow(wx.Frame):
         self.breakpoint.Disable()
 
         self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/killStaleProcess.png", wx.BITMAP_TYPE_ANY), wx.Point(360, 555), wx.Size(50, 42))
-        self.cancelbutton.Bind(wx.EVT_LEFT_DOWN, self.OnExit)
+        self.cancelbutton.Bind(wx.EVT_LEFT_DOWN, self.OnKillProcess)
         self.cancelbutton.SetToolTip(wx.ToolTip("To kill Stale process"))
         self.cancel_label=wx.StaticText(self.panel, -1, 'Kill Stale Process', wx.Point(340, 600), wx.Size(100, 70))
 
@@ -825,10 +823,11 @@ class ClientWindow(wx.Frame):
         self.killScrapeWindow()
         self.Destroy()
         controller.kill_process()
+        exit()
          # you may also do:  event.Skip()
          # since the default event handler does call Destroy(), too
 
-    def OnExit(self, event):
+    def OnKillProcess(self, event):
         controller.kill_process()
 
     def OnTerminate(self, event, *args):

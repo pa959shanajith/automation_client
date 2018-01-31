@@ -415,9 +415,6 @@ class Controller():
                 inpval.append(string[index+1:len(string)])
             elif string != '':
                 inpval.append(string)
-            for i in range(0,len(inpval)):
-                if inpval[i].find(STATIC_SEPARATOR) != -1:
-                    inpval[i] = inpval.replace(STATIC_SEPARATOR,SEMICOLON)
             if keyword.lower() not in [CREATE_DYN_VARIABLE]:
                 inpval[0]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[0],keyword,self)
             if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE]:
@@ -425,13 +422,11 @@ class Controller():
         else:
             if keyword in WS_KEYWORDS or keyword == 'navigateToURL':
                 input_list=[input[0]]
-            #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
             for x in input_list:
                 if STATIC_NONE in x:
                     x=None
                 else:
-                    if x.find(STATIC_SEPARATOR) != -1:
-                        x = x.replace(STATIC_SEPARATOR,SEMICOLON)
+                    #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
                     x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
                 inpval.append(x)
         return inpval,ignore_status

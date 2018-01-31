@@ -23,20 +23,16 @@ import json
 
 """ast - The ast module helps Python applications to process trees of the Python abstract syntax grammar."""
 import ast
-
 from xlrd import open_workbook
 import re
 import logger
-
 import handler
-
+import dynamic_variable_handler
 from teststepproperty import TestStepProperty
-
 import controller
-
 import logging
-
 from constants import *
+statCnt=0
 
 log = logging.getLogger("getparam.py")
 
@@ -429,6 +425,7 @@ class GetParam():
         teststepproperty =handler.tspList[paramindex]
         inputval = teststepproperty.inputval
         inputlistwithval = (list)( inputval)
+        global statCnt
         try:
             for i in range(0,len(inputval)):
                 inputvalstring = inputval[i]
@@ -442,7 +439,6 @@ class GetParam():
                     static_var_list=re.findall("\|(.*?)\|", inputvalstring)
                     statDict={}
                     statDict[STATIC_NONE]=None
-                    statCnt=0
                     for var in static_var_list:
                         inputresult=self.get_static_value(data,row,var)
                         if inputresult is None:
@@ -451,12 +447,11 @@ class GetParam():
                             if isinstance(inputresult,float):
                                 if inputresult%1 == 0.0:
                                     inputresult= int(inputresult)
-                            temp='{#@#'+str(statCnt)+'#@#}'
-                            statDict[temp]=inputresult
-                            resultinput = resultinput.replace('|'+var+'|',temp)
+                            temp=STATIC_DV_NAME[:9]+str(statCnt)+STATIC_DV_NAME[9:]
                             statCnt+=1
+                            dynamic_variable_handler.dynamic_variable_map[temp]=inputresult
+                            resultinput = resultinput.replace('|'+var+'|',temp)
                     inputlistwithval.insert(i,resultinput)
-                    inputlistwithval.insert(i+1,statDict)
                 else:
                     keywordList=[EVALUATE,DATE_COMPARE]
                     if teststepproperty.name.lower() in keywordList :
@@ -481,9 +476,10 @@ class GetParam():
                                     if isinstance(inputresult,float):
                                         if inputresult%1 == 0.0:
                                             inputresult = int(inputresult)
-                                    elif inputresult.find(';') != -1:
-                                        inputresult = inputresult.replace(SEMICOLON,STATIC_SEPARATOR)
-                                resultinput = resultinput.replace(variable,str(inputresult))
+                                temp=STATIC_DV_NAME[:9]+str(statCnt)+STATIC_DV_NAME[9:]
+                                statCnt+=1
+                                dynamic_variable_handler.dynamic_variable_map[temp]=inputresult
+                                resultinput = resultinput.replace(variable,temp)
                                 inputlistwithval.insert(i,resultinput)
         except Exception as e:
             log.error(e)
@@ -818,7 +814,5 @@ class GetParam():
             step_description='Data Parameterization failed : Wrong filters given'
             self.add_report_end_iteration(reporting_obj,step_description,0,0)
             #Reporting part ends
-
             log.error(e)
-            logger.print_on_console(e)
         return return_value
