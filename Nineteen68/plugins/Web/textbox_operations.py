@@ -165,14 +165,21 @@ class TextboxKeywords:
 
     def __get_text(self,webelement):
         text=''
+        #get the text using selenium in-built method
         text=webelement.get_attribute('value')
-        if text == '':
-            id = webelement.get_attribute('id')
-            if(id != ''):
-                text = browser_Keywords.driver_obj.execute_script("return document.getElementById(arguments[0]).value",id)
-        if text is None or text is '':
-            text=webelement.get_attribute('placeholder')
-        log.debug('Text returning from __get_text is '+text)
+        if text is None or text == '':
+            #if failed, use javascript to get the text
+            text = browser_Keywords.driver_obj.execute_script("""return arguments[0].value""",webelement)
+            if text is None or text is '':
+                #if failed, use the id to get the text
+                id = webelement.get_attribute('id')
+                if(id != '' and id is not None):
+                    text = browser_Keywords.driver_obj.execute_script("return document.getElementById(arguments[0]).value",id)
+                    #finally everything failed then return the placeholder
+                    if text is None or text is '':
+                        text=webelement.get_attribute('placeholder')
+        log.debug('Text returning from __get_text is ')
+        log.debug(text)
         return text
 
     def __clear_text(self,webelement):
@@ -197,7 +204,8 @@ class TextboxKeywords:
                methodoutput=TEST_RESULT_TRUE
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
-        logger.print_on_console(METHOD_OUTPUT+text)
+        logger.print_on_console(METHOD_OUTPUT)
+        logger.print_on_console(text)
         return status,methodoutput,text,err_msg
 
     def verify_text(self,webelement,input,*args):
