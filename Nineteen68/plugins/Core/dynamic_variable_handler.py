@@ -164,11 +164,8 @@ class DynamicVariables:
     #To simplify expression for IF, ELSEIF and EVALUATE keywords
     def simplify_expression(self,input_var,keyword,con_obj):
         k=-1
-        dv_dict=dict()
         if keyword.lower() in [IF,ELSE_IF]:
             k=1
-            if len(input_var)>1:
-                dv_dict=dict(input_var[1])
             input_var=input_var[0]
         elif keyword.lower() == EVALUATE:
             k=2
@@ -263,9 +260,7 @@ class DynamicVariables:
                     if len(exp[i])==0:
                         continue
                     if exp[i][0]=='{' and exp[i][-1]=='}':
-                        if not dv_dict.has_key(exp[i]):
-                            dv_dict[exp[i]]=self.replace_dynamic_variable(exp[i],keyword,con_obj)
-                        inp_err_list[i]=exp[i]=dv_dict[exp[i]]
+                        inp_err_list[i]=exp[i]=self.replace_dynamic_variable(exp[i],keyword,con_obj)
                         if exp[i] is None:
                             exp[i]='null'
                     try:
@@ -306,25 +301,3 @@ class DynamicVariables:
             return [disp_expression,invalid_msg]
         log.debug('__OUTPUT: ',exp)
         return [exp,None,disp_expression]
-
-
-##
-##obj=DynamicVariables()
-##dynamic_variable_map['{a}']='0'
-##dynamic_variable_map['{b}']='1'
-##dynamic_variable_map['{c[0]}']='3333'
-##dynamic_variable_map['{c[0][1]}']='10101'
-##print '{a} is dynamic variable :',obj.check_for_dynamicvariables('{a}')
-##print '{a}= ',obj.get_dynamic_value('{a}')
-##status,nested_var1=  obj.check_dynamic_inside_dynamic('{c[{a}]}')
-##status,nested_var= obj.check_dynamic_inside_dynamic('{c}')
-##value= obj.get_nestedDyn_value(nested_var1,'{c[{a}]}')
-##print '{c[{a}]} ',obj.get_dynamic_value(value)
-##status,nested_var1=  obj.check_dynamic_inside_dynamic('{c[{a}][{b}]}')
-##print '{c[{a}][{b}]} FIRST ',status,nested_var1
-##nested_var= obj.get_nestedDyn_value(nested_var1,'{c[{a}][{b}]}')
-##print 'nested_var----- ',nested_var
-##print '{c[{a}][{b}]} SECOND ',obj.get_dynamic_value(nested_var)
-##print '-------------------'
-##print dynamic_variable_map
-##print '------------------'

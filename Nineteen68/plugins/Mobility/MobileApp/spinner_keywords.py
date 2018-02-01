@@ -16,7 +16,7 @@ import install_and_launch
 import logging
 import logger
 import time
-
+driver_obj = None
 
 log = logging.getLogger('button_link_keywords_mobility.py')
 
@@ -50,25 +50,49 @@ class Spinner_Keywords():
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                count= len(element)
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
+                                    count= len(element)
                             else :
                                 className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
+
                             length1=len(text)
+                            scrollele11=obj[0]
+                            scrollele21=obj[(length1)-1]
+                            import time
+                            time.sleep(3)
+                            top_val=element[0].text
+                            driver.scroll(scrollele11,scrollele21)
+                            for i in element:
+                                if i.text not in text:
+                                    text.append(i.text)
+                                    obj.append(i)
+                                if i.text ==top_val:
+                                    break
+                            length3=len(text)
+                            driver.scroll(scrollele11,scrollele21)
                             if length1 >4 :
-                                scrollele1=obj[length1-1]
-                                scrollele2=obj[length1-2]
+                                scrollele1=obj[length3-1]
+                                scrollele2=obj[length3-2]
                                 import time
                                 time.sleep(3)
-                                driver.scroll(scrollele1,scrollele2)
+                                driver.scroll(scrollele2,scrollele1)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                             count= len(element)
-
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                count= len(element)
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
+                                    count= len(element)
                             else :
                                 className='CheckedTextView'
                             for i in element:
@@ -78,7 +102,7 @@ class Spinner_Keywords():
                             length2=len(text)
                             import time
                             time.sleep(3)
-##                            driver.scroll(scrollele1,scrollele2)
+                            driver.scroll(scrollele2,scrollele1)
 
                             if (length1==length2):
                                 output=length1
@@ -86,7 +110,7 @@ class Spinner_Keywords():
                                 result=TEST_RESULT_TRUE
                                 break
 
-                        if className == 'CheckedTextView' :
+                        if className != 'RadioButton' :
                             driver.back()
 
                     else:
@@ -133,43 +157,69 @@ class Spinner_Keywords():
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                count= len(element)
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
+                                    count= len(element)
                             else :
                                 className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
+
                             length1=len(text)
+                            scrollele11=obj[0]
+                            scrollele21=obj[(length1)-1]
+                            import time
+                            time.sleep(3)
+                            top_val=element[0].text
+                            driver.scroll(scrollele11,scrollele21)
+                            for i in element:
+                                if i.text not in text:
+                                    text.append(i.text)
+                                    obj.append(i)
+                                if i.text ==top_val:
+                                    break
+                            length3=len(text)
+
                             if length1 >4 :
-                                scrollele1=obj[length1-1]
-                                scrollele2=obj[length1-2]
+                                scrollele1=obj[length3-1]
+                                scrollele2=obj[length3-2]
                                 import time
                                 time.sleep(3)
-                                driver.scroll(scrollele1,scrollele2)
+                                driver.scroll(scrollele2,scrollele1)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                             count= len(element)
-
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                count= len(element)
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
+                                    count= len(element)
                             else :
                                 className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
-
                             length2=len(text)
                             import time
                             time.sleep(3)
-##                            driver.scroll(scrollele1,scrollele2)
+                            driver.scroll(scrollele2,scrollele1)
 
                             if (length1==length2):
                                 count=length1
+                                status=TEST_RESULT_PASS
+                                result=TEST_RESULT_TRUE
                                 break
-                        if className == 'CheckedTextView' :
+
+                        if className != 'RadioButton' :
                             driver.back()
-                        if (input==count):
+                        if (input==len(text)):
                                 log.debug('count matched')
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
@@ -177,7 +227,6 @@ class Spinner_Keywords():
                                 err_msg='count not matching'
                                 log.error('count not matching')
                                 logger.print_on_console(err_msg)
-
 
 
                     else:
@@ -190,8 +239,8 @@ class Spinner_Keywords():
                     logger.print_on_console(err_msg)
         except Exception as e:
                 log.error(e)
-
         return status,result,output,err_msg
+
 
 
     def select_value_by_text(self,webelement,input,*args):
@@ -204,7 +253,6 @@ class Spinner_Keywords():
         text=[]
         obj=[]
         flag=False
-
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
@@ -221,12 +269,16 @@ class Spinner_Keywords():
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                             count= len(element)
-
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                count= len(element)
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
                             else :
                                 className='CheckedTextView'
+
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
@@ -239,30 +291,25 @@ class Spinner_Keywords():
                                         result=TEST_RESULT_TRUE
                                         global flag
                                         flag=True
+                                        break
                                 else :
                                     err_msg='invalid input'
                                     log.error('invalid input')
                                     logger.print_on_console(err_msg)
                             length1=len(text)
-                            if length1 >4 :
-                                scrollele1=obj[length1-1]
-                                scrollele2=obj[length1-2]
-                                import time
-                                time.sleep(3)
-                                driver.scroll(scrollele1,scrollele2)
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            count= len(element)
-
-                            if count == 0 :
-                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
-                                className='RadioButton'
-                            else :
-                                className='CheckedTextView'
+                            scrollele11=obj[0]
+                            scrollele21=obj[(length1)-1]
+                            import time
+                            time.sleep(3)
+                            top_val=element[0].text
+                            driver.scroll(scrollele11,scrollele21)
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
-                            if flag == False:
+                                if i.text ==top_val:
+                                    break
+                            for j in obj:
                                 if input is not None:
                                     if input == j.text :
                                         j.click()
@@ -270,24 +317,52 @@ class Spinner_Keywords():
                                         result=TEST_RESULT_TRUE
                                         global flag
                                         flag=True
+                                        break
                                 else :
                                     err_msg='invalid input'
                                     log.error('invalid input')
-                                    logger.print_on_console(err_msg)
+                            length3=len(text)
+                            driver.scroll(scrollele11,scrollele21)
+                            if flag == False:
+                                if length1 >4 :
+                                    scrollele1=obj[0]
+                                    scrollele2=obj[(length1)-1]
+                                    import time
+                                    time.sleep(3)
+                                    driver.scroll(scrollele2,scrollele1)
+                                    for i in element:
+                                        if i.text not in text:
+                                            text.append(i.text)
+                                            obj.append(i)
+                                    for j in obj:
+                                        if input is not None:
+                                            if input == j.text :
+                                                j.click()
+                                                status=TEST_RESULT_PASS
+                                                result=TEST_RESULT_TRUE
+                                                global flag
+                                                flag=True
+                                                break
+                                        else :
+                                            err_msg='invalid input'
+                                            log.error('invalid input')
+                                            logger.print_on_console(err_msg)
                             length2=len(text)
                             import time
                             time.sleep(3)
-                            driver.scroll(scrollele1,scrollele2)
+                            driver.scroll(scrollele2,scrollele1)
 
                             if (length1==length2):
                                 if flag == False:
                                     err_msg='invalid input'
                                     log.error('invalid input')
                                     logger.print_on_console(err_msg)
-                                    if className == 'CheckedTextView' :
-                                        driver.back()
                                 break
 
+
+                            if className != 'RadioButton':
+                                driver.back()
+                            break
 
                     else:
                         err_msg='element is disabled'
@@ -334,76 +409,96 @@ class Spinner_Keywords():
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
                             else :
                                 className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
-                            for j in obj:
-                                if input is not None:
-                                    selected=j.get_attribute("checked")
-                                    if str(selected)== 'true':
-                                        if input == j.text :
-                                            status=TEST_RESULT_PASS
-                                            result=TEST_RESULT_TRUE
-                                            if status == TEST_RESULT_PASS :
+                            if className !='TextView':
+                                for j in obj:
+                                    if input is not None:
+                                        selected=j.get_attribute("checked")
+                                        if str(selected)== 'true':
+                                            if input == j.text :
+                                                status=TEST_RESULT_PASS
+                                                result=TEST_RESULT_TRUE
+                                                if status == TEST_RESULT_PASS :
+                                                    driver.back()
+                                                    var='true'
+                                                global flag
+                                                flag=True
+                                            else:
+                                                if var=='' :
+                                                    driver.back()
+                                                    var='true'
+                                    else :
+                                        driver.back()
+                                        err_msg='invalid input'
+                                        log.error('invalid input')
+                                        logger.print_on_console(err_msg)
+                            else:
+                                for j in obj:
+                                    if input is not None:
+                                        selected=j.get_attribute("text")
+                                        if selected.strip() != '':
+                                            if input == j.text :
+                                                global flag
+                                                flag=True
                                                 driver.back()
-                                                var='true'
-                                            global flag
-                                            flag=True
-                                        else:
-                                            if var=='' :
+                                                status=TEST_RESULT_PASS
+                                                result=TEST_RESULT_TRUE
+                                                break
+                                            else :
                                                 driver.back()
-                                                var='true'
-                                else :
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
-                                    logger.print_on_console(err_msg)
-                            length1=len(text)
-                            if length1 >4 :
-                                scrollele1=obj[length1-1]
-                                scrollele2=obj[length1-2]
-                                import time
-                                time.sleep(3)
-                                driver.scroll(scrollele1,scrollele2)
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            count= len(element)
+                                                err_msg='invalid input'
+                                                log.error('invalid input')
+                                                logger.print_on_console(err_msg)
+                                                break
 
-                            if count == 0 :
-                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
-                                className='RadioButton'
-                            else :
-                                className='CheckedTextView'
-                            for i in element:
-                                if i.text not in text:
-                                    text.append(i.text)
-                                    obj.append(i)
-                            if flag == False:
-                                if input is not None:
-                                    selected=j.get_attribute("checked")
-                                    if str(selected)== 'true':
-                                        if input == j.text :
-                                            status=TEST_RESULT_PASS
-                                            result=TEST_RESULT_TRUE
-                                            if var=='' :
-                                                driver.back()
-                                                var='true'
-                                            global flag
-                                            flag=True
-                                        else :
-                                            if var=='' :
-                                                driver.back()
-                                                var='true'
+                            if className !='TextView':
+                                length1=len(text)
+                                if length1 >4 :
+                                    scrollele1=obj[length1-1]
+                                    scrollele2=obj[length1-2]
+                                    import time
+                                    time.sleep(3)
+                                    driver.scroll(scrollele2,scrollele1)
 
-                                else :
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
-                                    logger.print_on_console(err_msg)
+                                for i in element:
+                                    if i.text not in text:
+                                        text.append(i.text)
+                                        obj.append(i)
+                                if flag == False:
+                                        for j in obj:
+                                            if input is not None:
+                                                selected=j.get_attribute("checked")
+                                                if str(selected)== 'true':
+                                                    if input == j.text :
+                                                        status=TEST_RESULT_PASS
+                                                        result=TEST_RESULT_TRUE
+                                                        if var=='' :
+                                                            driver.back()
+                                                            var='true'
+                                                        global flag
+                                                        flag=True
+                                                    else :
+                                                        if var=='' :
+                                                            driver.back()
+                                                            var='true'
+
+                                            else :
+                                                err_msg='invalid input'
+                                                log.error('invalid input')
+                                                logger.print_on_console(err_msg)
+
                             length2=len(text)
                             import time
                             time.sleep(3)
-                            driver.scroll(scrollele1,scrollele2)
+                            ##driver.scroll(scrollele2,scrollele1)
 
                             if (length1==length2):
                                 if flag == False:
@@ -467,39 +562,63 @@ class Spinner_Keywords():
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
                             else :
                                 className='CheckedTextView'
+
+
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
-                            for j in obj:
-                                if input is not None:
-                                    if input<len(obj) :
-                                        obj[input].click()
-                                        status=TEST_RESULT_PASS
-                                        result=TEST_RESULT_TRUE
-                                        global flag
-                                        flag=True
-                                else :
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
-                                    logger.print_on_console(err_msg)
+
+                            if input is not None:
+                                if input<len(obj) :
+                                    obj[input].click()
+                                    status=TEST_RESULT_PASS
+                                    result=TEST_RESULT_TRUE
+                                    global flag
+                                    flag=True
+                            else :
+                                err_msg='invalid input'
+                                log.error('invalid input')
+                                logger.print_on_console(err_msg)
                             length1=len(text)
+                            scrollele11=obj[0]
+                            scrollele21=obj[(length1)-1]
+                            import time
+                            time.sleep(3)
+                            top_val=element[0].text
+                            driver.scroll(scrollele11,scrollele21)
+                            for i in element:
+                                if i.text not in text:
+                                    text.append(i.text)
+                                    obj.append(i)
+                                if i.text ==top_val:
+                                    break
+                            if input is not None:
+                                if input<len(obj) :
+                                    obj[input].click()
+                                    status=TEST_RESULT_PASS
+                                    result=TEST_RESULT_TRUE
+                                    global flag
+                                    flag=True
+                            else :
+                                err_msg='invalid input'
+                                log.error('invalid input')
+                                logger.print_on_console(err_msg)
+                            length3=len(text)
+                            driver.scroll(scrollele11,scrollele21)
+
                             if length1 >4 :
-                                scrollele1=obj[length1-1]
+                                scrollele1=obj[0]
                                 scrollele2=obj[length1-2]
                                 import time
                                 time.sleep(3)
-                                driver.scroll(scrollele1,scrollele2)
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            count= len(element)
+                                driver.scroll(scrollele2,scrollele1)
 
-                            if count == 0 :
-                                element=driver.find_elements_by_class_name('android.widget.RadioButton')
-                                className='RadioButton'
-                            else :
-                                className='CheckedTextView'
                             for i in element:
                                 if i.text not in text:
                                     text.append(i.text)
@@ -519,7 +638,7 @@ class Spinner_Keywords():
                             length2=len(text)
                             import time
                             time.sleep(3)
-                            driver.scroll(scrollele1,scrollele2)
+                            driver.scroll(scrollele2,scrollele1)
 
                             if (length1==length2):
                                 if flag == False:
@@ -529,6 +648,10 @@ class Spinner_Keywords():
                                     if className == 'CheckedTextView' :
                                         driver.back()
                                 break
+                            if className != 'RadioButton' :
+                                driver.back()
+
+
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
@@ -573,6 +696,10 @@ class Spinner_Keywords():
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
+
                             else :
                                 className='CheckedTextView'
                             for i in element:
@@ -647,6 +774,9 @@ class Spinner_Keywords():
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
                             else :
                                 className='CheckedTextView'
                             for i in element:
@@ -674,8 +804,8 @@ class Spinner_Keywords():
                                 if length1 >4 :
                                     scrollele1=obj[length1-1]
                                     scrollele2=obj[length1-2]
-                                    driver.scroll(scrollele1,scrollele2)
-                        if className == 'CheckedTextView' :
+                                    driver.scroll(scrollele2,scrollele1)
+                        if className != 'RadioButton' :
                             driver.back()
 
                     else:
@@ -725,32 +855,56 @@ class Spinner_Keywords():
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
                             else :
                                 className='CheckedTextView'
+                            k=int(input[0])
                             for i in element:
                                 if i.text not in text:
                                     text.append(str(i.text))
                                     obj.append(i)
 
-                                k=int(input[0])
-                                if k<len(obj) :
-                                    if text[k] not in temp:
-                                        temp.append(text[k])
-                                        count=count+1
+                                ##if k<len(obj) :
+                                ##if text[k] not in temp:
+                                    ##temp.append(text[k])
+                                    ##count=count+1
 
                             length1=len(text)
+                            scrollele11=obj[0]
+                            scrollele21=obj[(length1)-1]
+                            import time
+                            time.sleep(3)
+                            top_val=element[0].text
+                            driver.scroll(scrollele11,scrollele21)
+                            for i in element:
+                                if i.text not in text:
+                                    text.append(i.text)
+                                    obj.append(i)
+                                if i.text ==top_val:
+                                    break
+                                ##if k<len(obj) :
+                                ##if text[k] not in temp:
+                                    ##temp.append(text[k])
+                                    ##count=count+1
+
+                            driver.scroll(scrollele11,scrollele21)
                             if length1 >4 :
                                 scrollele1=obj[length1-1]
                                 scrollele2=obj[length1-2]
                                 import time
                                 time.sleep(3)
-                                driver.scroll(scrollele1,scrollele2)
+                                driver.scroll(scrollele2,scrollele1)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                             count= len(element)
 
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
                             else :
                                 className='CheckedTextView'
                             for i in element:
@@ -758,34 +912,31 @@ class Spinner_Keywords():
                                     text.append(str(i.text))
                                     obj.append(i)
 
-                                k=int(input[0])
-                                if k<len(obj) :
-                                    if text[k] not in temp:
-                                        temp.append(text[k])
-                                        count=count+1
+
+                                ##if k<len(obj) :
+                                ##if text[k] not in temp:
+                                    ##temp.append(text[k])
+                                    ##count=count+1
                             length2=len(text)
-##                            import time
-##                            time.sleep(3)
-##                            driver.scroll(scrollele1,scrollele2)
-                            if (length1==length2):
+                            import time
+                            time.sleep(3)
+                            driver.scroll(scrollele2,scrollele1)
+                            ##if (length1==length2):
+                                ##if len(input) == len(temp):
+                                    ##output=temp[0]
+                            if k<=len(obj):
+                                output= obj[k].text
+                                status=TEST_RESULT_PASS
+                                result=TEST_RESULT_TRUE
+                                break
 
-                                if len(input) == len(temp):
-                                    output=temp[0]
-                                    status=TEST_RESULT_PASS
-                                    result=TEST_RESULT_TRUE
+                            else :
+                                    err_msg='invalid input'
+                                    log.error('invalid input')
+                                    logger.print_on_console(err_msg)
                                     break
-
-
-                                else :
-                                        err_msg='invalid input'
-                                        log.error('invalid input')
-                                        logger.print_on_console(err_msg)
-                                        break
-                        if className == 'CheckedTextView' :
+                        if className != 'RadioButton' :
                             driver.back()
-
-
-
 
 
                     else:
@@ -832,6 +983,9 @@ class Spinner_Keywords():
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
                             else :
                                 className='CheckedTextView'
                             for i in element:
@@ -839,31 +993,54 @@ class Spinner_Keywords():
                                     text.append(i.text)
                                     obj.append(i)
 
-                            for j in obj:
+
+                            length1=len(text)
+                            scrollele11=obj[0]
+                            scrollele21=obj[(length1)-1]
+                            import time
+                            time.sleep(3)
+                            top_val=element[0].text
+                            driver.scroll(scrollele11,scrollele21)
+                            for i in element:
+                                if i.text not in text:
+                                    text.append(i.text)
+                                    obj.append(i)
+                                if i.text ==top_val:
+                                    break
+                            length3=len(text)
+                            driver.scroll(scrollele11,scrollele21)
+                            if length1 >4 :
+                                scrollele1=obj[0]
+                                scrollele2=obj[length3-2]
+                                driver.scroll(scrollele2,scrollele1)
+                            for i in element:
+                                if i.text not in text:
+                                    text.append(i.text)
+                                    obj.append(i)
+                            driver.scroll(scrollele2,scrollele1)
+                            if className !='TextView':
+                                for j in obj:
                                     selected=j.get_attribute("checked")
-
-
-                                    if str(selected) == 'true' :
-
+                                    if str(selected) == 'true':
                                         output=j.text
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE
                                         global flag
                                         flag=True
+                                        break
 
-                                    else :
-
-                                        continue
-
-                            if flag :
+                            else:
+                                for j in obj:
+                                    selected=j.get_attribute("selected")
+                                    if str(selected) == 'true':
+                                        output=j.text
+                                        global flag
+                                        flag=True
+                                        status=TEST_RESULT_PASS
+                                        result=TEST_RESULT_TRUE
+                                        break
                                 break
-                            else :
-                                length1=len(text)
-                                if length1 >4 :
-                                    scrollele1=obj[length1-1]
-                                    scrollele2=obj[length1-2]
-                                    driver.scroll(scrollele1,scrollele2)
-                        if className == 'CheckedTextView' :
+                        if className != 'RadioButton' :
                             driver.back()
 
                     else:
@@ -878,8 +1055,6 @@ class Spinner_Keywords():
                 log.error(e)
 
         return status,result,output,err_msg
-
-
 
 
 
@@ -916,6 +1091,9 @@ class Spinner_Keywords():
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
                             else :
                                 className='CheckedTextView'
                             for i in element:
@@ -942,6 +1120,9 @@ class Spinner_Keywords():
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
                             else :
                                 className='CheckedTextView'
                             for i in element:
@@ -977,7 +1158,7 @@ class Spinner_Keywords():
 
 
 
-                        if className == 'CheckedTextView' :
+                        if className != 'RadioButton' :
                             driver.back()
                     else:
                         err_msg='element is disabled'
@@ -1008,6 +1189,7 @@ class Spinner_Keywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
+                eles = webelement.get_attribute("className")
                 visibility=webelement.is_displayed()
                 log.debug('element is visible')
                 if visibility:
@@ -1024,25 +1206,51 @@ class Spinner_Keywords():
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                count= len(element)
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
                             else :
                                 className='CheckedTextView'
+
                             for i in element:
                                 if i.text not in text:
                                     text.append(str(i.text))
                                     obj.append(i)
                             length1=len(text)
+                            scrollele11=obj[0]
+                            scrollele21=obj[(length1)-1]
+                            import time
+                            time.sleep(3)
+                            top_val=element[0].text
+                            driver.scroll(scrollele11,scrollele21)
+                            for i in element:
+                                if i.text not in text:
+                                    text.append(i.text)
+                                    obj.append(i)
+                                if i.text ==top_val:
+                                    break
+                            length3=len(text)
+                            import time
+                            time.sleep(3)
+                            driver.scroll(scrollele11,scrollele21)
+
                             if length1 >4 :
-                                scrollele1=obj[length1-1]
+                                scrollele1=obj[0]
                                 scrollele2=obj[length1-2]
                                 import time
                                 time.sleep(3)
-                                driver.scroll(scrollele1,scrollele2)
+                                driver.scroll(scrollele2,scrollele1)
                                 element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                                 count= len(element)
 
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                count= len(element)
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
                             else :
                                 className='CheckedTextView'
                             for i in element:
@@ -1050,16 +1258,20 @@ class Spinner_Keywords():
                                     text.append(i.text)
                                     obj.append(i)
                             length2=len(text)
-##                            import time
-##                            time.sleep(3)
-##                            driver.scroll(scrollele1,scrollele2)
+                            driver.scroll(scrollele2,scrollele1)
 
                             if (length1==length2):
                                 output=text
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
-                        if className == 'CheckedTextView' :
+                            else:
+                                output=text
+                                status=TEST_RESULT_PASS
+                                result=TEST_RESULT_TRUE
+                                break
+
+                        if className != 'RadioButton' :
                             driver.back()
                     else:
                         err_msg='element is disabled'
@@ -1105,6 +1317,9 @@ class Spinner_Keywords():
                             if count1 == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
                             else :
                                 className='CheckedTextView'
                             for i in element:
@@ -1112,18 +1327,35 @@ class Spinner_Keywords():
                                     text.append(str(i.text))
                                     obj.append(i)
                             length1=len(text)
+                            scrollele11=obj[0]
+                            scrollele21=obj[(length1)-1]
+                            import time
+                            time.sleep(3)
+                            top_val=element[0].text
+                            driver.scroll(scrollele11,scrollele21)
+                            for i in element:
+                                if i.text not in text:
+                                    text.append(i.text)
+                                    obj.append(i)
+                                if i.text ==top_val:
+                                    break
+                            length3=len(text)
+                            driver.scroll(scrollele11,scrollele21)
                             if length1 >4 :
-                                scrollele1=obj[length1-1]
+                                scrollele1=obj[0]
                                 scrollele2=obj[length1-2]
                                 import time
                                 time.sleep(3)
-                                driver.scroll(scrollele1,scrollele2)
+                                driver.scroll(scrollele2,scrollele1)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                             count1= len(element)
 
                             if count1 == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                if count == 0 :
+                                    element=driver.find_elements_by_class_name('android.widget.TextView')
+                                    className='TextView'
                             else :
                                 className='CheckedTextView'
                             for i in element:
@@ -1139,9 +1371,6 @@ class Spinner_Keywords():
                                     for k in input :
                                         if k in text:
                                             count=count+1
-
-
-
                                         else :
                                             err_msg='invalid input'
                                             log.error('invalid input')
@@ -1163,7 +1392,7 @@ class Spinner_Keywords():
                                 break
 
 
-                        if className == 'CheckedTextView' :
+                        if className != 'RadioButton' :
                             driver.back()
                     else:
                         err_msg='element is disabled'

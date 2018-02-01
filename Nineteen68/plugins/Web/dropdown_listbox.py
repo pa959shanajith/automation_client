@@ -1117,8 +1117,9 @@ class DropdownKeywords():
                             temp = []
                             for x in range(0, len(index)):
                                 value = select.all_selected_options[x].text
-                                if input[0] == "1":
-                                    value = value.strip()
+                                if len(input)==1:
+                                    if input[0] == "1":
+                                        value = value.strip()
                                 temp.append(value)
                             output = ';'.join(temp)
                             logger.print_on_console(output)
