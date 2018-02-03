@@ -44,7 +44,7 @@ class Shell_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
             log.error(e)
-            logger.print_on_console('Error occured in GETROWCOUNT and is a :',e)
+            logger.print_on_console('Error occured in GETROWCOUNT')
         return status,result,value,err_msg
 
     def get_colCount(self, sap_id,*args):
@@ -70,7 +70,7 @@ class Shell_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
             log.error(e)
-            logger.print_on_console('Error occured in GETCOLUMNCOUNT and is a :',e)
+            logger.print_on_console('Error occured in GETCOLUMNCOUNT')
         return status,result,value,err_msg
 
     def selectRows(self, sap_id,input_val,*args):
@@ -108,7 +108,7 @@ class Shell_Keywords():
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
                 log.error(e)
-                logger.print_on_console('Error occured in SELECTROWS and is a :',e)
+                logger.print_on_console('Error occured in SELECTROWS')
             return status,result,value,err_msg
 
     def toolBarActionKeys(self, sap_id,input_val,*args):
@@ -139,7 +139,7 @@ class Shell_Keywords():
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
                 log.error(e)
-                logger.print_on_console('Error occured in ToolbarActionKeys and is a :',e)
+                logger.print_on_console('Error occured in ToolbarActionKeys')
             return status,result,value,err_msg
 
     def getCellText(self, sap_id,input_val,*args):
@@ -183,7 +183,7 @@ class Shell_Keywords():
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
                 log.error(e)
-                logger.print_on_console('Error occured in GetCellText and is a :',e)
+                logger.print_on_console('Error occured in GetCellText')
             return status,result,value,err_msg
 
     def pressToolBarButton(self, sap_id,input_val,*args):
@@ -212,7 +212,12 @@ class Shell_Keywords():
                                          a=elem.GetToolbarButtonTooltip(x)
                                          if text.strip().lower()==str(a).strip().lower():
                                             elmID=elem.GetToolbarButtonId(x)
-                                            elem.PressToolbarButton(elmID)
+                                            if((elem.GetToolbarButtonType(x) == "Menu" or "ButtonAndMenu") and len(input_val)>1):
+                                                menuItem = str(input_val[1]).strip()
+                                                elem.PressToolbarContextButton(elmID)
+                                                elem.SelectContextMenuItemByText(menuItem)
+                                            else:
+                                                elem.PressToolbarButton(elmID)
                                             status = sap_constants.TEST_RESULT_PASS
                                             result = sap_constants.TEST_RESULT_TRUE
                                             break
@@ -251,7 +256,7 @@ class Shell_Keywords():
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
                 log.error(e)
-                logger.print_on_console('Error occured in PressToolbarButton and is a :',e)
+                logger.print_on_console('Error occured in PressToolbarButton')
             return status,result,value,err_msg
 
     def clickCell(self, sap_id,input_val,*args):
@@ -298,7 +303,7 @@ class Shell_Keywords():
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
                 log.error(e)
-                logger.print_on_console('Error occured in ClickCell and is a :',e)
+                logger.print_on_console('Error occured in ClickCell')
             return status,result,value,err_msg
 
     def doubleClickCell(self, sap_id,input_val,*args):
@@ -342,7 +347,7 @@ class Shell_Keywords():
             except Exception as e:
                 err_msg = sap_constants.ERROR_MSG
                 log.error(e)
-                logger.print_on_console('Error occured in DoubleClickCell and is a :',e)
+                logger.print_on_console('Error occured in DoubleClickCell')
             return status,result,value,err_msg
 
     def selectTreeNode(self, sap_id,input_val,*args):
@@ -391,7 +396,7 @@ class Shell_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
             log.error(e)
-            logger.print_on_console('Error occured in SelectTreeNode :',e)
+            logger.print_on_console('Error occured in SelectTreeNode')
         return status,result,value,err_msg
 
     def getNodeNameByIndex(self,sap_id,input_val,*args):
@@ -451,7 +456,7 @@ class Shell_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
             log.error(e)
-            logger.print_on_console('Error occured in GetNodeNameByIndex :',e)
+            logger.print_on_console('Error occured in GetNodeNameByIndex')
         return status,result,value,err_msg
 
 
