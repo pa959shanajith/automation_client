@@ -18,29 +18,29 @@ log = logging.getLogger('websevice_dispatcher.py')
 class Dispatcher:
     webservice = webservices.WSkeywords()
     def dispatcher(self,tsp,socketIO,*message):
-        keyword=tsp.name
+        keyword=tsp.name.lower()
         err_msg=None
         result=[constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
         try:
-            dict={'setEndPointURL': self.webservice.setEndPointURL,
-                  'setOperations' : self.webservice.setOperations,
-                  'setMethods'    : self.webservice.setMethods,
-                  'setHeader'     : self.webservice.setHeader,
-                  'setWholeBody'  : self.webservice.setWholeBody,
-                  'executeRequest' : self.webservice.executeRequest,
-                  'getHeader'      : self.webservice.getHeader,
-                  'getBody'      : self.webservice.getBody,
-                  'addClientCertificate':self.webservice.addClientCertificate,
-                  'setTagValue' : self.webservice.setTagValue,
-                  'getServerCertificate' : self.webservice.getServerCertificate,
-                  'setTagAttribute':self.webservice.setTagAttribute,
-                  'setHeaderTemplate':self.webservice.setHeaderTemplate
+            dict={'setendpointurl': self.webservice.setEndPointURL,
+                  'setoperations' : self.webservice.setOperations,
+                  'setmethods'    : self.webservice.setMethods,
+                  'setheader'     : self.webservice.setHeader,
+                  'setwholebody'  : self.webservice.setWholeBody,
+                  'executerequest' : self.webservice.executeRequest,
+                  'getheader'      : self.webservice.getHeader,
+                  'getbody'      : self.webservice.getBody,
+                  'addclientcertificate':self.webservice.addClientCertificate,
+                  'settagvalue' : self.webservice.setTagValue,
+                  'getservercertificate' : self.webservice.getServerCertificate,
+                  'settagattribute':self.webservice.setTagAttribute,
+                  'setheadertemplate':self.webservice.setHeaderTemplate
                 }
             if keyword in dict.keys():
-                if keyword in ['setTagValue','setTagAttribute']:
+                if keyword in ['settagvalue','settagattribute']:
                     message=list(message)
                     message.append(tsp.objectname)
-                elif keyword == 'executeRequest':
+                elif keyword == 'executerequest':
                     message=list(message)
                     message.append(socketIO)
 
