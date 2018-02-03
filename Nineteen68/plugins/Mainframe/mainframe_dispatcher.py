@@ -32,23 +32,23 @@ class MainframeDispatcher:
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
-        keyword = teststepproperty.name
+        keyword = teststepproperty.name.lower()
         err_msg=None
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
 
         try:
-            dict={'LaunchMainframe' : self.mainframe_obj.launch_mainframe,
-                  'Login' : self.mainframe_obj.login,
-                  'SecureLogin' : self.mainframe_obj.secure_login,
-                  'LogOff' : self.mainframe_obj.logoff,
-                  'SendValue' : self.mainframe_obj.send_value,
-                  'SubmitJob' : self.mainframe_obj.submit_job,
-                  'JobStatus' : self.mainframe_obj.job_status,
-                  'SendFunctionKeys' : self.mainframe_obj.send_function_keys,
-                  'GetText' : self.mainframe_obj.get_text,
-                  'SetText' : self.mainframe_obj.set_text,
-                  'SetCursor' : self.mainframe_obj.set_cursor,
-                  'VerifyTextExists' : self.mainframe_obj.verify_text_exists
+            dict={'launchmainframe' : self.mainframe_obj.launch_mainframe,
+                  'login' : self.mainframe_obj.login,
+                  'securelogin' : self.mainframe_obj.secure_login,
+                  'logoff' : self.mainframe_obj.logoff,
+                  'sendvalue' : self.mainframe_obj.send_value,
+                  'submitjob' : self.mainframe_obj.submit_job,
+                  'jobstatus' : self.mainframe_obj.job_status,
+                  'sendfunctionkeys' : self.mainframe_obj.send_function_keys,
+                  'gettext' : self.mainframe_obj.get_text,
+                  'settext' : self.mainframe_obj.set_text,
+                  'setcursor' : self.mainframe_obj.set_cursor,
+                  'verifytextexists' : self.mainframe_obj.verify_text_exists
                   }
 
             if keyword in dict.keys():
