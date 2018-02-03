@@ -58,14 +58,14 @@ class DropdownKeywords():
                             if len(index.strip()) != 0:
                                 input_val = int(index)
                                 #Issue fix ALM 131: ICE-Test Case: List and Dropdown -> "selectValueByIndex" is starting from index 1 instead of index 0
-    ##                            input_val = input_val - 1
+                                ##input_val = input_val - 1
                                 log.info('Input value obtained')
                                 log.info(input_val)
                                 select = Select(webelement)
                                 iList = select.options
                                 #print iList
                                 iListSize = len(iList)
-    ##                            input_val=input_val-1
+                                ##input_val=input_val-1
                                 if(input_val < iListSize):
                                     for i in range(0,iListSize):
                                         if(input_val == i):
@@ -172,6 +172,7 @@ class DropdownKeywords():
                             output = str(totalcount)
                             status = webconstants.TEST_RESULT_PASS
                             result = webconstants.TEST_RESULT_TRUE
+                            logger.print_on_console(output)
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                     except Exception as e:
                         log.error(e)
@@ -240,7 +241,7 @@ class DropdownKeywords():
                         """
                         if dropVal.lower()=='dropdown':
                             ## webelement1=self.jsExecutorForMultipleDropdown(webelement,input)
-##New javascript was not providing the accurate element still keeping the if else condition for future checks if any
+                            ##New javascript was not providing the accurate element still keeping the if else condition for future checks if any
                             webelement=self.radioKeywordsObj.getActualElement(webelement,input)
                         else:
                             webelement=self.radioKeywordsObj.getActualElement(webelement,input)
@@ -751,6 +752,7 @@ class DropdownKeywords():
                             if len(output) != 0:
                                 status = webconstants.TEST_RESULT_PASS
                                 result = webconstants.TEST_RESULT_TRUE
+                                logger.print_on_console(output)
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                             else:
                                 err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
@@ -790,6 +792,7 @@ class DropdownKeywords():
                                 if(len(temp) != 0 ):
                                     status=webconstants.TEST_RESULT_PASS
                                     result=webconstants.TEST_RESULT_TRUE
+                                    logger.print_on_console(output)
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
                                 else:
                                     err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
@@ -1459,6 +1462,7 @@ class DropdownKeywords():
                                 if output is not None:
                                     status = webconstants.TEST_RESULT_PASS
                                     result = webconstants.TEST_RESULT_TRUE
+                                    logger.print_on_console(output)
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
                             else:
                                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -1491,6 +1495,7 @@ class DropdownKeywords():
                                                     output=select.options[input_val].text.strip()
                                                 status=webconstants.TEST_RESULT_PASS
                                                 result=webconstants.TEST_RESULT_TRUE
+                                                logger.print_on_console(output)
                                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                                     else:
                                         logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -1506,7 +1511,6 @@ class DropdownKeywords():
                                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         except Exception as e:
                             log.error(e)
-
                             logger.print_on_console(e)
                     else:
                         logger.print_on_console('Element is not displayed')
