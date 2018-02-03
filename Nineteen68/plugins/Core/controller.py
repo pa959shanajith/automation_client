@@ -405,7 +405,7 @@ class Controller():
             ignore_status=True
         if keyword.lower() in [IF,ELSE_IF,EVALUATE]:
             inpval=self.dynamic_var_handler_obj.simplify_expression(input,keyword,self)
-        elif keyword in DYNAMIC_KEYWORDS:
+        elif keyword.lower() in DYNAMIC_KEYWORDS:
             if STATIC_NONE in input[0]:
                 input[0]=input[0].replace(STATIC_NONE,'')
             string=input[0]
@@ -420,7 +420,7 @@ class Controller():
             if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE]:
                 inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self)
         else:
-            if keyword in WS_KEYWORDS or keyword == 'navigateToURL':
+            if keyword.lower() in WS_KEYWORDS or keyword.lower() == 'navigatetourl':
                 input_list=[input[0]]
             for x in input_list:
                 if STATIC_NONE in x:
@@ -449,7 +449,7 @@ class Controller():
         if tsp.name.lower() in DATABASE_KEYWORDS:
             if keyword_response != []:
                 display_keyword_response='DB data fetched'
-        if(tsp.apptype.lower() == 'webservice' and tsp.name == 'executeRequest'):
+        if(tsp.apptype.lower() == 'webservice' and tsp.name.lower() == 'executerequest'):
             if len(display_keyword_response) == 2:
                 logger.print_on_console('Response Header: \n',display_keyword_response[0])
                 #data size check
@@ -482,7 +482,7 @@ class Controller():
             #data size check
             if self.core_utilsobject.getdatasize(display_keyword_response,'mb') < 10:
                 if not isinstance(display_keyword_response,list):
-                    if tsp.name == 'getIndexCount':
+                    if tsp.name.lower() == 'getindexcount':
                         if '@' in str(display_keyword_response):
                             row,col=display_keyword_response.split('@')
                             logger.print_on_console("The index count for the dynamic variable is " + "Row: "+str(row) + " and Column: "+str(col))
@@ -523,7 +523,7 @@ class Controller():
                 if self.verify_exists==False:
                     previous_step=handler.tspList[index-1]
                     apptype=previous_step.apptype.lower()
-                    if  apptype in self.verify_dict and previous_step.name==self.verify_dict[apptype]:
+                    if  apptype in self.verify_dict and previous_step.name.lower()==self.verify_dict[apptype]:
                         self.previous_step=previous_step
                         teststepproperty.custom_flag=True
                         self.verify_exists=True
@@ -535,21 +535,21 @@ class Controller():
                     teststepproperty.parent_xpath=self.previous_step.objectname
                     teststepproperty.url=self.previous_step.url
             #Fixed OEBS custom reference defect #398
-            elif keyword in [VERIFY_EXISTS,VERIFY_VISIBLE] and self.verify_exists:
+            elif keyword.lower() in [VERIFY_EXISTS,VERIFY_VISIBLE] and self.verify_exists:
                 self.verify_exists=False
             #Checking of  Drag and Drop keyowrds Issue #115 in Git
-            if teststepproperty.name==DROP:
+            if teststepproperty.name.lower()==DROP:
                 log.debug('Drop keyword encountered')
                 teststepproperty_prev = handler.tspList[index-1]
-                if teststepproperty_prev.name!=DRAG:
+                if teststepproperty_prev.name.lower()!=DRAG:
                     teststepproperty.execute_flag=False
                     result=list(result)
                     result[3]='Drag Keyword is missing'
-            elif keyword==DRAG:
+            elif keyword.lower()==DRAG:
                 log.debug('Drag keyword encountered')
                 if(index+1)<len(handler.tspList):
                     teststepproperty_next = handler.tspList[index+1]
-                    if teststepproperty_next.name!=DROP:
+                    if teststepproperty_next.name.lower()!=DROP:
                         teststepproperty.execute_flag=False
                         result=list(result)
                         result[3]='Drop Keyword is missing'
@@ -631,7 +631,7 @@ class Controller():
             logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n')
             log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
-            if teststepproperty.name==STOP:
+            if teststepproperty.name.lower()==STOP:
                 ## Issue #160
                 index=STOP
             return index,result
@@ -702,7 +702,7 @@ class Controller():
 
     def invokewebservicekeyword(self,teststepproperty,dispatcher_obj,inputval,socket_object):
         keyword = teststepproperty.name
-        if keyword == 'setTagValue' or keyword == 'setTagAttribute':
+        if keyword.lower() == 'settagvalue' or keyword.lower() == 'settagattribute':
             if handler.ws_templates_dict.has_key(teststepproperty.testscript_name):
                 handler.ws_template=handler.ws_templates_dict[teststepproperty.testscript_name]
             else:
