@@ -59,7 +59,7 @@ class Dispatcher:
         output = teststepproperty.outputval
         objectname = objectname.strip()
         url=teststepproperty.url.strip()
-        keyword = teststepproperty.name
+        keyword = teststepproperty.name.lower()
         driver = browser_Keywords_MW.driver_obj
         webelement = None
         element = None
@@ -70,24 +70,24 @@ class Dispatcher:
         configvalues = configobj.readJson()
         log.info('In Web dispatcher')
         custom_dict={
-                    'getStatus': ['radio','checkbox'],
-                    'selectRadioButton': ['radio'],
-                    'selectCheckbox': ['checkbox'],
-                    'unselectCheckbox': ['checkbox'],
+                    'getstatus': ['radio','checkbox'],
+                    'selectradiobutton': ['radio'],
+                    'selectcheckbox': ['checkbox'],
+                    'unselectcheckbox': ['checkbox'],
 
-                    'selectValueByIndex':['dropdown','listbox'],
-                    'selectValueByText': ['dropdown','listbox'],
-                    'getAllValues':['dropdown','listbox'],
-                    'verifyAllValues': ['dropdown','listbox'],
+                    'selectvaluebyindex':['dropdown','listbox'],
+                    'selectvaluebytext': ['dropdown','listbox'],
+                    'getallvalues':['dropdown','listbox'],
+                    'verifyallvalues': ['dropdown','listbox'],
 
-                    'setText': ['textbox','textarea','password','number','email','url'],
-                    'sendValue':['textbox','textarea','password','number','email','url'],
-                    'getText': ['textbox','textarea','password','number','email','url'],
-                    'setSecureText':['textbox','password']
+                    'settext': ['textbox','textarea','password','number','email','url'],
+                    'sendvalue':['textbox','textarea','password','number','email','url'],
+                    'gettext': ['textbox','textarea','password','number','email','url'],
+                    'setsecuretext':['textbox','password']
 
                     }
-        custom_dict_element={'element':['clickElement','doubleClick','rightClick','getElementText','verifyElementText','drag', 'drop','getToolTipText','verifyToolTipText','verifyExists', 'verifyDoesNotExists', 'verifyHidden','verifyVisible', 'switchToTab','switchToWindow','setFocus','sendFunctionKeys',
-                                        'tab','waitForElementVisible','mouseHover','saveFile']}
+        custom_dict_element={'element':['clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists', 'verifyhidden','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys',
+                                        'tab','waitforelementvisible','mousehover','savefile']}
 
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
 
@@ -163,107 +163,107 @@ class Dispatcher:
 
 
         try:
-            dict={'getObjectCount':self.custom_object.get_object_count,
+            dict={'getobjectcount':self.custom_object.get_object_count,
                   'click': self.button_link_object.click,
-                  'verifyButtonName' : self.button_link_object.verify_button_name,
-                  'getButtonName' : self.button_link_object.get_button_name,
-                  'getLinkText'    : self.button_link_object.get_link_text,
-                  'verifyLinkText' : self.button_link_object.verify_link_text,
+                  'verifybuttonname' : self.button_link_object.verify_button_name,
+                  'getbuttonname' : self.button_link_object.get_button_name,
+                  'getlinktext'    : self.button_link_object.get_link_text,
+                  'verifylinktext' : self.button_link_object.verify_link_text,
                   'press'  : self.button_link_object.press,
-                  'doubleClick' : self.button_link_object.double_click,
-                  'rightClick' : self.button_link_object.right_click,
-                  'uploadFile'  : self.button_link_object.upload_file,
+                  'doubleclick' : self.button_link_object.double_click,
+                  'rightclick' : self.button_link_object.right_click,
+                  'uploadfile'  : self.button_link_object.upload_file,
 
-                  'acceptPopUp' : self.popup_object.accept_popup,
-                  'dismissPopUp':self.popup_object.dismiss_popup,
-                  'getPopUpText':self.popup_object.get_popup_text,
-                  'verifyPopUpText':self.popup_object.verify_popup_text,
-
-
-                  'getStatus': self.radio_checkbox_object.get_status,
-                  'selectRadioButton': self.radio_checkbox_object.select_radiobutton,
-                  'selectCheckbox': self.radio_checkbox_object.select_checkbox,
-                  'unselectCheckbox': self.radio_checkbox_object.unselect_checkbox,
-
-                  'getRowCount' : self.table_object.getRowCount,
-                  'getColumnCount' : self.table_object.getColoumnCount,
-                  'getCellValue' : self.table_object.getCellValue,
-                  'verifyCellValue' : self.table_object.verifyCellValue,
-                  'cellClick' : self.table_object.cellClick,
-                  'getRowNumByText' : self.table_object.getRowNumByText,
-                  'getColNumByText' : self.table_object.getColNumByText,
-                  'getInnerTable' : self.table_object.getInnerTable,
+                  'acceptpopup' : self.popup_object.accept_popup,
+                  'dismisspopup':self.popup_object.dismiss_popup,
+                  'getpopuptext':self.popup_object.get_popup_text,
+                  'verifypopuptext':self.popup_object.verify_popup_text,
 
 
-                  'getElementText' : self.element_object.get_element_text,
-                  'verifyElementText' : self.element_object.verify_element_text,
-                  'clickElement' : self.element_object.click_element,
-                  'getToolTipText' : self.element_object.get_tooltip_text,
-                  'verifyToolTipText' : self.element_object.verify_tooltip_text,
+                  'getstatus': self.radio_checkbox_object.get_status,
+                  'selectradiobutton': self.radio_checkbox_object.select_radiobutton,
+                  'selectcheckbox': self.radio_checkbox_object.select_checkbox,
+                  'unselectcheckbox': self.radio_checkbox_object.unselect_checkbox,
+
+                  'getrowcount' : self.table_object.getRowCount,
+                  'getcolumncount' : self.table_object.getColoumnCount,
+                  'getcellvalue' : self.table_object.getCellValue,
+                  'verifycellvalue' : self.table_object.verifyCellValue,
+                  'cellclick' : self.table_object.cellClick,
+                  'getrownumbytext' : self.table_object.getRowNumByText,
+                  'getcolnumbytext' : self.table_object.getColNumByText,
+                  'getinnertable' : self.table_object.getInnerTable,
+
+
+                  'getelementtext' : self.element_object.get_element_text,
+                  'verifyelementtext' : self.element_object.verify_element_text,
+                  'clickelement' : self.element_object.click_element,
+                  'gettooltiptext' : self.element_object.get_tooltip_text,
+                  'verifytooltiptext' : self.element_object.verify_tooltip_text,
                   'drag':self.element_object.drag,
                   'drop':self.element_object.drop,
 
-                  'setText':self.textbox_object.set_text,
-                  'sendValue':self.textbox_object.send_value,
-                  'getText':self.textbox_object.get_text,
-                  'verifyText':self.textbox_object.verify_text,
-                  'clearText':self.textbox_object.clear_text,
-                  'getTextboxLength':self.textbox_object.gettextbox_length,
-                  'verifyTextboxLength':self.textbox_object.verifytextbox_length,
-                  'setSecureText':self.textbox_object.setsecuretext,
+                  'settext':self.textbox_object.set_text,
+                  'sendvalue':self.textbox_object.send_value,
+                  'gettext':self.textbox_object.get_text,
+                  'verifytext':self.textbox_object.verify_text,
+                  'cleartext':self.textbox_object.clear_text,
+                  'gettextboxlength':self.textbox_object.gettextbox_length,
+                  'verifytextboxlength':self.textbox_object.verifytextbox_length,
+                  'setsecuretext':self.textbox_object.setsecuretext,
 
-                  'selectValueByIndex':self.dropdown_list_object.selectValueByIndex,
-                  'getCount':self.dropdown_list_object.getCount,
-                  'selectValueByText':self.dropdown_list_object.selectValueByText,
+                  'selectvaluebyindex':self.dropdown_list_object.selectValueByIndex,
+                  'getcount':self.dropdown_list_object.getCount,
+                  'selectvaluebytext':self.dropdown_list_object.selectValueByText,
                   ## defect 360
-                  'verifySelectedValue':self.dropdown_list_object.verifySelectedValue,
-                  'verifySelectedValues':self.dropdown_list_object.verifySelectedValues,
-                  'verifyCount':self.dropdown_list_object.verifyCount,
-                  'selectAllValues':self.dropdown_list_object.selectAllValues,
-                  'selectMultipleValuesByIndexes':self.dropdown_list_object.selectMultipleValuesByIndexes,
-                  'getSelected':self.dropdown_list_object.getSelected,
-                  'selectMultipleValuesByText':self.dropdown_list_object.selectMultipleValuesByText,
-                  'getMultipleValuesByIndexes':self.dropdown_list_object.getMultipleValuesByIndexes,
-                  'verifyAllValues':self.dropdown_list_object.verifyAllValues,
-                  'getValueByIndex':self.dropdown_list_object.getValueByIndex,
-                  'verifyValuesExists':self.dropdown_list_object.verifyValuesExists,
-                  'deselectAll':self.dropdown_list_object.deselectAll,
+                  'verifyselectedvalue':self.dropdown_list_object.verifySelectedValue,
+                  'verifyselectedvalues':self.dropdown_list_object.verifySelectedValues,
+                  'verifycount':self.dropdown_list_object.verifyCount,
+                  'selectallvalues':self.dropdown_list_object.selectAllValues,
+                  'selectmultiplevaluesbyindexes':self.dropdown_list_object.selectMultipleValuesByIndexes,
+                  'getselected':self.dropdown_list_object.getSelected,
+                  'selectmultiplevaluesbytext':self.dropdown_list_object.selectMultipleValuesByText,
+                  'getmultiplevaluesbyindexes':self.dropdown_list_object.getMultipleValuesByIndexes,
+                  'verifyallvalues':self.dropdown_list_object.verifyAllValues,
+                  'getvaluebyindex':self.dropdown_list_object.getValueByIndex,
+                  'verifyvaluesexists':self.dropdown_list_object.verifyValuesExists,
+                  'deselectall':self.dropdown_list_object.deselectAll,
 
 
-                  'verifyVisible':self.util_object.verify_visible,
-                  'verifyExists':self.util_object.verify_exists,
-                  'verifyDoesNotExists':self.util_object.verify_doesnot_exists,
-                  'verifyEnabled':self.util_object.verify_enabled,
-                  'verifyDisabled':self.util_object.verify_disabled,
-                  'verifyHidden':self.util_object.verify_hidden,
-                  'verifyReadOnly':self.util_object.verify_readonly,
-                  'setFocus':self.util_object.setfocus,
-                  'mouseHover':self.util_object.mouse_hover,
+                  'verifyvisible':self.util_object.verify_visible,
+                  'verifyexists':self.util_object.verify_exists,
+                  'verifydoesnotexists':self.util_object.verify_doesnot_exists,
+                  'verifyenabled':self.util_object.verify_enabled,
+                  'verifydisabled':self.util_object.verify_disabled,
+                  'verifyhidden':self.util_object.verify_hidden,
+                  'verifyreadonly':self.util_object.verify_readonly,
+                  'setfocus':self.util_object.setfocus,
+                  'mousehover':self.util_object.mouse_hover,
                   'tab':self.util_object.tab,
-                  'ActionKey':self.action_keyowrds_object.action_key,
-                  'rightClick':self.util_object.rightclick,
-                  'mouseClick':self.util_object.mouse_click,
-                  'verifyWebImages':self.util_object.verify_web_images,
-                  'waitForElementVisible':self.element_object.waitforelement_visible,
+                  'actionkey':self.action_keyowrds_object.action_key,
+                  'rightclick':self.util_object.rightclick,
+                  'mouseclick':self.util_object.mouse_click,
+                  'verifywebimages':self.util_object.verify_web_images,
+                  'waitforelementvisible':self.element_object.waitforelement_visible,
 
 
 
-                  'openBrowser':self.browser_object.openBrowser,
-                  'navigateToURL':self.browser_object.navigateToURL,
-                  'openNewBrowser':self.browser_object.openNewBrowser,
-                  'getPageTitle':self.browser_object.getPageTitle,
-                  'getCurrentURL':self.browser_object.getCurrentURL,
-                  'maximizeBrowser':self.browser_object.maximizeBrowser,
+                  'openbrowser':self.browser_object.openBrowser,
+                  'navigatetourl':self.browser_object.navigateToURL,
+                  'opennewbrowser':self.browser_object.openNewBrowser,
+                  'getpagetitle':self.browser_object.getPageTitle,
+                  'getcurrenturl':self.browser_object.getCurrentURL,
+                  'maximizebrowser':self.browser_object.maximizeBrowser,
                   'refresh':self.browser_object.refresh,
-                  'verifyCurrentURL':self.browser_object.verifyCurrentURL,
-                  'closeBrowser':self.browser_object.closeBrowser,
-                  'closeSubWindows':self.browser_object.closeSubWindows,
-                  'switchToWindow':self.util_object.switch_to_window,
-                  'verifyTextExists':self.statict_text_object.verify_text_exists,
-                  'verifyPageTitle':self.browser_object.verify_page_title,
-                  'clearCache':self.browser_object.clear_cache,
-                  'navigateWithAuthenticate':self.browser_object.navigate_with_authenticate,
-                  'iosSendkey': self.util_object.iossendkey
+                  'verifycurrenturl':self.browser_object.verifyCurrentURL,
+                  'closebrowser':self.browser_object.closeBrowser,
+                  'closesubwindows':self.browser_object.closeSubWindows,
+                  'switchtowindow':self.util_object.switch_to_window,
+                  'verifytextexists':self.statict_text_object.verify_text_exists,
+                  'verifypagetitle':self.browser_object.verify_page_title,
+                  'clearcache':self.browser_object.clear_cache,
+                  'navigatewithauthenticate':self.browser_object.navigate_with_authenticate,
+                  'iossendkey': self.util_object.iossendkey
                 }
 
             if keyword in dict.keys():
