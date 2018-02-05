@@ -251,9 +251,9 @@ class RadioCheckboxKeywords():
                   lastElement=xpath_elements[len(xpath_elements)-1]
                   childindex=lastElement[lastElement.find("[")+1:lastElement.find("]")]
                   childindex = int(childindex)
-                  if tag.lower()=='dropdown' or tag.lower()=='listbox' and tagName=='select':
+                  if (tag.lower()=='dropdown' or tag.lower()=='listbox') and tagName=='select':
                     multiSelect=cellChild.get_attribute('multiple')
-                    if multiSelect!=None and multiSelect=='true' or multiSelect=='multiple':
+                    if multiSelect!=None and (multiSelect=='true' or multiSelect=='multiple'):
                           if index==childindex:
                             eleStatus =True
                           else:
@@ -293,7 +293,9 @@ class RadioCheckboxKeywords():
                                     else:
                                         counter+=1
                   else:
-                            eleStatus=True
+                            #Nineteen68#1626: commented next line, as because of this, loop was not going into next iteration 
+                            #eleStatus=True
+                            continue
 
                   if eleStatus==True:
                     actualElement=cellChild
