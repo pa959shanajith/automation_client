@@ -268,7 +268,7 @@ class StepDescription:
         return locals()[keyword]()
 
 
-   def webservices(self,keyword,tsp,inputval,input,output,con,reporting_obj):
+    def webservices(self,keyword,tsp,inputval,input,output,con,reporting_obj):
         def setwholebody():
             return 'Set the entire body ' +"'"+ input+"'"+ ' that needs to be sent in the request'
         def setoperations():
@@ -497,8 +497,8 @@ class StepDescription:
         #Dropdown keywords
         def getselected():
             return ' Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save value ' +"'"+ output +"'"+ ' in '+"'"+ tsp.outputval+"'"+ '.'
-##        def GetValueByIndex():
-##            return 'Get value with index ' + input + ' in the '+ "'" + tsp.custname + "'" + ' and save the value ' + output + ' in '+ tsp.outputval+'.'
+        ##        def GetValueByIndex():
+        ##            return 'Get value with index ' + input + ' in the '+ "'" + tsp.custname + "'" + ' and save the value ' + output + ' in '+ tsp.outputval+'.'
         def verifyvaluesexists():
             return ' Verify values ' +"'"+ input +"'"+ ' exists in the '+ "'" + tsp.custname + "'"+'.'
         def selectvaluebytext():
@@ -509,13 +509,13 @@ class StepDescription:
             return ' Verify values ' +"'"+ input +"'"+ ' are present in the '+ "'" + tsp.custname + "'"+'.'
         def verifycount():
             return ' Verify ' +"'"+ input +"'"+ ' is the list count of the ' +"'" + tsp.custname + "'"
-##        def SelectValueByIndex():
-##            return ' Select value with index value '+ input+' in the '+"'" + tsp.custname + "'"
+        ##        def SelectValueByIndex():
+        ##            return ' Select value with index value '+ input+' in the '+"'" + tsp.custname + "'"
         def getcount():
             return ' Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' +"'"+output+"'"+ ' in ' +"'"+tsp.outputval+"'"+'.'
         #Element Keywords
-##        def ClickElement():
-##            return 'Click on ' +"'" + tsp.custname + "'"+'.'
+        ##        def ClickElement():
+        ##            return 'Click on ' +"'" + tsp.custname + "'"+'.'
         def getelementtext():
             return ' Get the text of the element '+ "'" + tsp.custname + "'"+ ' and save the value  '+"'"+output +"'"+ ' in '+"'"+ tsp.outputval+"'"+'.'
         def verifyelementtext():
@@ -545,28 +545,28 @@ class StepDescription:
             return ' Verify cell value of element in row number ' +"'"+ input[0] +"'"+' and column number '+"'"+input[1] +"'"+' against the input value '+"'"+input[2]+"'"+' present in ' +"'" + tsp.custname + "'"+'.'
         def verifytextexists():
             return ' Verify text '+ "'"+input+"'"+' exists in table '+"'"+ tsp.custname +"'"+"and  save the result as "+"'"+ output +"'"+ ' in '+"'"+ tsp.outputval+"'"+'.'
-##        def CellClick():
-##            return 'Click on '+ "'" + tsp.custname + "'"+'.'
-##        def SelectValueByIndex():
-##            return ' Select the value with index '+ input+' in the '+"'" + tsp.custname + "'"
-##        def SelectValueByText():
-##            return 'Select the value '+"'"+input+"'"+' of the '+"'" + tsp.custname + "'"+' with the text '+"'"+input+"'"+' present in the table cell  '+"'" + tsp.custname + "'"+'-['+input+']['+input+']'
+        ##        def CellClick():
+        ##            return 'Click on '+ "'" + tsp.custname + "'"+'.'
+        ##        def SelectValueByIndex():
+        ##            return ' Select the value with index '+ input+' in the '+"'" + tsp.custname + "'"
+        ##        def SelectValueByText():
+        ##            return 'Select the value '+"'"+input+"'"+' of the '+"'" + tsp.custname + "'"+' with the text '+"'"+input+"'"+' present in the table cell  '+"'" + tsp.custname + "'"+'-['+input+']['+input+']'
         def getselected():
             return ' Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save value ' +"'"+ output +"'"+ ' in '+"'"+ tsp.outputval + "'"+'.'
-##        def GetTableStatus():
-##            return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']'+'.'
-##        def GetCellToolTip():
-##            return 'Get CellToolTip of  ' + input + ' and save the result as  '+output+' in ' + "'" + tsp.custname + "'"+'.'
-##        def TableCellClick():
-##            return 'Click on table cell ' + input + ' in '+ "'" + tsp.custname + "'"+'.'
-##        def TableCellDoubleClick():
-##            return 'Double click on cell ' + input + ' in ' +"'" + tsp.custname + "'"+'.'
+        ##        def GetTableStatus():
+        ##            return 'Select value by text '+input+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+input+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']'+'.'
+        ##        def GetCellToolTip():
+        ##            return 'Get CellToolTip of  ' + input + ' and save the result as  '+output+' in ' + "'" + tsp.custname + "'"+'.'
+        ##        def TableCellClick():
+        ##            return 'Click on table cell ' + input + ' in '+ "'" + tsp.custname + "'"+'.'
+        ##        def TableCellDoubleClick():
+        ##            return 'Double click on cell ' + input + ' in ' +"'" + tsp.custname + "'"+'.'
         def selectrow():
             return ' Select the row '+"'" + input+"'" +' in '+"'" + tsp.custname + "'"+'.'
         def unselectrow():
             return ' Unselect the row  '+"'" +input+"'" +' of '+ "'" + tsp.custname + "'"+ '.'
-##        def GetStatus():
-##            return 'Get the status of the ' + "'" + tsp.custname + "'"+ ' and save the status ' + "'" +output +"'" + ' in '+ tsp.outputval
+        ##        def GetStatus():
+        ##            return 'Get the status of the ' + "'" + tsp.custname + "'"+ ' and save the status ' + "'" +output +"'" + ' in '+ tsp.outputval
 
         #SAP gerenal keywords
         def click():
@@ -575,10 +575,10 @@ class StepDescription:
             return ' Double click on the '+ "'" +tsp.custname+ "'" +'.'
         def mousehover():
             return ' Move mouse pointer to ' + "'" + tsp.custname + "'"+'.'
-##        def GetToolTipText():
-##            return 'Get the tool tip  of '+ "'" +tsp.custname+ "'" +'.'
-##        def VerifyToolTipText():
-##            return 'Verify ' + input + ' is the tooltip of  '+ "'" + tsp.custname + "'"
+        ##        def GetToolTipText():
+        ##            return 'Get the tool tip  of '+ "'" +tsp.custname+ "'" +'.'
+        ##        def VerifyToolTipText():
+        ##            return 'Verify ' + input + ' is the tooltip of  '+ "'" + tsp.custname + "'"
         def setfocus():
             return ' Set the focus on '+ "'" + tsp.custname + "'"+'.'
 
@@ -1033,21 +1033,21 @@ class StepDescription:
         return locals()[keyword]()
 
     def web(self,keyword,tsp,inputval,input,output,con,reporting_obj):
-##        #-----------------------------------Added this step as input was returned as a string
-##        if type(input) is str:                  #----checking if input is a string
-##            if "," in input:                    #----checking if the string has a ","
-##                input = input.split(",")        #--------spliting the input by checking for "," then store the result in list input
-##        #-----------------------------------------if  more than one dynamic variable is given as output , considers only the first one
-##        try:
-##            if len(tsp.outputval)>0:
-##                if(";" in tsp.outputval):
-##                    i = tsp.outputval.index(";")
-##                    tsp.outputval=tsp.outputval[:i]
-##                if("," in output):
-##                    ni = output.index(',')
-##                    output =output[:ni]
-##        except:
-##            pass
+        ##        #-----------------------------------Added this step as input was returned as a string
+        ##        if type(input) is str:                  #----checking if input is a string
+        ##            if "," in input:                    #----checking if the string has a ","
+        ##                input = input.split(",")        #--------spliting the input by checking for "," then store the result in list input
+        ##        #-----------------------------------------if  more than one dynamic variable is given as output , considers only the first one
+        ##        try:
+        ##            if len(tsp.outputval)>0:
+        ##                if(";" in tsp.outputval):
+        ##                    i = tsp.outputval.index(";")
+        ##                    tsp.outputval=tsp.outputval[:i]
+        ##                if("," in output):
+        ##                    ni = output.index(',')
+        ##                    output =output[:ni]
+        ##        except:
+        ##            pass
         if tsp.custname == '@Custom':       # checking if  cust name is @Custom
             if type(input) is str:                  #----checking if input is a string
                 if "," in input:                    #----checking if the string has a ","
