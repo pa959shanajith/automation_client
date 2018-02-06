@@ -53,6 +53,7 @@ class BrowserOperations():
 
     def start_server(self):
         try:
+
             import subprocess
             import os
 ##            maindir = os.getcwd()
@@ -71,6 +72,7 @@ class BrowserOperations():
 
             import time
             time.sleep(15)
+
             logger.print_on_console('Server started')
         except Exception as e:
             logger.print_on_console('Exception in starting server')
@@ -214,7 +216,6 @@ class BrowserOperations():
                desired_caps['newCommandTimeout'] = 3600
                desired_caps['launchTimeout'] = 180000
                driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
-
                logger.log('FILE: browserops_MW.py , DEF: openSafariBrowser() , MSG:  Navigating to blank page')
                driver.get(domconstants_MW.BLANK_PAGE)
                ##            p = psutil.Process(driver.service.process.pid)
@@ -233,11 +234,10 @@ class BrowserOperations():
                 if input_list[1] == 'wifi':
                     self.wifi_connect()
                 else :
-                    from decimal import Decimal
+
                     import subprocess
                     global driver
                     self.start_server()
-
                     time.sleep(5)
                     desired_caps = {}
                     desired_caps['platformName'] = 'Android'
@@ -249,7 +249,8 @@ class BrowserOperations():
                     desired_caps['clearSystemFiles']=True
                     desired_caps['newCommandTimeout'] = '36000'
                     device_version= subprocess.check_output(["adb", "shell", "getprop ro.build.version.release"])
-                    if Decimal(input_list[1]) == Decimal(device_version):
+                    device_version_data =device_version.split('\r')
+                    if str(input_list[1]) == str(device_version_data[0]):
                         driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
                         logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
                         driver.get(domconstants_MW.BLANK_PAGE)
@@ -260,6 +261,7 @@ class BrowserOperations():
                         mobile_key_objects.custom_msg.append("Invalid Input")
                         status = domconstants_MW.STATUS_FAIL
                         logger.print_on_console("Invalid Input")
+
 
             ##            p = psutil.Process(driver.service.process.pid)
             ##            # logging.warning(p.get_children(recursive=True))

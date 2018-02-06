@@ -83,8 +83,6 @@ class BrowserKeywords():
             logger.print_on_console('Exception in starting server')
 
     def openBrowser(self, webelement, inputs, *args):
-
-
             ##self.start_server()
             status = webconstants_MW.TEST_RESULT_FAIL
             result = webconstants_MW.TEST_RESULT_FALSE
@@ -137,7 +135,6 @@ class BrowserKeywords():
                     result = webconstants_MW.TEST_RESULT_TRUE
                     status = webconstants_MW.TEST_RESULT_PASS
                 else:
-                    from decimal import Decimal
                     import subprocess
                     self.start_server()
                     global driver_obj
@@ -164,7 +161,8 @@ class BrowserKeywords():
                     ##            desired_caps['appium-version'] = '1.4.0'
                     desired_caps['newCommandTimeout'] = '36000'
                     device_version= subprocess.check_output(["adb", "shell", "getprop ro.build.version.release"])
-                    if Decimal(input_list[1]) == Decimal(device_version):
+                    device_version_data =device_version.split('\r')
+                    if str(input_list[1]) == str(device_version_data[0]):
                         driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
                         logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
                         driver.get(domconstants_MW.BLANK_PAGE)
