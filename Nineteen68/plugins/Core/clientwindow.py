@@ -558,7 +558,7 @@ class TestThread(threading.Thread):
             self.con = controller.Controller()
             self.wxObject.terminatebutton.Enable()
             self.con.configvalues=configvalues
-            self.con.exception_flag=configvalues["exception_flag"]
+            self.con.exception_flag=(str(configvalues["exception_flag"]).strip().lower()=="true")
             status = ''
             apptype = ''
             qc_status=None

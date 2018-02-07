@@ -828,6 +828,7 @@ class Controller():
                         execute_flag=True
                         con =Controller()
                         con.configvalues=configvalues
+                        con.exception_flag=self.exception_flag
                         con.wx_object=wxObject
                         handler.tspList=[]
                         #condition check for scenario execution and reporting for condition check
