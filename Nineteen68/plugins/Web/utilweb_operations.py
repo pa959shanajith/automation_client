@@ -295,7 +295,7 @@ class UtilWebKeywords:
                 browser_info=browser_Keywords.driver_obj.capabilities
                 browser_name=browser_info.get('browserName')
                 browser_version=browser_info.get('version')
-##                log.info('Browser is:'+browser_name+'Version is:'+browser_version)
+                ##log.info('Browser is:'+browser_name+'Version is:'+browser_version)
                 #get the original style of the element
                 original_style = webelement.get_attribute('style')
                 #Apply css to the element
@@ -827,6 +827,30 @@ class UtilWebKeywords:
                 log.error(err_msg)
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
+        return status,methodoutput,output,err_msg
+
+    def get_element_tag_value(self,webelement,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        if webelement is not None:
+            try:
+                if webelement.is_enabled():
+                    log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
+                    output = str(webelement.tag_name)
+                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                    logger.print_on_console('Result: ',output)
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+                else:
+                    log.error(ERR_DISABLED_OBJECT)
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
+                    logger.print_on_console(ERR_DISABLED_OBJECT)
+            except Exception as e:
+                 err_msg=self.__web_driver_exception(e)
+        log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
     def __get_window_handles(self):
