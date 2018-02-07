@@ -256,6 +256,7 @@ class Dispatcher:
                   'mouseclick':self.util_object.mouse_click,
                   'verifywebimages':self.util_object.verify_web_images,
                   'waitforelementvisible':self.element_object.waitforelement_visible,
+                  'getelementtagvalue': self.util_object.get_element_tag_value,
 
 
                   'openbrowser':self.browser_object.openBrowser,

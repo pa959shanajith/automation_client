@@ -1265,6 +1265,8 @@ class StepDescription:
             return 'Select value with exact text'+"'" +input + "'"+ ' present in the '+ "'" + tsp.custname + "'"
         def switchtowindow():
             return 'Control switched to window '+"'"+input+"'"
+        def getelementtagvalue():
+            return 'Get the html tag value of ' + "'" + tsp.custname + "'" + ' and save the value ' + output+ ' in ' + tsp.outputval
 
         #Table keywords
         def getcelltooltip():
