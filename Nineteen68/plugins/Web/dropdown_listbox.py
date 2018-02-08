@@ -1019,16 +1019,13 @@ class DropdownKeywords():
                                         jstext = """for (var j = 0; j < arguments[1].length; j++) {for (var i = 0; i < arguments[0].length; i++) {if ( i == arguments[1][j]) {arguments[0][i].selected = true;}}}"""
                                         browser_Keywords.driver_obj.execute_script(jstext, webelement, input_list)
                                     else:
-                                        for x in range(0, count):
-                                            if int(input[x]) <= iListSize:
-                                                for i in range(0, iListSize):
-                                                    input_val_temp = input[x]
-                                                    input_val = int(input_val_temp)
-                                                    if (input_val == i):
-                                                        if (isinstance(browser_Keywords.driver_obj, webdriver.Firefox)):
-                                                            iList[i].click()
-                                                        else:
-                                                            select.select_by_index(input_val)
+                                        for index in input:
+                                            inputindex = int(index)
+                                            if(inputindex != None and inputindex <= iListSize):
+                                                if (isinstance(browser_Keywords.driver_obj, webdriver.Firefox)):
+                                                    iList[inputindex].click()
+                                                else:
+                                                    select.select_by_index(inputindex)
                                             else:
                                                 flag = True
                                                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -1237,18 +1234,14 @@ class DropdownKeywords():
                                         err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                                 else:
                                     counter = 0
-                                    for x in range(0, count):
-                                        flag = False
-                                        for i in range(0, len(iList)):
-                                            if iList[i].text == input[x]:
-                                                flag = True
-                                        if (flag):
-                                            input_val = input[x]
-                                            log.info('Input value obtained')
-                                            log.info(input_val)
-                                            coreutilsobj = core_utils.CoreUtils()
-                                            input_val = coreutilsobj.get_UTF_8(input_val)
-                                            select.select_by_visible_text(input_val)
+                                    options = []
+                                    coreutilsobj = core_utils.CoreUtils()
+                                    for i in range(len(iList)):
+                                        options.append(iList[i].text)
+                                    for x in input:
+                                        userinput = coreutilsobj.get_UTF_8(x)
+                                        if (userinput is not None and len(userinput)>0 and userinput in options):
+                                            select.select_by_visible_text(userinput)
                                             counter = counter + 1
 
                                     if counter == count:
