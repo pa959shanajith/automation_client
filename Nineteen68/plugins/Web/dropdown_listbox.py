@@ -58,14 +58,14 @@ class DropdownKeywords():
                             if len(index.strip()) != 0:
                                 input_val = int(index)
                                 #Issue fix ALM 131: ICE-Test Case: List and Dropdown -> "selectValueByIndex" is starting from index 1 instead of index 0
-    ##                            input_val = input_val - 1
+                                ##input_val = input_val - 1
                                 log.info('Input value obtained')
                                 log.info(input_val)
                                 select = Select(webelement)
                                 iList = select.options
                                 #print iList
                                 iListSize = len(iList)
-    ##                            input_val=input_val-1
+                                ##input_val=input_val-1
                                 if(input_val < iListSize):
                                     for i in range(0,iListSize):
                                         if(input_val == i):
@@ -159,52 +159,53 @@ class DropdownKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
-            if ((webelement.is_enabled())):
-                log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
-                    # performing js code
-                    log.debug('element is invisible, performing js code')
+            ##if ((webelement.is_enabled())):
+            log.info('Recieved web element from the web dispatcher')
+            if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                # performing js code
+                log.debug('element is invisible, performing js code')
+                try:
+                    totalcount = browser_Keywords.driver_obj.execute_script("""return arguments[0].childElementCount""",webelement)
+                    log.info('totalcount is')
+                    log.info(totalcount)
+                    if totalcount is not None:
+                        output = str(totalcount)
+                        status = webconstants.TEST_RESULT_PASS
+                        result = webconstants.TEST_RESULT_TRUE
+                        logger.print_on_console(output)
+                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                except Exception as e:
+                    log.error(e)
+                    logger.print_on_console(e)
+            else:
+                if self.util.is_visible(webelement):
+                    # performing selenium code
+                    log.debug('element is visible, performing selenium code')
+                    log.debug(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                     try:
-                        totalcount = browser_Keywords.driver_obj.execute_script("""return arguments[0].childElementCount""",webelement)
-                        log.info('totalcount is')
-                        log.info(totalcount)
-                        if totalcount is not None:
-                            output = str(totalcount)
-                            status = webconstants.TEST_RESULT_PASS
-                            result = webconstants.TEST_RESULT_TRUE
+                        select = Select(webelement)
+                        iList = select.options
+                        iListSize = len(iList)
+                        log.info('Count of dropdown/listbox')
+                        log.info(iListSize)
+                        logger.print_on_console('Count obtained is',iListSize)
+                        if (iListSize >= 0):
+                            output = str(iListSize)
+                            status=webconstants.TEST_RESULT_PASS
+                            result=webconstants.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                     except Exception as e:
                         log.error(e)
                         logger.print_on_console(e)
+                    log.info(RETURN_RESULT)
                 else:
-                    if self.util.is_visible(webelement):
-                        # performing selenium code
-                        log.debug('element is visible, performing selenium code')
-                        log.debug(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
-                        try:
-                            select = Select(webelement)
-                            iList = select.options
-                            iListSize = len(iList)
-                            log.info('Count of dropdown/listbox')
-                            log.info(iListSize)
-                            logger.print_on_console('Count obtained is',iListSize)
-                            if (iListSize >= 0):
-                                output = str(iListSize)
-                                status=webconstants.TEST_RESULT_PASS
-                                result=webconstants.TEST_RESULT_TRUE
-                                log.info(STATUS_METHODOUTPUT_UPDATE)
-                        except Exception as e:
-                            log.error(e)
-                            logger.print_on_console(e)
-                        log.info(RETURN_RESULT)
-                    else:
-                        logger.print_on_console('Element is not displayed')
-                        log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
-                        err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
-            else:
-                err_msg = 'Element is not enabled '
-                logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                    logger.print_on_console('Element is not displayed')
+                    log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                    err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
+            ##else:
+                ##err_msg = 'Element is not enabled '
+                ##logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                ##log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
         return status,result,output,err_msg
 
     """
@@ -240,7 +241,7 @@ class DropdownKeywords():
                         """
                         if dropVal.lower()=='dropdown':
                             ## webelement1=self.jsExecutorForMultipleDropdown(webelement,input)
-##New javascript was not providing the accurate element still keeping the if else condition for future checks if any
+                            ##New javascript was not providing the accurate element still keeping the if else condition for future checks if any
                             webelement=self.radioKeywordsObj.getActualElement(webelement,input)
                         else:
                             webelement=self.radioKeywordsObj.getActualElement(webelement,input)
@@ -723,94 +724,96 @@ class DropdownKeywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             log.info('Recieved web element from the web dispatcher')
-            if ((webelement.is_enabled())):
-                if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
-                    try:
-                        # performing js code
-                        log.debug('element is invisible, performing js code')
-                        if input is not None:
-                            alloptions = []
-                            if browser_Keywords.driver_obj is not None and isinstance(browser_Keywords.driver_obj,
-                                                                                      webdriver.Ie):
-                                count = browser_Keywords.driver_obj.execute_script(
-                                    """return arguments[0].childElementCount""", webelement)
-                                for i in range(count):
-                                    alloptions.append(browser_Keywords.driver_obj.execute_script(
-                                        """return arguments[0].options[arguments[1]].text""", webelement, i))
-                            else:
-                                optionlist = browser_Keywords.driver_obj.execute_script(
-                                    """return arguments[0].options""", webelement)
-                                for element in optionlist:
-                                    alloptions.append(
-                                        browser_Keywords.driver_obj.execute_script("""return arguments[0].text""",
-                                                                                   element))
-                            if len(input)!=0 and input[0] == "1":
-                                for i in range(len(alloptions)):
-                                    alloptions[i] = alloptions[i].strip()
-                            output = alloptions
-                            if len(output) != 0:
-                                status = webconstants.TEST_RESULT_PASS
-                                result = webconstants.TEST_RESULT_TRUE
+            ##if ((webelement.is_enabled())):
+            if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                try:
+                    # performing js code
+                    log.debug('element is invisible, performing js code')
+                    if input is not None:
+                        alloptions = []
+                        if browser_Keywords.driver_obj is not None and isinstance(browser_Keywords.driver_obj,
+                                                                                  webdriver.Ie):
+                            count = browser_Keywords.driver_obj.execute_script(
+                                """return arguments[0].childElementCount""", webelement)
+                            for i in range(count):
+                                alloptions.append(browser_Keywords.driver_obj.execute_script(
+                                    """return arguments[0].options[arguments[1]].text""", webelement, i))
+                        else:
+                            optionlist = browser_Keywords.driver_obj.execute_script(
+                                """return arguments[0].options""", webelement)
+                            for element in optionlist:
+                                alloptions.append(
+                                    browser_Keywords.driver_obj.execute_script("""return arguments[0].text""",
+                                                                               element))
+                        if len(input)!=0 and input[0] == "1":
+                            for i in range(len(alloptions)):
+                                alloptions[i] = alloptions[i].strip()
+                        output = alloptions
+                        if len(output) != 0:
+                            status = webconstants.TEST_RESULT_PASS
+                            result = webconstants.TEST_RESULT_TRUE
+                            logger.print_on_console(output)
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                        else:
+                            err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                            logger.print_on_console(err_msg)
+                            log.error(err_msg)
+                    else:
+                        err_msg = 'Provided input not present in element'
+                        logger.print_on_console(err_msg)
+                        log.error(err_msg)
+                except Exception as e:
+                    log.error(e)
+                    logger.print_on_console(e)
+            else:
+                try:
+                    if input is not None:
+                        log.info('Input is not none')
+                        if self.util.is_visible(webelement):
+                            # performing selenium code
+                            log.debug('element is visible, performing selenium code')
+                            log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
+                            select = Select(webelement)
+                            option_len = select.options
+                            opt_len = len(option_len)
+                            inp_val_len = len(input)
+                            log.info('inp_val_len')
+                            log.info(inp_val_len)
+                            temp = []
+                            flag = True
+                            for x in range(0,opt_len):
+                                internal_val = select.options[x].text
+                                if len(input)!=0 and input[0] == "1":
+                                    internal_val= select.options[x].text.strip()
+                                temp.append(internal_val)
+                            log.info('temp value')
+                            log.info(temp)
+                            output=temp
+                            if(len(temp) != 0 ):
+                                status=webconstants.TEST_RESULT_PASS
+                                result=webconstants.TEST_RESULT_TRUE
+                                logger.print_on_console(output)
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                             else:
                                 err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                                 logger.print_on_console(err_msg)
                                 log.error(err_msg)
                         else:
-                            err_msg = 'Provided input not present in element'
+                            err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
                             logger.print_on_console(err_msg)
                             log.error(err_msg)
-                    except Exception as e:
-                        log.error(e)
-                        logger.print_on_console(e)
-                else:
-                    try:
-                        if input is not None:
-                            log.info('Input is not none')
-                            if self.util.is_visible(webelement):
-                                # performing selenium code
-                                log.debug('element is visible, performing selenium code')
-                                log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
-                                select = Select(webelement)
-                                option_len = select.options
-                                opt_len = len(option_len)
-                                inp_val_len = len(input)
-                                log.info('inp_val_len')
-                                log.info(inp_val_len)
-                                temp = []
-                                flag = True
-                                for x in range(0,opt_len):
-                                    internal_val = select.options[x].text
-                                    if len(input)!=0 and input[0] == "1":
-                                        internal_val= select.options[x].text.strip()
-                                    temp.append(internal_val)
-                                log.info('temp value')
-                                log.info(temp)
-                                output=temp
-                                if(len(temp) != 0 ):
-                                    status=webconstants.TEST_RESULT_PASS
-                                    result=webconstants.TEST_RESULT_TRUE
-                                    log.info(STATUS_METHODOUTPUT_UPDATE)
-                                else:
-                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                    logger.print_on_console(err_msg)
-                                    log.error(err_msg)
-                            else:
-                                err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
-                                logger.print_on_console(err_msg)
-                                log.error(err_msg)
 
-                        else:
-                            err_msg='Provided input not present in element'
-                            logger.print_on_console(err_msg)
-                            log.error(err_msg)
-                    except Exception as e:
-                        log.error(e)
-                        logger.print_on_console(e)
-            else:
-                err_msg = 'Element is not enabled '
-                logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                    else:
+                        err_msg='Provided input not present in element'
+                        logger.print_on_console(err_msg)
+                        log.error(err_msg)
+                except Exception as e:
+                    log.error(e)
+                    logger.print_on_console(e)
+            ##else:
+                ##err_msg = 'Element is not enabled '
+                ##logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                ##log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
         return status,result,output,err_msg
 
     def verifyAllValues(self,webelement,input,*args):
@@ -1016,16 +1019,13 @@ class DropdownKeywords():
                                         jstext = """for (var j = 0; j < arguments[1].length; j++) {for (var i = 0; i < arguments[0].length; i++) {if ( i == arguments[1][j]) {arguments[0][i].selected = true;}}}"""
                                         browser_Keywords.driver_obj.execute_script(jstext, webelement, input_list)
                                     else:
-                                        for x in range(0, count):
-                                            if int(input[x]) <= iListSize:
-                                                for i in range(0, iListSize):
-                                                    input_val_temp = input[x]
-                                                    input_val = int(input_val_temp)
-                                                    if (input_val == i):
-                                                        if (isinstance(browser_Keywords.driver_obj, webdriver.Firefox)):
-                                                            iList[i].click()
-                                                        else:
-                                                            select.select_by_index(input_val)
+                                        for index in input:
+                                            inputindex = int(index)
+                                            if(inputindex != None and inputindex <= iListSize):
+                                                if (isinstance(browser_Keywords.driver_obj, webdriver.Firefox)):
+                                                    iList[inputindex].click()
+                                                else:
+                                                    select.select_by_index(inputindex)
                                             else:
                                                 flag = True
                                                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -1067,80 +1067,90 @@ class DropdownKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
-            if ((webelement.is_enabled())):
-                log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
-                    try:
-                        # performing js code
-                        log.debug('element is invisible, performing js code')
-                        if webelement.tag_name=='table':
+            ##if ((webelement.is_enabled())):
+            log.info('Recieved web element from the web dispatcher')
+            if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                try:
+                    # performing js code
+                    log.debug('element is invisible, performing js code')
+                    if webelement.tag_name=='table':
+                        if ((webelement.is_enabled())):
                             webelement=self.radioKeywordsObj.getActualElement(webelement,input)
-                        selectedvalues = []
-                        if browser_Keywords.driver_obj is not None and isinstance(browser_Keywords.driver_obj,webdriver.Ie):
-                            count = browser_Keywords.driver_obj.execute_script("""return arguments[0].childElementCount""", webelement)
-                            for i in range(count):
-                                if browser_Keywords.driver_obj.execute_script(
-                                        """return arguments[0].options[arguments[1]].selected""", webelement, i):
-                                    value=browser_Keywords.driver_obj.execute_script(
-                                        """return arguments[0].options[arguments[1]].text""", webelement, i)
-                                    if input[0] == "1":
-                                        value = value.strip()
-                                    selectedvalues.append(value)
                         else:
-                            optionlist = browser_Keywords.driver_obj.execute_script(
-                                """return arguments[0].selectedOptions""", webelement)
-                            for element in optionlist:
-                                value = browser_Keywords.driver_obj.execute_script("""return arguments[0].text""",element)
+                            err_msg = 'Element is not enabled '
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                            log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                    selectedvalues = []
+                    if browser_Keywords.driver_obj is not None and isinstance(browser_Keywords.driver_obj,webdriver.Ie):
+                        count = browser_Keywords.driver_obj.execute_script("""return arguments[0].childElementCount""", webelement)
+                        for i in range(count):
+                            if browser_Keywords.driver_obj.execute_script(
+                                    """return arguments[0].options[arguments[1]].selected""", webelement, i):
+                                value=browser_Keywords.driver_obj.execute_script(
+                                    """return arguments[0].options[arguments[1]].text""", webelement, i)
                                 if input[0] == "1":
                                     value = value.strip()
                                 selectedvalues.append(value)
-                        output = selectedvalues
-                        logger.print_on_console(output)
-                        status = webconstants.TEST_RESULT_PASS
-                        result=webconstants.TEST_RESULT_TRUE
-                        log.info(STATUS_METHODOUTPUT_UPDATE)
-                    except Exception as e:
-                        log.error(e)
-                        logger.print_on_console(e)
-                else:
-                    try:
-                        if webelement.tag_name == 'table':
-                            webelement = self.radioKeywordsObj.getActualElement(webelement, input)
-                        if self.util.is_visible(webelement):
-                            # performing selenium code
-                            log.debug('element is visible, performing selenium code')
-                            log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
-                            select = Select(webelement)
-                            index = select.all_selected_options
-                            log.info('Index value')
-                            log.info(index)
-                            temp = []
-                            for x in range(0, len(index)):
-                                value = select.all_selected_options[x].text
-                                if len(input)==1:
-                                    if input[0] == "1":
-                                        value = value.strip()
-                                temp.append(value)
-                            output = ';'.join(temp)
-                            logger.print_on_console(output)
-                            if len(temp) > 1:
-                                output = temp
-                            else:
-                                output = value
-                            status = webconstants.TEST_RESULT_PASS
-                            result = webconstants.TEST_RESULT_TRUE
-                            log.info(STATUS_METHODOUTPUT_UPDATE)
-                        else:
-                            logger.print_on_console('Element is not displayed')
-                            log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
-                            err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
-                    except Exception as e:
-                        log.error(e)
-                        logger.print_on_console(e)
+                    else:
+                        optionlist = browser_Keywords.driver_obj.execute_script(
+                            """return arguments[0].selectedOptions""", webelement)
+                        for element in optionlist:
+                            value = browser_Keywords.driver_obj.execute_script("""return arguments[0].text""",element)
+                            if input[0] == "1":
+                                value = value.strip()
+                            selectedvalues.append(value)
+                    output = selectedvalues
+                    logger.print_on_console(output)
+                    status = webconstants.TEST_RESULT_PASS
+                    result=webconstants.TEST_RESULT_TRUE
+                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                except Exception as e:
+                    log.error(e)
+                    logger.print_on_console(e)
             else:
-                err_msg = 'Element is not enabled '
-                logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                try:
+                    if webelement.tag_name == 'table':
+                        if ((webelement.is_enabled())):
+                            webelement = self.radioKeywordsObj.getActualElement(webelement, input)
+                        else:
+                            err_msg = 'Element is not enabled '
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                            log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                    if self.util.is_visible(webelement):
+                        # performing selenium code
+                        log.debug('element is visible, performing selenium code')
+                        log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
+                        select = Select(webelement)
+                        index = select.all_selected_options
+                        log.info('Index value')
+                        log.info(index)
+                        temp = []
+                        for x in range(0, len(index)):
+                            value = select.all_selected_options[x].text
+                            if len(input)==1:
+                                if input[0] == "1":
+                                    value = value.strip()
+                            temp.append(value)
+                        output = ';'.join(temp)
+                        logger.print_on_console(output)
+                        if len(temp) > 1:
+                            output = temp
+                        else:
+                            output = value
+                        status = webconstants.TEST_RESULT_PASS
+                        result = webconstants.TEST_RESULT_TRUE
+                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                    else:
+                        logger.print_on_console('Element is not displayed')
+                        log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                        err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
+                except Exception as e:
+                    log.error(e)
+                    logger.print_on_console(e)
+            ##else:
+                ##err_msg = 'Element is not enabled '
+                ##logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                ##log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
         return status, result, output ,err_msg
 
 
@@ -1224,18 +1234,14 @@ class DropdownKeywords():
                                         err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                                 else:
                                     counter = 0
-                                    for x in range(0, count):
-                                        flag = False
-                                        for i in range(0, len(iList)):
-                                            if iList[i].text == input[x]:
-                                                flag = True
-                                        if (flag):
-                                            input_val = input[x]
-                                            log.info('Input value obtained')
-                                            log.info(input_val)
-                                            coreutilsobj = core_utils.CoreUtils()
-                                            input_val = coreutilsobj.get_UTF_8(input_val)
-                                            select.select_by_visible_text(input_val)
+                                    options = []
+                                    coreutilsobj = core_utils.CoreUtils()
+                                    for i in range(len(iList)):
+                                        options.append(iList[i].text)
+                                    for x in input:
+                                        userinput = coreutilsobj.get_UTF_8(x)
+                                        if (userinput is not None and len(userinput)>0 and userinput in options):
+                                            select.select_by_visible_text(userinput)
                                             counter = counter + 1
 
                                     if counter == count:
@@ -1271,96 +1277,96 @@ class DropdownKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
-            if ((webelement.is_enabled())):
-                log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
-                    try:
-                        # performing js code
-                        log.debug('element is invisible, performing js code')
-                        if input is not None and len(input) != 0:
-                            flag = False
-                            resultoptions = []
-                            log.info('userinput count is')
-                            log.info(len(input))
-                            totalcount = browser_Keywords.driver_obj.execute_script("""return arguments[0].childElementCount""", webelement)
-                            log.info('totalcount is')
-                            log.info(totalcount)
-                            for inputindex in input:
-                                if inputindex is not None:
-                                    inputindex = int(inputindex)
-                                    if inputindex < totalcount:
-                                        resultoptions.append(str(browser_Keywords.driver_obj.execute_script("""return arguments[0].options[arguments[1]].text""", webelement,inputindex)))
-                                    else:
-                                        flag = True
-                                        log.info("One of the provided index is invalid")
-                                        break
+            ##if ((webelement.is_enabled())):
+            log.info('Recieved web element from the web dispatcher')
+            if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                try:
+                    # performing js code
+                    log.debug('element is invisible, performing js code')
+                    if input is not None and len(input) != 0:
+                        flag = False
+                        resultoptions = []
+                        log.info('userinput count is')
+                        log.info(len(input))
+                        totalcount = browser_Keywords.driver_obj.execute_script("""return arguments[0].childElementCount""", webelement)
+                        log.info('totalcount is')
+                        log.info(totalcount)
+                        for inputindex in input:
+                            if inputindex is not None:
+                                inputindex = int(inputindex)
+                                if inputindex < totalcount:
+                                    resultoptions.append(str(browser_Keywords.driver_obj.execute_script("""return arguments[0].options[arguments[1]].text""", webelement,inputindex)))
                                 else:
                                     flag = True
-                                    log.info("One of the provided index is invalid (None)")
+                                    log.info("One of the provided index is invalid")
                                     break
-                            if (not flag):
-                                output = resultoptions
+                            else:
+                                flag = True
+                                log.info("One of the provided index is invalid (None)")
+                                break
+                        if (not flag):
+                            output = resultoptions
+                            logger.print_on_console(output)
+                            status = webconstants.TEST_RESULT_PASS
+                            result = webconstants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                    else:
+                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                except Exception as e:
+                    log.error(e)
+                    logger.print_on_console(e)
+            else:
+                try:
+                    if input is not None and len(input) != 0:
+                        if self.util.is_visible(webelement):
+                            # performing selenium code
+                            log.debug('element is visible, performing selenium code')
+                            log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
+                            count = len(input)
+                            log.info('count is')
+                            log.info(count)
+                            select = Select(webelement)
+                            iList = select.options
+                            iListSize = len(iList)
+                            temp = []
+                            flag = False
+                            for x in range(0,count):
+                                if int(input[x]) <= iListSize:
+                                    input_val_temp = input[x]
+                                    input_val = int(input_val_temp)
+                                    out=select.options[input_val].text
+                                    value = str(out)
+                                    temp.append(value)
+                                else:
+                                    flag = True
+                                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                    log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                    break
+                            if(not flag):
+                                output = ';'.join(temp)
                                 logger.print_on_console(output)
-                                status = webconstants.TEST_RESULT_PASS
-                                result = webconstants.TEST_RESULT_TRUE
+                                output=temp
+                                status=webconstants.TEST_RESULT_PASS
+                                result=webconstants.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
-                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                    except Exception as e:
-                        log.error(e)
-                        logger.print_on_console(e)
-                else:
-                    try:
-                        if input is not None and len(input) != 0:
-                            if self.util.is_visible(webelement):
-                                # performing selenium code
-                                log.debug('element is visible, performing selenium code')
-                                log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
-                                count = len(input)
-                                log.info('count is')
-                                log.info(count)
-                                select = Select(webelement)
-                                iList = select.options
-                                iListSize = len(iList)
-                                temp = []
-                                flag = False
-                                for x in range(0,count):
-                                    if int(input[x]) <= iListSize:
-                                        input_val_temp = input[x]
-                                        input_val = int(input_val_temp)
-                                        out=select.options[input_val].text
-                                        value = str(out)
-                                        temp.append(value)
-                                    else:
-                                        flag = True
-                                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                        break
-                                if(not flag):
-                                    output = ';'.join(temp)
-                                    logger.print_on_console(output)
-                                    output=temp
-                                    status=webconstants.TEST_RESULT_PASS
-                                    result=webconstants.TEST_RESULT_TRUE
-                                    log.info(STATUS_METHODOUTPUT_UPDATE)
-                            else:
-                                logger.print_on_console('Element is not displayed')
-                                log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
-                                err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
-                        else:
-                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                    except Exception as e:
-                        log.error(e)
-                        logger.print_on_console(e)
-            else:
-                err_msg = 'Element is not enabled '
-                logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                            logger.print_on_console('Element is not displayed')
+                            log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                            err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
+                    else:
+                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                except Exception as e:
+                    log.error(e)
+                    logger.print_on_console(e)
+            ##else:
+                ##err_msg = 'Element is not enabled '
+                ##logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                ##log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
         return status,result,output,err_msg
 
     def selectAllValues(self,webelement,*args):
@@ -1445,21 +1451,59 @@ class DropdownKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
-            if ((webelement.is_enabled())):
-                log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+            ##if ((webelement.is_enabled())):
+            log.info('Recieved web element from the web dispatcher')
+            if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                try:
+                    # performing js code
+                    log.debug('element is invisible, performing js code')
+                    if input is not None and len(input[0].strip()) != 0:
+                        alloptionscount = browser_Keywords.driver_obj.execute_script("""return arguments[0].childElementCount""", webelement)
+                        input_val = int(input[0])
+                        if input_val < alloptionscount:
+                            output = browser_Keywords.driver_obj.execute_script("""return arguments[0].options[arguments[1]].text""",webelement,input_val)
+                            if output is not None:
+                                status = webconstants.TEST_RESULT_PASS
+                                result = webconstants.TEST_RESULT_TRUE
+                                logger.print_on_console(output)
+                                log.info(STATUS_METHODOUTPUT_UPDATE)
+                        else:
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                    else:
+                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                except Exception as e:
+                    log.error(e)
+                    logger.print_on_console(e)
+            else:
+                if self.util.is_visible(webelement):
+                    # performing selenium code
+                    log.debug('element is visible, performing selenium code')
+                    log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                     try:
-                        # performing js code
-                        log.debug('element is invisible, performing js code')
-                        if input is not None and len(input[0].strip()) != 0:
-                            alloptionscount = browser_Keywords.driver_obj.execute_script("""return arguments[0].childElementCount""", webelement)
-                            input_val = int(input[0])
-                            if input_val < alloptionscount:
-                                output = browser_Keywords.driver_obj.execute_script("""return arguments[0].options[arguments[1]].text""",webelement,input_val)
-                                if output is not None:
-                                    status = webconstants.TEST_RESULT_PASS
-                                    result = webconstants.TEST_RESULT_TRUE
-                                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                        if input is not None:
+                            if len(input[0].strip()) != 0:
+                                input_val = int(input[0])
+                                select = Select(webelement)
+                                iList = select.options
+                                iListSize = len(iList)
+                                if(input_val < iListSize):
+                                    for i in range(0,iListSize):
+                                        if(input_val == i):
+                                            output=select.options[input_val].text
+                                            if input[0] == "1":
+                                                output=select.options[input_val].text.strip()
+                                            status=webconstants.TEST_RESULT_PASS
+                                            result=webconstants.TEST_RESULT_TRUE
+                                            logger.print_on_console(output)
+                                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                                else:
+                                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                    log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                             else:
                                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -1472,50 +1516,13 @@ class DropdownKeywords():
                         log.error(e)
                         logger.print_on_console(e)
                 else:
-                    if self.util.is_visible(webelement):
-                        # performing selenium code
-                        log.debug('element is visible, performing selenium code')
-                        log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
-                        try:
-                            if input is not None:
-                                if len(input[0].strip()) != 0:
-                                    input_val = int(input[0])
-                                    select = Select(webelement)
-                                    iList = select.options
-                                    iListSize = len(iList)
-                                    if(input_val < iListSize):
-                                        for i in range(0,iListSize):
-                                            if(input_val == i):
-                                                output=select.options[input_val].text
-                                                if input[0] == "1":
-                                                    output=select.options[input_val].text.strip()
-                                                status=webconstants.TEST_RESULT_PASS
-                                                result=webconstants.TEST_RESULT_TRUE
-                                                log.info(STATUS_METHODOUTPUT_UPDATE)
-                                    else:
-                                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                else:
-                                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                    log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            else:
-                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                        except Exception as e:
-                            log.error(e)
-
-                            logger.print_on_console(e)
-                    else:
-                        logger.print_on_console('Element is not displayed')
-                        log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
-                        err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
-            else:
-                err_msg = 'Element is not enabled '
-                logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                    logger.print_on_console('Element is not displayed')
+                    log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                    err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
+            ##else:
+                ##err_msg = 'Element is not enabled '
+                ##logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                ##log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
         return status,result,output,err_msg
 
     def verifyValuesExists(self,webelement,input,*args):

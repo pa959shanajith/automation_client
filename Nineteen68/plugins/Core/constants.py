@@ -88,11 +88,11 @@ CONTINUE='continue'
 
 CUSTOM='@Custom'
 
-VERIFY_EXISTS='verifyExists'
+VERIFY_EXISTS='verifyexists'
 
-VERIFY_VISIBLE='verifyVisible'
+VERIFY_VISIBLE='verifyvisible'
 
-DYNAMIC_KEYWORDS=['createDynVariable','copyValue','modifyValue','deleteDynVariable']
+DYNAMIC_KEYWORDS=['createdynvariable','copyvalue','modifyvalue','deletedynvariable']
 
 CREATE_DYN_VARIABLE='createdynvariable'
 
@@ -102,7 +102,7 @@ MODIFY_VALUE='modifyvalue'
 
 DELETE_DYN_VARIABLE='deletedynvariable'
 
-WS_KEYWORDS=['setHeader','setHeaderTemplate']
+WS_KEYWORDS=['setheader','setheadertemplate']
 
 PARALLEL = 'parallel'
 
@@ -394,11 +394,11 @@ DB_VAR='ret_riever'
 
 COMPLETED='success'
 
-MULTIPLE_OUTPUT_KEYWORDS=['getSelected','split']
+MULTIPLE_OUTPUT_KEYWORDS=['getselected','split']
 
-DISPALY_VARIABLE_VALUE='displayVariableValue'
+DISPALY_VARIABLE_VALUE='displayvariablevalue'
 
-DATE_COMPARE='dateCompare'
+DATE_COMPARE='datecompare'
 
 STEPSTATUS_INREPORTS_ZERO = '0'
 

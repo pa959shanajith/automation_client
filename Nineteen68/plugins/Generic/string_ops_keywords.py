@@ -264,13 +264,14 @@ class StringOperation:
         try:
             if not (input is None or input is ''):
                 output = len(input)
-##                logger.print_on_console('Result : ',output)
+                logger.print_on_console('Result : ',output)
                 log.info('Result : ')
                 log.info(output)
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
             else:
                 output = len(input)
+                logger.print_on_console('Result : ')
                 log.info('Result : ')
                 log.info(output)
                 status=generic_constants.TEST_RESULT_PASS

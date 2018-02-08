@@ -219,8 +219,7 @@ class GetParam():
                 for row in allRows:
                     if rowcount == 0:
                         firstrowelements = row
-                        for a in range(len(firstrowelements)):
-                            colcount = colcount + 1
+                        colcount = colcount + len(firstrowelements)
                     if rowcount >= 1:
                         testdataexist = True
                     rowcount = rowcount + 1
@@ -240,7 +239,6 @@ class GetParam():
                                 if currentcell != '' or currentcell != None:
                                     with open(filepath, mode='r') as f:
                                         reader = csv.DictReader(f, delimiter=',')
-                                        myReader = None
                                         for col in reader.fieldnames:
                                             myDict[col] = []
                                         for row in reader:
@@ -251,8 +249,7 @@ class GetParam():
             return myDict
         except Exception as e:
             log.error(e)
-
-            logger.print_on_console(e)
+            logger.print_on_console("Error while reading CSV file")
 
     def xmlTreeReader(self,xroot,sdata):
         """
@@ -280,7 +277,6 @@ class GetParam():
         """
         try:
             sdata = dict()
-            entries = []
             if len(fileinfo) > 0:
                 filepath = fileinfo[0]
                 xtree = ET.parse(filepath)
@@ -374,6 +370,7 @@ class GetParam():
             log.info( 'Get Param Result :'+ str(getparamres) )
             logger.print_on_console( 'Get Param Result :',getparamres )
             if getparamres == TEST_RESULT_PASS:
+                externalDataList=''
                 log.debug( "File is valid, try to fetch the data...")
                 #need to check dynamic variable for filepath
                 filename, file_extension = os.path.splitext(filepath)
@@ -385,12 +382,10 @@ class GetParam():
                     log.debug( "Type is .csv")
                     """CSV .csv file check goes here"""
                     externalDataList = self.readcsvfile(fileinfo);
-                    status = TEST_RESULT_PASS
                 elif file_extension[1:].lower() == FILE_TYPE_XML:
                     log.debug( "Type is .xml")
                     """XML .xml file check goes here"""
                     externalDataList = self.readxmlfile(fileinfo);
-                    status = TEST_RESULT_PASS
                 return externalDataList
             else:
                 log.error( 'Invalid file! Please provide valid file name and/or sheet name')
@@ -398,8 +393,7 @@ class GetParam():
                 return getparamres
         except Exception as e:
             log.error(e)
-
-            logger.print_on_console(e)
+            logger.print_on_console('Error while reading file')
 
     def invokegetparam(self,input):
         """
@@ -441,8 +435,11 @@ class GetParam():
                     statDict[STATIC_NONE]=None
                     for var in static_var_list:
                         inputresult=self.get_static_value(data,row,var)
+                        var = PIPE + var + PIPE
                         if inputresult is None:
-                            resultinput = resultinput.replace('|'+var+'|',STATIC_NONE)
+                            temp = STATIC_NONE
+                        elif inputresult == IGNORE_THIS_STEP:
+                            temp = IGNORE_THIS_STEP
                         else:
                             if isinstance(inputresult,float):
                                 if inputresult%1 == 0.0:
@@ -450,14 +447,14 @@ class GetParam():
                             temp=STATIC_DV_NAME[:9]+str(statCnt)+STATIC_DV_NAME[9:]
                             statCnt+=1
                             dynamic_variable_handler.dynamic_variable_map[temp]=inputresult
-                            resultinput = resultinput.replace('|'+var+'|',temp)
+                        resultinput = resultinput.replace(var,temp)
                     inputlistwithval.insert(i,resultinput)
                 else:
                     keywordList=[EVALUATE,DATE_COMPARE]
                     if teststepproperty.name.lower() in keywordList :
                         static_var_list=re.findall("\|(.*?)\|", inputvalstring)
                         for var in static_var_list:
-                            arr.append('|'+var+'|')
+                            arr.append(PIPE+var+PIPE)
                     else:
                         arr = inputvalstring.split(';')
                     for item in arr:
@@ -471,14 +468,16 @@ class GetParam():
                                 p = p + len(variable)
                                 inputresult=self.get_static_value(data,row,columnname)
                                 if inputresult is None:
-                                    inputresult=STATIC_NONE
+                                    temp=STATIC_NONE
+                                elif inputresult == IGNORE_THIS_STEP:
+                                    temp=IGNORE_THIS_STEP
                                 else:
                                     if isinstance(inputresult,float):
                                         if inputresult%1 == 0.0:
                                             inputresult = int(inputresult)
-                                temp=STATIC_DV_NAME[:9]+str(statCnt)+STATIC_DV_NAME[9:]
-                                statCnt+=1
-                                dynamic_variable_handler.dynamic_variable_map[temp]=inputresult
+                                    temp=STATIC_DV_NAME[:9]+str(statCnt)+STATIC_DV_NAME[9:]
+                                    statCnt+=1
+                                    dynamic_variable_handler.dynamic_variable_map[temp]=inputresult
                                 resultinput = resultinput.replace(variable,temp)
                                 inputlistwithval.insert(i,resultinput)
         except Exception as e:
@@ -669,7 +668,6 @@ class GetParam():
                                 if handler.tspList[self.index+1].name.lower()==STARTLOOP:
                                     handler.tspList[self.index+1].executed=True
                                 if (inputval != None):
-                                    j = 0
                                     log.info(  '***Data Param: Iteration '+ str(k) +  ' started***')
                                     logger.print_on_console(  '***Data Param: Iteration ',k, ' started***')
                                     step_description='Dataparam: Iteration '+str(k)+' started'

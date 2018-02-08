@@ -72,21 +72,21 @@ INVALID_CHARS='\/:*?"<>|'
 
 DYNAMIC_STATIC=['dynamic','static']
 
-DISPLAY_VARIABLE_VALUE='displayVariableValue'
+DISPLAY_VARIABLE_VALUE='displayvariablevalue'
 
 PAUSE = 'pause'
 
-SENDFUNCTIONKEYS='sendFunctionKeys'
+SENDFUNCTIONKEYS='sendfunctionkeys'
 
-DATE_COMPARE='dateCompare'
+DATE_COMPARE='datecompare'
 
-EXPORT_DATA='exportData'
+EXPORT_DATA='exportdata'
 
-GET_DATA='getData'
+GET_DATA='getdata'
 
-SECURE_EXPORT_DATA='secureExportData'
+SECURE_EXPORT_DATA='secureexportdata'
 
-SECURE_GET_DATA='secureGetData'
+SECURE_GET_DATA='securegetdata'
 
 DATA_BASE_KEYWORDS=[EXPORT_DATA,GET_DATA,SECURE_EXPORT_DATA,SECURE_GET_DATA]
 

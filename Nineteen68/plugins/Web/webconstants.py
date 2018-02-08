@@ -141,26 +141,26 @@ STATUS_CODE_DICT={520: 'Unknown Error',
             511: 'Network Authentication Required',
             111 : 'Connection Refused'}
 
-GET_OBJECT_COUNT='getObjectCount'
+GET_OBJECT_COUNT='getobjectcount'
 
-WAIT_FOR_ELEMENT_VISIBLE='waitForElementVisible'
+WAIT_FOR_ELEMENT_VISIBLE='waitforelementvisible'
 
-GET_INNER_TABLE='getInnerTable'
+GET_INNER_TABLE='getinnertable'
 
-OPEN_BROWSER='openBrowser'
+OPEN_BROWSER='openbrowser'
 
-OPEN_NEW_BROWSER='openNewBrowser'
+OPEN_NEW_BROWSER='opennewbrowser'
 
-CLOSE_BROWSER='closeBrowser'
+CLOSE_BROWSER='closebrowser'
 
-GET_POPUP_TEXT = 'getPopUpText'
+GET_POPUP_TEXT = 'getpopuptext'
 
-VERIFY_POPUP_TEXT = 'verifyPopUpText'
+VERIFY_POPUP_TEXT = 'verifypopuptext'
 
 
-NON_WEBELEMENT_KEYWORDS=['openBrowser','openNewBrowser','navigateToURL','getPageTitle','verifyPageTitle','getCurrentURL','verifyCurrentURL','closeBrowser',
-'switchToWindow','closeSubWindows','waitForElementVisible','refresh','maximizeBrowser','getCurrentURL','acceptPopUp','dismissPopUp',
-'getPopUpText','verifyPopUpText','clearCache','navigateWithAuthenticate']
+NON_WEBELEMENT_KEYWORDS=['openbrowser','opennewbrowser','navigatetourl','getpagetitle','verifypagetitle','getcurrenturl','verifycurrenturl','closebrowser',
+'switchtowindow','closesubwindows','waitforelementvisible','refresh','maximizebrowser','getcurrenturl','acceptpopup','dismisspopup',
+'getpopuptext','verifypopuptext','clearcache','navigatewithauthenticate']
 
 FOUND='found'
 

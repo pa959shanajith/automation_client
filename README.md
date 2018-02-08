@@ -12,6 +12,7 @@
     * Cassandra-driver
 * `Database`
     * Cassandra v2.1
+    * Redis v3.2.1
 
 ### Core Development
 

@@ -47,7 +47,7 @@ class DynamicVariables:
         coreutilsobj=core_utils.CoreUtils()
         input_var=coreutilsobj.get_UTF_8(input_var)
         actual_value=input_var
-        if not(keyword in DYNAMIC_KEYWORDS):
+        if not(keyword.lower() in DYNAMIC_KEYWORDS):
             status,nested_var=self.check_dynamic_inside_dynamic(input_var)
             if status==TEST_RESULT_TRUE:
                 value=self.get_nestedDyn_value(nested_var,input_var)

@@ -96,7 +96,7 @@ class For():
 
 
         #block to execute for
-        if self.name==constants.FOR:
+        if self.name.lower()==constants.FOR:
 
             endForNum = self.info_dict[0].keys()[0]
             inputval=input[0]
