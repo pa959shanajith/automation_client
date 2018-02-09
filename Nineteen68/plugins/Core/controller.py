@@ -20,6 +20,7 @@ import test
 import handler
 import os,sys
 import logger
+import json
 from constants import *
 import pause_execution
 import dynamic_variable_handler
@@ -61,7 +62,7 @@ class TestThread(threading.Thread):
             time.sleep(2)
             con = Controller()
             con.conthread=self.thread
-            status,qc_status = con.invoke_controller(EXECUTE,'',con.conthread,self.browser)
+            status = con.invoke_controller(EXECUTE,'',con.conthread,self.browser)
             if status==TERMINATE:
                 logger.print_on_console( '---------Termination Completed-------')
             else:
@@ -783,9 +784,8 @@ class Controller():
         obj.clear_dyn_variables()
         return status
 
-    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues):
+    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc):
         global terminate_flag
-        qc_status =None
         qc_url=''
         qc_password=''
         qc_username=''
@@ -900,9 +900,6 @@ class Controller():
                                 #logic for condition check
                                 report_json=con.reporting_obj.report_json[OVERALLSTATUS]
                                 if len(scenario['qcdetails'])==7 and (qc_url!='' and qc_password!='' and  qc_username!=''):
-                                    sys.path.append(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins'+'/Qc')
-                                    import qc
-                                    qc_json=qc.Qc()
                                     qc_status_over=report_json[0]
                                     qc_update_status=qc_status_over['overallstatus']
                                     if(str(qc_update_status).lower()=='pass'):
@@ -911,20 +908,31 @@ class Controller():
                                         qc_update_status='Failed'
                                     else:
                                         qc_update_status='Not Completed'
-
-                                    ##qc_status='http://srv03wap121:8080/qcbin,Chethan,Chethan1,ENTERPRISE,DimensionLab,root\TestFolder1,TestSet1,[1]QC-2,'+str(qc_update_status)
-                                    qc_status = {}
-                                    qc_status['qcaction']='qcupdate'
-                                    qc_status['qc_domain']=qc_domain
-                                    qc_status['qc_project']=qc_project
-                                    qc_status['qc_folder']=qc_folder
-                                    qc_status['qc_tsList']=qc_tsList
-                                    qc_status['qc_testrunname']=qc_testrunname
-                                    qc_status['qc_update_status'] = qc_update_status
-                                    ##qc_status=qc_url+','+qc_username+','+qc_password+','+qc_domain+','+qc_project+','+qc_folder+','+qc_tsList+','+qc_testrunname+','+str(qc_update_status)
-                                    ##status_qc=qc_json.update_qc_details(str(qc_status))
-                                elif (qc_url!='' and qc_password!='' and  qc_username!=''):
-                                    logger.print_on_console('****Failed to Update QCDetails****')
+                                    try:
+                                        qc_status = {}
+                                        qc_status['qcaction']='qcupdate'
+                                        qc_status['qc_domain']=qc_domain
+                                        qc_status['qc_project']=qc_project
+                                        qc_status['qc_folder']=qc_folder
+                                        qc_status['qc_tsList']=qc_tsList
+                                        qc_status['qc_testrunname']=qc_testrunname
+                                        qc_status['qc_update_status'] = qc_update_status
+                                        logger.print_on_console('****Updating QCDetails****')
+                                        if qc_soc is not None:
+                                            data_to_send = json.dumps(qc_status).encode('utf-8')
+                                            data_to_send+='#E&D@Q!C#'
+                                            qc_soc.send(data_to_send)
+                                            data_stream= qc_soc.recv(1024)
+                                            server_data = data_stream[:data_stream.find('#E&D@Q!C#')]
+                                            parsed_data = json.loads(server_data.decode('utf-8'))
+                                            if parsed_data['QC_UpdateStatus']:
+                                                logger.print_on_console('****Updated QCDetails****')
+                                            else:
+                                                logger.print_on_console('****Failed to Update QCDetails****')
+                                        else:
+                                            logger.print_on_console('****Failed to Update QCDetails****')
+                                    except Exception as e:
+                                        logger.print_on_console('Error in Updating Qc details')
 
                                 #Check is made to fix issue #401
                                 if len(report_json)>0:
@@ -969,7 +977,7 @@ class Controller():
             logger.print_on_console( '***Terminating the Execution***')
             print( '=======================================================================================================')
 
-        return status,qc_status
+        return status
 
     #Building of Dictionary to send back toserver to save the data
     def getreport_data(self,testsuite_id,scenario_id,con,execution_id):
@@ -995,9 +1003,8 @@ class Controller():
         'executionId':execution_id}
         return obj
 
-    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,wxObject,socketIO,*args):
+    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,wxObject,socketIO,qc_soc,*args):
         status = COMPLETED
-        qc_status = None
         global terminate_flag,break_point,pause_flag,socket_object
         self.conthread=mythread
         self.clear_data()
@@ -1014,14 +1021,14 @@ class Controller():
             ##if execution_mode.lower() == PARALLEL:
             ##    status=self.invoke_execution(mythread,json_data)
             if self.execution_mode.lower() == SERIAL:
-                status,qc_status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues)
+                status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc)
         elif action.lower()==DEBUG:
             self.debug_mode=debug_mode
             self.wx_object=wxObject
             status=self.invoke_debug(mythread,runfrom_step,json_data)
         if status != TERMINATE:
             status=COMPLETED
-        return status,qc_status
+        return status
     def invoke_parralel_exe(self,action,input_breakpoint,mythread):
         #create a ThreadPoolExecutor to perform parallel execution
         executor = ThreadPoolExecutor(max_workers=len(browsers))

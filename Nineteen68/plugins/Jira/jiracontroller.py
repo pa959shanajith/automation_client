@@ -24,6 +24,7 @@ class JiraWindow():
         try:
             jira_options = {'server': jira_serverlocation}
             jira = JIRA(options=jira_options,basic_auth=(jira_uname,jira_pwd))
+            print jira
             return jira
         except Exception as e:
             print 'Failed to connect to JIRA'
@@ -125,7 +126,13 @@ class JiraWindow():
             socket.emit('auto_populate',data)
         except Exception as e:
             log.error(e)
-            socket.emit('auto_populate','Fail')
+            print e
+            if 'Invalid URL' in str(e):
+                socket.emit('auto_populate','Invalid Url')
+            elif 'Unauthorized' in str(e):
+                socket.emit('auto_populate','Invalid Credentials')
+            else:
+                socket.emit('auto_populate','Fail')
             logger.print_on_console('Exception in login and auto populating data')
 
 

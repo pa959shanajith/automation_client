@@ -94,6 +94,8 @@ class MainNamespace(BaseNamespace):
                     controller.disconnect_flag=False
                 wxObject.connectbutton.Enable()
             except Exception as e:
+                import traceback
+                traceback.print_exc()
                 logger.print_on_console('Error while checking connection request')
                 log.info('Error while checking connection request')
                 log.error(e)
@@ -561,7 +563,6 @@ class TestThread(threading.Thread):
             self.con.exception_flag=(str(configvalues["exception_flag"]).strip().lower()=="true")
             status = ''
             apptype = ''
-            qc_status=None
             if(self.action == DEBUG):
                 apptype = (self.json_data)[0]['apptype']
             else:
@@ -572,22 +573,7 @@ class TestThread(threading.Thread):
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE
             else:
-                status,qc_status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO)
-
-            if(qc_status is not None):
-                logger.print_on_console('****Updating QCDetails****')
-                #logger.print_on_console(qc_status)
-                data_to_send = json.dumps(qc_status).encode('utf-8')
-                data_to_send+='#E&D@Q!C#'
-                soc.send(data_to_send)
-                data_stream= soc.recv(1024)
-                server_data = data_stream[:data_stream.find('#E&D@Q!C#')]
-                parsed_data = json.loads(server_data.decode('utf-8'))
-                if parsed_data['QC_UpdateStatus']:
-                    logger.print_on_console('****Updated QCDetails****')
-                else:
-                    logger.print_on_console('****Failed to Update QCDetails****')
-
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO,soc)
 
             logger.print_on_console('Execution status',status)
 

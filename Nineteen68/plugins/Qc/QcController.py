@@ -61,7 +61,7 @@ class QcWindow():
                 except Exception as eqc:
                     print('Connection Failed..')
                     self.quit_qc()
-                    flag=1;
+                    flag=1
                     #self.quit_qc()
                     #logger.print_on_console('Please provide valid credentials - Connection not established / Login unsuccessful')
             elif(filePath["qcaction"]=='project'):
@@ -335,9 +335,11 @@ class QcWindow():
         global dictFolderJson
         if(status):
             dictFolderJson = {'QC_UpdateStatus':True}
+            """
             TD.Logout()
             TD.releaseconnection()
             print 'closing_connection'
+            """
         else:
             dictFolderJson = {'QC_UpdateStatus':False}
         return status
@@ -365,7 +367,7 @@ class QcWindow():
             return True
         except Exception as e:
             print 'Erro in Quit_qc'
-            con.send('Error in qc')
+            con.send("Fail"+"\n")
 
     def emit_data(self):
 ##        print d,' in emit data'
@@ -402,21 +404,21 @@ if __name__ == '__main__':
                 data_stream = con.recv(1024)
                 client_data+=data_stream
                 if('#E&D@Q!C#' in data_stream):
-                    print data_stream
+                    #print data_stream
                     parsed_data = client_data[:client_data.find('#E&D@Q!C#')]
                     data_to_use = json.loads(parsed_data.decode('utf-8'))
                     #print data_to_use
                     qc_ref = QcWindow(data_to_use)
                     client_data=''
                     if(sent!=1):
-                        con.send('Error in qc')
+                        con.send("Fail"+"\n")
                     else:
                         sent=0
             except Exception as e:
                 import traceback
                 traceback.print_exc()
                 print 'Error in data receiving'
-                con.send('Error in qc / Something went wrong,Qc Stopped')
+                con.send("Fail"+"\n")
                 break
     except Exception as e:
         print 'Error in running Qc'
