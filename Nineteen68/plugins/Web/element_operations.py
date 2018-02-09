@@ -263,7 +263,7 @@ class ElementKeywords:
                     else:
                         obj.enumwindows()
                         if len(obj.rect)>1:
-                            obj.slide(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6), 0)
+                            obj.slide(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6), "slow")
                         else:
                             err_msg='Element to be dragged should be on top'
                             log.error=err_msg
