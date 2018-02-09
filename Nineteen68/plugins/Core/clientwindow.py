@@ -94,8 +94,6 @@ class MainNamespace(BaseNamespace):
                     controller.disconnect_flag=False
                 wxObject.connectbutton.Enable()
             except Exception as e:
-                import traceback
-                traceback.print_exc()
                 logger.print_on_console('Error while checking connection request')
                 log.info('Error while checking connection request')
                 log.error(e)

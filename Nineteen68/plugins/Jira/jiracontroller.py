@@ -24,7 +24,6 @@ class JiraWindow():
         try:
             jira_options = {'server': jira_serverlocation}
             jira = JIRA(options=jira_options,basic_auth=(jira_uname,jira_pwd))
-            print jira
             return jira
         except Exception as e:
             print 'Failed to connect to JIRA'
