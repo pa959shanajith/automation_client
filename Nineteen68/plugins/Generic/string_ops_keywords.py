@@ -262,20 +262,15 @@ class StringOperation:
         err_msg=None
         output=OUTPUT_CONSTANT
         try:
-            if not (input is None or input is ''):
+            if input is not None :
                 output = len(input)
-                logger.print_on_console('Result : ',output)
-                log.info('Result : ')
+                logger.print_on_console('Result obtained is: ',output)
+                log.info('Result obtained is:')
                 log.info(output)
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
             else:
-                output = len(input)
-                logger.print_on_console('Result : ')
-                log.info('Result : ')
-                log.info(output)
-                status=generic_constants.TEST_RESULT_PASS
-                result=generic_constants.TEST_RESULT_TRUE
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)

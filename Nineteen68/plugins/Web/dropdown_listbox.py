@@ -172,7 +172,7 @@ class DropdownKeywords():
                         output = str(totalcount)
                         status = webconstants.TEST_RESULT_PASS
                         result = webconstants.TEST_RESULT_TRUE
-                        logger.print_on_console(output)
+                        logger.print_on_console('Result obtained is: ',output)
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                 except Exception as e:
                     log.error(e)
@@ -188,11 +188,11 @@ class DropdownKeywords():
                         iListSize = len(iList)
                         log.info('Count of dropdown/listbox')
                         log.info(iListSize)
-                        logger.print_on_console('Count obtained is',iListSize)
                         if (iListSize >= 0):
                             output = str(iListSize)
                             status=webconstants.TEST_RESULT_PASS
                             result=webconstants.TEST_RESULT_TRUE
+                            logger.print_on_console('Result obtained is: ',output)
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                     except Exception as e:
                         log.error(e)
@@ -1465,7 +1465,7 @@ class DropdownKeywords():
                             if output is not None:
                                 status = webconstants.TEST_RESULT_PASS
                                 result = webconstants.TEST_RESULT_TRUE
-                                logger.print_on_console(output)
+                                logger.print_on_console('Result obtained is: ',output)
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
                             logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -1498,7 +1498,7 @@ class DropdownKeywords():
                                                 output=select.options[input_val].text.strip()
                                             status=webconstants.TEST_RESULT_PASS
                                             result=webconstants.TEST_RESULT_TRUE
-                                            logger.print_on_console(output)
+                                            logger.print_on_console('Result obtained is: ',output)
                                             log.info(STATUS_METHODOUTPUT_UPDATE)
                                 else:
                                     logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])

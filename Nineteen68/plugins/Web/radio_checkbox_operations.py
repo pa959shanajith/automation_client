@@ -172,7 +172,7 @@ class RadioCheckboxKeywords():
                     output=self.__fetch_status(webelement)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
-                    logger.print_on_console(output)
+                    logger.print_on_console('Result obtained is: ',output)
 
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
