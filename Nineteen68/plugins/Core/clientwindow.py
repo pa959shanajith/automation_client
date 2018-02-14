@@ -49,9 +49,9 @@ class MainNamespace(BaseNamespace):
 
         if(str(args[0]) == 'connected'):
             if(allow_connect):
-                logger.print_on_console('Normal Mode: Connection to the Node Server established')
+                logger.print_on_console('Normal Mode: Connection to the Nineteen68 Server established')
                 wxObject.schedule.Enable()
-                log.info('Normal Mode: Connection to the Node Server established')
+                log.info('Normal Mode: Connection to the Nineteen68 Server established')
             else:
                 if socketIO != None:
                     log.info('Closing the socket')
@@ -90,7 +90,7 @@ class MainNamespace(BaseNamespace):
                     allow_connect = True
                     wxObject.connectbutton.SetBitmapLabel(wxObject.disconnect_img)
                     wxObject.connectbutton.SetName("disconnect")
-                    wxObject.connectbutton.SetToolTip(wx.ToolTip("Disconnect from node Server"))
+                    wxObject.connectbutton.SetToolTip(wx.ToolTip("Disconnect from Nineteen68 Server"))
                     controller.disconnect_flag=False
                 wxObject.connectbutton.Enable()
             except Exception as e:
@@ -436,7 +436,8 @@ class SocketThread(threading.Thread):
         icesession = {
             'ice_id':str(uuid.uuid4()),
             'connect_time':str(datetime.now()),
-            'username':username
+            'username':username,
+            'system_mac':core_utils_obj.getMacAddress()
         }
         icesession_enc = core_utils_obj.wrap(json.dumps(icesession))
         params={'username':username,'icesession':icesession_enc}
@@ -561,7 +562,6 @@ class TestThread(threading.Thread):
             self.con.exception_flag=(str(configvalues["exception_flag"]).strip().lower()=="true")
             status = ''
             apptype = ''
-            qc_status=None
             if(self.action == DEBUG):
                 apptype = (self.json_data)[0]['apptype']
             else:
@@ -572,22 +572,7 @@ class TestThread(threading.Thread):
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE
             else:
-                status,qc_status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO)
-
-            if(qc_status is not None):
-                logger.print_on_console('****Updating QCDetails****')
-                #logger.print_on_console(qc_status)
-                data_to_send = json.dumps(qc_status).encode('utf-8')
-                data_to_send+='#E&D@Q!C#'
-                soc.send(data_to_send)
-                data_stream= soc.recv(1024)
-                server_data = data_stream[:data_stream.find('#E&D@Q!C#')]
-                parsed_data = json.loads(server_data.decode('utf-8'))
-                if parsed_data['QC_UpdateStatus']:
-                    logger.print_on_console('****Updated QCDetails****')
-                else:
-                    logger.print_on_console('****Failed to Update QCDetails****')
-
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO,soc)
 
             logger.print_on_console('Execution status',status)
 
@@ -699,7 +684,7 @@ class ClientWindow(wx.Frame):
         self.Bind(wx.EVT_MENU, self.menuhandler)
         self.connectbutton = wx.BitmapButton(self.panel, bitmap=self.connect_img,pos=(10, 10), size=(100, 25), name='connect')
         self.connectbutton.Bind(wx.EVT_BUTTON, self.OnNodeConnect)
-        self.connectbutton.SetToolTip(wx.ToolTip("Connect to node Server"))
+        self.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
         self.log = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_MULTILINE|wx.TE_READONLY)
         font1 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL,  False, u'Consolas')
         self.log.SetForegroundColour((0,50,250))
@@ -812,7 +797,7 @@ class ClientWindow(wx.Frame):
         controller.terminate_flag=True
         controller.disconnect_flag=True
         global socketIO
-        logger.print_on_console('Disconnected from node server')
+        logger.print_on_console('Disconnected from Nineteen68 server')
         if socketIO != None:
             log.info('Sending Socket disconnect request')
             socketIO.emit('unavailableLocalServer')
@@ -863,7 +848,7 @@ class ClientWindow(wx.Frame):
                 self.mythread = SocketThread(self)
             else:
                 self.OnTerminate(event,"term_exec")
-                logger.print_on_console('Disconnected from node server')
+                logger.print_on_console('Disconnected from Nineteen68 server')
                 if socketIO is not None:
                     log.info('Sending Socket disconnect request')
                     socketIO.emit('unavailableLocalServer')
@@ -872,7 +857,7 @@ class ClientWindow(wx.Frame):
                     socketIO = None
                 self.connectbutton.SetBitmapLabel(self.connect_img)
                 self.connectbutton.SetName('connect')
-                self.connectbutton.SetToolTip(wx.ToolTip("Connect to node Server"))
+                self.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
                 self.schedule.SetValue(False)
                 self.schedule.Disable()
                 self.connectbutton.Enable()

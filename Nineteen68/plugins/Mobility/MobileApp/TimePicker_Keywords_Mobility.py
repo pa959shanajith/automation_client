@@ -30,7 +30,9 @@ class Time_Keywords():
         err_msg=None
         text=[]
         obj=[]
-
+        Tflag=False
+        Tflag1 =False
+        Tflag2 =False
         input_date=input[0].split(':')
 
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -49,42 +51,56 @@ class Time_Keywords():
                         count= len(Date_picker)
 
                         if count == 1 :
+                            if input_date[0] !='':
                                 element=driver.find_elements_by_class_name('android.widget.EditText')
                                 element[0].set_text(input_date[0])
-                                value=element[0].text
+                                Tflag = True
+                            else:
+                                err_msg='Invalid input'
+                                log.error('Invalid input')
+                                logger.print_on_console(err_msg)
 
-                                print 'input_date[0]',input_date[0]
-                                if value != input_date[0] :
+                            if input_date[1] !='':
+                                element[1].set_text(input_date[1])
+                                value=element[1].text
+                                Tflag1 = True
+                            else:
+                                err_msg='Invalid input'
+                                log.error('Invalid input')
+                                logger.print_on_console(err_msg)
 
-                                    err_msg='Invalid input'
-                                    log.error('Invalid input')
-                                    logger.print_on_console(err_msg)
-                                else :
+                            if input_date[2] !='':
+                                element[2].set_text(input_date[2])
+                                value=element[2].text
+                                Tflag2 = True
+                            else:
+                                err_msg='Invalid input'
+                                log.error('Invalid input')
+                                logger.print_on_console(err_msg)
 
+                            if Tflag == True and Tflag1 ==True and Tflag2== True:
+                                value0=element[0].text
+                                value1=element[1].text
+                                value2=element[2].text
+                                if value0 != input_date[0]:
+                                    element[0].set_text(input_date[0])
+                                    time.sleep(3)
+                                    value00=element[0].text
+                                if value1 != input_date[1]:
                                     element[1].set_text(input_date[1])
-                                    value=element[1].text
+                                    time.sleep(3)
+                                    value11=element[1].text
+                                if value2 != input_date[2]:
+                                    element[2].set_text(input_date[2])
+                                    time.sleep(3)
+                                    value22=element[2].text
 
-                                    if value != input_date[1] :
-
-                                        err_msg='Invalid input'
-                                        log.error('Invalid input')
-                                        logger.print_on_console(err_msg)
-                                    else :
-
-                                        element[2].set_text(input_date[2])
-                                        value=element[2].text
-
-
-                                        if value != input_date[2] :
-
-                                            err_msg='Invalid input'
-                                            log.error('Invalid input')
-                                            logger.print_on_console(err_msg)
-                                        else :
-
-                                            status=TEST_RESULT_PASS
-                                            result=TEST_RESULT_TRUE
-
+                                if value0 == input_date[0] and value1== input_date[1] and value2==input_date[2]:
+                                    status=TEST_RESULT_PASS
+                                    result=TEST_RESULT_TRUE
+                                elif value00 == input_date[0] and value11== input_date[1] and value22==input_date[2]:
+                                    status=TEST_RESULT_PASS
+                                    result=TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
