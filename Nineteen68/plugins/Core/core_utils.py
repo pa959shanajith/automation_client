@@ -13,7 +13,7 @@
 import sys
 import logging
 log = logging.getLogger("core_utils.py")
-
+import os
 from Crypto.Cipher import AES
 BS=16
 iv='0'*16
@@ -87,3 +87,20 @@ class CoreUtils():
     def scrape_wrap(self,data):
         aes = AES.new(scrape_key, AES.MODE_CBC, iv)
         return aes.encrypt(self.pad(data)).encode('hex')
+
+    def getMacAddress(self):
+        mac=""
+        if sys.platform == 'win32':
+            for line in os.popen("ipconfig /all"):
+                if line.lstrip().startswith('Physical Address'):
+    ##                mac = line.split(':')[1].strip().replace('-',':')
+                    mac = line.split(':')[1].strip()
+                    mac = mac+'    '
+                    break
+        else:
+            for line in os.popen("/sbin/ifconfig"):
+                if line.find('Ether') > -1:
+                    mac = line.split()[4]
+                    mac = mac+'    '
+                    break
+        return str(mac).strip()
