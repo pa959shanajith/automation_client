@@ -54,9 +54,7 @@ class Webocular():
         if '#' in new_url :
             pos = new_url.index('#')
             new_url = new_url[:pos]
-        elif 'javascript' in new_url :
-            new_url = None
-        elif "mailto" in new_url :
+        elif 'javascript:' in new_url or "mailto:" in new_url or "tel:" in new_url:
             new_url = None
         return new_url
 
@@ -78,7 +76,7 @@ class Webocular():
     def crawl(self,start_url, level,agent) :
         self.domain = tldextract.extract(str(start_url)).domain
         #create a start object to initiate the process
-        start_obj = {"name" : start_url, "parent" : "None", "level" : 0 }
+        start_obj = {"name" : start_url, "parent" : "None", "level" : 0,"noOfTries" : 0 }
         self.discovered.add(start_url)
         self.queue.append(start_obj)
 
@@ -89,7 +87,7 @@ class Webocular():
         while(self.queue and not controller.terminate_flag) :
             obj = self.queue.pop(0)
             url = obj['name']
-            t = threading.Thread(target = self.parse, args = (url, obj, level,agent))
+            t = threading.Thread(target = self.parse, args = (url, obj, level,agent,webocular_constants.REQUEST_URL_TIMEOUT))
             t.start()
             threads.append(t)
             if i == 1 :
@@ -99,7 +97,7 @@ class Webocular():
         for thread in threads :
             thread.join()
 
-    def parse(self,url, obj, lev,agent) :
+    def parse(self,url, obj, lev,agent,timeout) :
 
         if controller.terminate_flag:
             return
@@ -111,10 +109,12 @@ class Webocular():
                 }
         try:
             headers = {'User-Agent': agents[agent]}
-            #if URL is for file type .pdf, .docx or .zip we will send only header request, will not download entire content
+            #if URL is for file type .pdf, .docx or .zip (mentioned in webocular_constants.py),
+            # we will send only header request, will not download entire content
 
-            if not url.endswith('.pdf') and not url.endswith('.docx') and not url.endswith('.zip'):
-                r = requests.get(url, headers = headers,verify = False,timeout = 40)
+            if not url.endswith(webocular_constants.IGNORE_FILE_EXTENSIONS):
+                obj["noOfTries"] = obj["noOfTries"] + 1
+                r = requests.get(url, headers = headers,verify = False,timeout = timeout)
                 rurl = r.url
 
                 #Check whether this URL redirects to some other URL
@@ -185,8 +185,10 @@ class Webocular():
                                         #if new_url not in self.visited:
                                             pagelinks.add(new_url)
                                             self.discovered.add(new_url)
-                                            self.queue.append({"name" : new_url, "parent" : rurl, "desc" : url_text, "level" : obj['level']+1  })
+                                            self.queue.append({"name" : new_url, "parent" : rurl, "desc" : url_text, "level" : obj['level']+1,"noOfTries" : 0  })
                                             self.edgedata.append({"source" : rurl, "target" : new_url })
+                                            #let's sleep for sometime
+                                            time.sleep(0.1)
                                     else :
                                         if new_url not in pagelinks :
                                             self.reversedLinks.append({"name" : new_url, "parent" :rurl, "level" : obj['level']+1 })
@@ -211,8 +213,10 @@ class Webocular():
                                         pagelinks.add(new_url)
                                         self.discovered.add(new_url)
                                         self.queue.append({"name": new_url, "parent": rurl, "desc": url_text,
-                                                           "level": obj['level'] + 1})
+                                                           "level": obj['level'] + 1,"noOfTries" : 0 })
                                         self.edgedata.append({"source": rurl, "target": new_url})
+                                        #let's sleep for sometime
+                                        time.sleep(0.1)
                                     else:
                                         if new_url not in pagelinks:
                                             self.reversedLinks.append(
@@ -235,9 +239,11 @@ class Webocular():
                                         pagelinks.add(new_url)
                                         self.discovered.add(new_url)
                                         self.queue.append({"name": new_url, "parent": rurl, "desc": url_text,
-                                                           "level": obj['level'] + 1})
+                                                           "level": obj['level'] + 1,"noOfTries" : 0 })
                                         leveln = obj['level'] + 1
                                         self.edgedata.append({"source": rurl, "target": new_url})
+                                        #let's sleep for sometime
+                                        time.sleep(0.1)
                                     else:
                                         if new_url not in pagelinks:
                                             self.reversedLinks.append(
@@ -248,13 +254,51 @@ class Webocular():
                 obj['type'] = "others"
                 self.nodedata[url] = obj
                 self.socketIO.emit('result_web_crawler',json.dumps(obj))
-
+        except requests.exceptions.HTTPError as e:
+            if obj["noOfTries"] < 2:
+                logger.print_on_console("\nHTTPError : retrying for url : ",url)
+                log.info("retrying for url : ")
+                log.info(url)
+                self.parse(url, obj, lev,agent,webocular_constants.REQUEST_URL_TIMEOUT/2)
+            else:
+                logger.print_on_console("\nMax retries exceeded for url : ",url)
+                obj['error'] = str(e)
+                obj['status'] = 400
+                self.nodedata[url] = obj
+                log.info("Max retries exceeded for url : ")
+                log.info(url)
+        except requests.exceptions.ConnectTimeout as e:
+            if obj["noOfTries"] < 2:
+                logger.print_on_console("ConnectTimeout : retrying for url : ",url,"\n\n")
+                log.info("retrying for url : ")
+                log.info(url)
+                self.parse(url, obj, lev,agent,webocular_constants.REQUEST_URL_TIMEOUT/2)
+            else:
+                logger.print_on_console("Max retries exceeded for url : ",url,"\n\n")
+                obj['error'] = str(e)
+                obj['status'] = 400
+                self.nodedata[url] = obj
+                log.info("Max retries exceeded for url : ")
+                log.info(url)
+        except requests.exceptions.ReadTimeout as e:
+            if obj["noOfTries"] < 2:
+                logger.print_on_console("ReadTimeout : retrying for url : ",url,"\n\n")
+                log.info("retrying for url : ")
+                log.info(url)
+                self.parse(url, obj, lev,agent,webocular_constants.REQUEST_URL_TIMEOUT/2)
+            else:
+                logger.print_on_console("Max retries exceeded for url : ",url,"\n\n")
+                obj['error'] = str(e)
+                obj['status'] = 400
+                self.nodedata[url] = obj
+                log.info("Max retries exceeded for url : ")
+                log.info(url)
         except Exception as e:
             obj['error'] = str(e)
             obj['status'] = 400
             self.nodedata[url] = obj
-            print e
-            print "error url" , url
+            log.error(e)
+            logger.print_on_console("Problem accessing url : ",url,"\n\n")
             #import traceback
             #traceback.format_exc()
             self.crawlStatus = False
