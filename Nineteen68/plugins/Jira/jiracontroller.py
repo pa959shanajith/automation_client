@@ -14,7 +14,6 @@ import os
 import logger
 import logging
 log = logging.getLogger("jiracontroller.py")
-
 class JiraWindow():
     jira = None
     def __init__(self,x=0):
@@ -26,7 +25,7 @@ class JiraWindow():
             jira = JIRA(options=jira_options,basic_auth=(jira_uname,jira_pwd))
             return jira
         except Exception as e:
-            print 'Failed to connect to JIRA'
+            logger.print_on_console("Failed to connect to JIRA")
 
     def createIssue(self,data,socket):
         """
@@ -52,13 +51,14 @@ class JiraWindow():
                 log.debug('Condition passed inside if not none check')
                 description = data['description']
                 label = data['label']
-                attachement_path = data['attachment']
+                attachement_path = str(data['attachment'])
                 check = None
                 if attachement_path != '':
                     log.debug('Condition passed inside if condition of attachment path')
                     if(attachement_path.startswith('\\')):
                         log.debug('attachment path obtained of server location')
-                        new_path = '\\'+attachement_path
+                        new_path = attachement_path
+                        new_path=new_path.strip()
                         check = os.path.exists(new_path)
                     else:
                         log.debug('attachment path of local machine')
@@ -75,7 +75,7 @@ class JiraWindow():
                         try:
                             file_obj = None
                             if(attachement_path.startswith('\\')):
-                                new_path = '\\'+attachement_path
+                                new_path = attachement_path
                                 file_obj=open(new_path,'rb')
                             else:
                                 file_obj=open(attachement_path,'rb')
@@ -125,7 +125,6 @@ class JiraWindow():
             socket.emit('auto_populate',data)
         except Exception as e:
             log.error(e)
-            print e
             if 'Invalid URL' in str(e):
                 socket.emit('auto_populate','Invalid Url')
             elif 'Unauthorized' in str(e):
