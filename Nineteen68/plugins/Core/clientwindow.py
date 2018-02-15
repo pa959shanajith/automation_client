@@ -41,6 +41,8 @@ configvalues = None
 IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images"
 CERTIFICATE_PATH = os.environ["NINETEEN68_HOME"] + "/Scripts/CA_BUNDLE"
 LOGCONFIG_PATH = os.environ["NINETEEN68_HOME"] + "/logging.conf"
+ice_ndac_key = 'ajkdfiHFEow#DjgLIqocn^8sjp2hfY&d'
+mac_verification_key = "N1i1N2e3T5e8E13n21SiXtY34eIgHt55"
 
 
 class MainNamespace(BaseNamespace):
@@ -70,7 +72,7 @@ class MainNamespace(BaseNamespace):
             try:
                 global icesession,plugins_list
                 core_utils_obj = core_utils.CoreUtils()
-                response = json.loads(core_utils_obj.unwrap(str(args[1])))
+                response = json.loads(core_utils_obj.unwrap(str(args[1]),ice_ndac_key))
                 plugins_list = response['plugins']
                 err_res = None
                 if(response['id'] != icesession['ice_id'] and response['connect_time'] != icesession['connect_time']):
@@ -436,10 +438,9 @@ class SocketThread(threading.Thread):
         icesession = {
             'ice_id':str(uuid.uuid4()),
             'connect_time':str(datetime.now()),
-            'username':username,
-            'system_mac':core_utils_obj.getMacAddress()
+            'username':username
         }
-        icesession_enc = core_utils_obj.wrap(json.dumps(icesession))
+        icesession_enc = core_utils_obj.wrap(json.dumps(icesession),ice_ndac_key)
         params={'username':username,'icesession':icesession_enc}
         socketIO = SocketIO(temp_server_IP,server_port,MainNamespace,verify=server_cert,cert=client_cert,params=params)
         socketIO.wait()
@@ -739,6 +740,7 @@ class ClientWindow(wx.Frame):
             self.clearbutton.Disable()
             self.connectbutton.Disable()
             self.rbox.Disable()
+        threading.Timer(0.2,self.verifyMACAddress).start()
 
     """
     Modifying Logger and Handlers Level dynamically without creating a new logger object
@@ -945,6 +947,27 @@ class ClientWindow(wx.Frame):
                     #call display logic
                     self.new = pause_display_operation.Display(parent = self,id = -1, title="SLK Nineteen68 - Display Variable",input = inputvalue)
 
+    def verifyMACAddress(self):
+        flag = False
+        core_utils_obj = core_utils.CoreUtils()
+        system_mac = core_utils_obj.getMacAddress()
+        try:
+            with open(CERTIFICATE_PATH+'\license.key', mode='r') as f:
+                key = "".join(f.readlines()[1:-1]).replace("\n","")
+                key = core_utils_obj.unwrap(key,mac_verification_key)
+                mac_addr = key[36:-36]
+                if ("," in mac_addr):
+                    mac_addr = mac_addr.split(",")
+                else:
+                    mac_addr = [mac_addr]
+                if(system_mac in mac_addr):
+                    flag = True
+        except:
+            pass
+        if not flag:
+            logger.print_on_console("Unauthorized: Access denied, system is not registered with Nineteen68")
+            self.connectbutton.Disable()
+        return flag
 
 class DebugWindow(wx.Frame):
     def __init__(self, parent,id, title):
