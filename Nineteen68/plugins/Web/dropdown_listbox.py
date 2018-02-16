@@ -1100,7 +1100,7 @@ class DropdownKeywords():
                                 value = value.strip()
                             selectedvalues.append(value)
                     output = selectedvalues
-                    logger.print_on_console(output)
+                    logger.print_on_console('Result obtained is: ',output)
                     status = webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
                     log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -1132,11 +1132,11 @@ class DropdownKeywords():
                                     value = value.strip()
                             temp.append(value)
                         output = ';'.join(temp)
-                        logger.print_on_console(output)
                         if len(temp) > 1:
                             output = temp
                         else:
                             output = value
+                        logger.print_on_console('Result obtained is: ',output)
                         status = webconstants.TEST_RESULT_PASS
                         result = webconstants.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)

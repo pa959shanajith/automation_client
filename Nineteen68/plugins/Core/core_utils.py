@@ -19,7 +19,6 @@ BS=16
 iv='0'*16
 ##key='Nineeteen68@ScrapeNineeteen68@Sc'
 scrape_key='Nineeteen68@SecureScrapeDataPath'
-ice_ndac_key = 'ajkdfiHFEow#DjgLIqocn^8sjp2hfY&d'
 
 class CoreUtils():
 
@@ -69,15 +68,14 @@ class CoreUtils():
         data=data.decode('utf-8')
         return data[0:-ord(data[-1])]
 
-    def unwrap(self,hex_data):
+    def unwrap(self,hex_data,key):
         data = ''.join(map(chr, bytearray.fromhex(hex_data)))
-        aes = AES.new(ice_ndac_key, AES.MODE_CBC, iv)
+        aes = AES.new(key, AES.MODE_CBC, iv)
         return self.unpad(aes.decrypt(data))
 
-    def wrap(self,data):
-        aes = AES.new(ice_ndac_key, AES.MODE_CBC, iv)
+    def wrap(self,data,key):
+        aes = AES.new(key, AES.MODE_CBC, iv)
         return aes.encrypt(self.pad(data)).encode('hex')
-
 
     def scrape_unwrap(self,hex_data):
         data = ''.join(map(chr, bytearray.fromhex(hex_data)))
@@ -95,12 +93,10 @@ class CoreUtils():
                 if line.lstrip().startswith('Physical Address'):
     ##                mac = line.split(':')[1].strip().replace('-',':')
                     mac = line.split(':')[1].strip()
-                    mac = mac+'    '
                     break
         else:
             for line in os.popen("/sbin/ifconfig"):
                 if line.find('Ether') > -1:
                     mac = line.split()[4]
-                    mac = mac+'    '
                     break
         return str(mac).strip()
