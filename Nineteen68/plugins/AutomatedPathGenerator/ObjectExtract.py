@@ -632,7 +632,7 @@ def classOrInterfaceExtraction(root):
 	global PresentClass, PresentClassName  # Used for MethodLinking
 	ClassOrInterfaceName = ASTNode[root]["value"][1]
 	Property = []  # AccessModifiers For Class(Eg:public)
-	access_modifier = ClassOrInterfaceName[ClassOrInterfaceName.find("("):ClassOrInterfaceName.find(")") + 1]
+	complete_class_name = ClassOrInterfaceName
 	while ClassOrInterfaceName.find("(") != -1:
 		Property.append(ClassOrInterfaceName[ClassOrInterfaceName.find(
 			"(") + 1:ClassOrInterfaceName.find(")")])
@@ -641,7 +641,7 @@ def classOrInterfaceExtraction(root):
 	# Last Property will either be class or interface
 	ClassOrInterface = Property.pop()
 	'''creating a Class Node'''
-	ClassOrInterfaceName = ClassOrInterfaceName + access_modifier
+	ClassOrInterfaceName = complete_class_name
 	PresentClassName = ClassOrInterfaceName
 	if ClassOrInterface == 'class':
 		if ASTNode[ASTNode[root]["parent"]]["NodesPosition"] != -1:
@@ -2325,6 +2325,7 @@ def main(ASTDict, Flow, Class, PosMeth):
 		Classes = Class
 		PosMethod = PosMeth
 		PossibleMethods = []
+		ClassVariables = {}
 		objectExtract(0)
 	except Exception as e:
 		log.error(e)

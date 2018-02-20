@@ -44,6 +44,7 @@ class AutomatedPathGenerator:
                     flag = self.open_file(filename, java_version, True)
                     data = [c for c in self.Classes if c not in prev_classes]
                     for d in data:
+                        d = self.modifyJSON(d)
                         self.socketIO.emit('flowgraph_result',json.dumps(d))
                 if(not flag):
                     break
@@ -67,6 +68,7 @@ class AutomatedPathGenerator:
                     flag = self.open_file(filename, java_version, True)
                     data = [c for c in self.Classes if c not in prev_classes]
                     for d in data:
+                        d = self.modifyJSON(d)
                         self.socketIO.emit('flowgraph_result',json.dumps(d))
                 if(not flag):
                     break
@@ -89,6 +91,7 @@ class AutomatedPathGenerator:
                     flag = self.open_file(filename, java_version, True)
                     data = [c for c in self.Classes if c not in prev_classes]
                     for d in data:
+                        d = self.modifyJSON(d)
                         self.socketIO.emit('flowgraph_result',json.dumps(d))
                 if(not flag):
                     break
@@ -129,8 +132,7 @@ class AutomatedPathGenerator:
                         root, self.FlowChart, self.Classes, self.PosMethod)
                     if(not folder_flag):
                         for cls in self.Classes:
-                            if(cls['name'] in self.ClassVariables.keys()):
-                                cls['classVariables'] = self.ClassVariables[cls['name']]
+                            cls = self.modifyJSON(cls)
                             self.socketIO.emit("flowgraph_result",json.dumps(cls))
                     flag = True
                     del root
@@ -141,6 +143,25 @@ class AutomatedPathGenerator:
             import traceback
             print(traceback.format_exc())
         return flag
+
+    def modifyJSON(self, cls):
+        try:
+            cls['abstract'] = False
+            cls['classVariables'] = []
+            if(cls['name'] in self.ClassVariables.keys()):
+                cls['classVariables'] = self.ClassVariables[cls['name']]
+            name = cls['name'].split('(',1)
+            cls['name'] = name[0]
+            if ('abstract' in name[1]):
+                cls['abstract'] = True
+            acc_mod = name[1].split(')',1)
+            if(acc_mod[0] == 'package private'):
+                cls['accessModifier'] = 'default'
+            else:
+                cls['accessModifier'] = acc_mod[0]
+        except Exception as e:
+            pass
+        return cls
 
     def checkformat(self, version, source):
         flag = True
@@ -199,7 +220,7 @@ class AutomatedPathGenerator:
 ##                Visualization.main(Filename, JsonString)
                 Filename = None
                 JsonString = None
-                data = {"classes":self.Classes, "result":"success"}
+                data = {"classes":self.Classes, "classVariables":self.ClassVariables, "result":"success"}
                 self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
                 logger.print_on_console("Graph generation completed")
 
