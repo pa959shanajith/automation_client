@@ -266,8 +266,9 @@ class RumbaKeywords:
             data = dataTransmitter("gettext", int(length), position)
             return_value = data["stat"]
             if return_value == 0:
-                log.error(MAINFRAME_TEXT_FOUND)
-                logger.print_on_console(MAINFRAME_TEXT_FOUND)
+                output = data["res"]
+                log.info("Output text = %s",output)
+                logger.print_on_console("Output text = "+output)
             else:
                 err_msg = "Error: "+data["emsg"]
                 log.error(err_msg)
