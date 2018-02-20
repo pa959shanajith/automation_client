@@ -810,6 +810,8 @@ class ClientWindow(wx.Frame):
         self.killScrapeWindow()
         self.Destroy()
         controller.kill_process()
+        if platform.system() == "Windows":
+            os.system("TASKKILL /F /IM nineteen68_rumba_api.exe")
         exit()
          # you may also do:  event.Skip()
          # since the default event handler does call Destroy(), too
