@@ -36,6 +36,8 @@ ContinuePos = []
 Ternary = False  # for arguments list ternary statement
 TernaryPos = []
 Label = {}
+ClassVariables = {}
+PresentClassName = None
 
 '''FlowChart Node (Shape,Text,Child Node Nos,Parent Node Nos)'''
 def addNodes(shape, text, parent, child):
@@ -47,10 +49,14 @@ def addNodes(shape, text, parent, child):
 
 
 '''Class Node (Name,FlowChart Node No,Methods,Constructors,Extend Name,Implements Name)'''
-def addClass(name, position):
+def addClass(name, position, flag):
 	'''Method key has a dictionary value for handling same method with different no. of arguments.'''
-	return {"name": name, "position": position, "methods": {},
-			"constructors": [], "extends": None, "implements": None}
+	if(flag):
+		return {"name": name, "position": position, "methods": {},
+				"constructors": [], "extends": None, "implements": None, "interface": False}
+	else:
+		return {"name": name, "position": position, "methods": {},
+				"constructors": [], "extends": None, "implements": None, "interface": True}
 
 
 '''Possible Method Node For Method Linking
@@ -623,9 +629,10 @@ def classOrInterfaceBodyDeclarationExtraction(root):
 
 '''ClassOrInterface (handles Class OR Interface)'''
 def classOrInterfaceExtraction(root):
-	global PresentClass  # Used for MethodLinking
+	global PresentClass, PresentClassName  # Used for MethodLinking
 	ClassOrInterfaceName = ASTNode[root]["value"][1]
 	Property = []  # AccessModifiers For Class(Eg:public)
+	access_modifier = ClassOrInterfaceName[ClassOrInterfaceName.find("("):ClassOrInterfaceName.find(")") + 1]
 	while ClassOrInterfaceName.find("(") != -1:
 		Property.append(ClassOrInterfaceName[ClassOrInterfaceName.find(
 			"(") + 1:ClassOrInterfaceName.find(")")])
@@ -634,6 +641,8 @@ def classOrInterfaceExtraction(root):
 	# Last Property will either be class or interface
 	ClassOrInterface = Property.pop()
 	'''creating a Class Node'''
+	ClassOrInterfaceName = ClassOrInterfaceName + access_modifier
+	PresentClassName = ClassOrInterfaceName
 	if ClassOrInterface == 'class':
 		if ASTNode[ASTNode[root]["parent"]]["NodesPosition"] != -1:
 			New_Nodes = addNodes("Box",
@@ -652,10 +661,15 @@ def classOrInterfaceExtraction(root):
 			addClass(
 				ClassOrInterfaceName,
 				len(FlowChart) -
-				1))  # adding it to Classes
+				1,True))  # adding it to Classes
 		PresentClass = len(Classes) - 1  # updating Present Class
 	else:
 		'''creating an Interface Node'''
+		Classes.append(
+			addClass(
+				ClassOrInterfaceName,
+				len(FlowChart) -
+				1,False))
 		if ASTNode[ASTNode[root]["parent"]]["NodesPosition"] != -1:
 			New_Nodes = addNodes("Box",
 								 "Interface:" + ClassOrInterfaceName,
@@ -1623,7 +1637,7 @@ def extendsListExtraction(root):
 
 '''FieldDeclaration (handles Class Variable)'''
 def fieldExtraction(root):
-	global AnonymousInnerClass, s
+	global AnonymousInnerClass, s, PresentClassName, ClassVariables
 	Prop = ASTNode[root]["value"][1]  # AccessModifiers
 	Property = []
 	Possibility = 0
@@ -1644,6 +1658,10 @@ def fieldExtraction(root):
 					name, list):  # Ternary Condition will be handled here
 				Vname = name.pop()  # Variable Name
 				# Variable Type and Name stored in VarStorage
+				if(ClassVariables.has_key(PresentClassName)):
+					ClassVariables[PresentClassName].append(str(LocalVariableName + " " + Vname))
+				else:
+					ClassVariables[PresentClassName] = [str(LocalVariableName + " " + Vname)]
 				VarStorage.update({Vname: LocalVariableName})
 				# print len(name)
 				LocalVariableName = LocalVariableName + " " + Vname
@@ -1696,9 +1714,17 @@ def fieldExtraction(root):
 				return [len(FlowChart) - 2, len(FlowChart) - 1]
 			else:
 				if name.rfind("=") != -1:  # Variable initializer id is present
+					if(ClassVariables.has_key(PresentClassName)):
+						ClassVariables[PresentClassName].append(str(LocalVariableName + " " + name[:name.rfind("=")]))
+					else:
+						ClassVariables[PresentClassName] = [str(LocalVariableName + " " + name[:name.rfind("=")])]
 					VarStorage.update(
 						{name[:name.rfind("=")]: LocalVariableName})
 				else:
+					if(ClassVariables.has_key(PresentClassName)):
+						ClassVariables[PresentClassName].append(str(LocalVariableName + " " + name))
+					else:
+						ClassVariables[PresentClassName] = [str(LocalVariableName + " " + name)]
 					VarStorage.update({name: LocalVariableName})
 				LocalVariableName = LocalVariableName + " " + name
 				if isinstance(ASTNode[ASTNode[root]["parent"]]
@@ -2292,15 +2318,17 @@ def localVariableExtraction(root):
 
 
 def main(ASTDict, Flow, Class, PosMeth):
-	global ASTNode, FlowChart, Classes, PosMethod, PossibleMethods
-	ASTNode = ASTDict
-	FlowChart = Flow
-	Classes = Class
-	PosMethod = PosMeth
-	PossibleMethods = []
-	objectExtract(0)
-
-	return FlowChart, Classes, PossibleMethods
+	try:
+		global ASTNode, FlowChart, Classes, PosMethod, PossibleMethods, ClassVariables
+		ASTNode = ASTDict
+		FlowChart = Flow
+		Classes = Class
+		PosMethod = PosMeth
+		PossibleMethods = []
+		objectExtract(0)
+	except Exception as e:
+		log.error(e)
+	return FlowChart, Classes, PossibleMethods, ClassVariables
 
 
 def memberSelectorExtraction(root):

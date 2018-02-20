@@ -411,8 +411,8 @@ class MainNamespace(BaseNamespace):
         try:
             con = controller.Controller()
             con.get_all_the_imports('AutomatedPathGenerator')
-            import flowgraph
-            fg = flowgraph.Flowgraph()
+            import apg
+            fg = apg.AutomatedPathGenerator()
             args=list(args)
             global socketIO
             #args[0] is version, args[1] is filepath

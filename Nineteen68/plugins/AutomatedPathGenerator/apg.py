@@ -5,15 +5,12 @@ import zipfile
 import tarfile
 import dataStruct
 import ObjectExtract
-#import OE
 import CheckPossibleMethods
-#import Visualization
 import logger
 import shutil
 import json
-import controller
 
-class Flowgraph:
+class AutomatedPathGenerator:
     def __init__(self):
         self.FlowChart = [] #List of all the FlowChart Nodes
         self.PosMethod = [] #List of all the PossibleMethods
@@ -21,6 +18,7 @@ class Flowgraph:
         self.PossibleMethods = []
         self.filenames = set()
         self.socketIO = None
+        self.ClassVariables= {}
 
     '''function to open zip file'''
     def open_zip(self, zip_file, java_version):
@@ -127,10 +125,12 @@ class Flowgraph:
                 root = dataStruct.start()
                 if root:
                     # ObjectExtract.main will generate the FlowChart Nodes, give the Classes and all Possible Methods
-                    self.FlowChart, self.Classes, self.PosMethod = ObjectExtract.main(
+                    self.FlowChart, self.Classes, self.PosMethod, self.ClassVariables = ObjectExtract.main(
                         root, self.FlowChart, self.Classes, self.PosMethod)
                     if(not folder_flag):
                         for cls in self.Classes:
+                            if(cls['name'] in self.ClassVariables.keys()):
+                                cls['classVariables'] = self.ClassVariables[cls['name']]
                             self.socketIO.emit("flowgraph_result",json.dumps(cls))
                     flag = True
                     del root
@@ -168,7 +168,7 @@ class Flowgraph:
 ##            sys.stdout = s
 ##            sys.path = p
             self.socketIO=socketIO
-            logger.print_on_console("Flowgraph generation in progress...")
+            logger.print_on_console("Graph generation in progress...")
             logger.print_on_console("File name:")
             logger.print_on_console("=============")
             '''This is to check the input is a zip/tar/java file or a folder.'''
@@ -201,12 +201,12 @@ class Flowgraph:
                 JsonString = None
                 data = {"classes":self.Classes, "result":"success"}
                 self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
-                logger.print_on_console("Flowgraph generation completed")
+                logger.print_on_console("Graph generation completed")
 
             else:
                 data = {"result":"fail"}
                 self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
-                logger.print_on_console("Flowgraph generation failed")
+                logger.print_on_console("Graph generation failed")
 ##            s = sys.stdout
 ##            p = sys.path
 ##            reload(sys)
