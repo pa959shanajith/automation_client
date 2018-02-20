@@ -46,7 +46,6 @@ class QcWindow():
                     global loginflag
                     loginflag=False
                     global TD
-                    print(user_name,pass_word,Qc_Url)
                     TD = win32com.client.Dispatch("TDApiOle80.TDConnection")
                     print("Connection Build - ",TD)
                     global urlflag
@@ -79,12 +78,12 @@ class QcWindow():
                 if status!=None:
                     self.emit_data()
                 else:
-                    con.send("Fail"+"\n")
+                    con.send("Fail#E&D@Q!C#")
             else:
                 pass
         except Exception as e:
             print 'Error in Qc actions...'
-            con.send('Error in qc')
+            con.send('Fail#E&D@Q!C#')
             sent=1
            # logger.print_on_console('Something went wrong - Lost Connection with QC')
 
@@ -137,8 +136,7 @@ class QcWindow():
                     print('Please select valid domain')
         except Exception as eproject:
             print('Error in fetching projects')
-            import traceback
-            traceback.print_exc()
+            #print eproject
 ##            logger.print_on_console('Something went wrong - Lost Connection with QC')
             dictFolderJson=None
         return dictFolderJson
@@ -220,8 +218,7 @@ class QcWindow():
             dictFolderJson = json.dumps(OverallList)
             dictFolderJson=json.loads(dictFolderJson)
         except Exception as e:
-            import traceback
-            traceback.print_exc()
+            print e
             #logger.print_on_console('Something went wrong - Unable to fetch the TestSet(s)')
             dictFolderJson=None
         finally:
@@ -231,7 +228,6 @@ class QcWindow():
 
     def test_case_generator(self,filePath):
         try:
-            print 'Inside ....'
             test_case_dict={}
             key="testcase"
 ##            print filePath
@@ -249,7 +245,6 @@ class QcWindow():
                 if str(test_case_ind.name)==str(test_set_name):
 ##                   print i
                    abc=listTC[i].tsTestFactory
-                   print abc
                    qc_ts=abc.NewList("")
                    for tsname in qc_ts:
 ##                       print tsname.name
@@ -263,8 +258,7 @@ class QcWindow():
             dictFolderJson=json.loads(dictFolderJson)
         except Exception as e:
             #logger.print_on_console('Something went wrong - Unable to fetch the TestCase(s)')
-            import traceback
-            traceback.print_exc()
+            print e
             dictFolderJson=None
         return dictFolderJson
 
@@ -306,8 +300,6 @@ class QcWindow():
                 for tsTest in tsTestList:
                     #Iterate the Test list
                     #logger.log('Iterate the Test list')
-                    print tsTest.Name
-                    print testrunname
                     if tsTest.Name == testrunname:
                         #logger.log('Test runname matched')
                         RunFactory = tsTest.RunFactory
@@ -367,15 +359,13 @@ class QcWindow():
             return True
         except Exception as e:
             print 'Erro in Quit_qc'
-            con.send("Fail"+"\n")
+            con.send("Fail#E&D@Q!C#")
 
     def emit_data(self):
 ##        print d,' in emit data'
         global dictFolderJson,sent
         data_to_send = json.dumps(dictFolderJson).encode('utf-8')
-        print data_to_send
         data_to_send+='#E&D@Q!C#'
-        print data_to_send
         sent=1
         con.send(data_to_send)
         # 10 is the limit of MB set as per Nineteen68 standards
@@ -411,14 +401,12 @@ if __name__ == '__main__':
                     qc_ref = QcWindow(data_to_use)
                     client_data=''
                     if(sent!=1):
-                        con.send("Fail"+"\n")
+                        con.send("Fail#E&D@Q!C#")
                     else:
                         sent=0
             except Exception as e:
-                import traceback
-                traceback.print_exc()
                 print 'Error in data receiving'
-                con.send("Fail"+"\n")
+                con.send("Fail#E&D@Q!C#")
                 break
     except Exception as e:
         print 'Error in running Qc'

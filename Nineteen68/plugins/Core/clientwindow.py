@@ -227,29 +227,32 @@ class MainNamespace(BaseNamespace):
         data_stream=None
         client_data=None
         try:
-            if len(args) > 0:
-                qcdata = args[0]
-                if soc is None:
-                    import subprocess
-                    path = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Qc/QcController.exe"
-                    pid = subprocess.Popen(path, shell=True)
-                    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    soc.connect(("localhost",10000))
+            if platform.system() == "Windows":
+                if len(args) > 0:
+                    qcdata = args[0]
+                    if soc is None:
+                        import subprocess
+                        path = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Qc/QcController.exe"
+                        pid = subprocess.Popen(path, shell=True)
+                        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        soc.connect(("localhost",10000))
 
-                data_to_send = json.dumps(qcdata).encode('utf-8')
-                data_to_send+='#E&D@Q!C#'
-                soc.send(data_to_send)
-                while True:
-                    data_stream= soc.recv(1024)
-                    server_data+=data_stream
-                    if '#E&D@Q!C#' in server_data:
-                        break
-                client_data= server_data[:server_data.find('#E&D@Q!C#')]
-                if('Error in qc' in client_data):
-                    logger.print_on_console('Error occurred in QC')
-                socketIO.emit('qcresponse',client_data)
+                    data_to_send = json.dumps(qcdata).encode('utf-8')
+                    data_to_send+='#E&D@Q!C#'
+                    soc.send(data_to_send)
+                    while True:
+                        data_stream= soc.recv(1024)
+                        server_data+=data_stream
+                        if '#E&D@Q!C#' in server_data:
+                            break
+                    client_data= server_data[:server_data.find('#E&D@Q!C#')]
+                    if('Fail' in client_data):
+                        logger.print_on_console('Error occurred in QC')
+                    socketIO.emit('qcresponse',client_data)
+                else:
+                    socketIO.emit('qcresponse','Error:data recevied empty')
             else:
-                socketIO.emit('qcresponse','Error:data recevied empty')
+                 socketIO.emit('qcresponse','Error:Failed in running Qc')
         except Exception as e:
             log.error(e)
             socketIO.emit('qcresponse','Error:Qc Operations')
@@ -810,6 +813,8 @@ class ClientWindow(wx.Frame):
         self.killScrapeWindow()
         self.Destroy()
         controller.kill_process()
+        if platform.system() == "Windows":
+            os.system("TASKKILL /F /IM QcController.exe")
         exit()
          # you may also do:  event.Skip()
          # since the default event handler does call Destroy(), too

@@ -46,6 +46,7 @@ class JiraWindow():
             summary = data['summary']
             issue_type = data['issuetype']
             priority = data['priority']
+            parentid=data['parentissue']
             flag = False
             if all(check1 is not None for check1 in [project_id, summary, issue_type, priority]):
                 log.debug('Condition passed inside if not none check')
@@ -69,6 +70,8 @@ class JiraWindow():
                     flag = True
                 if(flag):
                     issue_dict = {'project': {'id': project_id},'summary': summary,'description': description,'issuetype': {'name': issue_type},'priority':{'name' : priority},'labels':label}
+                    if(issue_type=='Sub-task'):
+                        issue_dict['parent']={'id':parentid}
                     create_issues = jira.create_issue(issue_dict)
                     issue_id = create_issues.id
                     if attachement_path != '' and check == True:
