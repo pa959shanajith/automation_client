@@ -2328,7 +2328,7 @@ def main(ASTDict, Flow, Class, PosMeth):
 		ClassVariables = {}
 		objectExtract(0)
 	except Exception as e:
-		log.error(e)
+		pass
 	return FlowChart, Classes, PossibleMethods, ClassVariables
 
 
@@ -2814,7 +2814,7 @@ def primaryExpressionExtraction(root):
 						else:
 							k = ArgumentName.find(',', k) + 1
 					if ArgumentName.find(',', k) == -1:
-						if ArgumentName[:ArgumentName.find(',', k) + 1] == '':
+						if (ArgumentName[:ArgumentName.find(',', k) + 1] == '') and len(ArgumentName)!=1:
 							ArgumentName = ArgumentName[1:]
 					if ArgumentName in VarStorage:
 						PossibleMethods[len(
@@ -2836,7 +2836,7 @@ def primaryExpressionExtraction(root):
 						NoOfArguments = NoOfArguments + 1
 					PossibleMethods[len(PossibleMethods) -
 									1]["NoOfArguments"] = NoOfArguments
-
+					PossibleMethods[len(PossibleMethods) - 1]["PresentClass"] = PresentClassName
 				Possibility = Possibility + 1
 	return Possibility, Variable
 

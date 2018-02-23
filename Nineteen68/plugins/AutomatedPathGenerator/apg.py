@@ -9,6 +9,9 @@ import CheckPossibleMethods
 import logger
 import shutil
 import json
+import controller
+import logging
+log = logging.getLogger('apg.py')
 
 class AutomatedPathGenerator:
     def __init__(self):
@@ -19,6 +22,7 @@ class AutomatedPathGenerator:
         self.filenames = set()
         self.socketIO = None
         self.ClassVariables= {}
+        self.counter = 0
 
     '''function to open zip file'''
     def open_zip(self, zip_file, java_version):
@@ -30,7 +34,8 @@ class AutomatedPathGenerator:
         except Exception as e:
             pass
         zf = zipfile.ZipFile(zip_file, 'r')
-        flag = True
+        error_flag = True
+        term_flag = True
         try:
             lst = zf.infolist()
             for zi in lst:
@@ -38,62 +43,76 @@ class AutomatedPathGenerator:
                 fn = zi.filename
                 filename = zf.extract(fn)
                 if os.path.isdir(filename):
-                    flag = self.open_folder(filename, java_version)
+                    error_flag = self.open_folder(filename, java_version)
                 elif (os.path.isfile(filename) and filename.endswith('.java')):
                     prev_classes.extend(self.Classes)
-                    flag = self.open_file(filename, java_version, True)
+                    error_flag = self.open_file(filename, java_version, True)
                     data = [c for c in self.Classes if c not in prev_classes]
                     for d in data:
-                        d = self.modifyJSON(d)
-                        self.socketIO.emit('flowgraph_result',json.dumps(d))
-                if(not flag):
+                        if(not controller.terminate_flag):
+                            d = self.modifyJSON(d,filename)
+                            self.socketIO.emit('flowgraph_result',json.dumps(d))
+                        else:
+                            term_flag = False
+                            break
+                if((not error_flag) or (not term_flag)):
                     break
         finally:
             zf.close()
-        return flag
+        return error_flag
 
     '''function to open tar file'''
     def open_tar(self, tar_file, java_version):
         tf = tarfile.TarFile(tar_file, 'r')
-        flag = True
+        error_flag = True
+        term_flag = True
         try:
             lst = tf.getnames()
             for zi in lst:
                 prev_classes = []
                 filename = tf.extract(zi, path="")
                 if os.path.isdir(filename):
-                    flag = self.open_folder(filename, java_version)
+                    error_flag = self.open_folder(filename, java_version)
                 elif (os.path.isfile(filename) and filename.endswith('.java')):
                     prev_classes.extend(self.Classes)
-                    flag = self.open_file(filename, java_version, True)
+                    error_flag = self.open_file(filename, java_version, True)
                     data = [c for c in self.Classes if c not in prev_classes]
                     for d in data:
-                        d = self.modifyJSON(d)
-                        self.socketIO.emit('flowgraph_result',json.dumps(d))
-                if(not flag):
+                        if(not controller.terminate_flag):
+                            d = self.modifyJSON(d,filename)
+                            self.socketIO.emit('flowgraph_result',json.dumps(d))
+                        else:
+                            term_flag = False
+                            break
+                if((not error_flag) or (not term_flag)):
                     break
         finally:
             tf.close()
-        return flag
+        return error_flag
 
     '''function to open folder'''
     def open_folder(self, folder, java_version):
-        flag = True
+        error_flag = True
+        term_flag = True
         try:
             lst = os.listdir(folder)
             for filename in lst:
                 prev_classes = []
-                filename = folder + "/" + filename
+                filename = folder + "\\" + filename
                 if os.path.isdir(filename):
-                    flag = self.open_folder(filename, java_version)
+                    error_flag = self.open_folder(filename, java_version)
                 elif (os.path.isfile(filename) and filename.endswith('.java')):
                     prev_classes.extend(self.Classes)
-                    flag = self.open_file(filename, java_version, True)
+                    error_flag = self.open_file(filename, java_version, True)
                     data = [c for c in self.Classes if c not in prev_classes]
                     for d in data:
-                        d = self.modifyJSON(d)
-                        self.socketIO.emit('flowgraph_result',json.dumps(d))
-                if(not flag):
+                        if(not controller.terminate_flag):
+                            d = self.modifyJSON(d,filename)
+                            self.socketIO.emit('flowgraph_result',json.dumps(d))
+                        else:
+                            term_flag = False
+                            break
+                if((not error_flag) or (not term_flag)):
                     break
         except Exception as e:
             pass
@@ -132,20 +151,32 @@ class AutomatedPathGenerator:
                         root, self.FlowChart, self.Classes, self.PosMethod)
                     if(not folder_flag):
                         for cls in self.Classes:
-                            cls = self.modifyJSON(cls)
-                            self.socketIO.emit("flowgraph_result",json.dumps(cls))
+                            if(not controller.terminate_flag):
+                                d = self.modifyJSON(cls,filename)
+                                self.socketIO.emit('flowgraph_result',json.dumps(d))
+                            else:
+                                break
                     flag = True
-                    del root
                 else:
                     print("Java file %s has Errors!!!" % (filename))
         except Exception as e:
-            print "open file",e
-            import traceback
-            print(traceback.format_exc())
+            log.error(e)
+            logger.print_on_console("Error occured in open file")
         return flag
 
-    def modifyJSON(self, cls):
+    def modifyJSON(self, cls, filename):
         try:
+            output = []
+            for keys in cls['methods']:
+                method = cls['methods'][keys][0]['MethodName']+'('+cls['methods'][keys][0]['Variables']+'): '+cls['methods'][keys][0]['ResultType']
+                if cls['methods'][keys][0]['MethodType'][0] == 'package private':
+                    output.append('~'+method)
+                elif cls['methods'][keys][0]['MethodType'][0] == 'private':
+                    output.append('-'+method)
+                elif cls['methods'][keys][0]['MethodType'][0] == 'protected':
+                    output.append('#'+method)
+                elif cls['methods'][keys][0]['MethodType'][0] == 'public':
+                    output.append('+'+method)
             cls['abstract'] = False
             cls['classVariables'] = []
             if(cls['name'] in self.ClassVariables.keys()):
@@ -159,6 +190,10 @@ class AutomatedPathGenerator:
                 cls['accessModifier'] = 'default'
             else:
                 cls['accessModifier'] = acc_mod[0]
+            cls['classMethods'] = output
+            cls['id'] = self.counter
+            self.counter = self.counter + 1
+            cls['file'] = filename
         except Exception as e:
             pass
         return cls
@@ -175,19 +210,11 @@ class AutomatedPathGenerator:
             else:
                 flag = self.open_folder(source, version)
         except Exception as e:
-            import traceback
-            traceback.print_exc()
+            pass
         return flag
 
     def generate_flowgraph(self, version, source, socketIO, *args):
         try:
-##            s = sys.stdout
-##            p = sys.path
-##            reload(sys)
-##            sys.setdefaultencoding('Cp1252')
-##            sys.setrecursionlimit(15000)
-##            sys.stdout = s
-##            sys.path = p
             self.socketIO=socketIO
             logger.print_on_console("Graph generation in progress...")
             logger.print_on_console("File name:")
@@ -198,44 +225,37 @@ class AutomatedPathGenerator:
                 '''After check format, the flow chart would be made completely. So now, we'll check the possible method linking.'''
                 self.PossibleMethods = CheckPossibleMethods.main(
                     self.PosMethod, self.Classes)
+                jsonString = []
+                c_source=None
+                c_target=None
+                for method in self.PossibleMethods:
+                    if(method["ParentNodeNo"] != None):
+                        m = method["PosMethod"].split('(')[0]
+                        for cls in self.Classes:
+                            if (m in cls["methods"].keys()):
+                                print "target",cls["name"]
+                                c_target = cls["name"]
+                                break
+                        if(isinstance(method["Class"],str)):
+                            print "source",method["Class"]
+                            c_source = method["PresentClass"].split("(")[0]
+                        else:
+                            c_source = self.Classes[method["Class"]]["name"]
+                        if(c_source != c_target):
+                            jsonString.append({"source":c_source,"target":c_target})
 
-                JsonString = '{"MethodLink":['
-                for i in range(0, len(self.PossibleMethods)):
-                    if (self.PossibleMethods[i]["ParentNodeNo"]) is not None:
-                        JsonString = JsonString + '{"NodeNo":"' + str(self.PossibleMethods[i]["NodeNo"]) + '","ParentNodeNo":"' + str(
-                            self.PossibleMethods[i]["ParentNodeNo"]) + '","PosMethod":"' + self.PossibleMethods[i]["PosMethod"] + '"},'
-                if JsonString[len(JsonString) - 1] == ',':
-                    JsonString = JsonString[0:len(JsonString) - 1] + ']}'
-                else:
-                    JsonString = JsonString + ']}'
-
-                data = {"classes":self.Classes,"method":self.PosMethod}
-                with open("flowgraphdata.json", 'w') as outfile:
-                    json.dump(data, outfile, indent=4, sort_keys=False)
-
-##                '''OE.main will generate FlowChart.svg'''
-##                Filename = OE.main(self.FlowChart)
-##                '''Visualization.main will generate index.html, link it with js file and open it in the default browser.'''
-##                logger.print_on_console("Visualizing graph...")
-##                Visualization.main(Filename, JsonString)
-                Filename = None
-                JsonString = None
-                data = {"classes":self.Classes, "classVariables":self.ClassVariables, "result":"success"}
+                data = {"classes":self.Classes, "links":jsonString, "result":"success"}
                 self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
-                logger.print_on_console("Graph generation completed")
-
+                if(not controller.terminate_flag):
+                    logger.print_on_console("Graph generation completed")
+                else:
+                    logger.print_on_console("---------Termination Completed-------")
+                controller.terminate_flag = False
             else:
                 data = {"result":"fail"}
                 self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
                 logger.print_on_console("Graph generation failed")
-##            s = sys.stdout
-##            p = sys.path
-##            reload(sys)
-##            sys.setdefaultencoding('ascii')
-##            sys.stdout = s
-##            sys.path = p
 
         except Exception as e:
-            print "generate flowgraph",e
-            import traceback
-            print (traceback.format_exc())
+            log.error(e)
+            logger.print_on_console("Error occured while generate graph.")
