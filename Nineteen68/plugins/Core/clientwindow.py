@@ -41,8 +41,6 @@ configvalues = None
 IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images"
 CERTIFICATE_PATH = os.environ["NINETEEN68_HOME"] + "/Scripts/CA_BUNDLE"
 LOGCONFIG_PATH = os.environ["NINETEEN68_HOME"] + "/logging.conf"
-ice_ndac_key = 'ajkdfiHFEow#DjgLIqocn^8sjp2hfY&d'
-mac_verification_key = "N1i1N2e3T5e8E13n21SiXtY34eIgHt55"
 
 
 class MainNamespace(BaseNamespace):
@@ -71,8 +69,10 @@ class MainNamespace(BaseNamespace):
         elif(str(args[0]) == 'checkConnection'):
             try:
                 global icesession,plugins_list
+                ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+                    'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
                 core_utils_obj = core_utils.CoreUtils()
-                response = json.loads(core_utils_obj.unwrap(str(args[1]),ice_ndac_key))
+                response = json.loads(core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
                 plugins_list = response['plugins']
                 err_res = None
                 if(response['id'] != icesession['ice_id'] and response['connect_time'] != icesession['connect_time']):
@@ -429,8 +429,11 @@ class SocketThread(threading.Thread):
         server_port = int(configvalues['server_port'])
         server_IP = configvalues['server_ip']
         server_cert = configvalues['server_cert']
-        if os.path.exists(server_cert) == False:
-            server_cert = CERTIFICATE_PATH +'/server.crt'
+        if configvalues.has_key("ignore_server_certificate"):
+            server_cert = False
+        else:
+            if os.path.exists(server_cert) == False:
+                server_cert = CERTIFICATE_PATH +'/server.crt'
         client_cert = (CERTIFICATE_PATH + '/client.crt', CERTIFICATE_PATH + '/client.key')
         temp_server_IP = 'https://' + server_IP
         key='USERNAME'
@@ -443,11 +446,12 @@ class SocketThread(threading.Thread):
             'connect_time':str(datetime.now()),
             'username':username
         }
-        icesession_enc = core_utils_obj.wrap(json.dumps(icesession),ice_ndac_key)
+        ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+            'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
+        icesession_enc = core_utils_obj.wrap(json.dumps(icesession), ice_ndac_key)
         params={'username':username,'icesession':icesession_enc}
         socketIO = SocketIO(temp_server_IP,server_port,MainNamespace,verify=server_cert,cert=client_cert,params=params)
         socketIO.wait()
-
 
 
 class Parallel(threading.Thread):
@@ -956,10 +960,11 @@ class ClientWindow(wx.Frame):
         flag = False
         core_utils_obj = core_utils.CoreUtils()
         system_mac = core_utils_obj.getMacAddress()
+        mac_verification_key = "".join(['N','1','i','1','N','2','e','3','T','5','e','8','E','1','3','n','2','1','S','i','X','t','Y','3','4','e','I','g','H','t','5','5'])
         try:
             with open(CERTIFICATE_PATH+'\license.key', mode='r') as f:
                 key = "".join(f.readlines()[1:-1]).replace("\n","")
-                key = core_utils_obj.unwrap(key,mac_verification_key)
+                key = core_utils_obj.unwrap(key, mac_verification_key)
                 mac_addr = key[36:-36]
                 if ("," in mac_addr):
                     mac_addr = mac_addr.split(",")
