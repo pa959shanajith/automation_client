@@ -433,6 +433,7 @@ class Shell_Keywords():
                                     count = count - 1
                             except:
                                 pass
+                            self.expandTree(elem,node)
                         else:
                             child_nodes = elem.GetSubNodesCol(node)
                             if(count>len(child_nodes)):
@@ -447,6 +448,7 @@ class Shell_Keywords():
                                     j = j + 1
                             except Exception as e:
                                 pass
+                            self.expandTree(elem,node)
                     if(flag):
                         value = elem.GetNodeTextByKey(node)
                         status = sap_constants.TEST_RESULT_PASS
@@ -464,6 +466,7 @@ class Shell_Keywords():
             err_msg = sap_constants.ERROR_MSG
             log.error(e)
             logger.print_on_console('Error occured in GetNodeNameByIndex')
+        self.colapseTree(elem)
         return status,result,value,err_msg
 
 
