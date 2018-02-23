@@ -15,11 +15,15 @@ import logger
 import time
 from saputil_operations import SapUtilKeywords
 from sap_launch_keywords import Launch_Keywords
+import logging
+global nodeList
+log = logging.getLogger("sap_shell_keywords.py")
 
 class Shell_Keywords():
     def __init__(self):
         self.uk = SapUtilKeywords()
         self.lk =Launch_Keywords()
+        self.nodeList=[]
 
     def get_rowCount(self, sap_id,*args):
         self.lk.setWindowToForeground(sap_id)
@@ -370,6 +374,7 @@ class Shell_Keywords():
                                     node = elem.GetNextNodeKey(node)
                             except:
                                 pass
+                            self.expandTree(elem,node)
                         else:
                             child_nodes = elem.GetSubNodesCol(node)
                             j = 0
@@ -380,6 +385,7 @@ class Shell_Keywords():
                                     j = j + 1
                             except:
                                 pass
+                            self.expandTree(elem,node)
                     if(elem.GetNodeTextByKey(node) == input_val[len(input_val)-1]):
                         elem.DoubleClickNode(node)
                         status = sap_constants.TEST_RESULT_PASS
@@ -397,6 +403,7 @@ class Shell_Keywords():
             err_msg = sap_constants.ERROR_MSG
             log.error(e)
             logger.print_on_console('Error occured in SelectTreeNode')
+        self.colapseTree(elem)
         return status,result,value,err_msg
 
     def getNodeNameByIndex(self,sap_id,input_val,*args):
@@ -470,3 +477,21 @@ class Shell_Keywords():
             except:
                 break
         return c
+
+    def expandTree(self,tree,node):
+        if tree.IsFolder(node)==True:
+            if tree.IsFolderExpandable(node)==True:
+                if tree.IsFolderExpanded(node)!=True:
+                    try:
+                        tree.ExpandNode(node)
+                        self.nodeList.append(node)
+                    except:
+                        pass
+
+    def colapseTree(self,tree):
+        try:
+            for i in self.nodeList:
+                tree.CollapseNode(i)
+        except:
+            import traceback
+            traceback.print_exc()
