@@ -552,10 +552,10 @@ class StepDescription:
             return ' Double click on the '+ "'" +tsp.custname+ "'" +'.'
         def mousehover():
             return ' Move mouse pointer to ' + "'" + tsp.custname + "'"+'.'
-        def gettooltiptext():
-            return 'Get the tool tip from the '+ "'" + tsp.custname + "'"+ ' and save the tool tip text ' +"'"+output+"'"+ ' in ' +"'"+tsp.outputval+"'"
-        def verifytooltiptext():
-            return 'Verify ' +"'"+ input +"'"+ ' is the tooltip of  '+ "'" + tsp.custname + "'"
+        ##        def GetToolTipText():
+        ##            return 'Get the tool tip  of '+ "'" +tsp.custname+ "'" +'.'
+        ##        def VerifyToolTipText():
+        ##            return 'Verify ' + input + ' is the tooltip of  '+ "'" + tsp.custname + "'"
         def setfocus():
             return ' Set the focus on '+ "'" + tsp.custname + "'"+'.'
 
