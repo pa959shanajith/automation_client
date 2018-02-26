@@ -304,6 +304,8 @@ ELLAPSED_TIME='EllapsedTime'
 
 STEP='Step '
 
+REMARKS='Remark'
+
 KEYWORD='Keyword'
 
 TEST_SCRIPT_NAME='TestCase Name'
