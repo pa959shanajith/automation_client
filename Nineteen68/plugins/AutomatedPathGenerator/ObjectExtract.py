@@ -2326,6 +2326,7 @@ def main(ASTDict, Flow, Class, PosMeth):
 		PosMethod = PosMeth
 		PossibleMethods = []
 		ClassVariables = {}
+		PresentClassName = ''
 		objectExtract(0)
 	except Exception as e:
 		pass
@@ -2836,7 +2837,7 @@ def primaryExpressionExtraction(root):
 						NoOfArguments = NoOfArguments + 1
 					PossibleMethods[len(PossibleMethods) -
 									1]["NoOfArguments"] = NoOfArguments
-					PossibleMethods[len(PossibleMethods) - 1]["PresentClass"] = PresentClassName
+				PossibleMethods[len(PossibleMethods) - 1]["PresentClass"] = PresentClassName
 				Possibility = Possibility + 1
 	return Possibility, Variable
 
