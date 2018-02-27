@@ -459,7 +459,7 @@ class Handler():
 
 
 
-    def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,extract_path=None):
+    def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,extract_path=None):
         """
         def : create_step
         purpose : creates an object of each step
@@ -524,7 +524,7 @@ class Handler():
                             objectname = left_part+';'+xpath_string[1]+';'+right_part
                     except Exception as e:
                         log.error(e)
-                tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i)
+                tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark)
         except Exception as e:
             logger.print_on_console(e)
             log.error(e)
@@ -546,6 +546,9 @@ class Handler():
         stepnum=step['stepNo']
         url=step['url']
         custname=step['custname']
+        remark=''
+        if 'remarks' in step:
+            remark=step['remarks']
         additionalinfo = ''
         outputArray=outputval.split(';')
         #check if the step is commented before adding to the tsplist
@@ -553,9 +556,9 @@ class Handler():
             global tspIndex2
             tspIndex2+=1
             if(extract_path== None):
-                return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i)
+                return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark)
             else:
-                return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,extract_path)
+                return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,extract_path)
         return None
 
 

@@ -41,8 +41,6 @@ configvalues = None
 IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images"
 CERTIFICATE_PATH = os.environ["NINETEEN68_HOME"] + "/Scripts/CA_BUNDLE"
 LOGCONFIG_PATH = os.environ["NINETEEN68_HOME"] + "/logging.conf"
-ice_ndac_key = 'ajkdfiHFEow#DjgLIqocn^8sjp2hfY&d'
-mac_verification_key = "N1i1N2e3T5e8E13n21SiXtY34eIgHt55"
 
 
 class MainNamespace(BaseNamespace):
@@ -71,8 +69,10 @@ class MainNamespace(BaseNamespace):
         elif(str(args[0]) == 'checkConnection'):
             try:
                 global icesession,plugins_list
+                ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+                    'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
                 core_utils_obj = core_utils.CoreUtils()
-                response = json.loads(core_utils_obj.unwrap(str(args[1]),ice_ndac_key))
+                response = json.loads(core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
                 plugins_list = response['plugins']
                 err_res = None
                 if(response['id'] != icesession['ice_id'] and response['connect_time'] != icesession['connect_time']):
@@ -227,29 +227,32 @@ class MainNamespace(BaseNamespace):
         data_stream=None
         client_data=None
         try:
-            if len(args) > 0:
-                qcdata = args[0]
-                if soc is None:
-                    import subprocess
-                    path = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Qc/QcController.exe"
-                    pid = subprocess.Popen(path, shell=True)
-                    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    soc.connect(("localhost",10000))
+            if platform.system() == "Windows":
+                if len(args) > 0:
+                    qcdata = args[0]
+                    if soc is None:
+                        import subprocess
+                        path = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Qc/QcController.exe"
+                        pid = subprocess.Popen(path, shell=True)
+                        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        soc.connect(("localhost",10000))
 
-                data_to_send = json.dumps(qcdata).encode('utf-8')
-                data_to_send+='#E&D@Q!C#'
-                soc.send(data_to_send)
-                while True:
-                    data_stream= soc.recv(1024)
-                    server_data+=data_stream
-                    if '#E&D@Q!C#' in server_data:
-                        break
-                client_data= server_data[:server_data.find('#E&D@Q!C#')]
-                if('Error in qc' in client_data):
-                    logger.print_on_console('Error occurred in QC')
-                socketIO.emit('qcresponse',client_data)
+                    data_to_send = json.dumps(qcdata).encode('utf-8')
+                    data_to_send+='#E&D@Q!C#'
+                    soc.send(data_to_send)
+                    while True:
+                        data_stream= soc.recv(1024)
+                        server_data+=data_stream
+                        if '#E&D@Q!C#' in server_data:
+                            break
+                    client_data= server_data[:server_data.find('#E&D@Q!C#')]
+                    if('Fail' in client_data):
+                        logger.print_on_console('Error occurred in QC')
+                    socketIO.emit('qcresponse',client_data)
+                else:
+                    socketIO.emit('qcresponse','Error:data recevied empty')
             else:
-                socketIO.emit('qcresponse','Error:data recevied empty')
+                 socketIO.emit('qcresponse','Error:Failed in running Qc')
         except Exception as e:
             log.error(e)
             socketIO.emit('qcresponse','Error:Qc Operations')
@@ -426,8 +429,11 @@ class SocketThread(threading.Thread):
         server_port = int(configvalues['server_port'])
         server_IP = configvalues['server_ip']
         server_cert = configvalues['server_cert']
-        if os.path.exists(server_cert) == False:
-            server_cert = CERTIFICATE_PATH +'/server.crt'
+        if configvalues.has_key("ignore_server_certificate"):
+            server_cert = False
+        else:
+            if os.path.exists(server_cert) == False:
+                server_cert = CERTIFICATE_PATH +'/server.crt'
         client_cert = (CERTIFICATE_PATH + '/client.crt', CERTIFICATE_PATH + '/client.key')
         temp_server_IP = 'https://' + server_IP
         key='USERNAME'
@@ -440,11 +446,12 @@ class SocketThread(threading.Thread):
             'connect_time':str(datetime.now()),
             'username':username
         }
-        icesession_enc = core_utils_obj.wrap(json.dumps(icesession),ice_ndac_key)
+        ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+            'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
+        icesession_enc = core_utils_obj.wrap(json.dumps(icesession), ice_ndac_key)
         params={'username':username,'icesession':icesession_enc}
         socketIO = SocketIO(temp_server_IP,server_port,MainNamespace,verify=server_cert,cert=client_cert,params=params)
         socketIO.wait()
-
 
 
 class Parallel(threading.Thread):
@@ -810,6 +817,8 @@ class ClientWindow(wx.Frame):
         self.killScrapeWindow()
         self.Destroy()
         controller.kill_process()
+        if platform.system() == "Windows":
+            os.system("TASKKILL /F /IM QcController.exe")
         exit()
          # you may also do:  event.Skip()
          # since the default event handler does call Destroy(), too
@@ -951,10 +960,11 @@ class ClientWindow(wx.Frame):
         flag = False
         core_utils_obj = core_utils.CoreUtils()
         system_mac = core_utils_obj.getMacAddress()
+        mac_verification_key = "".join(['N','1','i','1','N','2','e','3','T','5','e','8','E','1','3','n','2','1','S','i','X','t','Y','3','4','e','I','g','H','t','5','5'])
         try:
             with open(CERTIFICATE_PATH+'\license.key', mode='r') as f:
-                key = "".join(f.readlines()[1:-1]).replace("\n","")
-                key = core_utils_obj.unwrap(key,mac_verification_key)
+                key = "".join(f.readlines()[1:-1]).replace("\n","").replace("\r","")
+                key = core_utils_obj.unwrap(key, mac_verification_key)
                 mac_addr = key[36:-36]
                 if ("," in mac_addr):
                     mac_addr = mac_addr.split(",")

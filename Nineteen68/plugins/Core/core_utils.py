@@ -18,7 +18,6 @@ from Crypto.Cipher import AES
 BS=16
 iv='0'*16
 ##key='Nineeteen68@ScrapeNineeteen68@Sc'
-scrape_key='Nineeteen68@SecureScrapeDataPath'
 
 class CoreUtils():
 
@@ -79,24 +78,36 @@ class CoreUtils():
 
     def scrape_unwrap(self,hex_data):
         data = ''.join(map(chr, bytearray.fromhex(hex_data)))
+        scrape_key = "".join(['N','i','n','e','e','t','e','e','n','6','8','@','S','e',
+            'c','u','r','e','S','c','r','a','p','e','D','a','t','a','P','a','t','h'])
         aes = AES.new(scrape_key, AES.MODE_CBC, iv)
         return self.unpad(aes.decrypt(data))
 
     def scrape_wrap(self,data):
+        scrape_key = "".join(['N','i','n','e','e','t','e','e','n','6','8','@','S','e',
+            'c','u','r','e','S','c','r','a','p','e','D','a','t','a','P','a','t','h'])
         aes = AES.new(scrape_key, AES.MODE_CBC, iv)
         return aes.encrypt(self.pad(data)).encode('hex')
 
     def getMacAddress(self):
         mac=""
         if sys.platform == 'win32':
-            for line in os.popen("ipconfig /all"):
-                if line.lstrip().startswith('Physical Address'):
-    ##                mac = line.split(':')[1].strip().replace('-',':')
-                    mac = line.split(':')[1].strip()
-                    break
+            ##for line in os.popen("ipconfig /all"):
+            ##    if line.lstrip().startswith('Physical Address'):
+            ##        ##mac = line.split(':')[1].strip().replace('-',':')
+            ##        mac = line.split(':')[1].strip()
+            ##        break
+            ipdata=os.popen("ipconfig /all").read()
+            eth_st=ipdata.find("Ether")
+            phy_st=ipdata[eth_st:].find("Physical Address")+eth_st
+            phy_en=ipdata[phy_st:].find("\n")+phy_st
+            mac=ipdata[phy_st:phy_en].split(':')[1].strip()
         else:
             for line in os.popen("/sbin/ifconfig"):
-                if line.find('Ether') > -1:
-                    mac = line.split()[4]
+                if line.lower().find('ether') > -1:
+                    if(sys.platform == 'darwin'):
+                        mac = line.split()[2]
+                    else:
+                        mac = line.split()[4]
                     break
         return str(mac).strip()
