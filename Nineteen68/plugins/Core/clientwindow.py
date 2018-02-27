@@ -963,7 +963,7 @@ class ClientWindow(wx.Frame):
         mac_verification_key = "".join(['N','1','i','1','N','2','e','3','T','5','e','8','E','1','3','n','2','1','S','i','X','t','Y','3','4','e','I','g','H','t','5','5'])
         try:
             with open(CERTIFICATE_PATH+'\license.key', mode='r') as f:
-                key = "".join(f.readlines()[1:-1]).replace("\n","")
+                key = "".join(f.readlines()[1:-1]).replace("\n","").replace("\r","")
                 key = core_utils_obj.unwrap(key, mac_verification_key)
                 mac_addr = key[36:-36]
                 if ("," in mac_addr):

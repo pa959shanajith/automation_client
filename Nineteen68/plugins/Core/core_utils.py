@@ -105,6 +105,9 @@ class CoreUtils():
         else:
             for line in os.popen("/sbin/ifconfig"):
                 if line.lower().find('ether') > -1:
-                    mac = line.split()[4]
+                    if(sys.platform == 'darwin'):
+                        mac = line.split()[2]
+                    else:
+                        mac = line.split()[4]
                     break
         return str(mac).strip()
