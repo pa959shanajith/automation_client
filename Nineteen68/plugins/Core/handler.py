@@ -478,7 +478,7 @@ class Handler():
                     self.insert_into_fordict(index,key_lower,None)
                     log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
 ##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
-                tsp_step=for_step.For(index,keyword,inputval,outputval,stepnum,testscript_name,for_info[key],False,apptype,additionalinfo,i)
+                tsp_step=for_step.For(index,keyword,inputval,outputval,stepnum,testscript_name,for_info[key],False,apptype,additionalinfo,i,remark)
 
             #block which creates the step of instances (if,elseIf,else,endIf)
             elif key_lower in if_array:
@@ -487,7 +487,7 @@ class Handler():
                     log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
 ##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
 
-                tsp_step=if_step.If(index,keyword,inputval,outputval,stepnum,testscript_name,if_info[key],False,apptype,additionalinfo,i)
+                tsp_step=if_step.If(index,keyword,inputval,outputval,stepnum,testscript_name,if_info[key],False,apptype,additionalinfo,i,remark)
 
             #block which creates the step of instances of (getparam,startloop,endloop)
             elif key_lower in get_param:
@@ -497,17 +497,17 @@ class Handler():
 ##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
 
                 if(extract_path==None):
-                    tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i)
+                    tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i,remark)
                 else:
-                    tsp_step=getparam.GetParam(index,keyword,extract_path,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i)
+                    tsp_step=getparam.GetParam(index,keyword,extract_path,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i,remark)
 
             #block which creates the step of instances of (jumpBy)
             elif key_lower == constants.JUMP_BY:
-                tsp_step=jumpBy.JumpBy(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype,additionalinfo,i)
+                tsp_step=jumpBy.JumpBy(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype,additionalinfo,i,remark)
 
             #block which creates the step of instances of (jumpTo)
             elif key_lower == constants.JUMP_TO:
-                tsp_step=jumpTo.JumpTo(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype,additionalinfo,i)
+                tsp_step=jumpTo.JumpTo(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype,additionalinfo,i,remark)
 
             #block which creates the step of instances of (Keywords)
             else:
