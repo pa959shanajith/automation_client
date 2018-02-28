@@ -21,7 +21,7 @@ log = logging.getLogger('jumpBy.py')
 
 
 class  JumpBy():
-    def __init__(self,index,name,inputval,outputval,stepnum,testscript_name,executed,apptype,additionalinfo,testcase_num):
+    def __init__(self,index,name,inputval,outputval,stepnum,testscript_name,executed,apptype,additionalinfo,testcase_num,remark):
         self.index=index
         self.name=name
         self.inputval=inputval
@@ -36,6 +36,7 @@ class  JumpBy():
         self.status=False
         self.testcase_num=testcase_num
         self.jumpByStepNum=-1
+        self.remarks=remark
 
     def print_step(self):
         log.info(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name)

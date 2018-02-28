@@ -40,7 +40,7 @@ log = logging.getLogger("getparam.py")
 import xml.etree.ElementTree as ET
 class GetParam():
     """Object instantiation of 'getparam,startloop,endloop' object"""
-    def __init__(self,index,name,inputval,outputval,stepnum,testscript_name,info_dict,executed,apptype,additionalinfo,testcase_num):
+    def __init__(self,index,name,inputval,outputval,stepnum,testscript_name,info_dict,executed,apptype,additionalinfo,testcase_num,remark):
         self.index=index
         self.name=name
         self.inputval=inputval
@@ -54,6 +54,7 @@ class GetParam():
         self.parent_id=0
         self.step_description=''
         self.testcase_num=testcase_num
+        self.remarks=remark
 
     def print_step(self):
 ##        logger.print_on_console('Step: '+str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
