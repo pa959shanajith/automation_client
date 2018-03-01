@@ -427,8 +427,15 @@ class Controller():
                 if STATIC_NONE in x:
                     x=None
                 else:
-                    #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
-                    x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
+                    if x.find(STATIC_SEPARATOR) != -1:
+                        x = x.replace(STATIC_SEPARATOR,SEMICOLON)
+                    if x.startswith('{') and x.endswith('}'):
+                        vals = self.dynamic_var_handler_obj.get_dynamic_value(x)
+                        if type(vals not in [str, unicode,int]):
+                            x= vals
+                    else:
+                        #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
+                        x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
                 inpval.append(x)
         return inpval,ignore_status
 
