@@ -143,8 +143,8 @@ class Dispatcher:
                 else:
                     if objectname=="@Object":
                         webelement = input[0]
-                        log.info(WEB_ELEMENT_FOUND)
-                        logger.print_on_console(WEB_ELEMENT_FOUND)
+                        log.info(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
+                        logger.print_on_console(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
                     else:
                         webelement = self.getwebelement(driver,objectname)
                         if webelement != None:
@@ -310,11 +310,7 @@ class Dispatcher:
 
                     if keyword==OPEN_BROWSER:
                         input.append(self.action)
-                    if objectname=="@Object":
-                        actual_input=teststepproperty.inputval[0].split(";")
-                        actual_input=actual_input[1:]
-                    else:
-                        actual_input=teststepproperty.inputval[0].split(";")
+                    actual_input=teststepproperty.inputval[0].split(";")
                     if(keyword.lower() == "sendfunctionkeys"):
                         input.extend(actual_input)
                     ## Issue #190 Driver control won't switch back to parent window
