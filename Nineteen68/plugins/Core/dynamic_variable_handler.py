@@ -63,12 +63,19 @@ class DynamicVariables:
                 if temp_value is None:
                     actual_value=temp_value
                 else:
-                    if not isinstance(temp_value,unicode):
+                    try:
+                        dyn_data=temp_value.tag_name
+                    except:
+                        dyn_data=''
+                    if not ((isinstance(temp_value,unicode))or (dyn_data !='')):
                         if actual_value is not None:
                             actual_value=actual_value.replace(input_var,str(temp_value))
                     else:
                         if actual_value is not None:
-                            actual_value=actual_value.replace(input_var,temp_value)
+                            if dyn_data !='':
+                                actual_value=temp_value
+                            else:
+                                actual_value=actual_value.replace(input_var,temp_value)
         else:
             status,nested_var=self.check_dynamic_inside_dynamic(input_var)
             if status==TEST_RESULT_TRUE:

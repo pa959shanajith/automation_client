@@ -314,7 +314,7 @@ class TableOperationKeywords():
                 log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                 err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
                 logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
-            return status,methodoutput,err_msg
+            return status,methodoutput,verifytooltip,err_msg
 
 
 #   lclicks on the given cell, if the table found with the given xpath
@@ -551,7 +551,7 @@ class TableOperationKeywords():
                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-##                
+##
 ##            return status,methodoutput,output_val,err_msg
 
 
