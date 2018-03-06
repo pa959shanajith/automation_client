@@ -306,7 +306,6 @@ class AutomatedPathGenerator:
                     return complexity_data[cname]
                  else:
                     return 4
-                 return 4
              else:
                 if cname in Cylomatic_Compelxity[filepath]:
                     return Cylomatic_Compelxity[filepath][cname]
