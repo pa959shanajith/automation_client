@@ -23,7 +23,7 @@ def start():
     global ASTNode
     ASTNode = []
     try:
-        with open(r'./Nineteen68/plugins/AutomatedPathGenerator/ASTTree.txt', 'rt') as f:
+        with open(r'./ASTTree.txt', 'rt') as f:
             line = f.readline()
             level, value = next_line(line)
             if value.find(":") != -1:

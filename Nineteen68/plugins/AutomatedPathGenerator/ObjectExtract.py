@@ -38,14 +38,24 @@ TernaryPos = []
 Label = {}
 ClassVariables = {}
 PresentClassName = None
+import logging
+import logger
+log = logging.getLogger('ObjectExtract.py')
+counter = -1
 
 '''FlowChart Node (Shape,Text,Child Node Nos,Parent Node Nos)'''
 def addNodes(shape, text, parent, child):
+	global counter
+	counter = counter + 1 
+	if('package' in text.lower() or 'import' in text.lower()):
+		classname = "import"
+	else:
+		classname = PresentClassName
 	if parent is None:
-		return {"shape": shape, "text": text, "parent": parent, "child": child}
+		return {"shape": shape, "text": text, "parent": parent, "child": child, "class": classname, "id": counter}
 	else:
 		return {"shape": shape, "text": text,
-				"parent": [parent], "child": child}
+				"parent": [parent], "child": child, "class": classname, "id": counter}
 
 
 '''Class Node (Name,FlowChart Node No,Methods,Constructors,Extend Name,Implements Name)'''
@@ -286,6 +296,7 @@ def andExpressionExtraction(root):
 	AndOperator = '&'
 	Possibility = 0
 	Variable = ""
+	Var = ""
 	for i in range(0, len(ASTNode[root]["child"])):
 		line = ASTNode[ASTNode[root]["child"][i]
 					   ]["value"][0]  # Label of the child
@@ -1930,8 +1941,6 @@ def forStatementExtraction(root):
 						exPar = FlowChart[UpdationS]["parent"].pop()
 						if FlowChart[exPar]["child"] is not None and UpdationS in FlowChart[exPar]["child"]:
 							FlowChart[exPar]["child"].remove(UpdationS)
-						else:
-							print UpdationS
 					if isinstance(index, list):
 						# print index
 						for j in range(0, len(index)):
@@ -2097,6 +2106,7 @@ def inclusiveOrExpressionExtraction(root):
 	OrOperator = '|'
 	Possibility = 0
 	Variable = ""
+	Var = ""
 	for i in range(0, len(ASTNode[root]["child"])):
 		line = ASTNode[ASTNode[root]["child"][i]
 					   ]["value"][0]  # Label of the child
@@ -2329,11 +2339,13 @@ def main(ASTDict, Flow, Class, PosMeth):
 		PresentClassName = ''
 		objectExtract(0)
 	except Exception as e:
-		pass
+		log.error(e)
+		logger.print_on_console("Exception occured in object extract")
 	return FlowChart, Classes, PossibleMethods, ClassVariables
 
 
 def memberSelectorExtraction(root):
+	MethodName = ""
 	ClassName = ASTNode[root]["value"][1]
 	for i in range(0, len(ASTNode[root]["child"])):
 		line = ASTNode[ASTNode[root]["child"][i]]["value"][0]

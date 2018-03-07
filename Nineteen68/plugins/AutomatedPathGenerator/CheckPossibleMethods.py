@@ -1,3 +1,5 @@
+import logging
+log = logging.getLogger('CheckPossibleMethods.py')
 '''This method will link all the user-defined method call with their method definition.'''
 def main(PossibleMethods, Classes):
     try:
@@ -168,10 +170,6 @@ def main(PossibleMethods, Classes):
                                             PossibleMethods[i]["ParentNodeNo"] = j["NodeNo"]
                                     else:
                                         PossibleMethods[i]["ParentNodeNo"] = j["NodeNo"]
-##        for i in range(0, len(PossibleMethods)):
-##            print PossibleMethods[i]["ParentNodeNo"]
     except Exception as e:
-        import traceback
-        traceback.print_exc()
-    # return updated PossibleMethods
+        log.error(e)
     return PossibleMethods

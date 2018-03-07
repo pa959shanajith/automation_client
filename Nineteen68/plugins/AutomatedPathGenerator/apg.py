@@ -13,6 +13,8 @@ import controller
 import logging
 log = logging.getLogger('apg.py')
 Cylomatic_Compelxity={}
+prev_classes = []
+
 class AutomatedPathGenerator:
     def __init__(self):
         self.FlowChart = [] #List of all the FlowChart Nodes
@@ -35,28 +37,16 @@ class AutomatedPathGenerator:
             pass
         zf = zipfile.ZipFile(zip_file, 'r')
         error_flag = True
-        term_flag = True
         try:
             lst = zf.infolist()
             for zi in lst:
-                prev_classes = []
                 fn = zi.filename
                 filename = zf.extract(fn)
                 if os.path.isdir(filename):
                     error_flag = self.open_folder(filename, java_version)
                 elif (os.path.isfile(filename) and filename.endswith('.java')):
-                    prev_classes.extend(self.Classes)
                     error_flag = self.open_file(filename, java_version, True)
-                    data = [c for c in self.Classes if c not in prev_classes]
-                    for d in data:
-                        if(not controller.terminate_flag):
-                            d = self.modifyJSON(d,filename)
-                            d['complexity']=self.cyclomatic_Complexity(filename,d['name'])
-                            self.socketIO.emit('flowgraph_result',json.dumps(d))
-                        else:
-                            term_flag = False
-                            break
-                if((not error_flag) or (not term_flag)):
+                if(not error_flag):
                     break
         finally:
             zf.close()
@@ -66,27 +56,15 @@ class AutomatedPathGenerator:
     def open_tar(self, tar_file, java_version):
         tf = tarfile.TarFile(tar_file, 'r')
         error_flag = True
-        term_flag = True
         try:
             lst = tf.getnames()
             for zi in lst:
-                prev_classes = []
                 filename = tf.extract(zi, path="")
                 if os.path.isdir(filename):
                     error_flag = self.open_folder(filename, java_version)
                 elif (os.path.isfile(filename) and filename.endswith('.java')):
-                    prev_classes.extend(self.Classes)
                     error_flag = self.open_file(filename, java_version, True)
-                    data = [c for c in self.Classes if c not in prev_classes]
-                    for d in data:
-                        if(not controller.terminate_flag):
-                            d = self.modifyJSON(d,filename)
-                            d['complexity']=self.cyclomatic_Complexity(filename,d['name'])
-                            self.socketIO.emit('flowgraph_result',json.dumps(d))
-                        else:
-                            term_flag = False
-                            break
-                if((not error_flag) or (not term_flag)):
+                if(not error_flag):
                     break
         finally:
             tf.close()
@@ -95,35 +73,23 @@ class AutomatedPathGenerator:
     '''function to open folder'''
     def open_folder(self, folder, java_version):
         error_flag = True
-        term_flag = True
         try:
             lst = os.listdir(folder)
             for filename in lst:
-                prev_classes = []
                 filename = folder + "\\" + filename
                 if os.path.isdir(filename):
                     error_flag = self.open_folder(filename, java_version)
                 elif (os.path.isfile(filename) and filename.endswith('.java')):
-                    prev_classes.extend(self.Classes)
                     error_flag = self.open_file(filename, java_version, True)
-                    data = [c for c in self.Classes if c not in prev_classes]
-                    for d in data:
-                        if(not controller.terminate_flag):
-                            d = self.modifyJSON(d,filename)
-                            d['complexity']=self.cyclomatic_Complexity(filename,d['name'])
-                            self.socketIO.emit('flowgraph_result',json.dumps(d))
-                        else:
-                            term_flag = False
-                            break
-                if((not error_flag) or (not term_flag)):
+                if(not error_flag):
                     break
         except Exception as e:
             pass
-        return flag
+        return error_flag
 
     '''This call will generate the AST Using PMD Parser and store it in ASTTree.txt'''
     def pmdCall(self, version, pathToFile):
-        os.chdir(r'./Nineteen68/plugins/AutomatedPathGenerator')
+        os.chdir(r'./Lib/site-packages')
         subprocess.call(['java',
                          '-classpath',
                          r'.\flowgraph_lib\*;.',
@@ -137,6 +103,7 @@ class AutomatedPathGenerator:
     def open_file(self, filename, java_version, folder_flag):
         flag = False
         try:
+            global prev_classes
             filename = filename.replace("/", "\\")
             if filename not in self.filenames:
                 if filename.find(".java", len(filename) - 5,
@@ -145,25 +112,27 @@ class AutomatedPathGenerator:
                     self.filenames.add(filename)
                     # call to generate ASTTree
                     self.pmdCall(java_version, filename)
-                    os.chdir(os.environ["NINETEEN68_HOME"])
                 # ASTTree 1st node(CompilationUnit) captured in root if no error is present
                 root = dataStruct.start()
+                os.remove('./ASTTree.txt')
+                os.chdir(os.environ["NINETEEN68_HOME"])
                 if root:
                     # ObjectExtract.main will generate the FlowChart Nodes, give the Classes and all Possible Methods
+                    prev_classes.extend(self.Classes)
                     self.FlowChart, self.Classes, PosMethod, self.ClassVariables = ObjectExtract.main(
                         root, self.FlowChart, self.Classes, self.PosMethod)
                     (self.PosMethod).extend(PosMethod)
-                    if(not folder_flag):
-                        for cls in self.Classes:
-                            if(not controller.terminate_flag):
-                                d = self.modifyJSON(cls,filename)
-                                d['complexity']=self.cyclomatic_Complexity(filename,d['name'])
-                                self.socketIO.emit('flowgraph_result',json.dumps(d))
-                            else:
-                                break
+                    data = [c for c in self.Classes if c not in prev_classes]
+                    for cls in data:
+                        if(not controller.terminate_flag):
+                            d = self.modifyJSON(cls,filename)
+                            d['complexity']=self.cyclomatic_Complexity(filename,d['name'])
+                            self.socketIO.emit('flowgraph_result',json.dumps(d))
+                        else:
+                            break
                     flag = True
                 else:
-                    print("Java file %s has Errors!!!" % (filename))
+                    print("Java file %s has Errors!!!" % (filename.split('\\')[-1]))
         except Exception as e:
             log.error(e)
             logger.print_on_console("Error occured in open file")
@@ -220,8 +189,10 @@ class AutomatedPathGenerator:
 
     def generate_flowgraph(self, version, source, socketIO, *args):
         try:
-            global Cylomatic_Compelxity
+            global Cylomatic_Compelxity, prev_classes
             self.socketIO=socketIO
+            Cylomatic_Compelxity={}
+            prev_classes=[]
             logger.print_on_console("Graph generation in progress...")
             logger.print_on_console("File name:")
             logger.print_on_console("=============")
@@ -245,9 +216,11 @@ class AutomatedPathGenerator:
                             c_source = method["PresentClass"].split("(")[0]
                         if(c_source != c_target and c_source != None and c_target != None):
                             jsonString.append({"source":c_source,"target":c_target})
-                Cylomatic_Compelxity={}
+                jsonString = [dict(t) for t in set([tuple(d.items()) for d in jsonString])]
+
                 data = {"classes":self.Classes, "links":jsonString, "result":"success"}
                 self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
+
                 if(not controller.terminate_flag):
                     logger.print_on_console("Graph generation completed")
                 else:
@@ -258,7 +231,7 @@ class AutomatedPathGenerator:
                 self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
                 logger.print_on_console("Graph generation failed")
 
-        except Exception as e
+        except Exception as e:
             log.error(e)
             logger.print_on_console("Error occured while generate graph.")
 
@@ -277,15 +250,11 @@ class AutomatedPathGenerator:
              global Cylomatic_Compelxity
              error_flag_cc=False
              if not filepath in Cylomatic_Compelxity:
-                 #filepath=os.path.normpath(filepath)
-                 pmd_path = os.environ["NINETEEN68_HOME"]
-                 pmd_path=pmd_path+'\\Nineteen68\\plugins\\AutomatedPathGenerator\\pmd.bat'
-                 command = pmd_path + ' -d '+ filepath +' -R rulesets/java/codesize.xml -f text > Output.txt'
                  complexity_data={}
-                 os.system(command)
-                 #logger.print_on_console(command)
-                 file= open('Output.txt','r+')
-                 flag_name='';
+                 subprocess.call(['java','-classpath',r'./Lib/site-packages/flowgraph_lib/*','net.sourceforge.pmd.PMD','-d',
+                                    str(filepath),'-R','rulesets/java/codesize.xml','-f','text','>','Output.txt'],shell="false")
+                 file= open('./Output.txt','r+')
+                 flag_name=''
                  for i in file:
                     if 'The class' in i and 'has a Cyclomatic Complexity of ' in i:
                         flag_name=''
@@ -295,13 +264,12 @@ class AutomatedPathGenerator:
                             complexity_data[class_name]=complexity
                         else:
                             error_flag_cc=true
-                           #print 'Error'
                     elif 'The method' in i and 'has a Cyclomatic Complexity of ' in i:
                         method_name,complexity=self.extract_Complexity(i)
                         complexity_data[flag_name+'_'+method_name]=complexity
-                 #logger.print_on_console(complexity_data)
                  Cylomatic_Compelxity[filepath]=complexity_data
                  file.close()
+                 os.remove('./Output.txt')
                  if cname in complexity_data:
                     return complexity_data[cname]
                  else:
@@ -313,6 +281,5 @@ class AutomatedPathGenerator:
                     return 4
 
         except Exception as e:
-            import traceback
-            print(traceback.format_exc())
-            print e
+            logger.print_on_console("Error occured while calculating complexity")
+            log.error(e)
