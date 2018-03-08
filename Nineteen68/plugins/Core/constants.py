@@ -306,6 +306,8 @@ STEP='Step '
 
 REMARKS='Remark'
 
+TESTCASE_DETAILS='testcase_details'
+
 KEYWORD='Keyword'
 
 TEST_SCRIPT_NAME='TestCase Name'

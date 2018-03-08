@@ -19,7 +19,7 @@ log = logging.getLogger('for_step.py')
 class For():
 
     """Object instantiation of 'for,endfor' object"""
-    def __init__(self,index,name,inputval,outputval,stepnum,testscript_name,info_dict,executed,apptype,additionalinfo,testcase_num,remark):
+    def __init__(self,index,name,inputval,outputval,stepnum,testscript_name,info_dict,executed,apptype,additionalinfo,testcase_num,remark,testcase_details):
         self.index=index
         self.name=name
         self.inputval=inputval
@@ -36,6 +36,7 @@ class For():
         self.step_description=''
         self.testcase_num=testcase_num
         self.remarks=remark
+        self.testcase_details=testcase_details
 
 
     def print_step(self):
