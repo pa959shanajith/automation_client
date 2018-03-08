@@ -150,7 +150,6 @@ class BluezoneKeywords:
         output=OUTPUT_CONSTANT
         return_value = 0
         try:
-            buffer_var = ''
             self.host.WaitReady(10,1000)
             self.host.SendKeys(MAINFRAME_KEY_3)
             scrncnt = self.host.ReadScreen(Buf1,5,1,2)
@@ -401,7 +400,6 @@ class BluezoneKeywords:
         output=OUTPUT_CONSTANT
         return_value = 0
         try:
-            buffer_var = ''
             self.host.WaitReady(10,1000)
             self.host.WaitReady(10,1000)
             self.host.Setcursor(4,15)
@@ -460,11 +458,3 @@ class BluezoneKeywords:
                 err_msg = "Error: Unable to set the cursor on Emulator screen."
                 logger.print_on_console("Unable to set the cursor on Emulator screen.")
         return (return_value == 1),output,err_msg
-
-
-
-
-
-
-
-
