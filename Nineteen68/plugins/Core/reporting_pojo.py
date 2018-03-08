@@ -17,7 +17,7 @@ class ReportingStep:
 
     """
 
-    def __init__(self,_id,name,parent_id,status,step,comments,step_description,ellapsedtime,testscript_name,screenshot_path,remark):
+    def __init__(self,_id,name,parent_id,status,step,comments,step_description,ellapsedtime,testscript_name,screenshot_path,remark,testcase_details):
         self._id=_id
         self.name=name
         self.parent_id=parent_id
@@ -29,6 +29,7 @@ class ReportingStep:
         self.testscript_name=testscript_name
         self.screenshot_path= screenshot_path
         self.remarks=remark
+        self.testcase_details=testcase_details
 
 
 
