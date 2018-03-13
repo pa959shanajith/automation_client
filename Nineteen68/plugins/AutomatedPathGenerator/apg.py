@@ -263,7 +263,7 @@ class AutomatedPathGenerator:
                         if not (class_name in complexity_data):
                             complexity_data[class_name]=complexity
                         else:
-                            error_flag_cc=true
+                            error_flag_cc=True
                     elif 'The method' in i and 'has a Cyclomatic Complexity of ' in i:
                         method_name,complexity=self.extract_Complexity(i)
                         complexity_data[flag_name+'_'+method_name]=complexity
