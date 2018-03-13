@@ -126,7 +126,7 @@ class AutomatedPathGenerator:
                     for cls in data:
                         if(not controller.terminate_flag):
                             d = self.modifyJSON(cls,filename)
-                            d['complexity']=self.cyclomatic_Complexity(filename,d['name'])
+                            d['complexity']=self.cyclomatic_Complexity(filename,d['name'],d['methods'].keys())
                             self.socketIO.emit('flowgraph_result',json.dumps(d))
                         else:
                             break
@@ -245,10 +245,11 @@ class AutomatedPathGenerator:
             complexity=complexity[:complexity.find('.')]
         return name,complexity
 
-    def cyclomatic_Complexity(self,filepath,cname):
+    def cyclomatic_Complexity(self,filepath,cname,cmethods):
         try:
              global Cylomatic_Compelxity
              error_flag_cc=False
+             cdata={'class':'', 'methods':{}}
              if not filepath in Cylomatic_Compelxity:
                  complexity_data={}
                  subprocess.call(['java','-classpath',r'./Lib/site-packages/flowgraph_lib/*','net.sourceforge.pmd.PMD','-d',
@@ -271,15 +272,25 @@ class AutomatedPathGenerator:
                  file.close()
                  os.remove('./Output.txt')
                  if cname in complexity_data:
-                    return complexity_data[cname]
+                    cdata['class']=  complexity_data[cname]
                  else:
-                    return 4
+                    cdata['class']=  "4"
+                 for i in cmethods:
+                    if(cname+'_'+i) in complexity_data:
+                        cdata['methods'][i]=complexity_data[cname+'_'+i]
+                    else:
+                        cdata['methods'][i]="1"
              else:
                 if cname in Cylomatic_Compelxity[filepath]:
-                    return Cylomatic_Compelxity[filepath][cname]
+                    cdata['class'] = Cylomatic_Compelxity[filepath][cname]
                 else:
-                    return 4
-
+                    cdata['class']="4"
+                for i in cmethods:
+                    if(cname+'_'+i) in Cylomatic_Compelxity[filepath]:
+                        cdata['methods'][i]=Cylomatic_Compelxity[filepath][cname+'_'+i]
+                    else:
+                        cdata['methods'][i]="1"
+             return cdata
         except Exception as e:
             logger.print_on_console("Error occured while calculating complexity")
             log.error(e)
