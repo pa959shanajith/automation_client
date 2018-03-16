@@ -88,7 +88,7 @@ class AutomatedPathGenerator:
         return error_flag
 
     '''This call will generate the AST Using PMD Parser and store it in ASTTree.txt'''
-    def pmdCall(self, version, pathToFile):
+    def pmdCall(self, version, pathToFile, filename):
         os.chdir(r'./Lib/site-packages')
         subprocess.call(['java',
                          '-classpath',
@@ -96,25 +96,27 @@ class AutomatedPathGenerator:
                          r'PMD.DD',
                          str(version),
                          pathToFile,
+                         filename
                          ],
                         shell="false")
 
     '''function to open file'''
-    def open_file(self, filename, java_version, folder_flag):
+    def open_file(self, filename, java_version):
         flag = False
         try:
             global prev_classes
             filename = filename.replace("/", "\\")
+            name = filename.split('\\')[-1][:-5]
             if filename not in self.filenames:
                 if filename.find(".java", len(filename) - 5,
                                  len(filename)) > 0:
                     logger.print_on_console(filename)
                     self.filenames.add(filename)
                     # call to generate ASTTree
-                    self.pmdCall(java_version, filename)
+                    self.pmdCall(java_version, filename, name)
                 # ASTTree 1st node(CompilationUnit) captured in root if no error is present
-                root = dataStruct.start()
-                os.remove('./ASTTree.txt')
+                root = dataStruct.start(name)
+                #os.remove(r'./ASTTree' + name + '.txt')
                 os.chdir(os.environ["NINETEEN68_HOME"])
                 if root:
                     # ObjectExtract.main will generate the FlowChart Nodes, give the Classes and all Possible Methods
@@ -134,6 +136,8 @@ class AutomatedPathGenerator:
                 else:
                     print("Java file %s has Errors!!!" % (filename.split('\\')[-1]))
         except Exception as e:
+            import traceback
+            print(traceback.format_exc())
             log.error(e)
             logger.print_on_console("Error occured in open file")
         return flag
@@ -180,7 +184,7 @@ class AutomatedPathGenerator:
             elif source.find(".zip") > 0:
                 flag = self.open_zip(source, version)
             elif source.find(".java") > 0:
-                flag = self.open_file(source, version, False)
+                flag = self.open_file(source, version)
             else:
                 flag = self.open_folder(source, version)
         except Exception as e:
@@ -202,6 +206,10 @@ class AutomatedPathGenerator:
                 '''After check format, the flow chart would be made completely. So now, we'll check the possible method linking.'''
                 self.PossibleMethods = CheckPossibleMethods.main(
                     self.PosMethod, self.Classes)
+
+                for i in range(0,len(self.FlowChart)):
+                    self.FlowChart[i]['id']=i
+                #print self.PossibleMethods
                 jsonString = []
                 c_source=None
                 c_target=None
@@ -215,10 +223,61 @@ class AutomatedPathGenerator:
                         if(method.has_key("PresentClass")):
                             c_source = method["PresentClass"].split("(")[0]
                         if(c_source != c_target and c_source != None and c_target != None):
+                        #if(c_source != None and c_target != None):
                             jsonString.append({"source":c_source,"target":c_target})
+                            id = None
+                            for fc in self.FlowChart:
+                                if((fc['class'].split('(')[0] == c_source) and (method['PosMethod'].split('(')[0] in fc['text'])):
+                                    for trgt in self.FlowChart:
+                                        if((trgt['class'].split('(')[0] == c_target) and (method['PosMethod'].split('(')[0] in trgt['text'])):
+                                            id = trgt['id']
+                                            break
+                                    fc['child'].append(id)
+                                    break
                 jsonString = [dict(t) for t in set([tuple(d.items()) for d in jsonString])]
+                #print jsonString
 
-                data = {"classes":self.Classes, "links":jsonString, "result":"success"}
+                count = -1
+                test = []
+                i = 0
+                while (i < len(self.FlowChart)):
+                    if(self.FlowChart[i]['shape'] != 'Square'):
+                        self.FlowChart[i]['modified_id'] = count
+                        test.append(self.FlowChart[i])
+                    else:
+                        children = []
+                        while(self.FlowChart[i+1]['shape'] == 'Square'):
+                            self.FlowChart[i]['modified_id'] = count
+                            children.extend(self.FlowChart[i]['child'])
+                            i = i+1
+                        children.extend(self.FlowChart[i]['child'])
+                        test.append({'modified_id': count,
+                                      'parent': [count - 1],
+                                	   'text': u'Processing',
+                                	   'class': self.FlowChart[i]['class'],
+                                	   'shape': 'Circle',
+                                	   'child': children
+                                	})
+                        self.FlowChart[i]['modified_id'] = count
+                    count = count + 1
+                    i = i + 1
+                #print self.FlowChart
+                for t in test:
+                    if(t['parent'] != [-1] and t['parent'] != [] and t['parent'] != None and t['text']!= 'Processing'):
+                        t['parent'] = [((self.FlowChart[t['parent'][0]])['modified_id'])]
+                    if(t['child'] != None):
+                        children = []
+                        for ch in t['child']:
+                            if(ch != None and ch != ''):
+                                children.append((self.FlowChart[ch])['modified_id'])
+                        children = list(set(children))
+                        if (t['modified_id'] in children):
+                            children.remove(t['modified_id'])
+                        t['child'] = children
+                #print test
+
+                data = {"classes":self.Classes, "links":jsonString, "data_flow":test, "result":"success"}
+                #data = {"classes":self.Classes, "links":jsonString, "result":"success"}
                 self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
 
                 if(not controller.terminate_flag):
@@ -232,6 +291,11 @@ class AutomatedPathGenerator:
                 logger.print_on_console("Graph generation failed")
 
         except Exception as e:
+            data = {"result":"fail"}
+            self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
+            logger.print_on_console("Graph generation failed")
+            import traceback
+            print (traceback.format_exc())
             log.error(e)
             logger.print_on_console("Error occured while generate graph.")
 

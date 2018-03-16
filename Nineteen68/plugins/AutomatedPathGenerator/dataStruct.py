@@ -19,11 +19,11 @@ def divide(line):
     except Exception as e:
         pass
 
-def start():
+def start(name):
     global ASTNode
     ASTNode = []
     try:
-        with open(r'./ASTTree.txt', 'rt') as f:
+        with open(r'./ASTTree' + name + '.txt', 'rt') as f:
             line = f.readline()
             level, value = next_line(line)
             if value.find(":") != -1:
@@ -56,5 +56,7 @@ def start():
                     parent = len(ASTNode) - 1
             f.close()
     except Exception as e:
+        import traceback
+        print(traceback.format_exc())
         ASTNode = []
     return ASTNode

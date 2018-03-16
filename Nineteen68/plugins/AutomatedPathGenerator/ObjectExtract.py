@@ -41,21 +41,19 @@ PresentClassName = None
 import logging
 import logger
 log = logging.getLogger('ObjectExtract.py')
-counter = -1
 
 '''FlowChart Node (Shape,Text,Child Node Nos,Parent Node Nos)'''
 def addNodes(shape, text, parent, child):
-	global counter
-	counter = counter + 1 
-	if('package' in text.lower() or 'import' in text.lower()):
+	if(text.lower().startswith('package') or text.lower().startswith('import')):
 		classname = "import"
 	else:
 		classname = PresentClassName
+	text = unicode(text, errors='replace')
 	if parent is None:
-		return {"shape": shape, "text": text, "parent": parent, "child": child, "class": classname, "id": counter}
+		return {"shape": shape, "text": text, "parent": parent, "child": child, "class": classname}
 	else:
 		return {"shape": shape, "text": text,
-				"parent": [parent], "child": child, "class": classname, "id": counter}
+				"parent": [parent], "child": child, "class": classname}
 
 
 '''Class Node (Name,FlowChart Node No,Methods,Constructors,Extend Name,Implements Name)'''
@@ -635,6 +633,9 @@ def classOrInterfaceBodyDeclarationExtraction(root):
 			ASTNode[root]["NodesPosition"] = index
 		elif re.match('EnumDeclaration', line):  # Enum in the class
 			s.append(enumExtraction(ASTNode[root]["child"][i]))
+		elif re.match('ClassOrInterfaceDeclaration', line):  # For nested classes
+			index = classOrInterfaceExtraction(ASTNode[root]["child"][i])
+			ASTNode[root]["NodesPosition"] = index
 	return ASTNode[root]["NodesPosition"]
 
 
@@ -654,7 +655,7 @@ def classOrInterfaceExtraction(root):
 	'''creating a Class Node'''
 	ClassOrInterfaceName = complete_class_name
 	PresentClassName = ClassOrInterfaceName
-	if ClassOrInterface == 'class':
+	if ClassOrInterface == 'class' or (ClassOrInterface == 'nested' and Property.pop() == 'class'):
 		if ASTNode[ASTNode[root]["parent"]]["NodesPosition"] != -1:
 			New_Nodes = addNodes("Box",
 								 "Class:" + ClassOrInterfaceName,
@@ -1314,7 +1315,7 @@ def enumExtraction(root):
 		if re.match("EnumBody", line):
 			Variable = enumBodyExtraction(ASTNode[root]["child"][i])
 			'''FlowChart Node For Enum'''
-			New_Nodes = addNodes("InnerBox", enumToText(
+			New_Nodes = addNodes("Square", enumToText(
 				EnumType, EnumName, Variable), ASTNode[ASTNode[root]["parent"]]["NodesPosition"], [])
 			FlowChart.append(New_Nodes)
 			ASTNode[root]["NodesPosition"] = len(FlowChart) - 1
@@ -2424,7 +2425,7 @@ def methodExtraction(root):
 			Names = nameListExtraction(ASTNode[root]["child"][i])
 			New_Nodes = addNodes(
 				"SwitchDiamond",
-				"Error",
+				"Throws",
 				ASTNode[root]["NodesPosition"],
 				[])
 			FlowChart.append(New_Nodes)
@@ -3692,7 +3693,7 @@ def tryStatementExtraction(root):
 		if None in ASTNode[ASTNode[root]["parent"]]["NodesPosition"]:
 			ASTNode[ASTNode[root]["parent"]]["NodesPosition"].remove(None)
 		New_Nodes = addNodes("SwitchDiamond",
-							 "Error",
+							 "Try",
 							 ASTNode[ASTNode[root]["parent"]
 									 ]["NodesPosition"][0],
 							 [])
@@ -3706,7 +3707,7 @@ def tryStatementExtraction(root):
 							  ]["parent"].append(j)
 	else:
 		New_Nodes = addNodes("SwitchDiamond",
-							 "Error",
+							 "Try",
 							 ASTNode[ASTNode[root]["parent"]]["NodesPosition"],
 							 [])
 		FlowChart.append(New_Nodes)
