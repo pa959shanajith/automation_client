@@ -45,7 +45,7 @@ class AutomatedPathGenerator:
                 if os.path.isdir(filename):
                     error_flag = self.open_folder(filename, java_version)
                 elif (os.path.isfile(filename) and filename.endswith('.java')):
-                    error_flag = self.open_file(filename, java_version, True)
+                    error_flag = self.open_file(filename, java_version)
                 if(not error_flag):
                     break
         finally:
@@ -63,7 +63,7 @@ class AutomatedPathGenerator:
                 if os.path.isdir(filename):
                     error_flag = self.open_folder(filename, java_version)
                 elif (os.path.isfile(filename) and filename.endswith('.java')):
-                    error_flag = self.open_file(filename, java_version, True)
+                    error_flag = self.open_file(filename, java_version)
                 if(not error_flag):
                     break
         finally:
@@ -80,7 +80,7 @@ class AutomatedPathGenerator:
                 if os.path.isdir(filename):
                     error_flag = self.open_folder(filename, java_version)
                 elif (os.path.isfile(filename) and filename.endswith('.java')):
-                    error_flag = self.open_file(filename, java_version, True)
+                    error_flag = self.open_file(filename, java_version)
                 if(not error_flag):
                     break
         except Exception as e:
