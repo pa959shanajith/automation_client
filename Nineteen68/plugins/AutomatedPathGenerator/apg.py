@@ -9,8 +9,11 @@ import CheckPossibleMethods
 import logger
 import shutil
 import json
+import re
 import controller
+import math
 import logging
+import lizard
 log = logging.getLogger('apg.py')
 Cylomatic_Compelxity={}
 prev_classes = []
@@ -116,7 +119,7 @@ class AutomatedPathGenerator:
                     self.pmdCall(java_version, filename, name)
                 # ASTTree 1st node(CompilationUnit) captured in root if no error is present
                 root = dataStruct.start(name)
-                #os.remove(r'./ASTTree' + name + '.txt')
+                os.remove(r'./ASTTree' + name + '.txt')
                 os.chdir(os.environ["NINETEEN68_HOME"])
                 if root:
                     # ObjectExtract.main will generate the FlowChart Nodes, give the Classes and all Possible Methods
@@ -128,7 +131,7 @@ class AutomatedPathGenerator:
                     for cls in data:
                         if(not controller.terminate_flag):
                             d = self.modifyJSON(cls,filename)
-                            d['complexity']=self.cyclomatic_Complexity(filename,d['name'],d['methods'].keys())
+                            d['complexity']=self.cyclomatic_Complexity(filename,d['name'])
                             self.socketIO.emit('flowgraph_result',json.dumps(d))
                         else:
                             break
@@ -136,8 +139,6 @@ class AutomatedPathGenerator:
                 else:
                     print("Java file %s has Errors!!!" % (filename.split('\\')[-1]))
         except Exception as e:
-            import traceback
-            print(traceback.format_exc())
             log.error(e)
             logger.print_on_console("Error occured in open file")
         return flag
@@ -301,60 +302,64 @@ class AutomatedPathGenerator:
 
 
     def extract_Complexity(self,line):
-        name = line[line.find('\'')+1:line.rfind('\'')]
-        unqiue_str = 'has a Cyclomatic Complexity of '
-        complexity = line[line.find('has a Cyclomatic Complexity of ')+len(unqiue_str):]
-        complexity= complexity[:complexity.find(' ')]
-        if complexity.find('.')!=-1:
-            complexity=complexity[:complexity.find('.')]
-        return name,complexity
+        name=""
+        complexity=""
+        name = re.findall(r"['](.*?)[']",line)
+        if len(name)!=0:
+            name = re.sub(r"\s?\(.*?\)",r"",name[0])
+        complexity=re.search("cyclomatic complexity of (\d+)",line,re.IGNORECASE).group(1)
+        line_no=re.search(r'.*:([^:]*):',line).group(1)
+        return name,complexity,line_no
 
-    def cyclomatic_Complexity(self,filepath,cname,cmethods):
+    def cyclomatic_Complexity(self,filepath,cname):
         try:
              global Cylomatic_Compelxity
              error_flag_cc=False
-             cdata={'class':'', 'methods':{}}
+             cdata={'class':'', 'methods':{},'line_no':''}
+             logger.print_on_console(cname)
              if not filepath in Cylomatic_Compelxity:
                  complexity_data={}
-                 subprocess.call(['java','-classpath',r'./Lib/site-packages/flowgraph_lib/*','net.sourceforge.pmd.PMD','-d',
-                                    str(filepath),'-R','rulesets/java/codesize.xml','-f','text','>','Output.txt'],shell="false")
+                 subprocess.call(['java','-classpath',r'./Lib/site-packages/flowgraph_lib/Cyclomatic/*','net.sourceforge.pmd.PMD','-d',
+                                    str(filepath),'-R','category/java/design.xml/CyclomaticComplexity','-f','text','>','Output.txt'],shell="false")
+
                  file= open('./Output.txt','r+')
                  flag_name=''
                  for i in file:
-                    if 'The class' in i and 'has a Cyclomatic Complexity of ' in i:
+                    if 'The class' in i:
                         flag_name=''
-                        class_name,complexity=self.extract_Complexity(i)
+                        class_name,complexity,line_no=self.extract_Complexity(i)
                         flag_name=class_name
                         if not (class_name in complexity_data):
                             complexity_data[class_name]=complexity
+                            complexity_data[flag_name+'_/@#%&/_methods']={}
+                            complexity_data[flag_name+'line_no']=line_no
                         else:
                             error_flag_cc=True
-                    elif 'The method' in i and 'has a Cyclomatic Complexity of ' in i:
-                        method_name,complexity=self.extract_Complexity(i)
-                        complexity_data[flag_name+'_'+method_name]=complexity
+                    elif 'The method' in i:
+                        method_name,complexity,line_no=self.extract_Complexity(i)
+                        complexity_data[flag_name+'_/@#%&/_methods'][method_name]={'complexity':complexity,'line_no':line_no}
                  Cylomatic_Compelxity[filepath]=complexity_data
                  file.close()
                  os.remove('./Output.txt')
                  if cname in complexity_data:
-                    cdata['class']=  complexity_data[cname]
+                    cdata['class']=complexity_data[cname]
+                    cdata['line_no']=complexity_data[cname+'line_no']
+                    for i in complexity_data[cname+'_/@#%&/_methods']:
+                        cdata['methods'][i]=complexity_data[cname+'_/@#%&/_methods'][i]
                  else:
-                    cdata['class']=  "4"
-                 for i in cmethods:
-                    if(cname+'_'+i) in complexity_data:
-                        cdata['methods'][i]=complexity_data[cname+'_'+i]
-                    else:
-                        cdata['methods'][i]="1"
+                    cdata="Undefined"
              else:
                 if cname in Cylomatic_Compelxity[filepath]:
                     cdata['class'] = Cylomatic_Compelxity[filepath][cname]
+                    cdata['line_no'] = Cylomatic_Compelxity[filepath][cname+'line_no']
+                    for i in Cylomatic_Compelxity[filepath][cname+'_/@#%&/_methods']:
+                        cdata['methods'][i]=Cylomatic_Compelxity[filepath][cname+'_/@#%&/_methods'][i]
                 else:
-                    cdata['class']="4"
-                for i in cmethods:
-                    if(cname+'_'+i) in Cylomatic_Compelxity[filepath]:
-                        cdata['methods'][i]=Cylomatic_Compelxity[filepath][cname+'_'+i]
-                    else:
-                        cdata['methods'][i]="1"
+                    cdata="Undefined"
+
              return cdata
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             logger.print_on_console("Error occured while calculating complexity")
             log.error(e)
