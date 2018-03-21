@@ -13,7 +13,6 @@ import re
 import controller
 import math
 import logging
-import lizard
 log = logging.getLogger('apg.py')
 Cylomatic_Compelxity={}
 prev_classes = []
@@ -316,7 +315,6 @@ class AutomatedPathGenerator:
              global Cylomatic_Compelxity
              error_flag_cc=False
              cdata={'class':'', 'methods':{},'line_no':''}
-             logger.print_on_console(cname)
              if not filepath in Cylomatic_Compelxity:
                  complexity_data={}
                  subprocess.call(['java','-classpath',r'./Lib/site-packages/flowgraph_lib/Cyclomatic/*','net.sourceforge.pmd.PMD','-d',
