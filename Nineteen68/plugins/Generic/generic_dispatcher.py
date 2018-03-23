@@ -131,6 +131,7 @@ class GenericKeywordDispatcher:
                   'verifyobjects': self.xml_oper.verifyObjects,
                   'typecast':self.util_operation_obj.type_cast,
                   'verifyfileimages':self.util_operation_obj.verify_file_images,
+                  'imagesimilaritypercentage':self.util_operation_obj.image_similarity_percentage,
                   'stop':self.util_operation_obj.stop,
                   'createdynvariable':self.dyn_var_obj.create_dynamic_variable,
                   'copyvalue':self.dyn_var_obj.copy_value,
