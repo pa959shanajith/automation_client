@@ -1081,6 +1081,8 @@ class StepDescription:
         #Image keywords
         def verifywebimages():
             return ' Compare images '+ "'" + tsp.custname + "'" + ' and ' +"'"+input+"'"
+        def imagesimilaritypercentage():
+            return ' Compare images '+ "'" + tsp.custname + "'" + ' and ' +"'"+input+"'"
 
         #dropdown keywords
         def getselected():
