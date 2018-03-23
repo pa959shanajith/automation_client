@@ -11,20 +11,20 @@ import shutil
 import json
 import re
 import controller
-import math
 import logging
+from datetime import datetime
 log = logging.getLogger('apg.py')
 Cylomatic_Compelxity={}
 prev_classes = []
 
 class AutomatedPathGenerator:
-    def __init__(self):
+    def __init__(self,sockeIOobj):
         self.FlowChart = [] #List of all the FlowChart Nodes
         self.PosMethod = [] #List of all the PossibleMethods
         self.Classes = [] #List of all the Classes
         self.PossibleMethods = []
         self.filenames = set()
-        self.socketIO = None
+        self.socketIO = sockeIOobj
         self.ClassVariables= {}
         self.counter = 0
 
@@ -194,7 +194,10 @@ class AutomatedPathGenerator:
     def generate_flowgraph(self, version, source, socketIO, *args):
         try:
             global Cylomatic_Compelxity, prev_classes
-            self.socketIO=socketIO
+            currentdate= datetime.now()
+            beginingoftime = datetime.utcfromtimestamp(0)
+            differencedate= currentdate - beginingoftime
+            start_time = long(differencedate.total_seconds() * 1000.0)
             Cylomatic_Compelxity={}
             prev_classes=[]
             logger.print_on_console("Graph generation in progress...")
@@ -275,8 +278,11 @@ class AutomatedPathGenerator:
                             children.remove(t['modified_id'])
                         t['child'] = children
                 #print test
-
-                data = {"classes":self.Classes, "links":jsonString, "data_flow":test, "result":"success"}
+                currentdate= datetime.now()
+                beginingoftime = datetime.utcfromtimestamp(0)
+                differencedate= currentdate - beginingoftime
+                end_time = long(differencedate.total_seconds() * 1000.0)
+                data = {"classes":self.Classes, "links":jsonString, "data_flow":test, "result":"success", "starttime":start_time, "endtime":end_time}
                 #data = {"classes":self.Classes, "links":jsonString, "result":"success"}
                 self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
 
@@ -360,4 +366,24 @@ class AutomatedPathGenerator:
             import traceback
             traceback.print_exc()
             logger.print_on_console("Error occured while calculating complexity")
+            log.error(e)
+
+    def open_file_in_editor(self, editor, filepath, linenumber):
+        try:
+            if os.path.exists(filepath):
+                linenumberOption = "-n" + str(linenumber)
+                editorOption = "C:\\Program Files (x86)\\Notepad++\\notepad++.exe"
+                command = editorOption + " " + linenumberOption + " " + filepath
+                logger.print_on_console('Opening file %s',filepath)
+                editor_process = subprocess.Popen(command)
+                data = {'status' : 'success','message' : 'successfully opened file'}
+                self.socketIO.emit('open_file_in_editor_result',json.dumps(data))
+            else:
+                logger.print_on_console("File ",filepath ," is removed or deleted")
+                data = {'status': 'fail','message': "File is removed or deleted"}
+                self.socketIO.emit('open_file_in_editor_result', json.dumps(data))
+        except Exception as e:
+            logger.print_on_console("Error occured while opening file")
+            data = {'status': 'fail', 'message': "Notepad++ installation filepath is not correct"}
+            self.socketIO.emit('open_file_in_editor_result', json.dumps(data))
             log.error(e)
