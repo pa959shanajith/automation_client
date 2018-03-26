@@ -29,21 +29,27 @@ class ScrapeWindow(wx.Frame):
         self.action = action
         self.data = data
         status = obj.openBrowser(browser)
-        self.panel = wx.Panel(self)
-        self.core_utilsobject = core_utils.CoreUtils()
-        if (self.action == 'scrape'):
-            self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd",pos=(12,18 ), size=(175, 28))
-            self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)   # need to implement OnExtract()
-            self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,48 ), size=(175, 28))
-            self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)   # need to implement OnExtract()
-        elif(self.action == 'compare'):
-            self.comparebutton = wx.ToggleButton(self.panel, label="Compare",pos=(12,38 ), size=(175, 28))
-            self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)   # need to implement OnExtract()
-        self.Centre()
-        style = self.GetWindowStyle()
-        self.SetWindowStyle( style|wx.STAY_ON_TOP )
-        wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
-        self.Show()
+        if status == False:
+            self.socketIO.emit('scrape',status)
+            driver = browserops.driver
+            driver.close()
+            self.Close()
+        else:
+            self.panel = wx.Panel(self)
+            self.core_utilsobject = core_utils.CoreUtils()
+            if (self.action == 'scrape'):
+                self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd",pos=(12,18 ), size=(175, 28))
+                self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)   # need to implement OnExtract()
+                self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,48 ), size=(175, 28))
+                self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)   # need to implement OnExtract()
+            elif(self.action == 'compare'):
+                self.comparebutton = wx.ToggleButton(self.panel, label="Compare",pos=(12,38 ), size=(175, 28))
+                self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)   # need to implement OnExtract()
+            self.Centre()
+            style = self.GetWindowStyle()
+            self.SetWindowStyle( style|wx.STAY_ON_TOP )
+            wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
+            self.Show()
 
 
 
