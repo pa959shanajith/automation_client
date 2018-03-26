@@ -38,6 +38,7 @@ TernaryPos = []
 Label = {}
 ClassVariables = {}
 PresentClassName = None
+PresentMethodName = None
 import logging
 import logger
 log = logging.getLogger('ObjectExtract.py')
@@ -50,10 +51,10 @@ def addNodes(shape, text, parent, child):
 		classname = PresentClassName
 	text = unicode(text, errors='replace')
 	if parent is None:
-		return {"shape": shape, "text": text, "parent": parent, "child": child, "class": classname}
+		return {"shape": shape, "text": text, "parent": parent, "child": child, "class": classname, "method": PresentMethodName}
 	else:
 		return {"shape": shape, "text": text,
-				"parent": [parent], "child": child, "class": classname}
+				"parent": [parent], "child": child, "class": classname, "method": PresentMethodName}
 
 
 '''Class Node (Name,FlowChart Node No,Methods,Constructors,Extend Name,Implements Name)'''
@@ -2377,6 +2378,7 @@ def methodDeclaratorExtraction(root):
 
 
 def methodExtraction(root):
+	global PresentMethodName
 	line = ASTNode[root]["value"][1]
 	MethodType = []
 	NameList = False
@@ -2390,6 +2392,7 @@ def methodExtraction(root):
 			ResultType = resultTypeExtraction(ASTNode[root]["child"][i])
 		elif re.match('MethodDeclarator', line):
 			MethodName = ASTNode[ASTNode[root]["child"][i]]["value"][1]
+			PresentMethodName = MethodName
 			NoOfFormalParameters, Variables = methodDeclaratorExtraction(
 				ASTNode[root]["child"][i])
 			New_Nodes = addNodes("InnerBox",

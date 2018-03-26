@@ -191,7 +191,7 @@ class AutomatedPathGenerator:
             pass
         return flag
 
-    def generate_flowgraph(self, version, source, socketIO, *args):
+    def generate_flowgraph(self, version, source, *args):
         try:
             global Cylomatic_Compelxity, prev_classes
             currentdate= datetime.now()
@@ -212,7 +212,18 @@ class AutomatedPathGenerator:
 
                 for i in range(0,len(self.FlowChart)):
                     self.FlowChart[i]['id']=i
-                #print self.PossibleMethods
+                    if("'" in self.FlowChart[i]['text']):
+                        print self.FlowChart[i]['text']
+                        self.FlowChart[i]['text'] = (self.FlowChart[i]['text']).replace("'", '"')
+                    if(self.FlowChart[i]['class'] == 'import'):
+                        start = i
+                        while(self.FlowChart[i]['class'] == 'import'):
+                            i = i + 1
+                            end = i
+                        classname = self.FlowChart[i]['class']
+                        for j in range (start, end):
+                            self.FlowChart[j]['class'] = classname
+
                 jsonString = []
                 c_source=None
                 c_target=None
@@ -240,48 +251,46 @@ class AutomatedPathGenerator:
                 jsonString = [dict(t) for t in set([tuple(d.items()) for d in jsonString])]
                 #print jsonString
 
-                count = -1
                 test = []
                 i = 0
-                while (i < len(self.FlowChart)):
-                    if(self.FlowChart[i]['shape'] != 'Square'):
-                        self.FlowChart[i]['modified_id'] = count
-                        test.append(self.FlowChart[i])
+                flag = False
+                while(i < len(self.FlowChart)):
+                    if(self.FlowChart[i]['shape'] == 'Square'):
+                        start = i
+                        parent = self.FlowChart[i]['id']
+                        i = i + 1
+                        f = False
+                        #while(i <len(self.FlowChart) and self.FlowChart[i]['shape'] == 'Square'
+                        #and self.FlowChart[i]['child'] != None and len(self.FlowChart[i]['child']) == 1):
+                        while(i <len(self.FlowChart) and self.FlowChart[i]['shape'] == 'Square'
+                        and self.FlowChart[i]['parent'] == [parent]):
+                            id = self.FlowChart[i]['id']
+                            parent = id
+                            for fc in self.FlowChart:
+                                if(fc['child'] != None and (id in fc['child']) and fc['id'] > id):
+                                    f = True
+                                    break
+                            if(not f):
+                                self.FlowChart[start]['text'] += '\n' + self.FlowChart[i]['text']
+                                self.FlowChart[i]['delete'] = 'true'
+                                end = i
+                                flag = True
+                            i = i + 1
+                        if (flag):
+                            self.FlowChart[start]['child'] = self.FlowChart[end]['child']
+                            self.FlowChart[end+1]['parent'] = [start]
+                            flag = False
                     else:
-                        children = []
-                        while(self.FlowChart[i+1]['shape'] == 'Square'):
-                            self.FlowChart[i]['modified_id'] = count
-                            children.extend(self.FlowChart[i]['child'])
-                            i = i+1
-                        children.extend(self.FlowChart[i]['child'])
-                        test.append({'modified_id': count,
-                                      'parent': [count - 1],
-                                	   'text': u'Processing',
-                                	   'class': self.FlowChart[i]['class'],
-                                	   'shape': 'Circle',
-                                	   'child': children
-                                	})
-                        self.FlowChart[i]['modified_id'] = count
-                    count = count + 1
-                    i = i + 1
-                #print self.FlowChart
-                for t in test:
-                    if(t['parent'] != [-1] and t['parent'] != [] and t['parent'] != None and t['text']!= 'Processing'):
-                        t['parent'] = [((self.FlowChart[t['parent'][0]])['modified_id'])]
-                    if(t['child'] != None):
-                        children = []
-                        for ch in t['child']:
-                            if(ch != None and ch != ''):
-                                children.append((self.FlowChart[ch])['modified_id'])
-                        children = list(set(children))
-                        if (t['modified_id'] in children):
-                            children.remove(t['modified_id'])
-                        t['child'] = children
+                        i = i + 1
+                for fc in self.FlowChart:
+                    if not (fc.has_key('delete')):
+                        test.append(fc)
                 #print test
+
                 currentdate= datetime.now()
-                beginingoftime = datetime.utcfromtimestamp(0)
                 differencedate= currentdate - beginingoftime
                 end_time = long(differencedate.total_seconds() * 1000.0)
+
                 data = {"classes":self.Classes, "links":jsonString, "data_flow":test, "result":"success", "starttime":start_time, "endtime":end_time}
                 #data = {"classes":self.Classes, "links":jsonString, "result":"success"}
                 self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
