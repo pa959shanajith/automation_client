@@ -775,7 +775,8 @@ class Singleton_DriverUtil():
                     logger.print_on_console('Chrome browser started')
                     log.info('Chrome browser started')
                 else:
-                    logger.print_on_console('Browser version doesnot support driver version')
+                    logger.print_on_console('Chrome browser version not supported')
+                    log.info('Chrome browser version not supported')
                     driver = None
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
@@ -847,8 +848,8 @@ class Singleton_DriverUtil():
                         log.info('Firefox browser started using geckodriver ')
                     else:
                         driver.close()
-                        logger.print_on_console("Browser version not supported")
-                        log.info('Browser version not supported')
+                        logger.print_on_console("Firefox browser version not supported")
+                        log.info('Firefox browser version not supported')
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 log.info('Requested browser is not available')
@@ -870,15 +871,15 @@ class Singleton_DriverUtil():
                 browser_ver=driver.capabilities['version']
                 browser_ver1 = browser_ver.encode('utf-8')
                 browser_ver = int(browser_ver1)
-                if(browser_ver<=8):
+                if(browser_ver>=8 and browser_ver<=11):
                     drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('IE browser started')
                     log.info('IE browser started')
                 else:
                     driver.close()
-                    logger.print_on_console("Browser version not supported")
-                    log.info('Browser version not supported')
+                    logger.print_on_console("IE browser version not supported")
+                    log.info('IE browser version not supported')
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 log.info('Requested browser is not available')
