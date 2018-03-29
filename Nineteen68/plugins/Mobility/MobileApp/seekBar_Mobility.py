@@ -34,7 +34,15 @@ class Seek_Bar_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        webelement.send_keys('0')
+                        ##webelement.send_keys('0')
+                        location=webelement.location
+                        size=webelement.size
+                        start_x=location['x']
+                        start_y=location['y'] + (size['height']/2)
+                        end_x=location['x']
+                        end_y=location['y'] + (size['height']/2)
+                        driver=install_and_launch.driver
+                        driver.swipe(start_x,start_y,end_x,end_y,3000)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:

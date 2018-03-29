@@ -150,8 +150,8 @@ class Dispatcher:
                         if webelement != None:
                             if isinstance(webelement,list):
                                 webelement = webelement[0]
-                            log.info(WEB_ELEMENT_FOUND)
-                            logger.print_on_console(WEB_ELEMENT_FOUND)
+                                log.info(WEB_ELEMENT_FOUND)
+                                logger.print_on_console(WEB_ELEMENT_FOUND)
             return webelement
 
 
