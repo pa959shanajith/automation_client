@@ -519,7 +519,6 @@ class FileOperations:
         return : linenumbers [list]
 
         """
-        Rflag=False
         Tflag= False
         try:
 
@@ -544,7 +543,6 @@ class FileOperations:
                                 methodoutput=TEST_RESULT_TRUE
                                 Tflag=True
                     else:
-
                         err_msg=result[3]
             except:
                 params=[]
@@ -553,16 +551,47 @@ class FileOperations:
                 result=self.verify_file_exists(params[0],'')
                 if result[1]==TEST_RESULT_TRUE:
                     file_ext,res=self.__get_ext(params[0])
-                    if res == True:
-                        res,linenumbers,err_msg= self.dict[file_ext+'_get_line_number'](*params)
-    ##                    logger.print_on_console(linenumbers)
-                        if linenumbers is not None and len(linenumbers) > 0:
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
-                            Tflag=True
-                else:
-                    err_msg=result[3]
-
+                    try:
+                        if res == True:
+                            res,linenumbers,err_msg= self.dict[file_ext+'_get_line_number'](*params)
+        ##                    logger.print_on_console(linenumbers)
+                            if linenumbers is not None and len(linenumbers) > 0:
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                                Tflag=True
+                    except:
+                        for src, dest in self.cp1252.items():
+                            if src in content:
+                                content = content.replace(src, dest)
+                        content = content.encode('raw_unicode_escape')
+                        params=self.__split(input_path,content,*args)
+                        result=self.verify_file_exists(params[0],'')
+                        if result[1]==TEST_RESULT_TRUE:
+                            file_ext,res=self.__get_ext(params[0])
+                            if res == True:
+                                res,linenumbers,err_msg= self.dict[file_ext+'_get_line_number'](*params)
+            ##                    logger.print_on_console(linenumbers)
+                                if linenumbers is not None and len(linenumbers) > 0:
+                                    status=TEST_RESULT_PASS
+                                    methodoutput=TEST_RESULT_TRUE
+                                    Tflag=True
+                                else:
+                                    content=data.encode('cp1252')
+                                    params=self.__split(input_path,content,*args)
+                                    result=self.verify_file_exists(params[0],'')
+                                    if result[1]==TEST_RESULT_TRUE:
+                                        file_ext,res=self.__get_ext(params[0])
+                                        if res == True:
+                                            res,linenumbers,err_msg= self.dict[file_ext+'_get_line_number'](*params)
+                        ##                    logger.print_on_console(linenumbers)
+                                            if linenumbers is not None and len(linenumbers) > 0:
+                                                status=TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
+                                                Tflag=True
+                                    else:
+                                        err_msg=result[3]
+                        else:
+                            err_msg=result[3]
             if Tflag!=True:
                 ##content=data.encode('cp1252')
                 for src, dest in self.cp1252.items():
@@ -579,7 +608,7 @@ class FileOperations:
                         if linenumbers is not None and len(linenumbers) > 0:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
-                            Rflag=True
+                            Tflag=True
                         else:
                             content=data.encode('cp1252')
                             params=self.__split(input_path,content,*args)
@@ -592,6 +621,7 @@ class FileOperations:
                                     if linenumbers is not None and len(linenumbers) > 0:
                                         status=TEST_RESULT_PASS
                                         methodoutput=TEST_RESULT_TRUE
+                                        Tflag=True
                             else:
                                 err_msg=result[3]
                 else:

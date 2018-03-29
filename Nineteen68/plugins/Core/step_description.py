@@ -66,6 +66,8 @@ class StepDescription:
             return "Write '"+ inputval[1] + "' to file  '" + inputval[0] + "'"
         def verifyfileimages():
             return "Compare images '" + inputval[0]+ "' and '" + inputval[1]+ "'"
+        def imagesimilaritypercentage():
+            return "Compare images '" + inputval[0]+ "' and '" + inputval[1]+ "'"
         def clearfilecontent():
 #            this needs to be implemeted
 ##            if(testStepProperty.getInputVal().size() == 2){
@@ -1078,6 +1080,8 @@ class StepDescription:
 
         #Image keywords
         def verifywebimages():
+            return ' Compare images '+ "'" + tsp.custname + "'" + ' and ' +"'"+input+"'"
+        def imagesimilaritypercentage():
             return ' Compare images '+ "'" + tsp.custname + "'" + ' and ' +"'"+input+"'"
 
         #dropdown keywords
