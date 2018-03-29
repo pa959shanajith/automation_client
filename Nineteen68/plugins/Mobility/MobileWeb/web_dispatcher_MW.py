@@ -244,6 +244,7 @@ class Dispatcher:
                   'rightclick':self.util_object.rightclick,
                   'mouseclick':self.util_object.mouse_click,
                   'verifywebimages':self.util_object.verify_web_images,
+                  'imagesimilaritypercentage':self.util_object.image_similarity_percentage,
                   'waitforelementvisible':self.element_object.waitforelement_visible,
 
 
