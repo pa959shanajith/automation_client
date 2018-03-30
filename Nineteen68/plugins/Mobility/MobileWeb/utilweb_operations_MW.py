@@ -709,9 +709,9 @@ class UtilWebKeywords:
                         output = str((1-err)*100)
                         logger.print_on_console("Image similarity percentage is: "+str((1-err)*100)+"%")
                         methodoutput=TEST_RESULT_TRUE
-                        status=TEST_RESULT_PASS       
+                        status=TEST_RESULT_PASS
                         log.info('Result is ',output)
-                        logger.print_on_console('Result is ',output)                                         
+                        logger.print_on_console('Result is ',output)
             else:
                 err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
             if err_msg != None:
@@ -721,7 +721,7 @@ class UtilWebKeywords:
             log.error(e)
             logger.print_on_console(e)
             err_msg=INPUT_ERROR
-    return status,methodoutput,output,err_msg
+        return status,methodoutput,output,err_msg
 
     def __get_window_handles(self):
         window_handles=browser_Keywords_MW.driver_obj.window_handles
