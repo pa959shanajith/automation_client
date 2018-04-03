@@ -1034,12 +1034,15 @@ class Singleton_DriverUtil():
         log.info('Driver version:',driver_ver)
 ##        logger.print_on_console(webconstants.CHROME_DRIVER_VERSION[0][0])
 ##        logger.print_on_console(type(webconstants.CHROME_DRIVER_VERSION[0][0]))
-        if(driver_ver == float(webconstants.CHROME_DRIVER_VERSION[0][0]) and browser_ver >= int(webconstants.CHROME_DRIVER_VERSION[0][1]) and browser_ver <= int(webconstants.CHROME_DRIVER_VERSION[0][2])):
-            flag1 = 1
-        elif(driver_ver == float(webconstants.CHROME_DRIVER_VERSION[0][0]) and browser_ver >= int(webconstants.CHROME_DRIVER_VERSION[0][1]) and browser_ver <= int(webconstants.CHROME_DRIVER_VERSION[0][2])):
-            flag1 = 2
-        else:
-            flag1 = 0
+        for i in range(0,int(len(webconstants.CHROME_DRIVER_VERSION))):
+            print i
+            if(driver_ver == float(webconstants.CHROME_DRIVER_VERSION[i][0]) and browser_ver >= int(webconstants.CHROME_DRIVER_VERSION[i][1]) and browser_ver <= int(webconstants.CHROME_DRIVER_VERSION[i][2])):
+                flag1 = i
+##                logger.print_on_console('Flag:',flag1)
+                log.info('Flag:',flag1)
+                return flag1
+            else:
+                flag1 = 0
 ##        logger.print_on_console('Flag:',flag1)
         log.info('Flag:',flag1)
         return flag1
