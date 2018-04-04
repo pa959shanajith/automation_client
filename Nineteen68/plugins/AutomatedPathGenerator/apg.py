@@ -104,7 +104,7 @@ class AutomatedPathGenerator:
 
     '''function to open file'''
     def open_file(self, filename, java_version):
-        flag = False
+        flag = True
         try:
             global prev_classes
             filename = filename.replace("/", "\\")
@@ -129,13 +129,14 @@ class AutomatedPathGenerator:
                     data = [c for c in self.Classes if c not in prev_classes]
                     for cls in data:
                         if(not controller.terminate_flag):
-                            d = self.modifyJSON(cls,filename)
+                            d = self.modifyJSON(cls, filename)
                             d['complexity']=self.cyclomatic_Complexity(filename,d['name'])
                             self.socketIO.emit('flowgraph_result',json.dumps(d))
                         else:
+                            flag = False
                             break
-                    flag = True
                 else:
+                    flag = False
                     print("Java file %s has Errors!!!" % (filename.split('\\')[-1]))
         except Exception as e:
             log.error(e)
@@ -146,15 +147,16 @@ class AutomatedPathGenerator:
         try:
             output = []
             for keys in cls['methods']:
-                method = cls['methods'][keys][0]['MethodName']+'('+cls['methods'][keys][0]['Variables']+'): '+cls['methods'][keys][0]['ResultType']
-                if cls['methods'][keys][0]['MethodType'][0] == 'package private':
-                    output.append('~'+method)
-                elif cls['methods'][keys][0]['MethodType'][0] == 'private':
-                    output.append('-'+method)
-                elif cls['methods'][keys][0]['MethodType'][0] == 'protected':
-                    output.append('#'+method)
-                elif cls['methods'][keys][0]['MethodType'][0] == 'public':
-                    output.append('+'+method)
+                for meth in cls['methods'][keys]:
+                    method = meth['MethodName']+'('+meth['Variables']+'): '+meth['ResultType']
+                    if meth['MethodType'][0] == 'package private':
+                        output.append('~'+method)
+                    elif meth['MethodType'][0] == 'private':
+                        output.append('-'+method)
+                    elif meth['MethodType'][0] == 'protected':
+                        output.append('#'+method)
+                    elif meth['MethodType'][0] == 'public':
+                        output.append('+'+method)
             cls['abstract'] = False
             cls['classVariables'] = []
             if(cls['name'] in self.ClassVariables.keys()):
@@ -213,7 +215,6 @@ class AutomatedPathGenerator:
                 for i in range(0,len(self.FlowChart)):
                     self.FlowChart[i]['id']=i
                     if("'" in self.FlowChart[i]['text']):
-                        #print self.FlowChart[i]['text']
                         self.FlowChart[i]['text'] = (self.FlowChart[i]['text']).replace("'", '"')
                     if(self.FlowChart[i]['class'] == 'import'):
                         start = i
@@ -224,6 +225,7 @@ class AutomatedPathGenerator:
                         for j in range (start, end):
                             self.FlowChart[j]['class'] = classname
 
+                '''jsonString contains the association links for the class diagram'''
                 jsonString = []
                 c_source=None
                 c_target=None
@@ -234,23 +236,34 @@ class AutomatedPathGenerator:
                             if (m in cls["methods"].keys()):
                                 c_target = cls["name"]
                                 break
+                            elif (m == cls["name"]):
+                                c_target = cls["name"]
+                                break
                         if(method.has_key("PresentClass")):
                             c_source = method["PresentClass"].split("(")[0]
-                        if(c_source != c_target and c_source != None and c_target != None):
-                        #if(c_source != None and c_target != None):
-                            jsonString.append({"source":c_source,"target":c_target})
+                        if(c_source != None and c_target != None):
+                            if(c_source != c_target):
+                                jsonString.append({"source":c_source,"target":c_target})
                             id = None
                             for fc in self.FlowChart:
-                                if((fc['class'].split('(')[0] == c_source) and (method['PosMethod'].split('(')[0] in fc['text'])):
+                                if((fc['class'].split('(')[0] == c_source) and (m in fc['text']) and ('Method Name:' not in fc['text'])):
                                     for trgt in self.FlowChart:
-                                        if((trgt['class'].split('(')[0] == c_target) and (method['PosMethod'].split('(')[0] in trgt['text'])):
+                                        if((trgt['class'].split('(')[0] == c_target) and (m in trgt['text']) and ('Method Name:' in trgt['text'])):
                                             id = trgt['id']
                                             break
-                                    fc['child'].append(id)
+                                    if(isinstance(fc['child'],list)):
+                                        fc['child'].append(id)
+                                    else:
+                                        fc['child'] = [id]
+                                    if(c_source == c_target):
+                                        fc['within'] = True
+                                    else:
+                                        fc['outside'] = True
                                     break
                 jsonString = [dict(t) for t in set([tuple(d.items()) for d in jsonString])]
                 #print jsonString
 
+                '''To compress similar nodes in data-flow into one'''
                 test = []
                 i = 0
                 flag = False
@@ -260,10 +273,8 @@ class AutomatedPathGenerator:
                         parent = self.FlowChart[i]['id']
                         i = i + 1
                         f = False
-                        #while(i <len(self.FlowChart) and self.FlowChart[i]['shape'] == 'Square'
-                        #and self.FlowChart[i]['child'] != None and len(self.FlowChart[i]['child']) == 1):
-                        while(i <len(self.FlowChart) and self.FlowChart[i]['shape'] == 'Square'
-                        and self.FlowChart[i]['parent'] == [parent]):
+                        while(i <len(self.FlowChart) and self.FlowChart[i]['shape'] == 'Square' and self.FlowChart[i-1]['child'] == [self.FlowChart[i]['id']]
+                        and self.FlowChart[i]['child'] == [self.FlowChart[i]['id']+1] and self.FlowChart[i].has_key('call') == False):
                             id = self.FlowChart[i]['id']
                             parent = id
                             for fc in self.FlowChart:
@@ -285,26 +296,24 @@ class AutomatedPathGenerator:
                 for fc in self.FlowChart:
                     if not (fc.has_key('delete')):
                         test.append(fc)
-                #print test
 
                 currentdate= datetime.now()
                 differencedate= currentdate - beginingoftime
                 end_time = long(differencedate.total_seconds() * 1000.0)
 
-                data = {"classes":self.Classes, "links":jsonString, "data_flow":test, "result":"success", "starttime":start_time, "endtime":end_time}
-                #data = {"classes":self.Classes, "links":jsonString, "result":"success"}
+                data = {"links":jsonString, "data_flow":test, "result":"success", "starttime":start_time, "endtime":end_time}
+                #data = {"classes":self.Classes, "links":jsonString, "result":"success", "starttime":start_time, "endtime":end_time}
                 self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
+                logger.print_on_console("Graph generation completed")
 
-                if(not controller.terminate_flag):
-                    logger.print_on_console("Graph generation completed")
-                else:
-                    logger.print_on_console("---------Termination Completed-------")
-                controller.terminate_flag = False
             else:
+                if(controller.terminate_flag == True):
+                    logger.print_on_console("---------Termination Completed-------")
                 data = {"result":"fail"}
                 self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
                 logger.print_on_console("Graph generation failed")
 
+            controller.terminate_flag = False
         except Exception as e:
             data = {"result":"fail"}
             self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
@@ -323,7 +332,6 @@ class AutomatedPathGenerator:
         complexity=re.search("cyclomatic complexity of (\d+)",line,re.IGNORECASE).group(1)
         complexity = "1" if complexity=="0" else complexity
         line_no=re.search(r'.*:([^:]*):',line).group(1)
-        #print(name+"-"+complexity+"-"+line_no)
         return name,complexity,line_no
 
     def cyclomatic_Complexity(self,filepath,cname):
@@ -371,7 +379,7 @@ class AutomatedPathGenerator:
              return cdata
         except Exception as e:
             import traceback
-            traceback.print_exc()
+            print (traceback.format_exc())
             logger.print_on_console("Error occured while calculating complexity")
             log.error(e)
 

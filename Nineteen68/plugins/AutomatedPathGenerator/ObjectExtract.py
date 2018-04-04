@@ -39,6 +39,9 @@ Label = {}
 ClassVariables = {}
 PresentClassName = None
 PresentMethodName = None
+method_level = 0
+first_method_flag = True
+nested_method_flag = False
 import logging
 import logger
 log = logging.getLogger('ObjectExtract.py')
@@ -193,7 +196,7 @@ def additiveExpressionExtraction(root):
 '''AllocationExpression (handles new keyword)'''
 def allocationExpressionExtraction(root):
 	# This will link the anonymous inner classes with the respected statement
-	global AnonymousInnerClass, s
+	global AnonymousInnerClass, s, PresentClassName
 	Possibility = 0
 	Variables = "new "  # new keyword added for display purpose
 	Variable = ""
@@ -286,7 +289,7 @@ def allocationExpressionExtraction(root):
 			NoOfArguments = NoOfArguments + 1
 		PossibleMethods[len(PossibleMethods) -
 						1]["NoOfArguments"] = NoOfArguments
-
+	PossibleMethods[len(PossibleMethods) - 1]["PresentClass"] = PresentClassName
 	Possibility = Possibility + 1  # increase by 1 as new keyword found
 	return Possibility, Variables
 
@@ -296,6 +299,7 @@ def andExpressionExtraction(root):
 	Possibility = 0
 	Variable = ""
 	Var = ""
+	Possible = 0
 	for i in range(0, len(ASTNode[root]["child"])):
 		line = ASTNode[ASTNode[root]["child"][i]
 					   ]["value"][0]  # Label of the child
@@ -476,6 +480,7 @@ def assertStatementExtraction(root):
 
 '''Block (handles part between {})'''
 def blockExtraction(root):
+	global PresentMethodName, nested_method_flag
 	ASTNode[root]["NodesPosition"] = ASTNode[ASTNode[root]["parent"]
 											 ]["NodesPosition"]  # initializing the root's Flow Chart Node No
 	'''creating a start FlowChart Node for Method Beginning'''
@@ -504,6 +509,10 @@ def blockExtraction(root):
 		if re.match('MethodDeclaration', ASTNode[ASTNode[root]["parent"]]["value"][0]) and (
 				FlowChart[index[0]]["shape"] != 'Circle' or FlowChart[index[0]]["child"] is not None):
 			New_Nodes = addNodes("Circle", "End", index[0], None)
+			if(not nested_method_flag):
+				PresentMethodName = None
+			else:
+				nested_method_flag = False
 			FlowChart.append(New_Nodes)
 			ASTNode[root]["NodesPosition"] = len(FlowChart) - 1
 			FlowChart[index[0]]["child"].append(ASTNode[root]["NodesPosition"])
@@ -521,6 +530,10 @@ def blockExtraction(root):
 		if re.match('MethodDeclaration', ASTNode[ASTNode[root]["parent"]]["value"][0]) and (
 				FlowChart[index]["shape"] != 'Circle' or FlowChart[index]["child"] is not None):
 			New_Nodes = addNodes("Circle", "End", index, None)
+			if(not nested_method_flag):
+				PresentMethodName = None
+			else:
+				nested_method_flag = False
 			FlowChart.append(New_Nodes)
 			ASTNode[root]["NodesPosition"] = len(FlowChart) - 1
 			FlowChart[index]["child"].append(ASTNode[root]["NodesPosition"])
@@ -642,7 +655,7 @@ def classOrInterfaceBodyDeclarationExtraction(root):
 
 '''ClassOrInterface (handles Class OR Interface)'''
 def classOrInterfaceExtraction(root):
-	global PresentClass, PresentClassName  # Used for MethodLinking
+	global PresentClass, PresentClassName, ClassVariables  # Used for MethodLinking
 	ClassOrInterfaceName = ASTNode[root]["value"][1]
 	Property = []  # AccessModifiers For Class(Eg:public)
 	complete_class_name = ClassOrInterfaceName
@@ -656,6 +669,21 @@ def classOrInterfaceExtraction(root):
 	'''creating a Class Node'''
 	ClassOrInterfaceName = complete_class_name
 	PresentClassName = ClassOrInterfaceName
+	if('static' in Property):
+		VarStorage.update({ClassOrInterfaceName.split('(')[0]:ClassOrInterfaceName.split('(')[0]})
+		for posmeth in PossibleMethods:
+			if(ClassOrInterfaceName.split('(')[0] in posmeth['PosMethod'] and posmeth['Class'] != ClassOrInterfaceName.split('(')[0]):
+				posmeth['Class'] = ClassOrInterfaceName.split('(')[0]
+				if('.' in posmeth['PosMethod']):
+					posmeth['PosMethod'] = posmeth['PosMethod'].split('.')[1]
+				arguments = posmeth['PosMethod'][posmeth['PosMethod'].find("(")+1:posmeth['PosMethod'].find(")")]
+				if(',' in arguments):
+					arguments = arguments.split(',')
+				else:
+					arguments = [arguments]
+				for arg in arguments:
+					if(VarStorage.has_key(arg)):
+						posmeth['typeOfArguments'].append(VarStorage[arg])
 	if ClassOrInterface == 'class' or (ClassOrInterface == 'nested' and Property.pop() == 'class'):
 		if ASTNode[ASTNode[root]["parent"]]["NodesPosition"] != -1:
 			New_Nodes = addNodes("Box",
@@ -1087,7 +1115,11 @@ def constructorExtraction(root):
 								 [])
 			FlowChart.append(New_Nodes)
 			ASTNode[root]["NodesPosition"] = len(FlowChart) - 1
-			FlowChart[ASTNode[ASTNode[root]["parent"]]["NodesPosition"]
+			if (isinstance(ASTNode[ASTNode[root]["parent"]]["NodesPosition"], list)):
+				for n in ASTNode[ASTNode[root]["parent"]]["NodesPosition"]:
+					FlowChart[n]["child"].append(ASTNode[root]["NodesPosition"])
+			else:
+				FlowChart[ASTNode[ASTNode[root]["parent"]]["NodesPosition"]
 					  ]["child"].append(ASTNode[root]["NodesPosition"])
 			Classes[len(Classes) - 1]["constructors"].append(addConstructor(ASTNode[root]
 																			["NodesPosition"], NoOfFormalParameters, Variables))  # adding it to Class variable
@@ -1133,6 +1165,7 @@ def constructorExtraction(root):
 			New_Nodes = addNodes(
 				"Circle", "End", ASTNode[root]["NodesPosition"][0], [])
 			FlowChart.append(New_Nodes)
+			PresentMethodName = None
 			FlowChart[ASTNode[root]["NodesPosition"][0]
 					  ]["child"].append(len(FlowChart) - 1)
 			for j in ASTNode[root]["NodesPosition"]:
@@ -1145,6 +1178,7 @@ def constructorExtraction(root):
 			New_Nodes = addNodes(
 				"Circle", "End", ASTNode[root]["NodesPosition"], [])
 			FlowChart.append(New_Nodes)
+			PresentMethodName = None
 			FlowChart[ASTNode[root]["NodesPosition"]
 					  ]["child"].append(len(FlowChart) - 1)
 			ASTNode[root]["NodesPosition"] = len(FlowChart) - 1
@@ -1920,11 +1954,12 @@ def forStatementExtraction(root):
 					FlowChart.append(New_Nodes)
 					FlowChart[len(FlowChart) - 1]["parent"].pop()
 					for j in range(0, len(index)):
-						if FlowChart[index[j]]["child"] is not None:
-							FlowChart[index[j]]["child"].append(
-								len(FlowChart) - 1)
-							FlowChart[len(FlowChart) -
-									  1]["parent"].append(index[j])
+						if(index[j] != None):
+							if FlowChart[index[j]]["child"] is not None:
+								FlowChart[index[j]]["child"].append(
+									len(FlowChart) - 1)
+								FlowChart[len(FlowChart) -
+										  1]["parent"].append(index[j])
 				else:
 					if index is not None:
 						New_Nodes = addNodes("Square", Updation, index, [])
@@ -1946,7 +1981,7 @@ def forStatementExtraction(root):
 					if isinstance(index, list):
 						# print index
 						for j in range(0, len(index)):
-							if j is not None and FlowChart[index[j]
+							if index[j] is not None and FlowChart[index[j]
 														   ]["child"] is not None:
 								FlowChart[index[j]]["child"].append(UpdationS)
 								FlowChart[UpdationS]["parent"].append(index[j])
@@ -2109,6 +2144,7 @@ def inclusiveOrExpressionExtraction(root):
 	Possibility = 0
 	Variable = ""
 	Var = ""
+	Possible = 0
 	for i in range(0, len(ASTNode[root]["child"])):
 		line = ASTNode[ASTNode[root]["child"][i]
 					   ]["value"][0]  # Label of the child
@@ -2357,7 +2393,7 @@ def memberSelectorExtraction(root):
 	PossibleMethods.append(addPossibleMethod("MemberSelector", MethodName, -1))
 	PossibleMethods[len(PossibleMethods) - 1]["Class"] = ClassName
 
-	return 1, ClassName + "::" + MethodName
+	return 1, str(ClassName) + "::" + str(MethodName)
 
 
 def methodDeclaratorExtraction(root):
@@ -2378,8 +2414,11 @@ def methodDeclaratorExtraction(root):
 
 
 def methodExtraction(root):
-	global PresentMethodName
+	global PresentMethodName, first_method_flag, method_level, nested_method_flag
 	line = ASTNode[root]["value"][1]
+	if(first_method_flag):
+		first_method_flag = False
+		method_level = ASTNode[root]["level"]
 	MethodType = []
 	NameList = False
 	Block = False
@@ -2392,7 +2431,10 @@ def methodExtraction(root):
 			ResultType = resultTypeExtraction(ASTNode[root]["child"][i])
 		elif re.match('MethodDeclarator', line):
 			MethodName = ASTNode[ASTNode[root]["child"][i]]["value"][1]
-			PresentMethodName = MethodName
+			if (ASTNode[root]["level"] == method_level):
+				PresentMethodName = MethodName
+			elif(ASTNode[root]["level"] > method_level):
+				nested_method_flag = True
 			NoOfFormalParameters, Variables = methodDeclaratorExtraction(
 				ASTNode[root]["child"][i])
 			New_Nodes = addNodes("InnerBox",
@@ -2459,9 +2501,8 @@ def methodExtraction(root):
 			FlowChart.append(New_Nodes)
 			FlowChart[ASTNode[root]["NodesPosition"]
 					  ]["child"].append(len(FlowChart) - 1)
-		FlowChart[FlowChart[ASTNode[root]["NodesPosition"]]["child"][1]]["text"] = "False:" + \
-			FlowChart[FlowChart[ASTNode[root]["NodesPosition"]]
-					  ["child"][1]]["text"]
+		FlowChart[FlowChart[ASTNode[root]["NodesPosition"]]["child"][1]]["text"] = FlowChart[FlowChart[ASTNode[root]["NodesPosition"]]
+					  																["child"][1]]["text"]
 	return aIC
 
 
@@ -2833,6 +2874,7 @@ def primaryExpressionExtraction(root):
 					if ArgumentName.find(',', k) == -1:
 						if (ArgumentName[:ArgumentName.find(',', k) + 1] == '') and len(ArgumentName)!=1:
 							ArgumentName = ArgumentName[1:]
+							#NoOfArguments = NoOfArguments + 1
 					if ArgumentName in VarStorage:
 						PossibleMethods[len(
 							PossibleMethods) - 1]["typeOfArguments"].append(VarStorage[ArgumentName])
@@ -3066,13 +3108,23 @@ def returnStatementExtraction(root):
 		FlowChart[ASTNode[root]["NodesPosition"]
 				  ]["child"].append(len(FlowChart) - 1)
 
-		New_Nodes = addNodes(
-			"Square",
-			"TernaryTemp=" +
-			name[2],
-			ASTNode[root]["NodesPosition"],
-			[])
-		FlowChart.append(New_Nodes)
+		if(isinstance(name[2],list)):
+			for n in name[2]:
+				New_Nodes = addNodes(
+					"Square",
+					"TernaryTemp=" +
+					n,
+					ASTNode[root]["NodesPosition"],
+					[])
+				FlowChart.append(New_Nodes)
+		else:
+			New_Nodes = addNodes(
+					"Square",
+					"TernaryTemp=" +
+					name[2],
+					ASTNode[root]["NodesPosition"],
+					[])
+			FlowChart.append(New_Nodes)
 		FlowChart[ASTNode[root]["NodesPosition"]
 				  ]["child"].append(len(FlowChart) - 1)
 		ASTNode[ASTNode[root]["parent"]]["NodesPosition"] = [
@@ -3242,8 +3294,13 @@ def statementExpressionExtraction(root):
 			ASTNode[root]["NodesPosition"],
 			[])
 		FlowChart.append(New_Nodes)
-		FlowChart[ASTNode[root]["NodesPosition"]
-				  ]["child"].append(len(FlowChart) - 1)
+		if(isinstance(ASTNode[root]["NodesPosition"],list)):
+			for n in ASTNode[root]["NodesPosition"]:
+				if(FlowChart[n]["child"] is not None):
+					FlowChart[n]["child"].append(len(FlowChart) - 1)
+		else:
+			FlowChart[ASTNode[root]["NodesPosition"]
+					  ]["child"].append(len(FlowChart) - 1)
 		ASTNode[root]["NodesPosition"] = len(FlowChart) - 1
 
 		New_Nodes = addNodes(
@@ -3274,13 +3331,23 @@ def statementExpressionExtraction(root):
 		FlowChart[ASTNode[root]["NodesPosition"]
 				  ]["child"].append(len(FlowChart) - 1)
 
-		New_Nodes = addNodes(
-			"Square",
-			"TernaryTemp=" +
-			name[2],
-			ASTNode[root]["NodesPosition"],
-			[])
-		FlowChart.append(New_Nodes)
+		if(isinstance(name[2],list)):
+			for n in name[2]:	
+				New_Nodes = addNodes(
+					"Square",
+					"TernaryTemp=" +
+					n,
+					ASTNode[root]["NodesPosition"],
+					[])
+				FlowChart.append(New_Nodes)
+		else:
+			New_Nodes = addNodes(
+					"Square",
+					"TernaryTemp=" +
+					name[2],
+					ASTNode[root]["NodesPosition"],
+					[])
+			FlowChart.append(New_Nodes)
 		FlowChart[ASTNode[root]["NodesPosition"]
 				  ]["child"].append(len(FlowChart) - 1)
 		ASTNode[ASTNode[root]["parent"]]["NodesPosition"] = [
@@ -3728,9 +3795,8 @@ def tryStatementExtraction(root):
 					index.append(j)
 			else:
 				index.append(x)
-			FlowChart[FlowChart[ASTNode[root]["NodesPosition"]]["child"][noChild]]["text"] = "False:" + \
-				FlowChart[FlowChart[ASTNode[root]["NodesPosition"]]
-						  ["child"][noChild]]["text"]
+			FlowChart[FlowChart[ASTNode[root]["NodesPosition"]]["child"][noChild]]["text"] = FlowChart[FlowChart[ASTNode[root]["NodesPosition"]]
+						  																		["child"][noChild]]["text"]
 		elif re.match("CatchStatement", line):
 			noChild = len(FlowChart[ASTNode[root]["NodesPosition"]]["child"])
 			x = catchStatementExtraction(noChild, ASTNode[root]["child"][i])

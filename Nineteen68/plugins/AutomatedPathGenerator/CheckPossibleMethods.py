@@ -82,7 +82,7 @@ def main(PossibleMethods, Classes):
                     if PosMethodName in PresentClass["methods"]:
                         for j in (PresentClass["methods"])[PosMethodName]:
                             if NoOfArguments == j["NoOfFormalParameters"]:
-                                if NoOfArguments > 0:
+                                '''if NoOfArguments > 0:
                                     Variables = j["Variables"]
                                     y = 0
                                     while(Variables.find(",") != -1):
@@ -105,7 +105,8 @@ def main(PossibleMethods, Classes):
                                     if y == NoOfArguments:
                                         PossibleMethods[i]["ParentNodeNo"] = j["NodeNo"]
                                 else:
-                                    PossibleMethods[i]["ParentNodeNo"] = j["NodeNo"]
+                                    PossibleMethods[i]["ParentNodeNo"] = j["NodeNo"]'''
+                                PossibleMethods[i]["ParentNodeNo"] = j["NodeNo"]
                 while PossibleMethods[i]["ParentNodeNo"] is None and PresentClass["extends"] is not None:
                     extend = False
                     for k in Classes:
@@ -144,7 +145,7 @@ def main(PossibleMethods, Classes):
             else:
                 for k in Classes:
                     if k["name"] == PosMethodName:
-                        if k["constructors"] is not None:
+                        if ((k["constructors"] is not None) and (k["constructors"] != [])):
                             for j in k["constructors"]:
                                 if NoOfArguments == j["NoOfFormalParameters"]:
                                     if NoOfArguments > 0:
@@ -170,6 +171,8 @@ def main(PossibleMethods, Classes):
                                             PossibleMethods[i]["ParentNodeNo"] = j["NodeNo"]
                                     else:
                                         PossibleMethods[i]["ParentNodeNo"] = j["NodeNo"]
+                        #else:
+                         #   PossibleMethods[i]["ParentNodeNo"] = k["position"]
     except Exception as e:
         log.error(e)
     return PossibleMethods
