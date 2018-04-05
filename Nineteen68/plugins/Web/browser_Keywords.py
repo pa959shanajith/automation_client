@@ -841,7 +841,7 @@ class Singleton_DriverUtil():
                     browser_ver=driver.capabilities['browserVersion']
                     browser_ver1 = browser_ver.encode('utf-8')
                     browser_ver = float(browser_ver1[:5])
-                    if(browser_ver <= float(webconstants.FIREFOX_BROWSER_VERSION[0]) ):
+                    if(browser_ver == float(webconstants.FIREFOX_BROWSER_VERSION[0]) ):
                         drivermap.append(driver)
                         driver.maximize_window()
                         logger.print_on_console('Firefox browser started using geckodriver')
@@ -851,8 +851,8 @@ class Singleton_DriverUtil():
                         driver = None
                         logger.print_on_console("Firefox browser version not supported")
                         log.info('Firefox browser version not supported')
-##                        logger.print_on_console("Browser version:",browser_ver)
-                        log.info('Browser version:',browser_ver)
+##                    logger.print_on_console("Browser version:",browser_ver)
+                    log.info('Browser version:',browser_ver)
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 log.info('Requested browser is not available')
@@ -1034,7 +1034,7 @@ class Singleton_DriverUtil():
         log.info('Driver version:',driver_ver)
 ##        logger.print_on_console(webconstants.CHROME_DRIVER_VERSION[0][0])
 ##        logger.print_on_console(type(webconstants.CHROME_DRIVER_VERSION[0][0]))
-        for i in range(0,int(len(webconstants.CHROME_DRIVER_VERSION))):
+        for i in range(0,len(webconstants.CHROME_DRIVER_VERSION)):
 ##            print i
             if(driver_ver == float(webconstants.CHROME_DRIVER_VERSION[i][0]) and browser_ver >= int(webconstants.CHROME_DRIVER_VERSION[i][1]) and browser_ver <= int(webconstants.CHROME_DRIVER_VERSION[i][2])):
                 flag1 = i
