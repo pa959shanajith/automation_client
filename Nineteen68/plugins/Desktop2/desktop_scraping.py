@@ -69,9 +69,9 @@ class Scrape:
                         try:
                             global allobjects
                             allobjects=self.get_all_children_caller(app_uia)
-                            objects = allobjects['view']
+##                            objects = allobjects['view']
                             tempobjects = []
-                            for i in objects:
+                            for i in allobjects['view']:
                                 res = match(i['x_screen'],i['y_screen'],i['width'],i['height'],self.coordX,self.coordY)
                                 if res == 1:
                                     tempobjects.append(i)
@@ -86,8 +86,8 @@ class Scrape:
                                         break
                                 except Exception as e:
                                     break
-                            disp_obj = desktop_dispatcher.DesktopDispatcher()
-                            ele = disp_obj.get_desktop_element(actualelement['xpath'],actualelement['url'],app_uia)
+##                            disp_obj = desktop_dispatcher.DesktopDispatcher()
+##                            ele = disp_obj.get_desktop_element(actualelement['xpath'],actualelement['url'],app_uia)
                             global actualobjects
                             if actualelement not in actualobjects:#------check to remove duplicate elements
                                 actualobjects.append(actualelement)
@@ -201,10 +201,13 @@ class Scrape:
                         foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
                         appThread = win32api.GetCurrentThreadId()
                         if( foreThread != appThread ):
-                            win32process.AttachThreadInput(foreThread[0], appThread, True)
-                            win32gui.BringWindowToTop(handle)
-                            win32gui.ShowWindow(handle,5)
-                            win32process.AttachThreadInput(foreThread[0], appThread, False)
+                            try:
+                                win32process.AttachThreadInput(foreThread[0], appThread, True)
+                                win32gui.BringWindowToTop(handle)
+                                win32gui.ShowWindow(handle,5)
+                                win32process.AttachThreadInput(foreThread[0], appThread, False)
+                            except Exception as e:
+                                pass
                         else:
                             win32gui.BringWindowToTop(handle)
                             win32gui.ShowWindow(handle,5)
