@@ -1,9 +1,12 @@
 import logging
 log = logging.getLogger('CheckPossibleMethods.py')
 '''This method will link all the user-defined method call with their method definition.'''
-def main(PossibleMethods, Classes):
+def main(PossibleMethods, Classes, VarStorage):
     try:
         Variables = None
+        classnames = []
+        for cls in Classes:
+            classnames.append(cls['name'])
         for i in range(0, len(PossibleMethods)):
             PresentClass = PossibleMethods[i]["Class"]
             PosMethod = PossibleMethods[i]["PosMethod"]
@@ -107,6 +110,18 @@ def main(PossibleMethods, Classes):
                                 else:
                                     PossibleMethods[i]["ParentNodeNo"] = j["NodeNo"]'''
                                 PossibleMethods[i]["ParentNodeNo"] = j["NodeNo"]
+                    else:
+                        for keys in VarStorage:
+                            if (str(keys) in PosMethodName and VarStorage[keys] in classnames):
+                                PossibleMethods[i]["Class"] = VarStorage[keys]
+                                PossibleMethods[i]["MethodOrClassCall"] = "Variable"
+                                break
+                        if(PossibleMethods[i]["MethodOrClassCall"] != "Variable"):
+                            for cls in classnames:
+                                if (str(cls) in PosMethodName):
+                                    PossibleMethods[i]["Class"] = cls
+                                    PossibleMethods[i]["MethodOrClassCall"] = "Variable"
+                                    break
                 while PossibleMethods[i]["ParentNodeNo"] is None and PresentClass["extends"] is not None:
                     extend = False
                     for k in Classes:

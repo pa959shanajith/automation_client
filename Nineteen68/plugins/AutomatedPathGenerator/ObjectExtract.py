@@ -2379,7 +2379,7 @@ def main(ASTDict, Flow, Class, PosMeth):
 	except Exception as e:
 		log.error(e)
 		logger.print_on_console("Exception occured in object extract")
-	return FlowChart, Classes, PossibleMethods, ClassVariables
+	return FlowChart, Classes, PossibleMethods, ClassVariables, VarStorage
 
 
 def memberSelectorExtraction(root):

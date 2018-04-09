@@ -16,6 +16,7 @@ from datetime import datetime
 log = logging.getLogger('apg.py')
 Cylomatic_Compelxity={}
 prev_classes = []
+varstorage = None
 
 class AutomatedPathGenerator:
     def __init__(self,sockeIOobj):
@@ -106,7 +107,7 @@ class AutomatedPathGenerator:
     def open_file(self, filename, java_version):
         flag = True
         try:
-            global prev_classes
+            global prev_classes, varstorage
             filename = filename.replace("/", "\\")
             name = filename.split('\\')[-1][:-5]
             if filename not in self.filenames:
@@ -123,7 +124,7 @@ class AutomatedPathGenerator:
                 if root:
                     # ObjectExtract.main will generate the FlowChart Nodes, give the Classes and all Possible Methods
                     prev_classes.extend(self.Classes)
-                    self.FlowChart, self.Classes, PosMethod, self.ClassVariables = ObjectExtract.main(
+                    self.FlowChart, self.Classes, PosMethod, self.ClassVariables, varstorage = ObjectExtract.main(
                         root, self.FlowChart, self.Classes, self.PosMethod)
                     (self.PosMethod).extend(PosMethod)
                     data = [c for c in self.Classes if c not in prev_classes]
@@ -195,13 +196,14 @@ class AutomatedPathGenerator:
 
     def generate_flowgraph(self, version, source, *args):
         try:
-            global Cylomatic_Compelxity, prev_classes
+            global Cylomatic_Compelxity, prev_classes, varstorage
             currentdate= datetime.now()
             beginingoftime = datetime.utcfromtimestamp(0)
             differencedate= currentdate - beginingoftime
             start_time = long(differencedate.total_seconds() * 1000.0)
             Cylomatic_Compelxity={}
             prev_classes=[]
+            varstorage = None
             logger.print_on_console("Graph generation in progress...")
             logger.print_on_console("File name:")
             logger.print_on_console("=============")
@@ -210,7 +212,7 @@ class AutomatedPathGenerator:
                     True):
                 '''After check format, the flow chart would be made completely. So now, we'll check the possible method linking.'''
                 self.PossibleMethods = CheckPossibleMethods.main(
-                    self.PosMethod, self.Classes)
+                    self.PosMethod, self.Classes, varstorage)
 
                 for i in range(0,len(self.FlowChart)):
                     self.FlowChart[i]['id']=i
@@ -229,8 +231,14 @@ class AutomatedPathGenerator:
                 jsonString = []
                 c_source=None
                 c_target=None
+                method_calls_count = {}
                 for method in self.PossibleMethods:
-                    if(method["ParentNodeNo"] != None):
+                    if(method["MethodOrClassCall"] == "Variable"):
+                        c_source = method["PresentClass"].split("(")[0]
+                        c_target = method["Class"]
+                        if(c_source != None and c_target != None and c_source != c_target):
+                            jsonString.append({"source":c_source,"target":c_target})
+                    elif(method["ParentNodeNo"] != None):
                         m = method["PosMethod"].split('(')[0]
                         for cls in self.Classes:
                             if (m in cls["methods"].keys()):
@@ -251,17 +259,20 @@ class AutomatedPathGenerator:
                                         if((trgt['class'].split('(')[0] == c_target) and (m in trgt['text']) and ('Method Name:' in trgt['text'])):
                                             id = trgt['id']
                                             break
+                                    if(not method_calls_count.has_key(fc['method'])):
+                                        method_calls_count.update({fc['method']:{'within':0,'outside':0}})
                                     if(isinstance(fc['child'],list)):
                                         fc['child'].append(id)
                                     else:
                                         fc['child'] = [id]
                                     if(c_source == c_target):
                                         fc['within'] = True
+                                        method_calls_count[fc['method']]['within'] += 1
                                     else:
                                         fc['outside'] = True
+                                        method_calls_count[fc['method']]['outside'] += 1
                                     break
                 jsonString = [dict(t) for t in set([tuple(d.items()) for d in jsonString])]
-                #print jsonString
 
                 '''To compress similar nodes in data-flow into one'''
                 test = []
@@ -274,7 +285,7 @@ class AutomatedPathGenerator:
                         i = i + 1
                         f = False
                         while(i <len(self.FlowChart) and self.FlowChart[i]['shape'] == 'Square' and self.FlowChart[i-1]['child'] == [self.FlowChart[i]['id']]
-                        and self.FlowChart[i]['child'] == [self.FlowChart[i]['id']+1] and self.FlowChart[i].has_key('call') == False):
+                        and self.FlowChart[i]['child'] == [self.FlowChart[i]['id']+1]):
                             id = self.FlowChart[i]['id']
                             parent = id
                             for fc in self.FlowChart:
@@ -297,12 +308,14 @@ class AutomatedPathGenerator:
                     if not (fc.has_key('delete')):
                         test.append(fc)
 
-                currentdate= datetime.now()
+                currentdate = datetime.now()
                 differencedate= currentdate - beginingoftime
                 end_time = long(differencedate.total_seconds() * 1000.0)
 
-                data = {"links":jsonString, "data_flow":test, "result":"success", "starttime":start_time, "endtime":end_time}
-                #data = {"classes":self.Classes, "links":jsonString, "result":"success", "starttime":start_time, "endtime":end_time}
+                data = {"links":jsonString, "data_flow":test, "result":"success", "starttime":start_time,
+                        "endtime":end_time, "method_calls_count":method_calls_count}
+                #data = {"classes":self.Classes, "links":jsonString, "data_flow":test, "result":"success", "starttime":start_time,
+                 #       "endtime":end_time, "method_calls_count":method_calls_count}
                 self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
                 logger.print_on_console("Graph generation completed")
 
