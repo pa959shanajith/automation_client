@@ -2,19 +2,22 @@
 # Name:        mainframe_keywords.py
 # Purpose:     To automate Mainframe keywords
 # Supported Emulators : Bluezone, Extra and Pcomm
-#Keyword Available to Automate :
-"""         1. launch_mainframe - This keyword or action specifies the Tool to launch the emulator.
-#           2. login            - This keyword or action specifies the Tool to Login to the Mainframe Region using userID and password.
-#           3. secure_login     - This keyword or action specifies the Tool to Login to the Mainframe Region using userID and password (Using encrypted password).
-#           4. logoff          - This keyword or action specifies the Tool to Log off from the Mainframe.
-#           5. set_text         - This keyword or action specifies the Tool to enter the text at the location specified by the user.
-#           6. send_value       - This keyword or action specifies the Tool to send the individual keystrokes to the location where the cursor is present at the point of execution.
-#           7. get_text         - This keyword or action specifies the Tool to fetch the text and save the results in the output variable.
-#           8. verify_text_exists - This keyword or action specifies the Tool to verify whether the given Text exists in the screen.
-#           9. submit_job       - This keyword or action specifies the Tool to submit the specified job to the mainframe and stores the Job ID in the output variable.
-#           10. job_status       - This keyword or action specifies the Tool to fetch the job status along with the Job ID based on "SubmitJob" output variable provided as input.
-#           11.send_function_keys - This keyword or action specifies the Tool to send the function keys to the application.
-#           12.set_cursor       - This keyword or action specifies the Tool to set the cursor at the specified location. The location is identified by the row and column mentioned in the input.
+# Keyword Available to Automate :
+"""         1. launch_mainframe   - This keyword or action specifies the Tool to launch the emulator.
+#           2. connect_session    - This keyword or action specifies the Tool to connect to a presentation space.
+#           3. login              - This keyword or action specifies the Tool to Login to the Mainframe Region using userID and password.
+#           4. secure_login       - This keyword or action specifies the Tool to Login to the Mainframe Region using userID and password (Using encrypted password).
+#           5. logoff             - This keyword or action specifies the Tool to Log off from the Mainframe.
+#           6. set_text           - This keyword or action specifies the Tool to enter the text at the location specified by the user.
+#           7. send_value         - This keyword or action specifies the Tool to send the individual keystrokes to the location where the cursor is present at the point of execution.
+#           8. get_text           - This keyword or action specifies the Tool to fetch the text and save the results in the output variable.
+#           9. verify_text_exists - This keyword or action specifies the Tool to verify whether the given Text exists in the screen.
+#          10. submit_job         - This keyword or action specifies the Tool to submit the specified job to the mainframe and stores the Job ID in the output variable.
+#          11. job_status         - This keyword or action specifies the Tool to fetch the job status along with the Job ID based on "SubmitJob" output variable provided as input.
+#          12. send_function_keys - This keyword or action specifies the Tool to send the function keys to the application.
+#          13. set_cursor         - This keyword or action specifies the Tool to set the cursor at the specified location. The location is identified by the row and column mentioned in the input.
+#          14. disconnect_session - This keyword or action specifies the Tool to disconnect from the active presentation space.
+#          15. close_mainframe    - This keyword or action specifies the Tool to close the emulator.
 """
 # Author:      wasimakram.sutar
 # Created:     08-09-2016
@@ -23,12 +26,11 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-
 import time
 import os
 from mainframe_constants import *
 from bluezone_keywords import *
-from rumba_keywords import RumbaKeywords
+from ehllapi_keywords import EhllapiKeywords
 from encryption_utility import AESCipher
 import logger
 import logging
@@ -58,10 +60,10 @@ class MainframeKeywords:
         }
         self.bluezone_object = BluezoneKeywords()
         try:
-            self.rumba_object = RumbaKeywords()
-        except:
-            import traceback
-            traceback.print_exc()
+            self.ehllapi_object = EhllapiKeywords()
+        except Exception as e:
+            log.error("Fail to load EhllapiKeywords")
+            log.error(e)
 
     def launch_mainframe(self,inputs):
         """
@@ -87,7 +89,7 @@ class MainframeKeywords:
                 log.info("Input recieved")
                 log.info("Emulator Path : %s \t Emulator type : %s",self.emulator_path,self.emulator_type)
                 # Print the input details on ICE console
-                logger.print_on_console("Input recieved:\nEmulator path : "+self.emulator_path + "\nEmulator type :" + self.emulator_type)
+                logger.print_on_console("Input recieved:\nEmulator path : "+self.emulator_path + "\nEmulator type : " + self.emulator_type)
                 if os.path.isfile(self.emulator_path):
                     #Log the state of file in log file
                     log.info("Emulator path %s is valid, continue execution...",self.emulator_path)
@@ -102,10 +104,8 @@ class MainframeKeywords:
                         print "Extra Emulator code"
                     elif self.emulator_type == MAINFRAME_BLUEZONE:
                         result,output,err_msg =  self.bluezone_object.launch_mainframe(self.emulator_path)
-                    elif self.emulator_type == MAINFRAME_PCOMM:
-                        print "Pcomm Emulator code"
-                    elif self.emulator_type == MAINFRAME_RUMBA:
-                        result,output,err_msg =  self.rumba_object.launch_mainframe(self.emulator_path)
+                    elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                        result,output,err_msg =  self.ehllapi_object.launch_mainframe(self.emulator_path, self.emulator_type)
                     #Update the status variables based on result.
                     if result:
                         status = TEST_RESULT_PASS
@@ -134,7 +134,7 @@ class MainframeKeywords:
         inputs      : User can provide input value to connect either from excel sheet or through dynamic variable.
                         1. Short SessionID
         Purpose     : This keyword connects the hllAPI to mainframe
-        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm, and Rumba.
+        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm and Rumba.
         """
         result = None
         status = TEST_RESULT_FAIL
@@ -159,10 +159,8 @@ class MainframeKeywords:
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     print "Bluezone Emulator code"
                     #result,output,err_msg =  self.bluezone_object.connect_session(psid)
-                elif self.emulator_type == MAINFRAME_PCOMM:
-                    print "Pcomm Emulator code"
-                elif self.emulator_type == MAINFRAME_RUMBA:
-                    result,output,err_msg =  self.rumba_object.connect_session(psid)
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                    result,output,err_msg =  self.ehllapi_object.connect_session(psid)
                 if result:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
@@ -186,7 +184,7 @@ class MainframeKeywords:
                         2. userID - Userid to login into  emulator
                         3. password - Password to login into emulator
         Purpose     : This keyword or action specifies the Tool to Login to the Mainframe Region using userID and password.
-        Support     : Supported Emulators are Bluezone, EXTRA and Pcomm.
+        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm and Rumba.
         """
         result = None
         status = TEST_RESULT_FAIL
@@ -214,10 +212,8 @@ class MainframeKeywords:
                     print "Extra Emulator code"
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.login(self.region,self.userID,self.password)
-                elif self.emulator_type == MAINFRAME_PCOMM:
-                    print "Pcomm Emulator code"
-                elif self.emulator_type == MAINFRAME_RUMBA:
-                    result,output,err_msg = self.rumba_object.login(self.region,self.userID,self.password)
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                    result,output,err_msg = self.ehllapi_object.login(self.region,self.userID,self.password)
                 if result:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
@@ -241,7 +237,7 @@ class MainframeKeywords:
                         2. userID - Userid to login into  emulator
                         3. password - Password to login into emulator (Encrypted using AES)
         Purpose     : This keyword or action specifies the Tool to Login to the Mainframe Region using userID and password.
-        Support     : Supported Emulators are Bluezone, EXTRA and Pcomm.
+        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm and Rumba.
         """
         result = None
         status = TEST_RESULT_FAIL
@@ -272,11 +268,8 @@ class MainframeKeywords:
                     print "Extra Emulator code"
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.login(self.region,self.userID,password)
-                elif self.emulator_type == MAINFRAME_PCOMM:
-                    print "Pcomm Emulator code"
-                elif self.emulator_type == MAINFRAME_RUMBA:
-                    print "Rumba Emulator code"
-                    result,output,err_msg = self.rumba_object.login(self.region,self.userID,password)
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                    result,output,err_msg = self.ehllapi_object.login(self.region,self.userID,password)
                 if result:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
@@ -304,7 +297,7 @@ class MainframeKeywords:
                                 4.Keep the new dataset and Logoff
 
         Purpose     : This keyword or action specifies the Tool to Log off from the Mainframe.
-        Support     : Supported Emulators are Bluezone, EXTRA and Pcomm.
+        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm and Rumba.
         """
         result = None
         status = TEST_RESULT_FAIL
@@ -326,16 +319,14 @@ class MainframeKeywords:
                         #Log the state of  keyword in log file
                         log.info("Logging off from %s emulator...",self.emulator_type)
                         #Print the state of keyword on ICE console
-                        logger.print_on_console("Logging off from  " + self.emulator_type +" emulator...")
+                        logger.print_on_console("Logging off from " + self.emulator_type +" emulator...")
                     if self.emulator_type == MAINFRAME_EXTRA:
                         #Logic to launch Extra Emulator goes here
                         print "Extra Emulator code"
                     elif self.emulator_type == MAINFRAME_BLUEZONE:
                         result,output,err_msg = self.bluezone_object.logoff(self.option)
-                    elif self.emulator_type == MAINFRAME_PCOMM:
-                        print "Pcomm Emulator code"
-                    elif self.emulator_type == MAINFRAME_RUMBA:
-                        result,output,err_msg = self.rumba_object.logoff(self.option)
+                    elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                        result,output,err_msg = self.ehllapi_object.logoff(self.option)
                     if result:
                         status = TEST_RESULT_PASS
                         methodoutput = TEST_RESULT_TRUE
@@ -369,7 +360,7 @@ class MainframeKeywords:
         inputs      : User can provide input value to send_value either from excel sheet or through dynamic variable.
                         1. text - Text to be sent
         Purpose     : This keyword or action specifies the Tool to send the individual keystrokes to the location where the cursor is present at the point of execution.
-        Support     : Supported Emulators are Bluezone, EXTRA and Pcomm.
+        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm and Rumba.
         """
         result = None
         status = TEST_RESULT_FAIL
@@ -390,16 +381,14 @@ class MainframeKeywords:
                     #Log the state of  keyword in log file
                     log.info("Sending Value to %s emulator screen...",self.emulator_type)
                     #Print the state of keyword on ICE console
-                    logger.print_on_console("Sending Value to  " + self.emulator_type +" emulator screen...")
+                    logger.print_on_console("Sending Value to " + self.emulator_type +" emulator screen...")
                 if self.emulator_type == MAINFRAME_EXTRA:
                     #Logic to launch Extra Emulator goes here
                     print "Extra Emulator code"
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.send_value(self.text)
-                elif self.emulator_type == MAINFRAME_PCOMM:
-                    print "Pcomm Emulator code"
-                elif self.emulator_type == MAINFRAME_RUMBA:
-                    result,output,err_msg = self.rumba_object.send_value(self.text)
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                    result,output,err_msg = self.ehllapi_object.send_value(self.text)
                 if result:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
@@ -422,7 +411,7 @@ class MainframeKeywords:
                         2. Column Number
                         3. Text
         Purpose     : This keyword or action specifies the Tool to enter the text at the location specified by the user.
-        Support     : Supported Emulators are Bluezone, EXTRA and Pcomm.
+        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm and Rumba.
         """
         result = None
         status = TEST_RESULT_FAIL
@@ -450,10 +439,8 @@ class MainframeKeywords:
                     print "Extra Emulator code"
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.set_text(row_number,column_number,text)
-                elif self.emulator_type == MAINFRAME_PCOMM:
-                    print "Pcomm Emulator code"
-                elif self.emulator_type == MAINFRAME_RUMBA:
-                    result,output,err_msg = self.rumba_object.set_text(row_number,column_number,text)
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                    result,output,err_msg = self.ehllapi_object.set_text(row_number,column_number,text)
                 if result:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
@@ -475,7 +462,7 @@ class MainframeKeywords:
                         1. Function key
                         2. Number
         Purpose     : This keyword or action specifies the Tool to send the function keys to the application.
-        Support     : Supported Emulators are Bluezone, EXTRA and Pcomm.
+        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm and Rumba.
         """
         result = None
         status = TEST_RESULT_FAIL
@@ -499,16 +486,14 @@ class MainframeKeywords:
                     #Log the state of  keyword in log file
                     log.info("Sending Function key to %s emulator screen...",self.emulator_type)
                     #Print the state of keyword on ICE console
-                    logger.print_on_console("Sending function key to  " + self.emulator_type +" emulator screen...")
+                    logger.print_on_console("Sending function key to " + self.emulator_type +" emulator screen...")
                 if self.emulator_type == MAINFRAME_EXTRA:
                     #Logic to launch Extra Emulator goes here
                     print "Extra Emulator code"
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.send_function_keys(function_key,number)
-                elif self.emulator_type == MAINFRAME_PCOMM:
-                    print "Pcomm Emulator code"
-                elif self.emulator_type == MAINFRAME_RUMBA:
-                    result,output,err_msg = self.rumba_object.send_function_keys(inputs[0].lower(),number)
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                    result,output,err_msg = self.ehllapi_object.send_function_keys(inputs[0].lower(),number)
                 if result:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
@@ -532,7 +517,7 @@ class MainframeKeywords:
                         2. Column Number
                         3. Length of the text to be fetched
         Purpose     : This keyword or action specifies the Tool to fetch the text and save the results in the output variable.
-        Support     : Supported Emulators are Bluezone, EXTRA and Pcomm.
+        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm and Rumba.
         """
         result = None
         status = TEST_RESULT_FAIL
@@ -561,10 +546,8 @@ class MainframeKeywords:
                     print "Extra Emulator code"
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.get_text(row_number,column_number,length)
-                elif self.emulator_type == MAINFRAME_PCOMM:
-                    print "Pcomm Emulator code"
-                elif self.emulator_type == MAINFRAME_RUMBA:
-                    result,output,err_msg = self.rumba_object.get_text(row_number,column_number,length)
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                    result,output,err_msg = self.ehllapi_object.get_text(row_number,column_number,length)
                 if result:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
@@ -585,7 +568,7 @@ class MainframeKeywords:
         inputs      : User can provide input value to get_text either from excel sheet or through dynamic variable.
                         1. Text
         Purpose     : This keyword or action specifies the Tool to verify whether the given Text exists in the screen.
-        Support     : Supported Emulators are Bluezone, EXTRA and Pcomm.
+        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm and Rumba.
         """
         result = None
         status = TEST_RESULT_FAIL
@@ -612,10 +595,8 @@ class MainframeKeywords:
                     print "Extra Emulator code"
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.verify_text_exists(text)
-                elif self.emulator_type == MAINFRAME_PCOMM:
-                    print "Pcomm Emulator code"
-                elif self.emulator_type == MAINFRAME_RUMBA:
-                    result,output,err_msg = self.rumba_object.verify_text_exists(text)
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                    result,output,err_msg = self.ehllapi_object.verify_text_exists(text)
                 if result:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
@@ -637,7 +618,7 @@ class MainframeKeywords:
                         1. Job path
                         2. Member name
         Purpose     : This keyword or action specifies the Tool to submit the specified job to the mainframe and stores the Job ID in the output variable.
-        Support     : Supported Emulators are Bluezone, EXTRA and Pcomm.
+        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm and Rumba.
         """
         result = None
         status = TEST_RESULT_FAIL
@@ -665,10 +646,8 @@ class MainframeKeywords:
                     print "Extra Emulator code"
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.submit_job(self.job_path,self.member_name)
-                elif self.emulator_type == MAINFRAME_PCOMM:
-                    print "Pcomm Emulator code"
-                elif self.emulator_type == MAINFRAME_RUMBA:
-                    result,output,err_msg = self.rumba_object.submit_job(self.job_path,self.member_name)
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                    result,output,err_msg = self.ehllapi_object.submit_job(self.job_path,self.member_name)
                 if result:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
@@ -687,7 +666,7 @@ class MainframeKeywords:
         inputs      : User can provide input value to job_status through dynamic variable.
                         1. Output variable of SubmitJob
         Purpose     : This keyword or action specifies the Tool to fetch the job status along with the Job ID based on "SubmitJob" output variable provided as input.
-        Support     : Supported Emulators are Bluezone, EXTRA and Pcomm.
+        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm and Rumba.
         """
         result = None
         status = TEST_RESULT_FAIL
@@ -714,10 +693,8 @@ class MainframeKeywords:
                     print "Extra Emulator code"
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.job_status(self.job_no)
-                elif self.emulator_type == MAINFRAME_PCOMM:
-                    print "Pcomm Emulator code"
-                elif self.emulator_type == MAINFRAME_RUMBA:
-                    result,output,err_msg = self.rumba_object.job_status(self.job_no)
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                    result,output,err_msg = self.ehllapi_object.job_status(self.job_no)
                 if result:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
@@ -739,7 +716,7 @@ class MainframeKeywords:
                         1. Row number
                         2. Column number
         Purpose     : This keyword or action specifies the Tool to set the cursor at the specified location. The location is identified by the row and column mentioned in the input.
-        Support     : Supported Emulators are Bluezone, EXTRA and Pcomm.
+        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm and Rumba.
         """
         result = None
         status = TEST_RESULT_FAIL
@@ -767,10 +744,8 @@ class MainframeKeywords:
                     print "Extra Emulator code"
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.set_cursor(row_number,column_number)
-                elif self.emulator_type == MAINFRAME_PCOMM:
-                    print "Pcomm Emulator code"
-                elif self.emulator_type == MAINFRAME_RUMBA:
-                    result,output,err_msg = self.rumba_object.set_cursor(row_number,column_number)
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                    result,output,err_msg = self.ehllapi_object.set_cursor(row_number,column_number)
                 if result:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
@@ -791,7 +766,7 @@ class MainframeKeywords:
         method name : disconnect_session
         inputs      : N/A
         Purpose     : This keyword disconnects the hllAPI to mainframe
-        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm, and Rumba.
+        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm and Rumba.
         """
         result = None
         status = TEST_RESULT_FAIL
@@ -809,10 +784,8 @@ class MainframeKeywords:
             elif self.emulator_type == MAINFRAME_BLUEZONE:
                 print "Bluezone Emulator code"
                 #result,output,err_msg = self.bluezone_object.disconnect_session()
-            elif self.emulator_type == MAINFRAME_PCOMM:
-                print "Pcomm Emulator code"
-            elif self.emulator_type == MAINFRAME_RUMBA:
-                result,output,err_msg = self.rumba_object.disconnect_session()
+            elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                result,output,err_msg = self.ehllapi_object.disconnect_session()
             if result:
                 status = TEST_RESULT_PASS
                 methodoutput = TEST_RESULT_TRUE
@@ -829,7 +802,7 @@ class MainframeKeywords:
         method name : close_mainframe
         inputs      : N/A
         Purpose     : This keyword closes the emulator
-        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm, and Rumba.
+        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm and Rumba.
         """
         result = None
         status = TEST_RESULT_FAIL
@@ -847,10 +820,8 @@ class MainframeKeywords:
             elif self.emulator_type == MAINFRAME_BLUEZONE:
                 print "Bluezone Emulator code"
                 #result,output,err_msg = self.bluezone_object.close_mainframe()
-            elif self.emulator_type == MAINFRAME_PCOMM:
-                print "Pcomm Emulator code"
-            elif self.emulator_type == MAINFRAME_RUMBA:
-                result,output,err_msg = self.rumba_object.close_mainframe()
+            elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                result,output,err_msg = self.ehllapi_object.close_mainframe()
             if result:
                 status = TEST_RESULT_PASS
                 methodoutput = TEST_RESULT_TRUE
@@ -869,42 +840,3 @@ class MainframeKeywords:
         vbhost.language = VB_LANGUAGE
         vbhost.addcode("Function getString()\nDim Sys\nDim Sess\nDim MyScreen\nSet Sys = CreateObject(\"EXTRA.System\")\nSet Sess = Sys.ActiveSession\nSet MyScreen = Sess.Screen\nrow ="+row+"\ncol="+col+"\nlength ="+leng+"\nMyString = MyScreen.GetString(row,col,length)\ngetString=MyString\nEnd Function\n")
         gotStr = vbhost.eval(VB_HOST_EVAL)
-
-if __name__ == '__main__':
-    print "***Begin main method***"
-
-    mainframe_obj = MainframeKeywords()
-    launch_inputs = ['C:\\Users\\wasimakram.sutar\\Desktop\\CONFIG1.zmd','Bluezone']
-    print mainframe_obj.launch_mainframe(launch_inputs)
-    print "Launch completed"
-
-
-##    login_inputs = ['L TSO','EDISTA1','EDISTA1']
-##    print mainframe_obj.login(login_inputs)
-##    print "Login completed"
-
-##    send_value = ["L TSO"]
-##    print mainframe_obj.send_value(send_value)
-##    print "SendValue Completed"
-
-    set_text_input = ["24","1","WASIMAKRAM"]
-    print mainframe_obj.set_text(set_text_input)
-    print "SetText Completed"
-
-##    send_function_input = ["Enter"]
-##    print mainframe_obj.send_function_keys(send_function_input)
-##    print "send_function_keys Completed"
-
-    get_text_input = ["24","1","10"]
-    print mainframe_obj.get_text(get_text_input)
-    print "get_text completed"
-
-
-    verify_text_input = ["WASIMAKRAM"]
-    print mainframe_obj.verify_text_exists(verify_text_input)
-    print "verify_text_input completed"
-
-    set_cursor_input = ["24","1"]
-    print mainframe_obj.set_cursor(set_cursor_input)
-    print "verify_text_input completed"
-
