@@ -82,6 +82,7 @@ class Controller():
     sap_dispatcher_obj = None
     mobile_app_dispatcher_obj = None
     mainframe_dispatcher_obj = None
+    system_dispatcher_obj = None
     def __init__(self):
         self.get_all_the_imports(CORE)
         self.__load_generic()
@@ -214,6 +215,18 @@ class Controller():
         except Exception as e:
             logger.print_on_console('Error loading Mainframe plugin')
             log.error(e)
+
+    def __load_system(self):
+        try:
+            self.get_all_the_imports('System')
+            import system_dispatcher
+            self.system_dispatcher_obj = system_dispatcher.SystemDispatcher()
+            self.system_dispatcher_obj.exception_flag=self.exception_flag
+            self.system_dispatcher_obj.action=self.action
+        except Exception as e:
+            logger.print_on_console('Error loading System plugin')
+            log.error(e)
+
 
     def dangling_status(self,index):
         step=handler.tspList[index]
@@ -559,9 +572,13 @@ class Controller():
                 #Check the apptype and pass to perticular module
                 if teststepproperty.apptype.lower() == APPTYPE_GENERIC:
                     #Generic apptype module call
-                    if self.generic_dispatcher_obj == None:
-                        self.__load_generic()
-                    result = self.invokegenerickeyword(teststepproperty,self.generic_dispatcher_obj,inpval)
+
+                    if self.system_dispatcher_obj == None:
+                        self.__load_system()
+                    if teststepproperty.custname != "@System":
+                        result = self.invokegenerickeyword(teststepproperty,self.generic_dispatcher_obj,inpval)
+                    else:
+                        result = self.invokesystemkeyword(teststepproperty,self.system_dispatcher_obj,inpval)
                 elif teststepproperty.apptype.lower() == APPTYPE_WEB:
                     #Web apptype module call
                     if self.web_dispatcher_obj == None:
@@ -695,6 +712,10 @@ class Controller():
 
     def invokegenerickeyword(self,teststepproperty,dispatcher_obj,inputval):
         res = dispatcher_obj.dispatcher(teststepproperty,self.wx_object,self.conthread,*inputval)
+        return res
+
+    def invokesystemkeyword(self,teststepproperty,dispatcher_obj,inputval):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval)
         return res
 
     def invokeoebskeyword(self,teststepproperty,dispatcher_obj,inputval):
