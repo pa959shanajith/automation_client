@@ -840,7 +840,7 @@ class Singleton_DriverUtil():
                     driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH)
                     browser_ver=driver.capabilities['browserVersion']
                     browser_ver1 = browser_ver.encode('utf-8')
-                    browser_ver = float(browser_ver1[:5])
+                    browser_ver = float(browser_ver1[:4])
                     if(browser_ver == float(webconstants.FIREFOX_BROWSER_VERSION[0]) ):
                         drivermap.append(driver)
                         driver.maximize_window()
