@@ -14,6 +14,7 @@ import wmi
 import system_constants
 import os
 import logger
+import time
 import logging
 import pythoncom
 log = logging.getLogger('system_keywords.py')
@@ -139,9 +140,11 @@ class N68System_Keywords():
                 if wmi_ref is not None:
                     if machine_name is None:
                         path_outfile=os.environ["NINETEEN68_HOME"]+"//Nineteen68//plugins//System//n68sys.txt"
+                        process_id, process_status = wmi_ref.Win32_Process.Create(CommandLine="cmd /c "+command_toexecute+" > "+path_outfile)
                     else:
                         path_outfile="//"+machine_name+"/c$/n68sys.txt"
-                    process_id, process_status = wmi_ref.Win32_Process.Create(CommandLine="cmd /c "+command_toexecute+" > C://n68sys.txt")
+                        process_id, process_status = wmi_ref.Win32_Process.Create(CommandLine="cmd /c "+command_toexecute+" > C://n68sys.txt")
+                    time.sleep(2)
                     status=system_constants.TEST_RESULT_PASS
                     result=system_constants.TEST_RESULT_TRUE
                 else:

@@ -37,7 +37,7 @@ class SystemDispatcher:
                             'executecommand':self.system_keyword_obj.executeCommand
                          }
             result=()
-            if len(input)!=0:
+            if input != ['']:
                 result = keyword_dict[keyword](input)
             else:
                 result = keyword_dict[keyword]()
