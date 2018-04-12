@@ -86,8 +86,8 @@ class Scrape:
                                         break
                                 except Exception as e:
                                     break
-##                            disp_obj = desktop_dispatcher.DesktopDispatcher()
-##                            ele = disp_obj.get_desktop_element(actualelement['xpath'],actualelement['url'],app_uia)
+                            disp_obj = desktop_dispatcher.DesktopDispatcher()
+                            ele = disp_obj.get_desktop_element(actualelement['xpath'],actualelement['url'],app_uia)
                             global actualobjects
                             if actualelement not in actualobjects:#------check to remove duplicate elements
                                 actualobjects.append(actualelement)
