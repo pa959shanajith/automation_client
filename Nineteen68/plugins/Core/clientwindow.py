@@ -819,10 +819,8 @@ class ClientWindow(wx.Frame):
         controller.kill_process()
         if platform.system() == "Windows":
             os.system("TASKKILL /F /IM QcController.exe")
-            os.system("TASKKILL /F /IM nineteen68_rumba_api.exe")
+            os.system("TASKKILL /F /IM nineteen68_ehllapi.exe")
         exit()
-         # you may also do:  event.Skip()
-         # since the default event handler does call Destroy(), too
 
     def OnKillProcess(self, event):
         controller.kill_process()

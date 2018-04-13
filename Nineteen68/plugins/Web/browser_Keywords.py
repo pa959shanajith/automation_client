@@ -840,7 +840,7 @@ class Singleton_DriverUtil():
                     driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH)
                     browser_ver=driver.capabilities['browserVersion']
                     browser_ver1 = browser_ver.encode('utf-8')
-                    browser_ver = float(browser_ver1[:5])
+                    browser_ver = float(browser_ver1[:4])
                     if(browser_ver == float(webconstants.FIREFOX_BROWSER_VERSION[0]) ):
                         drivermap.append(driver)
                         driver.maximize_window()
@@ -1037,7 +1037,7 @@ class Singleton_DriverUtil():
         for i in range(0,len(webconstants.CHROME_DRIVER_VERSION)):
 ##            print i
             if(driver_ver == float(webconstants.CHROME_DRIVER_VERSION[i][0]) and browser_ver >= int(webconstants.CHROME_DRIVER_VERSION[i][1]) and browser_ver <= int(webconstants.CHROME_DRIVER_VERSION[i][2])):
-                flag1 = i
+                flag1 = 1
 ##                logger.print_on_console('Flag:',flag1)
                 log.info('Flag:',flag1)
                 return flag1
