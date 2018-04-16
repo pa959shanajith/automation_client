@@ -45,6 +45,8 @@ TEST_RESULT_TRUE = 'True'
 
 HYPHEN = '-'
 
+SYSTEM_CHECK ='@System'
+
 APPTYPE_WEB = 'web'
 
 APPTYPE_GENERIC = 'generic'

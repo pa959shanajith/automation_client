@@ -575,7 +575,7 @@ class Controller():
 
                     if self.system_dispatcher_obj == None:
                         self.__load_system()
-                    if teststepproperty.custname != "@System":
+                    if teststepproperty.custname != SYSTEM_CHECK:
                         result = self.invokegenerickeyword(teststepproperty,self.generic_dispatcher_obj,inpval)
                     else:
                         result = self.invokesystemkeyword(teststepproperty,self.system_dispatcher_obj,inpval)

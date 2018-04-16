@@ -22,3 +22,12 @@ TEST_RESULT_FAIL = "Fail"
 TEST_RESULT_TRUE = "True"
 
 TEST_RESULT_FALSE = "False"
+
+
+ERROR_CODE_DICT ={
+                    'ERR_UNABLE_TO_CONNECT':'Unable to connect with machine',
+                    'ERR_OS_INFO':'Error Occured while executing getOSInfo Keyword',
+                    'ERR_GET_INSTALLED_APP':'Error Occured while executing getallinstalledapps Keyword',
+                    'ERR_GET_ALL_PROCESS':'Error Occured while executing getallprocess Keyword',
+                    'ERR_EXECUTE_COMMAND':'Error Occured while executing executeCommand Keyword'
+                 }

@@ -17,7 +17,7 @@ log = logging.getLogger('system_dispatcher.py')
 
 class SystemDispatcher:
 
-    system_keyword_obj = system_keywords.N68System_Keywords()
+    system_keyword_obj = system_keywords.System_Keywords()
 
     def __init__(self):
         self.exception_flag=''
@@ -44,5 +44,4 @@ class SystemDispatcher:
         except Exception as e:
             logger.print_on_console('Error:Keyword Not found')
         return result
-if __name__ == '__main__':
-    main()
+

@@ -19,21 +19,25 @@ import logging
 import pythoncom
 log = logging.getLogger('system_keywords.py')
 
-class N68System_Keywords():
+class System_Keywords():
 
     def __init__(self):
         pass
 
     def getWmi(self,machine_name):
         wmi_ref=None
+        err_msg=None
         try:
             pythoncom.CoInitialize()
             if machine_name is not None:
+                if isinstance(machine_name,list):
+                    machine_name=machine_name[0]
                 wmi_ref = wmi.WMI(machine_name)
             else:
                 wmi_ref = wmi.WMI()
         except Exception as e:
-            logger.print_on_console('Error : Unable to connect with machine')
+            log.error('Error occured',e)
+            err_msg = system_constants.ERROR_CODE_DICT['ERR_UNABLE_TO_CONNECT']
         return wmi_ref
 
     def getOsInfo(self,machine_name=None):
@@ -63,8 +67,8 @@ class N68System_Keywords():
                 status=system_constants.TEST_RESULT_PASS
                 result = system_constants.TEST_RESULT_TRUE
         except Exception as e:
-            logger.print_on_console('Error Occured in getOsInfo Keyword')
-            err_msg ='Error Occured in getOsInfo Keyword'
+            logger.error('Error occured',e)
+            err_msg =system_constants.ERROR_CODE_DICT['ERR_OS_INFO']
         return status,result,os_info,err_msg
 
     def getAllInstalledApps(self,machine_name=None):
@@ -92,8 +96,8 @@ class N68System_Keywords():
                 #dpkg --get-selections
                 pass
         except Exception as e:
-            logger.print_on_console('Error Occured in GetAllInstalledApps Keyword')
-            err_msg = "Error Occured in GetAllInstalledApps Keyword"
+            logger.error('Error occured',e)
+            err_msg = system_constants.ERROR_CODE_DICT['ERR_GET_INSTALLED_APP']
         return status,result,apps_data,err_msg
 
     def getInstalledAppInfo(self,app_name,machine_name=None):
@@ -117,8 +121,8 @@ class N68System_Keywords():
                 else:
                     pass
         except Exception as e:
-            logger.print_on_console('Error Occured in getAllProcess Keyword')
-            err_msg = "Error Occured in getAllProcess Keyword"
+            logger.error('Error occured',e)
+            err_msg = system_constants.ERROR_CODE_DICT['ERR_GET_ALL_PROCESS']
         return status,result,process_data,err_msg
 
     def getProcessInfo(self):
@@ -157,12 +161,14 @@ class N68System_Keywords():
             for i in f:
                 result_data+=i
         except Exception as e:
-            logger.print_on_console('Error Occured in executeCommand Keyword')
-            err_msg = "Error Occured in executeCommand Keyword"
+            logger.error('Error occured',e)
+            err_msg = system_constants.ERROR_CODE_DICT['ERR_EXECUTE_COMMAND']
         return status,result,result_data,err_msg
 
-
+'''
 if __name__ == '__main__':
     #test_keyword = N68System_Keywords()
     #test_keyword.executeCommand(['ipconfig','wslk13fodc6-054'])
     pass
+
+'''
