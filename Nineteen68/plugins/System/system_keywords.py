@@ -67,7 +67,7 @@ class System_Keywords():
                 status=system_constants.TEST_RESULT_PASS
                 result = system_constants.TEST_RESULT_TRUE
         except Exception as e:
-            logger.error('Error occured',e)
+            log.error('Error occured',e)
             err_msg =system_constants.ERROR_CODE_DICT['ERR_OS_INFO']
         return status,result,os_info,err_msg
 
@@ -96,7 +96,7 @@ class System_Keywords():
                 #dpkg --get-selections
                 pass
         except Exception as e:
-            logger.error('Error occured',e)
+            log.error('Error occured',e)
             err_msg = system_constants.ERROR_CODE_DICT['ERR_GET_INSTALLED_APP']
         return status,result,apps_data,err_msg
 
@@ -121,7 +121,7 @@ class System_Keywords():
                 else:
                     pass
         except Exception as e:
-            logger.error('Error occured',e)
+            log.error('Error occured',e)
             err_msg = system_constants.ERROR_CODE_DICT['ERR_GET_ALL_PROCESS']
         return status,result,process_data,err_msg
 
@@ -161,7 +161,7 @@ class System_Keywords():
             for i in f:
                 result_data+=i
         except Exception as e:
-            logger.error('Error occured',e)
+            log.error('Error occured',e)
             err_msg = system_constants.ERROR_CODE_DICT['ERR_EXECUTE_COMMAND']
         return status,result,result_data,err_msg
 
