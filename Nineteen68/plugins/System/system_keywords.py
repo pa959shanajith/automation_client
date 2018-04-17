@@ -36,7 +36,7 @@ class System_Keywords():
             else:
                 wmi_ref = wmi.WMI()
         except Exception as e:
-            log.error('Error occured',e)
+            log.error(e)
             err_msg = system_constants.ERROR_CODE_DICT['ERR_UNABLE_TO_CONNECT']
         return wmi_ref
 
@@ -67,7 +67,7 @@ class System_Keywords():
                 status=system_constants.TEST_RESULT_PASS
                 result = system_constants.TEST_RESULT_TRUE
         except Exception as e:
-            log.error('Error occured',e)
+            log.error(e)
             err_msg =system_constants.ERROR_CODE_DICT['ERR_OS_INFO']
         return status,result,os_info,err_msg
 
@@ -86,7 +86,6 @@ class System_Keywords():
                         apps_data.append(p.Name)
                     status=system_constants.TEST_RESULT_PASS
                     result=system_constants.TEST_RESULT_TRUE
-                    pass
                 else:
                     pass
             elif platform.system().lower()=="darwin":
@@ -96,7 +95,7 @@ class System_Keywords():
                 #dpkg --get-selections
                 pass
         except Exception as e:
-            log.error('Error occured',e)
+            log.error(e)
             err_msg = system_constants.ERROR_CODE_DICT['ERR_GET_INSTALLED_APP']
         return status,result,apps_data,err_msg
 
@@ -121,7 +120,7 @@ class System_Keywords():
                 else:
                     pass
         except Exception as e:
-            log.error('Error occured',e)
+            log.error(e)
             err_msg = system_constants.ERROR_CODE_DICT['ERR_GET_ALL_PROCESS']
         return status,result,process_data,err_msg
 
@@ -134,20 +133,37 @@ class System_Keywords():
         err_msg=None
         machine_name=None
         path_outfile=None
+        path_attrib=None
+
         status = system_constants.TEST_RESULT_FAIL
         result = system_constants.TEST_RESULT_FALSE
         try:
             command_toexecute=command_data[0]
-            machine_name = command_data[1] if len(command_data)==2 else None
+            machine_name = command_data[1] if len(command_data)>=2 else None
+            path_outfile = command_data[2] if len(command_data)>=3 else None
             if machine_name is not None or platform.system().lower()=="windows":
                 wmi_ref=self.getWmi(machine_name)
                 if wmi_ref is not None:
                     if machine_name is None:
-                        path_outfile=os.environ["NINETEEN68_HOME"]+"//Nineteen68//plugins//System//n68sys.txt"
+                        path_outfile=os.environ["NINETEEN68_HOME"]+"//Nineteen68//plugins//System//nsys.txt"
                         process_id, process_status = wmi_ref.Win32_Process.Create(CommandLine="cmd /c "+command_toexecute+" > "+path_outfile)
                     else:
-                        path_outfile="//"+machine_name+"/c$/n68sys.txt"
-                        process_id, process_status = wmi_ref.Win32_Process.Create(CommandLine="cmd /c "+command_toexecute+" > C://n68sys.txt")
+                        file_name=None
+                        if(path_outfile is None):
+                            raise Exception('Invalid file path.')
+                        else:
+                            path_attrib=path_outfile.split(':')
+                            if(len(path_attrib)==2):
+                                if path_attrib[1].endswith('\\'):
+                                    file_name ="nsys.txt"
+                                else:
+                                    file_name="/nsys.txt"
+
+                                path_outfile = "//"+machine_name+"/"+path_attrib[0]+"$"+path_attrib[1]+file_name
+                            else:
+                                raise Exception('Invalid file path.')
+                        file_name = command_data[2]+file_name
+                        process_id, process_status = wmi_ref.Win32_Process.Create(CommandLine="cmd /c "+command_toexecute+" > "+file_name)
                     time.sleep(2)
                     status=system_constants.TEST_RESULT_PASS
                     result=system_constants.TEST_RESULT_TRUE
@@ -161,7 +177,7 @@ class System_Keywords():
             for i in f:
                 result_data+=i
         except Exception as e:
-            log.error('Error occured',e)
+            log.error(e)
             err_msg = system_constants.ERROR_CODE_DICT['ERR_EXECUTE_COMMAND']
         return status,result,result_data,err_msg
 
