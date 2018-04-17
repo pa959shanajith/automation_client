@@ -14,7 +14,6 @@ import os
 from ctypes import *
 from sys import *
 import logging
-from hllApi import HllApi
 from mainframe_constants import *
 
 import logger
