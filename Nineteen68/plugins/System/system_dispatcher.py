@@ -42,6 +42,6 @@ class SystemDispatcher:
             else:
                 result = keyword_dict[keyword]()
         except Exception as e:
-            logger.print_on_console('Error:Keyword Not found')
+            log.error(e)
         return result
 
