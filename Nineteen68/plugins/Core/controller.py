@@ -573,12 +573,16 @@ class Controller():
                 if teststepproperty.apptype.lower() == APPTYPE_GENERIC:
                     #Generic apptype module call
 
+                    if self.generic_dispatcher_obj == None:
+                        self.__load_generic()
+                    result = self.invokegenerickeyword(teststepproperty,self.generic_dispatcher_obj,inpval)
+
+                elif teststepproperty.apptype.lower() == APPTYPE_SYSTEM:
+                    #System apptype module call
                     if self.system_dispatcher_obj == None:
                         self.__load_system()
-                    if teststepproperty.custname != SYSTEM_CHECK:
-                        result = self.invokegenerickeyword(teststepproperty,self.generic_dispatcher_obj,inpval)
-                    else:
-                        result = self.invokesystemkeyword(teststepproperty,self.system_dispatcher_obj,inpval)
+                    result = self.invokesystemkeyword(teststepproperty,self.system_dispatcher_obj,inpval)
+
                 elif teststepproperty.apptype.lower() == APPTYPE_WEB:
                     #Web apptype module call
                     if self.web_dispatcher_obj == None:
