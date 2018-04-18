@@ -49,6 +49,8 @@ APPTYPE_WEB = 'web'
 
 APPTYPE_GENERIC = 'generic'
 
+APPTYPE_SYSTEM = 'system'
+
 APPTYPE_WEBSERVICE = 'webservice'
 
 APPTYPE_MAINFRAME = 'mainframe'
