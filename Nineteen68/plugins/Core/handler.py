@@ -459,7 +459,7 @@ class Handler():
 
 
 
-    def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,extract_path=None):
+    def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,extract_path=None):
         """
         def : create_step
         purpose : creates an object of each step
@@ -478,7 +478,7 @@ class Handler():
                     self.insert_into_fordict(index,key_lower,None)
                     log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
 ##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
-                tsp_step=for_step.For(index,keyword,inputval,outputval,stepnum,testscript_name,for_info[key],False,apptype,additionalinfo,i)
+                tsp_step=for_step.For(index,keyword,inputval,outputval,stepnum,testscript_name,for_info[key],False,apptype,additionalinfo,i,remark,testcase_details)
 
             #block which creates the step of instances (if,elseIf,else,endIf)
             elif key_lower in if_array:
@@ -487,7 +487,7 @@ class Handler():
                     log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
 ##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
 
-                tsp_step=if_step.If(index,keyword,inputval,outputval,stepnum,testscript_name,if_info[key],False,apptype,additionalinfo,i)
+                tsp_step=if_step.If(index,keyword,inputval,outputval,stepnum,testscript_name,if_info[key],False,apptype,additionalinfo,i,remark,testcase_details)
 
             #block which creates the step of instances of (getparam,startloop,endloop)
             elif key_lower in get_param:
@@ -497,17 +497,17 @@ class Handler():
 ##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
 
                 if(extract_path==None):
-                    tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i)
+                    tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i,remark,testcase_details)
                 else:
-                    tsp_step=getparam.GetParam(index,keyword,extract_path,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i)
+                    tsp_step=getparam.GetParam(index,keyword,extract_path,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i,remark,testcase_details)
 
             #block which creates the step of instances of (jumpBy)
             elif key_lower == constants.JUMP_BY:
-                tsp_step=jumpBy.JumpBy(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype,additionalinfo,i)
+                tsp_step=jumpBy.JumpBy(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype,additionalinfo,i,remark,testcase_details)
 
             #block which creates the step of instances of (jumpTo)
             elif key_lower == constants.JUMP_TO:
-                tsp_step=jumpTo.JumpTo(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype,additionalinfo,i)
+                tsp_step=jumpTo.JumpTo(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype,additionalinfo,i,remark,testcase_details)
 
             #block which creates the step of instances of (Keywords)
             else:
@@ -524,7 +524,7 @@ class Handler():
                             objectname = left_part+';'+xpath_string[1]+';'+right_part
                     except Exception as e:
                         log.error(e)
-                tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i)
+                tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details)
         except Exception as e:
             logger.print_on_console(e)
             log.error(e)
@@ -546,6 +546,13 @@ class Handler():
         stepnum=step['stepNo']
         url=step['url']
         custname=step['custname']
+        remark=''
+        testcase_details=''
+        if 'remarks' in step:
+            remark=step['remarks']
+        if 'addTestCaseDetailsInfo' in step:
+            testcase_details=step['addTestCaseDetailsInfo']
+
         additionalinfo = ''
         outputArray=outputval.split(';')
         #check if the step is commented before adding to the tsplist
@@ -553,9 +560,9 @@ class Handler():
             global tspIndex2
             tspIndex2+=1
             if(extract_path== None):
-                return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i)
+                return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details)
             else:
-                return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,extract_path)
+                return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,extract_path)
         return None
 
 

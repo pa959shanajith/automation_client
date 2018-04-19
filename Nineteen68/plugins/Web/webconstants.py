@@ -32,6 +32,12 @@ INVALID_INPUT='Input is Invalid'
 ##CHROME_DRIVER_PATH = 'chromedriver.exe'
 CHROME_DRIVER_PATH = drivers_path + "\\chromedriver.exe"
 
+CHROME_DRIVER_VERSION = [[2.35,62,65]]
+
+IE_BROWSER_VERSION = [8,11]
+
+FIREFOX_BROWSER_VERSION = [58]
+
 IE_DRIVER_PATH_64 =  drivers_path +'\\IEDriverServer64.exe'
 
 IE_DRIVER_PATH_32 =   drivers_path +'\\IEDriverServer.exe'

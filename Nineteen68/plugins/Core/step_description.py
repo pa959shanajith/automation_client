@@ -66,6 +66,8 @@ class StepDescription:
             return "Write '"+ inputval[1] + "' to file  '" + inputval[0] + "'"
         def verifyfileimages():
             return "Compare images '" + inputval[0]+ "' and '" + inputval[1]+ "'"
+        def imagesimilaritypercentage():
+            return "Compare images '" + inputval[0]+ "' and '" + inputval[1]+ "'"
         def clearfilecontent():
 #            this needs to be implemeted
 ##            if(testStepProperty.getInputVal().size() == 2){
@@ -552,10 +554,10 @@ class StepDescription:
             return ' Double click on the '+ "'" +tsp.custname+ "'" +'.'
         def mousehover():
             return ' Move mouse pointer to ' + "'" + tsp.custname + "'"+'.'
-        ##        def GetToolTipText():
-        ##            return 'Get the tool tip  of '+ "'" +tsp.custname+ "'" +'.'
-        ##        def VerifyToolTipText():
-        ##            return 'Verify ' + input + ' is the tooltip of  '+ "'" + tsp.custname + "'"
+        def gettooltiptext():
+            return 'Get the tool tip from the '+ "'" + tsp.custname + "'"+ ' and save the tool tip text ' +"'"+output+"'"+ ' in ' +"'"+tsp.outputval+"'"
+        def verifytooltiptext():
+            return 'Verify ' +"'"+ input +"'"+ ' is the tooltip of  '+ "'" + tsp.custname + "'"
         def setfocus():
             return ' Set the focus on '+ "'" + tsp.custname + "'"+'.'
 
@@ -1079,6 +1081,8 @@ class StepDescription:
         #Image keywords
         def verifywebimages():
             return ' Compare images '+ "'" + tsp.custname + "'" + ' and ' +"'"+input+"'"
+        def imagesimilaritypercentage():
+            return ' Compare images '+ "'" + tsp.custname + "'" + ' and ' +"'"+input+"'"
 
         #dropdown keywords
         def getselected():
@@ -1282,11 +1286,16 @@ class StepDescription:
             if "," in input:                    #----checking if the string has a ","
                 listInput = input.split(",")        #--------spliting the input by checking for "," then store the result in list input
         def launchmainframe():
-            print input
             if len(listInput) == 2:
                 return "Launch Mainframe through emulator '" + listInput[1] + "' present in the path '" + listInput[0] +"'"
             else:
                 return "Launch mainframe failed due to insufficient parameter(s)"
+
+        def connectsession():
+            if input is not None:
+                return "Connected to host session '"+input +"'"
+            else:
+                return "Connection failed due to insufficient parameter(s)"
 
         def login():
             if len(listInput) == 3:
@@ -1324,8 +1333,10 @@ class StepDescription:
                 return "JobStatus failed due to insufficient parameter(s)"
 
         def sendfunctionkeys():
-            if input is not None:
-                return "Execute Function key  : '" + listInput[0] + "'"
+            if type(listInput) == str:
+                return "Execute Function key  : '" + listInput + "'"
+            elif type(listInput) == list and len(listInput) == 2:
+                return "Execute Function key  : '" + listInput[0] + "' for '" + listInput[1] + "' times"
             else:
                 return "SendFunctionKeys failed due to insufficient parameter(s)"
 
@@ -1352,6 +1363,13 @@ class StepDescription:
                 return "Verify text : '" + input + "' present in Emulator screen "
             else:
                 return "VerifyTextExists failed due to insufficient parameter(s)"
+
+        def disconnectsession():
+            return "Disconnected from host session"
+
+        def closemainframe():
+            return "Mainframe emulator closed"
+
         return locals()[keyword]()
 
 #==========================================================================================================#

@@ -308,6 +308,10 @@ class Reporting:
         obj[SCREENSHOT_PATH]= report_obj.screenshot_path
         report_obj.ellapsedtime=self.core_utilsobject.get_UTF_8(report_obj.ellapsedtime)
         obj[ELLAPSED_TIME]=report_obj.ellapsedtime
+        report_obj.remarks=self.core_utilsobject.get_UTF_8(report_obj.remarks)
+        obj[REMARKS]=report_obj.remarks
+        report_obj.testcase_details=self.core_utilsobject.get_UTF_8(report_obj.testcase_details)
+        obj[TESTCASE_DETAILS]=report_obj.testcase_details
         self.report_string.append(obj)
 
     def generate_report_step(self,tsp,status,con,ellapsedtime,keyword_flag,*args):
@@ -322,6 +326,8 @@ class Reporting:
         screenshot_path = None
         parent_id=0
         name=tsp.name
+        remark=tsp.remarks
+        testcase_details=tsp.testcase_details
         step_num=STEP+str(tsp.stepnum)
         step_testcase_name=tsp.testscript_name
         step_description=''
@@ -380,8 +386,7 @@ class Reporting:
                 else:
                     screenshot_path = None
 
-        reporting_pojo_obj=reporting_pojo.ReportingStep(self.id_counter,name,parent_id,status,str(step_num),comments,step_description,str(ellapsedtime),step_testcase_name,screenshot_path)
-
+        reporting_pojo_obj=reporting_pojo.ReportingStep(self.id_counter,name,parent_id,status,str(step_num),comments,step_description,str(ellapsedtime),step_testcase_name,screenshot_path,remark,testcase_details)
         self.generate_keyword_step(reporting_pojo_obj)
         self.id_counter+=1
 
@@ -444,6 +449,4 @@ class Reporting:
             import traceback
             log.debug(traceback.print_exc())
             traceback.print_exc()
-
-
 

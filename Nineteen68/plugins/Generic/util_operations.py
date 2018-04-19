@@ -192,7 +192,7 @@ class UtilOperations:
                         imageB = np.asarray(img2)
                         err = np.sum((imageA.astype("float") - imageB.astype("float"))**2)
                         #print 'err: ',err
-                        err /= float(size[0]*size[1]*3*255*255);
+                        err /= float(size[0]*size[1]*3*255*255)
                         #print 'err %: ',err*100,'%'
                         if(err<0.0005):
                             info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
@@ -202,6 +202,68 @@ class UtilOperations:
                             status=TEST_RESULT_PASS
                         else:
                             err_msg=ERROR_CODE_DICT['ERR_IMAGE_COMPARE_FAIL']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
+            if err_msg != None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg=INPUT_ERROR
+        return status,methodoutput,output,err_msg
+
+    def image_similarity_percentage(self,file1,file2):
+
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            log.debug('reading the inputs')
+            if file1 != None and file2 != None and file1 != '' and file2 != '' and os.path.exists(file1) and os.path.exists(file2) :
+				#960 Imageverificaton added ssim and histogram algo. (Himanshu)
+                #sending Image path instead of Images (Himanshu)
+                #img1 = Image.open(file1)
+                #img2 = Image.open(file2)
+                log.debug('comparing the images')
+                if self.verify_image_obj != None:
+                	#Meaning user has advanced image processing plugin
+                    if self.verify_image_obj.imagecomparison(file1,file2):
+                        info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
+                        log.info(info_msg)
+                        logger.print_on_console(info_msg)
+                        methodoutput=TEST_RESULT_TRUE
+                        status=TEST_RESULT_PASS
+                else:
+                		#using MSE
+                        from PIL import Image
+                        import numpy as np
+                        img1 = Image.open(file1)
+                        img2 = Image.open(file2)
+                        width1, height1 = img1.size
+                        width2, height2 = img2.size
+                        size=(min(width1,width2,1024),min(height1,height2,800))
+                        if not(file1.split('.')[-1]=='jpg'):
+                            img1 = img1.convert('RGB')
+                            #print 'converted img 1'
+                        if not(file2.split('.')[-1]=='jpg'):
+                            img2 = img2.convert('RGB')
+                            #print 'converted img 2'
+                        img1 = img1.resize(size)
+                        img2 = img2.resize(size)
+                        imageA = np.asarray(img1)
+                        imageB = np.asarray(img2)
+                        err = np.sum((imageA.astype("float") - imageB.astype("float"))**2)
+                        #print 'err: ',err
+                        err /= float(size[0]*size[1]*3*255*255)
+                        #print 'err %: ',err*100,'%'
+                        output = str((1-err)*100)
+                        logger.print_on_console("Image similarity percentage is: "+str((1-err)*100)+"%")
+                        methodoutput=TEST_RESULT_TRUE
+                        status=TEST_RESULT_PASS       
+                        log.info('Result is ',output)
+                        logger.print_on_console('Result is ',output)                                         
             else:
                 err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
             if err_msg != None:

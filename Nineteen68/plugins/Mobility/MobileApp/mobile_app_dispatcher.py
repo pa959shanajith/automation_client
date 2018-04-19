@@ -105,7 +105,7 @@ class MobileDispatcher:
                     'getdevices' : self.device_keywords_object.get_device_list,
                     'invokedevice' : self.device_keywords_object.invoke_device,
                     'stopserver':self.install_and_launch_object.stop_server,
-                    'hidesoftKeyboard':self.swipe_keywords_object.hide_soft_keyboard,
+                    'hidesoftkeyboard':self.swipe_keywords_object.hide_soft_keyboard,
                     'backpress':self.swipe_keywords_object.backPress,
                     'presselement':self.button_link_object.press,
                     'longpresselement':self.button_link_object.long_press,

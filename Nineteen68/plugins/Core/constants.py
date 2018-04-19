@@ -49,6 +49,8 @@ APPTYPE_WEB = 'web'
 
 APPTYPE_GENERIC = 'generic'
 
+APPTYPE_SYSTEM = 'system'
+
 APPTYPE_WEBSERVICE = 'webservice'
 
 APPTYPE_MAINFRAME = 'mainframe'
@@ -304,6 +306,10 @@ ELLAPSED_TIME='EllapsedTime'
 
 STEP='Step '
 
+REMARKS='Remark'
+
+TESTCASE_DETAILS='testcase_details'
+
 KEYWORD='Keyword'
 
 TEST_SCRIPT_NAME='TestCase Name'
@@ -413,3 +419,5 @@ JIRA_ACTION_2 = 'createIssueInJira'
 STATIC_NONE = "{#@#n_o_n_e#@#}"
 
 STATIC_DV_NAME = "{#@#n_u_m#@#}"
+
+WEB_ELEMENT_FOUND_FROM_GetInnerTable = 'Web Element found from GetInnerTable'

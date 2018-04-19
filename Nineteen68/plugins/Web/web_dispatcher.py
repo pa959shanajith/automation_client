@@ -141,12 +141,17 @@ class Dispatcher:
                             print_error('ERR_CUSTOM_NOTFOUND')
 
                 else:
-                    webelement = self.getwebelement(driver,objectname)
-                    if webelement != None:
-                        if isinstance(webelement,list):
-                            webelement = webelement[0]
-                            log.info(WEB_ELEMENT_FOUND)
-                            logger.print_on_console(WEB_ELEMENT_FOUND)
+                    if objectname=="@Object":
+                        webelement = input[0]
+                        log.info(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
+                        logger.print_on_console(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
+                    else:
+                        webelement = self.getwebelement(driver,objectname)
+                        if webelement != None:
+                            if isinstance(webelement,list):
+                                webelement = webelement[0]
+                                log.info(WEB_ELEMENT_FOUND)
+                                logger.print_on_console(WEB_ELEMENT_FOUND)
             return webelement
 
 
@@ -255,6 +260,7 @@ class Dispatcher:
                   'rightclick':self.util_object.rightclick,
                   'mouseclick':self.util_object.mouse_click,
                   'verifywebimages':self.util_object.verify_web_images,
+                  'imagesimilaritypercentage':self.util_object.image_similarity_percentage,
                   'waitforelementvisible':self.element_object.waitforelement_visible,
                   'getelementtagvalue': self.util_object.get_element_tag_value,
 
@@ -311,7 +317,12 @@ class Dispatcher:
                     ## Issue #190 Driver control won't switch back to parent window
                     if self.popup_object.check_if_no_popup_exists():
                         self.browser_object.validate_current_window_handle()
-                    result= dict[keyword](webelement,input)
+                    if objectname=="@Object":
+                        ##webelement = input[0]
+                        input =input[1:]
+                        result= dict[keyword](webelement,input)
+                    else:
+                        result= dict[keyword](webelement,input)
                     ## To terminate debug/execution if requested browser is not available in the system (Defect #846)
                     if(result[1] == TERMINATE):
                         result = TERMINATE

@@ -616,7 +616,9 @@ class BrowserKeywords():
                 #parent_handle=all_handles[0]
                 recent_handles=filter(lambda a:a not in invalid_handles,recent_handles)
                 if len(recent_handles)>0:
-                    driver_obj.switch_to.window(recent_handles[-1])
+                    ## Fix Nineteen68#1278
+                    if driver_obj.current_window_handle != recent_handles[-1]:
+                        driver_obj.switch_to.window(recent_handles[-1])
             except Exception as e:
                 log.error(e)
 
@@ -735,8 +737,7 @@ class Singleton_DriverUtil():
                             d = 'stale'
                             break
 
-
-                                    ##        drivermap.reverse()
+                                   ##        drivermap.reverse()
         return d
 
     def getBrowser(self,browser_num):
@@ -748,24 +749,36 @@ class Singleton_DriverUtil():
         log.debug('BROWSER NUM: ')
         log.debug(browser_num)
         logger.print_on_console( 'BROWSER NUM: ',browser_num)
-
+        flag1 = 0
         if (browser_num == '1'):
             try:
                 chrome_path = configvalues['chrome_path']
                 exec_path = webconstants.CHROME_DRIVER_PATH
-                if ((str(chrome_path).lower()) == 'default'):
-                    choptions = webdriver.ChromeOptions()
-                    choptions.add_argument('start-maximized')
-                    choptions.add_argument('--disable-extensions')
-                    driver = webdriver.Chrome(chrome_options=choptions, executable_path=exec_path)
+                choptions1 = webdriver.ChromeOptions()
+                # --headless helps to run chrome without browser window
+                choptions1.add_argument('--headless')
+                driver = webdriver.Chrome(chrome_options=choptions1, executable_path=exec_path)
+                flag1 = self.chrome_version(driver)
+                driver = None
+                if(flag1 != 0):
+                    if ((str(chrome_path).lower()) == 'default'):
+                        choptions = webdriver.ChromeOptions()
+                        choptions.add_argument('start-maximized')
+                        choptions.add_argument('--disable-extensions')
+                        driver = webdriver.Chrome(chrome_options=choptions, executable_path=exec_path)
+                    else:
+                        choptions = webdriver.ChromeOptions()
+                        choptions.add_argument('start-maximized')
+                        choptions.add_argument('--disable-extensions')
+                        logger.print_on_console('Choptions:',choptions)
+                        driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
+                    drivermap.append(driver)
+                    logger.print_on_console('Chrome browser started')
+                    log.info('Chrome browser started')
                 else:
-                    choptions = webdriver.ChromeOptions()
-                    choptions.add_argument('start-maximized')
-                    choptions.add_argument('--disable-extensions')
-                    driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
-                drivermap.append(driver)
-                logger.print_on_console('Chrome browser started')
-                log.info('Chrome browser started')
+                    logger.print_on_console('Chrome browser version not supported')
+                    log.info('Chrome browser version not supported')
+                    driver = None
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 log.info('Requested browser is not available')
@@ -825,10 +838,21 @@ class Singleton_DriverUtil():
                     caps=webdriver.DesiredCapabilities.FIREFOX
                     caps['marionette'] = True
                     driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH)
-                    drivermap.append(driver)
-                    driver.maximize_window()
-                    logger.print_on_console('Firefox browser started using geckodriver')
-                    log.info('Firefox browser started using geckodriver ')
+                    browser_ver=driver.capabilities['browserVersion']
+                    browser_ver1 = browser_ver.encode('utf-8')
+                    browser_ver = float(browser_ver1[:4])
+                    if(browser_ver == float(webconstants.FIREFOX_BROWSER_VERSION[0]) ):
+                        drivermap.append(driver)
+                        driver.maximize_window()
+                        logger.print_on_console('Firefox browser started using geckodriver')
+                        log.info('Firefox browser started using geckodriver ')
+                    else:
+                        driver.close()
+                        driver = None
+                        logger.print_on_console("Firefox browser version not supported")
+                        log.info('Firefox browser version not supported')
+##                    logger.print_on_console("Browser version:",browser_ver)
+                    log.info('Browser version:',browser_ver)
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 log.info('Requested browser is not available')
@@ -847,10 +871,21 @@ class Singleton_DriverUtil():
                 else:
                     iepath = webconstants.IE_DRIVER_PATH_64
                 driver = webdriver.Ie(capabilities=caps,executable_path=iepath)
-                drivermap.append(driver)
-                driver.maximize_window()
-                logger.print_on_console('IE browser started')
-                log.info('IE browser started')
+                browser_ver=driver.capabilities['version']
+                browser_ver1 = browser_ver.encode('utf-8')
+                browser_ver = int(browser_ver1)
+                if(browser_ver >= int(webconstants.IE_BROWSER_VERSION[0]) and browser_ver <= int(webconstants.IE_BROWSER_VERSION[1])):
+                    drivermap.append(driver)
+                    driver.maximize_window()
+                    logger.print_on_console('IE browser started')
+                    log.info('IE browser started')
+                else:
+                    driver.close()
+                    driver = None
+                    logger.print_on_console("IE browser version not supported")
+                    log.info('IE browser version not supported')
+##                    logger.print_on_console("Browser version:",browser_ver)
+                    log.info('Browser version:',browser_ver)
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 log.info('Requested browser is not available')
@@ -986,6 +1021,31 @@ class Singleton_DriverUtil():
                                         , set_security_zonesexc)
 
 
+    def chrome_version(self,driver):
+        browser_ver = driver.capabilities['version']
+        browser_ver1 = browser_ver.encode('utf-8')
+        browser_ver = int(browser_ver1[:2])
+##        logger.print_on_console('Driver version:',browser_ver)
+        log.info('Driver version:',browser_ver)
+        driver_ver = driver.capabilities['chrome']['chromedriverVersion']
+        driver_ver1 = driver_ver.encode('utf-8')
+        driver_ver = float(driver_ver1[:4])
+##        logger.print_on_console('Driver version:',driver_ver)
+        log.info('Driver version:',driver_ver)
+##        logger.print_on_console(webconstants.CHROME_DRIVER_VERSION[0][0])
+##        logger.print_on_console(type(webconstants.CHROME_DRIVER_VERSION[0][0]))
+        for i in range(0,len(webconstants.CHROME_DRIVER_VERSION)):
+##            print i
+            if(driver_ver == float(webconstants.CHROME_DRIVER_VERSION[i][0]) and browser_ver >= int(webconstants.CHROME_DRIVER_VERSION[i][1]) and browser_ver <= int(webconstants.CHROME_DRIVER_VERSION[i][2])):
+                flag1 = 1
+##                logger.print_on_console('Flag:',flag1)
+                log.info('Flag:',flag1)
+                return flag1
+            else:
+                flag1 = 0
+##        logger.print_on_console('Flag:',flag1)
+        log.info('Flag:',flag1)
+        return flag1
 
 
 ##driver = Singleton_DriverUtil()

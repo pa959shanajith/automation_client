@@ -256,12 +256,14 @@ class Webocular():
                 self.socketIO.emit('result_web_crawler',json.dumps(obj))
         except requests.exceptions.HTTPError as e:
             if obj["noOfTries"] < 2:
-                logger.print_on_console("\nHTTPError : retrying for url : ",url)
+                logger.print_on_console("HTTPError : retrying for url : ",url)
+                logger.print_on_console("----------------------------")
                 log.info("retrying for url : ")
                 log.info(url)
                 self.parse(url, obj, lev,agent,webocular_constants.REQUEST_URL_TIMEOUT/2)
             else:
-                logger.print_on_console("\nMax retries exceeded for url : ",url)
+                logger.print_on_console("Max retries exceeded for url : ",url)
+                logger.print_on_console("----------------------------")
                 obj['error'] = str(e)
                 obj['status'] = 400
                 self.nodedata[url] = obj
@@ -269,12 +271,14 @@ class Webocular():
                 log.info(url)
         except requests.exceptions.ConnectTimeout as e:
             if obj["noOfTries"] < 2:
-                logger.print_on_console("ConnectTimeout : retrying for url : ",url,"\n\n")
+                logger.print_on_console("ConnectTimeout : retrying for url : ",url)
+                logger.print_on_console("----------------------------")
                 log.info("retrying for url : ")
                 log.info(url)
                 self.parse(url, obj, lev,agent,webocular_constants.REQUEST_URL_TIMEOUT/2)
             else:
-                logger.print_on_console("Max retries exceeded for url : ",url,"\n\n")
+                logger.print_on_console("Max retries exceeded for url : ",url)
+                logger.print_on_console("----------------------------")
                 obj['error'] = str(e)
                 obj['status'] = 400
                 self.nodedata[url] = obj
@@ -282,12 +286,14 @@ class Webocular():
                 log.info(url)
         except requests.exceptions.ReadTimeout as e:
             if obj["noOfTries"] < 2:
-                logger.print_on_console("ReadTimeout : retrying for url : ",url,"\n\n")
+                logger.print_on_console("ReadTimeout : retrying for url : ",url)
+                logger.print_on_console("----------------------------")
                 log.info("retrying for url : ")
                 log.info(url)
                 self.parse(url, obj, lev,agent,webocular_constants.REQUEST_URL_TIMEOUT/2)
             else:
-                logger.print_on_console("Max retries exceeded for url : ",url,"\n\n")
+                logger.print_on_console("Max retries exceeded for url : ",url)
+                logger.print_on_console("----------------------------")
                 obj['error'] = str(e)
                 obj['status'] = 400
                 self.nodedata[url] = obj
@@ -298,7 +304,8 @@ class Webocular():
             obj['status'] = 400
             self.nodedata[url] = obj
             log.error(e)
-            logger.print_on_console("Problem accessing url : ",url,"\n\n")
+            logger.print_on_console("Problem accessing url : ",url)
+            logger.print_on_console("----------------------------")
             #import traceback
             #traceback.format_exc()
             self.crawlStatus = False

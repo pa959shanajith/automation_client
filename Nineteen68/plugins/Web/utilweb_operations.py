@@ -116,7 +116,7 @@ class UtilWebKeywords:
         flag=False
         log.debug('Checking the visibility of element')
         try:
-            script="""var isVisible = (function() {     function inside(schild, sparent) {         while (schild) {             if (schild === sparent) return true;             schild = schild.parentNode;         }         return false;     };     return function(selem) {         if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0) return false;         var srect = selem.getBoundingClientRect();         if (window.getComputedStyle || selem.currentStyle) {             var sel = selem,                 scomp = null;             while (sel) {                 if (sel === document) {                     break;                 } else if (!sel.parentNode) return false;                 scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;                 if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && scomp.opacity != 1))) return false;                 sel = sel.parentNode;             }         }         return true;     } })(); var s = arguments[0]; return isVisible(s);"""
+            script="""var isVisible = (function() {     function inside(schild, sparent) {         while (schild) {             if (schild === sparent) return true;             schild = schild.parentNode;         }         return false;     };     return function(selem) {         if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0) return false;         var srect = selem.getBoundingClientRect();         if (window.getComputedStyle || selem.currentStyle) {             var sel = selem,                 scomp = null;             while (sel) {                 if (sel === document) {                     break;                 } else if (!sel.parentNode) return false;                 scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;                 if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && !(scomp.opacity > 0)))) return false;                 sel = sel.parentNode;             }         }         return true;     } })(); var s = arguments[0]; return isVisible(s);"""
             flag= browser_Keywords.driver_obj.execute_script(script,webelement)
         except Exception as e:
             self.__web_driver_exception(e)
@@ -804,8 +804,8 @@ class UtilWebKeywords:
                             img2 = Image.open(file2)
                             img1 = img1.convert('RGB')
                             img2 = img2.convert('RGB')
-                            img1 = img1.resize(size);
-                            img2 = img2.resize(size);
+                            img1 = img1.resize(size)
+                            img2 = img2.resize(size)
                             imageA = np.asarray(img1)
                             imageB = np.asarray(img2)
                             err = np.sum((imageA.astype("float") - imageB.astype("float"))**2)
@@ -827,6 +827,63 @@ class UtilWebKeywords:
                 log.error(err_msg)
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
+        return status,methodoutput,output,err_msg
+
+    def image_similarity_percentage(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            from PIL import Image
+            if webelement!=None and webelement !='':
+                img_src = webelement.get_attribute("src")
+                file1 = cStringIO.StringIO(urllib.urlopen(img_src).read())
+                file2=input[0]
+                log.info(INPUT_IS)
+                log.info(file2)
+                if file1 != None and file2 != None and  file2 != '' and os.path.exists(file2) :
+                    log.debug('comparing the images')
+                    if self.verify_image_obj != None: #Meaning user has advanced image processing plugin
+                        if self.verify_image_obj.imagecomparison(file1,file2):
+                            info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
+                            log.info(info_msg)
+                            logger.print_on_console(info_msg)
+                            methodoutput=TEST_RESULT_TRUE
+                            status=TEST_RESULT_PASS
+                    else:
+                            from PIL import Image
+                            import numpy as np
+                            size=(128,128)
+                            img1 = Image.open(file1)
+                            img2 = Image.open(file2)
+                            img1 = img1.convert('RGB')
+                            img2 = img2.convert('RGB')
+                            img1 = img1.resize(size)
+                            img2 = img2.resize(size)
+                            imageA = np.asarray(img1)
+                            imageB = np.asarray(img2)
+                            err = np.sum((imageA.astype("float") - imageB.astype("float"))**2)
+                            err /= float(imageA.shape[0] * imageA.shape[1])
+                            #print 'err: ',err
+                            err /= float(size[0]*size[1]*3*255*255)
+                            #print 'err %: ',err*100,'%'
+                            output = str((1-err)*100)
+                            logger.print_on_console("Image similarity percentage is: "+str((1-err)*100)+"%")
+                            methodoutput=TEST_RESULT_TRUE
+                            status=TEST_RESULT_PASS       
+                            log.info('Result is ',output)
+                            logger.print_on_console('Result is ',output)                                         
+                else:
+                    err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
+                if err_msg != None:
+                    logger.print_on_console(err_msg)
+                    log.error(err_msg)
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg=INPUT_ERROR
         return status,methodoutput,output,err_msg
 
     def get_element_tag_value(self,webelement,*args):
