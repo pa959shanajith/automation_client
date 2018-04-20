@@ -410,6 +410,34 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
             log.info("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
 
+    def on_generateFlowGraph(self,*args):
+        try:
+            global socketIO
+            con = controller.Controller()
+            con.get_all_the_imports('AutomatedPathGenerator')
+            import apg
+            fg = apg.AutomatedPathGenerator(socketIO)
+            args=list(args)
+            #args[0] is version, args[1] is filepath
+            fg.generate_flowgraph(str(args[0]),str(args[1]))
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console('Exception in generate flowgraph')
+
+    def on_apgOpenFileInEditor(self, *args):
+        try:
+            global socketIO
+            con = controller.Controller()
+            con.get_all_the_imports('AutomatedPathGenerator')
+            import apg
+            fg = apg.AutomatedPathGenerator(socketIO)
+            args = list(args)
+            # args[0] is Editor name, args[1] is filepath, args[2] is line number
+            fg.open_file_in_editor(str(args[0]), str(args[1]), int(args[2]))
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console('Exception in on_apgOpenFileInEditor')
+
 
 class SocketThread(threading.Thread):
     """Test Worker Thread Class."""
