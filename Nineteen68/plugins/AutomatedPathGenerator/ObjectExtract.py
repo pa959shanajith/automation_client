@@ -2378,7 +2378,6 @@ def main(ASTDict, Flow, Class, PosMeth):
 		objectExtract(0)
 	except Exception as e:
 		log.error(e)
-		logger.print_on_console("Exception occured in object extract")
 	return FlowChart, Classes, PossibleMethods, ClassVariables, VarStorage
 
 
@@ -3332,7 +3331,7 @@ def statementExpressionExtraction(root):
 				  ]["child"].append(len(FlowChart) - 1)
 
 		if(isinstance(name[2],list)):
-			for n in name[2]:	
+			for n in name[2]:
 				New_Nodes = addNodes(
 					"Square",
 					"TernaryTemp=" +

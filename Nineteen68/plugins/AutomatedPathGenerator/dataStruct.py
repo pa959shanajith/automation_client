@@ -56,7 +56,5 @@ def start(name):
                     parent = len(ASTNode) - 1
             f.close()
     except Exception as e:
-        import traceback
-        print(traceback.format_exc())
         ASTNode = []
     return ASTNode

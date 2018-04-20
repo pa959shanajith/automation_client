@@ -119,7 +119,7 @@ class AutomatedPathGenerator:
                     self.pmdCall(java_version, filename, name)
                 # ASTTree 1st node(CompilationUnit) captured in root if no error is present
                 root = dataStruct.start(name)
-                os.remove(r'./ASTTree' + name + '.txt')
+                #os.remove(r'./ASTTree' + name + '.txt')
                 os.chdir(os.environ["NINETEEN68_HOME"])
                 if root:
                     # ObjectExtract.main will generate the FlowChart Nodes, give the Classes and all Possible Methods
@@ -331,8 +331,6 @@ class AutomatedPathGenerator:
             data = {"result":"fail"}
             self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
             logger.print_on_console("Graph generation failed")
-            import traceback
-            print (traceback.format_exc())
             log.error(e)
             logger.print_on_console("Error occured while generate graph.")
 
@@ -351,6 +349,7 @@ class AutomatedPathGenerator:
         try:
              global Cylomatic_Compelxity
              error_flag_cc=False
+             logger.print_on_console(cname)
              cdata={'class':'', 'methods':[],'line_no':''}
              if not filepath in Cylomatic_Compelxity:
                  complexity_data={}
@@ -391,8 +390,6 @@ class AutomatedPathGenerator:
                     cdata="Undefined"
              return cdata
         except Exception as e:
-            import traceback
-            print (traceback.format_exc())
             logger.print_on_console("Error occured while calculating complexity")
             log.error(e)
 
@@ -402,7 +399,7 @@ class AutomatedPathGenerator:
                 linenumberOption = "-n" + str(linenumber)
                 editorOption = "C:\\Program Files (x86)\\Notepad++\\notepad++.exe"
                 command = editorOption + " " + linenumberOption + " " + filepath
-                logger.print_on_console('Opening file %s',filepath)
+                logger.print_on_console('Opening file %s' % filepath)
                 editor_process = subprocess.Popen(command)
                 data = {'status' : 'success','message' : 'successfully opened file'}
                 self.socketIO.emit('open_file_in_editor_result',json.dumps(data))
