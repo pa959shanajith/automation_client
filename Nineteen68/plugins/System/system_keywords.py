@@ -53,8 +53,8 @@ class System_Keywords():
                     os_details = wmi_ref.Win32_OperatingSystem()
                     for iterator in os_details:
                         os_info['system']='windows'
-                        os_info['machine']=iterator.Caption
-                        os_info['version']=iterator.Version
+                        os_info['machine']=str(iterator.Caption)
+                        os_info['version']=str(iterator.Version)
                     status=system_constants.TEST_RESULT_PASS
                     result = system_constants.TEST_RESULT_TRUE
                 else:
@@ -85,7 +85,7 @@ class System_Keywords():
                 if wmi_ref is not None:
                     for p in wmi_ref.Win32_Product():
                         #apps_data.append({'caption':p.Caption,'version':p.Version,'name':p.Name,'vendor':p.Vendor})
-                        apps_data.append(p.Name)
+                        apps_data.append(p.Name+'-'+p.Version)
                     status=system_constants.TEST_RESULT_PASS
                     result=system_constants.TEST_RESULT_TRUE
                 else:
