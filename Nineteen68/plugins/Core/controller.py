@@ -509,6 +509,11 @@ class Controller():
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         log.info('Result obtained is: ')
         log.info(display_keyword_response)
+        if tsp.apptype.lower()=='desktop' or tsp.apptype.lower()=='sap' or tsp.apptype.lower()=='desktopjava':
+            if result[2]!='9cc33d6fe25973868b30f4439f09901a':
+                logger.print_on_console('Result obtained is: ',result[2])
+            elif result:
+                logger.print_on_console('Result obtained is: ',result[1])
         if len(output)>0 and output[0] != '':
             self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response,tsp.name)
         if len(output)>1:

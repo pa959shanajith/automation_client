@@ -1,18 +1,19 @@
 #-------------------------------------------------------------------------------
-# Name:        outlook
-# Purpose:      To automate outlook keywords
+# Name:        outlook.py
+# Purpose:     To automate 'Outlook'
 #
-# Author:      prudhvi.gujjuboyina
+# Author:      prudhvi.gujjuboyina,anas.ahmed
 #
 # Created:     07-09-2016
-# Copyright:   (c) prudhvi.gujjuboyina 2016
+# Copyright:   (c) prudhvi.gujjuboyina 2016,(c) anas.ahmed 2018
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
 from  win32com.client import Dispatch
 import outlook_constants
 from   pywintypes import  com_error
-
+import random
+import string
 import desktop_constants
 import logging
 from constants import *
@@ -21,11 +22,6 @@ import pythoncom
 import threading
 import core_utils
 log = logging.getLogger('outlook.py')
-##import ftfy
-##from  cherrypy import engine
-
-count=0
-
 
 ## This class will have the methods to automate Outlook Application
 class OutlookKeywords:
@@ -34,17 +30,10 @@ class OutlookKeywords:
             self.senderEmail=''
             self.subject=''
             self.toMail=''
-            self.Flag=False
-            self.Subject=''
-            self.ToMailID=''
-            self.FromMailId=''
-            self.AttachmentStatus=outlook_constants.ATTACH_STATUS_NO
-            self.Body=''
-            self.message=''
-            self.Content=None
             self.targetFolder=None
             self.outlook=None
             self.store=None
+            self.GetEmailList=[]
             #----------------------sendmail
             self.sendFlag=False
             self.subjectFlag=False
@@ -80,11 +69,15 @@ class OutlookKeywords:
             method_output=desktop_constants.TEST_RESULT_FALSE
             error_msg=None
             result=OUTPUT_CONSTANT
+            folders=[]
             try:
-                ##logger.print_on_console('switching to the folder')
                 folderPath=input[0]
                 folderPath=folderPath.strip('\\')
-                folders=folderPath.split('\\')
+                folders=str(folderPath).split('\\')
+                #---------------------------------
+                while '' in folders:
+                    folders.remove('')
+                #---------------------------------
                 accountname=folders[0]
 ##                global count
 ##                if count>0:
@@ -98,9 +91,7 @@ class OutlookKeywords:
                     for store in stores:
                         if store.DisplayName==accountname:
                             self.store=store
-
-                            if folders[1]=='Inbox':
-
+                            if folders[1].strip()=='Inbox':
                                 inbox_folder = store.GetDefaultFolder(outlook_constants.INBOX_FOLDER)
                                 index=0;
                                 folder=None
@@ -127,20 +118,16 @@ class OutlookKeywords:
                     logger.print_on_console('Check the path given')
                     error_msg='Check the path given'
             except Exception as e:
+                import traceback
+                traceback.print_exc()
                 log.error(e)
                 logger.print_on_console('Check the given path')
             return status,method_output,result,error_msg
 
 
-##  This method takes 3 params
-##  1. senderName (Display name  in Outlook application)
-##  2. subject
-##  3.to whom mail has been sent
-##  On success return the mail content in string format
-## else return fail
+        """  This method takes 3 Input Params :1.Sender Name (Display name  in Outlook application) 2.Subject  3.To whom mail has been sent
+On success return the mail content in string format else return fail"""
         def GetEmail(self,input,*args):
-
-##   Get the Outlook com object registry
             try:
                 status=desktop_constants.TEST_RESULT_FAIL
                 method_output=desktop_constants.TEST_RESULT_FALSE
@@ -150,21 +137,12 @@ class OutlookKeywords:
                 self.subject=input[2]
                 self.toMail=input[1].strip()
                 #clearing all the variables before fetching the values
-                self.Subject=''
-                self.ToMailID=''
-                self.FromMailId=''
-                self.AttachmentStatus=outlook_constants.ATTACH_STATUS_NO
-                self.Body=''
-                self.message=''
-                self.Flag=False
-
-##                pythoncom.CoInitialize()
-##                engine.subscribe('start_thread', onThreadStart)
-##                global count
-##                if count>1:
-##                    import pythoncom
-##                    pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
-##                count=count+1
+                Subject=''
+                ToMailID=''
+                FromMailId=''
+                AttachmentStatus=outlook_constants.ATTACH_STATUS_NO
+                Body=''
+                Flag=False
                 if (self.outlook==None):
                      self.outlook = self.getOutlookComObj(2)
                      inbox = self.outlook.GetDefaultFolder(outlook_constants.INBOX_FOLDER)
@@ -186,26 +164,25 @@ class OutlookKeywords:
                                     to = str(to)
                                     to = to.strip()
                                     if self.toMail == to:
-                                        self.Content=msg
-                                        self.Subject = msg.Subject
-                                        self.Body= msg.Body
                                         if msg.SenderEmailType=='EX':
                                             try:
-                                                self.FromMailId= msg.Sender.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS)
+                                                FromMailId= msg.Sender.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS)
                                             except:
                                                 pass
                                         else:
-                                            self.FromMailId=msg.SenderEmailAddress
+                                            FromMailId=msg.SenderEmailAddress
                                         for recipient in  msg.Recipients:
                                             if recipient.Type==1:
-                                                self.ToMailID+=recipient.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS)+';'
-                                        self.ToMailID=self.ToMailID[:-1]
+                                                ToMailID+=recipient.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS)+';'
+                                        ToMailID=ToMailID[:-1]
                                         if msg.Attachments.Count>0:
-                                            self.AttachmentStatus=outlook_constants.ATTACH_STATUS_YES
-    ##                                    message="From : "+msg.SenderName+" <"+self.FromMailId+">"+"\n"+ "To: "+ self.ToMailID + "\n"+ "Date: "+str(msg.SentOn)+ "\n"+ "Subject: "+ msg.Subject+ "\n"+ str(msg.Attachments.Count)+ " attachments." + "\n"+ msg.Body
+                                            AttachmentStatus=outlook_constants.ATTACH_STATUS_YES
                                         try:
                                                 msg.Display()
-                                                self.Flag=True
+                                                Flag=True
+                                                key=''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5)) #creating a random key of length '5'
+                                                self.GetEmailList.append({'Subject':msg.Subject,'ToMailID':ToMailID,'FromMailId':FromMailId,'AttachmentStatus':AttachmentStatus,'Body':msg.Body,'Flag':Flag,'Key':key,'Content':msg})
+                                                result=key
                                                 status=desktop_constants.TEST_RESULT_PASS
                                                 method_output=desktop_constants.TEST_RESULT_TRUE
                                         except Exception as e:# done to handle popups and dialog boxes
@@ -222,67 +199,91 @@ class OutlookKeywords:
                             break
                         else :
                             continue
-
-                if self.Flag!=True:
+                if Flag!=True:
                     if error_msg==None:
                         logger.print_on_console('Error: No such mail found')
                         error_msg='Error: No such mail found'
             except Exception as e:
+                import traceback
+                traceback.print_exc()
                 log.error(e)
                 logger.print_on_console('Error: No such mail found')
             return status,method_output,result,error_msg
 
         def GetFromMailId(self,input,*args):
+            status=desktop_constants.TEST_RESULT_FAIL
+            method_output=desktop_constants.TEST_RESULT_FALSE
+            error_msg=None
+            res=None
+            Fail_Flag=True
             try:
-                status=desktop_constants.TEST_RESULT_FAIL
-                method_output=desktop_constants.TEST_RESULT_FALSE
-                error_msg=None
-                res=None
-                if self.Flag==True:
-                    res= self.FromMailId
-                    status=desktop_constants.TEST_RESULT_PASS
-                    method_output=desktop_constants.TEST_RESULT_TRUE
-                else:
+                for data in self.GetEmailList:
+                    if input[0]==data['Key'] and data['Flag']==True:
+                        res= data['FromMailId']
+                        status=desktop_constants.TEST_RESULT_PASS
+                        method_output=desktop_constants.TEST_RESULT_TRUE
+                        Fail_Flag=False
+                if Fail_Flag==True:
                     logger.print_on_console('Error : No such mail id found')
                     error_msg='Error : No such mail id found'
             except Exception as  e:
+                import traceback
+                traceback.print_exc()
                 log.error(e)
                 logger.print_on_console('Error : No such mail id found')
             return status,method_output,res,error_msg
 
 
         def GetAttachmentStatus(self,input,*args):
+            status=desktop_constants.TEST_RESULT_FAIL
+            method_output=desktop_constants.TEST_RESULT_FALSE
+            res=None
+            error_msg=None
+            Fail_Flag=True
             try:
-                status=desktop_constants.TEST_RESULT_FAIL
-                method_output=desktop_constants.TEST_RESULT_FALSE
-                res=None
-                error_msg=None
-                if self.Flag==True:
-                    res= self.AttachmentStatus
-                    status=desktop_constants.TEST_RESULT_PASS
-                    method_output=desktop_constants.TEST_RESULT_TRUE
-                else:
+                for data in self.GetEmailList:
+                    if len(input)==1:
+                        if input[0]==data['Key'] and data['Flag']==True:
+                            res= data['AttachmentStatus']
+                            if res =='Yes':
+                                res='Present'
+                            elif res=='No':
+                                res='Not present'
+                            status=desktop_constants.TEST_RESULT_PASS
+                            method_output=desktop_constants.TEST_RESULT_TRUE
+                            Fail_Flag=False
+                    else:
+                        logger.print_on_console('Invalid Input')
+                        error_msg='Invalid Input'
+                if Fail_Flag==True:
                     logger.print_on_console('Error : mail does''t have such info')
                     error_msg='Error : mail does''t have such info'
             except Exception as  e:
+                import traceback
+                traceback.print_exc()
                 log.error(e)
                 logger.print_on_console('Error : mail does''t have such info')
             return status,method_output,res,error_msg
 
         def GetSubject(self,input,*args):
+            status=desktop_constants.TEST_RESULT_FAIL
+            method_output=desktop_constants.TEST_RESULT_FALSE
+            res=None
+            error_msg=None
+            Fail_Flag=True
             try:
-                status=desktop_constants.TEST_RESULT_FAIL
-                method_output=desktop_constants.TEST_RESULT_FALSE
-                res=None
-                error_msg=None
-                if self.Flag==True:
-                    res= self.Subject
-                    status=desktop_constants.TEST_RESULT_PASS
-                    method_output=desktop_constants.TEST_RESULT_TRUE
-                else:
+                for data in self.GetEmailList:
+                    if input[0]==data['Key'] and data['Flag']==True:
+                        res= data['Subject']
+                        status=desktop_constants.TEST_RESULT_PASS
+                        method_output=desktop_constants.TEST_RESULT_TRUE
+                        Fail_Flag=False
+                if Fail_Flag==True:
                     logger.print_on_console('Error : No subject found')
                     error_msg='Error : No subject found'
             except Exception as  e:
+                import traceback
+                traceback.print_exc()
                 log.error(e)
                 logger.print_on_console('Error : No subject found')
             return status,method_output,res,error_msg
@@ -292,15 +293,20 @@ class OutlookKeywords:
             method_output=desktop_constants.TEST_RESULT_FALSE
             res=None
             error_msg=None
+            Fail_Flag=True
             try:
-                if self.Flag==True:
-                    res= self.ToMailID
-                    status=desktop_constants.TEST_RESULT_PASS
-                    method_output=desktop_constants.TEST_RESULT_TRUE
-                else:
+                for data in self.GetEmailList:
+                    if input[0]==data['Key'] and data['Flag']==True:
+                        res= data['ToMailID']
+                        status=desktop_constants.TEST_RESULT_PASS
+                        method_output=desktop_constants.TEST_RESULT_TRUE
+                        Fail_Flag=False
+                if Fail_Flag==True:
                     logger.print_on_console('Error : No such mail id found')
                     error_msg='Error : No such mail id found'
             except Exception as  e:
+                import traceback
+                traceback.print_exc()
                 log.error(e)
                 logger.print_on_console('Error : No such mail id found')
             return status,method_output,res,error_msg
@@ -311,50 +317,49 @@ class OutlookKeywords:
             method_output=desktop_constants.TEST_RESULT_FALSE
             res=None
             error_msg=None
+            Fail_Flag=True
             try:
-                if self.Flag==True:
-                    res= self.Body
-##                    res= ftfy.fix_text(res)
-                    coreutilsobj=core_utils.CoreUtils()
-                    res=coreutilsobj.get_UTF_8(res)
-                    status=desktop_constants.TEST_RESULT_PASS
-                    method_output=desktop_constants.TEST_RESULT_TRUE
-                else:
+                for data in self.GetEmailList:
+                    if input[0]==data['Key'] and data['Flag']==True:
+                        res= data['Body']
+                        coreutilsobj=core_utils.CoreUtils()
+                        res=coreutilsobj.get_UTF_8(res)
+                        status=desktop_constants.TEST_RESULT_PASS
+                        method_output=desktop_constants.TEST_RESULT_TRUE
+                        Fail_Flag=False
+                if Fail_Flag==True:
                     logger.print_on_console('Error : No Body found')
                     error_msg='Error : No Body found'
             except Exception as  e:
+                    import traceback
+                    traceback.print_exc()
                     log.error(e)
                     logger.print_on_console('Error : No Body found')
             return status,method_output,res,error_msg
 
 
         def VerifyEmail(self,input,*args):
+            status=desktop_constants.TEST_RESULT_FAIL
+            method_output=desktop_constants.TEST_RESULT_FALSE
+            error_msg=None
+            res=OUTPUT_CONSTANT
+            Fail_Flag=True
             try:
-                status=desktop_constants.TEST_RESULT_FAIL
-                method_output=desktop_constants.TEST_RESULT_FALSE
-                error_msg=None
-                res=OUTPUT_CONSTANT
-                if self.Flag==True:
-                    try:
-                        FilePath=input[0]
-                        mail_content = self.outlook.OpenSharedItem(FilePath)
-                        if str(self.Content.SenderName) == str(mail_content.SenderName):
-                            if self.Content.To==mail_content.To:
-                                if self.Content.Subject==mail_content.Subject:
-                                    if self.Content.Body==mail_content.Body:
-                                        if str(self.Content.Attachments)==str(mail_content.Attachments):
-                                            if self.Content.SentOn==mail_content.SentOn:
-                                                status=desktop_constants.TEST_RESULT_PASS
-                                                method_output=desktop_constants.TEST_RESULT_TRUE
-
-
-                    except Exception as e:
-                        logger.print_on_console('Error occured : File not found')
-                else:
+                for data in self.GetEmailList:
+                    if input[1]==data['Key'] and data['Flag']==True:
+                            FilePath=input[0]
+                            mail_content = self.outlook.OpenSharedItem(FilePath)
+                            if str(data['Content'].SenderName) == str(mail_content.SenderName) and data['Content'].To==mail_content.To and data['Content'].Subject==mail_content.Subject and data['Content'].Body==mail_content.Body and str(data['Content'].Attachments)==str(mail_content.Attachments) and data['Content'].SentOn==mail_content.SentOn:
+                                status=desktop_constants.TEST_RESULT_PASS
+                                method_output=desktop_constants.TEST_RESULT_TRUE
+                                Fail_Flag=False
+                if Fail_Flag==True:
                     logger.print_on_console('Error : No such mail found')
+                    error_msg='Error : No such mail found'
             except Exception as  e:
-                #import traceback
-                logger.print_on_console('Error occured : File not found')
+                import traceback
+                traceback.print_exc()
+                logger.print_on_console('Wrong input given')
             return status,method_output,res,error_msg
 
 # Internal method to search for a folder in given folder
