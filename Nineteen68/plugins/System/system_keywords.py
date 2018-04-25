@@ -69,6 +69,8 @@ class System_Keywords():
         except Exception as e:
             log.error(e)
             err_msg =system_constants.ERROR_CODE_DICT['ERR_OS_INFO']
+            status = system_constants.TEST_RESULT_FAIL
+            result = system_constants.TEST_RESULT_FALSE
         return status,result,os_info,err_msg
 
     def getAllInstalledApps(self,machine_name=None):
@@ -97,6 +99,8 @@ class System_Keywords():
         except Exception as e:
             log.error(e)
             err_msg = system_constants.ERROR_CODE_DICT['ERR_GET_INSTALLED_APP']
+            status = system_constants.TEST_RESULT_FAIL
+            result = system_constants.TEST_RESULT_FALSE
         return status,result,apps_data,err_msg
 
     def getInstalledAppInfo(self,app_name,machine_name=None):
@@ -122,6 +126,8 @@ class System_Keywords():
         except Exception as e:
             log.error(e)
             err_msg = system_constants.ERROR_CODE_DICT['ERR_GET_ALL_PROCESS']
+            status = system_constants.TEST_RESULT_FAIL
+            result = system_constants.TEST_RESULT_FALSE
         return status,result,process_data,err_msg
 
     def getProcessInfo(self):
@@ -145,7 +151,7 @@ class System_Keywords():
                 wmi_ref=self.getWmi(machine_name)
                 if wmi_ref is not None:
                     if machine_name is None:
-                        path_outfile=os.environ["NINETEEN68_HOME"]+"//Nineteen68//plugins//System//nsys.txt"
+                        path_outfile=os.environ["NINETEEN68_HOME"]+"//Nineteen68//plugins//System//nineteen68_system.txt"
                         process_id, process_status = wmi_ref.Win32_Process.Create(CommandLine="cmd /c "+command_toexecute+" > "+path_outfile)
                     else:
                         file_name=None
@@ -155,9 +161,9 @@ class System_Keywords():
                             path_attrib=path_outfile.split(':')
                             if(len(path_attrib)==2):
                                 if path_attrib[1].endswith('\\'):
-                                    file_name ="nsys.txt"
+                                    file_name ="nineteen68_system.txt"
                                 else:
-                                    file_name="/nsys.txt"
+                                    file_name="/nineteen68_system.txt"
 
                                 path_outfile = "//"+machine_name+"/"+path_attrib[0]+"$"+path_attrib[1]+file_name
                             else:
@@ -179,6 +185,8 @@ class System_Keywords():
         except Exception as e:
             log.error(e)
             err_msg = system_constants.ERROR_CODE_DICT['ERR_EXECUTE_COMMAND']
+            status = system_constants.TEST_RESULT_FAIL
+            result = system_constants.TEST_RESULT_FALSE
         return status,result,result_data,err_msg
 
 '''
