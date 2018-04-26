@@ -1374,3 +1374,50 @@ class StepDescription:
 
 #==========================================================================================================#
 #End of Mainframe Keyword Reporting starts
+
+
+# Start of System Keyword Reporting
+#==========================================================================================================#
+
+    def system(self,keyword,tsp,inputval,input,output,con,reporting_obj):
+
+        def get_machine_name(value):
+            machine_name=''
+            if not value:
+                machine_name="local machine"
+            else:
+                machine_name=value
+            return machine_name
+
+
+        def getosinfo():
+            machine_name = get_machine_name(input)
+            return "Get Os Information from '"+machine_name+"' and save the info '"+output+"' in '"+tsp.outputval+"'"
+            pass
+
+        def getallprocess():
+            machine_name = get_machine_name(input)
+            return "Get All Process from '"+machine_name+"' and save the info '"+output+"' in '"+tsp.outputval+"'"
+
+        def getallinstalledapps():
+            machine_name=get_machine_name(input)
+            return "Get All Installed apps from '"+machine_name+"' and save the info '"+output+"' in '"+tsp.outputval+"'"
+
+        def executecommand():
+            input_data=input.split(',')
+            machine_name=''
+            if len(input_data)==1:
+                machine_name="local machine"
+            else:
+                machine_name=input_data[1]
+            return "Get result of Execute Command'"+input_data[0]+"' from '"+machine_name+"' and save the info '"+output+"' in '"+tsp.outputval+"'"
+        logger.print_on_console(keyword)
+
+        return locals()[keyword]()
+
+
+
+
+
+#==========================================================================================================#
+#End of System Keyword Reporting starts

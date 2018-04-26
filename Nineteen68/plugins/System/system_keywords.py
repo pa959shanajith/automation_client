@@ -197,6 +197,8 @@ class System_Keywords():
             f= open(path_outfile,"r")
             for i in f:
                 result_data+=i
+            if not result_data:
+                raise Exception('Command not found or Unable to connect to machine')
         except Exception as e:
             log.error(e)
             err_msg = system_constants.ERROR_CODE_DICT['ERR_EXECUTE_COMMAND']

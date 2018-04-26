@@ -42,6 +42,7 @@ class SystemDispatcher:
             else:
                 result = keyword_dict[keyword]()
         except Exception as e:
+            logger.print_on_console('Input Error : Provide valid input')
             log.error(e)
         return result
 
