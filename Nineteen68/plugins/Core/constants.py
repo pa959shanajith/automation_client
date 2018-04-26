@@ -421,3 +421,7 @@ STATIC_NONE = "{#@#n_o_n_e#@#}"
 STATIC_DV_NAME = "{#@#n_u_m#@#}"
 
 WEB_ELEMENT_FOUND_FROM_GetInnerTable = 'Web Element found from GetInnerTable'
+
+FIREFOX_BROWSER_VERSION = [[0.16,52.7],[0.18,52.7],[0.19,58.0]]
+
+CHROME_DRIVER_VERSION = [[2.37,63,66],[2.35,62,65]]
