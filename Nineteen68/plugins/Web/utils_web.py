@@ -123,15 +123,26 @@ class Utils:
 
                     hwnds.append(hwnd)
             return True
-        hwnds = []
-        win32gui.EnumWindows(callback, hwnds)
+        try:
+            hwnds = []
+            win32gui.EnumWindows(callback, hwnds)
+        except Exception as e:
+            log.error(e)
         return hwnds
 
     def bring_Window_Front(self,pid):
         hwnd =self.get_hwnds_for_pid(pid)
-        winSize = len(hwnd)
-        win32gui.ShowWindow(hwnd[winSize - 1], win32con.SW_MAXIMIZE)
-        win32gui.SetWindowPos(hwnd[winSize - 1], win32con.HWND_NOTOPMOST, 0, 0, 0, 0, win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
-        win32gui.SetWindowPos(hwnd[winSize - 1], win32con.HWND_TOPMOST, 0, 0, 0, 0, win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
-        win32gui.SetWindowPos(hwnd[winSize - 1], win32con.HWND_NOTOPMOST, 0, 0, 0, 0, win32con.SWP_SHOWWINDOW + win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
-        return hwnd[winSize - 1]
+        win_handle=None
+        try:
+            winSize = len(hwnd)
+            win32gui.ShowWindow(hwnd[winSize - 1], win32con.SW_MAXIMIZE)
+            win32gui.SetWindowPos(hwnd[winSize - 1], win32con.HWND_NOTOPMOST, 0, 0, 0, 0, win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
+            win32gui.SetWindowPos(hwnd[winSize - 1], win32con.HWND_TOPMOST, 0, 0, 0, 0, win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
+            win32gui.SetWindowPos(hwnd[winSize - 1], win32con.HWND_NOTOPMOST, 0, 0, 0, 0, win32con.SWP_SHOWWINDOW + win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
+            if winSize>0:
+                win_handle=hwnd[winSize - 1]
+                log.debug(win_handle)
+            log.info(win_handle)
+        except Exception as e:
+            log.error(e)
+        return win_handle
