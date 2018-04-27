@@ -155,16 +155,14 @@ class Textbox_keywords():
                             if len(webelement.text)>0:
                                 log.debug('clearing  the existing text')
                                 webelement.clear()
-                                encryption_obj = AESCipher()
-                                input_val = encryption_obj.decrypt(input)
+                            encryption_obj = AESCipher()
+                            input_val = encryption_obj.decrypt(input)
 ##                            user_input=self.validate_input(webelement,input_val)
 ##                            if user_input is not None:
 ##                                input_val=user_input
-                                webelement.send_keys(input_val)
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
-
-
+                            webelement.set_text(input_val)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
 
                 else:
                     err_msg='element is disabled'

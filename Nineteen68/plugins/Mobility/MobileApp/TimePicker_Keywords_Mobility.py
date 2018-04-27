@@ -85,20 +85,17 @@ class Time_Keywords():
                                 if value0 != input_date[0]:
                                     element[0].set_text(input_date[0])
                                     time.sleep(3)
-                                    value00=element[0].text
+                                    value0=element[0].text
                                 if value1 != input_date[1]:
                                     element[1].set_text(input_date[1])
                                     time.sleep(3)
-                                    value11=element[1].text
+                                    value1=element[1].text
                                 if value2 != input_date[2]:
                                     element[2].set_text(input_date[2])
                                     time.sleep(3)
-                                    value22=element[2].text
+                                    value2=element[2].text
 
                                 if value0 == input_date[0] and value1== input_date[1] and value2==input_date[2]:
-                                    status=TEST_RESULT_PASS
-                                    result=TEST_RESULT_TRUE
-                                elif value00 == input_date[0] and value11== input_date[1] and value22==input_date[2]:
                                     status=TEST_RESULT_PASS
                                     result=TEST_RESULT_TRUE
                     else:
