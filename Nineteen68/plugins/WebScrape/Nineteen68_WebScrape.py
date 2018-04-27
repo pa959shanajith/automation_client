@@ -43,7 +43,8 @@ class ScrapeWindow(wx.Frame):
                 self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,48 ), size=(175, 28))
                 self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)   # need to implement OnExtract()
             elif(self.action == 'compare'):
-                self.comparebutton = wx.ToggleButton(self.panel, label="Compare",pos=(12,38 ), size=(175, 28))
+                browserops.driver.get(data['scrapedurl'])
+                self.comparebutton = wx.ToggleButton(self.panel, label="Start Compare",pos=(12,38 ), size=(175, 28))
                 self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)   # need to implement OnExtract()
             self.Centre()
             style = self.GetWindowStyle()
@@ -97,18 +98,16 @@ class ScrapeWindow(wx.Frame):
         state = event.GetEventObject().GetValue()
         if state == True:
             obj = objectspy.Object_Mapper()
-            obj.compare(self.data)
-            event.GetEventObject().SetLabel("Update")
-        else:
-            obj = objectspy.Object_Mapper()
-            d = obj.update()
+            event.GetEventObject().SetLabel("Comparing...")
+            self.comparebutton.Disable()
+            d = obj.perform_compare(self.data)
             if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
                 if  isinstance(d,str):
                     if d.lower() == 'fail':
                         self.socketIO.emit('scrape',d)
                 else:
                     self.socketIO.emit('scrape',d)
-                    print 'Update completed'
+                    print 'Compare completed'
             else:
                 print 'data exceeds max. Limit.'
                 self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
