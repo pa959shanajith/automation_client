@@ -95,7 +95,7 @@ class System_Keywords():
                     for p in wmi_ref.Win32_Product():
                         #apps_data.append({'caption':p.Caption,'version':p.Version,'name':p.Name,'vendor':p.Vendor})
                         value = self.removingUnicodeSign(p.Name)
-                        value+="-"
+                        value+="--"
                         value+= self.removingUnicodeSign(p.Version)
                         apps_data.append(value)
                     status=system_constants.TEST_RESULT_PASS
@@ -131,7 +131,7 @@ class System_Keywords():
                     for process in wmi_ref.Win32_Process():
                         #process_data.append({"pid":process.ProcessId,"pname":process.Name})
                         value = self.removingUnicodeSign(process.Name)
-                        value+="-"
+                        value+="--"
                         value+=self.removingUnicodeSign(process.ProcessId)
                         process_data.append(value)
                     status=system_constants.TEST_RESULT_PASS
