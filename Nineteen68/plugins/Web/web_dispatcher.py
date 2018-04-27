@@ -424,14 +424,17 @@ class Dispatcher:
                     #find by rxpath
                     tempwebElement = driver.find_elements_by_xpath(identifiers[0])
                     if (len(tempwebElement) == 1):
+                        logger.print_on_console('Webelement found by Relative_xpath- OI1')
                         log.debug('Webelement found by Relative_xpath- OI1')
                     if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                         tempwebElement = driver.find_elements_by_id(identifiers[1])
                         if (len(tempwebElement) == 1):
+                            logger.print_on_console('Webelement found by ID- OI2')
                             log.debug('Webelement found by ID- OI2')
                         if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                             tempwebElement = driver.find_elements_by_xpath(identifiers[2])
                             if (len(tempwebElement) == 1):
+                                logger.print_on_console('Webelement found by AbsolutXPath - OI3')
                                 log.debug('Webelement found by AbsolutXPath - OI3')
                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                 tempwebElement = None
@@ -443,10 +446,12 @@ class Dispatcher:
                         #find by id
                         tempwebElement = driver.find_elements_by_id(identifiers[1])
                         if (len(tempwebElement) == 1):
+                            logger.print_on_console('Webelement found by ID- OI2')
                             log.debug('Webelement found by ID- OI2')
                         if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                             tempwebElement = driver.find_elements_by_xpath(identifiers[2])
                             if (len(tempwebElement) == 1):
+                                logger.print_on_console('Webelement found by AbsolutXPath - OI3')
                                 log.debug('Webelement found by AbsolutXPath - OI3')
                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                 tempwebElement = None
@@ -457,6 +462,7 @@ class Dispatcher:
                         try:
                             tempwebElement = driver.find_elements_by_xpath(identifiers[2])
                             if (len(tempwebElement) == 1):
+                                logger.print_on_console('Webelement found by AbsolutXPath - OI3')
                                 log.debug('Webelement found by AbsolutXPath - OI3')
                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                 tempwebElement = None
@@ -487,6 +493,7 @@ class Dispatcher:
                     if (elementname!='null'):
                             tempwebElement = driver.find_elements_by_name(elementname)
                             if (len(tempwebElement) == 1):
+                                logger.print_on_console('Webelement found by Javascript - OI4')
                                 log.debug('Webelement found by Javascript - OI4')
                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                 webElement=None
