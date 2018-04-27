@@ -18,7 +18,7 @@ import logging
 import readconfig
 import constants
 import screenshot_keywords
-log = logging.getLogger('Dispatcher.py')
+log = logging.getLogger('mainframe_dispatcher.py')
 
 class MainframeDispatcher:
 
@@ -30,7 +30,6 @@ class MainframeDispatcher:
 
     def dispatcher(self,teststepproperty,input):
         objectname = teststepproperty.objectname
-        output = teststepproperty.outputval
         objectname = objectname.strip()
         keyword = teststepproperty.name.lower()
         err_msg=None
@@ -38,21 +37,21 @@ class MainframeDispatcher:
 
         try:
             keyword_dict={
-                'launchmainframe' : self.mainframe_obj.launch_mainframe,
-                'connectsession' : self.mainframe_obj.connect_session,
-                'login' : self.mainframe_obj.login,
-                'securelogin' : self.mainframe_obj.secure_login,
-                'logoff' : self.mainframe_obj.logoff,
-                'sendvalue' : self.mainframe_obj.send_value,
-                'submitjob' : self.mainframe_obj.submit_job,
-                'jobstatus' : self.mainframe_obj.job_status,
-                'sendfunctionkeys' : self.mainframe_obj.send_function_keys,
-                'gettext' : self.mainframe_obj.get_text,
-                'settext' : self.mainframe_obj.set_text,
-                'setcursor' : self.mainframe_obj.set_cursor,
-                'verifytextexists' : self.mainframe_obj.verify_text_exists,
-                'disconnectsession' : self.mainframe_obj.disconnect_session,
-                'closemainframe' : self.mainframe_obj.close_mainframe
+                'launchmainframe': self.mainframe_obj.launch_mainframe,
+                'connectsession': self.mainframe_obj.connect_session,
+                'login': self.mainframe_obj.login,
+                'securelogin': self.mainframe_obj.secure_login,
+                'logoff': self.mainframe_obj.logoff,
+                'sendvalue': self.mainframe_obj.send_value,
+                'submitjob': self.mainframe_obj.submit_job,
+                'jobstatus': self.mainframe_obj.job_status,
+                'sendfunctionkeys': self.mainframe_obj.send_function_keys,
+                'gettext': self.mainframe_obj.get_text,
+                'settext': self.mainframe_obj.set_text,
+                'setcursor': self.mainframe_obj.set_cursor,
+                'verifytextexists': self.mainframe_obj.verify_text_exists,
+                'disconnectsession': self.mainframe_obj.disconnect_session,
+                'closemainframe': self.mainframe_obj.close_mainframe
             }
 
             if keyword in keyword_dict.keys():
@@ -76,6 +75,4 @@ class MainframeDispatcher:
                         result.append(file_path[2])
         except Exception as e:
             log.error(e)
-            import traceback
-            traceback.print_exc()
         return result

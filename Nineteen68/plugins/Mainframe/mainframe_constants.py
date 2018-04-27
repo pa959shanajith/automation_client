@@ -13,13 +13,9 @@
 MAINFRAME_EXTRA = 'Extra!'
 MAINFRAME_EXTRA_EXE = 'EXTRA.exe'
 MAINFRAME_EXTRA_SYSTEM = 'EXTRA.System'
-
 MAINFRAME_PCOMM = 'Pcomm'
 MAINFRAME_PCOMM_EXE = 'pcsws.exe'
-MAINFRAME_HLLAPI_DLL_LOCATION  = 'C:\Program Files\IBM\Personal Communications\whlapi32.dll'
-
 MAINFRAME_BZMD_EXE = 'bzmd.exe'
-
 MAINFRAME_RUMBA = 'Rumba'
 MAINFRAME_BLUEZONE = 'Bluezone'
 MAINFRAME_TASKLIST = 'tasklist'
@@ -85,6 +81,7 @@ MAINFRAME_TEXT_FAIL_TO_SET = 'Text could not be set at this position\n'
 MAINFRAME_SESSION_CONNECTED = 'Session connected\n'
 MAINFRAME_SESSION_DISCONNECTED = 'Session disconnected\n'
 MAINFRAME_APP_CLOSED = 'Emulator closed\n'
+MAINFRAME_RESOLUTION_FAIL = 'Failed to Obtain screen resolution. Switching to default resolution 24x80\n'
 
 
 MAINFRAME_DEF_SENDVALUE = 'sendValue'
@@ -122,8 +119,8 @@ MAINFRAME_FN_KEYS = { "enter": "<Enter>", "tab": "<Tab>", "home": "<Home>",
 }
 
 
-RUMBA_DATA_EOF = "$r^mB@$"
-MAINFRAME_RUMBA_MNEMONICS = {
+EHLLAPI_DATA_EOF = "$r^mB@$"
+MAINFRAME_EHLLAPI_MNEMONICS = {
     "left tab": "@B", "clear": "@C", "delete": "@D", "enter": "@E", "erase eof": "@F",
     "help": "@H", "insert": "@I", "jump": "@J", "left": "@L", "new line": "@N",
     "space": "@O", "print": "@P", "reset": "@R", "tab": "@T", "up": "@U", "down": "@V",
