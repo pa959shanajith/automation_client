@@ -21,6 +21,7 @@ import threading
 import os
 from constants import *
 import logging
+import clientwindow
 drivermap = []
 log = logging.getLogger('browser_Keywords.py')
 import platform
@@ -754,13 +755,14 @@ class Singleton_DriverUtil():
             try:
                 chrome_path = configvalues['chrome_path']
                 exec_path = webconstants.CHROME_DRIVER_PATH
-                choptions1 = webdriver.ChromeOptions()
-                # --headless helps to run chrome without browser window
-                choptions1.add_argument('--headless')
-                driver = webdriver.Chrome(chrome_options=choptions1, executable_path=exec_path)
-                flag1 = self.chrome_version(driver)
-                driver = None
-                if(flag1 != 0):
+##                choptions1 = webdriver.ChromeOptions()
+##                # --headless helps to run chrome without browser window
+##                choptions1.add_argument('--headless')
+##                driver = webdriver.Chrome(chrome_options=choptions1, executable_path=exec_path)
+##                flag1 = self.chrome_version(driver)
+##                driver = None
+                print clientwindow.chromeFlag
+                if( clientwindow.chromeFlag == True ):
                     if ((str(chrome_path).lower()) == 'default'):
                         choptions = webdriver.ChromeOptions()
                         choptions.add_argument('start-maximized')
@@ -837,17 +839,17 @@ class Singleton_DriverUtil():
 ##                else:
                     caps=webdriver.DesiredCapabilities.FIREFOX
                     caps['marionette'] = True
-                    driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH)
-                    browser_ver=driver.capabilities['browserVersion']
-                    browser_ver1 = browser_ver.encode('utf-8')
-                    browser_ver = float(browser_ver1[:4])
-                    if(browser_ver == float(webconstants.FIREFOX_BROWSER_VERSION[0]) ):
+##                    driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH)
+##                    browser_ver=driver.capabilities['browserVersion']
+##                    browser_ver1 = browser_ver.encode('utf-8')
+##                    browser_ver = float(browser_ver1[:4])
+                    if(clientwindow.firefoxFlag == True):
+                        driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH)
                         drivermap.append(driver)
                         driver.maximize_window()
                         logger.print_on_console('Firefox browser started using geckodriver')
                         log.info('Firefox browser started using geckodriver ')
                     else:
-                        driver.close()
                         driver = None
                         logger.print_on_console("Firefox browser version not supported")
                         log.info('Firefox browser version not supported')
