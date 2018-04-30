@@ -229,7 +229,7 @@ def allocationExpressionExtraction(root):
 				# print index
 				AnonymousInnerClass = 1  # Anonymous Inner Class Detected.
 
-	'''New Class variable made so its respected constructor needs to be called.'''
+	'''New class variable made so the respective constructor needs to be called.'''
 	Variables = Variables + Variable
 	# 'class' means its possible constructor call type.
 	PossibleMethods.append(addPossibleMethod("Class", Variable, -1))
@@ -2811,6 +2811,10 @@ def primaryExpressionExtraction(root):
 				Variable = 'PrintAndGoToNextLine'
 			elif re.match('System.out.print', Variable):
 				Variable = 'Print'
+			elif Variable.rfind(".") != -1:
+				PossibleMethods.append(addPossibleMethod("Method", Variable, -1))
+				PossibleMethods[len(PossibleMethods) - 1]["Class"] = PresentClassName.split('(')[0]
+				PossibleMethods[len(PossibleMethods) - 1]["PresentClass"] = PresentClassName
 		elif re.match('PrimarySuffix', line):
 			Possible, Var = primarySuffixExtraction(ASTNode[root]["child"][i])
 			Variable = Variable + Var

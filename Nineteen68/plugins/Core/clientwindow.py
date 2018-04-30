@@ -166,31 +166,26 @@ class MainNamespace(BaseNamespace):
         d = args[0]
         action = d['action']
         task = d['task']
-        data = ''
+        data = {}
         if action == 'scrape':
             if str(task) == 'OPEN BROWSER CH':
                 browsername = '1'
-                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
             elif str(task) == 'OPEN BROWSER IE':
                 browsername = '3'
-                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
             elif str(task) == 'OPEN BROWSER FX':
                 browsername = '2'
-                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
             elif str(task) == 'OPEN BROWSER SF':
                 browsername = '6'
-                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
         elif action == 'compare':
-            data = d['viewString']
+            data['view'] = d['viewString']
+            data['scrapedurl'] = d['scrapedurl']
             if str(task) == 'OPEN BROWSER CH':
                 browsername = '1'
-                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
             elif str(task) == 'OPEN BROWSER IE':
                 browsername = '3'
-                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
             elif str(task) == 'OPEN BROWSER FX':
                 browsername = '2'
-                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+        wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_focus(self, *args):
         appType=args[2]
@@ -198,7 +193,7 @@ class MainNamespace(BaseNamespace):
         if appType==APPTYPE_WEB:
             import highlight
             light =highlight.Highlight()
-            res = light.highlight(args,None,None)
+            res = light.perform_highlight(args[0],args[1])
             logger.print_on_console('Highlight result: '+str(res))
         if appType==APPTYPE_MOBILE.lower():
             import highlight_MW
@@ -749,6 +744,11 @@ class ClientWindow(wx.Frame):
         log.info('Started')
         requests_log = logging.getLogger("requests")
         requests_log.setLevel(logging.CRITICAL)
+
+        ## Following two lines set 'CRITICAL' leg level for selenium, uncomment these to not log entries from
+        ## selenium if current log level is < CRITICAL
+        # selenium_log = logging.getLogger("selenium")
+        # selenium_log.setLevel(logging.CRITICAL)
 
         self.panel = wx.Panel(self)
         self.sizer = wx.GridBagSizer(6, 5)

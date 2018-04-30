@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        webocular.py
-# Purpose:      Provides serivces to the webocular plugin
+# Purpose:      Provides services to the webocular plugin
 #
 # Author:      nikunj.jain
 #
@@ -44,7 +44,7 @@ class Webocular():
         self.crawlStatus = True
         self.notParsedURLs = []
         self.socketIO=None
-        #self.driver = webdriver.PhantomJS(executable_path="D:\\NikunjWorkspace\\Nineteen68\\Drivers\\phantomjs.exe")
+        #self.driver = webdriver.PhantomJS(executable_path="some\\path")
 
     def get_complete_url(self,url, new_url) :
         try:

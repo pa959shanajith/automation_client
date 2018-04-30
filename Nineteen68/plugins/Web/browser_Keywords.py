@@ -1027,13 +1027,13 @@ class Singleton_DriverUtil():
         browser_ver = driver.capabilities['version']
         browser_ver1 = browser_ver.encode('utf-8')
         browser_ver = int(browser_ver1[:2])
-##        logger.print_on_console('Driver version:',browser_ver)
-        log.info('Driver version:',browser_ver)
+        log.info('Browser version:',browser_ver)
         driver_ver = driver.capabilities['chrome']['chromedriverVersion']
         driver_ver1 = driver_ver.encode('utf-8')
         driver_ver = float(driver_ver1[:4])
 ##        logger.print_on_console('Driver version:',driver_ver)
         log.info('Driver version:',driver_ver)
+
 ##        logger.print_on_console(webconstants.CHROME_DRIVER_VERSION[0][0])
 ##        logger.print_on_console(type(webconstants.CHROME_DRIVER_VERSION[0][0]))
         for i in range(0,len(webconstants.CHROME_DRIVER_VERSION)):
