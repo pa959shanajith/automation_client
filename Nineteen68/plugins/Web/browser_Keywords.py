@@ -854,7 +854,7 @@ class Singleton_DriverUtil():
                         logger.print_on_console("Firefox browser version not supported")
                         log.info('Firefox browser version not supported')
 ##                    logger.print_on_console("Browser version:",browser_ver)
-                    log.info('Browser version:',browser_ver)
+                    #log.info('Browser version:',browser_ver)
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 log.info('Requested browser is not available')
