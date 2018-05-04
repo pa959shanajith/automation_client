@@ -246,7 +246,7 @@ class MainNamespace(BaseNamespace):
                         if '#E&D@Q!C#' in server_data:
                             break
                     client_data= server_data[:server_data.find('#E&D@Q!C#')]
-                    if('Fail' in client_data):
+                    if('Fail#E&D@Q!C#' in server_data):
                         logger.print_on_console('Error occurred in QC')
                     socketIO.emit('qcresponse',client_data)
                 else:

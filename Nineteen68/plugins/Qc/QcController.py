@@ -248,7 +248,8 @@ class QcWindow():
                    qc_ts=abc.NewList("")
                    for tsname in qc_ts:
 ##                       print tsname.name
-                       test_case_dict[key].append(str(tsname.name))
+                       ts_complete_name = tsname.name + '/'+ tsname.testid
+                       test_case_dict[key].append(str(ts_complete_name))
                 i=i+1
 ##            print test_case_dict,'no'
             OverallList=[]
@@ -358,7 +359,7 @@ class QcWindow():
             dictFolderJson=None
             return True
         except Exception as e:
-            print 'Erro in Quit_qc'
+            print 'Error in Quit_qc'
             con.send("Fail#E&D@Q!C#")
 
     def emit_data(self):
