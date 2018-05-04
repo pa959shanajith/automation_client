@@ -423,33 +423,51 @@ class Dispatcher:
                 try:
                     #find by rxpath
                     tempwebElement = driver.find_elements_by_xpath(identifiers[0])
+                    if (len(tempwebElement) == 1):
+                        logger.print_on_console('Webelement found by Relative_xpath- OI1')
+                        log.debug('Webelement found by Relative_xpath- OI1')
                     if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                         tempwebElement = driver.find_elements_by_id(identifiers[1])
+                        if (len(tempwebElement) == 1):
+                            logger.print_on_console('Webelement found by ID- OI2')
+                            log.debug('Webelement found by ID- OI2')
                         if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                             tempwebElement = driver.find_elements_by_xpath(identifiers[2])
+                            if (len(tempwebElement) == 1):
+                                logger.print_on_console('Webelement found by AbsolutXPath - OI3')
+                                log.debug('Webelement found by AbsolutXPath - OI3')
                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                 tempwebElement = None
-                    log.debug('Webelement found by relative xpath')
+##                    log.debug('Webelement found by relative xpath')
                     webElement = tempwebElement
 
                 except Exception as webEx:
                     try:
                         #find by id
                         tempwebElement = driver.find_elements_by_id(identifiers[1])
+                        if (len(tempwebElement) == 1):
+                            logger.print_on_console('Webelement found by ID- OI2')
+                            log.debug('Webelement found by ID- OI2')
                         if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                             tempwebElement = driver.find_elements_by_xpath(identifiers[2])
+                            if (len(tempwebElement) == 1):
+                                logger.print_on_console('Webelement found by AbsolutXPath - OI3')
+                                log.debug('Webelement found by AbsolutXPath - OI3')
                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                 tempwebElement = None
-                        log.debug('Webelement found by Id')
+##                        log.debug('Webelement found by Id')
                         webElement = tempwebElement
                     except Exception as webEx:
                         #find by absolute Xpath
                         try:
                             tempwebElement = driver.find_elements_by_xpath(identifiers[2])
+                            if (len(tempwebElement) == 1):
+                                logger.print_on_console('Webelement found by AbsolutXPath - OI3')
+                                log.debug('Webelement found by AbsolutXPath - OI3')
                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                 tempwebElement = None
                             webElement = tempwebElement
-                            log.debug('Webelement found by absolute Xpath')
+##                            log.debug('Webelement found by absolute Xpath')
                         except Exception as webEx:
                             err_msg=WEB_ELEMENT_NOT_FOUND
             #enhance object reconition changes
@@ -474,6 +492,9 @@ class Dispatcher:
                             elementname= name
                     if (elementname!='null'):
                             tempwebElement = driver.find_elements_by_name(elementname)
+                            if (len(tempwebElement) == 1):
+                                logger.print_on_console('Webelement found by Javascript - OI4')
+                                log.debug('Webelement found by Javascript - OI4')
                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                 webElement=None
                     if(webElement==None):

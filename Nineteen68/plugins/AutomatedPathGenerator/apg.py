@@ -119,7 +119,7 @@ class AutomatedPathGenerator:
                     self.pmdCall(java_version, filename, name)
                 # ASTTree 1st node(CompilationUnit) captured in root if no error is present
                 root = dataStruct.start(name)
-                #os.remove(r'./ASTTree' + name + '.txt')
+                os.remove(r'./ASTTree' + name + '.txt')
                 os.chdir(os.environ["NINETEEN68_HOME"])
                 if root:
                     # ObjectExtract.main will generate the FlowChart Nodes, give the Classes and all Possible Methods
@@ -213,7 +213,7 @@ class AutomatedPathGenerator:
                 '''After check format, the flow chart would be made completely. So now, we'll check the possible method linking.'''
                 self.PossibleMethods = CheckPossibleMethods.main(
                     self.PosMethod, self.Classes, varstorage)
-
+                #print self.PossibleMethods
                 for i in range(0,len(self.FlowChart)):
                     self.FlowChart[i]['id']=i
                     if("'" in self.FlowChart[i]['text']):
@@ -314,8 +314,6 @@ class AutomatedPathGenerator:
 
                 data = {"links":jsonString, "data_flow":test, "result":"success", "starttime":start_time,
                         "endtime":end_time, "method_calls_count":method_calls_count}
-                #data = {"classes":self.Classes, "links":jsonString, "data_flow":test, "result":"success", "starttime":start_time,
-                 #       "endtime":end_time, "method_calls_count":method_calls_count}
                 self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
                 logger.print_on_console("Graph generation completed")
 
@@ -331,6 +329,8 @@ class AutomatedPathGenerator:
             data = {"result":"fail"}
             self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
             logger.print_on_console("Graph generation failed")
+            import traceback
+            print (traceback.format_exc())
             log.error(e)
             logger.print_on_console("Error occured while generate graph.")
 
@@ -349,7 +349,6 @@ class AutomatedPathGenerator:
         try:
              global Cylomatic_Compelxity
              error_flag_cc=False
-             logger.print_on_console(cname)
              cdata={'class':'', 'methods':[],'line_no':''}
              if not filepath in Cylomatic_Compelxity:
                  complexity_data={}

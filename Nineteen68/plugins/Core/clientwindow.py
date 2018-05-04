@@ -20,13 +20,15 @@ import httplib
 import json
 import socket
 
-
 log = logging.getLogger('clientwindow.py')
 wxObject = None
 browsername = None
 qcdata = None
 soc=None
 qcConFlag=False
+browsercheckFlag=False
+chromeFlag=False
+firefoxFlag=False
 desktopScrapeFlag=False
 sapScrapeFlag=False
 mobileScrapeFlag=False
@@ -41,16 +43,74 @@ configvalues = None
 IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images"
 CERTIFICATE_PATH = os.environ["NINETEEN68_HOME"] + "/Scripts/CA_BUNDLE"
 LOGCONFIG_PATH = os.environ["NINETEEN68_HOME"] + "/logging.conf"
-
+DRIVERS_PATH = os.environ["NINETEEN68_HOME"] + "/Drivers"
+CHROME_DRIVER_PATH = DRIVERS_PATH + "\\chromedriver.exe"
+GECKODRIVER_PATH = DRIVERS_PATH + '\\geckodriver.exe'
 
 class MainNamespace(BaseNamespace):
+    def check_browser(self):
+        try:
+            global chromeFlag,firefoxFlag
+            logger.print_on_console('Checking for browser versions...')
+            import subprocess
+            from selenium import webdriver
+            from selenium.webdriver import ChromeOptions
+            a=[]
+            p = subprocess.Popen('chromedriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
+            for line in iter(p.stdout.readline, b''):
+                a.append(str(line))
+            a=float(a[0][13:17])
+            choptions1 = webdriver.ChromeOptions()
+            choptions1.add_argument('--headless')
+            driver = webdriver.Chrome(chrome_options=choptions1, executable_path=CHROME_DRIVER_PATH)
+            browser_ver = driver.capabilities['version']
+            browser_ver1 = browser_ver.encode('utf-8')
+            browser_ver = int(browser_ver1[:2])
+            driver.close()
+            driver=None
+            for i in CHROME_DRIVER_VERSION:
+                if a == i[0]:
+                    if browser_ver >= i[1] and browser_ver <= i[2]:
+                        chromeFlag=True
+            if chromeFlag == False :
+                logger.print_on_console('!! WARNING : Chrome version',browser_ver,' is not supported.')
+            p = subprocess.Popen('geckodriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
+            a=[]
+            for line in iter(p.stdout.readline, b''):
+                a.append(str(line))
+            a=float(a[0][12:16])
+            caps=webdriver.DesiredCapabilities.FIREFOX
+            caps['marionette'] = True
+            from selenium.webdriver.firefox.options import Options
+            options = Options()
+            options.add_argument('-headless')
+            driver = webdriver.Firefox(capabilities=caps,firefox_options=options, executable_path=GECKODRIVER_PATH)
+            browser_ver=driver.capabilities['browserVersion']
+            browser_ver1 = browser_ver.encode('utf-8')
+            browser_ver = float(browser_ver1[:4])
+            driver.close()
+            driver=None
+            for i in FIREFOX_BROWSER_VERSION:
+                if a == i[0]:
+                    if browser_ver == i[1]:
+                        firefoxFlag=True
+            if firefoxFlag == False:
+                logger.print_on_console('!! WARNING : Firefox version',browser_ver,' is not supported.')
+            if chromeFlag == True and firefoxFlag == True:
+                logger.print_on_console('Current version of browsers are supported')
+            return True
+        except Exception as e:
+            logger.print_on_console('Found Exception')
+        return False
     def on_message(self, *args):
-        global action,wxObject,browsername,desktopScrapeFlag,allow_connect
+        global action,wxObject,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag
 
         if(str(args[0]) == 'connected'):
             if(allow_connect):
                 logger.print_on_console('Normal Mode: Connection to the Nineteen68 Server established')
                 wxObject.schedule.Enable()
+                if browsercheckFlag == False:
+                    browsercheckFlag=self.check_browser()
                 log.info('Normal Mode: Connection to the Nineteen68 Server established')
             else:
                 if socketIO != None:
@@ -106,31 +166,26 @@ class MainNamespace(BaseNamespace):
         d = args[0]
         action = d['action']
         task = d['task']
-        data = ''
+        data = {}
         if action == 'scrape':
             if str(task) == 'OPEN BROWSER CH':
                 browsername = '1'
-                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
             elif str(task) == 'OPEN BROWSER IE':
                 browsername = '3'
-                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
             elif str(task) == 'OPEN BROWSER FX':
                 browsername = '2'
-                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
             elif str(task) == 'OPEN BROWSER SF':
                 browsername = '6'
-                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
         elif action == 'compare':
-            data = d['viewString']
+            data['view'] = d['viewString']
+            data['scrapedurl'] = d['scrapedurl']
             if str(task) == 'OPEN BROWSER CH':
                 browsername = '1'
-                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
             elif str(task) == 'OPEN BROWSER IE':
                 browsername = '3'
-                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
             elif str(task) == 'OPEN BROWSER FX':
                 browsername = '2'
-                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+        wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_focus(self, *args):
         appType=args[2]
@@ -138,7 +193,7 @@ class MainNamespace(BaseNamespace):
         if appType==APPTYPE_WEB:
             import highlight
             light =highlight.Highlight()
-            res = light.highlight(args,None,None)
+            res = light.perform_highlight(args[0],args[1])
             logger.print_on_console('Highlight result: '+str(res))
         if appType==APPTYPE_MOBILE.lower():
             import highlight_MW
@@ -689,6 +744,11 @@ class ClientWindow(wx.Frame):
         log.info('Started')
         requests_log = logging.getLogger("requests")
         requests_log.setLevel(logging.CRITICAL)
+
+        ## Following two lines set 'CRITICAL' leg level for selenium, uncomment these to not log entries from
+        ## selenium if current log level is < CRITICAL
+        # selenium_log = logging.getLogger("selenium")
+        # selenium_log.setLevel(logging.CRITICAL)
 
         self.panel = wx.Panel(self)
         self.sizer = wx.GridBagSizer(6, 5)

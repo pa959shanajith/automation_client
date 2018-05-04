@@ -703,15 +703,15 @@ class StepDescription:
         def getattachmentstatus():
             return ' Attachment is '+"'"+output+"'"+' in the email.'
         def getbody():
-            return ' Fetch '+"'"+'Body'+"'"+' from email and save the value in variable '+"'"+tsp.outputval+"'."
+            return ' Fetch the '+"'"+'Body'+"'"+' from the mail '+"'"+inputval[0]+"'"+' and save the value in variable '+"'"+tsp.outputval+"'."
         def getemail():
-            return ' Fetch the email  which is having '+"'"+'From'+"'"+' as '+"'"+listInput[0]+"'"+', '+"'"+' To '+"'" +' as '+"'"+listInput[1]+"'"+' and '+"'"+'Subject'+"'"+ ' as '+"'"+listInput[2]+"'"
+            return ' Fetch the email  which is having '+"'"+'From'+"'"+' as '+"'"+listInput[0]+"'"+', '+"'"+' To '+"'" +' as '+"'"+listInput[1]+"'"+' and '+"'"+'Subject'+"'"+ ' as '+"'"+listInput[2]+"' and save the email in the variable "+"'"+tsp.outputval+"'."
         def getfrommailid():
-            return ' Fetch '+"'"+'From Mail ID'+"'"+' from email and save the value in variable '+"'"+tsp.outputval+"'."
+            return ' Fetch the '+"'"+'From Mail ID'+"'"+' from the mail '+"'"+inputval[0]+"'"+'  and save the value '+"'"+output+"'"+' in variable '+"'"+tsp.outputval+"'."
         def getsubject():
-            return ' Fetch '+"'"+'Subject'+"'"+' from email and save the value in variable '+"'"+tsp.outputval+"'."
+            return ' Fetch the '+"'"+'Subject'+"'"+' from the mail '+"'"+inputval[0]+"'"+' and save the value '+"'"+output+"'"+' in variable '+"'"+tsp.outputval+"'."
         def gettomailid():
-            return ' Fetch '+"'"+'To Mail ID'+"'"+' from email and save the value in variable '+"'"+tsp.outputval+"'."
+            return ' Fetch the '+"'"+'To Mail ID'+"'"+' from the mail '+"'"+inputval[0]+"'"+' and save the value '+"'"+output+"'"+' in variable '+"'"+tsp.outputval+"'."
         def switchtofolder():
             return ' Switched to folder'+"'"+input+"'."
         def verifyemail():
