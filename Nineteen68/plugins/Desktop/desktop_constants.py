@@ -12,6 +12,7 @@
 # CONSTANTS
 ##KEYEVENTF_EXTENDEDKEY = 1
 ##KEYEVENTF_KEYUP = 2
+CUSTOM='@Custom'
 
 #Dictionary used for send function keys special characters
 
@@ -83,3 +84,5 @@ LABEL='label'
 ELEMENT_FOUND=True
 
 ERROR_MSG = 'Error occured'
+
+APPLICATION_KEYWORDS = ['launchapplication','findwindowandattach','closeapplication','switchtofolder','getemail','getfrommailid','getattachmentstatus','getsubject','gettomailid','getbody','verifyemail']

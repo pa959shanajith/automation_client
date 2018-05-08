@@ -44,8 +44,8 @@ IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images"
 CERTIFICATE_PATH = os.environ["NINETEEN68_HOME"] + "/Scripts/CA_BUNDLE"
 LOGCONFIG_PATH = os.environ["NINETEEN68_HOME"] + "/logging.conf"
 DRIVERS_PATH = os.environ["NINETEEN68_HOME"] + "/Drivers"
-CHROME_DRIVER_PATH = DRIVERS_PATH + "\\chromedriver.exe"
-GECKODRIVER_PATH = DRIVERS_PATH + '\\geckodriver.exe'
+CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver.exe"
+GECKODRIVER_PATH = DRIVERS_PATH + '/geckodriver.exe'
 
 class MainNamespace(BaseNamespace):
     def check_browser(self):
@@ -100,7 +100,9 @@ class MainNamespace(BaseNamespace):
                 logger.print_on_console('Current version of browsers are supported')
             return True
         except Exception as e:
-            logger.print_on_console('Found Exception')
+            logger.print_on_console("Error while checking browser compatibility")
+            log.debug("Error while checking browser compatibility")
+            log.debug(e)
         return False
     def on_message(self, *args):
         global action,wxObject,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag
@@ -209,7 +211,7 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console('Highlight result: '+str(res))
         elif appType==APPTYPE_DESKTOP.lower():
             con =controller.Controller()
-            con.get_all_the_imports('Desktop2')
+            con.get_all_the_imports('Desktop')
             import desktop_highlight
             highlightObj=desktop_highlight.highLight()
             highlightObj.highLiht_element(args[0],args[1])
@@ -249,10 +251,10 @@ class MainNamespace(BaseNamespace):
         global browsername
         browsername = args[0]
         con =controller.Controller()
-        con.get_all_the_imports('Desktop2')
-        import ninteen_68_desktop_scrape
+        con.get_all_the_imports('Desktop')
+        import desktop_scrape
         global desktopScrapeObj
-        desktopScrapeObj=ninteen_68_desktop_scrape
+        desktopScrapeObj=desktop_scrape
         global desktopScrapeFlag
         desktopScrapeFlag=True
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
@@ -264,9 +266,9 @@ class MainNamespace(BaseNamespace):
             browsername = args[0]
             con =controller.Controller()
             con.get_all_the_imports('SAP')
-            import ninteen_68_sap_scrape
+            import sap_scrape
             global sapScrapeObj
-            sapScrapeObj=ninteen_68_sap_scrape
+            sapScrapeObj=sap_scrape
             global sapScrapeFlag
             sapScrapeFlag=True
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
@@ -328,9 +330,9 @@ class MainNamespace(BaseNamespace):
             con.get_all_the_imports('Mobility/MobileApp')
         else:
             con.get_all_the_imports('Mobility')
-        import ninteen_68_mobile_scrape
+        import mobile_app_scrape
         global mobileScrapeObj
-        mobileScrapeObj=ninteen_68_mobile_scrape
+        mobileScrapeObj=mobile_app_scrape
         global mobileScrapeFlag
         mobileScrapeFlag=True
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
@@ -345,8 +347,8 @@ class MainNamespace(BaseNamespace):
             con.get_all_the_imports('Mobility/MobileWeb')
         else:
             con.get_all_the_imports('Mobility')
-        import ninteen_68_mobile_web_scrape
-        mobileWebScrapeObj=ninteen_68_mobile_web_scrape
+        import mobile_web_scrape
+        mobileWebScrapeObj=mobile_web_scrape
         mobileWebScrapeFlag=True
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 

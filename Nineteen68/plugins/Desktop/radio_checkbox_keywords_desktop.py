@@ -1,21 +1,21 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
-# Purpose:
+# Name:        radio_checkbox_keywords_desktop.py
+# Purpose:     Radio check box operations
 #
-# Author:      rakesh.v
+# Author:      wasimakram.sutar
 #
-# Created:     21-11-2016
-# Copyright:   (c) rakesh.v 2016
+# Created:     09-05-2017
+# Copyright:   (c) wasimakram.sutar 2017
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import desktop_constants
-from editable_text import Text_Box
-from launch_keywords import ldtp
-import launch_keywords
-from ldtp.client_exception import LdtpExecutionError
+from desktop_editable_text import Text_Box
+import desktop_launch_keywords
 from constants import *
 import logger
+import logging
 
+log = logging.getLogger('radio_checkbox_keywords_desktop.py')
 class Radio_Checkbox_keywords():
     def select_radiobutton(self, element , parent  , *args):
         status=desktop_constants.TEST_RESULT_FAIL
@@ -23,22 +23,43 @@ class Radio_Checkbox_keywords():
         verb = OUTPUT_CONSTANT
         err_msg=None
         try:
-            if launch_keywords.window_name!=None:
-                dektop_element = element.split(';')
+            if desktop_launch_keywords.window_name!=None:
+                log.info('Recieved element from the desktop dispatcher')
+                dektop_element = element
                 verify_obj = Text_Box()
-                check = verify_obj.verify_parent(dektop_element[0],parent)
-                if (check == True):
-                    states = ldtp.getallstates(launch_keywords.window_name,dektop_element[0])
-                    if(desktop_constants.ENABLED_CHECK and desktop_constants.VISIBLE_CHECK in states):
-                       flag = ldtp.check(launch_keywords.window_name,dektop_element[0])
-                       status = desktop_constants.TEST_RESULT_PASS
-                       result = desktop_constants.TEST_RESULT_TRUE
+                check = verify_obj.verify_parent(element,parent)
+                log.debug('Parent of element while scraping')
+                log.debug(parent)
+                log.debug('Parent check status')
+                log.debug(check)
+                if (check):
+                    log.info('Parent matched')
+                    if(element.is_enabled()):
+                        state = self.get_status(element,parent)
+                        if state[2] == 'Selected':
+                            log.info( 'Radio button already selected')
+                            err_msg='Radio button already selected'
+                            logger.print_on_console('Radio button already selected')
+
+                        else:
+                            element.check_by_click()
+                            status = desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                        status = desktop_constants.TEST_RESULT_PASS
+                        result = desktop_constants.TEST_RESULT_TRUE
+                        log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
-                        logger.print_on_console('Element state does not allow to perform the operation')
+                      log.info('Element state does not allow to perform the operation')
+                      logger.print_on_console('Element state does not allow to perform the operation')
+                      err_msg= 'Element state does not allow to perform the operation'
                 else:
-                    logger.print_on_console('element not present on the page where operation is trying to be performed')
-        except LdtpExecutionError as exception:
-            Exceptions.error(exception)
+                   log.info('Element not present on the page where operation is trying to be performed')
+                   err_msg='Element not present on the page where operation is trying to be performed'
+                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
+        except Exception as exception:
+            log.error(exception)
+            logger.print_on_console(exception)
             err_msg = desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
@@ -48,25 +69,40 @@ class Radio_Checkbox_keywords():
         verb = OUTPUT_CONSTANT
         err_msg=None
         try:
-            if launch_keywords.window_name!=None:
-                print element
-                dektop_element = element.split(';')
+            if desktop_launch_keywords.window_name!=None:
+                log.info('Recieved element from the desktop dispatcher')
+                dektop_element = element
                 verify_obj = Text_Box()
-                check = verify_obj.verify_parent(dektop_element[0],parent)
-                if (check == True):
-                    states = ldtp.getallstates(launch_keywords.window_name,dektop_element[0])
-                    if(desktop_constants.ENABLED_CHECK and desktop_constants.VISIBLE_CHECK in states):
-                        if(not(desktop_constants.CHECKED_CHECK in states)):
-
-                               flag = ldtp.check(launch_keywords.window_name,dektop_element[0])
-                               status = desktop_constants.TEST_RESULT_PASS
-                               result = desktop_constants.TEST_RESULT_TRUE
+                check = verify_obj.verify_parent(element,parent)
+                log.debug('Parent of element while scraping')
+                log.debug(parent)
+                log.debug('Parent check status')
+                log.debug(check)
+                if (check):
+                    log.info('Parent matched')
+                    if(element.is_enabled()):
+                        state = self.get_status(element,parent)
+                        if state[2] == 'Checked':
+                            log.info( 'Check box is already checked')
+                            err_msg='Check box is already checked'
+                            logger.print_on_console('Check box is already checked')
+                        else:
+                            element.check()
+                            status = desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
-                        logger.print_on_console('Element state does not allow to perform the operation')
+                      log.info('Element state does not allow to perform the operation')
+                      logger.print_on_console('Element state does not allow to perform the operation')
+                      err_msg= 'Element state does not allow to perform the operation'
                 else:
-                    logger.print_on_console('element not present on the page where operation is trying to be performed')
-        except LdtpExecutionError as exception:
-            Exceptions.error(exception)
+                   log.info('Element not present on the page where operation is trying to be performed')
+                   err_msg='Element not present on the page where operation is trying to be performed'
+                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
+        except Exception as exception:
+            log.error(exception)
+            logger.print_on_console(exception)
             err_msg = desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
@@ -76,23 +112,39 @@ class Radio_Checkbox_keywords():
         verb = OUTPUT_CONSTANT
         err_msg=None
         try:
-            if launch_keywords.window_name!=None:
-                dektop_element = element.split(';')
+            if desktop_launch_keywords.window_name!=None:
+                log.info('Recieved element from the desktop dispatcher')
+                dektop_element = element
                 verify_obj = Text_Box()
-                check = verify_obj.verify_parent(dektop_element[0],parent)
-                if (check == True):
-                    states = ldtp.getallstates(launch_keywords.window_name,dektop_element[0])
-                    if(desktop_constants.ENABLED_CHECK and desktop_constants.VISIBLE_CHECK and desktop_constants.CHECKED_CHECK in states):
-
-                           flag = ldtp.uncheck(launch_keywords.window_name,dektop_element[0])
-                           status = desktop_constants.TEST_RESULT_PASS
-                           result = desktop_constants.TEST_RESULT_TRUE
+                check = verify_obj.verify_parent(element,parent)
+                log.debug('Parent of element while scraping')
+                log.debug(parent)
+                log.debug('Parent check status')
+                log.debug(check)
+                if (check):
+                    log.info('Parent matched')
+                    if(element.is_enabled()):
+                        state = self.get_status(element,parent)
+                        if state[2] == 'UnChecked':
+                            log.info( 'Check box is already unchecked')
+                            err_msg='Check box is already unchecked'
+                            logger.print_on_console('Check box is already unchecked')
+                        else:
+                            element.uncheck()
+                            status = desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
-                        logger.print_on_console('Element state does not allow to perform the operation')
+                      log.info('Element state does not allow to perform the operation')
+                      logger.print_on_console('Element state does not allow to perform the operation')
+                      err_msg= 'Element state does not allow to perform the operation'
                 else:
-                    logger.print_on_console('element not present on the page where operation is trying to be performed')
-        except LdtpExecutionError as exception:
-            Exceptions.error(exception)
+                   log.info('Element not present on the page where operation is trying to be performed')
+                   err_msg='Element not present on the page where operation is trying to be performed'
+                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
+        except Exception as exception:
+            log.error(exception)
+            logger.print_on_console(exception)
             err_msg = desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
@@ -102,37 +154,43 @@ class Radio_Checkbox_keywords():
         flag=None
         err_msg=None
         try:
-            if launch_keywords.window_name!=None:
-                dektop_element = element.split(';')
+            if desktop_launch_keywords.window_name!=None:
                 verify_obj = Text_Box()
-                check = verify_obj.verify_parent(dektop_element[0],parent)
-                if (check == True):
-                    states = ldtp.getallstates(launch_keywords.window_name,dektop_element[0])
-                    if(desktop_constants.VISIBLE_CHECK in states):
-                        if(dektop_element[0].strip()[0:3] == 'chk'):
-                            if(desktop_constants.CHECKED_CHECK in states):
-                                flag = 'Checked'
-                                status=desktop_constants.TEST_RESULT_PASS
-                                result = desktop_constants.TEST_RESULT_TRUE
-                            else:
-                                flag = 'UnChecked'
-                                status=desktop_constants.TEST_RESULT_PASS
-                                result = desktop_constants.TEST_RESULT_TRUE
-                        if(dektop_element[0].strip()[0:4] == 'rbtn'):
-                            if(desktop_constants.SELECTED_CHECK in states):
-                                flag = 'Selected'
-                                status=desktop_constants.TEST_RESULT_PASS
-                                result = desktop_constants.TEST_RESULT_TRUE
-                            else:
-                                flag = 'UnSelected'
-                                status=desktop_constants.TEST_RESULT_PASS
-                                result = desktop_constants.TEST_RESULT_TRUE
-                    else:
-                        logger.print_on_console('Element state does not allow to perform the operation')
-                else:
-                    logger.print_on_console('element not present on the page where operation is trying to be performed')
+                check = verify_obj.verify_parent(element,parent)
+                if (check):
+                    tag = element.friendly_class_name()
+                    status = element.get_check_state()
+                    if(tag == 'CheckBox'):
+                        if(status == 1):
+                            flag = 'Checked'
+                            status=desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                        else:
+                            flag = 'UnChecked'
+                            status=desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                    if(tag == 'RadioButton'):
+                        if(status == 1):
+                            flag = 'Selected'
+                            status=desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                        else:
+                            flag = 'UnSelected'
+                            status=desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                    elif(tag == 'Button'):
+                        flag = status
+                        status=desktop_constants.TEST_RESULT_PASS
+                        result = desktop_constants.TEST_RESULT_TRUE
 
-        except LdtpExecutionError as exception:
-            Exceptions.error(exception)
+                else:
+                   log.info('Element not present on the page where operation is trying to be performed')
+                   err_msg='Element not present on the page where operation is trying to be performed'
+                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
+
+        except Exception as exception:
+            import traceback
+            traceback.print_exc()
+            #Exceptions.error(exception)
             err_msg = desktop_constants.ERROR_MSG
         return status,result,flag,err_msg
