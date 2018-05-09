@@ -431,7 +431,7 @@ class Controller():
                 inpval.append(string)
             if keyword.lower() not in [CREATE_DYN_VARIABLE]:
                 inpval[0]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[0],keyword,self)
-            if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE]:
+            if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE,CREATE_DYN_VARIABLE]:
                 inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self)
         else:
             if keyword.lower() in WS_KEYWORDS or keyword.lower() == 'navigatetourl':
