@@ -400,7 +400,7 @@ DB_VAR='ret_riever'
 
 COMPLETED='success'
 
-MULTIPLE_OUTPUT_KEYWORDS=['getselected','split']
+MULTIPLE_OUTPUT_KEYWORDS=['split']
 
 DISPALY_VARIABLE_VALUE='displayvariablevalue'
 
