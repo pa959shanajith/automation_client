@@ -873,21 +873,21 @@ class Singleton_DriverUtil():
                 else:
                     iepath = webconstants.IE_DRIVER_PATH_64
                 driver = webdriver.Ie(capabilities=caps,executable_path=iepath)
-                browser_ver=driver.capabilities['version']
-                browser_ver1 = browser_ver.encode('utf-8')
-                browser_ver = int(browser_ver1)
-                if(browser_ver >= int(webconstants.IE_BROWSER_VERSION[0]) and browser_ver <= int(webconstants.IE_BROWSER_VERSION[1])):
-                    drivermap.append(driver)
-                    driver.maximize_window()
-                    logger.print_on_console('IE browser started')
-                    log.info('IE browser started')
-                else:
-                    driver.close()
-                    driver = None
-                    logger.print_on_console("IE browser version not supported")
-                    log.info('IE browser version not supported')
-##                    logger.print_on_console("Browser version:",browser_ver)
-                    log.info('Browser version:',browser_ver)
+##                browser_ver=driver.capabilities['version']
+##                browser_ver1 = browser_ver.encode('utf-8')
+##                browser_ver = int(browser_ver1)
+##                if(browser_ver >= int(webconstants.IE_BROWSER_VERSION[0]) and browser_ver <= int(webconstants.IE_BROWSER_VERSION[1])):
+                drivermap.append(driver)
+                driver.maximize_window()
+                logger.print_on_console('IE browser started')
+                log.info('IE browser started')
+##                else:
+##                    driver.close()
+##                    driver = None
+##                    logger.print_on_console("IE browser version not supported")
+##                    log.info('IE browser version not supported')
+####                    logger.print_on_console("Browser version:",browser_ver)
+##                    log.info('Browser version:',browser_ver)
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 log.info('Requested browser is not available')
