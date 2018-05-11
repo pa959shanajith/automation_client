@@ -277,7 +277,8 @@ ERROR_CODE_DICT ={
                     'ERR_FILE_FORMAT':'The specified file is not Excel file\n',
                     #JumpBy error messages
                     """ERR_JUMPY_STEP_DOESN'T_EXISTS""" : """Invalid input, jumpBy Step doesn't exist""",
-                    """ERR_JUMPBY_CAN'T_BE_0""":"""Invalid input, jumpBy Step?cannot be '0'"""
+                    """ERR_JUMPBY_CAN'T_BE_0""":"""Invalid input, jumpBy Step?cannot be '0'""",
+                    'ERR_CUSTOM_ELE_NOTFOUND':'Error occured in finding Custom element'
                 }
 
 STOP='stop'
@@ -422,6 +423,6 @@ STATIC_DV_NAME = "{#@#n_u_m#@#}"
 
 WEB_ELEMENT_FOUND_FROM_GetInnerTable = 'Web Element found from GetInnerTable'
 
-FIREFOX_BROWSER_VERSION = [[0.13,52.7,52.8],[0.16,52.7,52.8],[0.19,58.0,60.0]]
+FIREFOX_BROWSER_VERSION = [[0.13,52,53],[0.16,52,53],[0.19,55.0,61.0]]
 
 CHROME_DRIVER_VERSION = [[2.38,65,67],[2.37,64,66],[2.36,63,65],[2.35,62,65]]
