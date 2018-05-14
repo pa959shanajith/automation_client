@@ -25,6 +25,10 @@ import time
 import win32gui
 import base64
 #-------------------
+
+import cropandadd
+cropandaddobj = cropandadd.Cropandadd()
+
 obj=None
 class ScrapeWindow(wx.Frame):
     def __init__(self, parent,id, title,filePath,socketIO):
@@ -50,6 +54,8 @@ class ScrapeWindow(wx.Frame):
                 self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,38 ), size=(175, 28))
                 self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)   # need to implement OnExtract()
                 self.Centre()
+                self.cropbutton = wx.ToggleButton(self.panel, label="Crop and Add",pos=(12,68 ), size=(175, 28))
+                self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
 
                 self.Centre()
                 style = self.GetWindowStyle()
@@ -161,6 +167,22 @@ class ScrapeWindow(wx.Frame):
         else:
             logger.print_on_console('Full scrape Failed..')
 
+    def cropandadd(self,event):
+        print "button clicked"
+        state = event.GetEventObject().GetValue()
+        if state == True:
+            self.fullscrapebutton.Disable()
+            event.GetEventObject().SetLabel("Stop CropAndAdd")
+            status = cropandaddobj.startcropandadd()
+##            wx.MessageBox('CLICKANDADD: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
+
+        else:
+            d = cropandaddobj.stopcropandadd()
+            print 'Scrapped data saved successfully in domelements.json file'
+            self.socketIO.emit('scrape',d)
+            self.Close()
+            event.GetEventObject().SetLabel("Start CropAndAdd")
+            print 'Crop and add scrape completed'
 
 
 

@@ -8,7 +8,8 @@
 # Copyright:   (c) wasimakram.sutar 2017
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-from pywinauto.application import Application
+#from pywinauto.application import Application
+from pywinauto import Application
 import desktop_dispatcher
 import pywinauto
 import pyHook
@@ -92,6 +93,7 @@ class Scrape:
                             if actualelement not in actualobjects:#------check to remove duplicate elements
                                 actualobjects.append(actualelement)
                         except Exception as e:
+                            print e
                             logger.print_on_console('Clicked option is not a part of DesktopGUI')
                         return True
 

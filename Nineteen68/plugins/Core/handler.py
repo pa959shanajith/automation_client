@@ -546,7 +546,7 @@ class Handler():
         stepnum=step['stepNo']
         url=step['url']
         custname=step['custname']
-        if(step['cord']): 
+        if(step.has_key('cord')): 
             cord=step['cord']
         else:
             cord=None

@@ -19,6 +19,8 @@ import desktop_tab_control_keywords
 import desktop_date_control_keywords
 import desktop_treeview_keywords
 import screenshot_keywords
+import iris_operations
+import json
 import logger
 import desktop_constants
 import radio_checkbox_keywords_desktop
@@ -29,7 +31,8 @@ import readconfig
 import desktop_custom_object
 from pywinauto.application import Application
 import pywinauto
-
+from pywinauto.findwindows    import find_window
+from pywinauto.win32functions import SetForegroundWindow
 log = logging.getLogger('desktop_dispatcher.py')
 
 class DesktopDispatcher:
@@ -44,6 +47,7 @@ class DesktopDispatcher:
     date_control_keywords_obj = desktop_date_control_keywords.DateControlKeywords()
     desktop_custom_object_obj =desktop_custom_object.CustomObjectHandler()
     tree_keywords_obj=desktop_treeview_keywords.Tree_View_Keywords()
+    iris_object = iris_operations.IRISKeywords()
 ##    outook_obj=outlook.OutlookKeywords()
 
     def __init__(self):
@@ -197,7 +201,9 @@ class DesktopDispatcher:
 ##                    'selecttreeelement':self.tree_keywords_obj.select_element,
                     'selecttreenode':self.tree_keywords_obj.click_tree_element,
 ##                    'doubleclicktreenode':self.tree_keywords_obj.double_click_tree_element,
-                    'getnodenamebyindex':self.tree_keywords_obj.getElementTextByIndex
+                    'getnodenamebyindex':self.tree_keywords_obj.getElementTextByIndex,
+                    'clickiris':self.iris_object.clickiris,
+                    'settextiris':self.iris_object.settextiris
 
 
                 }
@@ -226,8 +232,15 @@ class DesktopDispatcher:
                 else:
                     self.launch_keywords_obj.verifyWindowTitle()
                     if objectname != '':
-                        app_uia = desktop_launch_keywords.app_uia
-                        ele = self.get_desktop_element(objectname,url,app_uia)
+                        if teststepproperty.cord != None and teststepproperty.cord != '':
+                            app_uia = desktop_launch_keywords.app_uia
+                            print desktop_launch_keywords.window_name
+                            SetForegroundWindow(find_window(title=desktop_launch_keywords.window_name))
+                            ele = {'cord': teststepproperty.cord} 
+                        else:
+                            app_uia = desktop_launch_keywords.app_uia
+                            ele = self.get_desktop_element(objectname,url,app_uia)
+                       
                     result= dict[keyword](ele,url,input,output)
 
                 if not(desktop_constants.ELEMENT_FOUND) and self.exception_flag:
