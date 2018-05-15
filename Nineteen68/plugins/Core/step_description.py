@@ -13,13 +13,9 @@ class StepDescription:
 
 
     def generic(self,keyword,tsp,inputval,input,output,con,reporting_obj):
-        print output
-
         if str(keyword) in ["typecast","split","displayvariablevalue"]:
             if type(output) is list:
                     output=','.join(output)
-                    print output
-
         #Date operations
         def getcurrenttime():
             return 'Get current time of the system and save the time '+ "'"+ output + "'"+ ' in '+ "'"+ tsp.outputval+ "'"
@@ -115,7 +111,7 @@ class StepDescription:
         def add():
             return "Add the numbers '"+ input+"' and save the value '"+output +"' in '"+ tsp.outputval+"'"
         def evaluate():
-            return "Evaluate Mathematical expression '"+ input+"' and save the result '"+output+"' in '"+ tsp.outputval+"'"
+            return "Evaluate Mathematical expression '"+ input+"' and save the result '"+ output +"' in '"+ tsp.outputval+"'"
 
         #Compare keywords
         def verifyobjects():
@@ -124,8 +120,8 @@ class StepDescription:
         #String operations
         def tolowercase():
             return 'Change ' +"'"+ input+"'"+ ' to Lower case and save the value ' +"'"+ output+"'"+' in '+"'"+ tsp.outputval+"'"
-        def evaluate():
-            return 'Evaluate Mathematical expression ' +"'"+ input+ "'"+' and save the result ' +"'"+ output +"'"+ ' in '+"'"+ tsp.outputval+"'"
+        ##def evaluate():
+            ##return 'Evaluate Mathematical expression ' +"'"+ input+ "'"+' and save the result ' +"'"+ output +"'"+ ' in '+"'"+ tsp.outputval+"'"
         def touppercase():
             return 'Change ' +"'"+ input+"'"+ ' to Upper case and save the value ' +"'"+ output+"'"+ ' in ' +"'"+ tsp.outputval+"'"
         def trim():
@@ -1012,6 +1008,10 @@ class StepDescription:
         return locals()[keyword]()
 
     def web(self,keyword,tsp,inputval,input,output,con,reporting_obj):
+         #-----------------------------------Added this step as input was returned as a string
+        if type(input) is str:                  #----checking if input is a string
+            if "," in input:                    #----checking if the string has a ","
+                inputL = input.split(",")        #--------spliting the input by checking for "," then store the result in list input
         ##        #-----------------------------------Added this step as input was returned as a string
         ##        if type(input) is str:                  #----checking if input is a string
         ##            if "," in input:                    #----checking if the string has a ","
@@ -1122,7 +1122,7 @@ class StepDescription:
             if tsp.custname=="@Custom":
                 return 'Select value '+"'" +input+"'" +' with visible text '+"'" +visible_text+"'" +' of the type '+"'" +ele_type+"'" +' with the index '+"'" +cust_index+"'" +' present in '+ "'" + tsp.custname + "'"
             else:
-                return ' Select value with index value '+"'"+ input+"'"+' in the '+"'" + tsp.custname + "'"
+                return 'Select the value '+output+' with the index '+input+' present in the table cell '+"'" + tsp.custname+'['+inputval[0]+']['+inputval[1]+']'+"'."
         def getcount():
             return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' +"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
         #Radio checkbox keywords
@@ -1182,7 +1182,10 @@ class StepDescription:
         def clickelement():
             return ' Click '+ "'" + tsp.custname + "'"
         def mouseclick():
-            return ' Mouse Click on  '+ "'" + tsp.custname + "'"
+            if len(inputval)>0:
+                return ' Mouse Click on  '+ "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+"'"
+            else:
+                return ' Mouse Click on  '+ "'" + tsp.custname + "'"
         def verifyelementtext():
             return 'Verify ' +"'"+ input +"'"+ ' is the text of the '+ "'" + tsp.custname + "'"
         def verifyelementexists():
@@ -1251,7 +1254,9 @@ class StepDescription:
 
         #Table keywords
         def getcelltooltip():
-            return 'Get the cell tooltip from the '+ "'" + tsp.custname + "'"+ ' and save the tool tip text ' +"'"+output+"'"+' in ' +"'"+tsp.outputval+"'"
+            return 'Get the cell tooltip from the '+ "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+ "'"+ ' and save the tool tip text ' +"'"+output+"'"+' in ' +"'"+tsp.outputval+"'"
+        def verifycelltooltip():
+            return 'Verify cell tooltip value '+"'"+input+"'"+' is present in the '+ "'"+ tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+ "' table."
         def cellclick():
             return 'Click ' + "'" + tsp.custname + "'"
         def getrowcount():
@@ -1259,15 +1264,16 @@ class StepDescription:
         def getcolumncount():
             return 'Get column count of the '+ "'" + tsp.custname + "'"+ ' and save the count '+"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
         def verifycellvalue():
-            return 'Verify cell value [Null] is present in the '+ "'" + tsp.custname + "'" + ' Invalid input'
+            input = inputL[2:]# getting list elements from pos 3 till end
+            input = ','.join(input)# if list is make it into a string
+            return 'Verify cell value'+"'"+str(input)+"'" +'  is present in the '+ "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+"' table."
 
         def getcolnumbytext():
             return 'Get column number of ' + "'" + tsp.custname + "'" + ' by text '+"'"+input +"'"+' and save the column number ' +"'"+ output + "'"+' in '+"'"+tsp.outputval+"'"
         def getrownumbytext():
             return 'Get row number of ' + "'" + tsp.custname + "'" + ' by text '+"'"+input +"'"+' and save the row number ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
         def getcellvalue():
-            return 'Get row number of ' + "'" + tsp.custname + "'" + ' by text '+"'"+input +"'"+' and save the row number ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
-
+            return 'Get cell value of ' + "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+"'" + ' in the table and save the value ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
         #custom keyword
         def getobjectcount():
             return 'Get Object count of the type '+"'" +ele_type+"'" +' and save the count '+"'" +output+"'" +' in '+"'"+tsp.outputval+"'"
@@ -1374,3 +1380,50 @@ class StepDescription:
 
 #==========================================================================================================#
 #End of Mainframe Keyword Reporting starts
+
+
+# Start of System Keyword Reporting
+#==========================================================================================================#
+
+    def system(self,keyword,tsp,inputval,input,output,con,reporting_obj):
+
+        def get_machine_name(value):
+            machine_name=''
+            if not value:
+                machine_name="local machine"
+            else:
+                machine_name=value
+            return machine_name
+
+
+        def getosinfo():
+            machine_name = get_machine_name(input)
+            return "Get Os Information from '"+machine_name+"' and save the info '"+output+"' in '"+tsp.outputval+"'"
+            pass
+
+        def getallprocess():
+            machine_name = get_machine_name(input)
+            return "Get All Process from '"+machine_name+"' and save the info '"+output+"' in '"+tsp.outputval+"'"
+
+        def getallinstalledapps():
+            machine_name=get_machine_name(input)
+            return "Get All Installed apps from '"+machine_name+"' and save the info '"+output+"' in '"+tsp.outputval+"'"
+
+        def executecommand():
+            input_data=input.split(',')
+            machine_name=''
+            if len(input_data)==1:
+                machine_name="local machine"
+            else:
+                machine_name=input_data[1]
+            return "Get result of Execute Command'"+input_data[0]+"' from '"+machine_name+"' and save the info '"+output+"' in '"+tsp.outputval+"'"
+        logger.print_on_console(keyword)
+
+        return locals()[keyword]()
+
+
+
+
+
+#==========================================================================================================#
+#End of System Keyword Reporting starts

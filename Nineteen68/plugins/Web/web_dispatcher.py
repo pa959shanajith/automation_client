@@ -87,12 +87,12 @@ class Dispatcher:
 
                     }
         custom_dict_element={'element':['clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists', 'verifyhidden','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys',
-                                        'tab','waitforelementvisible','mousehover','savefile']}
+                                        'tab','waitforelementvisible','mousehover','savefile','press','verifyenabled','verifydisabled','verifyreadonly']}
 
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
 
         def print_error(err_msg):
-            err_msg=ERROR_CODE_DICT['ERR_CUSTOM_MISMATCH']
+##            err_msg=ERROR_CODE_DICT['ERR_CUSTOM_MISMATCH']
             logger.print_on_console(err_msg)
             log.error(err_msg)
 
@@ -102,56 +102,58 @@ class Dispatcher:
 
                 log.debug('In send_webelement_to_keyword method')
                 #check if the element is in iframe or frame
-
-                if url !=  '' and self.custom_object.is_int(url):
-                    log.debug('Encountered iframe/frame url')
-                    self.custom_object.switch_to_iframe(url,driver.current_window_handle)
-                    driver = browser_Keywords.driver_obj
-                if objectname==CUSTOM:
-                    log.info('Encountered custom object')
-                    log.info('Custom flag is ')
-                    log.info(teststepproperty.custom_flag)
-                    if teststepproperty.custom_flag:
-                        reference_element=self.getwebelement(driver,teststepproperty.parent_xpath)
-                        log.debug('Reference_element ')
-                        log.debug(reference_element)
-                        if reference_element != None:
-                            reference_element = reference_element[0]
-                            log.info('Reference_element is found')
-                            if keyword==GET_OBJECT_COUNT:
-                                log.info('Keyword is ')
-                                log.info(keyword)
-                                webelement=reference_element
-                            elif len(input)>=3:
-                                if (keyword in custom_dict and input[0].lower() in custom_dict[keyword]) or keyword in custom_dict_element.values()[0]:
-                                    webelement=self.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url)
-                                    log.debug(MSG_CUSTOM_FOUND)
-                                    input.reverse()
-                                    for x in range(0,3):
-                                        input.pop()
-                                    input.reverse()
+                try:
+                    if url !=  '' and self.custom_object.is_int(url):
+                        log.debug('Encountered iframe/frame url')
+                        self.custom_object.switch_to_iframe(url,driver.current_window_handle)
+                        driver = browser_Keywords.driver_obj
+                    if objectname==CUSTOM:
+                        log.info('Encountered custom object')
+                        log.info('Custom flag is ')
+                        log.info(teststepproperty.custom_flag)
+                        if teststepproperty.custom_flag:
+                            reference_element=self.getwebelement(driver,teststepproperty.parent_xpath)
+                            log.debug('Reference_element ')
+                            log.debug(reference_element)
+                            if reference_element != None:
+##                                reference_element = reference_element[0]
+                                log.info('Reference_element is found')
+                                if keyword==GET_OBJECT_COUNT:
+                                    log.info('Keyword is ')
+                                    log.info(keyword)
+                                    webelement=reference_element
+                                elif len(input)>=3:
+                                    if (keyword in custom_dict and input[0].lower() in custom_dict[keyword]) or keyword in custom_dict_element.values()[0]:
+                                        webelement=self.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url)
+                                        log.debug(MSG_CUSTOM_FOUND)
+                                        input.reverse()
+                                        for x in range(0,3):
+                                            input.pop()
+                                        input.reverse()
+                                    else:
+                                        print_error('ERR_CUSTOM_MISMATCH')
                                 else:
-                                    print_error('ERR_CUSTOM_MISMATCH')
+                                    print_error('ERR_PRECONDITION_NOTMET')
+                                    print_error('ERR_CUSTOM_NOTFOUND')
+
                             else:
-                                print_error('ERR_PRECONDITION_NOTMET')
+                                print_error('ERR_REF_ELE_NULL')
                                 print_error('ERR_CUSTOM_NOTFOUND')
 
-                        else:
-                            print_error('ERR_REF_ELE_NULL')
-                            print_error('ERR_CUSTOM_NOTFOUND')
-
-                else:
-                    if objectname=="@Object":
-                        webelement = input[0]
-                        log.info(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
-                        logger.print_on_console(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
                     else:
-                        webelement = self.getwebelement(driver,objectname)
-                        if webelement != None:
-                            if isinstance(webelement,list):
-                                webelement = webelement[0]
-                                log.info(WEB_ELEMENT_FOUND)
-                                logger.print_on_console(WEB_ELEMENT_FOUND)
+                        if objectname=="@Object":
+                            webelement = input[0]
+                            log.info(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
+                            logger.print_on_console(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
+                        else:
+                            webelement = self.getwebelement(driver,objectname)
+                            if webelement != None:
+                                if isinstance(webelement,list):
+                                    webelement = webelement[0]
+                                    log.info(WEB_ELEMENT_FOUND)
+                                    logger.print_on_console(WEB_ELEMENT_FOUND)
+                except Exception as e:
+                    print_error('ERR_CUSTOM_ELE_NOTFOUND')
             return webelement
 
 
@@ -424,18 +426,18 @@ class Dispatcher:
                     #find by rxpath
                     tempwebElement = driver.find_elements_by_xpath(identifiers[0])
                     if (len(tempwebElement) == 1):
-                        logger.print_on_console('Webelement found by Relative_xpath- OI1')
-                        log.debug('Webelement found by Relative_xpath- OI1')
+                        logger.print_on_console('Webelement found by OI1')
+                        log.debug('Webelement found by OI1')
                     if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                         tempwebElement = driver.find_elements_by_id(identifiers[1])
                         if (len(tempwebElement) == 1):
-                            logger.print_on_console('Webelement found by ID- OI2')
-                            log.debug('Webelement found by ID- OI2')
+                            logger.print_on_console('Webelement found by OI2')
+                            log.debug('Webelement found by OI2')
                         if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                             tempwebElement = driver.find_elements_by_xpath(identifiers[2])
                             if (len(tempwebElement) == 1):
-                                logger.print_on_console('Webelement found by AbsolutXPath - OI3')
-                                log.debug('Webelement found by AbsolutXPath - OI3')
+                                logger.print_on_console('Webelement found by OI3')
+                                log.debug('Webelement found by OI3')
                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                 tempwebElement = None
 ##                    log.debug('Webelement found by relative xpath')
@@ -446,13 +448,13 @@ class Dispatcher:
                         #find by id
                         tempwebElement = driver.find_elements_by_id(identifiers[1])
                         if (len(tempwebElement) == 1):
-                            logger.print_on_console('Webelement found by ID- OI2')
-                            log.debug('Webelement found by ID- OI2')
+                            logger.print_on_console('Webelement found by OI2')
+                            log.debug('Webelement found by OI2')
                         if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                             tempwebElement = driver.find_elements_by_xpath(identifiers[2])
                             if (len(tempwebElement) == 1):
-                                logger.print_on_console('Webelement found by AbsolutXPath - OI3')
-                                log.debug('Webelement found by AbsolutXPath - OI3')
+                                logger.print_on_console('Webelement found by OI3')
+                                log.debug('Webelement found by OI3')
                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                 tempwebElement = None
 ##                        log.debug('Webelement found by Id')
@@ -462,8 +464,8 @@ class Dispatcher:
                         try:
                             tempwebElement = driver.find_elements_by_xpath(identifiers[2])
                             if (len(tempwebElement) == 1):
-                                logger.print_on_console('Webelement found by AbsolutXPath - OI3')
-                                log.debug('Webelement found by AbsolutXPath - OI3')
+                                logger.print_on_console('Webelement found by OI3')
+                                log.debug('Webelement found by OI3')
                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                 tempwebElement = None
                             webElement = tempwebElement
@@ -493,8 +495,8 @@ class Dispatcher:
                     if (elementname!='null'):
                             tempwebElement = driver.find_elements_by_name(elementname)
                             if (len(tempwebElement) == 1):
-                                logger.print_on_console('Webelement found by Javascript - OI4')
-                                log.debug('Webelement found by Javascript - OI4')
+                                logger.print_on_console('Webelement found by OI4')
+                                log.debug('Webelement found by OI4')
                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                 webElement=None
                     if(webElement==None):
@@ -522,5 +524,6 @@ class Dispatcher:
                 err_msg=WEB_ELEMENT_NOT_FOUND
                 logger.print_on_console(err_msg)
                 log.error(err_msg)
-
+        if isinstance(webElement,list):
+            webElement=webElement[0]
         return webElement

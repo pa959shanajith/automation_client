@@ -17,6 +17,7 @@ import logger
 import time
 import logging
 import pythoncom
+from ast import literal_eval
 log = logging.getLogger('system_keywords.py')
 
 class System_Keywords():
@@ -40,6 +41,13 @@ class System_Keywords():
             err_msg = system_constants.ERROR_CODE_DICT['ERR_UNABLE_TO_CONNECT']
         return wmi_ref
 
+    def removingUnicodeSign(self,val):
+        val = repr(val).replace("u'","'")
+        val = literal_eval(val)
+        if not isinstance(val,basestring):
+            val=str(val)
+        return val
+
     def getOsInfo(self,machine_name=None):
 
         os_info={}
@@ -53,8 +61,9 @@ class System_Keywords():
                     os_details = wmi_ref.Win32_OperatingSystem()
                     for iterator in os_details:
                         os_info['system']='windows'
-                        os_info['machine']=iterator.Caption
-                        os_info['version']=iterator.Version
+                        os_info['machine']=self.removingUnicodeSign(iterator.Caption)
+                        os_info['version']=self.removingUnicodeSign(iterator.Version)
+                        os_info['OSArchitecture'] = self.removingUnicodeSign(iterator.OSArchitecture)
                     status=system_constants.TEST_RESULT_PASS
                     result = system_constants.TEST_RESULT_TRUE
                 else:
@@ -69,6 +78,8 @@ class System_Keywords():
         except Exception as e:
             log.error(e)
             err_msg =system_constants.ERROR_CODE_DICT['ERR_OS_INFO']
+            status = system_constants.TEST_RESULT_FAIL
+            result = system_constants.TEST_RESULT_FALSE
         return status,result,os_info,err_msg
 
     def getAllInstalledApps(self,machine_name=None):
@@ -83,7 +94,10 @@ class System_Keywords():
                 if wmi_ref is not None:
                     for p in wmi_ref.Win32_Product():
                         #apps_data.append({'caption':p.Caption,'version':p.Version,'name':p.Name,'vendor':p.Vendor})
-                        apps_data.append(p.Name)
+                        value = self.removingUnicodeSign(p.Name)
+                        value+="--"
+                        value+= self.removingUnicodeSign(p.Version)
+                        apps_data.append(value)
                     status=system_constants.TEST_RESULT_PASS
                     result=system_constants.TEST_RESULT_TRUE
                 else:
@@ -97,6 +111,8 @@ class System_Keywords():
         except Exception as e:
             log.error(e)
             err_msg = system_constants.ERROR_CODE_DICT['ERR_GET_INSTALLED_APP']
+            status = system_constants.TEST_RESULT_FAIL
+            result = system_constants.TEST_RESULT_FALSE
         return status,result,apps_data,err_msg
 
     def getInstalledAppInfo(self,app_name,machine_name=None):
@@ -114,7 +130,10 @@ class System_Keywords():
                 if wmi_ref is not None:
                     for process in wmi_ref.Win32_Process():
                         #process_data.append({"pid":process.ProcessId,"pname":process.Name})
-                        process_data.append(process.Name)
+                        value = self.removingUnicodeSign(process.Name)
+                        value+="--"
+                        value+=self.removingUnicodeSign(process.ProcessId)
+                        process_data.append(value)
                     status=system_constants.TEST_RESULT_PASS
                     result=system_constants.TEST_RESULT_TRUE
                 else:
@@ -122,6 +141,8 @@ class System_Keywords():
         except Exception as e:
             log.error(e)
             err_msg = system_constants.ERROR_CODE_DICT['ERR_GET_ALL_PROCESS']
+            status = system_constants.TEST_RESULT_FAIL
+            result = system_constants.TEST_RESULT_FALSE
         return status,result,process_data,err_msg
 
     def getProcessInfo(self):
@@ -145,7 +166,7 @@ class System_Keywords():
                 wmi_ref=self.getWmi(machine_name)
                 if wmi_ref is not None:
                     if machine_name is None:
-                        path_outfile=os.environ["NINETEEN68_HOME"]+"//Nineteen68//plugins//System//nsys.txt"
+                        path_outfile=os.environ["NINETEEN68_HOME"]+"//Nineteen68//plugins//System//nineteen68_system.txt"
                         process_id, process_status = wmi_ref.Win32_Process.Create(CommandLine="cmd /c "+command_toexecute+" > "+path_outfile)
                     else:
                         file_name=None
@@ -155,9 +176,9 @@ class System_Keywords():
                             path_attrib=path_outfile.split(':')
                             if(len(path_attrib)==2):
                                 if path_attrib[1].endswith('\\'):
-                                    file_name ="nsys.txt"
+                                    file_name ="nineteen68_system.txt"
                                 else:
-                                    file_name="/nsys.txt"
+                                    file_name="/nineteen68_system.txt"
 
                                 path_outfile = "//"+machine_name+"/"+path_attrib[0]+"$"+path_attrib[1]+file_name
                             else:
@@ -176,9 +197,13 @@ class System_Keywords():
             f= open(path_outfile,"r")
             for i in f:
                 result_data+=i
+            if not result_data:
+                raise Exception('Command not found or Unable to connect to machine')
         except Exception as e:
             log.error(e)
             err_msg = system_constants.ERROR_CODE_DICT['ERR_EXECUTE_COMMAND']
+            status = system_constants.TEST_RESULT_FAIL
+            result = system_constants.TEST_RESULT_FALSE
         return status,result,result_data,err_msg
 
 '''
