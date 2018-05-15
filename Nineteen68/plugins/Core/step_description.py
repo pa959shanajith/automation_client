@@ -111,7 +111,7 @@ class StepDescription:
         def add():
             return "Add the numbers '"+ input+"' and save the value '"+output +"' in '"+ tsp.outputval+"'"
         def evaluate():
-            return "Evaluate Mathematical expression '"+ input+"' and save the result '"+output+"' in '"+ tsp.outputval+"'"
+            return "Evaluate Mathematical expression '"+ input+"' and save the result '"+ output +"' in '"+ tsp.outputval+"'"
 
         #Compare keywords
         def verifyobjects():
@@ -120,8 +120,8 @@ class StepDescription:
         #String operations
         def tolowercase():
             return 'Change ' +"'"+ input+"'"+ ' to Lower case and save the value ' +"'"+ output+"'"+' in '+"'"+ tsp.outputval+"'"
-        def evaluate():
-            return 'Evaluate Mathematical expression ' +"'"+ input+ "'"+' and save the result ' +"'"+ output +"'"+ ' in '+"'"+ tsp.outputval+"'"
+        ##def evaluate():
+            ##return 'Evaluate Mathematical expression ' +"'"+ input+ "'"+' and save the result ' +"'"+ output +"'"+ ' in '+"'"+ tsp.outputval+"'"
         def touppercase():
             return 'Change ' +"'"+ input+"'"+ ' to Upper case and save the value ' +"'"+ output+"'"+ ' in ' +"'"+ tsp.outputval+"'"
         def trim():
@@ -1008,6 +1008,10 @@ class StepDescription:
         return locals()[keyword]()
 
     def web(self,keyword,tsp,inputval,input,output,con,reporting_obj):
+         #-----------------------------------Added this step as input was returned as a string
+        if type(input) is str:                  #----checking if input is a string
+            if "," in input:                    #----checking if the string has a ","
+                inputL = input.split(",")        #--------spliting the input by checking for "," then store the result in list input
         ##        #-----------------------------------Added this step as input was returned as a string
         ##        if type(input) is str:                  #----checking if input is a string
         ##            if "," in input:                    #----checking if the string has a ","
@@ -1260,9 +1264,8 @@ class StepDescription:
         def getcolumncount():
             return 'Get column count of the '+ "'" + tsp.custname + "'"+ ' and save the count '+"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
         def verifycellvalue():
-            input=input.split(',')#making list of the input string
-            input=input[2:]# getting list elements from pos 3 till end
-            input=','.join(input)# if list is make it into a string
+            input = inputL[2:]# getting list elements from pos 3 till end
+            input = ','.join(input)# if list is make it into a string
             return 'Verify cell value'+"'"+str(input)+"'" +'  is present in the '+ "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+"' table."
 
         def getcolnumbytext():
