@@ -56,7 +56,7 @@ class Cropandadd():
         self.data = {}
         self.data['view'] = []            #cords of selected parts
         self.stopflag = False
-        with open("test.png", "rb") as imageFile:
+        with open("test.jpg", "rb") as imageFile:
             self.data['mirror'] = base64.b64encode(imageFile.read())     #screenshot
         # self.data['mirror'] = ''
         print "copied: ",self.RGB_img_c
