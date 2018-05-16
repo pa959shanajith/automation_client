@@ -148,7 +148,7 @@ class Dispatcher:
                         webelement = input[0]
                         log.info(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
                         logger.print_on_console(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
-                    elif teststepproperty.cord != None:
+                    elif teststepproperty.cord != None teststepproperty.cord != "":
                         webelement = {'cord': teststepproperty.cord}
 
 
@@ -159,7 +159,7 @@ class Dispatcher:
                                 webelement = webelement[0]
                                 log.info(WEB_ELEMENT_FOUND)
                                 logger.print_on_console(WEB_ELEMENT_FOUND)
-            elif teststepproperty.cord != None:
+            elif teststepproperty.cord != None teststepproperty.cord != "":
                 webelement = {'cord': teststepproperty.cord}
 
             return webelement
