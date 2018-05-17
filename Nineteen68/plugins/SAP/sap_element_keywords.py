@@ -10,7 +10,6 @@
 #-------------------------------------------------------------------------------
 import pywinauto
 import sap_constants
-import sap_launch_keywords
 from sap_launch_keywords import Launch_Keywords
 from constants import *
 import logger
@@ -35,17 +34,16 @@ class ElementKeywords():
         err_msg=None
         try:
             if(id != None):
-
-                        value = ses.FindById(id).text
-                        status=sap_constants.TEST_RESULT_PASS
-                        result=sap_constants.TEST_RESULT_TRUE
+                value = ses.FindById(id).text
+                status=sap_constants.TEST_RESULT_PASS
+                result=sap_constants.TEST_RESULT_TRUE
             else:
                 log.info('element not present on the page where operation is trying to be performed')
                 err_msg='element not present on the page where operation is trying to be performed'
         except Exception as e:
+            err_msg = sap_constants.ERROR_MSG
             log.error(e)
-            logger.print_on_console("Exception has occured :",e)
-        #log.info(RETURN_RESULT)
+            logger.print_on_console("Error occured in getElementText")
         return status,result,value,err_msg
 
     def verify_element_text(self, sap_id,input_val, *args):
@@ -57,30 +55,30 @@ class ElementKeywords():
         err_msg=None
         try:
             if(id != None):
-                    if(len(input_val)!=0):
-                        if(len(input_val)>1):
-                            input = input_val[2]
-                        else:
-                            input=input_val[0]
-
-                        if(ses.FindById(id).text== input):
-                            status=sap_constants.TEST_RESULT_PASS
-                            result=sap_constants.TEST_RESULT_TRUE
-                    elif(len(input_val)==0):
-                        log.info('entered text is empty')
-                        err_msg='entered text is empty'
-                        logger.print_on_console('entered text is empty')
+                if(len(input_val)!=0):
+                    if(len(input_val)>1):
+                        input = input_val[2]
                     else:
-                        log.info('Incorrect syntax')
-                        err_msg='Incorrect syntax'
-                        logger.print_on_console('Incorrect syntax')
+                        input=input_val[0]
+
+                    if(ses.FindById(id).text== input):
+                        status=sap_constants.TEST_RESULT_PASS
+                        result=sap_constants.TEST_RESULT_TRUE
+                elif(len(input_val)==0):
+                    log.info('entered text is empty')
+                    err_msg='entered text is empty'
+                    logger.print_on_console('entered text is empty')
+                else:
+                    log.info('Incorrect syntax')
+                    err_msg='Incorrect syntax'
+                    logger.print_on_console('Incorrect syntax')
             else:
                 log.info('element not present on the page where operation is trying to be performed')
                 err_msg='element not present on the page where operation is trying to be performed'
         except Exception as e:
+            err_msg = sap_constants.ERROR_MSG
             log.error(e)
-            logger.print_on_console("Exception has occured :",e)
-        #log.info(RETURN_RESULT)
+            logger.print_on_console("Error occured in verifyElementText")
         return status,result,value,err_msg
 
     def getTooltipText(self, sap_id,*args):
@@ -124,7 +122,8 @@ class ElementKeywords():
 
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console('Error occoured in getTooltipText and is :',e)
+            log.error(e)
+            logger.print_on_console("Error occured in getTooltipText")
         return status,result,value,err_msg
 
     def verifyTooltipText(self, sap_id,input_val,*args):
@@ -166,7 +165,8 @@ class ElementKeywords():
 
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console('Error occoured in verifyTooltipText')
+            log.error(e)
+            logger.print_on_console("Error occured in verifyTooltipText")
         return status,result,value,err_msg
 
     def getIconName(self, sap_id,*args):
@@ -207,7 +207,8 @@ class ElementKeywords():
 
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console('Error occoured in getIconName and is :',e)
+            log.error(e)
+            logger.print_on_console("Error occured in getIconName")
         return status,result,value,err_msg
 
     def getInputHelp(self, sap_id,*args):
@@ -221,38 +222,37 @@ class ElementKeywords():
         err_msg=None
         try:
             if(id != None):
-                        #------------------------------Condition to check if its a table element
-                        if(elem.type=='GuiTableControl'):
-                            arg=args[0]
-                            if len(arg) > 0 and len(arg)==2 :
-                                row=int(arg[0])-1
-                                col=int(arg[1])-1
-                                elem = elem.GetCell(row, col)
-                            else:
-                                elem=None
-                                logger.print_on_console('Invalid Arguments Passed')
+                #------------------------------Condition to check if its a table element
+                if(elem.type=='GuiTableControl'):
+                    arg=args[0]
+                    if len(arg) > 0 and len(arg)==2 :
+                        row=int(arg[0])-1
+                        col=int(arg[1])-1
+                        elem = elem.GetCell(row, col)
+                    else:
+                        elem=None
+                        logger.print_on_console('Invalid Arguments Passed')
 
-                        if(elem.type == "GuiTextField" or elem.type == "GuiCTextField"):
-                            elem.SetFocus()
-                            sendfnt.sendfunction_keys("F4")
-                            d1,d2,error,d3=self.lk.getErrorMessage()
-                            if(error=="No input help is available" or error=="No error message" or error ==""):
-                                logger.print_on_console('No input help is available')
-                                err_msg='No input help is available'
-                            else:
-                                status=sap_constants.TEST_RESULT_PASS
-                                result=sap_constants.TEST_RESULT_TRUE
-                        else:
-                            logger.print_on_console('No input help is available')
-                            err_msg='No input help is available'
-
+                if(elem.type == "GuiTextField" or elem.type == "GuiCTextField"):
+                    elem.SetFocus()
+                    sendfnt.sendfunction_keys("F4")
+                    d1,d2,error,d3=self.lk.getErrorMessage()
+                    if(error=="No input help is available" or error=="No error message" or error ==""):
+                        logger.print_on_console('No input help is available')
+                        err_msg='No input help is available'
+                    else:
+                        status=sap_constants.TEST_RESULT_PASS
+                        result=sap_constants.TEST_RESULT_TRUE
+                else:
+                    logger.print_on_console('No input help is available')
+                    err_msg='No input help is available'
             else:
                 log.info('element not present on the page where operation is trying to be performed')
                 err_msg='element not present on the page where operation is trying to be performed'
         except Exception as e:
+            err_msg = sap_constants.ERROR_MSG
             log.error(e)
-            logger.print_on_console("Exception has occured :",e)
-        #log.info(RETURN_RESULT)
+            logger.print_on_console("Error occured in getInputHelp")
         return status,result,value,err_msg
 
     def mouseHover(self, sap_id,*args):
@@ -277,7 +277,6 @@ class ElementKeywords():
                     elem=None
                     logger.print_on_console('Invalid Arguments Passed')
         #--------------------------------mouse will move over to the middle of the element and click
-
             left =  elem.__getattr__("ScreenLeft")
             width = elem.__getattr__("Width")
             x = left + width/2
@@ -288,10 +287,9 @@ class ElementKeywords():
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
-            log.error('Error occured',e)
-            import traceback
-            traceback.print_exc()
             err_msg = sap_constants.ERROR_MSG
+            log.error(e)
+            logger.print_on_console("Error occured in mouseHover")
         return status,result,value,err_msg
 
     def doubleClick(self, sap_id,*args):
@@ -316,7 +314,6 @@ class ElementKeywords():
                     elem=None
                     logger.print_on_console('Invalid Arguments Passed')
         #--------------------------------mouse will move over to the middle of the element and click
-
             left =  elem.ScreenLeft
             width = elem.Width
             x = left + width/2
@@ -324,16 +321,15 @@ class ElementKeywords():
             height = elem.Height
             y= top + height/2
             if(elem.type=='GuiTab'):
-                    x=left + width*0.75
-                    y=top+height*0.25
+                x=left + width*0.75
+                y=top+height*0.25
             pywinauto.mouse.double_click(button="left", coords = (int(x), int(y)))
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
-            log.error('Error occured',e)
-            import traceback
-            traceback.print_exc()
             err_msg = sap_constants.ERROR_MSG
+            log.error(e)
+            logger.print_on_console("Error occured in doubleClick")
         return status,result,value,err_msg
 
     def click(self, sap_id,*args):
@@ -345,50 +341,39 @@ class ElementKeywords():
         id,ses=self.uk.getSapElement(sap_id)
         elem=ses.FindById(id)
         try:
-##            if(elem.type=="GuiRadioButton"):
-##                if(elem.Changeable == True):
-##                    elem.Press()
-##                    status =sap_constants.TEST_RESULT_PASS
-##                    result = sap_constants.TEST_RESULT_TRUE
-
             #------------------------------Condition to check if its a table element
-                if(elem.type=='GuiTableControl'):
-                    arg=args[0]
-                    if(len(arg)==1 and arg[0]==''):
-                        pass
-                    elif (len(arg)==2):
-                        if(isinstance(arg[0],int) and isinstance(arg[1],int)):
-                            row=int(arg[0])-1
-                            col=int(arg[1])-1
-                            elem = elem.GetCell(row, col)
-                        else:
-                            pass
-                    elif(len(arg)>2):
-                        row=int(arg[2])-1
-                        col=int(arg[3])-1
-                        elem = elem.GetCell(row, col)
-                    else:
-                        elem=None
-                        logger.print_on_console('Invalid Arguments Passed')
+            if(elem.type=='GuiTableControl'):
+                arg=args[0]
+                if(len(arg)==1 and arg[0]==''):
+                    pass
+                elif (len(arg)==2):
+                    row=int(arg[0])-1
+                    col=int(arg[1])-1
+                    elem = elem.GetCell(row, col)
+                elif(len(arg)>2):
+                    row=int(arg[2])-1
+                    col=int(arg[3])-1
+                    elem = elem.GetCell(row, col)
+                else:
+                    elem=None
+                    logger.print_on_console('Invalid Arguments Passed')
             #--------------------------------mouse will move over to the middle of the element and click
-
-                left =  elem.__getattr__("ScreenLeft")
-                width = elem.__getattr__("Width")
-                x = left + width/2
-                top =  elem.__getattr__("ScreenTop")
-                height = elem.__getattr__("Height")
-                y= top + height/2
-                if(elem.type=='GuiTab'):
-                    x=left + width*0.75
-                    y=top+height*0.25
-                pywinauto.mouse.click(button='left', coords=(int(x), int(y)))
-                status=sap_constants.TEST_RESULT_PASS
-                result=sap_constants.TEST_RESULT_TRUE
+            left =  elem.__getattr__("ScreenLeft")
+            width = elem.__getattr__("Width")
+            x = left + width/2
+            top =  elem.__getattr__("ScreenTop")
+            height = elem.__getattr__("Height")
+            y= top + height/2
+            if(elem.type=='GuiTab'):
+                x=left + width*0.75
+                y=top+height*0.25
+            pywinauto.mouse.click(button='left', coords=(int(x), int(y)))
+            status=sap_constants.TEST_RESULT_PASS
+            result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
-            log.error('Error occured',e)
-            import traceback
-            traceback.print_exc()
             err_msg = sap_constants.ERROR_MSG
+            log.error(e)
+            logger.print_on_console("Error occured in click")
         return status,result,value,err_msg
 
     def rightClick(self, sap_id,*args):
@@ -400,38 +385,35 @@ class ElementKeywords():
             id,ses=self.uk.getSapElement(sap_id)
             elem=ses.FindById(id)
             try:
-
                 #------------------------------Condition to check if its a table element
-                    if(elem.type=='GuiTableControl'):
-                        arg=args[0]
-                        if(len(arg)==1 and arg[0]==''):
-                            pass
-                        elif len(arg)==2:
-                            row=int(arg[0])-1
-                            col=int(arg[1])-1
-                            elem = elem.GetCell(row, col)
-                        else:
-                            elem=None
-                            logger.print_on_console('Invalid Arguments Passed')
+                if(elem.type=='GuiTableControl'):
+                    arg=args[0]
+                    if(len(arg)==1 and arg[0]==''):
+                        pass
+                    elif len(arg)==2:
+                        row=int(arg[0])-1
+                        col=int(arg[1])-1
+                        elem = elem.GetCell(row, col)
+                    else:
+                        elem=None
+                        logger.print_on_console('Invalid Arguments Passed')
                 #--------------------------------Check if element is a tab and select that element
-
-                    if(elem.Type == "GuiTab"):
-                            elem.Select()
+                if(elem.Type == "GuiTab"):
+                    elem.Select()
                 #--------------------------------mouse will move over to the middle of the element and click
-                    left =  elem.__getattr__("ScreenLeft")
-                    width = elem.__getattr__("Width")
-                    x = left + width/2
-                    top =  elem.__getattr__("ScreenTop")
-                    height = elem.__getattr__("Height")
-                    y= top + height/2
-                    pywinauto.mouse.right_click(coords=(int(x), int(y)))
-                    status=sap_constants.TEST_RESULT_PASS
-                    result=sap_constants.TEST_RESULT_TRUE
+                left =  elem.__getattr__("ScreenLeft")
+                width = elem.__getattr__("Width")
+                x = left + width/2
+                top =  elem.__getattr__("ScreenTop")
+                height = elem.__getattr__("Height")
+                y= top + height/2
+                pywinauto.mouse.right_click(coords=(int(x), int(y)))
+                status=sap_constants.TEST_RESULT_PASS
+                result=sap_constants.TEST_RESULT_TRUE
             except Exception as e:
-                log.error('Error occured',e)
-                import traceback
-                traceback.print_exc()
                 err_msg = sap_constants.ERROR_MSG
+                log.error(e)
+                logger.print_on_console("Error occured in rightClick")
             return status,result,value,err_msg
 
     def setFocus(self, sap_id, *args):
@@ -455,20 +437,13 @@ class ElementKeywords():
                 else:
                     elem=None
                     logger.print_on_console('Invalid Arguments Passed')
-        #--------------------------------mouse will move over to the middle of the element and click
-            left =  elem.__getattr__("ScreenLeft")
-            width = elem.__getattr__("Width")
-            x = left + width/2
-            top =  elem.__getattr__("ScreenTop")
-            height = elem.__getattr__("Height")
-            y= top + height/2
-            pywinauto.mouse.move(coords=(int(x), int(y)))
             elem.SetFocus()
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
-            log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
+            log.error(e)
+            logger.print_n_console("Error occured in setFocus")
         return status,result,value,err_msg
 #-----------------------------------------------------------------Scroll_Bar_related_keywords
     def scrollUp(self, sap_id, input_val,*args):
@@ -496,10 +471,8 @@ class ElementKeywords():
                 else:
                     logger.print_on_console('Scrollbar cannot be moved')
             except Exception as e:
-                #import traceback
-                #traceback.print_exc()
-                logger.print_on_console('Scrollbar not found    ',e)
-                log.error('Error occured',e)
+                logger.print_on_console("Error occured in scrollUp")
+                log.error(e)
                 err_msg = sap_constants.ERROR_MSG
         except:
             logger.print_on_console(sap_constants.INVALID_INPUT)
@@ -531,8 +504,8 @@ class ElementKeywords():
                 else:
                     logger.print_on_console('Scrollbar cannot be moved')
             except Exception as e:
-                logger.print_on_console('Scrollbar not found')
-                log.error('Error occured',e)
+                logger.print_on_console("Error occured in scrollDown")
+                log.error(e)
                 err_msg = sap_constants.ERROR_MSG
         except:
             logger.print_on_console(sap_constants.INVALID_INPUT)
@@ -682,10 +655,10 @@ class ElementKeywords():
                 elem.Select()
                 status=sap_constants.TEST_RESULT_PASS
                 result=sap_constants.TEST_RESULT_TRUE
-        except:
+        except Exception as e:
             err_msg=sap_constants.ERROR_MSG
-            import traceback
-            traceback.print_exc()
+            log.error(e)
+            logger.print_on_console("Error occured in selectTab")
         return status,result,value,err_msg
 
 

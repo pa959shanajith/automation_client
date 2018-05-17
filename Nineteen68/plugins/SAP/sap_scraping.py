@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        Sap_scraping
-# Purpose:     Module for full scrape and ClickAndAdd . ClickAndAdd is not supported as of now
+# Purpose:     Module for full scrape and ClickAndAdd
 #
 # Author:      anas.ahmed1,kavyashree,sakshi.goyal,saloni.goyal
 #
@@ -9,28 +9,20 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-from pywinauto.application import Application
 import win32com.client
-import json
-import base64
 import logger
 import logging
 import logging.config
 log = logging.getLogger('sap_scraping.py')
-
-
 import pyHook
 import pythoncom
 import ctypes
 import win32gui
 import win32api
-import time
 import win32process
 from threading import Thread
 ctrldownflag = False
 stopumpingmsgs = False
-#view = []
-#data = {}
 obj_ref = None
 window_id = None
 
@@ -123,7 +115,6 @@ class Scrape:
         return view
 
 
-   ## @staticmethod
     def getWindow(self, object):
         """
         name: getWindow
@@ -150,17 +141,13 @@ class Scrape:
                                 window_to_scrape = wnd
                                 w = w + 1
                             except:
-                                #logger.print_on_console('error in w:',e)
                                 break
                         s = s + 1
                     except:
-                        #logger.print_on_console('error in s:',e)
                         break
                 c = c + 1
             except:
-                #logger.print_on_console('error in c:',e)
                 break
-##        logger.print_on_console('Number of screens are :',number_of_active_screens)
         if(number_of_active_screens > 10):
             logger.print_on_console('Number of Active Screens Greater than 10 not supported at the moment')
             title=None
@@ -168,9 +155,8 @@ class Scrape:
                 if(window_to_scrape.__getattr__("Text").lower() != title.strip().lower()):
                     self.getWindow(object)
             except Exception as e:
-                print e
+                log.error(e)
                 return None
-##        logger.print_on_console('Window that is being scraped is :',wnd.text)
         return window_to_scrape
 
     def clickandadd(self,operation):
@@ -204,7 +190,7 @@ class Scrape:
                             elif(elem.__getattr__("Type") == "GuiTextField" or elem.__getattr__("Type") == "GuiCTextField" or elem.__getattr__("Type") == "GuiPasswordField") :
                                 custname = elem.__getattr__("Name") + "_txtbox"
                                 tag="input"
-                            elif(elem.__getattr__("Type") == "GuiComboBox" or elem.__getattr__("Type") == "GuiBox"):
+                            elif(elem.__getattr__("Type") == "GuiComboBox"):
                                 custname = elem.__getattr__("Name") + "_select"
                                 tag="select"
                             elif(elem.__getattr__("Type") == "GuiLabel"):
@@ -276,10 +262,10 @@ class Scrape:
                                 if wndNames is not 'Running applications':
                                         clicked_handle=evnt.Window
                                         while True:
-                                            if clicked_handle==0L:   #comparing wether parent window is same as clicked window
+                                            if clicked_handle==0L:   #comparing whether parent window is same as clicked window
                                                 break
                                             else:
-                                                if not(clicked_handle == self.handle ):    #recursivelt getting the parent handle
+                                                if not(clicked_handle == self.handle ):    #recursively getting the parent handle
                                                     clicked_handle=win32gui.GetParent(clicked_handle)
                                                 else:
                                                     if (self.ctrldownflag is True):
@@ -293,9 +279,8 @@ class Scrape:
                                                         return False
 
                             except Exception as e:
-                                print e
-                                import traceback
-                                traceback.print_exc()
+                                logger.print_on_console("Exception occured while scraping")
+                                log.error(e)
 
                             if (self.stopumpingmsgs is True):
                                 self.hm.UnhookKeyboard()
@@ -329,20 +314,6 @@ class Scrape:
                             self.ctrldownflag = False
                             return True
 
-##                        def dumpToJson():
-##                            """ Storing scraped elements in json """
-##                            try:
-##
-##                                data['scrapetype'] = 'cna'
-##                                data['scrapedin'] = ''
-##                                data['view'] = view
-####                                with open('domelements.json', 'w') as outfile:
-####                                    json.dump(data, outfile, indent=4, sort_keys=False)
-####                                    outfile.close()
-##
-##                            except Exception as e:
-##                                print e
-
                         global window_id
                         get_obj = GetObject()
                         window_id, self.handle = get_obj.GetWindow()
@@ -353,7 +324,6 @@ class Scrape:
                         self.hm.HookKeyboard()
                         self.hm.HookMouse()
                         pythoncom.PumpMessages()
-##                        dumpToJson()
 
                 class GetObject():
                     def __init__(self):

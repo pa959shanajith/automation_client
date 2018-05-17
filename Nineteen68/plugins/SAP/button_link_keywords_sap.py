@@ -10,7 +10,6 @@
 #-------------------------------------------------------------------------------
 
 import sap_constants
-import sap_launch_keywords
 from sap_launch_keywords import Launch_Keywords
 from saputil_operations import SapUtilKeywords
 from constants import *
@@ -18,9 +17,6 @@ import logger
 import logging
 import logging.config
 log = logging.getLogger('button_link_keywords_sap.py')
-
-#from text_keywords_sap import Text_Keywords
-
 
 class ButtonLinkKeyword():
     def __init__(self):
@@ -61,29 +57,23 @@ class ButtonLinkKeyword():
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
-        #log.debug(sap_launch_keywords.window_name)
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        #verb = OUTPUT_CONSTANT
         value=OUTPUT_CONSTANT
         err_msg=None
         try:
             if(id != None):
-##                if(ses.FindById(id).Changeable == True):
-                   if(ses.FindById(id).Text != None):
-                     value=ses.FindById(id).Text
-                     status =sap_constants.TEST_RESULT_PASS
-                     result = sap_constants.TEST_RESULT_TRUE
-                   else:
-                     print 'Button name is not defined'
-
+               if(ses.FindById(id).Text != None):
+                 value=ses.FindById(id).Text
+                 status =sap_constants.TEST_RESULT_PASS
+                 result = sap_constants.TEST_RESULT_TRUE
+               else:
+                 logger.print_on_console('Button name is not defined')
             else:
-                    log.info('element not present on the page where operation is trying to be performed')
-                    err_msg = 'element not present on the page where operation is trying to be performed'
+                log.info('element not present on the page where operation is trying to be performed')
+                err_msg = 'element not present on the page where operation is trying to be performed'
         except Exception as e:
-            import traceback
-            traceback.getexc()
             log.error(e)
-
+            logger.print_on_console("Error occured in getButtonName")
         return status,result,value,err_msg
 
     def verify_button_name(self,  sap_id , input_val, *args):
@@ -92,29 +82,24 @@ class ButtonLinkKeyword():
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         log.debug('Got window name after launching application')
-        #log.debug(sap_launch_keywords.window_name)
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         name=input_val[0]
-        #verb = OUTPUT_CONSTANT
         value=OUTPUT_CONSTANT
         err_msg=None
         try:
             if(id != None):
-##                if(ses.FindById(id).Changeable == True):
-                    if(ses.FindById(id).Text != None and ses.FindById(id).Text.lstrip() == name.lstrip()):
-                        status =sap_constants.TEST_RESULT_PASS
-                        result = sap_constants.TEST_RESULT_TRUE
-                    else:
-                        log.info('Button name is not Matching')
-                        err_msg = 'Button name is not Matching'
+                if(ses.FindById(id).Text != None and ses.FindById(id).Text.lstrip() == name.lstrip()):
+                    status =sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    log.info('Button name is not Matching')
+                    err_msg = 'Button name is not Matching'
             else:
-                    log.info('element not present on the page where operation is trying to be performed')
-                    err_msg = 'element not present on the page where operation is trying to be performed'
+                log.info('element not present on the page where operation is trying to be performed')
+                err_msg = 'element not present on the page where operation is trying to be performed'
         except Exception as e:
-            import traceback
-            traceback.getexc()
             log.error(e)
-
+            logger.print_on_console("Error occured in verifyButtonName")
         return status,result,value,err_msg
 
     def button_uploadFile(self,sap_id, input_val, *args):
@@ -156,9 +141,8 @@ class ButtonLinkKeyword():
                     log.info('element not present on the page where operation is trying to be performed')
                     err_msg = 'element not present on the page where operation is trying to be performed'
         except Exception as e:
-            import traceback
-            traceback.getexc()
             log.error(e)
+            logger.print_on_console("Error occured in uploadFile")
         return status,result,value,err_msg
 
 

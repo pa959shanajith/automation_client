@@ -9,11 +9,8 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import sap_constants
-import win32com.client
 from constants import *
-from sap_scraping import Scrape
 import logger
-import time
 from encryption_utility import AESCipher
 from saputil_operations import SapUtilKeywords
 from sap_launch_keywords import Launch_Keywords
@@ -32,31 +29,23 @@ class Text_Keywords():
         value=''
         try:
             if(id != None):
-##                if(ses.FindById(id).Changeable == True):
-                    if(ses.FindById(id).type == 'GuiCTextField' or 'GuiTextField'):
-                        status = sap_constants.TEST_RESULT_PASS
-                        result = sap_constants.TEST_RESULT_TRUE
-                        value=ses.FindById(id).text
-
-                    else:
-                        logger.print_on_console('Element state does not allow to perform the operation')
-                        err_msg = sap_constants.ERROR_MSG
-##                else:
-##                    logger.print_on_console( "Element is not changeable")
-##                    err_msg = "Element is not changeable"
-##                    log.info(err_msg)
+                if(ses.FindById(id).type == 'GuiCTextField' or 'GuiTextField'):
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                    value=ses.FindById(id).text
+                else:
+                    logger.print_on_console('Element state does not allow to perform the operation')
+                    err_msg = sap_constants.ERROR_MSG
             else:
                   logger.print_on_console('element not present on the page where operation is trying to be performed')
                   err_msg = sap_constants.ERROR_MSG
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
             log.error(e)
-            logger.print_on_console('Error occured in getText and is a :',e)
+            logger.print_on_console('Error occured in getText')
         return status,result,value,err_msg
 
     def setText(self, sap_id,input_val, *args):
-        ses=''
-        id=''
         self.lk.setWindowToForeground(sap_id)
         if(len(input_val)>1):
             text = input_val[2]
@@ -87,8 +76,8 @@ class Text_Keywords():
                   err_msg = sap_constants.ERROR_MSG
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            import traceback
-            traceback.print_exc()
+            log.error(e)
+            logger.print_on_console('Error occured in setText')
         return status,result,value,err_msg
 
     def setSecureText(self, sap_id, input_val,*args):
@@ -106,7 +95,6 @@ class Text_Keywords():
         encryption_obj = AESCipher()
         try:
             text_decrypted = encryption_obj.decrypt(text)
-            #id = elem.__getattr__("Id")
             if(id != None):
                 if(ses.FindById(id).Changeable == True):
                     ses.FindById(id).text = text_decrypted
@@ -120,9 +108,8 @@ class Text_Keywords():
                   err_msg = sap_constants.ERROR_MSG
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            import traceback
-            traceback.print_exc()
-            logger.print_on_console(err_msg,e)
+            log.error(e)
+            logger.print_on_console('Error occured in setSecureText')
         return status,result,value,err_msg
 
     def clearText(self, sap_id, *args):
@@ -144,12 +131,12 @@ class Text_Keywords():
               else:
                     logger.print_on_console( "Element is not changeable")
                     err_msg = "Element is not changeable"
-                    #log.info(err_msg)
             else:
                   logger.print_on_console('element not present on the page where operation is trying to be performed')
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console('Error occurred in clearText and is a :',e)
+            log.error(e)
+            logger.print_on_console('Error occured in clearText')
         return status,result,value,err_msg
 
     def verifyText(self, sap_id,input_val, *args):
@@ -162,17 +149,19 @@ class Text_Keywords():
         value=OUTPUT_CONSTANT
         try:
             if(id != None):
-                    if(ses.FindById(id).text.strip() == text):
-                        status = sap_constants.TEST_RESULT_PASS
-                        result = sap_constants.TEST_RESULT_TRUE
-                        logger.print_on_console('The text obtained is ',result)
-                    else:
-                        logger.print_on_console('Element text does not match input text')
-                        err_msg='Element text does not match input text'
+                if(ses.FindById(id).text.strip() == text):
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                    logger.print_on_console('The text obtained is ',result)
+                else:
+                    logger.print_on_console('Element text does not match input text')
+                    err_msg='Element text does not match input text'
             else:
                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
+            log.error(e)
+            logger.print_on_console('Error occured in verifyText')
         return status,result,value,err_msg
 
     def getTextboxLength(self, sap_id, *args):
@@ -184,22 +173,18 @@ class Text_Keywords():
         value=''
         try:
             if(id != None):
-##                if(ses.FindById(id).Changeable == True):
-                    if(ses.FindById(id).type == "GuiTextField" or "GuiCTextField"):
-                        value= ses.FindById(id).MaxLength#1:40
-                        status = sap_constants.TEST_RESULT_PASS
-                        result = sap_constants.TEST_RESULT_TRUE
-                    else:
-                        logger.print_on_console('Element state does not allow to perform the operation')
-##                else:
-##                    logger.print_on_console( "Element is not changeable")
-##                    err_msg = "Element is not changeable"
-##                    log.info(err_msg)
+                if(ses.FindById(id).type == "GuiTextField" or "GuiCTextField"):
+                    value= ses.FindById(id).MaxLength
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    logger.print_on_console('Element state does not allow to perform the operation')
             else:
                   logger.print_on_console('element not present on the page where operation is trying to be performed')
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console('Error occured in getText and is a :',e)
+            log.error(e)
+            logger.print_on_console('Error occured in getTextboxLength')
         return status,result,value,err_msg
 
 
@@ -213,26 +198,16 @@ class Text_Keywords():
         value=OUTPUT_CONSTANT
         try:
             if(id != None):
-##              if(ses.FindById(id).Changeable == True):
-                    if(ses.FindById(id).MaxLength == length):
-                        #value = ses.FindById(id).MaxLength
-                        status=sap_constants.TEST_RESULT_PASS
-                        result = sap_constants.TEST_RESULT_TRUE
-                    else:
-                        err_msg = sap_constants.ERROR_MSG
-                        logger.print_on_console('Given Length Does not match')
-##              else:
-##                logger.print_on_console( "Element is not changeable")
-##                err_msg = "Element is not changeable"
-##                log.info(err_msg)
+                if(ses.FindById(id).MaxLength == length):
+                    status=sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg = sap_constants.ERROR_MSG
+                    logger.print_on_console('Given Length Does not match')
             else:
                   logger.print_on_console('element not present on the page where operation is trying to be performed')
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console('Error cooured in getText and is a :',e)
+            log.error(e)
+            logger.print_on_console('Error occured in verifyTextboxLength')
         return status,result,value,err_msg
-
-
-
-
-
