@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        Ninteen_68_sap_scrape
+# Name:        sap_scrape
 # Purpose:     Module that acts as a control for ClickAndAdd and  FullScrape
 #
 # Author:      anas.ahmed1,kavyashree,sakshi.goyal,saloni.goyal

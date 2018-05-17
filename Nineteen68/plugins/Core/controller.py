@@ -185,7 +185,7 @@ class Controller():
 
     def __load_desktop(self):
         try:
-            self.get_all_the_imports('Desktop2')
+            self.get_all_the_imports('Desktop')
             import desktop_dispatcher
             self.desktop_dispatcher_obj = desktop_dispatcher.DesktopDispatcher()
             self.desktop_dispatcher_obj.exception_flag=self.exception_flag
@@ -766,11 +766,11 @@ class Controller():
         return res
 
     def get_all_the_imports(self,plugin_path):
-        path= os.environ["NINETEEN68_HOME"] + '//Nineteen68//plugins//'+plugin_path
+        path= os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/'+plugin_path
         sys.path.append(path)
         for root, dirs, files in os.walk(path):
             for d in dirs:
-                p = path + '\\' + d
+                p = path + '/' + d
                 sys.path.append(p)
 
     def invoke_debug(self,mythread,runfrom_step,json_data):
