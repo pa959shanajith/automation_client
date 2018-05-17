@@ -13,6 +13,8 @@ import cv2
 import screeninfo
 from PIL import Image
 import pyautogui
+
+import desktop_constants
 log = logging.getLogger('popup_keywords.py')
 
 def gotoobject(webelem):
@@ -48,14 +50,17 @@ class IRISKeywords():
         #img_rgb = cv2.imread('test.jpg')
         gotoobject(webelement['cord'])
         pyautogui.click()
-        print "clicked"
-        return True
+        err_msg = None
+        status= desktop_constants.TEST_RESULT_PASS
+        result = desktop_constants.TEST_RESULT_TRUE
+        return status,result,None,err_msg
 
     def settextiris(self,webelement,*args):
         #img_rgb = cv2.imread('test.jpg')
         gotoobject(webelement['cord'])
         pyautogui.click()
         print "text",args[0]
-        pyautogui.typewrite(args[0][0], interval=0.5)
-        print "clicked"
-        return True
+        pyautogui.typewrite(args[0][0], interval=0.1)
+        status= desktop_constants.TEST_RESULT_PASS
+        result = desktop_constants.TEST_RESULT_TRUE
+        return status,result,None,err_msg
