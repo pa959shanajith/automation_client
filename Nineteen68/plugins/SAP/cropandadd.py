@@ -53,7 +53,7 @@ class Cropandadd():
                     cv2.imwrite("cropped.png", RGB_img_crop)
                     with open("cropped.png", "rb") as imageFile:
                         RGB_img_crop_im = base64.b64encode(imageFile.read())
-                    self.data['view'].append({'custname': 'img_object_'+str(ix)+'_'+str(x)+'_'+str(iy)+'_'+str(y),'cord':RGB_img_crop_im})
+                    self.data['view'].append({'custname': 'img_object_'+str(ix)+'_'+str(x)+'_'+str(iy)+'_'+str(y),'cord':RGB_img_crop_im,'tag':'iris','width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix})
                     cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),1)
                     self.RGB_img_c = np.copy(self.RGB_img)
 

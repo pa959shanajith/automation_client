@@ -152,10 +152,8 @@ class Dispatcher:
                             webelement = input[0]
                             log.info(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
                             logger.print_on_console(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
-                        elif teststepproperty.cord != None teststepproperty.cord != "":
+                        elif teststepproperty.cord != None and teststepproperty.cord != "":
                             webelement = {'cord': teststepproperty.cord}
-
-
                         else:
                             webelement = self.getwebelement(driver,objectname)
                             if webelement != None:
@@ -165,8 +163,8 @@ class Dispatcher:
                                     logger.print_on_console(WEB_ELEMENT_FOUND)
                 except Exception as e:
                     print_error('ERR_CUSTOM_ELE_NOTFOUND')
-                    
-            elif teststepproperty.cord != None teststepproperty.cord != "":
+
+            elif teststepproperty.cord != None and teststepproperty.cord != "":
                 webelement = {'cord': teststepproperty.cord}
 
             return webelement

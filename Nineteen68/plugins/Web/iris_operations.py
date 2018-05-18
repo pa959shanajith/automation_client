@@ -22,9 +22,9 @@ def gotoobject(webelem):
         img_rgb = webelem.decode('base64')
         fh = open("sample.png", "wb")
         fh.write(img_rgb)
-        fh.close()        
+        fh.close()
 
-        im = PIL.ImageGrab.grab()     
+        im = PIL.ImageGrab.grab()
         im.save('test.png')
         img_rgb = cv2.imread('test.png')
         img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
@@ -36,32 +36,41 @@ def gotoobject(webelem):
         res = cv2.matchTemplate(img_gray,template,cv2.TM_CCOEFF_NORMED)
         threshold = 0.8
         loc = np.where( res >= threshold)
-        print "Loc: ",zip(*loc[::-1])
+        pt = []
         for pt in zip(*loc[::-1]):
             cv2.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0,0,255), 2)
 
         cv2.imwrite('res.png',img_rgb)
-        print pt
-        pyautogui.moveTo(pt[0]+ int(w/2),pt[1] + int(h/2))
+        if(len(pt) > 0):
+            pyautogui.moveTo(pt[0]+ int(w/2),pt[1] + int(h/2))
+        else:
+            return False
         time.sleep(1)
         return True
 
 class IRISKeywords():
     def clickiris(self,webelement,*args):
         #img_rgb = cv2.imread('test.jpg')
-        gotoobject(webelement['cord'])
-        pyautogui.click()
-        err_msg = None
-        status= TEST_RESULT_PASS
-        result = TEST_RESULT_TRUE
+        res = gotoobject(webelement['cord'])
+        if(res):
+            pyautogui.click()
+            err_msg = None
+            status= TEST_RESULT_PASS
+            result = TEST_RESULT_TRUE
+        else:
+            status = TEST_RESULT_FAIL
+            result = TEST_RESULT_TRUE
         return status,result,None,err_msg
 
     def settextiris(self,webelement,*args):
         #img_rgb = cv2.imread('test.jpg')
-        gotoobject(webelement['cord'])
-        pyautogui.click()
-        print "text",args[0]
-        pyautogui.typewrite(args[0][0], interval=0.1)
-        status= TEST_RESULT_PASS
-        result = TEST_RESULT_TRUE
+        res = gotoobject(webelement['cord'])
+        if(res):
+            pyautogui.click()
+            pyautogui.typewrite(args[0][0], interval=0.1)
+            status= TEST_RESULT_PASS
+            result = TEST_RESULT_TRUE
+        else:
+            status = TEST_RESULT_FAIL
+            result = TEST_RESULT_TRUE
         return status,result,None,err_msg
