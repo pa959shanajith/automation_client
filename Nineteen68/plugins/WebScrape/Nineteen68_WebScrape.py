@@ -45,7 +45,7 @@ class ScrapeWindow(wx.Frame):
                 self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)   # need to implement OnExtract()
                 self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,48 ), size=(175, 28))
                 self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)   # need to implement OnExtract()
-                self.cropbutton = wx.ToggleButton(self.panel, label="Crop and Add",pos=(12,78 ), size=(175, 28))
+                self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,78 ), size=(175, 28))
                 self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
 
             elif(self.action == 'compare'):
@@ -71,6 +71,7 @@ class ScrapeWindow(wx.Frame):
         state = event.GetEventObject().GetValue()
         if state == True:
             self.fullscrapebutton.Disable()
+            self.cropbutton.Disable()
             status = clickandaddoj.startclickandadd()
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
 ##            wx.MessageBox('CLICKANDADD: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
@@ -124,6 +125,7 @@ class ScrapeWindow(wx.Frame):
     def fullscrape(self,event):
         print 'Performing full scrape'
         self.startbutton.Disable()
+        self.cropbutton.Disable()
         d = fullscrapeobj.fullscrape()
 
         # 10 is the limit of MB set as per Nineteen68 standards
@@ -140,11 +142,11 @@ class ScrapeWindow(wx.Frame):
         self.Close()
 
     def cropandadd(self,event):
-        print "button clicked"
         state = event.GetEventObject().GetValue()
         if state == True:
             self.fullscrapebutton.Disable()
-            event.GetEventObject().SetLabel("Stop CropAndAdd")
+            self.startbutton.Disable()
+            event.GetEventObject().SetLabel("Stop IRIS")
             status = cropandaddobj.startcropandadd()
 ##            wx.MessageBox('CLICKANDADD: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
 
@@ -153,7 +155,7 @@ class ScrapeWindow(wx.Frame):
             print 'Scrapped data saved successfully in domelements.json file'
             self.socketIO.emit('scrape',d)
             self.Close()
-            event.GetEventObject().SetLabel("Start CropAndAdd")
+            event.GetEventObject().SetLabel("Start IRIS")
             print 'Crop and add scrape completed'
 
 

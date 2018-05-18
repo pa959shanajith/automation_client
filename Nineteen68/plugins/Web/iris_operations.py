@@ -40,7 +40,6 @@ def gotoobject(webelem):
         for pt in zip(*loc[::-1]):
             cv2.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0,0,255), 2)
 
-        cv2.imwrite('res.png',img_rgb)
         if(len(pt) > 0):
             pyautogui.moveTo(pt[0]+ int(w/2),pt[1] + int(h/2))
         else:

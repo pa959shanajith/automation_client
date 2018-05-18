@@ -54,7 +54,7 @@ class ScrapeWindow(wx.Frame):
             self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)
             self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,38 ), size=(175, 28))
             self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)
-            self.cropbutton = wx.ToggleButton(self.panel, label="Crop and Add",pos=(12,68 ), size=(175, 28))
+            self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,68 ), size=(175, 28))
             self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
             self.Centre()
             style = self.GetWindowStyle()
@@ -149,13 +149,13 @@ class ScrapeWindow(wx.Frame):
         if state == True:
             self.fullscrapebutton.Disable()
             self.startbutton.Disable()
-            event.GetEventObject().SetLabel("Stop CropAndAdd")
+            event.GetEventObject().SetLabel("Stop IRIS")
             status = cropandaddobj.startcropandadd()
         else:
             d = cropandaddobj.stopcropandadd()
             self.socketIO.emit('scrape',d)
             self.Close()
-            event.GetEventObject().SetLabel("Start CropAndAdd")
+            event.GetEventObject().SetLabel("Start IRIS")
 
 
 

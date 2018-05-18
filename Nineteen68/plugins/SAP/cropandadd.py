@@ -63,7 +63,6 @@ class Cropandadd():
             cv2.setMouseCallback('image',draw_rect)
             cv2.moveWindow('image', screen.x - 1, screen.y - 1)
             cv2.setWindowProperty('image', cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
-            cv2.rectangle(self.RGB_img,(1,1),(10,10),(0,255,0),1)
             while(1):
                 cv2.imshow('image',self.RGB_img)
                 k = cv2.waitKey(1) & 0xFF
