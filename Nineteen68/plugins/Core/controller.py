@@ -185,7 +185,7 @@ class Controller():
 
     def __load_desktop(self):
         try:
-            self.get_all_the_imports('Desktop2')
+            self.get_all_the_imports('Desktop')
             import desktop_dispatcher
             self.desktop_dispatcher_obj = desktop_dispatcher.DesktopDispatcher()
             self.desktop_dispatcher_obj.exception_flag=self.exception_flag
@@ -431,7 +431,7 @@ class Controller():
                 inpval.append(string)
             if keyword.lower() not in [CREATE_DYN_VARIABLE]:
                 inpval[0]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[0],keyword,self)
-            if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE]:
+            if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE,CREATE_DYN_VARIABLE]:
                 inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self)
         else:
             if keyword.lower() in WS_KEYWORDS or keyword.lower() == 'navigatetourl':
@@ -766,11 +766,11 @@ class Controller():
         return res
 
     def get_all_the_imports(self,plugin_path):
-        path= os.environ["NINETEEN68_HOME"] + '//Nineteen68//plugins//'+plugin_path
+        path= os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/'+plugin_path
         sys.path.append(path)
         for root, dirs, files in os.walk(path):
             for d in dirs:
-                p = path + '\\' + d
+                p = path + '/' + d
                 sys.path.append(p)
 
     def invoke_debug(self,mythread,runfrom_step,json_data):

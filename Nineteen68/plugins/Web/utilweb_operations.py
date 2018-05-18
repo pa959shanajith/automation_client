@@ -491,7 +491,9 @@ class UtilWebKeywords:
                         obj=Utils()
                         location=obj.get_element_location(webelement)
                         obj.enumwindows()
-                        obj.mouse_move(int(location.get('x')),int(location.get('y')-6)+120)
+                        rect=obj.rect
+                        robot=pyrobot.Robot()
+                        obj.mouse_move(int(location.get('x'))+9,int(location.get('y')+rect[1]+6))
                         log.debug('hover performed')
                 if platform.system() == 'Darwin':
                     try:
@@ -872,9 +874,9 @@ class UtilWebKeywords:
                             output = str((1-err)*100)
                             logger.print_on_console("Image similarity percentage is: "+str((1-err)*100)+"%")
                             methodoutput=TEST_RESULT_TRUE
-                            status=TEST_RESULT_PASS       
+                            status=TEST_RESULT_PASS
                             log.info('Result is ',output)
-                            logger.print_on_console('Result is ',output)                                         
+                            logger.print_on_console('Result is ',output)
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
                 if err_msg != None:

@@ -19,6 +19,9 @@ import readconfig
 import httplib
 import json
 import socket
+import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 log = logging.getLogger('clientwindow.py')
 wxObject = None
@@ -44,64 +47,10 @@ IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images"
 CERTIFICATE_PATH = os.environ["NINETEEN68_HOME"] + "/Scripts/CA_BUNDLE"
 LOGCONFIG_PATH = os.environ["NINETEEN68_HOME"] + "/logging.conf"
 DRIVERS_PATH = os.environ["NINETEEN68_HOME"] + "/Drivers"
-CHROME_DRIVER_PATH = DRIVERS_PATH + "\\chromedriver.exe"
-GECKODRIVER_PATH = DRIVERS_PATH + '\\geckodriver.exe'
+CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver.exe"
+GECKODRIVER_PATH = DRIVERS_PATH + '/geckodriver.exe'
 
 class MainNamespace(BaseNamespace):
-    def check_browser(self):
-        try:
-            global chromeFlag,firefoxFlag
-            logger.print_on_console('Checking for browser versions...')
-            import subprocess
-            from selenium import webdriver
-            from selenium.webdriver import ChromeOptions
-            a=[]
-            p = subprocess.Popen('chromedriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
-            for line in iter(p.stdout.readline, b''):
-                a.append(str(line))
-            a=float(a[0][13:17])
-            choptions1 = webdriver.ChromeOptions()
-            choptions1.add_argument('--headless')
-            driver = webdriver.Chrome(chrome_options=choptions1, executable_path=CHROME_DRIVER_PATH)
-            browser_ver = driver.capabilities['version']
-            browser_ver1 = browser_ver.encode('utf-8')
-            browser_ver = int(browser_ver1[:2])
-            driver.close()
-            driver=None
-            for i in CHROME_DRIVER_VERSION:
-                if a == i[0]:
-                    if browser_ver >= i[1] and browser_ver <= i[2]:
-                        chromeFlag=True
-            if chromeFlag == False :
-                logger.print_on_console('!! WARNING : Chrome version',browser_ver,' is not supported.')
-            p = subprocess.Popen('geckodriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
-            a=[]
-            for line in iter(p.stdout.readline, b''):
-                a.append(str(line))
-            a=float(a[0][12:16])
-            caps=webdriver.DesiredCapabilities.FIREFOX
-            caps['marionette'] = True
-            from selenium.webdriver.firefox.options import Options
-            options = Options()
-            options.add_argument('-headless')
-            driver = webdriver.Firefox(capabilities=caps,firefox_options=options, executable_path=GECKODRIVER_PATH)
-            browser_ver=driver.capabilities['browserVersion']
-            browser_ver1 = browser_ver.encode('utf-8')
-            browser_ver = float(browser_ver1[:4])
-            driver.close()
-            driver=None
-            for i in FIREFOX_BROWSER_VERSION:
-                if a == i[0]:
-                    if browser_ver == i[1]:
-                        firefoxFlag=True
-            if firefoxFlag == False:
-                logger.print_on_console('!! WARNING : Firefox version',browser_ver,' is not supported.')
-            if chromeFlag == True and firefoxFlag == True:
-                logger.print_on_console('Current version of browsers are supported')
-            return True
-        except Exception as e:
-            logger.print_on_console('Found Exception')
-        return False
     def on_message(self, *args):
         global action,wxObject,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag
 
@@ -110,7 +59,7 @@ class MainNamespace(BaseNamespace):
                 logger.print_on_console('Normal Mode: Connection to the Nineteen68 Server established')
                 wxObject.schedule.Enable()
                 if browsercheckFlag == False:
-                    browsercheckFlag=self.check_browser()
+                    browsercheckFlag = check_browser()
                 log.info('Normal Mode: Connection to the Nineteen68 Server established')
             else:
                 if socketIO != None:
@@ -209,7 +158,7 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console('Highlight result: '+str(res))
         elif appType==APPTYPE_DESKTOP.lower():
             con =controller.Controller()
-            con.get_all_the_imports('Desktop2')
+            con.get_all_the_imports('Desktop')
             import desktop_highlight
             highlightObj=desktop_highlight.highLight()
             highlightObj.highLiht_element(args[0],args[1])
@@ -249,10 +198,10 @@ class MainNamespace(BaseNamespace):
         global browsername
         browsername = args[0]
         con =controller.Controller()
-        con.get_all_the_imports('Desktop2')
-        import ninteen_68_desktop_scrape
+        con.get_all_the_imports('Desktop')
+        import desktop_scrape
         global desktopScrapeObj
-        desktopScrapeObj=ninteen_68_desktop_scrape
+        desktopScrapeObj=desktop_scrape
         global desktopScrapeFlag
         desktopScrapeFlag=True
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
@@ -264,9 +213,9 @@ class MainNamespace(BaseNamespace):
             browsername = args[0]
             con =controller.Controller()
             con.get_all_the_imports('SAP')
-            import ninteen_68_sap_scrape
+            import sap_scrape
             global sapScrapeObj
-            sapScrapeObj=ninteen_68_sap_scrape
+            sapScrapeObj=sap_scrape
             global sapScrapeFlag
             sapScrapeFlag=True
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
@@ -301,7 +250,8 @@ class MainNamespace(BaseNamespace):
                         if '#E&D@Q!C#' in server_data:
                             break
                     client_data= server_data[:server_data.find('#E&D@Q!C#')]
-                    if('Fail' in client_data):
+                    if('Fail@f@!l' in client_data):
+                        client_data=client_data[:client_data.find('@f@!l')]
                         logger.print_on_console('Error occurred in QC')
                     socketIO.emit('qcresponse',client_data)
                 else:
@@ -327,9 +277,9 @@ class MainNamespace(BaseNamespace):
             con.get_all_the_imports('Mobility/MobileApp')
         else:
             con.get_all_the_imports('Mobility')
-        import ninteen_68_mobile_scrape
+        import mobile_app_scrape
         global mobileScrapeObj
-        mobileScrapeObj=ninteen_68_mobile_scrape
+        mobileScrapeObj=mobile_app_scrape
         global mobileScrapeFlag
         mobileScrapeFlag=True
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
@@ -344,8 +294,8 @@ class MainNamespace(BaseNamespace):
             con.get_all_the_imports('Mobility/MobileWeb')
         else:
             con.get_all_the_imports('Mobility')
-        import ninteen_68_mobile_web_scrape
-        mobileWebScrapeObj=ninteen_68_mobile_web_scrape
+        import mobile_web_scrape
+        mobileWebScrapeObj=mobile_web_scrape
         mobileWebScrapeFlag=True
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
@@ -1108,3 +1058,60 @@ class DebugWindow(wx.Frame):
     def OnExit(self, event):
         self.Close()
         wxObject.debugwindow = None
+
+def check_browser():
+    try:
+        global chromeFlag,firefoxFlag
+        logger.print_on_console('Checking for browser versions...')
+        import subprocess
+        from selenium import webdriver
+        from selenium.webdriver import ChromeOptions
+        a=[]
+        p = subprocess.Popen('chromedriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
+        for line in iter(p.stdout.readline, b''):
+            a.append(str(line))
+        a=float(a[0][13:17])
+        choptions1 = webdriver.ChromeOptions()
+        choptions1.add_argument('--headless')
+        driver = webdriver.Chrome(chrome_options=choptions1, executable_path=CHROME_DRIVER_PATH)
+        browser_ver = driver.capabilities['version']
+        browser_ver1 = browser_ver.encode('utf-8')
+        browser_ver = int(browser_ver1[:2])
+        driver.close()
+        driver=None
+        for i in CHROME_DRIVER_VERSION:
+            if a == i[0]:
+                if browser_ver >= i[1] and browser_ver <= i[2]:
+                    chromeFlag=True
+        if chromeFlag == False :
+            logger.print_on_console('WARNING!! : Chrome version',browser_ver,' is not supported.')
+        p = subprocess.Popen('geckodriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
+        a=[]
+        for line in iter(p.stdout.readline, b''):
+            a.append(str(line))
+        a=float(a[0][12:16])
+        caps=webdriver.DesiredCapabilities.FIREFOX
+        caps['marionette'] = True
+        from selenium.webdriver.firefox.options import Options
+        options = Options()
+        options.add_argument('-headless')
+        driver = webdriver.Firefox(capabilities=caps,firefox_options=options, executable_path=GECKODRIVER_PATH)
+        browser_ver=driver.capabilities['browserVersion']
+        browser_ver1 = browser_ver.encode('utf-8')
+        browser_ver = float(browser_ver1[:4])
+        driver.close()
+        driver=None
+        for i in FIREFOX_BROWSER_VERSION:
+            if a == i[0]:
+                if browser_ver >= i[1] or browser_ver <= i[2]:
+                    firefoxFlag=True
+        if firefoxFlag == False:
+            logger.print_on_console('WARNING!! : Firefox version',browser_ver,' is not supported.')
+        if chromeFlag == True and firefoxFlag == True:
+            logger.print_on_console('Current version of browsers are supported')
+        return True
+    except Exception as e:
+        logger.print_on_console("Error while checking browser compatibility")
+        log.debug("Error while checking browser compatibility")
+        log.debug(e)
+    return False

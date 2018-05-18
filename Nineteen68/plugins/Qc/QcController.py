@@ -78,12 +78,12 @@ class QcWindow():
                 if status!=None:
                     self.emit_data()
                 else:
-                    con.send("Fail#E&D@Q!C#")
+                    con.send("Fail@f@!l#E&D@Q!C#")
             else:
                 pass
         except Exception as e:
             print 'Error in Qc actions...'
-            con.send('Fail#E&D@Q!C#')
+            con.send('Fail@f@!l#E&D@Q!C#')
             sent=1
            # logger.print_on_console('Something went wrong - Lost Connection with QC')
 
@@ -248,7 +248,8 @@ class QcWindow():
                    qc_ts=abc.NewList("")
                    for tsname in qc_ts:
 ##                       print tsname.name
-                       test_case_dict[key].append(str(tsname.name))
+                       ts_complete_name = tsname.name + '/'+ tsname.testid
+                       test_case_dict[key].append(str(ts_complete_name))
                 i=i+1
 ##            print test_case_dict,'no'
             OverallList=[]
@@ -358,8 +359,8 @@ class QcWindow():
             dictFolderJson=None
             return True
         except Exception as e:
-            print 'Erro in Quit_qc'
-            con.send("Fail#E&D@Q!C#")
+            print 'Error in Quit_qc'
+            con.send("Fail@f@!l#E&D@Q!C#")
 
     def emit_data(self):
 ##        print d,' in emit data'
@@ -401,12 +402,12 @@ if __name__ == '__main__':
                     qc_ref = QcWindow(data_to_use)
                     client_data=''
                     if(sent!=1):
-                        con.send("Fail#E&D@Q!C#")
+                        con.send("Fail@f@!l#E&D@Q!C#")
                     else:
                         sent=0
             except Exception as e:
                 print 'Error in data receiving'
-                con.send("Fail#E&D@Q!C#")
+                con.send("Fail@f@!l#E&D@Q!C#")
                 break
     except Exception as e:
         print 'Error in running Qc'
