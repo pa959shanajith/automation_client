@@ -91,7 +91,7 @@ class Cropandadd():
                 cv2.imwrite("cropped.png", RGB_img_crop)
                 with open("cropped.png", "rb") as imageFile:
                     RGB_img_crop_im = base64.b64encode(imageFile.read())
-                self.data['view'].append({'custname': 'img_object_'+str(ix)+'_'+str(x)+'_'+str(iy)+'_'+str(y),'cord':RGB_img_crop_im})                
+                self.data['view'].append({'custname': 'img_object_'+str(ix)+'_'+str(x)+'_'+str(iy)+'_'+str(y),'cord':RGB_img_crop_im,'tag':'iris','width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix})
                 cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),1)
                 self.RGB_img_c = np.copy(self.RGB_img)
 
@@ -100,7 +100,7 @@ class Cropandadd():
         cv2.namedWindow('image',cv2.WND_PROP_FULLSCREEN)
         cv2.setMouseCallback('image',draw_rect)
         cv2.moveWindow('image', screen.x - 1, screen.y - 1)
-        cv2.setWindowProperty('image', cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN) 
+        cv2.setWindowProperty('image', cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
         cv2.rectangle(self.RGB_img,(1,1),(10,10),(0,255,0),1)
         while(1):
             #print "showing image"
@@ -110,7 +110,7 @@ class Cropandadd():
                 break
 
         cv2.destroyAllWindows()
-   
+
 
     def stopcropandadd(self):
         print "crop and add stopping ... "
@@ -118,7 +118,7 @@ class Cropandadd():
             log.info('Opening domelements.json file to write vie object')
             json.dump(self.data, outfile, indent=4, sort_keys=False)
             log.info('crop and add is dumped into  domelements.json file ')
-        outfile.close()     
+        outfile.close()
         print "crop and add stopped"
         self.stopflag = True
         return self.data

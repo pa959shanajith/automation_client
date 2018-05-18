@@ -76,8 +76,8 @@ class Cropandadd():
                     cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),1)
                     #time.sleep(1)
                     # print "drawn rect"
-                else:
-                    print "pause event","ix,iy,x,y: ",ix,iy,x,y
+                #else:
+                    #print "pause event","ix,iy,x,y: ",ix,iy,x,y
 
             elif event == cv2.EVENT_LBUTTONUP:
                 print "up event"
@@ -88,7 +88,9 @@ class Cropandadd():
                 cv2.imwrite("cropped.png", RGB_img_crop)
                 with open("cropped.png", "rb") as imageFile:
                     RGB_img_crop_im = base64.b64encode(imageFile.read())
-                self.data['view'].append({'custname': 'img_object_'+str(ix)+'_'+str(x)+'_'+str(iy)+'_'+str(y),'cord':RGB_img_crop_im})
+                print "starting assignment"
+                self.data['view'].append({'custname': 'img_object_'+str(ix)+'_'+str(x)+'_'+str(iy)+'_'+str(y),'cord':RGB_img_crop_im,'tag':'iris','width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix})
+                print "assignment finished"
                 cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),1)
                 self.RGB_img_c = np.copy(self.RGB_img)
 
