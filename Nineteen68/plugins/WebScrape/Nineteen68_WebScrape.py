@@ -10,9 +10,12 @@ import time
 import objectspy
 import core_utils
 
+import cropandadd
+
 browserobj = browserops.BrowserOperations()
 clickandaddoj = clickandadd.Clickandadd()
 fullscrapeobj = fullscrape.Fullscrape()
+cropandaddobj = cropandadd.Cropandadd()
 
 class ScrapeWindow(wx.Frame):
     #----------------------------------------------------------------------
@@ -42,6 +45,9 @@ class ScrapeWindow(wx.Frame):
                 self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)   # need to implement OnExtract()
                 self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,48 ), size=(175, 28))
                 self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)   # need to implement OnExtract()
+                self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,78 ), size=(175, 28))
+                self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
+
             elif(self.action == 'compare'):
                 browserops.driver.get(data['scrapedurl'])
                 self.comparebutton = wx.ToggleButton(self.panel, label="Start Compare",pos=(12,38 ), size=(175, 28))
@@ -65,6 +71,7 @@ class ScrapeWindow(wx.Frame):
         state = event.GetEventObject().GetValue()
         if state == True:
             self.fullscrapebutton.Disable()
+            self.cropbutton.Disable()
             status = clickandaddoj.startclickandadd()
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
 ##            wx.MessageBox('CLICKANDADD: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
@@ -118,6 +125,7 @@ class ScrapeWindow(wx.Frame):
     def fullscrape(self,event):
         print 'Performing full scrape'
         self.startbutton.Disable()
+        self.cropbutton.Disable()
         d = fullscrapeobj.fullscrape()
 
         # 10 is the limit of MB set as per Nineteen68 standards
@@ -132,6 +140,24 @@ class ScrapeWindow(wx.Frame):
             print 'Scraped data exceeds max. Limit.'
             self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
         self.Close()
+
+    def cropandadd(self,event):
+        state = event.GetEventObject().GetValue()
+        if state == True:
+            self.fullscrapebutton.Disable()
+            self.startbutton.Disable()
+            event.GetEventObject().SetLabel("Stop IRIS")
+            status = cropandaddobj.startcropandadd()
+##            wx.MessageBox('CLICKANDADD: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
+
+        else:
+            d = cropandaddobj.stopcropandadd()
+            print 'Scrapped data saved successfully in domelements.json file'
+            self.socketIO.emit('scrape',d)
+            self.Close()
+            event.GetEventObject().SetLabel("Start IRIS")
+            print 'Crop and add scrape completed'
+
 
 
 

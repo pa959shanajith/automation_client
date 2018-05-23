@@ -22,6 +22,7 @@ import radio_checkbox_keywords_sap
 import saputil_operations
 import sap_table_keywords
 import sap_shell_keywords
+import iris_operations
 #-------------------------------------------------------------
 import sap_constants
 import constants
@@ -41,7 +42,7 @@ class SAPDispatcher:
     saputil_keywords_obj=saputil_operations.SapUtilKeywords()
     table_keywords_obj=sap_table_keywords.Table_keywords()
     shell_keywords_obj=sap_shell_keywords.Shell_Keywords()
-
+    iris_object = iris_operations.IRISKeywords()
 
     def __init__(self):
 
@@ -171,13 +172,17 @@ class SAPDispatcher:
                   'getcountofrows':self.shell_keywords_obj.get_rowCount,
                   'getcountofcolumns':self.shell_keywords_obj.get_colCount,
                   'selectrows':self.shell_keywords_obj.selectRows,
-                  'toolbaractionkeys':self.shell_keywords_obj.toolBarActionKeys,
                   'presstoolbarbutton':self.shell_keywords_obj.pressToolBarButton,
                   'getcelltext': self.shell_keywords_obj.getCellText,
                   'clickcell':self.shell_keywords_obj.clickCell,
                   'doubleclickcell':self.shell_keywords_obj.doubleClickCell,
                   'selecttreenode':self.shell_keywords_obj.selectTreeNode,
-                  'getnodenamebyindex':self.shell_keywords_obj.getNodeNameByIndex
+                  'getnodenamebyindex':self.shell_keywords_obj.getNodeNameByIndex,
+                  'setshelltext':self.shell_keywords_obj.setShellText,
+                  'getrowcolbytext':self.shell_keywords_obj.getRowColByText,
+                  'verifytreepath':self.shell_keywords_obj.verifyTreePath,
+                  'clickiris':self.iris_object.clickiris,
+                  'settextiris':self.iris_object.settextiris
                    }
 
 
@@ -187,6 +192,8 @@ class SAPDispatcher:
                 if keyword=='serverconnect' or keyword=='launchapplication' or keyword=='starttransaction' or keyword=='toolbaraction' :
                     result= dict[keyword](input,output)
                 else:
+                    if (teststepproperty.cord != None and teststepproperty.cord != ''):
+                        objectname = {'cord': teststepproperty.cord}
                     result= dict[keyword](objectname,input,output)
                 if not(sap_constants.ELEMENT_FOUND) and self.exception_flag:
                     logger.print_on_console('Element not found terminating')
@@ -215,14 +222,9 @@ class SAPDispatcher:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             log.error(e)
         if err_msg!=None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
 
         return result
-
-
-

@@ -9,22 +9,16 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import win32com.client
 import logger
 import sap_constants
-import time
 from constants import *
 from saputil_operations import SapUtilKeywords
 import logging
 import logging.config
 log = logging.getLogger('sap_table_keywords.py')
 #-----------------------------------------------------Module Imports
-import pywinauto
 from sap_launch_keywords import Launch_Keywords
-from button_link_keywords_sap import ButtonLinkKeyword
 from sap_dropdown_keywords import Dropdown_Keywords
-from radio_checkbox_keywords_sap import Radio_Checkbox_keywords
-from sap_element_keywords import ElementKeywords
 #-----------------------------------------------------Module Imports
 
 class Table_keywords():
@@ -32,7 +26,6 @@ class Table_keywords():
     def __init__(self):
         self.uk = SapUtilKeywords()
         self.lk = Launch_Keywords()
-        self.rk = Radio_Checkbox_keywords()
 
     def getXpath(self,sap_id,elem,row,col):
         try:
@@ -41,7 +34,7 @@ class Table_keywords():
             cell_xpath = sap_id + '/' + cell_id[-1]
         except Exception as e:
             log.error('Error occured',e)
-            logger.print_on_console('was not able to get cell_xpath')
+            logger.print_on_console('Not able to get cell_xpath')
         return cell,cell_xpath
 
 
@@ -60,8 +53,8 @@ class Table_keywords():
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
+            logger.print_on_console("Error occured in getRowCount")
         return status,result,value,err_msg
-
 
 
     def getColumnCount(self, sap_id, *args):
@@ -79,6 +72,7 @@ class Table_keywords():
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
+            logger.print_on_console("Error occured in getColumnCount")
         return status,result,value,err_msg
 
 
@@ -114,6 +108,7 @@ class Table_keywords():
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
+            logger.print_on_console("Error occured in getColNumByText")
         return status,result,value,err_msg
 
 
@@ -150,6 +145,7 @@ class Table_keywords():
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
+            logger.print_on_console("Error occured in getRowNumByText")
         return status,result,value,err_msg
 
 
@@ -171,6 +167,7 @@ class Table_keywords():
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
+            logger.print_on_console("Error occured in getCellValue")
         return status,result,value,err_msg
 
 
@@ -196,6 +193,7 @@ class Table_keywords():
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
+            logger.print_on_console("Error occured in verifyCellValue")
         return status,result,value,err_msg
 
 
@@ -227,7 +225,7 @@ class Table_keywords():
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
-
+            logger.print_on_console("Error occured in verifyTextExists")
         return status,result,value,err_msg
 
 
@@ -280,37 +278,6 @@ class Table_keywords():
 ##        return status,result,value,err_msg
 
 
-
-    def selectValueByIndex(self, sap_id, input_val,*args):
-        self.lk.setWindowToForeground(sap_id)
-        row=int(input_val[0])-1
-        col=int(input_val[1])-1
-        index=input_val[2]
-        id,ses=self.uk.getSapElement(sap_id)
-        dk = Dropdown_Keywords()
-        url=''#dummy variable
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        """Object type is dropdown and lists. For SAP, we only have dropdowns."""
-        value = OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            object_type_input = ses.FindById(id).type
-            elem=ses.FindById(id)
-            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            if(cell.__getattr__("type") == object_type_input):
-                print "Error: Type Mismatch"
-            else:
-                value = dk.selectValueByIndex(cell_xpath,url, index)
-                status=sap_constants.TEST_RESULT_PASS
-                result=sap_constants.TEST_RESULT_TRUE
-        except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-        return status,result,value,err_msg
-
-
-
     def selectValueByText(self, sap_id, input_val,*args):
         self.lk.setWindowToForeground(sap_id)
         row=int(input_val[0])-1
@@ -328,14 +295,15 @@ class Table_keywords():
             elem=ses.FindById(id)
             cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
             if(cell.__getattr__("type") == object_type_input):
-                print "Error: Type Mismatch"
+                logger.print_on_console("Error: Type Mismatch")
             else:
-                result = dk.selectValueByText(cell_xpath,url, text)
+                result = dk.selectValueByText(cell_xpath,text)
                 status=sap_constants.TEST_RESULT_PASS
                 result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
+            logger.print_on_console("Error occured in selectValueByText")
         return status,result,value,err_msg
 
 
@@ -356,7 +324,7 @@ class Table_keywords():
             elem=ses.FindById(id)
             cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
             if(cell.__getattr__("type") == object_type_input):
-                print "Error: Type Mismatch"
+                logger.print_on_console("Error: Type Mismatch")
             else:
                 status,result,value,err_msg = dk.getSelected(cell_xpath)
                 #status=sap_constants.TEST_RESULT_PASS
@@ -364,8 +332,8 @@ class Table_keywords():
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
+            logger.print_on_console("Error occured in getSelected")
         return status,result,value,err_msg
-
 
 
     def getStatus(self, sap_id,input_val,*args):
@@ -382,7 +350,7 @@ class Table_keywords():
             elem=ses.FindById(id)
             cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
             if(cell.__getattr__("type") == object_type_input):
-                print "Error: Type Mismatch"
+                logger.print_on_console("Error: Type Mismatch")
             else:
                 object_type_input=cell.__getattr__("type")
                 if(object_type_input == "GuiRadioButton" or object_type_input == "GuiCheckBox" ):
@@ -393,6 +361,7 @@ class Table_keywords():
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
+            logger.print_on_console("Error occured in getStatus")
         return status,result,value,err_msg
 
 
@@ -418,6 +387,7 @@ class Table_keywords():
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
+            logger.print_on_console("Error occured in selectRow")
         return status,result,value,err_msg
 
 
@@ -444,6 +414,7 @@ class Table_keywords():
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
+            logger.print_on_console("Error occured in unselectRow")
         return status,result,value,err_msg
 
 

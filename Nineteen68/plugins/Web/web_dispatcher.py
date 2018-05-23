@@ -17,6 +17,7 @@ import table_keywords
 import utilweb_operations
 import element_operations
 import textbox_operations
+import iris_operations
 import dropdown_listbox
 import utilweb_operations
 import static_text_keywords
@@ -31,6 +32,7 @@ import time
 import re
 import readconfig
 import logging
+import json
 
 log = logging.getLogger('web_dispatcher.py')
 
@@ -46,6 +48,7 @@ class Dispatcher:
     dropdown_list_object = dropdown_listbox.DropdownKeywords()
     util_object = utilweb_operations.UtilWebKeywords()
     statict_text_object = static_text_keywords.StaticTextKeywords()
+    iris_object = iris_operations.IRISKeywords()
     custom_object=custom_keyword.CustomKeyword()
     webelement_map=OrderedDict()
 
@@ -116,7 +119,7 @@ class Dispatcher:
                             log.debug('Reference_element ')
                             log.debug(reference_element)
                             if reference_element != None:
-##                                reference_element = reference_element[0]
+                                ##reference_element = reference_element[0]
                                 log.info('Reference_element is found')
                                 if keyword==GET_OBJECT_COUNT:
                                     log.info('Keyword is ')
@@ -140,11 +143,17 @@ class Dispatcher:
                                 print_error('ERR_REF_ELE_NULL')
                                 print_error('ERR_CUSTOM_NOTFOUND')
 
+                        else:
+                            print_error('ERR_REF_ELE_NULL')
+                            print_error('ERR_CUSTOM_NOTFOUND')
+
                     else:
                         if objectname=="@Object":
                             webelement = input[0]
                             log.info(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
                             logger.print_on_console(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
+                        elif teststepproperty.cord != None and teststepproperty.cord != "":
+                            webelement = {'cord': teststepproperty.cord}
                         else:
                             webelement = self.getwebelement(driver,objectname)
                             if webelement != None:
@@ -154,6 +163,10 @@ class Dispatcher:
                                     logger.print_on_console(WEB_ELEMENT_FOUND)
                 except Exception as e:
                     print_error('ERR_CUSTOM_ELE_NOTFOUND')
+
+            elif teststepproperty.cord != None and teststepproperty.cord != "":
+                webelement = {'cord': teststepproperty.cord}
+
             return webelement
 
 
@@ -281,7 +294,9 @@ class Dispatcher:
                   'verifytextexists':self.statict_text_object.verify_text_exists,
                   'verifypagetitle':self.browser_object.verify_page_title,
                   'clearcache':self.browser_object.clear_cache,
-                  'navigatewithauthenticate':self.browser_object.navigate_with_authenticate
+                  'navigatewithauthenticate':self.browser_object.navigate_with_authenticate,
+                  'clickiris':self.iris_object.clickiris,
+                  'settextiris':self.iris_object.settextiris
                 }
             if browser_Keywords.driver_obj is not None:
                 browser_info=browser_Keywords.driver_obj.capabilities

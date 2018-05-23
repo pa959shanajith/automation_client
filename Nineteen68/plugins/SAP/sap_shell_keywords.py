@@ -12,11 +12,9 @@
 import sap_constants
 from constants import *
 import logger
-import time
 from saputil_operations import SapUtilKeywords
 from sap_launch_keywords import Launch_Keywords
 import logging
-global nodeList
 log = logging.getLogger("sap_shell_keywords.py")
 
 class Shell_Keywords():
@@ -115,37 +113,6 @@ class Shell_Keywords():
                 logger.print_on_console('Error occured in SELECTROWS')
             return status,result,value,err_msg
 
-    def toolBarActionKeys(self, sap_id,input_val,*args):
-            self.lk.setWindowToForeground(sap_id)
-            id,ses=self.uk.getSapElement(sap_id)
-            status=sap_constants.TEST_RESULT_FAIL
-            result=sap_constants.TEST_RESULT_FALSE
-            err_msg=None
-            action=input_val[0]
-            value=OUTPUT_CONSTANT
-            elem = ses.FindById(id)
-            try:
-                if(id != None):
-                    if(elem.type == 'GuiShell'):
-                        if elem.rowCount!=0:
-                            try:
-                                elem.pressButton(unicode(action,"utf-8"))
-                            except Exception as e :
-                                print e
-                            status = sap_constants.TEST_RESULT_PASS
-                            result = sap_constants.TEST_RESULT_TRUE
-                    else:
-                        logger.print_on_console('Element is not a shell object')
-                        err_msg = sap_constants.ERROR_MSG
-                else:
-                      logger.print_on_console('element not present on the page where operation is trying to be performed')
-                      err_msg = sap_constants.ERROR_MSG
-            except Exception as e:
-                err_msg = sap_constants.ERROR_MSG
-                log.error(e)
-                logger.print_on_console('Error occured in ToolbarActionKeys')
-            return status,result,value,err_msg
-
     def getCellText(self, sap_id,input_val,*args):
             self.lk.setWindowToForeground(sap_id)
             id,ses=self.uk.getSapElement(sap_id)
@@ -210,21 +177,20 @@ class Shell_Keywords():
                         if(ele_type == "GuiGridControl"):
                             try:
                                 #-------------------------------store the tooltips of the grid buttons
-                                if elem.rowCount!=0:
-                                    lim=elem.ToolbarButtonCount
-                                    for x in range (0,lim):
-                                         a=elem.GetToolbarButtonTooltip(x)
-                                         if text.strip().lower()==str(a).strip().lower():
-                                            elmID=elem.GetToolbarButtonId(x)
-                                            if((elem.GetToolbarButtonType(x) == "Menu" or "ButtonAndMenu") and len(input_val)>1):
-                                                menuItem = str(input_val[1]).strip()
-                                                elem.PressToolbarContextButton(elmID)
-                                                elem.SelectContextMenuItemByText(menuItem)
-                                            else:
-                                                elem.PressToolbarButton(elmID)
-                                            status = sap_constants.TEST_RESULT_PASS
-                                            result = sap_constants.TEST_RESULT_TRUE
-                                            break
+                                lim=elem.ToolbarButtonCount
+                                for x in range (0,lim):
+                                     a=elem.GetToolbarButtonTooltip(x)
+                                     if text.strip().lower()==str(a).strip().lower():
+                                        elmID=elem.GetToolbarButtonId(x)
+                                        if((elem.GetToolbarButtonType(x) == "Menu" or "ButtonAndMenu") and len(input_val)>1):
+                                            menuItem = str(input_val[1]).strip()
+                                            elem.PressToolbarContextButton(elmID)
+                                            elem.SelectContextMenuItemByText(menuItem)
+                                        else:
+                                            elem.PressToolbarButton(elmID)
+                                        status = sap_constants.TEST_RESULT_PASS
+                                        result = sap_constants.TEST_RESULT_TRUE
+                                        break
                                 #-------------------------------store the tooltips of the grid buttons
                             except Exception as e:
                                 logger.print_on_console('Unable to press button / button does not exist')
@@ -354,7 +320,44 @@ class Shell_Keywords():
                 logger.print_on_console('Error occured in DoubleClickCell')
             return status,result,value,err_msg
 
-    def selectTreeNode(self, sap_id,input_val,*args):
+    def treeTraverse(self, elem, input_val):
+        for i in range(0, len(input_val)):
+            if (i == 0):
+                node = elem.TopNode
+                try:
+                    txt = self.getTextofNode(elem, node)
+                    while txt.lower() != input_val[i].lower():
+                        node = elem.GetNextNodeKey(node)
+                        txt = self.getTextofNode(elem, node)
+                except:
+                    pass
+                self.expandTree(elem, node)
+            else:
+                child_nodes = elem.GetSubNodesCol(node)
+                try:
+                    node = child_nodes[0]
+                    txt = self.getTextofNode(elem, node)
+                    while txt.lower() != input_val[i].lower():
+                        node = elem.GetNextNodeKey(node)
+                        txt = self.getTextofNode(elem, node)
+                except:
+                    pass
+                self.expandTree(elem, node)
+        txt = self.getTextofNode(elem, node)
+        if (txt.lower() == input_val[len(input_val) - 1].lower()):
+            return node
+        else:
+            return None
+
+    def getTextofNode(self, elem, node):
+        txt = ""
+        if (elem.GetTreeType() == 2):  # @add - add more conditions based on tree types
+            txt = elem.GetItemText(node, elem.GetColumnNames()[0])
+        else:
+            txt = elem.GetNodeTextByKey(node)
+        return txt
+
+    def selectTreeNode(self, sap_id,input_val, *args):
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -362,31 +365,16 @@ class Shell_Keywords():
         self.lk.setWindowToForeground(sap_id)
         id,ses=self.uk.getSapElement(sap_id)
         elem = ses.FindById(id)
+        elem.UnselectAll()
         node = ''
         try:
             if(id != None):
                 if(elem.type == 'GuiShell' and elem.SubType == 'Tree'):
-                    for i in range(0,len(input_val)):
-                        if(i==0):
-                            node = elem.TopNode
-                            try:
-                                while (elem.GetNodeTextByKey(node)).lower() != input_val[i].lower():
-                                    node = elem.GetNextNodeKey(node)
-                            except:
-                                pass
-                            self.expandTree(elem,node)
-                        else:
-                            child_nodes = elem.GetSubNodesCol(node)
-                            j = 0
-                            try:
-                                node = child_nodes[j]
-                                while (elem.GetNodeTextByKey(child_nodes[j])).lower() != input_val[i].lower():
-                                    node = elem.GetNextNodeKey(child_nodes[j])
-                                    j = j + 1
-                            except:
-                                pass
-                            self.expandTree(elem,node)
-                    if(elem.GetNodeTextByKey(node) == input_val[len(input_val)-1]):
+                    node = self.treeTraverse(elem, input_val)
+                    if(node):
+                        # SomeNodes with GetItemType = 2 does not work for Double Click But With SelectedNode
+                        # Selection and Double Click Both Operation so as to Select and DoubleClick in cases where Double Click Works and where selected Work
+                        elem.SelectedNode = node
                         elem.DoubleClickNode(node)
                         status = sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
@@ -403,7 +391,6 @@ class Shell_Keywords():
             err_msg = sap_constants.ERROR_MSG
             log.error(e)
             logger.print_on_console('Error occured in SelectTreeNode')
-        self.colapseTree(elem)
         return status,result,value,err_msg
 
     def getNodeNameByIndex(self,sap_id,input_val,*args):
@@ -439,13 +426,11 @@ class Shell_Keywords():
                             if(count>len(child_nodes)):
                                 flag = False
                                 break
-                            j = 0
                             try:
-                                node = child_nodes[j]
+                                node = child_nodes[0]
                                 while (count-1):
-                                    node = elem.GetNextNodeKey(child_nodes[j])
+                                    node = elem.GetNextNodeKey(child_nodes[0])
                                     count = count - 1
-                                    j = j + 1
                             except Exception as e:
                                 pass
                             self.expandTree(elem,node)
@@ -466,7 +451,6 @@ class Shell_Keywords():
             err_msg = sap_constants.ERROR_MSG
             log.error(e)
             logger.print_on_console('Error occured in GetNodeNameByIndex')
-        self.colapseTree(elem)
         return status,result,value,err_msg
 
 
@@ -481,20 +465,103 @@ class Shell_Keywords():
                 break
         return c
 
-    def expandTree(self,tree,node):
-        if tree.IsFolder(node)==True:
-            if tree.IsFolderExpandable(node)==True:
-                if tree.IsFolderExpanded(node)!=True:
+    def expandTree(self, tree, node):
+        if tree.IsFolder(node) == True:
+            if (tree.isFolderExpandable(node) == True or tree.GetNodeChildrenCount > 0):
+                if tree.IsFolderExpanded(node) != True:
                     try:
                         tree.ExpandNode(node)
-                        self.nodeList.append(node)
                     except:
                         pass
 
-    def colapseTree(self,tree):
+    def getRowColByText(self, sap_id, input_val, *args):
+        self.lk.setWindowToForeground(sap_id)
+        id, ses = self.uk.getSapElement(sap_id)
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        colOrder = []
+        if(id != None):
+            elem = ses.FindById(id)
+            if(elem.type == 'GuiShell'):
+                checkVal = input_val[0]
+                row_count = elem.rowCount
+                col_count = elem.columnCount
+                for col in range(col_count):
+                    colOrder.append(elem.columnorder(col))
+                data = {}
+                cnt = 0
+                for row in range(row_count):
+                    dataRow = {}
+                    cnt = cnt + 1
+                    for col in range(col_count):
+                        valFromTable = elem.getCellValue(row, colOrder[col])
+                        if(checkVal == valFromTable):
+                            dataRow[1] = str(row+1)
+                            dataRow[2] = str(col+1)
+                    data[cnt] = dataRow
+                value = data
+                status = sap_constants.TEST_RESULT_PASS
+                result = sap_constants.TEST_RESULT_TRUE
+            else:
+                logger.print_on_console('Element is not a shell object')
+                err_msg = sap_constants.ERROR_MSG
+        else:
+            logger.print_on_console('element not present on the page where operation is trying to be performed')
+            err_msg = sap_constants.ERROR_MSG
+        return status, result, value, err_msg
+
+    def setShellText(self, sap_id, input_val, *args):
+            self.lk.setWindowToForeground(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
+            status = sap_constants.TEST_RESULT_FAIL
+            result = sap_constants.TEST_RESULT_FALSE
+            value = OUTPUT_CONSTANT
+            err_msg = None
+            try:
+                if(id != None):
+                    elem = ses.FindById(id)
+                    if(elem.type == 'GuiShell'):
+                        elem.text = input_val[0]
+                        status = sap_constants.TEST_RESULT_PASS
+                        result = sap_constants.TEST_RESULT_TRUE
+                    else:
+                        logger.print_on_console('Element is not a shell object')
+                        err_msg = sap_constants.ERROR_MSG
+                else:
+                    logger.print_on_console('element not present on the page where operation is trying to be performed')
+                    err_msg = sap_constants.ERROR_MSG
+            except Exception as e:
+                logger.print_on_console(e)
+                err_msg = sap_constants.ERROR_MSG
+            return status, result, value, err_msg
+
+    def verifyTreePath(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        self.lk.setWindowToForeground(sap_id)
+        id, ses = self.uk.getSapElement(sap_id)
+        elem = ses.FindById(id)
         try:
-            for i in self.nodeList:
-                tree.CollapseNode(i)
-        except:
-            import traceback
-            traceback.print_exc()
+            if (id != None):
+                if (elem.type == 'GuiShell' and elem.SubType == 'Tree'):
+                    node = self.treeTraverse(elem, input_val)
+                    if(node):
+                        status = sap_constants.TEST_RESULT_PASS
+                        result = sap_constants.TEST_RESULT_TRUE
+                    else:
+                        logger.print_on_console("Verification Failed for the path specified in the Tree")
+                else:
+                    logger.print_on_console('Element is not a tree object')
+                    err_msg = sap_constants.ERROR_MSG
+            else:
+                logger.print_on_console('Element not present on the page where operation is trying to be performed')
+                err_msg = sap_constants.ERROR_MSG
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG
+            log.error(e)
+            logger.print_on_console('Error occured in SelectTreeNode')
+        return status,result,value,err_msg

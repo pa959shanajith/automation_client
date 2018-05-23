@@ -9,10 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import logger
-
-
 import sap_constants
-import time
 from constants import *
 from saputil_operations import SapUtilKeywords
 from sap_launch_keywords import Launch_Keywords
@@ -42,10 +39,10 @@ class Dropdown_Keywords():
                     logger.print_on_console( "Element is not changeable")
                     err_msg = "Element is not changeable"
                     log.info(err_msg)
-
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
+            logger.print_on_console("Error occured in getSelected")
         return status,result,value,err_msg
 
 
@@ -131,7 +128,6 @@ class Dropdown_Keywords():
             text = input_val[2]
         else:
             text=input_val[0]
-        #verb = OUTPUT_CONSTANT
         value=OUTPUT_CONSTANT
         err_msg=None
         i = 0
@@ -141,15 +137,11 @@ class Dropdown_Keywords():
                     entries = ses.FindById(id).Entries
                     while True:
                         try:
-                            #print entries(i).value
                             if(entries(i).value.strip() == text.strip()):
                                 ses.FindById(id).value = text
                                 status=sap_constants.TEST_RESULT_PASS
                                 result=sap_constants.TEST_RESULT_TRUE
-
                         except Exception as e:
-##                            err_msg = sap_constants.ERROR_MSG
-##                            log.error(err_msg)
                             break
                         i = i + 1
                 else:
@@ -158,8 +150,9 @@ class Dropdown_Keywords():
                     log.info(err_msg)
         except Exception as e:
               log.error('Error occured',e)
+              logger.print_on_console("Error occured in selectValueByText")
+              err_msg = sap_constants.ERROR_MSG
         return status,result,value,err_msg
-
 
 
     def verifySelectedValue(self,sap_id,input_val ,*args):
@@ -168,11 +161,8 @@ class Dropdown_Keywords():
         val=input_val[0]
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
-
-        verb = OUTPUT_CONSTANT
-        #value=OUTPUT_CONSTANT
+        value = OUTPUT_CONSTANT
         err_msg=None
-        result = None
         try:
             if(id != None):
                 if(ses.FindById(id).Changeable == True):
@@ -189,7 +179,8 @@ class Dropdown_Keywords():
         except Exception as e:
             log.error('Error occured',e)
             err_msg = sap_constants.ERROR_MSG
-        return status,result,verb,err_msg
+            logger.print_on_console("Error occured in verifySelectedValue")
+        return status,result,value,err_msg
 
 
     def getCount(self,sap_id, *args):
@@ -202,24 +193,19 @@ class Dropdown_Keywords():
         count = 0
         try:
             if(id != None):
-##                if(ses.FindById(id).Changeable == True):
-                    entries = ses.FindById(id).Entries
-                    while True:
-                        try:
-                            value = entries(count).value
-                            count = count + 1
-                            value=count
-                            status=sap_constants.TEST_RESULT_PASS
-                            result=sap_constants.TEST_RESULT_TRUE
-                        except Exception as e:
-##                            log.error('Error occured',e)
-                            break
-##                else:
-##                    logger.print_on_console( "Element is not changeable")
-##                    err_msg = "Element is not changeable"
-##                    log.info(err_msg)
+                entries = ses.FindById(id).Entries
+                while True:
+                    try:
+                        value = entries(count).value
+                        count = count + 1
+                        value=count
+                        status=sap_constants.TEST_RESULT_PASS
+                        result=sap_constants.TEST_RESULT_TRUE
+                    except Exception as e:
+                        break
         except Exception as e:
               log.error('Error occured',e)
+              logger.print_on_console("Error occured in getCount")
               err_msg = sap_constants.ERROR_MSG
         return status,result,value,err_msg
 
@@ -235,29 +221,23 @@ class Dropdown_Keywords():
         count = 0
         try:
             if(id != None):
-##                if(ses.FindById(id).Changeable == True):
-                    entries = ses.FindById(id).Entries
-                    while True:
-                        try:
-                            value = entries(count).value
-                            count = count + 1
-                        except Exception as e:
-##                            err_msg = sap_constants.ERROR_MSG
-                            break
-                    if(length == count):
-                        status=sap_constants.TEST_RESULT_PASS
-                        result=sap_constants.TEST_RESULT_TRUE
-                    else:
-                        err_msg = sap_constants.ERROR_MSG
-                        log.info('Count Verify has failed ')
-##                else:
-##                    logger.print_on_console( "Element is not changeable")
-##                    err_msg = "Element is not changeable"
-##                    log.info(err_msg)
-
+                entries = ses.FindById(id).Entries
+                while True:
+                    try:
+                        value = entries(count).value
+                        count = count + 1
+                    except Exception as e:
+                        break
+                if(length == count):
+                    status=sap_constants.TEST_RESULT_PASS
+                    result=sap_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg = sap_constants.ERROR_MSG
+                    log.info('Count Verify has failed ')
         except Exception as e:
               log.error('Error occured',e)
               err_msg = sap_constants.ERROR_MSG
+              logger.print_on_console("Error occured in verifyCount")
         return status,result,verb,err_msg
 
     def verifyValuesExists(self,sap_id,input_val, *args):
@@ -291,6 +271,7 @@ class Dropdown_Keywords():
         except Exception as e:
               log.error('Error occured',e)
               err_msg = sap_constants.ERROR_MSG
+              logger.print_on_console("Error occured in verifyValuesExists")
         return status,result,verb,err_msg
 
 
@@ -299,51 +280,35 @@ class Dropdown_Keywords():
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         id,ses=self.uk.getSapElement(sap_id)
-        val=input_val
         err_msg=None
-        verb = OUTPUT_CONSTANT
+        value = OUTPUT_CONSTANT
         i = 0
         dd_entries = []
         try:
             if(id != None):
-##                if(ses.FindById(id).Changeable == True):
-                    entries = ses.FindById(id).Entries
-                    while True:
-                        try:
-                            dd_entries.append(str(entries(i).value))
-                            i = i + 1
-                        except Exception as e:
-                            break
-                    flag=True
-                    if len(dd_entries)==len(val):
-                        for dd in dd_entries:
-                            if dd not in val:
-                                flag=False
-                    else:
-                        flag=False
-                    #if(cmp(dd_entries,val) == 0):
-                    if flag==True:
-                        status =sap_constants.TEST_RESULT_PASS
-                        result =sap_constants.TEST_RESULT_TRUE
-                    else:
-                      err_msg = sap_constants.ERROR_MSG
-##                else:
-##                    logger.print_on_console( "Element is not changeable")
-##                    err_msg = "Element is not changeable"
-##                    log.info(err_msg)
-
+                entries = ses.FindById(id).Entries
+                while True:
+                    try:
+                        dd_entries.append(str(entries(i).value))
+                        i = i + 1
+                    except Exception as e:
+                        break
+                flag=True
+                if len(dd_entries)==len(input_val):
+                    for dd in dd_entries:
+                        if dd not in input_val:
+                            flag=False
+                else:
+                    flag=False
+                if flag==True:
+                    status =sap_constants.TEST_RESULT_PASS
+                    result =sap_constants.TEST_RESULT_TRUE
+                else:
+                  err_msg = sap_constants.ERROR_MSG
         except Exception as e:
               log.error('Error occured',e)
               err_msg = sap_constants.ERROR_MSG
-        return status,result,verb,err_msg
-
-
-
-##        def clickOnCombo(self,objectName):
-##            try:
-##                a = ldtp.getobjectsize(launch_keywords.window_name,objectName);
-##                ldtp.generatemouseevent(a[0] + (a[2]) / 2, a[1]+ (a[3] / 2), "b1c")
-##            except Exception as e:
-##                logger.print_on_console('')
+              logger.print_on_console("Error occured in verifyAllValues")
+        return status,result,value,err_msg
 
 

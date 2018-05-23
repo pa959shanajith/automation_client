@@ -10,34 +10,24 @@
 #-------------------------------------------------------------------------------
 import sap_scraping
 import wx
-##import clientwindow
 from socketIO_client import SocketIO,BaseNamespace
 import sap_launch_keywords
 sap_scraping_obj = sap_scraping.Scrape()
 import os
 from constants import *
 import logger
-import win32com.client
 import logging
 import logging.config
 log = logging.getLogger('clientwindow.py')
-
 from saputil_operations import SapUtilKeywords
-
 import json
-
 import time
-import win32gui
-import win32ui
-import win32process
-import win32con
-import win32api
-from ctypes import windll
-from PIL import Image
 import base64
 import core_utils
-
+import cropandadd
+cropandaddobj = cropandadd.Cropandadd()
 obj=None
+
 class ScrapeWindow(wx.Frame):
     def __init__(self, parent,id, title,filePath,socketIO):
         self.uk=SapUtilKeywords()
@@ -49,7 +39,6 @@ class ScrapeWindow(wx.Frame):
         self.core_utilsobject = core_utils.CoreUtils()
 
         global obj
-        #logger.print_on_console("going to sap_launch_keywords")
         obj = sap_launch_keywords.Launch_Keywords()
         self.socketIO = socketIO
         fileLoc=filePath.split(';')[0]
@@ -62,18 +51,17 @@ class ScrapeWindow(wx.Frame):
         if status!=TERMINATE:
             self.panel = wx.Panel(self)
             self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd",pos=(12,8 ), size=(175, 28))
-            self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)   # need to implement OnExtract()
+            self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)
             self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,38 ), size=(175, 28))
-            self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)   # need to implement OnExtract()
-            self.Centre()
-
+            self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)
+            self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,68 ), size=(175, 28))
+            self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
             self.Centre()
             style = self.GetWindowStyle()
             self.SetWindowStyle( style|wx.STAY_ON_TOP )
             wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
             self.Show()
         else:
-
             self.socketIO.emit('scrape','Fail')
 
 
@@ -82,6 +70,7 @@ class ScrapeWindow(wx.Frame):
         state = event.GetEventObject().GetValue()
         if state == True:
             self.fullscrapebutton.Disable()
+            self.cropbutton.Disable()
             sap_scraping_obj.clickandadd('STARTCLICKANDADD')
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
         else:
@@ -109,7 +98,7 @@ class ScrapeWindow(wx.Frame):
             if self.core_utilsobject.getdatasize(str(data),'mb') < 10:
                 self.socketIO.emit('scrape',data)
             else:
-                print 'Scraped data exceeds max. Limit.'
+                logger.print_on_console('Scraped data exceeds max. Limit.')
                 self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
 
             os.remove("out.png")
@@ -117,6 +106,7 @@ class ScrapeWindow(wx.Frame):
 
     def fullscrape(self,event):
         self.startbutton.Disable()
+        self.cropbutton.Disable()
         SapGui=self.uk.getSapObject()
         wndname=sap_scraping_obj.getWindow(SapGui)
         wnd_title = wndname.__getattr__("Text")
@@ -152,7 +142,20 @@ class ScrapeWindow(wx.Frame):
         os.remove("out.png")
         self.Close()
 
-
+    def cropandadd(self,event):
+        SapGui=self.uk.getSapObject()
+        wndname=sap_scraping_obj.getWindow(SapGui)
+        state = event.GetEventObject().GetValue()
+        if state == True:
+            self.fullscrapebutton.Disable()
+            self.startbutton.Disable()
+            event.GetEventObject().SetLabel("Stop IRIS")
+            status = cropandaddobj.startcropandadd()
+        else:
+            d = cropandaddobj.stopcropandadd()
+            self.socketIO.emit('scrape',d)
+            self.Close()
+            event.GetEventObject().SetLabel("Start IRIS")
 
 
 

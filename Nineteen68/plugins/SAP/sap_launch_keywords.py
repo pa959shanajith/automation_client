@@ -12,59 +12,31 @@
 
 import win32gui
 import win32process
-import win32con
 import win32api
 import logger
-
-
 import os
 import sap_constants
-import ctypes
-import re
 import time
 from PIL import ImageGrab
-from PIL.ImageOps import flip
-import struct
-from ctypes import wintypes
 from constants import *
-
-window_name=None
-window_handle=None
-window_pid=None
-
-#-----------------------------
 from saputil_operations import SapUtilKeywords
-#---------------------------
-
 from pywinauto.application import Application
 from pywinauto import keyboard
-from pywinauto.findwindows    import find_window
+from pywinauto.findwindows import find_window
 from pywinauto.win32functions import SetForegroundWindow
 import win32com.client
-import json
 import pywinauto
-import win32ui
-from ctypes import windll
-from PIL import Image
-import base64
-
 import logging
 import logging.config
 log = logging.getLogger('sap_launch_keywords.py')
-
 from sap_scraping import Scrape
 
 class Launch_Keywords():
-
-
 
     def __init__(self):
         self.uk = SapUtilKeywords()
         self.windowname=''
         self.filePath=''
-        self.aut_handle=None
-        self.ldtpObj=None
-        self.windowHandle=None
 
     def getSession(self,*args):
         try:
@@ -72,7 +44,7 @@ class Launch_Keywords():
             try:
                 SapGui=self.uk.getSapObject()
             except Exception as e:
-                logger.print_on_console( 'no instance open error :',e)
+                logger.print_on_console('No instance open of SAP GUI')
             scrapingObj=Scrape()
             wnd = scrapingObj.getWindow(SapGui)
             wndId =  wnd.__getattr__('id')
@@ -83,7 +55,7 @@ class Launch_Keywords():
             ses = SapGui.FindByid(str(sesId))
             return ses
         except Exception as e:
-            logger.print_on_console( 'no instance open error :',e)
+            logger.print_on_console('No instance open of SAP GUI')
 
     def getSessWindow(self,*args):
         try:
@@ -99,11 +71,9 @@ class Launch_Keywords():
             ses = SapGui.FindByid(str(sesId))
             return ses,wnd
         except Exception as e:
-            logger.print_on_console( 'no instance open error :',e)
+            logger.print_on_console('No instance open of SAP GUI')
 
     def getErrorMessage(self,*args):
-        #sbar is the id of statusbar
-        #Eg - /app/con[0]/ses[0]/wnd[0]/sbar
         time.sleep(2)
         ses,wnd=self.getSessWindow()
         wndId =  wnd.__getattr__('id')
@@ -117,13 +87,12 @@ class Launch_Keywords():
             value = sbar.FindByName("pane[0]", "GuiStatusPane").text
             if value=='' or value==None:
                 err_msg='No error message'
-                #logger.print_on_console('No error message')
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
             err_msg='Failed to get error message'
             log.error(e)
-            #logger.print_on_console('Failed to get error message reason being :',e)
+            logger.print_on_console("Error occured in getErrorMessage")
         return status,result,value,err_msg
 
 
@@ -141,7 +110,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg='Failed to start transaction'
             log.error(e)
-            logger.print_on_console('Failed to start transaction reason being :',err_msg)
+            logger.print_on_console("Error occured in startTransaction")
         return status,result,value,err_msg
 
     def toolbar_actions(self,input_val,*args):
@@ -185,6 +154,7 @@ class Launch_Keywords():
                         err_msg='Button is disabled'
                     break
             except Exception as e:
+                log.error(e)
                 logger.print_on_console("Could not find the specified button")
                 err_msg='Could not find the specified button'
                 break
@@ -194,8 +164,6 @@ class Launch_Keywords():
     def launch_application(self,input_val,*args):
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
-        verb = OUTPUT_CONSTANT
-        app_just=False
         err_msg=None
         term = None
         try:
@@ -230,31 +198,27 @@ class Launch_Keywords():
                 SetForegroundWindow(find_window(title=self.windowName))
                 logger.print_on_console('SAP Logon window already exists will proceed further')
                 err_msg='SAP Logon window already exists'
-                #term =TERMINATE
                 status=sap_constants.TEST_RESULT_PASS
                 result = sap_constants.TEST_RESULT_TRUE
                 # made changes : launch will not terminate if window already exists
-            else :
+            else:
                 error_code=int(win32api.GetLastError())
                 if error_code in sap_constants.SAP_ERROR_CODES.keys():
-                    logger.print_on_console("checking for error codes ")
                     logger.print_on_console(sap_constants.SAP_ERROR_CODES.get(error_code))
-                    term =TERMINATE
                 else:
                     logger.print_on_console('unable to launch the application')
-                    term =TERMINATE
-
+                term =TERMINATE
         except Exception as e:
-            logger.print_on_console("Exception found",e)
+            log.error(e)
+            logger.print_on_console("Error occured in launchApplication")
             err_msg = sap_constants.ERROR_MSG
             term =TERMINATE
         if term!=None:
             return term
-        return status,result,verb,self.windowname,err_msg
+        return status,result,self.windowname,err_msg
 
     def serverConnect(self,input_val,*args):
         server=input_val[0]
-        #server = "SL2 [52.165.148.179]"
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
@@ -266,18 +230,32 @@ class Launch_Keywords():
             start_window = pywinauto.findwindows.find_window(title=self.windowName)
             if(start_window>1):
                 try:
-                    cursor_x,cursor_y = win32api.GetCursorPos()
                     app = Application(backend="win32").connect(path =self.filePath).window(title=self.windowName)
                     SetForegroundWindow(find_window(title=self.windowName))
                     try:
-                        app.Edit2.set_edit_text(u'')
-                        app.Edit2.type_keys(server, with_spaces = True)
-                        win32api.SetCursorPos((cursor_x,cursor_y))
-                    except:
-                        app.FilterEdit.set_edit_text(u'')
-                        app.FilterEdit.type_keys(server, with_spaces = True)
-                        win32api.SetCursorPos((cursor_x,cursor_y))
-                    keyboard.SendKeys('{ENTER}')
+                        editEle = app.Edit
+                        edit2Ele = app.Edit2
+                        editExists = editEle.exists()
+                        edit2Exists = edit2Ele.exists()
+                        if(editExists and edit2Exists):
+                            ele = (edit2Ele if(editEle.Rectangle().top > edit2Ele.Rectangle().top) else editEle)
+                        elif(editExists):
+                            ele = editEle
+                        elif(edit2Exists):
+                            ele = edit2Ele
+                        ele.set_edit_text(u'')
+                        ele.type_keys(server, with_spaces = True)
+                        if (app['Log &OnButton'].exists() and app['Log &OnButton'].is_enabled()):
+                            app['Log &OnButton'].click()
+                        elif (app['Log &On'].exists() and app['Log &On'].is_enabled()):
+                            app['Log &OnButton'].click()
+                        elif (app.Button.exists() and app.Button.is_enabled()):
+                            app.Button.click()
+                    except Exception as e:
+                        log.error(e)
+                        logger.print_on_console("Unable to Find LogOn Button or Filter Text Box")
+                        err_msg = "Unable to Find LogOn Button or Filter Text Box"
+                        return status, result, verb, err_msg
                     time.sleep(5)
                     if app!=None and app!='':
                         try:
@@ -287,7 +265,7 @@ class Launch_Keywords():
                             status=sap_constants.TEST_RESULT_PASS
                             result = sap_constants.TEST_RESULT_TRUE
                         except:
-                            logger.print_on_console('Given Server discription is incorrect')
+                            logger.print_on_console('Given Server description is incorrect')
                             err_msg='Given Server discription is incorrect'
                             term = TERMINATE
                     else:
@@ -306,6 +284,7 @@ class Launch_Keywords():
             logger.print_on_console("Could not find specified window name")
         return status,result,verb,err_msg
 
+
     def getPageTitle(self,*args):
         ses=self.getSession()
         status=sap_constants.TEST_RESULT_FAIL
@@ -313,11 +292,12 @@ class Launch_Keywords():
         err_msg=None
         value=OUTPUT_CONSTANT
         try:
-                value = ses.ActiveWindow.Text
-                status=sap_constants.TEST_RESULT_PASS
-                result = sap_constants.TEST_RESULT_TRUE
+            value = ses.ActiveWindow.Text
+            status=sap_constants.TEST_RESULT_PASS
+            result = sap_constants.TEST_RESULT_TRUE
         except Exception as e:
-            logger.print_on_console('unable to get the page title because',e)
+            log.error(e)
+            logger.print_on_console('Error occured in getPageTitle')
             err_msg = sap_constants.ERROR_MSG
         return status,result,value,err_msg
 
@@ -340,7 +320,8 @@ class Launch_Keywords():
             status=sap_constants.TEST_RESULT_PASS
             result = sap_constants.TEST_RESULT_TRUE
         except Exception as e:
-            logger.print_on_console('Not able to find text')
+            log.error(e)
+            logger.print_on_console('Error occured in getPopupText')
             err_msg = sap_constants.ERROR_MSG
         return status,result,value,err_msg
 
@@ -385,13 +366,14 @@ class Launch_Keywords():
                      time.sleep(2)
                      app.Close()
                 except:
-                     import os
                      os.system("TASKKILL /F /IM saplogon.exe")
                      #logger.print_on_console("SAP Logon 740 has is not able to close,please close manually.")
             status=sap_constants.TEST_RESULT_PASS
             result=sap_constants.TEST_RESULT_TRUE
         except Exception as e:
-            err_msg='Error has occured :',e
+            log.error(e)
+            logger.print_on_console('Error occured in closeApplication')
+            err_msg = sap_constants.ERROR_MSG
         return status,result,verb,err_msg
 
     def captureScreenshot(self,screen_name,screen_id):
@@ -410,7 +392,7 @@ class Launch_Keywords():
                 screen_id = screen_id[:i+4] + "0" + screen_id[i+5:]
                 screen_name = ses.FindById(screen_id).Text
             except Exception as e:
-                print e
+                log.error(e)
         try:
             handle = win32gui.FindWindow(None, screen_name)
             bbox = win32gui.GetWindowRect(handle)
@@ -429,7 +411,8 @@ class Launch_Keywords():
 ##            time.sleep(2)
 
         except Exception as e:
-            logger.print_on_console("Error has occured while capturing screenshot ",e)
+            log.error(e)
+            logger.print_on_console("Error has occured while capturing screenshot")
         #img.save(r'.\screenshot.png')
         return img
 
@@ -451,6 +434,4 @@ class Launch_Keywords():
                     win32gui.BringWindowToTop(handle)
                     win32gui.ShowWindow(handle,5)
         except Exception as e:
-            err_msg='The following error has occoured while bringing window to foreground'
-            log.error(err_msg)
-            #logger.print_on_console("The following error has occoured while bringing window to foreground",e)
+            log.error(e)
