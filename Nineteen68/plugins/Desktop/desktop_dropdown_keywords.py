@@ -263,7 +263,7 @@ class Dropdown_Keywords():
                     else:
                       log.info('Element not present on the page where operation is trying to be performed')
                       err_msg='Element not present on the page where operation is trying to be performed'
-                      print_on_console('Element not present on the page where operation is trying to be performed')
+                      logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
                 log.error(exception)
                 logger.print_on_console(exception)
@@ -307,10 +307,12 @@ class Dropdown_Keywords():
                     else:
                       log.info('Element not present on the page where operation is trying to be performed')
                       err_msg='Element not present on the page where operation is trying to be performed'
-                      print_on_console('Element not present on the page where operation is trying to be performed')
+                      logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
                 log.error(exception)
-                logger.print_on_console(exception)
+                import traceback
+                traceback.print_exc()
+                err_msg= "ERROR OCCURRED ",exception
 
             return status,result,verb,err_msg
 
@@ -338,7 +340,9 @@ class Dropdown_Keywords():
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                             except Exception as e :
-                                logger.print_on_console(e)
+                                import traceback
+                                traceback.print_exc()
+                                err_msg= "ERROR OCCURRED ",e
                         elif checkName == 'ListView' or 'ListBox':
                             if checkName =='ListBox':
                                 if element.is_active() == False:
@@ -382,13 +386,12 @@ class Dropdown_Keywords():
                else:
                    log.info('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'
-                   print_on_console('Element not present on the page where operation is trying to be performed')
+                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
                 import traceback
                 traceback.print_exc()
                 log.error(exception)
-                logger.print_on_console(exception)
-
+                err_msg= "ERROR OCCURRED ",exception
 
             return status,result,verb,err_msg
 
