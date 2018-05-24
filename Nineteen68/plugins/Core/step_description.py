@@ -697,7 +697,7 @@ class StepDescription:
 
         #Mail Related keywords(@Email keywords- 15 keywords)
         def getattachmentstatus():
-            return ' Attachment is '+"'"+output+"'"+' in the email.'
+            return ' Attachment is '+"'"+output+"'"+' in the mail '+"'"+tsp.outputval+"'."
         def getbody():
             return ' Fetch the '+"'"+'Body'+"'"+' from the mail '+"'"+inputval[0]+"'"+' and save the value in variable '+"'"+tsp.outputval+"'."
         def getemail():
@@ -709,9 +709,9 @@ class StepDescription:
         def gettomailid():
             return ' Fetch the '+"'"+'To Mail ID'+"'"+' from the mail '+"'"+inputval[0]+"'"+' and save the value '+"'"+output+"'"+' in variable '+"'"+tsp.outputval+"'."
         def switchtofolder():
-            return ' Switched to folder'+"'"+input+"'."
+            return ' Switched to folder '+"'"+input+"'."
         def verifyemail():
-            return ' Verify email from the path '+"'"+input+"'."
+            return ' Verify email from the path '+"'"+inputval[0]+"'."
         def settomailid():
             if len(listInput)>0:
                 input = ", ".join(listInput)
