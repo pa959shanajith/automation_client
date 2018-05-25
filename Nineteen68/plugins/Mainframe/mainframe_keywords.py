@@ -52,18 +52,12 @@ class MainframeKeywords:
         self.job_path = ''
         self.member_name = ''
         self.emulator_types= [MAINFRAME_BLUEZONE,MAINFRAME_EXTRA,MAINFRAME_PCOMM,MAINFRAME_RUMBA]
-        self.logoff_options = {
-            "1": "Prints the data set and Logoff (Not recommended)",
-            "2": "Delete the dataset and Logoff",
-            "3": "Keep the existing dataset and Logoff",
-            "4": "Keep the new dataset and Logoff"
-        }
+        self.logoff_options = ["Prints the data set and Logoff (Not recommended)",
+            "Delete the dataset and Logoff", "Keep the existing dataset and Logoff",
+            "Keep the new dataset and Logoff"]
         self.bluezone_object = BluezoneKeywords()
-        try:
-            self.ehllapi_object = EhllapiKeywords()
-        except Exception as e:
-            log.error("Fail to load EhllapiKeywords")
-            log.error(e)
+        #self.bluezone_object = BluezoneAPIKeywords()
+        self.ehllapi_object = EhllapiKeywords()
 
     def launch_mainframe(self,inputs):
         """
@@ -103,7 +97,10 @@ class MainframeKeywords:
                     if self.emulator_type == MAINFRAME_EXTRA:
                         print "Extra Emulator code"
                     elif self.emulator_type == MAINFRAME_BLUEZONE:
-                        result,output,err_msg =  self.bluezone_object.launch_mainframe(self.emulator_path)
+                        result,output,err_msg =  self.bluezone_object.launch_mainframe(self.emulator_path, self.emulator_type)
+                        if output == "x86":
+                            self.bluezone_object = BluezoneAPIKeywords()
+                            result,output,err_msg =  self.bluezone_object.launch_mainframe(self.emulator_path, self.emulator_type)
                     elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
                         result,output,err_msg =  self.ehllapi_object.launch_mainframe(self.emulator_path, self.emulator_type)
                     #Update the status variables based on result.
@@ -157,8 +154,7 @@ class MainframeKeywords:
                     #Logic to launch Extra Emulator goes here
                     print "Extra Emulator code"
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
-                    print "Bluezone Emulator code"
-                    #result,output,err_msg =  self.bluezone_object.connect_session(psid)
+                    result,output,err_msg =  self.bluezone_object.connect_session(psid)
                 elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
                     result,output,err_msg =  self.ehllapi_object.connect_session(psid)
                 if result:
@@ -204,9 +200,9 @@ class MainframeKeywords:
                 logger.print_on_console("Input recieved : \nRegion : "+self.region + "\nUserID :" + self.userID + "\nPassword :" + self.password)
                 if self.emulator_type in self.emulator_types:
                     #Log the state of  keyword in log file
-                    log.info("Logging to %s emulator...",self.emulator_type)
+                    log.info("Logging in to %s emulator...",self.emulator_type)
                     #Print the state of keyword on ICE console
-                    logger.print_on_console("Logging to " + self.emulator_type +" emulator...")
+                    logger.print_on_console("Logging in to " + self.emulator_type +" emulator...")
                 if self.emulator_type == MAINFRAME_EXTRA:
                     #Logic to launch Extra Emulator goes here
                     print "Extra Emulator code"
@@ -306,51 +302,48 @@ class MainframeKeywords:
         output=OUTPUT_CONSTANT
         try:
             #check for the exact inputs
-            if len(inputs) == 1:
+            if len(inputs) == 1 and inputs[0] != '':
+                opts = int(inputs[0])
                 self.option = inputs[0]
-                if self.option is not '':
-                    # Log the input details in log file
-                    log.info("Input recieved")
-                    log.info("Option : %s = %s ",self.option,self.logoff_options[self.option])
-                    # Print the input details on ICE console
-                    logger.print_on_console("Input recieved : ")
-                    logger.print_on_console("Option : "+self.option + "=" +  self.logoff_options[self.option])
-                    if self.emulator_type in self.emulator_types:
-                        #Log the state of  keyword in log file
-                        log.info("Logging off from %s emulator...",self.emulator_type)
-                        #Print the state of keyword on ICE console
-                        logger.print_on_console("Logging off from " + self.emulator_type +" emulator...")
-                    if self.emulator_type == MAINFRAME_EXTRA:
-                        #Logic to launch Extra Emulator goes here
-                        print "Extra Emulator code"
-                    elif self.emulator_type == MAINFRAME_BLUEZONE:
-                        result,output,err_msg = self.bluezone_object.logoff(self.option)
-                    elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
-                        result,output,err_msg = self.ehllapi_object.logoff(self.option)
-                    if result:
-                        status = TEST_RESULT_PASS
-                        methodoutput = TEST_RESULT_TRUE
-                else:
-                    err_msg = "Error: Invalid input!!! - logoff need 1 paramemter, 1. Option"
-                    log.error(err_msg)
-                    logger.print_on_console("Error: Invalid input!!! - logoff need 1 paramemter, 1. Option")
-                    logger.print_on_console("Available options :")
-                    logger.print_on_console("OPTION" + "\t\tVALUE")
-                    for key in self.logoff_options:
-                        logger.print_on_console(key + "\t\t" + self.logoff_options[key])
+                # Log the input details in log file
+                log.info("Input recieved")
+                log.info("Option : %s = %s ",self.option,self.logoff_options[opts])
+                # Print the input details on ICE console
+                logger.print_on_console("Input recieved : ")
+                logger.print_on_console("Option "+self.option+": "+self.logoff_options[opts])
+                if self.emulator_type in self.emulator_types:
+                    #Log the state of  keyword in log file
+                    log.info("Logging off from %s emulator...",self.emulator_type)
+                    #Print the state of keyword on ICE console
+                    logger.print_on_console("Logging off from " + self.emulator_type +" emulator...")
+                if self.emulator_type == MAINFRAME_EXTRA:
+                    #Logic to launch Extra Emulator goes here
+                    print "Extra Emulator code"
+                elif self.emulator_type == MAINFRAME_BLUEZONE:
+                    result,output,err_msg = self.bluezone_object.logoff(self.option)
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                    result,output,err_msg = self.ehllapi_object.logoff(self.option)
+                if result:
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
             else:
-                err_msg = "Error: Invalid input!!! - logoff need 1 paramemter, 1. Option"
-                log.error(err_msg)
-                logger.print_on_console("Error: Invalid input!!! - logoff need 1 paramemter, 1. Option")
-                logger.print_on_console("Available options :")
-                logger.print_on_console("OPTION" + "\t\tVALUE")
-                for key in self.logoff_options:
-                    logger.print_on_console(key + "\t\t" + self.logoff_options[key])
+                err_msg = "invalid_input"
         except Exception as e:
-            err_msg = "Error: Unable to logoff from Emulator."
+            if isinstance(e, ValueError):
+                err_msg = "invalid_input"
+            else:
+                err_msg = "Error: Unable to logoff from Emulator."
+                log.error(err_msg)
+                log.error(e)
+                logger.print_on_console(err_msg)
+        if err_msg == "invalid_input":
+            err_msg = "Error: Invalid input!!! - logoff need 1 paramemter, 1. Option"
             log.error(err_msg)
-            log.error(e)
             logger.print_on_console(err_msg)
+            logger.print_on_console("Available options :")
+            logger.print_on_console("OPTION" + "\tVALUE")
+            for i in range(len(self.logoff_options)):
+                logger.print_on_console("  "+str(i)+"\t\t"+self.logoff_options[i])
         return status,methodoutput,output,err_msg
 
 
@@ -426,9 +419,9 @@ class MainframeKeywords:
                 text = inputs[2]
                 # Log the input details in log file
                 log.info("Input recieved")
-                log.info("Row number : %s \t Column number : %s \t Text : %s",row_number,column_number,text)
+                log.info("Row number: %s \t Column number: %s \t Text: %s",row_number,column_number,text)
                 # Print the input details on ICE console
-                logger.print_on_console("Input recieved : \nRow number : "+row_number + "\nColumn number :" + column_number + "\nText :" + text)
+                logger.print_on_console("Input recieved : \nRow number: "+row_number + "\nColumn number: " + column_number + "\nText: " + text)
                 if self.emulator_type in self.emulator_types:
                     #Log the state of  keyword in log file
                     log.info("Setting the text in  %s emulator screen...",self.emulator_type)
@@ -472,16 +465,16 @@ class MainframeKeywords:
         try:
             #check for the exact inputs
             if len(inputs) == 1 or len(inputs) == 2 :
-                function_key = MAINFRAME_FN_KEYS[inputs[0].lower()]
+                function_key = inputs[0].lower()
                 number = 1
                 if len(inputs) == 2:
                     number = inputs[1]
                 # Log the input details in log file
                 log.info("Input recieved")
-                log.info("Function key : %s ",function_key)
+                log.info("Function key : %s ", function_key)
                 # Print the input details on ICE console
                 logger.print_on_console("Input recieved : ")
-                logger.print_on_console("Function key : "+function_key)
+                logger.print_on_console("Function key : " + function_key)
                 if self.emulator_type in self.emulator_types:
                     #Log the state of  keyword in log file
                     log.info("Sending Function key to %s emulator screen...",self.emulator_type)
@@ -493,7 +486,7 @@ class MainframeKeywords:
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.send_function_keys(function_key,number)
                 elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
-                    result,output,err_msg = self.ehllapi_object.send_function_keys(inputs[0].lower(),number)
+                    result,output,err_msg = self.ehllapi_object.send_function_keys(function_key,number)
                 if result:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
@@ -782,8 +775,7 @@ class MainframeKeywords:
                 #Logic to launch Extra Emulator goes here
                 print "Extra Emulator code"
             elif self.emulator_type == MAINFRAME_BLUEZONE:
-                print "Bluezone Emulator code"
-                #result,output,err_msg = self.bluezone_object.disconnect_session()
+                result,output,err_msg = self.bluezone_object.disconnect_session()
             elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
                 result,output,err_msg = self.ehllapi_object.disconnect_session()
             if result:
@@ -818,8 +810,7 @@ class MainframeKeywords:
                 #Logic to launch Extra Emulator goes here
                 print "Extra Emulator code"
             elif self.emulator_type == MAINFRAME_BLUEZONE:
-                print "Bluezone Emulator code"
-                #result,output,err_msg = self.bluezone_object.close_mainframe()
+                result,output,err_msg = self.bluezone_object.close_mainframe()
             elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
                 result,output,err_msg = self.ehllapi_object.close_mainframe()
             if result:

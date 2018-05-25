@@ -857,7 +857,7 @@ class ClientWindow(wx.Frame):
         controller.kill_process()
         if platform.system() == "Windows":
             os.system("TASKKILL /F /IM QcController.exe")
-            os.system("TASKKILL /F /IM nineteen68_ehllapi.exe")
+            os.system("TASKKILL /F /IM nineteen68MFapi.exe")
         exit()
 
     def OnKillProcess(self, event):
