@@ -761,19 +761,15 @@ class Singleton_DriverUtil():
 ##                driver = webdriver.Chrome(chrome_options=choptions1, executable_path=exec_path)
 ##                flag1 = self.chrome_version(driver)
 ##                driver = None
-                print clientwindow.chromeFlag
+                ##print clientwindow.chromeFlag
                 if( clientwindow.chromeFlag == True ):
-                    if ((str(chrome_path).lower()) == 'default'):
-                        choptions = webdriver.ChromeOptions()
-                        choptions.add_argument('start-maximized')
-                        choptions.add_argument('--disable-extensions')
-                        driver = webdriver.Chrome(chrome_options=choptions, executable_path=exec_path)
-                    else:
-                        choptions = webdriver.ChromeOptions()
-                        choptions.add_argument('start-maximized')
-                        choptions.add_argument('--disable-extensions')
-                        logger.print_on_console('Choptions:',choptions)
-                        driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
+                    choptions = webdriver.ChromeOptions()
+                    choptions.add_argument('start-maximized')
+                    choptions.add_argument('--disable-extensions')
+                    if ((str(chrome_path).lower()) != 'default'):
+                        choptions.binary_location=str(chrome_path)
+                    driver = webdriver.Chrome(executable_path=exec_path,chrome_options=choptions)
+                    ##driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
                     drivermap.append(driver)
                     logger.print_on_console('Chrome browser started')
                     log.info('Chrome browser started')
