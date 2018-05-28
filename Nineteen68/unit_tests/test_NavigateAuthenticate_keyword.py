@@ -8,8 +8,8 @@ import time
 def test_NavigateAuthenticate_keyword():
         val = "yes"
         try:
-                drivers_path = "D\Nineteen68 setup\Nineteen68\Drivers"
-                CHROME_DRIVER_PATH = drivers_path + "\\IEDriverServer.exe"
+                drivers_path = "D:/Nineteen68 setup/Nineteen68/Drivers"
+                CHROME_DRIVER_PATH = drivers_path + "/IEDriverServer.exe"
                 driver = webdriver.Ie(CHROME_DRIVER_PATH)
                 driver.get("https://wslk13fodc3-002:8443/")
                 try:

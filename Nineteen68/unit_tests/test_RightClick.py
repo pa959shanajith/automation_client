@@ -4,8 +4,8 @@ import os
 def rightclick(ids):
         err_msg=None
         try:
-            drivers_path = "D:\Nineteen68_Git_Core\Nineteen68\Drivers"
-            CHROME_DRIVER_PATH = drivers_path + "\\chromedriver.exe"
+            drivers_path = "D:/Nineteen68_Git_Core/Nineteen68/Drivers"
+            CHROME_DRIVER_PATH = drivers_path + "/chromedriver.exe"
             driver = webdriver.Chrome(CHROME_DRIVER_PATH)
             driver.get("https://www.ahridirectory.org/ahridirectory/pages/rfr/defaultSearch.aspx")
             cell=driver.find_element_by_id(ids)

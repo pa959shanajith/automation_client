@@ -857,7 +857,7 @@ class ClientWindow(wx.Frame):
         controller.kill_process()
         if platform.system() == "Windows":
             os.system("TASKKILL /F /IM QcController.exe")
-            os.system("TASKKILL /F /IM nineteen68_ehllapi.exe")
+            os.system("TASKKILL /F /IM nineteen68MFapi.exe")
         exit()
 
     def OnKillProcess(self, event):
@@ -1072,6 +1072,8 @@ def check_browser():
             a.append(str(line))
         a=float(a[0][13:17])
         choptions1 = webdriver.ChromeOptions()
+        if str(configvalues['chrome_path']).lower()!="default":
+            choptions1.binary_location=str(configvalues['chrome_path'])
         choptions1.add_argument('--headless')
         driver = webdriver.Chrome(chrome_options=choptions1, executable_path=CHROME_DRIVER_PATH)
         browser_ver = driver.capabilities['version']

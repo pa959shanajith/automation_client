@@ -412,7 +412,7 @@ class Scrape:
 ##            try:
 ##                wxobject.Hide()
 ##                time.sleep(2)
-##                img=ninteen_68_desktop_scrape.obj.captureScreenshot()
+##                img=desktop_scrape.obj.captureScreenshot()
 ##                img.save('out.png')
 ##                with open("out.png", "rb") as image_file:
 ##                    encoded_string = base64.b64encode(image_file.read())

@@ -25,48 +25,54 @@ core_utils_obj = core_utils.CoreUtils()
 
 def dataTransmitter(a,*args):
     if emulator is None:
-        raise Exception("Unable to contact Ehllapi")
+        raise Exception("Unable to contact nineteen68MFapi")
     else:
         key = "".join(['h','f','g','w','e','u','y','R','^','%','$','&','B','8','7',
             'n','x','z','t','7','0','8','r','n','t','.','&','%','^','(','*','@'])
         d={"action":a,"inputs":args}
-        data_to_send = core_utils_obj.wrap(json.dumps(d).encode('utf-8'), key) + EHLLAPI_DATA_EOF
+        data_to_send = core_utils_obj.wrap(json.dumps(d).encode('utf-8'), key) + MF_API_DATA_EOF
         soc_api.send(data_to_send)
         data=""
         while True:
             data_stream = soc_api.recv(1024)
             data += data_stream
-            if EHLLAPI_DATA_EOF in data_stream:
+            if MF_API_DATA_EOF in data_stream:
                 break
-        data = data[:data.find(EHLLAPI_DATA_EOF)]
+        data = data[:data.find(MF_API_DATA_EOF)]
         return json.loads(core_utils_obj.unwrap(data, key))
 
-def check_n_init():
+def check_n_init(emulator_type):
     global emulator, soc_api
     if emulator is None:
-        path = subprocess.os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Mainframe/nineteen68_ehllapi.exe"
+        path = subprocess.os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Mainframe/nineteen68MFapi.exe"
         emulator = subprocess.Popen(path, shell=True)
 
     if soc_api is None:
         try:
             soc_api = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             soc_api.connect(("localhost",10001))
+            data = dataTransmitter("test", emulator_type)
+            if data["stat"] != 0:
+                raise Exception(data["emsg"])
         except Exception as e:
-            err_msg = "Error: Unable to launch Ehllapi."
+            err_msg = "Error: Unable to launch nineteen68MFapi."
             log.error(err_msg)
             log.error(e)
             logger.print_on_console(err_msg)
-            subprocess.os.system("TASKKILL /F /IM nineteen68_ehllapi.exe")
+            subprocess.os.system("TASKKILL /F /IM nineteen68MFapi.exe")
             emulator = None
     else:
         try:
-            data = dataTransmitter("test")
-            if data["stat"]==0:
-                pass
+            data = dataTransmitter("test", emulator_type)
+            if data["stat"] != 0:
+                err_msg = "Error: Unable to launch nineteen68MFapi."
+                log.error(err_msg)
+                log.error(data["emsg"])
+                logger.print_on_console(err_msg)
         except:
             soc_api.close()
             soc_api = None
-            check_n_init()
+            check_n_init(emulator_type)
 
 
 class EhllapiKeywords:
@@ -79,8 +85,6 @@ class EhllapiKeywords:
         self.host = None
         self.rows = 0
         self.cols = 0
-        check_n_init()
-
 
     def launch_mainframe(self,emulator_path,emulator_type):
         err_msg=None
@@ -89,6 +93,7 @@ class EhllapiKeywords:
         try:
             self.emulator_path = emulator_path
             self.emulator_type = emulator_type
+            check_n_init(self.emulator_type)
             data = dataTransmitter("launchmainframe", self.emulator_path)
             return_value = data["stat"]
             time.sleep(5)
@@ -120,7 +125,7 @@ class EhllapiKeywords:
                 if data2["stat"] == 0:
                     self.rows = int(data2["res"][0])
                     self.cols = int(data2["res"][1])
-                    res_msg = "Screen resolution is identified as "+data2["res"][0]+"x"+data2["res"][1]
+                    res_msg = "Screen resolution is identified as "+str(data2["res"][0])+"x"+str(data2["res"][1])
                     log.info(res_msg)
                     logger.print_on_console(res_msg)
                 else:
@@ -136,7 +141,7 @@ class EhllapiKeywords:
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
         except Exception as e:
-            err_msg = "Error: Unable to connect to Emulator."
+            err_msg = "Error: Unable to connect to " + self.emulator_type + " Mainframe."
             log.error(err_msg)
             log.error(e)
             logger.print_on_console(err_msg)
@@ -154,23 +159,6 @@ class EhllapiKeywords:
             logger.print_on_console(err_msg)
         except Exception as e:
             err_msg = "Error: Unable to login into " + self.emulator_type + " Mainframe."
-            log.error(err_msg)
-            log.error(e)
-            logger.print_on_console(err_msg)
-        return (return_value == 0),output,err_msg
-
-    def secure_login(self,region,userID,password):
-        err_msg=None
-        output=OUTPUT_CONSTANT
-        return_value = None
-        try:
-            # Replace Here ##########
-            # dataTransmitter(region,userID,password)
-            err_msg = "Error: Unable to login securely into " + self.emulator_type + " Mainframe."
-            log.error(err_msg)
-            logger.print_on_console(err_msg)
-        except Exception as e:
-            err_msg = "Error: Unable to login securely into " + self.emulator_type + " Mainframe."
             log.error(err_msg)
             log.error(e)
             logger.print_on_console(err_msg)
@@ -244,8 +232,8 @@ class EhllapiKeywords:
         output=OUTPUT_CONSTANT
         return_value = None
         try:
-            if MAINFRAME_EHLLAPI_MNEMONICS.has_key(function_key):
-                text = MAINFRAME_EHLLAPI_MNEMONICS[function_key]
+            if EHLLAPI_MNEMONICS.has_key(function_key):
+                text = EHLLAPI_MNEMONICS[function_key]
                 for i in range(number):
                     data1 = dataTransmitter("wait")
                     if data1["stat"] == 0:
@@ -268,7 +256,7 @@ class EhllapiKeywords:
                 err_msg = "Error: Invalid function_key  '"+function_key+"' provided."
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
-                logger.print_on_console("Supported keys are: "+str(", ".join(MAINFRAME_EHLLAPI_MNEMONICS.keys())))
+                logger.print_on_console("Supported keys are: "+str(", ".join(EHLLAPI_MNEMONICS.keys())))
         except Exception as e:
             err_msg = "Error: Unable to send function key to the Emulator screen."
             log.error(err_msg)
@@ -314,7 +302,8 @@ class EhllapiKeywords:
                 logger.print_on_console(MAINFRAME_TEXT_VERIFIED)
                 log.info(MAINFRAME_TEXT_VERIFIED)
             elif return_value == 24:
-                err_msg=MAINFRAME_TEXT_NOT_FOUND
+                err_msg=MAINFRAME_TEXT_MISMATCHED
+                log.info(err_msg)
                 log.debug("Return Value is "+str(return_value))
                 logger.print_on_console(err_msg)
             else:
@@ -438,7 +427,7 @@ class EhllapiKeywords:
             logger.print_on_console(err_msg)
             import traceback
             traceback.print_exc()
-        return True,output,err_msg
+        return (return_value == 0),output,err_msg
 
 
 def mf_close():
