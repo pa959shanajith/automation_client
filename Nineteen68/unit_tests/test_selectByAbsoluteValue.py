@@ -5,8 +5,8 @@ from selenium.webdriver.support.ui import Select
 import ast
 def selectByAbsoluteValue(input):
     err_msg=None
-    drivers_path = "D:\Nineteen68_Git_Core\Nineteen68\Drivers"
-    CHROME_DRIVER_PATH = drivers_path + "\\chromedriver.exe"
+    drivers_path = "D:/Nineteen68_Git_Core/Nineteen68/Drivers"
+    CHROME_DRIVER_PATH = drivers_path + "/chromedriver.exe"
     driver = webdriver.Chrome(CHROME_DRIVER_PATH)
     input = ast.literal_eval(input)
     if len(input)==5:

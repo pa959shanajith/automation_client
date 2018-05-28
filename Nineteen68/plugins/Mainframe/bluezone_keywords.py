@@ -67,6 +67,8 @@ class BluezoneKeywords:
             log.error(err_msg)
             log.error(e)
             logger.print_on_console(err_msg)
+            if e[1] == "Class not registered":
+                output = "x86"
         return (return_value == 0),output,err_msg
 
     def connect_session(self,psid):
@@ -467,7 +469,7 @@ class BluezoneKeywords:
         output=OUTPUT_CONSTANT
         return_value = None
         try:
-            return_value = host.CloseSession(0,1)
+            return_value = self.host.CloseSession(0,1)
         except Exception as e:
             err_msg = "Error: Unable to close emulator."
             log.error(err_msg)
@@ -937,7 +939,7 @@ class BluezoneAPIKeywords:
 
 def dataTransmitter(a,*args):
     if emulator is None:
-        raise Exception("Unable to contact nineteen68_mf_api")
+        raise Exception("Unable to contact nineteen68MFapi")
     else:
         key = "".join(['h','f','g','w','e','u','y','R','^','%','$','&','B','8','7',
             'n','x','z','t','7','0','8','r','n','t','.','&','%','^','(','*','@'])
@@ -956,7 +958,7 @@ def dataTransmitter(a,*args):
 def check_n_init(emulator_type):
     global emulator, soc_api
     if emulator is None:
-        path = subprocess.os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Mainframe/nineteen68_mf_api.exe"
+        path = subprocess.os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Mainframe/nineteen68MFapi.exe"
         emulator = subprocess.Popen(path, shell=True)
 
     if soc_api is None:
@@ -967,17 +969,17 @@ def check_n_init(emulator_type):
             if data["stat"] != 0:
                 raise Exception(data["emsg"])
         except Exception as e:
-            err_msg = "Error: Unable to launch nineteen68_mf_api."
+            err_msg = "Error: Unable to launch nineteen68MFapi."
             log.error(err_msg)
             log.error(e)
             logger.print_on_console(err_msg)
-            subprocess.os.system("TASKKILL /F /IM nineteen68_mf_api.exe")
+            subprocess.os.system("TASKKILL /F /IM nineteen68MFapi.exe")
             emulator = None
     else:
         try:
             data = dataTransmitter("test", emulator_type)
             if data["stat"] != 0:
-                err_msg = "Error: Unable to launch nineteen68_mf_api."
+                err_msg = "Error: Unable to launch nineteen68MFapi."
                 log.error(err_msg)
                 log.error(data["emsg"])
                 logger.print_on_console(err_msg)

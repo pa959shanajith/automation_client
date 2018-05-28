@@ -7,8 +7,8 @@ def verifyValuesExists(input):
         visibilityFlag=True
         flag = True
         err_msg=None
-        drivers_path = "D:\Nineteen68_Git_Core\Nineteen68\Drivers"
-        CHROME_DRIVER_PATH = drivers_path + "\\chromedriver.exe"
+        drivers_path = "D:/Nineteen68_Git_Core/Nineteen68/Drivers"
+        CHROME_DRIVER_PATH = drivers_path + "/chromedriver.exe"
         driver = webdriver.Chrome(CHROME_DRIVER_PATH)
         try:
             input = ast.literal_eval(input)

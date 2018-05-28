@@ -301,8 +301,6 @@ class BZWhll_API():
                 status["stat"] = emulator.Connect()
             if status["stat"] == 1:
                 status["emsg"] = "Unable to connect to default Emulator session. Use 'connect_session' keyword."
-                log.error(err_msg)
-                logger.print_on_console(err_msg)
         except Exception as e:
             print e
             status["emsg"] = "Error while launching " + subprocess.os.path.basename(file_path)
@@ -530,7 +528,6 @@ if __name__ == '__main__':
                     data_to_use = json.loads(decode(parsed_data.decode('utf-8')))
                     if data_to_use["action"] == "test":
                         result = {"stat": 0}
-                        print data_to_use
                         emulator_type = data_to_use["inputs"][0]
                         if emulator_type.lower() == "bluezone":
                             api_obj = BZWhll_API()

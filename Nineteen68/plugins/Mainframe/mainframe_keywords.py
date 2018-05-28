@@ -56,7 +56,6 @@ class MainframeKeywords:
             "Delete the dataset and Logoff", "Keep the existing dataset and Logoff",
             "Keep the new dataset and Logoff"]
         self.bluezone_object = BluezoneKeywords()
-        #self.bluezone_object = BluezoneAPIKeywords()
         self.ehllapi_object = EhllapiKeywords()
 
     def launch_mainframe(self,inputs):
@@ -101,6 +100,8 @@ class MainframeKeywords:
                         if output == "x86":
                             self.bluezone_object = BluezoneAPIKeywords()
                             result,output,err_msg =  self.bluezone_object.launch_mainframe(self.emulator_path, self.emulator_type)
+                            if result == False:
+                                self.bluezone_object = BluezoneKeywords()
                     elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
                         result,output,err_msg =  self.ehllapi_object.launch_mainframe(self.emulator_path, self.emulator_type)
                     #Update the status variables based on result.
@@ -545,7 +546,7 @@ class MainframeKeywords:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
             else:
-                err_msg = "Error: Invalid input!!! - GetText need 3 paramemters, 1. Row number 2. Column number 3. Length of Text."
+                err_msg = "Error: Invalid input!!! - GetText need 3 parameters, 1. Row number 2. Column number 3. Length of Text."
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
         except Exception as e:
