@@ -266,7 +266,7 @@ class EhllapiKeywords:
 
     def get_text(self,row_number,column_number,length):
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         return_value = None
         try:
             position = (self.cols * (int(row_number)-1)) + int(column_number)
@@ -321,7 +321,7 @@ class EhllapiKeywords:
     def submit_job(self,job_path,member_name):
         #Logic to submit the job
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         return_value = None
         try:
             # Replace Here ##########
@@ -339,7 +339,7 @@ class EhllapiKeywords:
     def job_status(self,job_no):
         #Logic to submit the job
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         return_value = None
         try:
             # Replace Here ##########
