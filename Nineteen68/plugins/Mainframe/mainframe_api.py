@@ -460,7 +460,7 @@ class BZWhll_API():
     def getText(self,size,row,col):
         status = {"stat": -1, "emsg": "Something Went Wrong"}
         ret = emulator.ReadScreen('', size, row, col)
-        status["stat"] == ret[0]
+        status["stat"] = ret[0]
         if status["stat"] == 1:
             status["emsg"] = "Client is not connected to a host session."
         elif status["stat"] == 2:

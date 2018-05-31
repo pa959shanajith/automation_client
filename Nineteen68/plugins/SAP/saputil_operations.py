@@ -82,7 +82,7 @@ class SapUtilKeywords:
         value=OUTPUT_CONSTANT
         try:
             if(id != None):
-                if(ses.FindById(id).type == "GuiLabel" or ses.FindById(id).Changeable == False):
+                if(ses.FindById(id).Changeable == False and ses.FindById(id).type != "GuiLabel"):
                     status=sap_constants.TEST_RESULT_PASS
                     result=sap_constants.TEST_RESULT_TRUE
                 else:

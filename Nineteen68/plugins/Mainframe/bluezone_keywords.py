@@ -257,7 +257,7 @@ class BluezoneKeywords:
     def get_text(self,row_number,column_number,length):
         #Logic to get the text at the specified location
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         return_value = 0
         try:
             buffer_var = ''
@@ -307,7 +307,7 @@ class BluezoneKeywords:
     def submit_job(self,job_path,member_name):
         #Logic to submit the job
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         return_value = 0
         try:
             buffer_var = ''
@@ -390,7 +390,7 @@ class BluezoneKeywords:
     def job_status(self,job_no):
         #Logic to submit the job
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         return_value = 0
         try:
             self.host.WaitReady(10,1000)
@@ -412,13 +412,13 @@ class BluezoneKeywords:
             status = self.host.ReadScreen('',7,6,25)
             job_status = status[1]
             if job_status != " ":
-                logger.print_on_console('Job Status :'+ jobStat+MAINFRAME_JOB_COMPLETED)
-                log.info('Job Status : %s',jobStat+MAINFRAME_JOB_COMPLETED)
+                logger.print_on_console('Job Status :'+ job_status+MAINFRAME_JOB_COMPLETED)
+                log.info('Job Status : %s',job_status+MAINFRAME_JOB_COMPLETED)
                 return_value = 1
-                output=jobStat
+                output=job_status
             else:
-                logger.print_on_console('Job Status :' + jobStat+MAINFRAME_JOB_NOT_COMPLETED)
-                log.info('Job Status : %s',jobStat+MAINFRAME_JOB_NOT_COMPLETED)
+                logger.print_on_console('Job Status :' + job_status+MAINFRAME_JOB_NOT_COMPLETED)
+                log.info('Job Status : %s',job_status+MAINFRAME_JOB_NOT_COMPLETED)
                 err_msg=MAINFRAME_JOB_NOT_COMPLETED
         except Exception as e:
             err_msg = "Error: Unable to retrieve job status."
@@ -664,7 +664,7 @@ class BluezoneAPIKeywords:
             if stat == 0:
                 textlength = len(text)
                 output_text = dataTransmitter("gettext", textlength, row_number, column_number)
-                if text == output_text["ret"]:
+                if text == output_text["res"]:
                     logger.print_on_console(MAINFRAME_SET_TEXT)
                     log.info(MAINFRAME_SET_TEXT)
                     return_value = 0
@@ -719,7 +719,7 @@ class BluezoneAPIKeywords:
 
     def get_text(self,row_number,column_number,length):
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         return_value = None
         try:
             data = dataTransmitter("gettext", int(length), int(row_number), int(column_number))
@@ -773,7 +773,7 @@ class BluezoneAPIKeywords:
     def submit_job(self,job_path,member_name):
         #Logic to submit the job
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         return_value = None
         try:
             data = dataTransmitter("setcursor", 4, 15)
@@ -829,7 +829,7 @@ class BluezoneAPIKeywords:
     def job_status(self,job_no):
         #Logic to submit the job
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         return_value = None
         try:
             data = dataTransmitter("setcursor", 4, 15)

@@ -177,9 +177,10 @@ class Text_Box:
                 if (check):
                     log.info('Parent matched')
                     if(element.is_enabled()):
-                        cursor_x,cursor_y = win32api.GetCursorPos()#handling cursor move
-                        element.type_keys('^a{BACKSPACE}')
-                        win32api.SetCursorPos((cursor_x,cursor_y))#handling cursor move
+                        for i in range(0,len(element.text_block())):
+                            cursor_x,cursor_y = win32api.GetCursorPos()#handling cursor move
+                            element.type_keys('^a{BACKSPACE}')
+                            win32api.SetCursorPos((cursor_x,cursor_y))#handling cursor move
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)
