@@ -152,6 +152,10 @@ class ScrapeWindow(wx.Frame):
             event.GetEventObject().SetLabel("Stop IRIS")
             status = cropandaddobj.startcropandadd()
         else:
+            self.Hide()
+            import cv2
+            cv2.destroyAllWindows()
+            time.sleep(1)
             d = cropandaddobj.stopcropandadd()
             self.socketIO.emit('scrape',d)
             self.Close()

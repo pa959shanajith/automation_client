@@ -19,6 +19,7 @@ log = logging.getLogger('sap_table_keywords.py')
 #-----------------------------------------------------Module Imports
 from sap_launch_keywords import Launch_Keywords
 from sap_dropdown_keywords import Dropdown_Keywords
+from radio_checkbox_keywords_sap import Radio_Checkbox_keywords
 #-----------------------------------------------------Module Imports
 
 class Table_keywords():
@@ -26,6 +27,7 @@ class Table_keywords():
     def __init__(self):
         self.uk = SapUtilKeywords()
         self.lk = Launch_Keywords()
+        self.rk = Radio_Checkbox_keywords()
 
     def getXpath(self,sap_id,elem,row,col):
         try:

@@ -53,6 +53,8 @@ class IRISKeywords():
                 res = self.gotoobject(sapelement['cord'])
                 if(res):
                     pyautogui.click()
+                    pyautogui.hotkey('ctrl','a')
+                    pyautogui.press('backspace')
                     pyautogui.typewrite(input[0], interval=0.5)
                     status=sap_constants.TEST_RESULT_PASS
                     result=sap_constants.TEST_RESULT_TRUE

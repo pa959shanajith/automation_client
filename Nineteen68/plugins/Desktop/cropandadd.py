@@ -29,8 +29,8 @@ class Cropandadd():
             self.data = {}
             self.data['view'] = []            #cords of selected parts
             self.stopflag = False
-            with open("test.jpg", "rb") as imageFile:
-                self.data['mirror'] = base64.b64encode(imageFile.read())     #screenshot
+            #with open("test.jpg", "rb") as imageFile:
+             #   self.data['mirror'] = base64.b64encode(imageFile.read())     #screenshot
             # self.data['mirror'] = ''
             #drawing = False # true if mouse is pressed
             mode = True # if True, draw rectangle. Press 'm' to toggle to curve
@@ -53,7 +53,8 @@ class Cropandadd():
                     cv2.imwrite("cropped.png", RGB_img_crop)
                     with open("cropped.png", "rb") as imageFile:
                         RGB_img_crop_im = base64.b64encode(imageFile.read())
-                    self.data['view'].append({'custname': 'img_object_'+str(ix)+'_'+str(x)+'_'+str(iy)+'_'+str(y),'cord':RGB_img_crop_im,'tag':'iris','width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix})
+                    if(ix!=x and iy!=y):
+                        self.data['view'].append({'custname': 'img_object_'+str(ix)+'_'+str(x)+'_'+str(iy)+'_'+str(y),'cord':RGB_img_crop_im,'tag':'iris','width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix})
                     cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),1)
                     self.RGB_img_c = np.copy(self.RGB_img)
 
@@ -69,12 +70,18 @@ class Cropandadd():
                 if self.stopflag:
                     break
 
-            cv2.destroyAllWindows()
+            #cv2.destroyAllWindows()
         except Exception as e:
             log.error(e)
             logger.print_on_console("Error occured in capturing iris object")
 
     def stopcropandadd(self):
+        im = PIL.ImageGrab.grab()
+        im.save('out.jpg')
+        with open("out.jpg", "rb") as imageFile:
+            self.data['mirror'] = base64.b64encode(imageFile.read())
+        import os
+        os.remove('out.jpg')
         with open('domelements.json', 'w') as outfile:
             log.info('Opening domelements.json file to write scraped objects')
             json.dump(self.data, outfile, indent=4, sort_keys=False)

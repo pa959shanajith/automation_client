@@ -347,9 +347,12 @@ class ElementKeywords():
                 if(len(arg)==1 and arg[0]==''):
                     pass
                 elif (len(arg)==2):
-                    row=int(arg[0])-1
-                    col=int(arg[1])-1
-                    elem = elem.GetCell(row, col)
+                    if(isinstance(arg[0],int) and isinstance(arg[1],int)):
+                        row=int(arg[0])-1
+                        col=int(arg[1])-1
+                        elem = elem.GetCell(row, col)
+                    else:
+                        pass
                 elif(len(arg)>2):
                     row=int(arg[2])-1
                     col=int(arg[3])-1

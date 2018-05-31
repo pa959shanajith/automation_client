@@ -164,6 +164,7 @@ class Launch_Keywords():
     def launch_application(self,input_val,*args):
         status=sap_constants.TEST_RESULT_FAIL
         result=sap_constants.TEST_RESULT_FALSE
+        value=OUTPUT_CONSTANT
         err_msg=None
         term = None
         try:
@@ -215,7 +216,7 @@ class Launch_Keywords():
             term =TERMINATE
         if term!=None:
             return term
-        return status,result,self.windowname,err_msg
+        return status,result,value,err_msg
 
     def serverConnect(self,input_val,*args):
         server=input_val[0]

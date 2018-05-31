@@ -1,22 +1,13 @@
 import logger
 import time
 import logging
-import base64
-
-
-
-#Take the screenshot
 import PIL.ImageGrab
-#show in full screen
 import numpy as np
 import cv2
-import screeninfo
 from PIL import Image
 import pyautogui
-
-import webconstants
 from constants import *
-log = logging.getLogger('popup_keywords.py')
+log = logging.getLogger('iris_operations.py')
 
 def gotoobject(webelem):
         img_rgb = webelem.decode('base64')
@@ -49,27 +40,34 @@ def gotoobject(webelem):
 
 class IRISKeywords():
     def clickiris(self,webelement,*args):
-        #img_rgb = cv2.imread('test.jpg')
-        res = gotoobject(webelement['cord'])
-        if(res):
-            pyautogui.click()
-            err_msg = None
-            status= TEST_RESULT_PASS
-            result = TEST_RESULT_TRUE
-        else:
-            status = TEST_RESULT_FAIL
-            result = TEST_RESULT_TRUE
+        status = webconstants.TEST_RESULT_FAIL
+        result = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        try:
+            res = gotoobject(webelement['cord'])
+            if(res):
+                pyautogui.click()
+                status= TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console("Error occured in clickiris")
         return status,result,None,err_msg
 
     def settextiris(self,webelement,*args):
-        #img_rgb = cv2.imread('test.jpg')
-        res = gotoobject(webelement['cord'])
-        if(res):
-            pyautogui.click()
-            pyautogui.typewrite(args[0][0], interval=0.1)
-            status= TEST_RESULT_PASS
-            result = TEST_RESULT_TRUE
-        else:
-            status = TEST_RESULT_FAIL
-            result = TEST_RESULT_TRUE
+        status = webconstants.TEST_RESULT_FAIL
+        result = webconstants.TEST_RESULT_FALSE
+        err_msg=None
+        try:
+            res = gotoobject(webelement['cord'])
+            if(res):
+                pyautogui.click()
+                pyautogui.hotkey('ctrl','a')
+                pyautogui.press('backspace')
+                pyautogui.typewrite(args[0][0], interval=0.1)
+                status= TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console("Error occured in settextiris")
         return status,result,None,err_msg

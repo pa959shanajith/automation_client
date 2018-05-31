@@ -148,9 +148,11 @@ class ScrapeWindow(wx.Frame):
             self.startbutton.Disable()
             event.GetEventObject().SetLabel("Stop IRIS")
             status = cropandaddobj.startcropandadd()
-##            wx.MessageBox('CLICKANDADD: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
-
         else:
+            self.Hide()
+            import cv2
+            cv2.destroyAllWindows()
+            time.sleep(1)
             d = cropandaddobj.stopcropandadd()
             print 'Scrapped data saved successfully in domelements.json file'
             self.socketIO.emit('scrape',d)
