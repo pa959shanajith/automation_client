@@ -37,6 +37,7 @@ i = 0
 #Terminate Flag
 terminate_flag=False
 pause_flag=False
+iris_flag = False
 break_point=-1
 socket_object = None
 thread_tracker = []
@@ -175,6 +176,10 @@ class Controller():
 ##            self.get_all_the_imports('ImageProcessing')
             self.get_all_the_imports('WebScrape')
             self.get_all_the_imports('Web')
+            global iris_flag
+            if(os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
+                self.get_all_the_imports('IRIS')
+                iris_flag = True
             import web_dispatcher
             self.web_dispatcher_obj = web_dispatcher.Dispatcher()
             self.web_dispatcher_obj.exception_flag=self.exception_flag
@@ -185,7 +190,11 @@ class Controller():
 
     def __load_desktop(self):
         try:
+            global iris_flag
             self.get_all_the_imports('Desktop')
+            if(os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
+                self.get_all_the_imports('IRIS')
+                iris_flag = True
             import desktop_dispatcher
             self.desktop_dispatcher_obj = desktop_dispatcher.DesktopDispatcher()
             self.desktop_dispatcher_obj.exception_flag=self.exception_flag
@@ -196,7 +205,11 @@ class Controller():
 
     def __load_sap(self):
         try:
+            global iris_flag
             self.get_all_the_imports('SAP')
+            if(os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
+                self.get_all_the_imports('IRIS')
+                iris_flag = True
             import sap_dispatcher
             self.sap_dispatcher_obj = sap_dispatcher.SAPDispatcher()
             self.sap_dispatcher_obj.exception_flag=self.exception_flag
@@ -592,7 +605,7 @@ class Controller():
                     #Web apptype module call
                     if self.web_dispatcher_obj == None:
                         self.__load_web()
-                    result = self.invokewebkeyword(teststepproperty,self.web_dispatcher_obj,inpval,args[0])
+                    result = self.invokewebkeyword(teststepproperty,self.web_dispatcher_obj,inpval,args[0],iris_flag)
                 elif teststepproperty.apptype.lower() == APPTYPE_MOBILE:
                     #MobileWeb apptype module call
                     if self.mobile_web_dispatcher_obj == None:
@@ -612,13 +625,13 @@ class Controller():
                     #Desktop apptype module call
                     if self.desktop_dispatcher_obj == None:
                         self.__load_desktop()
-                    result = self.invokeDesktopkeyword(teststepproperty,self.desktop_dispatcher_obj,inpval)
+                    result = self.invokeDesktopkeyword(teststepproperty,self.desktop_dispatcher_obj,inpval,iris_flag)
                     #----------------------------------------------------------------------------------------------SAP change
                 elif teststepproperty.apptype.lower() == APPTYPE_SAP:
                     #SAP apptype module call
                     if self.sap_dispatcher_obj == None:
                         self.__load_sap()
-                    result = self.invokeSAPkeyword(teststepproperty,self.sap_dispatcher_obj,inpval)
+                    result = self.invokeSAPkeyword(teststepproperty,self.sap_dispatcher_obj,inpval,iris_flag)
                 #----------------------------------------------------------------------------------------------SAP change
                 elif teststepproperty.apptype.lower() == APPTYPE_DESKTOP_JAVA:
                     #OEBS apptype module call
@@ -741,8 +754,8 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,socket_object,*inputval)
         return res
 
-    def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
+    def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj,iris_flag):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,iris_flag)
         return res
 
     def invokemobilekeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
@@ -753,12 +766,12 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
         return res
 
-    def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval)
+    def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval,iris_flag):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,iris_flag)
         return res
 
-    def invokeSAPkeyword(self,teststepproperty,dispatcher_obj,inputval):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval)
+    def invokeSAPkeyword(self,teststepproperty,dispatcher_obj,inputval,iris_flag):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,iris_flag)
         return res
 
     def invokemainframekeyword(self,teststepproperty,dispatcher_obj,inputval):

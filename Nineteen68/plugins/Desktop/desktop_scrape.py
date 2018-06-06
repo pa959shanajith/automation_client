@@ -26,12 +26,12 @@ import win32gui
 import base64
 #-------------------
 
-import cropandadd
-cropandaddobj = cropandadd.Cropandadd()
+cropandaddobj = None
 
 obj=None
+
 class ScrapeWindow(wx.Frame):
-    def __init__(self, parent,id, title,filePath,socketIO):
+    def __init__(self, parent,id, title,filePath,socketIO,irisFlag):
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(200, 150) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
         self.SetBackgroundColour('#e6e7e8')
@@ -46,6 +46,7 @@ class ScrapeWindow(wx.Frame):
         input_val.append(windowname)
         input_val.append(5)
         status = obj.find_window_and_attach(input_val)
+        self.irisFlag = irisFlag
         if desktop_launch_keywords.app_uia != None and status[0].lower() != 'fail':
             if status!=TERMINATE:
                 self.panel = wx.Panel(self)
@@ -53,10 +54,12 @@ class ScrapeWindow(wx.Frame):
                 self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)   # need to implement OnExtract()
                 self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,38 ), size=(175, 28))
                 self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)   # need to implement OnExtract()
-                self.Centre()
-                self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,68 ), size=(175, 28))
-                self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
-
+                if(irisFlag):
+                    import cropandadd
+                    global cropandaddobj
+                    cropandaddobj = cropandadd.Cropandadd()
+                    self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,68 ), size=(175, 28))
+                    self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
                 self.Centre()
                 style = self.GetWindowStyle()
                 self.SetWindowStyle( style|wx.STAY_ON_TOP )
@@ -79,7 +82,8 @@ class ScrapeWindow(wx.Frame):
         if app_uia != None:
             if state == True:
                 self.fullscrapebutton.Disable()
-                self.cropbutton.Disable()
+                if(self.irisFlag):
+                    self.cropbutton.Disable()
     ##        self.comparebutton.Disable()
                 desktop_scraping_obj.clickandadd('STARTCLICKANDADD',self)
                 event.GetEventObject().SetLabel("Stop ClickAndAdd")
@@ -129,7 +133,8 @@ class ScrapeWindow(wx.Frame):
     def fullscrape(self,event):
         logger.print_on_console('Performing full scrape...')
         self.startbutton.Disable()
-        self.cropbutton.Disable()
+        if(self.irisFlag):
+            self.cropbutton.Disable()
 ##        print 'desktop_scraping_obj:',desktop_scraping_obj
 ####        self.comparebutton.Disable()
         app_uia = desktop_launch_keywords.app_uia
@@ -171,10 +176,14 @@ class ScrapeWindow(wx.Frame):
 
     def cropandadd(self,event):
         state = event.GetEventObject().GetValue()
+        global cropandaddobj
+        obj=desktop_launch_keywords.Launch_Keywords()
         if state == True:
+            obj.set_to_foreground()
             self.fullscrapebutton.Disable()
             self.startbutton.Disable()
             event.GetEventObject().SetLabel("Stop IRIS")
+            time.sleep(1)
             status = cropandaddobj.startcropandadd()
         else:
             self.Hide()

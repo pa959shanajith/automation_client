@@ -24,12 +24,11 @@ import json
 import time
 import base64
 import core_utils
-import cropandadd
-cropandaddobj = cropandadd.Cropandadd()
+cropandaddobj = None
 obj=None
 
 class ScrapeWindow(wx.Frame):
-    def __init__(self, parent,id, title,filePath,socketIO):
+    def __init__(self, parent,id, title,filePath,socketIO,irisFlag):
         self.uk=SapUtilKeywords()
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(200, 150) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
@@ -47,15 +46,19 @@ class ScrapeWindow(wx.Frame):
         input_val.append(fileLoc)
         input_val.append(windowname)
         status = obj.launch_application(input_val)
-        print status
+        self.irisFlag = irisFlag
         if status!=TERMINATE:
             self.panel = wx.Panel(self)
             self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd",pos=(12,8 ), size=(175, 28))
             self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)
             self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,38 ), size=(175, 28))
             self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)
-            self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,68 ), size=(175, 28))
-            self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
+            if(irisFlag):
+                import cropandadd
+                global cropandaddobj
+                cropandaddobj = cropandadd.Cropandadd()
+                self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,68 ), size=(175, 28))
+                self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
             self.Centre()
             style = self.GetWindowStyle()
             self.SetWindowStyle( style|wx.STAY_ON_TOP )
@@ -70,7 +73,8 @@ class ScrapeWindow(wx.Frame):
         state = event.GetEventObject().GetValue()
         if state == True:
             self.fullscrapebutton.Disable()
-            self.cropbutton.Disable()
+            if(self.irisFlag):
+                self.cropbutton.Disable()
             sap_scraping_obj.clickandadd('STARTCLICKANDADD')
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
         else:
@@ -106,7 +110,8 @@ class ScrapeWindow(wx.Frame):
 
     def fullscrape(self,event):
         self.startbutton.Disable()
-        self.cropbutton.Disable()
+        if(self.irisFlag):
+            self.cropbutton.Disable()
         SapGui=self.uk.getSapObject()
         wndname=sap_scraping_obj.getWindow(SapGui)
         wnd_title = wndname.__getattr__("Text")
@@ -146,6 +151,7 @@ class ScrapeWindow(wx.Frame):
         SapGui=self.uk.getSapObject()
         wndname=sap_scraping_obj.getWindow(SapGui)
         state = event.GetEventObject().GetValue()
+        global cropandaddobj
         if state == True:
             self.fullscrapebutton.Disable()
             self.startbutton.Disable()

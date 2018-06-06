@@ -19,7 +19,6 @@ import desktop_tab_control_keywords
 import desktop_date_control_keywords
 import desktop_treeview_keywords
 import screenshot_keywords
-import iris_operations
 import json
 import logger
 import desktop_constants
@@ -47,7 +46,6 @@ class DesktopDispatcher:
     date_control_keywords_obj = desktop_date_control_keywords.DateControlKeywords()
     desktop_custom_object_obj =desktop_custom_object.CustomObjectHandler()
     tree_keywords_obj=desktop_treeview_keywords.Tree_View_Keywords()
-    iris_object = iris_operations.IRISKeywords()
 ##    outook_obj=outlook.OutlookKeywords()
 
     def __init__(self):
@@ -88,7 +86,7 @@ class DesktopDispatcher:
                 }
 #-----------------------------------------------------------------for custom objects
 
-    def dispatcher(self,teststepproperty,input):
+    def dispatcher(self,teststepproperty,input,iris_flag):
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
@@ -201,10 +199,15 @@ class DesktopDispatcher:
 ##                    'selecttreeelement':self.tree_keywords_obj.select_element,
                     'selecttreenode':self.tree_keywords_obj.click_tree_element,
 ##                    'doubleclicktreenode':self.tree_keywords_obj.double_click_tree_element,
-                    'getnodenamebyindex':self.tree_keywords_obj.getElementTextByIndex,
-                    'clickiris':self.iris_object.clickiris,
-                    'settextiris':self.iris_object.settextiris
+                    'getnodenamebyindex':self.tree_keywords_obj.getElementTextByIndex
                 }
+
+            if(iris_flag):
+                import iris_operations
+                iris_object = iris_operations.IRISKeywords()
+                dict['clickiris'] = iris_object.clickiris
+                dict['settextiris'] = iris_object.settextiris
+                dict['gettextiris'] = iris_object.gettextiris
 
             email_dict={'getemail': 1,
                   'getfrommailid' : 2,
@@ -234,10 +237,11 @@ class DesktopDispatcher:
                             app_uia = desktop_launch_keywords.app_uia
                             SetForegroundWindow(find_window(title=desktop_launch_keywords.window_name))
                             ele = {'cord': teststepproperty.cord}
+                            result= dict[keyword](ele,input,output)
                         else:
                             app_uia = desktop_launch_keywords.app_uia
                             ele = self.get_desktop_element(objectname,url,app_uia)
-                    result= dict[keyword](ele,url,input,output)
+                            result= dict[keyword](ele,url,input,output)
 
                 if not(desktop_constants.ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE

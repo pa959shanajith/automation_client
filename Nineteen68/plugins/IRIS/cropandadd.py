@@ -10,7 +10,8 @@ import screeninfo
 drawing1 = False
 ix,iy = -1,-1
 log = logging.getLogger('cropandadd.py')
-
+from pywinauto.findwindows import find_window
+from pywinauto.win32functions import SetForegroundWindow
 
 class Cropandadd():
     def startcropandadd(self):
@@ -64,8 +65,12 @@ class Cropandadd():
             cv2.setMouseCallback('image',draw_rect)
             cv2.moveWindow('image', screen.x - 1, screen.y - 1)
             cv2.setWindowProperty('image', cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
+            flag = False
             while(1):
                 cv2.imshow('image',self.RGB_img)
+                if(not flag):
+                    flag = True
+                    SetForegroundWindow(find_window(title='image'))
                 k = cv2.waitKey(1) & 0xFF
                 if self.stopflag:
                     break
