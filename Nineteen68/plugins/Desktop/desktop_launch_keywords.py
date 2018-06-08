@@ -81,7 +81,7 @@ class Launch_Keywords():
             term =TERMINATE
         if term!=None:
             return term
-        return status,result,self.windowname,err_msg
+        return status,result,verb,err_msg
 
     def getPageTitle(self,*args):
         status=desktop_constants.TEST_RESULT_FAIL
@@ -404,7 +404,7 @@ class Launch_Keywords():
         except Exception as e:
             logger.print_on_console(e)
 
-        return status,result,self.windowname,err_msg
+        return status,result,verb,err_msg
 
 
     def getWindowText(self,hwnd):

@@ -22,7 +22,6 @@ import radio_checkbox_keywords_sap
 import saputil_operations
 import sap_table_keywords
 import sap_shell_keywords
-import iris_operations
 #-------------------------------------------------------------
 import sap_constants
 import constants
@@ -42,7 +41,6 @@ class SAPDispatcher:
     saputil_keywords_obj=saputil_operations.SapUtilKeywords()
     table_keywords_obj=sap_table_keywords.Table_keywords()
     shell_keywords_obj=sap_shell_keywords.Shell_Keywords()
-    iris_object = iris_operations.IRISKeywords()
 
     def __init__(self):
 
@@ -75,7 +73,7 @@ class SAPDispatcher:
 #-----------------------------------------------------------------for custom objects
 
 
-    def dispatcher(self,teststepproperty,input):
+    def dispatcher(self,teststepproperty,input,iris_flag):
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
@@ -180,12 +178,15 @@ class SAPDispatcher:
                   'getnodenamebyindex':self.shell_keywords_obj.getNodeNameByIndex,
                   'setshelltext':self.shell_keywords_obj.setShellText,
                   'getrowcolbytext':self.shell_keywords_obj.getRowColByText,
-                  'verifytreepath':self.shell_keywords_obj.verifyTreePath,
-                  'clickiris':self.iris_object.clickiris,
-                  'settextiris':self.iris_object.settextiris
+                  'verifytreepath':self.shell_keywords_obj.verifyTreePath
                    }
 
-
+            if(iris_flag):
+                import iris_operations
+                iris_object = iris_operations.IRISKeywords()
+                dict['clickiris'] = iris_object.clickiris
+                dict['settextiris'] = iris_object.settextiris
+                dict['gettextiris'] = iris_object.gettextiris
 
             keyword=keyword.lower()
             if keyword in dict.keys():
@@ -194,6 +195,13 @@ class SAPDispatcher:
                 else:
                     if (teststepproperty.cord != None and teststepproperty.cord != ''):
                         objectname = {'cord': teststepproperty.cord}
+                        from sap_scraping import Scrape
+                        scrapingObj=Scrape()
+                        sapgui = self.saputil_keywords_obj.getSapObject()
+                        if(sapgui != None):
+                            wnd = scrapingObj.getWindow(sapgui)
+                            wnd = wnd.Text + '/'
+                            self.launch_keywords_obj.setWindowToForeground(wnd)
                     result= dict[keyword](objectname,input,output)
                 if not(sap_constants.ELEMENT_FOUND) and self.exception_flag:
                     logger.print_on_console('Element not found terminating')

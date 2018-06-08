@@ -38,6 +38,7 @@ mobileScrapeFlag=False
 mobileWebScrapeFlag=False
 debugFlag = False
 oebsScrapeFlag = False
+irisFlag = False
 socketIO = None
 allow_connect = False
 icesession = None
@@ -197,7 +198,6 @@ class MainNamespace(BaseNamespace):
         con = controller.Controller()
         global browsername
         browsername = args[0]
-        con =controller.Controller()
         con.get_all_the_imports('Desktop')
         import desktop_scrape
         global desktopScrapeObj
@@ -211,7 +211,6 @@ class MainNamespace(BaseNamespace):
             con = controller.Controller()
             global browsername
             browsername = args[0]
-            con =controller.Controller()
             con.get_all_the_imports('SAP')
             import sap_scrape
             global sapScrapeObj
@@ -950,6 +949,11 @@ class ClientWindow(wx.Frame):
         global mobileScrapeFlag,qcConFlag,mobileWebScrapeFlag,desktopScrapeFlag
         global sapScrapeFlag,debugFlag,browsername,action,oebsScrapeFlag
         global socketIO,data
+        global irisFlag
+        con = controller.Controller()
+        if(irisFlag == True):
+            if(os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
+                con.get_all_the_imports('IRIS')
         if mobileScrapeFlag==True:
             self.new = mobileScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
             mobileScrapeFlag=False
@@ -960,11 +964,11 @@ class ClientWindow(wx.Frame):
             self.new = mobileWebScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",browser = browsername,socketIO = socketIO)
             mobileWebScrapeFlag=False
         elif desktopScrapeFlag==True:
-            self.new = desktopScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO)
+            self.new = desktopScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             desktopScrapeFlag=False
             browsername = ''
         elif sapScrapeFlag==True:
-            self.new = sapScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO)
+            self.new = sapScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             sapScrapeFlag=False
         elif oebsScrapeFlag==True:
             self.new = oebsScrapeObj.ScrapeDispatcher(parent = None,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO)
@@ -976,11 +980,11 @@ class ClientWindow(wx.Frame):
             browsernumbers = ['1','2','3','6']
             if browsername in browsernumbers:
                 logger.print_on_console('Browser name : '+str(browsername))
-                con = controller.Controller()
+                #con = controller.Controller()
                 con.get_all_the_imports('Web')
                 con.get_all_the_imports('WebScrape')
                 import Nineteen68_WebScrape
-                self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data)
+                self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data,irisFlag = irisFlag)
                 browsername = ''
             else:
                 import pause_display_operation
@@ -992,12 +996,13 @@ class ClientWindow(wx.Frame):
                 elif flag == 'display':
                     #call display logic
                     self.new = pause_display_operation.Display(parent = self,id = -1, title="SLK Nineteen68 - Display Variable",input = inputvalue)
-
     def verifyMACAddress(self):
         flag = False
         core_utils_obj = core_utils.CoreUtils()
         system_mac = core_utils_obj.getMacAddress()
         mac_verification_key = "".join(['N','1','i','1','N','2','e','3','T','5','e','8','E','1','3','n','2','1','S','i','X','t','Y','3','4','e','I','g','H','t','5','5'])
+        irisMAC = []
+        global irisFlag
         try:
             with open(CERTIFICATE_PATH+'\license.key', mode='r') as f:
                 key = "".join(f.readlines()[1:-1]).replace("\n","").replace("\r","")
@@ -1007,8 +1012,16 @@ class ClientWindow(wx.Frame):
                     mac_addr = mac_addr.split(",")
                 else:
                     mac_addr = [mac_addr]
+                index = 0
+                for mac in mac_addr:
+                    if(str(mac).startswith("IRIS")):
+                        mac_addr[index] = mac[4:]
+                        irisMAC.append(mac[4:])
+                    index = index + 1
                 if(system_mac in mac_addr):
                     flag = True
+                    if(system_mac in irisMAC):
+                        irisFlag = True
         except:
             pass
         if not flag:

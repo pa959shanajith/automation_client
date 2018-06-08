@@ -17,7 +17,6 @@ import table_keywords
 import utilweb_operations
 import element_operations
 import textbox_operations
-import iris_operations
 import dropdown_listbox
 import utilweb_operations
 import static_text_keywords
@@ -48,7 +47,6 @@ class Dispatcher:
     dropdown_list_object = dropdown_listbox.DropdownKeywords()
     util_object = utilweb_operations.UtilWebKeywords()
     statict_text_object = static_text_keywords.StaticTextKeywords()
-    iris_object = iris_operations.IRISKeywords()
     custom_object=custom_keyword.CustomKeyword()
     webelement_map=OrderedDict()
 
@@ -56,7 +54,7 @@ class Dispatcher:
         self.exception_flag=''
         self.action=None
 
-    def dispatcher(self,teststepproperty,input,reporting_obj):
+    def dispatcher(self,teststepproperty,input,reporting_obj,iris_flag):
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
@@ -294,10 +292,16 @@ class Dispatcher:
                   'verifytextexists':self.statict_text_object.verify_text_exists,
                   'verifypagetitle':self.browser_object.verify_page_title,
                   'clearcache':self.browser_object.clear_cache,
-                  'navigatewithauthenticate':self.browser_object.navigate_with_authenticate,
-                  'clickiris':self.iris_object.clickiris,
-                  'settextiris':self.iris_object.settextiris
+                  'navigatewithauthenticate':self.browser_object.navigate_with_authenticate
                 }
+
+            if(iris_flag):
+                import iris_operations
+                iris_object = iris_operations.IRISKeywords()
+                dict['clickiris'] = iris_object.clickiris
+                dict['settextiris'] = iris_object.settextiris
+                dict['gettextiris'] = iris_object.gettextiris
+
             if browser_Keywords.driver_obj is not None:
                 browser_info=browser_Keywords.driver_obj.capabilities
                 reporting_obj.browser_type=browser_info.get('browserName')

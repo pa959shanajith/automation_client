@@ -10,16 +10,14 @@ import time
 import objectspy
 import core_utils
 
-import cropandadd
-
+cropandaddobj = None
 browserobj = browserops.BrowserOperations()
 clickandaddoj = clickandadd.Clickandadd()
 fullscrapeobj = fullscrape.Fullscrape()
-cropandaddobj = cropandadd.Cropandadd()
 
 class ScrapeWindow(wx.Frame):
     #----------------------------------------------------------------------
-    def __init__(self, parent,id, title,browser,socketIO,action,data):
+    def __init__(self, parent,id, title,browser,socketIO,action,data,irisFlag):
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(200, 150) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
@@ -32,6 +30,7 @@ class ScrapeWindow(wx.Frame):
         self.action = action
         self.data = data
         status = obj.openBrowser(browser)
+        self.irisFlag = irisFlag
         if status == False:
             self.socketIO.emit('scrape',status)
             driver = browserops.driver
@@ -45,8 +44,12 @@ class ScrapeWindow(wx.Frame):
                 self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)   # need to implement OnExtract()
                 self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,48 ), size=(175, 28))
                 self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)   # need to implement OnExtract()
-                self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,78 ), size=(175, 28))
-                self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
+                if(irisFlag):
+                    import cropandadd
+                    global cropandaddobj
+                    cropandaddobj = cropandadd.Cropandadd()
+                    self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,78 ), size=(175, 28))
+                    self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
 
             elif(self.action == 'compare'):
                 browserops.driver.get(data['scrapedurl'])
@@ -71,7 +74,8 @@ class ScrapeWindow(wx.Frame):
         state = event.GetEventObject().GetValue()
         if state == True:
             self.fullscrapebutton.Disable()
-            self.cropbutton.Disable()
+            if(self.irisFlag):
+                self.cropbutton.Disable()
             status = clickandaddoj.startclickandadd()
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
 ##            wx.MessageBox('CLICKANDADD: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
@@ -125,7 +129,8 @@ class ScrapeWindow(wx.Frame):
     def fullscrape(self,event):
         print 'Performing full scrape'
         self.startbutton.Disable()
-        self.cropbutton.Disable()
+        if(self.irisFlag):
+            self.cropbutton.Disable()
         d = fullscrapeobj.fullscrape()
 
         # 10 is the limit of MB set as per Nineteen68 standards
@@ -143,6 +148,7 @@ class ScrapeWindow(wx.Frame):
 
     def cropandadd(self,event):
         state = event.GetEventObject().GetValue()
+        global cropandaddobj
         if state == True:
             self.fullscrapebutton.Disable()
             self.startbutton.Disable()
