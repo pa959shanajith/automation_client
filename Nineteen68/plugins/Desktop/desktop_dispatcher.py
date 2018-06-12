@@ -201,13 +201,16 @@ class DesktopDispatcher:
 ##                    'doubleclicktreenode':self.tree_keywords_obj.double_click_tree_element,
                     'getnodenamebyindex':self.tree_keywords_obj.getElementTextByIndex
                 }
-
             if(iris_flag):
                 import iris_operations
                 iris_object = iris_operations.IRISKeywords()
                 dict['clickiris'] = iris_object.clickiris
                 dict['settextiris'] = iris_object.settextiris
                 dict['gettextiris'] = iris_object.gettextiris
+                dict['getrowcountiris'] = iris_object.getrowcountiris
+                dict['getcolcountiris'] = iris_object.getcolcountiris
+                dict['getcellvalueiris'] = iris_object.getcellvalueiris
+                
 
             email_dict={'getemail': 1,
                   'getfrommailid' : 2,
@@ -235,7 +238,8 @@ class DesktopDispatcher:
                     if objectname != '':
                         if teststepproperty.cord != None and teststepproperty.cord != '':
                             app_uia = desktop_launch_keywords.app_uia
-                            SetForegroundWindow(find_window(title=desktop_launch_keywords.window_name))
+                            if(desktop_launch_keywords.window_name != None):
+                                SetForegroundWindow(find_window(title=desktop_launch_keywords.window_name))
                             ele = {'cord': teststepproperty.cord}
                             result= dict[keyword](ele,input,output)
                         else:
@@ -269,8 +273,6 @@ class DesktopDispatcher:
             result=list(result)
             result[3]=err_msg
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             log.error(e)
             #logger.print_on_console('Exception at dispatcher')
         if err_msg!=None:
