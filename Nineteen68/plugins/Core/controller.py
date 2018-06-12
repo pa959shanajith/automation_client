@@ -1075,7 +1075,6 @@ class Controller():
     def invoke_parralel_exe(self,action,input_breakpoint,mythread):
         #create a ThreadPoolExecutor to perform parallel execution
         executor = ThreadPoolExecutor(max_workers=len(browsers))
-        print
         #create Future object of  size number of browsers selected
         for browser in range(len(browsers)):
             #create a future object and start execution
