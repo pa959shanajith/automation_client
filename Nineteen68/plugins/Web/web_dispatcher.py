@@ -301,7 +301,10 @@ class Dispatcher:
                 dict['clickiris'] = iris_object.clickiris
                 dict['settextiris'] = iris_object.settextiris
                 dict['gettextiris'] = iris_object.gettextiris
-
+                dict['getrowcountiris'] = iris_object.getrowcountiris
+                dict['getcolcountiris'] = iris_object.getcolcountiris
+                dict['getcellvalueiris'] = iris_object.getcellvalueiris
+                
             if browser_Keywords.driver_obj is not None:
                 browser_info=browser_Keywords.driver_obj.capabilities
                 reporting_obj.browser_type=browser_info.get('browserName')

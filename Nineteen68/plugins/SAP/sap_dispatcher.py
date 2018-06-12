@@ -187,7 +187,10 @@ class SAPDispatcher:
                 dict['clickiris'] = iris_object.clickiris
                 dict['settextiris'] = iris_object.settextiris
                 dict['gettextiris'] = iris_object.gettextiris
-
+                dict['getrowcountiris'] = iris_object.getrowcountiris
+                dict['getcolcountiris'] = iris_object.getcolcountiris
+                dict['getcellvalueiris'] = iris_object.getcellvalueiris
+                
             keyword=keyword.lower()
             if keyword in dict.keys():
                 if keyword=='serverconnect' or keyword=='launchapplication' or keyword=='starttransaction' or keyword=='toolbaraction' :
