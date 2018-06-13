@@ -69,7 +69,7 @@ def hough_transform_p(img,pos):
     lines = cv2.HoughLinesP(edges,rho=1, theta=np.pi, threshold=int(0.8*edges.shape[0]), minLineLength=int(0.6*edges.shape[0]), maxLineGap=int(0.02*edges.shape[0]))
     lines_t = []
     for line in lines:
-		lines_t.append(line[0].tolist())
+        lines_t.append(line[0].tolist())
     # remove duplicates
     lines = remove_duplicates(lines_t)
 
