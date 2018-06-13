@@ -20,7 +20,7 @@ import os
 class readConfig():
 
     def __init__(self):
-        self.config_path = os.environ["NINETEEN68_HOME"] + '/config.json'
+        self.config_path = os.environ["NINETEEN68_HOME"] + '/Lib/config.json'
 
     def readJson(self):
         configvalues={"server_ip":"", "server_port":"", "ignore_certificate":"",
