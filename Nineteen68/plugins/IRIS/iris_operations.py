@@ -192,7 +192,7 @@ class IRISKeywords():
                 the_img = the_img.resize((int(width*5), int(height*5)), Image.ANTIALIAS)
                 text = pytesseract.image_to_string(the_img)
                 status= TEST_RESULT_PASS
-                result = TEST_RESULT_TRUE
+                result = text
                 value = text
                 os.remove(filename)
                 os.remove('cropped.png')
@@ -204,8 +204,7 @@ class IRISKeywords():
         return status,result,value,err_msg
 
     def getrowcountiris(self,element,*args):
-        vertical = []
-        horizontal = []        
+        global horizontal,vertical      
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
@@ -233,8 +232,7 @@ class IRISKeywords():
         return status,result,value,err_msg
 
     def getcolcountiris(self,element,*args):
-        vertical = []
-        horizontal = []        
+        global horizontal,vertical          
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
@@ -262,8 +260,7 @@ class IRISKeywords():
         return status,result,value,err_msg
 
     def getcellvalueiris(self,element,*args):
-        vertical = []
-        horizontal = []        
+        global horizontal,vertical        
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
