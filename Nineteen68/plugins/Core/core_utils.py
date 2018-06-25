@@ -104,10 +104,11 @@ class CoreUtils():
             mac=ipdata[phy_st:phy_en].split(':')[1].strip()
         else:
             for line in os.popen("/sbin/ifconfig"):
-                if line.lower().find('ether') > -1:
+                if line.strip().lower().find('ether') > -1:
                     if(sys.platform == 'darwin'):
-                        mac = line.split()[2]
+                        mac = line.strip().lower()[6:]
                     else:
                         mac = line.split()[4]
                     break
+        mac = str(mac).replace('-',':')
         return str(mac).strip()
