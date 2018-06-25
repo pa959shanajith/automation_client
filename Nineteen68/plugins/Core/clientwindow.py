@@ -1037,9 +1037,9 @@ class ClientWindow(wx.Frame):
                 key = core_utils_obj.unwrap(key, mac_verification_key)
                 mac_addr = key[36:-36]
                 if ("," in mac_addr):
-                    mac_addr = (mac_addr.replace('-',':')).split(",")
+                    mac_addr = (mac_addr.replace('-',':').replace(' ','')).split(",")
                 else:
-                    mac_addr = [mac_addr.replace('-',':')]
+                    mac_addr = [mac_addr.replace('-',':').replace(' ','')]
                 index = 0
                 for mac in mac_addr:
                     if(str(mac).startswith("IRIS")):
