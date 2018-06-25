@@ -19,8 +19,11 @@ os.environ["NINETEEN68_HOME"] = args.NINETEEN68_HOME
 configobj = readconfig.readConfig()
 configvalues = configobj.readJson()
 jsonSyntaxErrorFlag = False
+configMissingFlag = False
 if configvalues.has_key('errorflag'):
     jsonSyntaxErrorFlag = True
+elif configvalues.has_key('configmissing'):
+    configMissingFlag = True
 
 """
 This code snippet blocks the inheritance of file handlers from
@@ -48,7 +51,10 @@ if __name__ == "__main__":
     print('*******************************************************************************************************')
     print('=========================================Nineteen68 Client Window======================================')
     print('*******************************************************************************************************')
-    if jsonSyntaxErrorFlag:
+    if configMissingFlag:
+        logger.print_on_console( "Configure Nineteen68 Client by navigating to Configuration ->Edit ->Edit Config")
+        log.info("Configure Nineteen68 Client by navigating to Configuration ->Edit ->Edit Config")
+    elif jsonSyntaxErrorFlag:
         logger.print_on_console( "[Error]: Syntax error in config.json file, please check and restart the client window.")
         log.info("[Error]: Syntax error in config.json file, and please check and restart the client window.")
         log.error(configvalues['errorflag'])

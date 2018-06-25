@@ -28,29 +28,31 @@ class readConfig():
         "queryTimeOut":"", "timeOut":"", "stepExecutionWait":"", "displayVariableTimeOut":"",
         "retrieveURL":"", "delay":"", "ignoreVisibilityCheck":"", "exception_flag":"",
         "server_cert":"", "enableSecurityCheck":""}
-        try:
-            config = json.loads(open(self.config_path).read())
-            params = config['configuration']
-            configvalues['server_ip']=params['server_ip']
-            configvalues['server_port']=params['server_port']
-            configvalues['ignore_certificate']=params['ignore_certificate']
-            configvalues['chrome_path']=params['chrome_path']
-            configvalues['bit_64']=params['bit_64']
-            configvalues['logFile_Path']=params['logFile_Path']
-            configvalues['screenShot_Flag']=params['screenShot_Flag']
-            configvalues['queryTimeOut']=params['queryTimeOut']
-            configvalues['timeOut']=params['timeOut']
-            configvalues['stepExecutionWait']=params['stepExecutionWait']
-            configvalues['displayVariableTimeOut'] = params['displayVariableTimeOut']
-            configvalues['retrieveURL']=params['retrieveURL']
-            configvalues['delay']=params['delay']
-            configvalues['ignoreVisibilityCheck']=params['ignoreVisibilityCheck']
-            configvalues['exception_flag']=params['exception_flag']
-            configvalues['server_cert']=params['server_cert']
-            configvalues['enableSecurityCheck'] = params['enableSecurityCheck']
-            if params.has_key('ignore_server_certificate'):
-                configvalues['ignore_server_certificate'] = params['ignore_server_certificate']
-        except Exception as e:
-            configvalues['errorflag']=e
+        if os.path.isfile(self.config_path)==True:
+            try:
+                config = json.loads(open(self.config_path).read())
+                params = config['configuration']
+                configvalues['server_ip']=params['server_ip']
+                configvalues['server_port']=params['server_port']
+                configvalues['ignore_certificate']=params['ignore_certificate']
+                configvalues['chrome_path']=params['chrome_path']
+                configvalues['bit_64']=params['bit_64']
+                configvalues['logFile_Path']=params['logFile_Path']
+                configvalues['screenShot_Flag']=params['screenShot_Flag']
+                configvalues['queryTimeOut']=params['queryTimeOut']
+                configvalues['timeOut']=params['timeOut']
+                configvalues['stepExecutionWait']=params['stepExecutionWait']
+                configvalues['displayVariableTimeOut'] = params['displayVariableTimeOut']
+                configvalues['retrieveURL']=params['retrieveURL']
+                configvalues['delay']=params['delay']
+                configvalues['ignoreVisibilityCheck']=params['ignoreVisibilityCheck']
+                configvalues['exception_flag']=params['exception_flag']
+                configvalues['server_cert']=params['server_cert']
+                configvalues['enableSecurityCheck'] = params['enableSecurityCheck']
+                if params.has_key('ignore_server_certificate'):
+                    configvalues['ignore_server_certificate'] = params['ignore_server_certificate']
+            except Exception as e:
+                configvalues['errorflag']=e
+        else:
+            configvalues['configmissing']=os.path.isfile(self.config_path)
         return configvalues
-
