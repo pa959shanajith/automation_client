@@ -45,6 +45,7 @@ allow_connect = False
 icesession = None
 plugins_list = []
 configvalues = None
+CONFIG_PATH= os.environ["NINETEEN68_HOME"] + '/Lib/config.json'
 IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images"
 CERTIFICATE_PATH = os.environ["NINETEEN68_HOME"] + "/Scripts/CA_BUNDLE"
 LOGCONFIG_PATH = os.environ["NINETEEN68_HOME"] + "/logging.conf"
@@ -666,6 +667,7 @@ class ClientWindow(wx.Frame):
         ##self.ShowFullScreen(True,wx.ALL)
         ##self.SetBackgroundColour('#D0D0D0')
         self.logfilename_error_flag = False
+        self.is_config_present_flag = True
         self.debugwindow = None
         self.new = None
         self.id =id
@@ -680,6 +682,10 @@ class ClientWindow(wx.Frame):
         self.connect_img=wx.Image(IMAGES_PATH +"/connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.disconnect_img=wx.Image(IMAGES_PATH +"/disconnect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
 
+
+        """Check if config file is present"""
+        if os.path.isfile(CONFIG_PATH)!=True:
+            self.is_config_present_flag = False
         """
         Creating Root Logger using logger file config and setting logfile path,which is in config.json
         """
@@ -787,7 +793,7 @@ class ClientWindow(wx.Frame):
         self.Centre()
         self.Show()
 		#747 disable buttons if any flag raised (Himanshu)
-        if (self.logfilename_error_flag):
+        if (self.logfilename_error_flag)==True or self.is_config_present_flag==False:
             self.cancelbutton.Disable()
             self.terminatebutton.Disable()
             self.clearbutton.Disable()
@@ -827,8 +833,7 @@ class ClientWindow(wx.Frame):
             try:
                 logger.print_on_console( '--Edit Config selected--')
                 log.info( '--Edit Config selected--')
-                config_obj=Config_window(parent = None,id = -1, title="Nineteen68 Configuration")
-                #config_obj.config_check()
+                Config_window(parent = None,id = -1, title="Nineteen68 Configuration")
             except:
                 import traceback
                 traceback.print_exc()
@@ -1058,7 +1063,7 @@ class Config_window(wx.Frame):
     """The design of the config window is defined in the _init_() method"""
     def __init__(self, parent,id, title):
         #----------------------------------
-        d=self.readconfigJson()
+        isConfigJson=self.readconfigJson()
         #----------------------------------
         global socketIO
         wx.Frame.__init__(self, parent, title=title,
@@ -1070,15 +1075,18 @@ class Config_window(wx.Frame):
         self.socketIO = socketIO
         self.panel = wx.Panel(self)
 
-        wx.StaticText( self.panel, label="Server Address", pos=(12,8 ),size=(80, 28), style=0, name="")
-        self.server_add=wx.TextCtrl(self.panel, pos=(100,8 ), size=(140,-1))
-        if d!="Config file absent":
-            self.server_add.SetValue(d['configuration']['server_ip'])
+        self.currentDirectory = os.environ["NINETEEN68_HOME"]
+        self.defaultServerCrt ='./Scripts/CA_BUNDLE/server.crt'
 
-        wx.StaticText( self.panel, label="Server Port", pos=(260,8 ),size=(60, 28), style=0, name="")
-        self.server_port=wx.TextCtrl(self.panel, pos=(330,8 ), size=(115,-1))
-        if d!="Config file absent":
-            self.server_port.SetValue(d['configuration']['server_port'])
+        self.sev_add=wx.StaticText( self.panel, label="Server Address", pos=(12,8 ),size=(90, 28), style=0, name="")
+        self.server_add=wx.TextCtrl(self.panel, pos=(100,8 ), size=(140,-1))
+        if isConfigJson!=False:
+            self.server_add.SetValue(isConfigJson['configuration']['server_ip'])
+
+        self.sev_port=wx.StaticText( self.panel, label="Server Port", pos=(270,8 ),size=(70, 28), style=0, name="")
+        self.server_port=wx.TextCtrl(self.panel, pos=(340,8 ), size=(105,-1))
+        if isConfigJson!=False:
+            self.server_port.SetValue(isConfigJson['configuration']['server_port'])
 
         lblList = ['Yes', 'No']
         lblList2 = ['64-bit', '32-bit']
@@ -1086,110 +1094,115 @@ class Config_window(wx.Frame):
         lblList4 = ['False', 'True']
         self.rbox1 = wx.RadioBox(self.panel, label = 'Ignore Certificate', pos = (12,38), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if d!="Config file absent":
-            if d['configuration']['ignore_certificate']==lblList[0]:
+        if isConfigJson!=False:
+            if isConfigJson['configuration']['ignore_certificate']==lblList[0]:
                 self.rbox1.SetSelection(0)
             else:
                 self.rbox1.SetSelection(1)
 
         self.rbox2 = wx.RadioBox(self.panel, label = 'IE Architecture Type', pos = (170,38), choices = lblList2,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if d!="Config file absent":
-            val2=d['configuration']['bit_64']
-            if d['configuration']['bit_64'] =='Yes':
+        if isConfigJson!=False:
+            val2=isConfigJson['configuration']['bit_64']
+            if isConfigJson['configuration']['bit_64'] =='Yes':
                 self.rbox2.SetSelection(0)
             else:
                 self.rbox2.SetSelection(1)
 
         self.rbox3 = wx.RadioBox(self.panel, label = 'ScreenShot Flag', pos = (340,38), choices = lblList3,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if d!="Config file absent":
-            if d['configuration']['screenShot_Flag']==lblList3[0]:
+        if isConfigJson!=False:
+            if isConfigJson['configuration']['screenShot_Flag']==lblList3[0]:
                 self.rbox3.SetSelection(0)
             else:
                 self.rbox3.SetSelection(1)
 
-        wx.StaticText( self.panel, label="Chrome Path", pos=(12,98 ),size=(80, 28), style=0, name="")
-        self.chrome_path=wx.TextCtrl(self.panel, pos=(100,98 ), size=(345,-1))
-        if d!="Config file absent":
-            self.chrome_path.SetValue(d['configuration']['chrome_path'])
+        self.ch_path=wx.StaticText( self.panel, label="Chrome Path", pos=(12,98 ),size=(80, 28), style=0, name="")
+        self.chrome_path=wx.TextCtrl(self.panel, pos=(100,98 ), size=(310,-1))
+        wx.Button(self.panel, label="...",pos=(415,98 ), size=(30, -1)).Bind(wx.EVT_BUTTON, self.fileBrowser_chpath)
+        if isConfigJson!=False:
+            self.chrome_path.SetValue(isConfigJson['configuration']['chrome_path'])
+        else:
+            self.chrome_path.SetValue('default')
 
-        wx.StaticText( self.panel, label="Log File Path", pos=(12,128 ),size=(80, 28), style=0, name="")
-        self.log_file_path=wx.TextCtrl(self.panel, pos=(100,128 ), size=(345,-1))
-        if d!="Config file absent":
-            self.log_file_path.SetValue(d['configuration']['logFile_Path'])
+        self.log_fpath=wx.StaticText( self.panel, label="Log File Path", pos=(12,128 ),size=(80, 28), style=0, name="")
+        self.log_file_path=wx.TextCtrl(self.panel, pos=(100,128 ), size=(310,-1))
+        wx.Button(self.panel, label="...",pos=(415,128 ), size=(30, -1)).Bind(wx.EVT_BUTTON, self.fileBrowser_logfilepath)
+        if isConfigJson!=False:
+            self.log_file_path.SetValue(isConfigJson['configuration']['logFile_Path'])
 
-        wx.StaticText( self.panel, label="Query Timeout", pos=(12,158 ),size=(80, 28), style=0, name="")
+        self.qu_timeout=wx.StaticText( self.panel, label="Query Timeout", pos=(12,158 ),size=(85, 28), style=0, name="")
         self.query_timeout=wx.TextCtrl(self.panel, pos=(100,158 ), size=(80,-1))
-        if d!="Config file absent":
-            self.query_timeout.SetValue(d['configuration']['queryTimeOut'])
+        if isConfigJson!=False:
+            self.query_timeout.SetValue(isConfigJson['configuration']['queryTimeOut'])
 
         wx.StaticText( self.panel, label="Time Out", pos=(185,158 ),size=(50, 28), style=0, name="")
         self.time_out=wx.TextCtrl(self.panel, pos=(240,158 ), size=(80,-1))
-        if d!="Config file absent":
-            self.time_out.SetValue(d['configuration']['timeOut'])
+        if isConfigJson!=False:
+            self.time_out.SetValue(isConfigJson['configuration']['timeOut'])
 
         wx.StaticText( self.panel, label="Delay", pos=(325,158 ),size=(40, 28), style=0, name="")
         self.delay=wx.TextCtrl(self.panel, pos=(360,158 ), size=(85,-1))
-        if d!="Config file absent":
-            self.delay.SetValue(d['configuration']['delay'])
+        if isConfigJson!=False:
+            self.delay.SetValue(isConfigJson['configuration']['delay'])
 
         wx.StaticText( self.panel, label="Step Execution Wait", pos=(12,188 ),size=(120, 28), style=0, name="")
         self.step_exe_wait=wx.TextCtrl(self.panel, pos=(130,188 ), size=(80,-1))
-        if d!="Config file absent":
-            self.step_exe_wait.SetValue(d['configuration']['stepExecutionWait'])
+        if isConfigJson!=False:
+            self.step_exe_wait.SetValue(isConfigJson['configuration']['stepExecutionWait'])
 
         wx.StaticText( self.panel, label="Display Variable Timeout", pos=(225,188 ),size=(140, 28), style=0, name="")
         self.disp_var_timeout=wx.TextCtrl(self.panel, pos=(360,188 ), size=(85,-1))
-        if d!="Config file absent":
-            self.disp_var_timeout.SetValue(d['configuration']['displayVariableTimeOut'])
+        if isConfigJson!=False:
+            self.disp_var_timeout.SetValue(isConfigJson['configuration']['displayVariableTimeOut'])
 
-        wx.StaticText( self.panel, label="Server Cert", pos=(12,218 ),size=(85, 28), style=0, name="")
-        self.server_cert=wx.TextCtrl(self.panel, pos=(100,218 ), size=(345,-1))
-        if d!="Config file absent":
-            self.server_cert.SetValue(d['configuration']['server_cert'])
+        self.sev_cert=wx.StaticText( self.panel, label="Server Cert", pos=(12,218 ),size=(85, 28), style=0, name="")
+        self.server_cert=wx.TextCtrl(self.panel, pos=(100,218 ), size=(310,-1))
+        wx.Button(self.panel, label="...",pos=(415,218 ), size=(30, -1)).Bind(wx.EVT_BUTTON, self.fileBrowser_servcert)
+        if isConfigJson!=False:
+            self.server_cert.SetValue(isConfigJson['configuration']['server_cert'])
+        elif isConfigJson==False:
+            self.server_cert.SetValue(self.defaultServerCrt)
 
         self.rbox4 = wx.RadioBox(self.panel, label = 'Retrieve URL', pos = (80,248), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if d!="Config file absent":
-            if d['configuration']['retrieveURL']==lblList[0].lower():
+        if isConfigJson!=False:
+            if isConfigJson['configuration']['retrieveURL']==lblList[0].lower():
                 self.rbox4.SetSelection(0)
             else:
                 self.rbox4.SetSelection(1)
 
         self.rbox5 = wx.RadioBox(self.panel, label = 'Exception Flag', pos = (250,248), choices = lblList4,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if d!="Config file absent":
-            if d['configuration']['exception_flag']==lblList4[0].lower():
+        if isConfigJson!=False:
+            if isConfigJson['configuration']['exception_flag']==lblList4[0].lower():
                 self.rbox5.SetSelection(0)
             else:
                 self.rbox5.SetSelection(1)
 
         self.rbox6 = wx.RadioBox(self.panel, label = 'Ignore Visibility Check', pos = (80,300), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if d!="Config file absent":
-            if d['configuration']['ignoreVisibilityCheck']==lblList[0]:
+        if isConfigJson!=False:
+            if isConfigJson['configuration']['ignoreVisibilityCheck']==lblList[0]:
                 self.rbox6.SetSelection(0)
             else:
                 self.rbox6.SetSelection(1)
 
         self.rbox7 = wx.RadioBox(self.panel, label = 'Enable Security Check', pos = (250,300), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if d!="Config file absent":
-            if d['configuration']['enableSecurityCheck']==lblList[0]:
+        if isConfigJson!=False:
+            if isConfigJson['configuration']['enableSecurityCheck']==lblList[0]:
                 self.rbox7.SetSelection(0)
             else:
                 self.rbox7.SetSelection(1)
 
-        self.savebutton=wx.ToggleButton(self.panel, label="Save",pos=(100,388 ), size=(100, 28))
-        if d!="Config file absent":
-            self.savebutton.SetLabel("Edit and Save")
-        self.savebutton.Bind(wx.EVT_TOGGLEBUTTON, self.config_check)
-        self.closebutton=wx.Button(self.panel, label="Close",pos=(250,388 ), size=(100, 28))
-        self.closebutton.Bind(wx.EVT_BUTTON, self.close)
+        self.error_msg=wx.StaticText( self.panel, label="", pos=(85,360 ),size=(350, 28), style=0, name="")
+
+        wx.ToggleButton(self.panel, label="Save",pos=(100,388 ), size=(100, 28)).Bind(wx.EVT_TOGGLEBUTTON, self.config_check)
+
+        wx.Button(self.panel, label="Close",pos=(250,388 ), size=(100, 28)).Bind(wx.EVT_BUTTON, self.close)
         self.Centre()
 
-        self.Centre()
         style = self.GetWindowStyle()
         self.SetWindowStyle( style|wx.STAY_ON_TOP )
         wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
@@ -1212,53 +1225,114 @@ class Config_window(wx.Frame):
         server_port=self.server_port.GetValue()
 
         chrome_path=self.chrome_path.GetValue()
-        if chrome_path !='default' and self.filePathValidator(chrome_path)== False:
-            logger.print_on_console('Chrome path entered is invalid')
-            log.info('Chrome path entered is invalid')
         logFile_Path=self.log_file_path.GetValue()
-        if self.filePathValidator(logFile_Path)== False:
-            logger.print_on_console('Log File Path entered is invalid')
-            log.info('Log File Path entered is invalid')
         queryTimeOut=self.query_timeout.GetValue()
         time_out=self.time_out.GetValue()
         delay=self.delay.GetValue()
         stepExecutionWait=self.step_exe_wait.GetValue()
         displayVariableTimeOut=self.disp_var_timeout.GetValue()
         server_cert=self.server_cert.GetValue()
-        if self.filePathValidator(server_cert)== False:
-            logger.print_on_console('Server certificate file path entered is invalid')
-            log.info('Server certificate file path entered is invalid')
         #----------------creating data dictionary
-        data['server_ip'] = server_add
-        data['server_port'] = server_port
-        data['ignore_certificate'] = ignore_certificate
-        data['chrome_path'] = chrome_path
-        data['bit_64'] = bit_64
-        data['logFile_Path'] = logFile_Path
-        data['screenShot_Flag'] = screenShot_Flag
-        data['queryTimeOut'] = queryTimeOut
-        data['timeOut'] = time_out
-        data['stepExecutionWait'] = stepExecutionWait
-        data['displayVariableTimeOut'] = displayVariableTimeOut
-        data['retrieveURL'] = retrieveURL
-        data['delay'] = delay
-        data['ignoreVisibilityCheck'] = ignoreVisibilityCheck
-        data['enableSecurityCheck'] = enableSecurityCheck
-        data['exception_flag'] = exception_flag.lower()
-        data['server_cert'] =server_cert
+        data['server_ip'] = server_add.strip()
+        data['server_port'] = server_port.strip()
+        data['ignore_certificate'] = ignore_certificate.strip()
+        data['chrome_path'] = chrome_path.strip()
+        data['bit_64'] = bit_64.strip()
+        data['logFile_Path'] = logFile_Path.strip()
+        data['screenShot_Flag'] = screenShot_Flag.strip()
+        data['queryTimeOut'] = queryTimeOut.strip()
+        data['timeOut'] = time_out.strip()
+        data['stepExecutionWait'] = stepExecutionWait.strip()
+        data['displayVariableTimeOut'] = displayVariableTimeOut.strip()
+        data['retrieveURL'] = retrieveURL.strip()
+        data['delay'] = delay.strip()
+        data['ignoreVisibilityCheck'] = ignoreVisibilityCheck.strip()
+        data['enableSecurityCheck'] = enableSecurityCheck.strip()
+        data['exception_flag'] = exception_flag.strip().lower()
+        data['server_cert'] =server_cert.strip()
         #data['ignoreServerCertificate'] = False
         config_data['configuration']=data
-        self.jsonCreater(config_data)
+        if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='':
+            #---------------------------------------resetting the static texts
+            self.error_msg.SetLabel("")
+            self.sev_add.SetLabel('Server Address')
+            self.sev_add.SetForegroundColour((0,0,0))
+            self.sev_port.SetLabel('Server Port')
+            self.sev_port.SetForegroundColour((0,0,0))
+            self.log_fpath.SetLabel('Log File Path')
+            self.log_fpath.SetForegroundColour((0,0,0))
+            self.qu_timeout.SetLabel('Query Timeout')
+            self.qu_timeout.SetForegroundColour((0,0,0))
+            self.sev_cert.SetLabel('Server Cert')
+            self.sev_cert.SetForegroundColour((0,0,0))
+            self.ch_path.SetLabel('Chrome Path')
+            self.ch_path.SetForegroundColour((0,0,0))
+            #---------------------------------------resetting the static texts
+            if (os.path.isfile(data['chrome_path'])==True or str(data['chrome_path']).strip()=='default') and os.path.isfile(data['server_cert'])==True and os.path.isfile(data['logFile_Path'])==True:
+                self.jsonCreater(config_data)
+            else:
+                self.error_msg.SetLabel("Marked fields '^' contain invalid path, Data not saved")
+                self.error_msg.SetForegroundColour((0,0,255))
+                if os.path.isfile(data['server_cert'])!=True:
+                    self.sev_cert.SetLabel('Server Cert^')
+                    self.sev_cert.SetForegroundColour((0,0,255))
+                else:
+                    self.sev_cert.SetLabel('Server Cert')
+                    self.sev_cert.SetForegroundColour((0,0,0))
 
-    """ filePathValidator checks if file path is valid , return ture or false based on validity"""
-    def filePathValidator(self,filePath):
-        isfileValid=False
-        try:
-            isfileValid=os.path.isfile(filePath)
-        except:
-            import traceback
-            traceback.print_exc()
-        return isfileValid
+                if os.path.isfile(data['chrome_path'])==True or str(data['chrome_path']).strip()=='default':
+                    self.ch_path.SetLabel('Chrome Path')
+                    self.ch_path.SetForegroundColour((0,0,0))
+                elif  os.path.isfile(data['chrome_path'])!=True:
+                    self.ch_path.SetLabel('Chrome Path^')
+                    self.ch_path.SetForegroundColour((0,0,255))
+
+                if os.path.isfile(data['logFile_Path'])!=True:
+                    self.log_fpath.SetLabel('Log File Path^')
+                    self.log_fpath.SetForegroundColour((0,0,255))
+                else:
+                    self.log_fpath.SetLabel('Log File Path')
+                    self.log_fpath.SetForegroundColour((0,0,0))
+        else:
+            self.error_msg.SetLabel("Do not leave marked '*' fields empty, Data not saved")
+            self.error_msg.SetForegroundColour((255,0,0))
+            if data['server_ip']=='':
+                self.sev_add.SetLabel('Server Address*')
+                self.sev_add.SetForegroundColour((255,0,0))
+            else:
+                self.sev_add.SetLabel('Server Address')
+                self.sev_add.SetForegroundColour((0,0,0))
+            if data['server_port']=='':
+                self.sev_port.SetLabel('Server Port*')
+                self.sev_port.SetForegroundColour((255,0,0))
+            else:
+                self.sev_port.SetLabel('Server Port')
+                self.sev_port.SetForegroundColour((0,0,0))
+            if data['logFile_Path']=='':
+                self.log_fpath.SetLabel('Log File Path*')
+                self.log_fpath.SetForegroundColour((255,0,0))
+            else:
+                self.log_fpath.SetLabel('Log File Path')
+                self.log_fpath.SetForegroundColour((0,0,0))
+            if data['queryTimeOut']=='':
+                self.qu_timeout.SetLabel('Query Timeout*')
+                self.qu_timeout.SetForegroundColour((255,0,0))
+            else:
+                self.qu_timeout.SetLabel('Query Timeout')
+                self.qu_timeout.SetForegroundColour((0,0,0))
+            if data['server_cert']=='':
+                self.sev_cert.SetLabel('Server Cert*')
+                self.sev_cert.SetForegroundColour((255,0,0))
+            else:
+                self.sev_cert.SetLabel('Server Cert')
+                self.sev_cert.SetForegroundColour((0,0,0))
+            if data['chrome_path']=='':
+                self.ch_path.SetLabel('Chrome Path*')
+                self.ch_path.SetForegroundColour((255,0,0))
+            else:
+                self.ch_path.SetLabel('Chrome Path')
+                self.ch_path.SetForegroundColour((0,0,0))
+
 
     """jsonCreater saves the data in json form , location of file to be saved must be defined. This method will overwrite the existing .json file"""
     def jsonCreater(self,data):
@@ -1282,7 +1356,33 @@ class Config_window(wx.Frame):
         except:
             import traceback
             traceback.print_exc()
-            return "Config file absent"
+            return False
+            #return "Config file absent"
+
+    """This method open a file selector dialog , from where file path can be set """
+    def fileBrowser_chpath(self,event):
+        dlg = wx.FileDialog(self, message="Choose a file ...",defaultDir=self.currentDirectory,defaultFile="", wildcard="Chrome executable (*chrome.exe)|*chrome.exe|" \
+            "All files (*.*)|*.*", style=wx.FD_SAVE)
+        if dlg.ShowModal() == wx.ID_OK:
+            path = dlg.GetPath()
+            self.chrome_path.SetValue(path)
+        dlg.Destroy()
+    """This method open a file selector dialog , from where file path can be set """
+    def fileBrowser_logfilepath(self,event):
+        dlg = wx.FileDialog(self, message="Choose a file ...",defaultDir=self.currentDirectory,defaultFile="", wildcard="Log file (*.log)|*.log|" \
+            "All files (*.*)|*.*", style=wx.FD_SAVE)
+        if dlg.ShowModal() == wx.ID_OK:
+            path = dlg.GetPath()
+            self.log_file_path.SetValue(path)
+        dlg.Destroy()
+    """This method open a file selector dialog , from where file path can be set """
+    def fileBrowser_servcert(self,event):
+        dlg = wx.FileDialog(self, message="Choose a file ...",defaultDir=self.currentDirectory,defaultFile="", wildcard="Certificate file (*.crt)|*.crt|" \
+            "All files (*.*)|*.*", style=wx.FD_SAVE)
+        if dlg.ShowModal() == wx.ID_OK:
+            path = dlg.GetPath()
+            self.server_cert.SetValue(path)
+        dlg.Destroy()
 
     """This method closes the wxPython instance"""
     def close(self,event):
