@@ -1360,11 +1360,18 @@ class StepDescription:
             else:
                 return "SendValue failed due to insufficient parameter(s)"
 
+        def sendsecurevalue():
+            if input is not None:
+                return "Enter value : '" + input + "'"
+            else:
+                return "SendSecureValue failed due to insufficient parameter(s)"
+
         def submitjob():
             if len(listInput) == 2:
                 return "Submit the job present in file : '" + listInput[0] + "' with member name '" + listInput[1] + "'"
             else:
                 return "SubmitJob failed due to insufficient parameter(s)"
+
         def jobstatus():
             if input is not None:
                 return "Status of the Job with the Job ID : '" + input + "'" + "is '" + output + "'"
@@ -1390,6 +1397,12 @@ class StepDescription:
                 return "Enter the text '"+ listInput[2] + "' at row  : '" + listInput[0] + "'" + " column :'"+listInput[1] + "'"
             else:
                 return "SetText failed due to insufficient parameter(s)"
+
+        def setsecuretext():
+            if len(listInput) == 3:
+                return "Enter the text '"+ listInput[2] + "' at row  : '" + listInput[0] + "'" + " column :'"+listInput[1] + "'"
+            else:
+                return "SetSecureText failed due to insufficient parameter(s)"
 
         def setcursor():
             if len(listInput) == 2:
