@@ -324,6 +324,7 @@ class Handler():
                 #New change to insert even the satrt of the keyword
                 self.insert_into_ifdict(start_index[0],start_index[1],(keyword_index,keyword))
             elif keyword==constants.ENDIF:
+                whileflag=False
                 #insert 'endIf' key to dict
                 self.insert_into_ifdict(keyword_index,keyword,None)
                 #mapping 'if' and 'endIf'
@@ -332,6 +333,7 @@ class Handler():
                     self.insert_into_ifdict(start_index[0],start_index[1],(keyword_index,keyword))
                 #mapping 'endIf' to it's respective steps while backtracking
                 while(start_index[1]!=constants.IF):
+                    whileflag=True
                     if (len(condition_keywords)>0):
                         start_index=condition_keywords.items()[-1]
                         self.insert_into_ifdict(keyword_index,keyword,start_index)
@@ -343,6 +345,10 @@ class Handler():
                         logger.print_on_console('IF is missing: Invalid script ')
                         flag=False
                         break
+                #To fix issue with nested if blocks (without containing elseif/else blocks)
+                if(start_index[1]==constants.IF and not(whileflag)):
+                    condition_keywords.popitem()
+                    
             elif keyword==constants.IF:
 ##                self.insert_into_ifdict(keyword_index,keyword,None)
                   #New change to Map 'if' to 'if'
