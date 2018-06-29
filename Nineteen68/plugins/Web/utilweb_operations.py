@@ -226,7 +226,13 @@ class UtilWebKeywords:
             if webelement is not None:
                 #call to highlight the webelement
                 self.highlight(webelement)
-                if not(webelement.is_enabled()):
+                flag=False
+                unselectable_val=webelement.get_attribute('unselectable')
+                log.info('unselectable_val ',unselectable_val)
+                if (unselectable_val and unselectable_val.lower()=='on'):
+                    flag=True
+                log.info('Disabled flag value ',flag)
+                if not(webelement.is_enabled) or flag:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                     info_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']

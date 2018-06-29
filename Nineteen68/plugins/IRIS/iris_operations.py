@@ -30,7 +30,6 @@ def remove_duplicates(lines):
                 del lines[index]
     return lines
 
-
 def sort_line_list(lines,pos):
     # sort lines into horizontal and vertical
     vertical = []
@@ -58,11 +57,11 @@ def hough_transform_p(img,pos):
     # open and process images
     img_copy = img.copy()
     kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
-    
+
     img = cv2.filter2D(img, -1, kernel)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     edges = cv2.Canny(gray, 50, 150, apertureSize=3)
-    
+
     #aver = img[:, :].mean()
     #ret,edges = cv2.threshold(gray,aver,255,cv2.THRESH_BINARY_INV)
     # probabilistic hough transform
@@ -72,7 +71,6 @@ def hough_transform_p(img,pos):
         lines_t.append(line[0].tolist())
     # remove duplicates
     lines = remove_duplicates(lines_t)
-
 
     # draw image
     for i in range(len(lines)):
@@ -85,28 +83,14 @@ def hough_transform_p(img,pos):
     else:
         horizontal = sort_line_list(lines,2)
 
-    # save image (for testing)
-    if(pos==2):
-        cv2.imwrite("horizontal_lined.png", img_copy)
-    else:
-        cv2.imwrite("Vertical_lined.png", img_copy)
-
-def avg_width(para):
-    temp = 0
-    for i in range(len(para)):
-        if(i!=0):
-            temp+=para[i][0]-para[i-1][0]
-    return int(temp/(len(para)-1))
-            
-            
 def data_in_cells(image,row,column):
+    text = ''
     if(row<len(horizontal) and column<len(vertical)):
         img = image[horizontal[row-1][0]+2:horizontal[row][0]-2,vertical[column-1][0]+2:vertical[column][0]-2]
         text = get_ocr(img)
-        return text
     else:
-        print "Invalid Input for row and column number"
-
+        logger.print_on_console("Invalid Input for row and column number")
+    return text
 
 def gotoobject(elem):
         img_rgb = elem.decode('base64')
@@ -118,7 +102,6 @@ def gotoobject(elem):
         im.save('test.png')
         img_rgb = cv2.imread('test.png')
         img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
-
 
         template = cv2.imread('sample.png',0)
         w, h = template.shape[::-1]
@@ -142,21 +125,25 @@ class IRISKeywords():
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
+        value = OUTPUT_CONSTANT
         try:
             res = gotoobject(element['cord'])
             if(res):
                 pyautogui.click()
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
+            else:
+                logger.print_on_console("Object not found")
         except Exception as e:
             log.error(e)
             logger.print_on_console("Error occured in clickiris")
-        return status,result,None,err_msg
+        return status,result,value,err_msg
 
     def settextiris(self,element,*args):
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
+        value = OUTPUT_CONSTANT
         try:
             res = gotoobject(element['cord'])
             if(res):
@@ -166,10 +153,12 @@ class IRISKeywords():
                 pyautogui.typewrite(args[0][0], interval=0.1)
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
+            else:
+                logger.print_on_console("Object not found")
         except Exception as e:
             log.error(e)
             logger.print_on_console("Error occured in settextiris")
-        return status,result,None,err_msg
+        return status,result,value,err_msg
 
     def gettextiris(self,element,*args):
         status = TEST_RESULT_FAIL
@@ -182,19 +171,11 @@ class IRISKeywords():
                 os.environ["TESSDATA_PREFIX"] = os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR/tessdata'
                 with open("cropped.png", "wb") as f:
                     f.write(element['cord'].decode('base64'))
-                image = cv2.imread("cropped.png",0)
-                image = cv2.resize(image,(0,0),fx=2,fy=2)
-                gray = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
-                filename = "{}1.png".format(os.getpid())
-                cv2.imwrite(filename, gray)
-                the_img = Image.open(filename)
-                width, height = the_img.size
-                the_img = the_img.resize((int(width*5), int(height*5)), Image.ANTIALIAS)
-                text = pytesseract.image_to_string(the_img)
+                image = cv2.imread("cropped.png")
+                text = get_ocr(image)
                 status= TEST_RESULT_PASS
-                result = text
+                result = TEST_RESULT_TRUE
                 value = text
-                os.remove(filename)
                 os.remove('cropped.png')
             else:
                 log.error("Tesseract module not found.")
@@ -204,7 +185,7 @@ class IRISKeywords():
         return status,result,value,err_msg
 
     def getrowcountiris(self,element,*args):
-        global horizontal,vertical      
+        global horizontal,vertical
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
@@ -216,23 +197,22 @@ class IRISKeywords():
             hough_transform_p(img,1)
             # rotated = imutils.rotate_bound(img, 270)
             rotated = np.rot90(img,1)
-            #print(img.shape)
             cv2.imwrite("rotated.png", rotated)
             time.sleep(1)
             img = cv2.imread("rotated.png")
             hough_transform_p(img,2)
-            # print("Total Columns",len(vertical)-1)
-            # print("Total Rows", len(horizontal)-1)
             status  = TEST_RESULT_PASS
-            result = len(horizontal)-1
+            result = TEST_RESULT_TRUE
             value = len(horizontal)-1
+            os.remove('cropped.png')
+            os.remove('rotated.png')
         except Exception as e:
             log.error(e)
             logger.print_on_console("Error occured in gettextiris")
         return status,result,value,err_msg
 
     def getcolcountiris(self,element,*args):
-        global horizontal,vertical          
+        global horizontal,vertical
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
@@ -244,23 +224,22 @@ class IRISKeywords():
             hough_transform_p(img,1)
             # rotated = imutils.rotate_bound(img, 270)
             rotated = np.rot90(img,1)
-            #print(img.shape)
             cv2.imwrite("rotated.png", rotated)
             time.sleep(1)
             img = cv2.imread("rotated.png")
             hough_transform_p(img,2)
-            # print("Total Columns",len(vertical)-1)
-            # print("Total Rows", len(horizontal)-1)
             status  = TEST_RESULT_PASS
-            result = len(vertical)-1
+            result = TEST_RESULT_TRUE
             value = len(vertical)-1
+            os.remove('cropped.png')
+            os.remove('rotated.png')
         except Exception as e:
             log.error(e)
             logger.print_on_console("Error occured in gettextiris")
         return status,result,value,err_msg
 
     def getcellvalueiris(self,element,*args):
-        global horizontal,vertical        
+        global horizontal,vertical
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
@@ -268,6 +247,7 @@ class IRISKeywords():
         row = int(args[0][0])
         col = int(args[0][1])
         try:
+            self.getrowcountiris(element)
             if(os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR')):
                 pytesseract.tesseract_cmd = os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR/tesseract'
                 os.environ["TESSDATA_PREFIX"] = os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR/tessdata'
@@ -276,10 +256,11 @@ class IRISKeywords():
                 img = cv2.imread("cropped.png")
                 text = data_in_cells(img,row,col)
                 status  = TEST_RESULT_PASS
-                result = text
+                result = TEST_RESULT_TRUE
                 value = text
+                os.remove('cropped.png')
             else:
-                log.error("Tesseract module not found.")                
+                log.error("Tesseract module not found.")
         except Exception as e:
             log.error(e)
             logger.print_on_console("Error occured in gettextiris")

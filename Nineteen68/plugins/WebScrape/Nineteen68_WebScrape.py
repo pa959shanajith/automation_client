@@ -153,7 +153,7 @@ class ScrapeWindow(wx.Frame):
             self.fullscrapebutton.Disable()
             self.startbutton.Disable()
             event.GetEventObject().SetLabel("Stop IRIS")
-            status = cropandaddobj.startcropandadd()
+            status = cropandaddobj.startcropandadd(self)
         else:
             self.Hide()
             import cv2

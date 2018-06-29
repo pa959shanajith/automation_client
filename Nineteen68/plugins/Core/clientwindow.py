@@ -1032,17 +1032,17 @@ class ClientWindow(wx.Frame):
         irisMAC = []
         global irisFlag
         try:
-            with open(CERTIFICATE_PATH+'\license.key', mode='r') as f:
+            with open(CERTIFICATE_PATH+'/license.key', mode='r') as f:
                 key = "".join(f.readlines()[1:-1]).replace("\n","").replace("\r","")
                 key = core_utils_obj.unwrap(key, mac_verification_key)
                 mac_addr = key[36:-36]
                 if ("," in mac_addr):
-                    mac_addr = (mac_addr.replace('-',':').replace(' ','')).split(",")
+                    mac_addr = (mac_addr.replace('-',':').replace(' ','')).lower().split(",")
                 else:
-                    mac_addr = [mac_addr.replace('-',':').replace(' ','')]
+                    mac_addr = [mac_addr.replace('-',':').replace(' ','').lower()]
                 index = 0
                 for mac in mac_addr:
-                    if(str(mac).startswith("IRIS")):
+                    if(str(mac).startswith("iris")):
                         mac_addr[index] = mac[4:]
                         irisMAC.append(mac[4:])
                     index = index + 1

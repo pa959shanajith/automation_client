@@ -46,6 +46,7 @@ def check_n_init(emulator_type):
     if emulator is None:
         path = subprocess.os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Mainframe/nineteen68MFapi.exe"
         emulator = subprocess.Popen(path, shell=True)
+        time.sleep(1)
 
     if soc_api is None:
         try:

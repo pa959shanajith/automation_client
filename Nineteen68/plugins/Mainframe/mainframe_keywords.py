@@ -9,15 +9,17 @@
 #           4. secure_login       - This keyword or action specifies the Tool to Login to the Mainframe Region using userID and password (Using encrypted password).
 #           5. logoff             - This keyword or action specifies the Tool to Log off from the Mainframe.
 #           6. set_text           - This keyword or action specifies the Tool to enter the text at the location specified by the user.
-#           7. send_value         - This keyword or action specifies the Tool to send the individual keystrokes to the location where the cursor is present at the point of execution.
-#           8. get_text           - This keyword or action specifies the Tool to fetch the text and save the results in the output variable.
-#           9. verify_text_exists - This keyword or action specifies the Tool to verify whether the given Text exists in the screen.
-#          10. submit_job         - This keyword or action specifies the Tool to submit the specified job to the mainframe and stores the Job ID in the output variable.
-#          11. job_status         - This keyword or action specifies the Tool to fetch the job status along with the Job ID based on "SubmitJob" output variable provided as input.
-#          12. send_function_keys - This keyword or action specifies the Tool to send the function keys to the application.
-#          13. set_cursor         - This keyword or action specifies the Tool to set the cursor at the specified location. The location is identified by the row and column mentioned in the input.
-#          14. disconnect_session - This keyword or action specifies the Tool to disconnect from the active presentation space.
-#          15. close_mainframe    - This keyword or action specifies the Tool to close the emulator.
+#           7. set_secure_text    - This keyword or action specifies the Tool to enter the text at the location specified by the user (Using encrypted text).
+#           8. send_value         - This keyword or action specifies the Tool to send the individual keystrokes to the location where the cursor is present at the point of execution.
+#           9. send_secure_value  - This keyword or action specifies the Tool to send the individual keystrokes to the location where the cursor is present at the point of execution (Using encrypted text).
+#          10. get_text           - This keyword or action specifies the Tool to fetch the text and save the results in the output variable.
+#          11. verify_text_exists - This keyword or action specifies the Tool to verify whether the given Text exists in the screen.
+#          12. submit_job         - This keyword or action specifies the Tool to submit the specified job to the mainframe and stores the Job ID in the output variable.
+#          13. job_status         - This keyword or action specifies the Tool to fetch the job status along with the Job ID based on "SubmitJob" output variable provided as input.
+#          14. send_function_keys - This keyword or action specifies the Tool to send the function keys to the application.
+#          15. set_cursor         - This keyword or action specifies the Tool to set the cursor at the specified location. The location is identified by the row and column mentioned in the input.
+#          16. disconnect_session - This keyword or action specifies the Tool to disconnect from the active presentation space.
+#          17. close_mainframe    - This keyword or action specifies the Tool to close the emulator.
 """
 # Author:      wasimakram.sutar
 # Created:     08-09-2016
@@ -57,6 +59,7 @@ class MainframeKeywords:
             "Keep the new dataset and Logoff"]
         self.bluezone_object = BluezoneKeywords()
         self.ehllapi_object = EhllapiKeywords()
+        self.encryption_obj = AESCipher()
 
     def launch_mainframe(self,inputs):
         """
@@ -124,7 +127,6 @@ class MainframeKeywords:
             logger.print_on_console(err_msg)
         #Return the status of the keyword
         return status,methodoutput,output,err_msg
-
 
     def connect_session(self,inputs):
         """
@@ -225,7 +227,6 @@ class MainframeKeywords:
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
-
     def secure_login(self,inputs):
         """
         method name : secure_login
@@ -247,11 +248,10 @@ class MainframeKeywords:
                 self.region = inputs[0]
                 self.userID = inputs[1]
                 self.password = inputs[2]
-                encryption_obj = AESCipher()
-                password = encryption_obj.decrypt(self.password)
+                password = self.encryption_obj.decrypt(self.password)
                 # Log the input details in log file
                 log.info("Input recieved")
-                log.info("Region : %s \t UserID : %s \t Password : %s",self.region,self.userID,password)
+                log.info("Region : %s \t UserID : %s \t Password : %s",self.region,self.userID,self.password)
                 # Print the input details on ICE console
                 logger.print_on_console("Input recieved : ")
                 #logger.print_on_console("Region : "+self.region + "\t" + "UserID :" + self.userID + "\t" + "Password :" + password)
@@ -280,7 +280,6 @@ class MainframeKeywords:
             log.error(e)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
-
 
     def logoff(self,inputs):
         """
@@ -347,7 +346,6 @@ class MainframeKeywords:
                 logger.print_on_console("  "+str(i)+"\t\t"+self.logoff_options[i])
         return status,methodoutput,output,err_msg
 
-
     def send_value(self,inputs):
         """
         method name : send_value
@@ -391,7 +389,57 @@ class MainframeKeywords:
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
         except Exception as e:
-            err_msg = "Error: Unable to  send value to "+ self.emulator_type +" Emulator screen."
+            err_msg = "Error: Unable to send value to "+ self.emulator_type +" Emulator screen."
+            log.error(err_msg)
+            log.error(e)
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output,err_msg
+
+    def send_secure_value(self,inputs):
+        """
+        method name : send_secure_value
+        inputs      : User can provide input value to send_secure_value either from excel sheet or through dynamic variable.
+                        1. text - Text to be sent (Encrypted using AES)
+        Purpose     : This keyword or action specifies the Tool to send the individual keystrokes to the location where the cursor is present at the point of execution.
+        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm and Rumba.
+        """
+        result = None
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        try:
+             #check for the exact inputs
+            if len(inputs) == 1:
+                self.text = inputs[0]
+                text = self.encryption_obj.decrypt(self.text)
+                # Log the input details in log file
+                log.info("Input recieved")
+                log.info("Text : %s ",self.text)
+                # Print the input details on ICE console
+                logger.print_on_console("Input recieved : ")
+                logger.print_on_console("Text : "+self.text)
+                if self.emulator_type in self.emulator_types:
+                    #Log the state of  keyword in log file
+                    log.info("Sending Value to %s emulator screen...",self.emulator_type)
+                    #Print the state of keyword on ICE console
+                    logger.print_on_console("Sending Value to " + self.emulator_type +" emulator screen...")
+                if self.emulator_type == MAINFRAME_EXTRA:
+                    #Logic to launch Extra Emulator goes here
+                    print "Extra Emulator code"
+                elif self.emulator_type == MAINFRAME_BLUEZONE:
+                    result,output,err_msg = self.bluezone_object.send_value(text)
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                    result,output,err_msg = self.ehllapi_object.send_value(text)
+                if result:
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
+            else:
+                err_msg = "Error: Invalid input!!! - send_secure_value need 1 paramemter, 1. Text"
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
+        except Exception as e:
+            err_msg = "Error: Unable to send secure value to "+ self.emulator_type +" Emulator screen."
             log.error(err_msg)
             log.error(e)
             logger.print_on_console(err_msg)
@@ -399,7 +447,7 @@ class MainframeKeywords:
 
     def set_text(self,inputs):
         """
-        method name : set_value
+        method name : set_text
         inputs      : User can provide input value to set_text either from excel sheet or through dynamic variable.
                         1. Row Number
                         2. Column Number
@@ -443,7 +491,60 @@ class MainframeKeywords:
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
         except Exception as e:
-            err_msg = "Error: Unable to  set the text to "+ self.emulator_type +" Emulator screen."
+            err_msg = "Error: Unable to set the text to "+ self.emulator_type +" Emulator screen."
+            log.error(err_msg)
+            log.error(e)
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output,err_msg
+
+    def set_secure_text(self,inputs):
+        """
+        method name : set_secure_text
+        inputs      : User can provide input value to set_secure_text either from excel sheet or through dynamic variable.
+                        1. Row Number
+                        2. Column Number
+                        3. Text (Encrypted using AES)
+        Purpose     : This keyword or action specifies the Tool to enter the text at the location specified by the user.
+        Support     : Supported Emulators are Bluezone, EXTRA, Pcomm and Rumba.
+        """
+        result = None
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        try:
+            #check for the exact inputs
+            if len(inputs) == 3:
+                row_number = inputs[0]
+                column_number = inputs[1]
+                text = inputs[2]
+                text_plain = self.encryption_obj.decrypt(text)
+                # Log the input details in log file
+                log.info("Input recieved")
+                log.info("Row number: %s \t Column number: %s \t Text: %s",row_number,column_number,text)
+                # Print the input details on ICE console
+                logger.print_on_console("Input recieved : \nRow number: "+row_number + "\nColumn number: " + column_number + "\nText: " + text)
+                if self.emulator_type in self.emulator_types:
+                    #Log the state of  keyword in log file
+                    log.info("Setting the text in  %s emulator screen...",self.emulator_type)
+                    #Print the state of keyword on ICE console
+                    logger.print_on_console("Setting the text in " + self.emulator_type +" emulator screen...")
+                if self.emulator_type == MAINFRAME_EXTRA:
+                    #Logic to launch Extra Emulator goes here
+                    print "Extra Emulator code"
+                elif self.emulator_type == MAINFRAME_BLUEZONE:
+                    result,output,err_msg = self.bluezone_object.set_text(row_number,column_number,text_plain)
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
+                    result,output,err_msg = self.ehllapi_object.set_text(row_number,column_number,text_plain)
+                if result:
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
+            else:
+                err_msg = "Error: Invalid input!!! - SetSecureText need 3 paramemters, 1. Row number 2. Column number 3. Text."
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
+        except Exception as e:
+            err_msg = "Error: Unable to set the text to "+ self.emulator_type +" Emulator screen."
             log.error(err_msg)
             log.error(e)
             logger.print_on_console(err_msg)

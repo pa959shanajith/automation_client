@@ -12,30 +12,28 @@ ix,iy = -1,-1
 log = logging.getLogger('cropandadd.py')
 from pywinauto.findwindows import find_window
 from pywinauto.win32functions import SetForegroundWindow
+import os
+import time
 
 class Cropandadd():
-    def startcropandadd(self):
+    def startcropandadd(self,wx_window):
         try:
+            wx_window.Hide()
+            time.sleep(1)
             im = PIL.ImageGrab.grab()
             im.save('test.jpg')
-            screen_id = 0
 
             # get the size of the screen
-            screen = screeninfo.get_monitors()[screen_id]
+            screen = screeninfo.get_monitors()[0]
             width, height = screen.width, screen.height
             im1 = Image.open('test.jpg')
+            wx_window.Show()
             image = np.array(im1)
             self.RGB_img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             self.RGB_img_c = np.copy(self.RGB_img)
             self.data = {}
             self.data['view'] = []            #cords of selected parts
             self.stopflag = False
-            #with open("test.jpg", "rb") as imageFile:
-             #   self.data['mirror'] = base64.b64encode(imageFile.read())     #screenshot
-            # self.data['mirror'] = ''
-            #drawing = False # true if mouse is pressed
-            mode = True # if True, draw rectangle. Press 'm' to toggle to curve
-            # mouse callback function
             def draw_rect(event,x,y,flags,param):
                 global ix,iy,drawing1
                 if event == cv2.EVENT_LBUTTONDOWN:
@@ -55,7 +53,7 @@ class Cropandadd():
                     with open("cropped.png", "rb") as imageFile:
                         RGB_img_crop_im = base64.b64encode(imageFile.read())
                     if(ix!=x and iy!=y):
-                        self.data['view'].append({'custname': 'img_object_'+str(ix)+'_'+str(x)+'_'+str(iy)+'_'+str(y),'cord':RGB_img_crop_im,'tag':'iris','width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix})
+                        self.data['view'].append({'custname': 'img_object_'+str(ix)+'_'+str(x)+'_'+str(iy)+'_'+str(y),'cord':RGB_img_crop_im,'tag':'iris','width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix,'xpath':'iris'})
                     cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),1)
                     self.RGB_img_c = np.copy(self.RGB_img)
 
@@ -73,6 +71,10 @@ class Cropandadd():
                     SetForegroundWindow(find_window(title='image'))
                 k = cv2.waitKey(1) & 0xFF
                 if self.stopflag:
+                    if(os.path.isfile("test.jpg")):
+                        os.remove("test.jpg")
+                    if(os.path.isfile("cropped.png")):
+                        os.remove("cropped.png")
                     break
 
             #cv2.destroyAllWindows()
@@ -85,7 +87,6 @@ class Cropandadd():
         im.save('out.jpg')
         with open("out.jpg", "rb") as imageFile:
             self.data['mirror'] = base64.b64encode(imageFile.read())
-        import os
         os.remove('out.jpg')
         with open('domelements.json', 'w') as outfile:
             log.info('Opening domelements.json file to write scraped objects')
@@ -94,4 +95,3 @@ class Cropandadd():
         outfile.close()
         self.stopflag = True
         return self.data
-
