@@ -101,7 +101,7 @@ class CoreUtils():
             eth_st=ipdata.find("Ether")
             phy_st=ipdata[eth_st:].find("Physical Address")+eth_st
             phy_en=ipdata[phy_st:].find("\n")+phy_st
-            mac=ipdata[phy_st:phy_en].split(':')[1].strip()
+            mac=ipdata[phy_st:phy_en].split(':')[1].lower().strip()
         else:
             for line in os.popen("/sbin/ifconfig"):
                 if line.strip().lower().find('ether') > -1:

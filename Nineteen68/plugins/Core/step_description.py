@@ -598,6 +598,18 @@ class StepDescription:
             if(len(inputval)>1):
                 inp = '->'.join(inputval)
             return ' Get name of node at index'+"'"+inp+"'"+' and store the output as '+"'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
+        def clickiris():
+            return ' Click on '+ "'" +tsp.custname+ "'" +'.'
+        def settextiris():
+            return ' Enter text '+"'"+ inputval[0]+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
+        def gettextiris():
+            return ' Get Text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp.outputval+"'"+ '.'
+        def getrowcountiris():
+            return ' Get row count of '+ "'" + tsp.custname + "'"+ ' and save the count '+"'"+output+"'"+ ' in '+"'"+ tsp.outputval+"'"+ '.'
+        def getcolcountiris():
+            return ' Get column Count of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
+        def getcellvalueiris():
+            return ' Get cell value of  '+ "'" + tsp.custname + ' ' + str(input) + "'" +'in the table and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp.custname +"'"+'.'
         return locals()[keyword]()
 
 
@@ -816,7 +828,18 @@ class StepDescription:
             except:
                 input1=input
             return 'Select the tree node  '+"'"+input1+"'."
-
+        def clickiris():
+            return ' Click on '+ "'" +tsp.custname+ "'" +'.'
+        def settextiris():
+            return ' Enter text '+"'"+ inputval[0]+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
+        def gettextiris():
+            return ' Get Text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp.outputval+"'"+ '.'
+        def getrowcountiris():
+            return ' Get row count of '+ "'" + tsp.custname + "'"+ ' and save the count '+"'"+output+"'"+ ' in '+"'"+ tsp.outputval+"'"+ '.'
+        def getcolcountiris():
+            return ' Get column Count of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
+        def getcellvalueiris():
+            return ' Get cell value of  '+ "'" + tsp.custname +input + "'" +'in the table and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp.custname +"'"+'.'
         return locals()[keyword]()
 
     def mobileapp(self,keyword,tsp,inputval,input,output,con,reporting_obj):
@@ -1277,8 +1300,18 @@ class StepDescription:
         #custom keyword
         def getobjectcount():
             return 'Get Object count of the type '+"'" +ele_type+"'" +' and save the count '+"'" +output+"'" +' in '+"'"+tsp.outputval+"'"
-
-
+        def clickiris():
+            return ' Click on '+ "'" +tsp.custname+ "'" +'.'
+        def settextiris():
+            return ' Enter text '+"'"+ inputval[0]+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
+        def gettextiris():
+            return ' Get Text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp.outputval+"'"+ '.'
+        def getrowcountiris():
+            return ' Get row count of '+ "'" + tsp.custname + "'"+ ' and save the count '+"'"+output+"'"+ ' in '+"'"+ tsp.outputval+"'"+ '.'
+        def getcolcountiris():
+            return ' Get column Count of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
+        def getcellvalueiris():
+            return ' Get cell value of  '+ "'" + tsp.custname +input + "'" +'in the table and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp.custname +"'"+'.'
         return locals()[keyword]()
 
 
