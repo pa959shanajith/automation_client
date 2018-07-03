@@ -164,7 +164,7 @@ class UtilWebKeywords:
         try:
             if webelement is not None and webelement != '':
                 #call to highlight the webelement
-                self.highlight(webelement)
+##                self.highlight(webelement)
                 logger.print_on_console(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
                 log.info(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
                 status=TEST_RESULT_PASS
@@ -455,7 +455,7 @@ class UtilWebKeywords:
                                 else:
                                     counter+=1
                     elif tag=='textbox':
-                         if (tagName==('input') and (tagType==('text') or tagType==('email') or tagType==('password') or tagType==('range') or tagType==('search') or tagType==('url')) ):
+                         if (tagName==('input') and (tagType==('text') or tagType==('email') or tagType==('password') or tagType==('range') or tagType==('search') or tagType==('url') or tagType==('button') or tagType==('checkbox') or tagType==('color') or tagType==('date') or tagType==('datetime-local') or tagType==('file') or tagType==('image') or tagType==('month') or tagType==('week') or tagType==('time') or tagType==('number') or tagType==('radio') or tagType==('reset') or tagType==('submit') or tagType==('tel') or tagType==('None')) ):
                             if index==childindex:
                                 eleStatus =True
                             else:

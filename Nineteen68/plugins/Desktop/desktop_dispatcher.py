@@ -106,8 +106,7 @@ class DesktopDispatcher:
                     try:
                         custom_desktop_element=self.desktop_custom_object_obj.getobjectforcustom(parent_xpath,ele_type,input[1])
                     except:
-                        import traceback
-                        traceback.print_exc()
+                        pass
                     if(custom_desktop_element != '' or None):
                         objectname = custom_desktop_element
                 else:
@@ -210,7 +209,7 @@ class DesktopDispatcher:
                 dict['getrowcountiris'] = iris_object.getrowcountiris
                 dict['getcolcountiris'] = iris_object.getcolcountiris
                 dict['getcellvalueiris'] = iris_object.getcellvalueiris
-                
+
 
             email_dict={'getemail': 1,
                   'getfrommailid' : 2,
@@ -231,7 +230,7 @@ class DesktopDispatcher:
             keyword=keyword.lower()
             ele = None
             if keyword in dict.keys():
-                if keyword=='launchapplication' or keyword=='findwindowandattach' or keyword=='selectmenu' or keyword in email_dict.keys() :
+                if keyword in desktop_constants.WINDOW_KEYWORDS or keyword in email_dict.keys():
                     result= dict[keyword](input,output)
                 else:
                     self.launch_keywords_obj.verifyWindowTitle()

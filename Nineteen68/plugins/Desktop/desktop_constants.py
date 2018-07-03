@@ -85,4 +85,6 @@ ELEMENT_FOUND=True
 
 ERROR_MSG = 'Error occured'
 
+WINDOW_KEYWORDS=['launchapplication','findwindowandattach','selectmenu','closeapplication','getpagetitle','minimizewindow','maximizewindow']
+
 APPLICATION_KEYWORDS = ['launchapplication','findwindowandattach','closeapplication','switchtofolder','getemail','getfrommailid','getattachmentstatus','getsubject','gettomailid','getbody','verifyemail']

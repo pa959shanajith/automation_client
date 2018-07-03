@@ -56,22 +56,32 @@ class Launch_Keywords():
             if len(input_val)==1:
                 filePath=input_val[0]
                 timeout=5
-            if(os.path.isfile(filePath)):
-                directory = os.path.dirname(filePath)
-                #check for any existing instance of app by window name
-                filename,file_ext=os.path.splitext(filePath)
-                if file_ext == '.bat':
-                    log.debug('executing .bat file')
-                    logger.print_on_console('executing .bat  file')
-                    p = subprocess.Popen(filePath,cwd=os.path.dirname(filePath))
-                    status=desktop_constants.TEST_RESULT_PASS
-                    result = desktop_constants.TEST_RESULT_TRUE
-                elif file_ext == '.exe':
-                    value=win32api.ShellExecute(0,'open',filePath,None,directory,1)
-                    time.sleep(3)
-                    if int(value)>32:
-                        status=desktop_constants.TEST_RESULT_PASS
-                        result = desktop_constants.TEST_RESULT_TRUE
+                file_Name = self.getTaskName(filePath)
+                title_matched_windows = self.getProcessWindows(file_Name)
+                if len(title_matched_windows)>=1:
+                    self.windowHandle=title_matched_windows[0]
+                    self.windowname=self.getWindowText(self.windowHandle)
+                    logger.print_on_console(self.windowname+' Application already open')
+                    verb = self.windowname
+                else:
+                    if(os.path.exists(filePath)):
+                        directory = os.path.dirname(filePath)
+                        #check for any existing instance of app by window name
+                        filename,file_ext=os.path.splitext(filePath)
+                        if file_ext == '.bat':
+                            log.debug('executing .bat file')
+                            logger.print_on_console('executing .bat  file')
+                            p = subprocess.Popen(filePath,cwd=os.path.dirname(filePath))
+                            status=desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                            verb = "Application Launched"
+                        elif file_ext == '.exe':
+                            value=win32api.ShellExecute(0,'open',filePath,None,directory,1)
+                            time.sleep(3)
+                            if int(value)>32:
+                                status=desktop_constants.TEST_RESULT_PASS
+                                result = desktop_constants.TEST_RESULT_TRUE
+                                verb = "Application Launched"
             else:
                 term =TERMINATE
                 logger.print_on_console('The file does not exists')
@@ -552,3 +562,12 @@ class Launch_Keywords():
             return hwnd[winSize - 1]
         except Exception as e:
             logger.print_on_console ('AUT closed')
+
+    def getTaskName(self,filePath):
+        try:
+            language, codepage = win32api.GetFileVersionInfo(filePath, '\\VarFileInfo\\Translation')[0]
+            stringFileInfo = u'\\StringFileInfo\\%04X%04X\\%s' % (language, codepage, "FileDescription")
+            description = win32api.GetFileVersionInfo(filePath, stringFileInfo)
+        except:
+            description = ""
+        return description
