@@ -230,21 +230,14 @@ class DesktopDispatcher:
             keyword=keyword.lower()
             ele = None
             if keyword in dict.keys():
-                if keyword in desktop_constants.WINDOW_KEYWORDS or keyword in email_dict.keys():
+                if keyword=='launchapplication' or keyword=='findwindowandattach' or keyword=='selectmenu' or keyword in email_dict.keys() :
                     result= dict[keyword](input,output)
                 else:
                     self.launch_keywords_obj.verifyWindowTitle()
                     if objectname != '':
-                        if teststepproperty.cord != None and teststepproperty.cord != '':
-                            app_uia = desktop_launch_keywords.app_uia
-                            if(desktop_launch_keywords.window_name != None):
-                                SetForegroundWindow(find_window(title=desktop_launch_keywords.window_name))
-                            ele = {'cord': teststepproperty.cord}
-                            result= dict[keyword](ele,input,output)
-                        else:
-                            app_uia = desktop_launch_keywords.app_uia
-                            ele = self.get_desktop_element(objectname,url,app_uia)
-                            result= dict[keyword](ele,url,input,output)
+                        app_uia = desktop_launch_keywords.app_uia
+                        ele = self.get_desktop_element(objectname,url,app_uia)
+                    result= dict[keyword](ele,url,input,output)
 
                 if not(desktop_constants.ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE
