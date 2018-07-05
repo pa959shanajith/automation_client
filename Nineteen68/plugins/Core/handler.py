@@ -348,6 +348,7 @@ class Handler():
                 #To fix issue with nested if blocks (without containing elseif/else blocks)
                 if(start_index[1]==constants.IF and not(whileflag)):
                     condition_keywords.popitem()
+                    flag=constants.ENDIF
                     
             elif keyword==constants.IF:
 ##                self.insert_into_ifdict(keyword_index,keyword,None)
