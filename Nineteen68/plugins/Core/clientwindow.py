@@ -1050,6 +1050,7 @@ class ClientWindow(wx.Frame):
                     flag = True
                     if(system_mac in irisMAC):
                         irisFlag = True
+                        controller.iris_flag = True
         except:
             pass
         if not flag:

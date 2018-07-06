@@ -177,9 +177,8 @@ class Controller():
             self.get_all_the_imports('WebScrape')
             self.get_all_the_imports('Web')
             global iris_flag
-            if(os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
+            if(iris_flag and os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
                 self.get_all_the_imports('IRIS')
-                iris_flag = True
             import web_dispatcher
             self.web_dispatcher_obj = web_dispatcher.Dispatcher()
             self.web_dispatcher_obj.exception_flag=self.exception_flag
@@ -192,9 +191,8 @@ class Controller():
         try:
             global iris_flag
             self.get_all_the_imports('Desktop')
-            if(os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
+            if(iris_flag and os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
                 self.get_all_the_imports('IRIS')
-                iris_flag = True
             import desktop_dispatcher
             self.desktop_dispatcher_obj = desktop_dispatcher.DesktopDispatcher()
             self.desktop_dispatcher_obj.exception_flag=self.exception_flag
@@ -207,9 +205,8 @@ class Controller():
         try:
             global iris_flag
             self.get_all_the_imports('SAP')
-            if(os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
+            if(iris_flag and os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
                 self.get_all_the_imports('IRIS')
-                iris_flag = True
             import sap_dispatcher
             self.sap_dispatcher_obj = sap_dispatcher.SAPDispatcher()
             self.sap_dispatcher_obj.exception_flag=self.exception_flag
