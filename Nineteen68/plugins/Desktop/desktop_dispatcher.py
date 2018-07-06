@@ -234,10 +234,17 @@ class DesktopDispatcher:
                     result= dict[keyword](input,output)
                 else:
                     self.launch_keywords_obj.verifyWindowTitle()
-                    if objectname != '':
+                    if objectname != '' and teststepproperty.cord != None and teststepproperty.cord != '':
                         app_uia = desktop_launch_keywords.app_uia
-                        ele = self.get_desktop_element(objectname,url,app_uia)
-                    result= dict[keyword](ele,url,input,output)
+                        if(desktop_launch_keywords.window_name != None):
+                            SetForegroundWindow(find_window(title=desktop_launch_keywords.window_name))
+                        ele = {'cord': teststepproperty.cord}
+                        result= dict[keyword](ele,input,output)
+                    else:
+                        if objectname != '':
+                            app_uia = desktop_launch_keywords.app_uia
+                            ele = self.get_desktop_element(objectname,url,app_uia)
+                        result= dict[keyword](ele,url,input,output)
 
                 if not(desktop_constants.ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE
