@@ -106,8 +106,7 @@ class DesktopDispatcher:
                     try:
                         custom_desktop_element=self.desktop_custom_object_obj.getobjectforcustom(parent_xpath,ele_type,input[1])
                     except:
-                        import traceback
-                        traceback.print_exc()
+                        pass
                     if(custom_desktop_element != '' or None):
                         objectname = custom_desktop_element
                 else:
@@ -210,7 +209,7 @@ class DesktopDispatcher:
                 dict['getrowcountiris'] = iris_object.getrowcountiris
                 dict['getcolcountiris'] = iris_object.getcolcountiris
                 dict['getcellvalueiris'] = iris_object.getcellvalueiris
-                
+
 
             email_dict={'getemail': 1,
                   'getfrommailid' : 2,
@@ -235,17 +234,17 @@ class DesktopDispatcher:
                     result= dict[keyword](input,output)
                 else:
                     self.launch_keywords_obj.verifyWindowTitle()
-                    if objectname != '':
-                        if teststepproperty.cord != None and teststepproperty.cord != '':
-                            app_uia = desktop_launch_keywords.app_uia
-                            if(desktop_launch_keywords.window_name != None):
-                                SetForegroundWindow(find_window(title=desktop_launch_keywords.window_name))
-                            ele = {'cord': teststepproperty.cord}
-                            result= dict[keyword](ele,input,output)
-                        else:
+                    if objectname != '' and teststepproperty.cord != None and teststepproperty.cord != '':
+                        app_uia = desktop_launch_keywords.app_uia
+                        if(desktop_launch_keywords.window_name != None):
+                            SetForegroundWindow(find_window(title=desktop_launch_keywords.window_name))
+                        ele = {'cord': teststepproperty.cord}
+                        result= dict[keyword](ele,input,output)
+                    else:
+                        if objectname != '':
                             app_uia = desktop_launch_keywords.app_uia
                             ele = self.get_desktop_element(objectname,url,app_uia)
-                            result= dict[keyword](ele,url,input,output)
+                        result= dict[keyword](ele,url,input,output)
 
                 if not(desktop_constants.ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE

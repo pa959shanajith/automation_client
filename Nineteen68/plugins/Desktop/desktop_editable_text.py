@@ -49,6 +49,7 @@ class Text_Box:
                 if (check):
                     log.info('Parent matched')
                     if(element.is_enabled()):
+                        self.clear_text(element,parent)
                         input_val = text
                         cursor_x,cursor_y = win32api.GetCursorPos()#handling cursor move
                         element.type_keys(input_val,with_spaces = True)
@@ -96,6 +97,7 @@ class Text_Box:
                 if (check):
                     log.info('Parent matched')
                     if(element.is_enabled()):
+                        self.clear_text(element,parent)
                         input_val = text
                         log.info('Element state is enabled')
                         encryption_obj = AESCipher()
