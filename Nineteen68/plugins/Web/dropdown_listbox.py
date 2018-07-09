@@ -1099,7 +1099,10 @@ class DropdownKeywords():
                             if input[0] == "1":
                                 value = value.strip()
                             selectedvalues.append(value)
-                    output = selectedvalues
+                    if len(selectedvalues) == 1:
+                        output = selectedvalues[0]
+                    else:
+                        output = selectedvalues
                     logger.print_on_console('Result obtained is: ',output)
                     status = webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
