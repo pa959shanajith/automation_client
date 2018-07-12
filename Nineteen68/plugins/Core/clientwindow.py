@@ -442,8 +442,19 @@ class MainNamespace(BaseNamespace):
             fg.open_file_in_editor(str(args[0]), str(args[1]), int(args[2]))
         except Exception as e:
             log.error(e)
-            logger.print_on_console('Exception in on_apgOpenFileInEditor')
+            logger.print_on_console('Exception in APG Open File In Editor')
 
+    def on_killSession(self,*args):
+        global wxObject
+        try:
+            user = args[0]
+            wxObject.OnNodeConnect(wx.EVT_BUTTON)
+            msg = 'Connection terminated remotely by ' + user
+            logger.print_on_console(msg)
+            log.info(msg)
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console('Exception while Remote Disconnect')
 
 class SocketThread(threading.Thread):
     """Test Worker Thread Class."""
