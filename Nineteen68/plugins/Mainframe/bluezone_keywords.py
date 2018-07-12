@@ -235,8 +235,7 @@ class BluezoneKeywords:
         try:
             if func_keys.has_key(function_key):
                 function_key = func_keys[function_key]
-                number = int(number)
-                for i in range(number):
+                for i in range(int(number)):
                     self.host.Waitready(10,1000)
                     self.host.Focus
                     self.host.SendKeys(function_key)
@@ -692,7 +691,7 @@ class BluezoneAPIKeywords:
         try:
             if func_keys.has_key(function_key):
                 text = func_keys[function_key]
-                for i in range(number):
+                for i in range(int(number)):
                     data = dataTransmitter("sendvalue", text)
                     return_value = data["stat"]
                     if return_value == 0:
