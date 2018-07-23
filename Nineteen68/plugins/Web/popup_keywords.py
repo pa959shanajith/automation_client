@@ -154,7 +154,7 @@ class PopupKeywords():
             log.debug(driver)
             try:
                 text = driver.switch_to_alert().text
-                log.debug('Popup exists with text : ' , text)
+                log.debug('Popup exists with text : %s', text)
                 return False
             except Exception as e:
                 return True

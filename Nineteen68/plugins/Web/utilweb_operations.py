@@ -642,6 +642,7 @@ class UtilWebKeywords:
                 logger.print_on_console(INPUT_IS+input)
                 log.info('Switching to the window ')
                 log.info(to_window)
+                bk_obj.update_window_handles()
                 window_handles=self.__get_window_handles()
                 ## Issue #190 Driver control won't switch back to parent window
                 if to_window>len(window_handles):
