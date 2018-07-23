@@ -918,8 +918,8 @@ class ClientWindow(wx.Frame):
             global socketIO, configvalues
             name = self.connectbutton.GetName()
             self.connectbutton.Disable()
-            configvalues = readconfig.readConfig().readJson() # Re-reading config values
             if(name == 'connect'):
+                configvalues = readconfig.readConfig().readJson() # Re-reading config values
                 port = int(configvalues['server_port'])
                 conn = httplib.HTTPConnection(configvalues['server_ip'],port)
                 conn.connect()
@@ -941,16 +941,15 @@ class ClientWindow(wx.Frame):
                 self.schedule.Disable()
                 self.connectbutton.Enable()
         except Exception as e:
-            emsg="Forbidden request, Connection refused, please configure server ip and server port in Configuration ->Edit ->Edit Config, and re-connect."
+            emsg="Forbidden request, Connection refused, please configure server ip and server port in Edit -> Configuration, and re-connect."
             logger.print_on_console(emsg)
             log.error(emsg)
             self.cancelbutton.Disable()
             self.terminatebutton.Disable()
             self.clearbutton.Disable()
-            self.connectbutton.Disable()
+            self.connectbutton.Enable()
             self.rbox.Disable()
             log.error(e)
-            self.connectbutton.Enable() #Enabling Connect button so that user can reconfigure and connect again
 
     def killDebugWindow(self):
         #Close the debug window
