@@ -38,6 +38,7 @@ i = 0
 terminate_flag=False
 pause_flag=False
 iris_flag = False
+iris_constant_step = -1
 break_point=-1
 socket_object = None
 thread_tracker = []
@@ -163,6 +164,9 @@ class Controller():
     def __load_oebs(self):
         try:
             self.get_all_the_imports('Oebs')
+            global iris_flag
+            if(iris_flag and os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
+                self.get_all_the_imports('IRIS')
             import oebs_dispatcher
             self.oebs_dispatcher_obj = oebs_dispatcher.OebsDispatcher()
             self.oebs_dispatcher_obj.exception_flag=self.exception_flag
@@ -292,8 +296,9 @@ class Controller():
             log.info('Input: '+str(i + 1)+ '= '+repr(inpval[i]))
 
     def clear_data(self):
-        global terminate_flag,pause_flag
+        global terminate_flag,pause_flag,iris_constant_step
         terminate_flag=pause_flag=False
+        iris_constant_step = -1
 
     def resume_execution(self):
         global pause_flag
@@ -530,7 +535,7 @@ class Controller():
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
     def keywordinvocation(self,index,inpval,*args):
-        global socket_object
+        global socket_object,iris_constant_step
         configvalues = self.configvalues
         try:
             import time
@@ -582,6 +587,16 @@ class Controller():
                         teststepproperty.execute_flag=False
                         result=list(result)
                         result[3]='Drop Keyword is missing'
+            #Checking for test step with constant iris object
+            if(teststepproperty.cord != '' and teststepproperty.cord != None):
+                if (teststepproperty.objectname.split(';')[-1] == 'constant' and keyword.lower() == 'verifyexistsiris'):
+                    iris_constant_step = index
+                elif iris_constant_step!=-1:
+                    tsp = handler.tspList[iris_constant_step]
+                    obj_props = tsp.objectname.split(';')
+                    coords = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
+                    teststepproperty.custom_flag = True
+                    teststepproperty.parent_xpath = {'cord': tsp.cord, 'coordinates': coords}
             #get the output varible from the teststep property
             if teststepproperty.execute_flag:
                 #Check the apptype and pass to perticular module
@@ -634,7 +649,7 @@ class Controller():
                     #OEBS apptype module call
                     if self.oebs_dispatcher_obj == None:
                         self.__load_oebs()
-                    result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
+                    result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval,iris_flag)
             #----------------------------------------------------------------------------------------------Mainframe change
                 elif teststepproperty.apptype.lower() == APPTYPE_MAINFRAME:
                     #Mainframe apptype module call
@@ -737,8 +752,8 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
         return res
 
-    def invokeoebskeyword(self,teststepproperty,dispatcher_obj,inputval):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval)
+    def invokeoebskeyword(self,teststepproperty,dispatcher_obj,inputval,iris_flag):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,iris_flag)
         return res
 
     def invokewebservicekeyword(self,teststepproperty,dispatcher_obj,inputval,socket_object):

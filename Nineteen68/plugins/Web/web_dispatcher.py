@@ -100,7 +100,6 @@ class Dispatcher:
         def send_webelement_to_keyword(driver,objectname,url):
             webelement=None
             if driver != None:
-
                 log.debug('In send_webelement_to_keyword method')
                 #check if the element is in iframe or frame
                 try:
@@ -151,7 +150,9 @@ class Dispatcher:
                             log.info(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
                             logger.print_on_console(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
                         elif teststepproperty.cord != None and teststepproperty.cord != "":
-                            webelement = {'cord': teststepproperty.cord}
+                            obj_props = teststepproperty.objectname.split(';')
+                            coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
+                            webelement = {'cord': teststepproperty.cord, 'coordinates':coord}
                         else:
                             webelement = self.getwebelement(driver,objectname)
                             if webelement != None:
@@ -163,7 +164,9 @@ class Dispatcher:
                     print_error('ERR_CUSTOM_ELE_NOTFOUND')
 
             elif teststepproperty.cord != None and teststepproperty.cord != "":
-                webelement = {'cord': teststepproperty.cord}
+                obj_props = teststepproperty.objectname.split(';')
+                coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
+                webelement = {'cord': teststepproperty.cord, 'coordinates':coord}
 
             return webelement
 
@@ -304,7 +307,8 @@ class Dispatcher:
                 dict['getrowcountiris'] = iris_object.getrowcountiris
                 dict['getcolcountiris'] = iris_object.getcolcountiris
                 dict['getcellvalueiris'] = iris_object.getcellvalueiris
-                
+                dict['verifyexistsiris'] = iris_object.verifyexistsiris
+
             if browser_Keywords.driver_obj is not None:
                 browser_info=browser_Keywords.driver_obj.capabilities
                 reporting_obj.browser_type=browser_info.get('browserName')
@@ -345,6 +349,11 @@ class Dispatcher:
                         ##webelement = input[0]
                         input =input[1:]
                         result= dict[keyword](webelement,input)
+                    elif teststepproperty.cord!='' and teststepproperty.cord!=None:
+                        if teststepproperty.custom_flag:
+                            result = dict[keyword](webelement,input,output,teststepproperty.parent_xpath)
+                        else:
+                            result = dict[keyword](webelement,input,output)
                     else:
                         result= dict[keyword](webelement,input)
                     ## To terminate debug/execution if requested browser is not available in the system (Defect #846)

@@ -11,10 +11,10 @@ from constants import *
 log = logging.getLogger('iris_operations.py')
 import os
 from pytesseract import pytesseract
-
-#Input Image Name
+import base64
 vertical = []
 horizontal = []
+verifyexists = []
 
 def remove_duplicates(lines):
     # remove duplicate lines (lines within 10 pixels of eachother)
@@ -47,7 +47,6 @@ def get_ocr(image):
     filename = str(int(time.time()))+".png"
     cv2.imwrite(filename, gray)
     # load the image as a PIL/Pillow image, apply OCR, and then delete the temporary file
-
     text = pytesseract.image_to_string(Image.open(filename))
     os.remove(filename)
     return text
@@ -84,7 +83,7 @@ def hough_transform_p(img,pos):
         horizontal = sort_line_list(lines,2)
 
 def data_in_cells(image,row,column):
-    text = ''
+    text = None
     if(row<len(horizontal) and column<len(vertical)):
         img = image[horizontal[row-1][0]+2:horizontal[row][0]-2,vertical[column-1][0]+2:vertical[column][0]-2]
         text = get_ocr(img)
@@ -92,33 +91,83 @@ def data_in_cells(image,row,column):
         logger.print_on_console("Invalid Input for row and column number")
     return text
 
-def gotoobject(elem):
-        img_rgb = elem.decode('base64')
-        fh = open("sample.png", "wb")
-        fh.write(img_rgb)
-        fh.close()
+def gotoobject(elem, number):
+    img_rgb = elem.decode('base64')
+    fh = open("sample.png", "wb")
+    fh.write(img_rgb)
+    fh.close()
 
-        im = PIL.ImageGrab.grab()
-        im.save('test.png')
-        img_rgb = cv2.imread('test.png')
-        img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
+    im = PIL.ImageGrab.grab()
+    im.save('test.png')
+    img_rgb = cv2.imread('test.png')
+    img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
 
-        template = cv2.imread('sample.png',0)
-        w, h = template.shape[::-1]
-        iter = 0
-        res = cv2.matchTemplate(img_gray,template,cv2.TM_CCOEFF_NORMED)
-        threshold = 0.8
-        loc = np.where( res >= threshold)
-        pt = []
-        for pt in zip(*loc[::-1]):
-            cv2.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0,0,255), 2)
+    template = cv2.imread('sample.png',0)
+    w, h = template.shape[::-1]
+    res = cv2.matchTemplate(img_gray,template,cv2.TM_CCOEFF_NORMED)
+    threshold = 0.9
+    loc = np.where( res >= threshold)
+    ind = np.unravel_index(np.argmax(res, axis=None), res.shape)
+    pt = []
+    #points = []
+    for pt in zip(*loc[::-1]):
+        #points.append(pt)
+        cv2.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0,0,255), 2)
+    #cv2.imwrite('res.png',img_rgb)
 
-        if(len(pt) > 0):
-            pyautogui.moveTo(pt[0]+ int(w/2),pt[1] + int(h/2))
-        else:
-            return False
-        time.sleep(1)
-        return True
+##    if(number != None):
+##        if(number>=0 and number<len(points)):
+##            pt = points[number]
+##        else:
+##            logger.print_on_console("Input number exceeds the number of relevant images found.")
+##    else:
+##        pt = (ind[1],ind[0])
+##        print "pt updated",pt
+    if(len(pt) > 0):
+        pt = (ind[1],ind[0])
+        pyautogui.moveTo(pt[0]+ int(w/2),pt[1] + int(h/2))
+    if(os.path.isfile('sample.png')):
+        os.remove('sample.png')
+    if(os.path.isfile('test.png')):
+        os.remove('test.png')
+    return pt
+
+def find_relative_image(constant_cord,elements,const_new_coordinates):
+    try:
+        rel_image = ''
+        if(len(elements)>2):
+            im = PIL.ImageGrab.grab()
+            im.save('find_relative.png')
+            image = cv2.imread('find_relative.png')
+
+            #Start and end points of constant and relative image
+            a1 = elements[1]
+            a2 = elements[2]
+            a3 = elements[3]
+            a4 = elements[0]
+            #Distance between two image
+            dist = int(a2[0])-int(a4[0])
+
+            #Dimensions of captured relative image
+            width = int(a3[0])-int(a2[0])
+            height = abs(int(a2[1])-int(a3[1]))
+
+            #--Relative Coordinates--#
+            starty = int(const_new_coordinates[1]) + (int(a2[1]) - int(a4[1]))
+            endy = int(const_new_coordinates[1]) + (int(a2[1]) - int(a4[1])) + height
+            startx = int(const_new_coordinates[0]) + dist
+            endx = int(const_new_coordinates[0]) + dist + width
+
+            img = image[starty:endy,startx:endx]
+            cv2.imwrite('output.png',img)
+            with open('output.png', "rb") as imageFile:
+                rel_image = base64.b64encode(imageFile.read())
+            os.remove('find_relative.png')
+            os.remove('output.png')
+    except Exception as e:
+        log.error(e)
+        logger.print_on_console("Error occured in finding relative image.")
+    return rel_image
 
 class IRISKeywords():
     def clickiris(self,element,*args):
@@ -127,8 +176,23 @@ class IRISKeywords():
         err_msg=None
         value = OUTPUT_CONSTANT
         try:
-            res = gotoobject(element['cord'])
-            if(res):
+            img = None
+            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+                elem_coordinates = element['coordinates']
+                const_coordintes = args[2]['coordinates']
+                elements = [(const_coordintes[0],const_coordintes[1]),
+                        (const_coordintes[2],const_coordintes[3]),
+                        (elem_coordinates[0], elem_coordinates[1]),
+                        (elem_coordinates[2], elem_coordinates[3])]
+                img = find_relative_image(args[2]['cord'], elements, verifyexists)
+            else:
+                img = element['cord']
+            res = None
+            if(len(args[0])==1 and args[0][0].isdigit()):
+                res = gotoobject(img,int(args[0][0])-1)
+            else:
+                res = gotoobject(img,None)
+            if(len(res)>0):
                 pyautogui.click()
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
@@ -145,12 +209,27 @@ class IRISKeywords():
         err_msg=None
         value = OUTPUT_CONSTANT
         try:
-            res = gotoobject(element['cord'])
-            if(res):
+            img = None
+            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+                elem_coordinates = element['coordinates']
+                const_coordintes = args[2]['coordinates']
+                elements = [(const_coordintes[0],const_coordintes[1]),
+                        (const_coordintes[2],const_coordintes[3]),
+                        (elem_coordinates[0], elem_coordinates[1]),
+                        (elem_coordinates[2], elem_coordinates[3])]
+                img = find_relative_image(args[2]['cord'], elements, verifyexists)
+            else:
+                img = element['cord']
+            res = None
+            if(len(args[0]) == 2 and args[0][1].isdigit()):
+                res = gotoobject(img,int(args[0][1])-1)
+            else:
+                res = gotoobject(img,None)
+            if(len(res)>0):
                 pyautogui.click()
                 pyautogui.hotkey('ctrl','a')
                 pyautogui.press('backspace')
-                pyautogui.typewrite(args[0][0], interval=0.1)
+                pyautogui.typewrite(args[0][0], interval=0.5)
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
             else:
@@ -169,10 +248,70 @@ class IRISKeywords():
             if(os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR')):
                 pytesseract.tesseract_cmd = os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR/tesseract'
                 os.environ["TESSDATA_PREFIX"] = os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR/tessdata'
+                img = None
+                if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+                    elem_coordinates = element['coordinates']
+                    const_coordintes = args[2]['coordinates']
+                    elements = [(const_coordintes[0],const_coordintes[1]),
+                            (const_coordintes[2],const_coordintes[3]),
+                            (elem_coordinates[0], elem_coordinates[1]),
+                            (elem_coordinates[2], elem_coordinates[3])]
+                    img = find_relative_image(args[2]['cord'], elements, verifyexists)
+                else:
+                    img = element['cord']
                 with open("cropped.png", "wb") as f:
-                    f.write(element['cord'].decode('base64'))
+                    f.write(img.decode('base64'))
                 image = cv2.imread("cropped.png")
-                text = get_ocr(image)
+                text = ''
+                if(len(args[0])==1 and args[0][0].lower().strip() == 'select'):
+                    from pyrobot import Robot
+                    robot = Robot()
+                    height = int(element['coordinates'][3]) - int(element['coordinates'][1])
+                    pyautogui.moveTo(int(element['coordinates'][2]),int(element['coordinates'][3])-int(height/2))
+                    pyautogui.dragTo(int(element['coordinates'][0]),int(element['coordinates'][1])+int(height/2),button='left')
+                    robot.ctrl_press('c')
+                    time.sleep(1)
+                    text = robot.get_clipboard_data()
+                elif(len(args[0])==1 and args[0][0].lower().strip() == 'date'):
+                    img = Image.open('cropped.png')
+                    imgr = img.resize((img.size[0] * 10, img.size[1] * 10), Image.ANTIALIAS)
+                    imgr.save('scaled_cropped.png')
+                    '''
+                    image = cv2.imread('scaled_cropped.png')
+                    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+                    avg = np.mean(gray)
+                    gray = cv2.threshold(gray, 0.7*avg, 255, cv2.THRESH_BINARY_INV)[1]
+                    '''
+                    filename = 'scaled_cropped.png'
+                    img = cv2.imread(filename,0)
+                    Z = img.reshape((-1,))
+
+                    # convert to np.float32
+                    Z = np.float32(Z)
+
+                    # define criteria, number of clusters(K) and apply kmeans()
+                    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+                    K = 2
+                    ret,label,center=cv2.kmeans(Z,K,None,criteria,10,cv2.KMEANS_RANDOM_CENTERS)
+                    lbllist = np.unique(label)
+
+                    # Now convert back into uint8, and make original image
+                    center = np.uint8(center)
+                    res = center[label.flatten()]
+                    res2 = res.reshape((img.shape))
+                    a=int(center[0][0]/2+center[1][0]/2)
+                    if((center[0]>center[1] and center[0][0]>center[1][0]) or (center[0]<center[1] and center[0][0]<center[1][0])):
+                        a=255 - a
+                        res2 = cv2.bitwise_not(res2)
+                    img,gray = cv2.threshold(res2,a,255,cv2.THRESH_BINARY)
+                    cv2.imwrite('demo_cropped.png', gray)
+                    text = pytesseract.image_to_string(Image.open('demo_cropped.png'))
+                    if(os.path.isfile('scaled_cropped.png')):
+                        os.remove('scaled_cropped.png')
+                    if(os.path.isfile('demo_cropped.png')):
+                        os.remove('demo_cropped.png')
+                else:
+                    text = get_ocr(image)
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
                 value = text
@@ -191,8 +330,19 @@ class IRISKeywords():
         err_msg=None
         value = OUTPUT_CONSTANT
         try:
+            img = None
+            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+                elem_coordinates = element['coordinates']
+                const_coordintes = args[2]['coordinates']
+                elements = [(const_coordintes[0],const_coordintes[1]),
+                        (const_coordintes[2],const_coordintes[3]),
+                        (elem_coordinates[0], elem_coordinates[1]),
+                        (elem_coordinates[2], elem_coordinates[3])]
+                img = find_relative_image(args[2]['cord'], elements, verifyexists)
+            else:
+                img = element['cord']
             with open("cropped.png", "wb") as f:
-                f.write(element['cord'].decode('base64'))
+                f.write(img.decode('base64'))
             img = cv2.imread("cropped.png")
             hough_transform_p(img,1)
             # rotated = imutils.rotate_bound(img, 270)
@@ -208,7 +358,7 @@ class IRISKeywords():
             os.remove('rotated.png')
         except Exception as e:
             log.error(e)
-            logger.print_on_console("Error occured in gettextiris")
+            logger.print_on_console("Error occured in getrowcountiris")
         return status,result,value,err_msg
 
     def getcolcountiris(self,element,*args):
@@ -218,8 +368,19 @@ class IRISKeywords():
         err_msg=None
         value = OUTPUT_CONSTANT
         try:
+            img = None
+            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+                elem_coordinates = element['coordinates']
+                const_coordintes = args[2]['coordinates']
+                elements = [(const_coordintes[0],const_coordintes[1]),
+                        (const_coordintes[2],const_coordintes[3]),
+                        (elem_coordinates[0], elem_coordinates[1]),
+                        (elem_coordinates[2], elem_coordinates[3])]
+                img = find_relative_image(args[2]['cord'], elements, verifyexists)
+            else:
+                img = element['cord']
             with open("cropped.png", "wb") as f:
-                f.write(element['cord'].decode('base64'))
+                f.write(img.decode('base64'))
             img = cv2.imread("cropped.png")
             hough_transform_p(img,1)
             # rotated = imutils.rotate_bound(img, 270)
@@ -235,7 +396,7 @@ class IRISKeywords():
             os.remove('rotated.png')
         except Exception as e:
             log.error(e)
-            logger.print_on_console("Error occured in gettextiris")
+            logger.print_on_console("Error occured in getcolcountiris")
         return status,result,value,err_msg
 
     def getcellvalueiris(self,element,*args):
@@ -251,17 +412,52 @@ class IRISKeywords():
             if(os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR')):
                 pytesseract.tesseract_cmd = os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR/tesseract'
                 os.environ["TESSDATA_PREFIX"] = os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR/tessdata'
+                img = None
+                if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+                    elem_coordinates = element['coordinates']
+                    const_coordintes = args[2]['coordinates']
+                    elements = [(const_coordintes[0],const_coordintes[1]),
+                            (const_coordintes[2],const_coordintes[3]),
+                            (elem_coordinates[0], elem_coordinates[1]),
+                            (elem_coordinates[2], elem_coordinates[3])]
+                    img = find_relative_image(args[2]['cord'], elements, verifyexists)
+                else:
+                    img = element['cord']
                 with open("cropped.png", "wb") as f:
-                    f.write(element['cord'].decode('base64'))
+                    f.write(img.decode('base64'))
                 img = cv2.imread("cropped.png")
                 text = data_in_cells(img,row,col)
-                status  = TEST_RESULT_PASS
-                result = TEST_RESULT_TRUE
-                value = text
+                if(text != None):
+                    status  = TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
+                    value = text
                 os.remove('cropped.png')
             else:
                 log.error("Tesseract module not found.")
         except Exception as e:
             log.error(e)
-            logger.print_on_console("Error occured in gettextiris")
+            logger.print_on_console("Error occured in getcellvalueiris")
+        return status,result,value,err_msg
+
+    def verifyexistsiris(self,element,*args):
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg=None
+        value = OUTPUT_CONSTANT
+        try:
+            global verifyexists
+            res = None
+            if(len(args[0])==1 and args[0][0].isdigit()):
+                res = gotoobject(element['cord'],int(args[0][0])-1)
+            else:
+                res = gotoobject(element['cord'],None)
+            if(len(res)>0):
+                status= TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+                verifyexists = res
+            else:
+                logger.print_on_console("Object not found.")
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console("Error occured in verifyexists")
         return status,result,value,err_msg

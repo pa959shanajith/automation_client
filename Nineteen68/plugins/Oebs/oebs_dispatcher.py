@@ -104,10 +104,11 @@ class OebsDispatcher:
         message=[tsp.url,objectname,tsp.name,input,tsp.outputval]
         return message
 
-    def dispatcher(self,tsp,input,*message):
+    def dispatcher(self,tsp,input,iris_flag,*message):
          logger.print_on_console('Keyword is '+tsp.name)
          keyword=tsp.name
          err_msg=None
+         output = tsp.outputval
          result=[constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
          if windowname is not None and tsp.name.lower()!='findwindowandattach':
             self.utils_obj.set_to_foreground(windowname)
@@ -191,9 +192,30 @@ class OebsDispatcher:
                   'closeapplictaion':self.utils_obj.close_application
 
                 }
+
+            if(iris_flag):
+                import iris_operations
+                iris_object = iris_operations.IRISKeywords()
+                dict['clickiris'] = iris_object.clickiris
+                dict['settextiris'] = iris_object.settextiris
+                dict['gettextiris'] = iris_object.gettextiris
+                dict['getrowcountiris'] = iris_object.getrowcountiris
+                dict['getcolcountiris'] = iris_object.getcolcountiris
+                dict['getcellvalueiris'] = iris_object.getcellvalueiris
+                dict['verifyexistsiris'] = iris_object.verifyexistsiris
+
             keyword=keyword.lower()
             if keyword in dict.keys():
-                result=dict[keyword](*message)
+                if(tsp.cord != '' and tsp.cord != None):
+                    obj_props = tsp.objectname.split(';')
+                    coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
+                    ele = {'cord': tsp.cord, 'coordinates': coord}
+                    if(tsp.custom_flag):
+                        result = dict[keyword](ele,input,output,tsp.parent_xpath)
+                    else:
+                        result= dict[keyword](ele,input,output)
+                else:
+                    result=dict[keyword](*message)
                 if keyword == 'findwindowandattach':
                     if result[0] == "Fail":
                         result=constants.TERMINATE

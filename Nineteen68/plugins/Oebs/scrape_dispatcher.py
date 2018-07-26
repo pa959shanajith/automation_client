@@ -27,7 +27,7 @@ log = logging.getLogger('scrape_dispatcher.py')
 windownametoscrape = ''
 class ScrapeDispatcher(wx.Frame):
     print("Enetering inside scrape window")
-    def __init__(self, parent,id, title,filePath,socketIO):
+    def __init__(self, parent,id, title,filePath,socketIO,irisFlag):
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(200, 150) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
         self.SetBackgroundColour('#e6e7e8')
@@ -38,6 +38,7 @@ class ScrapeDispatcher(wx.Frame):
         self.utils_obj=utils.Utils()
         self.scrape_obj=oebs_fullscrape.FullScrape()
         self.core_utilsobject = core_utils.CoreUtils()
+        self.irisFlag = irisFlag
         global windownametoscrape
         windownametoscrape = filePath
         self.socketIO = socketIO
@@ -54,6 +55,12 @@ class ScrapeDispatcher(wx.Frame):
             self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)   # need to implement OnExtract()
             self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,38 ), size=(175, 28))
             self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)   # need to implement OnExtract()
+            if(irisFlag):
+                import cropandadd
+                global cropandaddobj
+                cropandaddobj = cropandadd.Cropandadd()
+                self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,68 ), size=(175, 28))
+                self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
             self.Centre()
 
             self.Centre()
@@ -72,6 +79,8 @@ class ScrapeDispatcher(wx.Frame):
 
         if state == True:
             self.fullscrapebutton.Disable()
+            if(self.irisFlag):
+                self.cropbutton.Disable()
     ##        self.comparebutton.Disable()
 
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
@@ -117,6 +126,8 @@ class ScrapeDispatcher(wx.Frame):
     def fullscrape(self,event):
         logger.print_on_console('Performing full scrape')
         self.startbutton.Disable()
+        if(self.irisFlag):
+            self.cropbutton.Disable()
 ##        print 'desktop_scraping_obj:',desktop_scraping_obj
 ####        self.comparebutton.Disable()
         scrape_obj=oebs_fullscrape.FullScrape()
@@ -170,3 +181,23 @@ class ScrapeDispatcher(wx.Frame):
              except Exception as e:
                 log.error(e)
                 logger.print_on_console(e)
+
+    def cropandadd(self,event):
+        state = event.GetEventObject().GetValue()
+        global cropandaddobj
+        if state == True:
+            self.fullscrapebutton.Disable()
+            self.startbutton.Disable()
+            event.GetEventObject().SetLabel("Stop IRIS")
+            time.sleep(1)
+            status = cropandaddobj.startcropandadd(self)
+        else:
+            self.Hide()
+            import cv2
+            cv2.destroyAllWindows()
+            time.sleep(1)
+            d = cropandaddobj.stopcropandadd()
+            print 'Scrapped data saved successfully in domelements.json file'
+            self.socketIO.emit('scrape',d)
+            self.Close()
+            print 'Crop and add scrape completed'

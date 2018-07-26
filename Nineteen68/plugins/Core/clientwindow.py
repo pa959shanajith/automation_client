@@ -153,12 +153,13 @@ class MainNamespace(BaseNamespace):
             res = light.highlight(args,None,None)
             logger.print_on_console('Highlight result: '+str(res))
         if appType==APPTYPE_DESKTOP_JAVA.lower():
-            con =controller.Controller()
-            con.get_all_the_imports('Oebs')
-            import utils
-            light =utils.Utils()
-            res = light.highlight(args[0],args[1])
-            logger.print_on_console('Highlight result: '+str(res))
+            if(not args[0].startswith('iris')):
+                con =controller.Controller()
+                con.get_all_the_imports('Oebs')
+                import utils
+                light =utils.Utils()
+                res = light.highlight(args[0],args[1])
+                logger.print_on_console('Highlight result: '+str(res))
         elif appType==APPTYPE_DESKTOP.lower():
             con =controller.Controller()
             con.get_all_the_imports('Desktop')
@@ -1003,7 +1004,7 @@ class ClientWindow(wx.Frame):
             self.new = sapScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             sapScrapeFlag=False
         elif oebsScrapeFlag==True:
-            self.new = oebsScrapeObj.ScrapeDispatcher(parent = None,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO)
+            self.new = oebsScrapeObj.ScrapeDispatcher(parent = None,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             oebsScrapeFlag=False
         elif debugFlag == True:
             self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
@@ -1028,6 +1029,7 @@ class ClientWindow(wx.Frame):
                 elif flag == 'display':
                     #call display logic
                     self.new = pause_display_operation.Display(parent = self,id = -1, title="SLK Nineteen68 - Display Variable",input = inputvalue)
+
     def verifyMACAddress(self):
         flag = False
         core_utils_obj = core_utils.CoreUtils()
