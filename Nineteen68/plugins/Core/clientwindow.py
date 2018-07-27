@@ -153,12 +153,13 @@ class MainNamespace(BaseNamespace):
             res = light.highlight(args,None,None)
             logger.print_on_console('Highlight result: '+str(res))
         if appType==APPTYPE_DESKTOP_JAVA.lower():
-            con =controller.Controller()
-            con.get_all_the_imports('Oebs')
-            import utils
-            light =utils.Utils()
-            res = light.highlight(args[0],args[1])
-            logger.print_on_console('Highlight result: '+str(res))
+            if(not args[0].startswith('iris')):
+                con =controller.Controller()
+                con.get_all_the_imports('Oebs')
+                import utils
+                light =utils.Utils()
+                res = light.highlight(args[0],args[1])
+                logger.print_on_console('Highlight result: '+str(res))
         elif appType==APPTYPE_DESKTOP.lower():
             con =controller.Controller()
             con.get_all_the_imports('Desktop')
@@ -442,8 +443,19 @@ class MainNamespace(BaseNamespace):
             fg.open_file_in_editor(str(args[0]), str(args[1]), int(args[2]))
         except Exception as e:
             log.error(e)
-            logger.print_on_console('Exception in on_apgOpenFileInEditor')
+            logger.print_on_console('Exception in APG Open File In Editor')
 
+    def on_killSession(self,*args):
+        global wxObject
+        try:
+            user = args[0]
+            wxObject.OnNodeConnect(wx.EVT_BUTTON)
+            msg = 'Connection terminated remotely by ' + user
+            logger.print_on_console(msg)
+            log.info(msg)
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console('Exception while Remote Disconnect')
 
 class SocketThread(threading.Thread):
     """Test Worker Thread Class."""
@@ -713,33 +725,30 @@ class ClientWindow(wx.Frame):
         box = wx.BoxSizer(wx.VERTICAL)
         self.menubar = wx.MenuBar()
         self.fileMenu = wx.Menu()
-        self.fileMenu2 = wx.Menu()
+        self.editMenu = wx.Menu()
         #own event
         self.Bind( wx.EVT_CHOICE, self.test)
         ##self.Bind(wx.EVT_CHOICE, self.debug)
         ##self.Bind(wx.EVT_CLOSE, self.closeScrapeWindow)
         #own event
-        self.configMenu = wx.Menu()
-        self.infoItem = wx.MenuItem(self.configMenu, 100,text = "Info",kind = wx.ITEM_NORMAL)
-        self.configMenu.AppendItem(self.infoItem)
+        self.loggerMenu = wx.Menu()
+        self.infoItem = wx.MenuItem(self.loggerMenu, 100,text = "Info",kind = wx.ITEM_NORMAL)
+        self.loggerMenu.AppendItem(self.infoItem)
 
-        self.debugItem = wx.MenuItem(self.configMenu, 101,text = "Debug",kind = wx.ITEM_NORMAL)
-        self.configMenu.AppendItem(self.debugItem)
+        self.debugItem = wx.MenuItem(self.loggerMenu, 101,text = "Debug",kind = wx.ITEM_NORMAL)
+        self.loggerMenu.AppendItem(self.debugItem)
 
-        self.errorItem = wx.MenuItem(self.configMenu, 102,text = "Error",kind = wx.ITEM_NORMAL)
-        self.configMenu.AppendItem(self.errorItem)
+        self.errorItem = wx.MenuItem(self.loggerMenu, 102,text = "Error",kind = wx.ITEM_NORMAL)
+        self.loggerMenu.AppendItem(self.errorItem)
 
-        self.fileMenu.AppendMenu(wx.ID_ANY, "Logger Level", self.configMenu)
-        self.fileMenu.AppendSeparator()
+        self.fileMenu.AppendMenu(wx.ID_ANY, "Logger Level", self.loggerMenu)
         self.menubar.Append(self.fileMenu, '&File')
+        #-----------------------------------------------------Config Menu Begins
+        self.configItem = wx.MenuItem(self.editMenu, 103,text = "Configuration",kind = wx.ITEM_NORMAL)
+        self.editMenu.AppendItem(self.configItem)
+        self.menubar.Append(self.editMenu, '&Edit')
+        #-------------------------------------------------------Config Menu Ends
         self.SetMenuBar(self.menubar)
-        #----------------------------------------------------------------Config menu
-        self.configMenu2 = wx.Menu()
-        self.infoItem = wx.MenuItem(self.configMenu2, 104,text = "Edit Config",kind = wx.ITEM_NORMAL)
-        self.configMenu2.AppendItem(self.infoItem)
-        self.fileMenu2.AppendMenu(wx.ID_ANY, "Edit", self.configMenu2)
-        self.menubar.Append(self.fileMenu2, '&Configuration')
-        #-----------------------------------------------------------------------------
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
         self.connectbutton = wx.BitmapButton(self.panel, bitmap=self.connect_img,pos=(10, 10), size=(100, 25), name='connect')
@@ -763,7 +772,6 @@ class ClientWindow(wx.Frame):
         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
 
         self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
-        ##self.rbox.SetBackgroundColour('#9f64e2')
         self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(230, 598), size=(60,20), style = wx.TE_RICH)
         box.Add(self.breakpoint, 1, wx.ALL|wx.EXPAND, 5)
         self.breakpoint.Disable()
@@ -802,41 +810,42 @@ class ClientWindow(wx.Frame):
         threading.Timer(0.2,self.verifyMACAddress).start()
 
     """
-    Modifying Logger and Handlers Level dynamically without creating a new logger object
-    When logging level is changed from Client window using "File" button.
-
+    Menu Items:
+      1. Modifying Logger and Handlers Level dynamically without creating a new logger object
+         When logging level is changed from Client window using "File" button.
+      2. Edit client configuration
     """
     def menuhandler(self, event):
         id = event.GetId()
-        #When user selects INFO level
-        if id == 100:
+        if id == 100:     # When user selects INFO level
             logger.print_on_console( '--Logger level : INFO selected--')
             log.info('--Logger level : INFO selected--')
             logging.getLogger().setLevel(logging.INFO)
             for handler in logging.root.handlers[:]:
                     handler.setLevel(logging.INFO)
-        #When user selects DEBUG level
-        elif id == 101:
+        elif id == 101:    # When user selects DEBUG level
             logger.print_on_console( '--Logger level : DEBUG selected--')
             log.info('--Logger level : DEBUG selected--')
             logging.getLogger().setLevel(logging.DEBUG)
             for handler in logging.root.handlers[:]:
                 handler.setLevel(logging.DEBUG)
-        #When user selects ERROR level
-        elif id ==102:
+        elif id ==102:     # When user selects ERROR level
             logger.print_on_console( '--Logger level : ERROR selected--')
             log.info( '--Logger level : ERROR selected--')
             logging.getLogger().setLevel(logging.ERROR)
             for handler in logging.root.handlers[:]:
                 handler.setLevel(logging.ERROR)
-        elif id==104:
+        elif id==103:      # When user selects Edit > Configuraion
             try:
-                logger.print_on_console( '--Edit Config selected--')
-                log.info( '--Edit Config selected--')
+                msg = '--Edit Config selected--'
+                logger.print_on_console(msg)
+                log.info(msg)
                 Config_window(parent = None,id = -1, title="Nineteen68 Configuration")
-            except:
-                import traceback
-                traceback.print_exc()
+            except Exception as e:
+                msg = "Error while updating configuration"
+                logger.print_on_console(msg)
+                log.info(msg)
+                log.error(e)
 
     def onChecked_Schedule(self, e):
         mode=self.schedule.GetValue()
@@ -907,14 +916,11 @@ class ClientWindow(wx.Frame):
 
     def OnNodeConnect(self,event):
         try:
-            global socketIO
+            global socketIO, configvalues
             name = self.connectbutton.GetName()
             self.connectbutton.Disable()
-            #--------------------------------------Re-reading config values
-            configobj = readconfig.readConfig()
-            configvalues = configobj.readJson()
-            #--------------------------------------Re-reading config values
             if(name == 'connect'):
+                configvalues = readconfig.readConfig().readJson() # Re-reading config values
                 port = int(configvalues['server_port'])
                 conn = httplib.HTTPConnection(configvalues['server_ip'],port)
                 conn.connect()
@@ -936,16 +942,15 @@ class ClientWindow(wx.Frame):
                 self.schedule.Disable()
                 self.connectbutton.Enable()
         except Exception as e:
-            emsg="Forbidden request, Connection refused, please configure server ip and server port in Configuration ->Edit ->Edit Config, and re-connect."
+            emsg="Forbidden request, Connection refused, please configure server ip and server port in Edit -> Configuration, and re-connect."
             logger.print_on_console(emsg)
             log.error(emsg)
             self.cancelbutton.Disable()
             self.terminatebutton.Disable()
             self.clearbutton.Disable()
-            self.connectbutton.Disable()
+            self.connectbutton.Enable()
             self.rbox.Disable()
             log.error(e)
-            self.connectbutton.Enable() #Enabling Connect button so that user can reconfigure and connect again
 
     def killDebugWindow(self):
         #Close the debug window
@@ -999,7 +1004,7 @@ class ClientWindow(wx.Frame):
             self.new = sapScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             sapScrapeFlag=False
         elif oebsScrapeFlag==True:
-            self.new = oebsScrapeObj.ScrapeDispatcher(parent = None,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO)
+            self.new = oebsScrapeObj.ScrapeDispatcher(parent = None,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             oebsScrapeFlag=False
         elif debugFlag == True:
             self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
@@ -1024,6 +1029,7 @@ class ClientWindow(wx.Frame):
                 elif flag == 'display':
                     #call display logic
                     self.new = pause_display_operation.Display(parent = self,id = -1, title="SLK Nineteen68 - Display Variable",input = inputvalue)
+
     def verifyMACAddress(self):
         flag = False
         core_utils_obj = core_utils.CoreUtils()
@@ -1335,7 +1341,7 @@ class Config_window(wx.Frame):
                 self.ch_path.SetForegroundColour((0,0,0))
 
 
-    """jsonCreater saves the data in json form , location of file to be saved must be defined. This method will overwrite the existing .json file"""
+    """jsonCreater saves the data in json form, location of file to be saved must be defined. This method will overwrite the existing .json file"""
     def jsonCreater(self,data):
         try:
             if wx.MessageBox("Config file has been edited , Would you like to save?","Confirm Save",wx.ICON_QUESTION | wx.YES_NO) == wx.YES:
@@ -1345,18 +1351,19 @@ class Config_window(wx.Frame):
                     outfile.write(unicode(str_))
                 logger.print_on_console('--Configuration saved--')
                 log.info('--Configuration saved--')
-        except:
-            import traceback
-            traceback.print_exc()
+        except Exception as e:
+            msg = "Error while updating configuration"
+            logger.print_on_console(msg)
+            log.info(msg)
+            log.error(e)
 
     """readconfigJson reads the config present in the set location, if file not present return 'Config file absent' """
     def readconfigJson(self):
         try:
-            with open('./Lib/config.json') as json_data:
+            with open(CONFIG_PATH) as json_data:
                 return json.load(json_data)
-        except:
-            import traceback
-            traceback.print_exc()
+        except Exception as e:
+            log.error(e)
             return False
             #return "Config file absent"
 
@@ -1389,8 +1396,9 @@ class Config_window(wx.Frame):
     def close(self,event):
         self.Close()
         self.Destroy()
-        logger.print_on_console('--Edit Config closed--')
-        log.info('--Edit Config closed--')
+        msg = '--Edit Config closed--'
+        logger.print_on_console(msg)
+        log.info(msg)
 
 class DebugWindow(wx.Frame):
     def __init__(self, parent,id, title):

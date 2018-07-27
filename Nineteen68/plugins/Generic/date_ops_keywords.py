@@ -438,8 +438,9 @@ class DateOperation:
     def validate(self,input):
         try:
             dict={'dd/MM/yyyy': '%d/%m/%Y',
-            'dd MM/yyyy': '%d %m/%Y',
+            'MMMM dd, yyyy': '%B %d, %Y',
             'MM/dd/yyyy': '%m/%d/%Y',
+            'yyyy/MM/dd': '%Y/%m/%d',
             'dd/MMM/yyyy': '%d/%b/%Y',
             'MMM/dd/yyyy':'%b/%d/%Y',
             'HH:mm:ss' : '%H:%M:%S',
@@ -447,7 +448,6 @@ class DateOperation:
             'MM/dd/yyyy HH:mm:ss' : '%m/%d/%Y %H:%M:%S',
             'dd/MMM/yyyy HH:mm:ss' : '%d/%b/%Y %H:%M:%S',
             'MMM/dd/yyyy HH:mm:ss' :'%b/%d/%Y %H:%M:%S'
-
             }
             if(input in dict):
                 date_format = dict.get(input)

@@ -209,6 +209,7 @@ class DesktopDispatcher:
                 dict['getrowcountiris'] = iris_object.getrowcountiris
                 dict['getcolcountiris'] = iris_object.getcolcountiris
                 dict['getcellvalueiris'] = iris_object.getcellvalueiris
+                dict['verifyexistsiris'] = iris_object.verifyexistsiris
 
 
             email_dict={'getemail': 1,
@@ -235,11 +236,15 @@ class DesktopDispatcher:
                 else:
                     self.launch_keywords_obj.verifyWindowTitle()
                     if objectname != '' and teststepproperty.cord != None and teststepproperty.cord != '':
-                        app_uia = desktop_launch_keywords.app_uia
                         if(desktop_launch_keywords.window_name != None):
                             SetForegroundWindow(find_window(title=desktop_launch_keywords.window_name))
-                        ele = {'cord': teststepproperty.cord}
-                        result= dict[keyword](ele,input,output)
+                        obj_props = teststepproperty.objectname.split(';')
+                        coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
+                        ele = {'cord': teststepproperty.cord, 'coordinates': coord}
+                        if(teststepproperty.custom_flag):
+                            result = dict[keyword](ele,input,output,teststepproperty.parent_xpath)
+                        else:
+                            result= dict[keyword](ele,input,output)
                     else:
                         if objectname != '':
                             app_uia = desktop_launch_keywords.app_uia

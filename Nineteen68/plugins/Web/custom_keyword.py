@@ -126,13 +126,15 @@ class CustomKeyword:
         logger.print_on_console(msg1)
         log.info(msg1)
         logger.print_on_console(msg2)
-        log.info(msg1)
+        log.info(msg2)
         logger.print_on_console(msg3)
         log.info(msg3)
 
         if not(ele_type is None or ele_type=='' or visible_text is None or ele_index is None):
-            ele_xpath=self.getElementXPath(reference_ele)
-            logger.print_on_console('Debug: reference_ele_xpath is'+str(ele_xpath))
+            #Commneting the getElementXPath script since it was freezing the application in MNT.
+            #As of now, it's a hot fix for MNT to make sure custom keywords do not impact the application functionality
+            #ele_xpath=self.getElementXPath(reference_ele)
+            #logger.print_on_console('Debug: reference_ele_xpath is'+str(ele_xpath))
             try:
                 ele_index=int(ele_index)
                 if ele_index<0:

@@ -149,6 +149,12 @@ class StepDescription:
         def stringgeneration():
             return "Generate a charecter string having a length '"+ input + "'."
 
+        #Clipboard keywords
+        def savetoclipboard():
+            return "Save the value '"+input +"' to ClipBoard and store the output '"+ output+ "' in variable '"+ tsp.outputval + "'."
+        def getfromclipboard():
+            return "Get data from ClipBoard and save the value '"+ output+ "' in variable '"+ tsp.outputval + "'."
+
         #delay keywords
         def wait():
             return "Wait for '" +input+"'  Second(s)"
@@ -407,6 +413,20 @@ class StepDescription:
             return 'Perform toggle maximize operation on ' + "'" + tsp.custname + "'"
         def toggleminimize():
             return 'Perform toggle minimize operation on ' + "'" + tsp.custname + "'"
+        def clickiris():
+            return ' Click on '+ "'" +tsp.custname+ "'" +'.'
+        def settextiris():
+            return ' Enter text '+"'"+ inputval[0]+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
+        def gettextiris():
+            return ' Get Text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp.outputval+"'"+ '.'
+        def getrowcountiris():
+            return ' Get row count of '+ "'" + tsp.custname + "'"+ ' and save the count '+"'"+output+"'"+ ' in '+"'"+ tsp.outputval+"'"+ '.'
+        def getcolcountiris():
+            return ' Get column Count of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
+        def getcellvalueiris():
+            return ' Get cell value of  '+ "'" + tsp.custname +input + "'" +'in the table and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp.custname +"'"+'.'
+        def verifyexistsiris():
+            return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         return locals()[keyword]()
 
     def sap(self,keyword,tsp,inputval,input,output,con,reporting_obj):
@@ -610,6 +630,8 @@ class StepDescription:
             return ' Get column Count of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
         def getcellvalueiris():
             return ' Get cell value of  '+ "'" + tsp.custname + ' ' + str(input) + "'" +'in the table and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp.custname +"'"+'.'
+        def verifyexistsiris():
+            return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         return locals()[keyword]()
 
 
@@ -840,6 +862,8 @@ class StepDescription:
             return ' Get column Count of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
         def getcellvalueiris():
             return ' Get cell value of  '+ "'" + tsp.custname +input + "'" +'in the table and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp.custname +"'"+'.'
+        def verifyexistsiris():
+            return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         return locals()[keyword]()
 
     def mobileapp(self,keyword,tsp,inputval,input,output,con,reporting_obj):
@@ -1312,6 +1336,8 @@ class StepDescription:
             return ' Get column Count of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
         def getcellvalueiris():
             return ' Get cell value of  '+ "'" + tsp.custname +input + "'" +'in the table and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp.custname +"'"+'.'
+        def verifyexistsiris():
+            return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         return locals()[keyword]()
 
 

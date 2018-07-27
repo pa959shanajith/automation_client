@@ -390,13 +390,12 @@ class TableOperationKeywords():
                             index=int(input_arr[3])
                             eleStatus=False
                             counter = 1
-                            log.debug('fiding the cell with given inputs')
+                            log.debug('finding the cell with given inputs')
                             cell=self.javascriptExecutor(webElement,row_number,col_number)
                             element_list=cell.find_elements_by_xpath('.//*')
                             #---------------------------condition when element list returns empty
                             if len(element_list)==0:
                                 element_list.append(cell)
-                                #print element_list
                             #---------------------------condition when element list returns empty
                             for member in element_list:
                                   js1='function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();'
@@ -495,7 +494,16 @@ class TableOperationKeywords():
                                             else:
                                                 counter+=1
                                   else:
-                                        eleStatus=True
+                                    log.debug('Found an occurence of '+tagName)
+                                    if tag==tagName:
+                                         if index==childindex:
+                                            eleStatus =True
+                                         else:
+                                            if counter==index:
+                                               index =childindex
+                                               eleStatus =True
+                                            else:
+                                                counter+=1
 
 
                                   if eleStatus==True:

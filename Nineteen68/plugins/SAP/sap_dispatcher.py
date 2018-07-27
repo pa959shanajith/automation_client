@@ -190,14 +190,17 @@ class SAPDispatcher:
                 dict['getrowcountiris'] = iris_object.getrowcountiris
                 dict['getcolcountiris'] = iris_object.getcolcountiris
                 dict['getcellvalueiris'] = iris_object.getcellvalueiris
-                
+                dict['verifyexistsiris'] = iris_object.verifyexistsiris
+
             keyword=keyword.lower()
             if keyword in dict.keys():
                 if keyword=='serverconnect' or keyword=='launchapplication' or keyword=='starttransaction' or keyword=='toolbaraction' :
                     result= dict[keyword](input,output)
                 else:
                     if (teststepproperty.cord != None and teststepproperty.cord != ''):
-                        objectname = {'cord': teststepproperty.cord}
+                        obj_props = teststepproperty.objectname.split(';')
+                        coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
+                        objectname = {'cord': teststepproperty.cord, 'coordinates':coord}
                         from sap_scraping import Scrape
                         scrapingObj=Scrape()
                         sapgui = self.saputil_keywords_obj.getSapObject()
@@ -205,7 +208,12 @@ class SAPDispatcher:
                             wnd = scrapingObj.getWindow(sapgui)
                             wnd = wnd.Text + '/'
                             self.launch_keywords_obj.setWindowToForeground(wnd)
-                    result= dict[keyword](objectname,input,output)
+                        if(teststepproperty.custom_flag):
+                            result = dict[keyword](objectname,input,output,teststepproperty.parent_xpath)
+                        else:
+                            result = dict[keyword](objectname,input,output)
+                    else:
+                        result= dict[keyword](objectname,input,output)
                 if not(sap_constants.ELEMENT_FOUND) and self.exception_flag:
                     logger.print_on_console('Element not found terminating')
                     result=constants.TERMINATE
@@ -237,5 +245,4 @@ class SAPDispatcher:
         if err_msg!=None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
-
         return result

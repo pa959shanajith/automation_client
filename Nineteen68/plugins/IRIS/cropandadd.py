@@ -8,6 +8,7 @@ import numpy as np
 import cv2
 import screeninfo
 drawing1 = False
+constant_image = False
 ix,iy = -1,-1
 log = logging.getLogger('cropandadd.py')
 from pywinauto.findwindows import find_window
@@ -21,12 +22,10 @@ class Cropandadd():
             wx_window.Hide()
             time.sleep(1)
             im = PIL.ImageGrab.grab()
-            im.save('test.jpg')
+            im.save('test.png')
 
-            # get the size of the screen
             screen = screeninfo.get_monitors()[0]
-            width, height = screen.width, screen.height
-            im1 = Image.open('test.jpg')
+            im1 = Image.open('test.png')
             wx_window.Show()
             image = np.array(im1)
             self.RGB_img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -35,15 +34,20 @@ class Cropandadd():
             self.data['view'] = []            #cords of selected parts
             self.stopflag = False
             def draw_rect(event,x,y,flags,param):
-                global ix,iy,drawing1
+                global ix,iy,drawing1,constant_image
                 if event == cv2.EVENT_LBUTTONDOWN:
                     drawing1 = True
                     ix,iy = x,y
+                    if (flags == 9):
+                        constant_image = True
 
                 elif event == cv2.EVENT_MOUSEMOVE:
                     if drawing1 == True:
                         self.RGB_img = np.copy(self.RGB_img_c)
-                        cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),1)
+                        if(constant_image):
+                            cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,0,255),1)
+                        else:
+                            cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),1)
 
                 elif event == cv2.EVENT_LBUTTONUP:
                     drawing1 = False
@@ -53,9 +57,19 @@ class Cropandadd():
                     with open("cropped.png", "rb") as imageFile:
                         RGB_img_crop_im = base64.b64encode(imageFile.read())
                     if(ix!=x and iy!=y):
-                        self.data['view'].append({'custname': 'img_object_'+str(ix)+'_'+str(x)+'_'+str(iy)+'_'+str(y),'cord':RGB_img_crop_im,'tag':'iris','width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix,'xpath':'iris'})
-                    cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),1)
+                        if(constant_image):
+                            custname = 'const_img_object_'+str(ix)+'_'+str(iy)+'_'+str(x)+'_'+str(y)
+                            tag = 'constant'
+                        else:
+                            custname = 'img_object_'+str(ix)+'_'+str(iy)+'_'+str(x)+'_'+str(y)
+                            tag = 'relative'
+                        self.data['view'].append({'custname': custname,'cord':RGB_img_crop_im,'tag':tag,'width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix,'xpath':'iris'})
+                    if(constant_image):
+                        cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,0,255),1)
+                    else:
+                        cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),1)
                     self.RGB_img_c = np.copy(self.RGB_img)
+                    constant_image = False
 
 
             #img = np.zeros((512,512,3), np.uint8)
@@ -71,8 +85,8 @@ class Cropandadd():
                     SetForegroundWindow(find_window(title='image'))
                 k = cv2.waitKey(1) & 0xFF
                 if self.stopflag:
-                    if(os.path.isfile("test.jpg")):
-                        os.remove("test.jpg")
+                    if(os.path.isfile("test.png")):
+                        os.remove("test.png")
                     if(os.path.isfile("cropped.png")):
                         os.remove("cropped.png")
                     break
@@ -84,10 +98,10 @@ class Cropandadd():
 
     def stopcropandadd(self):
         im = PIL.ImageGrab.grab()
-        im.save('out.jpg')
-        with open("out.jpg", "rb") as imageFile:
+        im.save('out.png')
+        with open("out.png", "rb") as imageFile:
             self.data['mirror'] = base64.b64encode(imageFile.read())
-        os.remove('out.jpg')
+        os.remove('out.png')
         with open('domelements.json', 'w') as outfile:
             log.info('Opening domelements.json file to write scraped objects')
             json.dump(self.data, outfile, indent=4, sort_keys=False)
