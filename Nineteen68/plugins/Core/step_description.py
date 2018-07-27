@@ -149,6 +149,12 @@ class StepDescription:
         def stringgeneration():
             return "Generate a charecter string having a length '"+ input + "'."
 
+        #Clipboard keywords
+        def savetoclipboard():
+            return "Save the value '"+input +"' to ClipBoard and store the output '"+ output+ "' in variable '"+ tsp.outputval + "'."
+        def getfromclipboard():
+            return "Get data from ClipBoard and save the value '"+ output+ "' in variable '"+ tsp.outputval + "'."
+
         #delay keywords
         def wait():
             return "Wait for '" +input+"'  Second(s)"

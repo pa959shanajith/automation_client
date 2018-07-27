@@ -76,6 +76,8 @@ class GenericKeywordDispatcher:
                   'concatenate' : self.generic_string.concatenate,
                   'getsubstring':self.generic_string.getSubString,
                   'stringgeneration':self.generic_string.stringGeneration,
+                  'savetoclipboard':self.generic_string.save_to_clip_board,
+                  'getfromclipboard':self.generic_string.get_from_clip_board,
                   'getcurrentdate' : self.generic_date.getCurrentDate,
                   'getcurrenttime' : self.generic_date.getCurrentTime,
                   'getcurrentdateandtime': self.generic_date.getCurrentDateAndTime,

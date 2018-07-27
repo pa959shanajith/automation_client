@@ -529,6 +529,11 @@ class Controller():
                 logger.print_on_console('Result obtained is: ',result[2])
             elif result:
                 logger.print_on_console('Result obtained is: ',result[1])
+        if tsp.apptype.lower()=='generic' and (tsp.name.lower()=='savetoclipboard' or tsp.name.lower()=='getfromclipboard'):
+            if result[2]!='9cc33d6fe25973868b30f4439f09901a':
+                logger.print_on_console('Result obtained is: ',result[2])
+            elif result:
+                logger.print_on_console('Result obtained is: ',result[1])
         if len(output)>0 and output[0] != '':
             self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response,tsp.name)
         if len(output)>1:

@@ -13,6 +13,7 @@ import random
 import logger
 import generic_constants
 import core_utils
+import win32clipboard
 
 import logging
 from constants import *
@@ -540,6 +541,58 @@ class StringOperation:
         if err_msg!=None:
             logger.print_on_console(err_msg)
         return status,result,output,err_msg
+
+    def save_to_clip_board(self,input_val,*args):
+            """
+            def : save_to_clip_board
+            purpose : to save data on clipboard
+            param  : string
+            return : string
+            """
+            status=generic_constants.TEST_RESULT_FAIL
+            result=generic_constants.TEST_RESULT_FALSE
+            err_msg=None
+            output=OUTPUT_CONSTANT
+            try:
+                # set clipboard data
+                win32clipboard.OpenClipboard()
+                win32clipboard.EmptyClipboard()
+                win32clipboard.SetClipboardText(input_val)
+                win32clipboard.CloseClipboard()
+                status=generic_constants.TEST_RESULT_PASS
+                result=generic_constants.TEST_RESULT_TRUE
+            except Exception as e:
+                logger.print_on_console(e)
+                err_msg=e
+                import traceback
+                traceback.print_exc()
+            return status,result,output,err_msg
+
+    def get_from_clip_board(self,*args):
+        """
+        def : get_from_clip_board
+        purpose : to get data from clipboard
+        param  : *args
+        return : string
+        """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        try:
+            # set clipboard data
+            win32clipboard.OpenClipboard()
+            output = win32clipboard.GetClipboardData()
+            win32clipboard.CloseClipboard()
+            status=generic_constants.TEST_RESULT_PASS
+            result=generic_constants.TEST_RESULT_TRUE
+        except Exception as e:
+            logger.print_on_console(e)
+            err_msg=e
+            import traceback
+            traceback.print_exc()
+        return status,result,output,err_msg
+
 
 ##obj =StringOperation()
 ##obj.toLowerCase('RAkESH')
