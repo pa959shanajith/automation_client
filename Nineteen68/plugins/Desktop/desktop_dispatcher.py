@@ -247,8 +247,7 @@ class DesktopDispatcher:
                             result= dict[keyword](ele,input,output)
                     else:
                         if objectname != '':
-                            app_uia = desktop_launch_keywords.app_uia
-                            ele = self.get_desktop_element(objectname,url,app_uia)
+                            ele = self.get_desktop_element(objectname,url)
                         result= dict[keyword](ele,url,input,output)
 
                 if not(desktop_constants.ELEMENT_FOUND) and self.exception_flag:
@@ -287,87 +286,119 @@ class DesktopDispatcher:
 
         return result
 
-    def get_desktop_element(self,xPath,url,app):
-        app2=app
+    def get_desktop_element(self,xPath,url):
         index=None
         ele = ''
+        backend='A'
         prev_flag=False
         if ";" in xPath:
             x_var=xPath.split(';')
             xpath=x_var[0]
             xclass=x_var[1]
-            xconID=int(x_var[2])
+            try:
+                xconID=int(x_var[2])
+            except:
+                pass #as uia element sometimes has no conID
             if len(x_var)==4:
                 xname=x_var[3]
+            if len(x_var)==5:
+                """checking for backend process"""
+                xname=x_var[3]
+                backend=x_var[4]
         else:
             xpath=xPath
             prev_flag=True # setting prev_flag to True since the xpath recieved is of an old test case.
         #logic to find the desktop element using the xpath
-        try:
-            win = app.top_window()
-            ch = win.children()
-            split_xpath = xpath.split('/')
-            parent = split_xpath[0]
-            index = int(parent[parent.index('[') + 1 : parent.index(']')])
-            ele = ch[int(index)]
-            for i in range(1,len(split_xpath)):
-                child = split_xpath[i]
-                index = child[child.index('[') + 1 : child.index(']')]
-                ch = ele.children()
-                ele = ch[int(index)]
-            #---------------------------------------------------
+        if backend=='A':
+            app = desktop_launch_keywords.app_win32
+            app2=app
             try:
-                if ele!='':     #checking if element is not empty
-                    if xclass==ele.friendly_class_name(): #comparing top window element class with the one obtained from TSP
-                        if ele.friendly_class_name()=='TabControl':
-                            if xconID!=ele.control_id(): #comparing if the control ID of top window element is same as one from TSP
-                                #-------element dosent handles matched
-                                ele=''
-                        else:
-                            #-------------------------------------getting text and comparing with xname
-                            handle= ele.handle
-                            try:
-                                element_text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
-                            except:
-                                pass
-                            if element_text!='':
+                win = app.top_window()
+                ch = win.children()
+                split_xpath = xpath.split('/')
+                parent = split_xpath[0]
+                index = int(parent[parent.index('[') + 1 : parent.index(']')])
+                ele = ch[int(index)]
+                for i in range(1,len(split_xpath)):
+                    child = split_xpath[i]
+                    index = child[child.index('[') + 1 : child.index(']')]
+                    ch = ele.children()
+                    ele = ch[int(index)]
+                #---------------------------------------------------
+                try:
+                    if ele!='':     #checking if element is not empty
+                        if xclass==ele.friendly_class_name(): #comparing top window element class with the one obtained from TSP
+                            if ele.friendly_class_name()=='TabControl':
+                                if xconID!=ele.control_id(): #comparing if the control ID of top window element is same as one from TSP
+                                    #-------element dosent handles matched
+                                    ele=''
+                            else:
+                                #-------------------------------------getting text and comparing with xname
+                                handle= ele.handle
                                 try:
-                                    comp_text=str(element_text)
+                                    element_text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
                                 except:
-                                    comp_text=element_text.encode('ascii', 'replace')
-                            else :
-                                comp_text=ele.texts()
-                            try:
-                                comp_text=comp_text.strip()
-                            except:
-                                comp_text=comp_text[0].strip()
-                            #----------------------------------------------------------------------------------
-                            if xname!=comp_text:
-                                ele=''
-                    else:
-                        #print "friendly class name does not match",ele.friendly_class_name()
-                        ele=''
-            except Exception as e:
-                if prev_flag==False:#checking if previous test case flag is True or not.
-                    ele=''  #If false then new test case and AUT structure has changed, so setting the ele to ''
-            #---------------------------------------------------
-        except :
-            #logger.print_on_console("Unable to get desktop elements because :")
-            import traceback
-            traceback.print_exc()
-        if ele=='':
-            #logger.print_on_console("Warning! AUT Structure has changed")
+                                    pass
+                                if element_text!='':
+                                    try:
+                                        comp_text=str(element_text)
+                                    except:
+                                        comp_text=element_text.encode('ascii', 'replace')
+                                else :
+                                    comp_text=ele.texts()
+                                try:
+                                    comp_text=comp_text.strip()
+                                except:
+                                    comp_text=comp_text[0].strip()
+                                #----------------------------------------------------------------------------------
+                                if xname!=comp_text:
+                                    ele=''
+                        else:
+                            #print "friendly class name does not match",ele.friendly_class_name()
+                            ele=''
+                except Exception as e:
+                    if prev_flag==False:#checking if previous test case flag is True or not.
+                        ele=''  #If false then new test case and AUT structure has changed, so setting the ele to ''
+                #---------------------------------------------------
+            except :
+                #logger.print_on_console("Unable to get desktop elements because :")
+                import traceback
+                traceback.print_exc()
+            if ele=='':
+                #logger.print_on_console("Warning! AUT Structure has changed")
+                try:
+                    ele=self.get_element_if_empty(xclass,xname,app2)
+                except:# only for tables
+                    ele=self.get_desktop_static_element(xclass,xconID,app)
+            if ele=='':#last attempt if the element is still empty, then find element using original index
+                try:
+                    ele = ch[int(index)]
+                except Exception as e:
+                    import traceback
+                    traceback.print_exc()
+                    logger.print_on_console("Unable to get desktop element because :",e)
+        elif backend =='B':
             try:
-                ele=self.get_element_if_empty(xclass,xname,app2)
-            except:# only for tables
-                ele=self.get_desktop_static_element(xclass,xconID,app)
-        if ele=='':#last attempt if the element is still empty, then find element using original index
-            try:
+                win = desktop_launch_keywords.app_uia.top_window()
+                ch=win.children()[:]
+                for i in range(0,len(ch)):
+                    if len(ch[i].children()):
+                        c=ch[i].children()
+                        for a in c:
+                            ch.append(a)
+                split_xpath = xpath.split('/')
+                parent = split_xpath[0]
+                index = int(parent[parent.index('[') + 1 : parent.index(']')])
                 ele = ch[int(index)]
+                for i in range(1,len(split_xpath)):
+                    child = split_xpath[i]
+                    index = child[child.index('[') + 1 : child.index(']')]
+                    ch = ele.children()
+                    ele = ch[int(index)]
             except Exception as e:
                 import traceback
                 traceback.print_exc()
-                logger.print_on_console("Unable to get desktop element because :")
+                logger.print_on_console('Unable to get desktop element because :',e)
         return ele
 
     def get_desktop_static_element(self,xclass,xconID,app):

@@ -1,8 +1,8 @@
 #-------------------------------------------------------------------------------
 # Name:        desktop_scraping.py
-# Purpose:     Radio check box operations
+# Purpose:     full scrape and (click and add) methods of scraping are defined in this script
 #
-# Author:      wasimakram.sutar
+# Author:      wasimakram.sutar,anas.ahmed
 #
 # Created:     09-05-2017
 # Copyright:   (c) wasimakram.sutar 2017
@@ -36,7 +36,6 @@ allobjects = []
 class Scrape:
     def clickandadd(self,operation,wxobject):
         window_name=desktop_launch_keywords.window_name
-        app_uia=desktop_launch_keywords.app_uia
         obj = desktop_launch_keywords.Launch_Keywords()
         obj.bring_Window_Front()
         if operation == 'STARTCLICKANDADD':
@@ -68,8 +67,8 @@ class Scrape:
                                 return 0
                         try:
                             global allobjects
-                            allobjects=self.get_all_children_caller(app_uia)
-##                            objects = allobjects['view']
+                            allobjects=self.get_all_children_caller()
+                            objects = allobjects['view']
                             tempobjects = []
                             for i in allobjects['view']:
                                 res = match(i['x_screen'],i['y_screen'],i['width'],i['height'],self.coordX,self.coordY)
@@ -84,32 +83,50 @@ class Scrape:
                                     if ((first_ele['x_screen'] > next_ele['x_screen']) and (first_ele['y_screen'] > next_ele['y_screen'])):
                                         actualelement = first_ele
                                         break
+                                    elif ((first_ele['x_screen'] < next_ele['x_screen']) and (first_ele['y_screen'] < next_ele['y_screen'])):
+                                        actualelement = next_ele
+                                        break
                                 except Exception as e:
                                     break
+                            """calling dispatcher methods to check if the scrapped elements actually exist or not, if not present fails and returns an exception"""
                             disp_obj = desktop_dispatcher.DesktopDispatcher()
-                            ele = disp_obj.get_desktop_element(actualelement['xpath'],actualelement['url'],app_uia)
+                            if str(wxobject.backend_process).strip() !='B':
+                                ele = disp_obj.get_desktop_element(actualelement['xpath'],actualelement['url'])
+                            elif  str(wxobject.backend_process).strip() =='B':
+                                ele = disp_obj.get_desktop_element(actualelement['xpath'],actualelement['url'])
                             global actualobjects
                             if actualelement not in actualobjects:#------check to remove duplicate elements
                                 actualobjects.append(actualelement)
                         except Exception as e:
+                            import traceback
+                            traceback.print_exc()
                             logger.print_on_console('Clicked option is not a part of DesktopGUI')
                         return True
 
-                    def get_all_children_caller(self,app_uia):
+                    def get_all_children_caller(self):
                         allobjs = {}
                         try:
-                            win = app_uia.top_window()
-                            ch = win.children()
-                            a = ''
+                            #=====================================check for uia
+                            if str(wxobject.backend_process).strip() =='A':
+                                win = desktop_launch_keywords.app_win32.top_window()
+                                ch=win.children()
+                            elif str(wxobject.backend_process).strip() =='B':
+                                win = desktop_launch_keywords.app_uia.top_window()
+                                ch=win.children()[:]
+                                for i in range(0,len(ch)):
+                                    if len(ch[i].children()):
+                                        c=ch[i].children()
+                                        for a in c:
+                                            ch.append(a)
+                            #===================================================
+                            objects = None
                             ne = []
                             obj = desktop_launch_keywords.Launch_Keywords()
-                            #obj.set_to_foreground()
                             obj.bring_Window_Front()
                             winrect = desktop_launch_keywords.win_rect
                             scrape_obj=Scrape()
-                            a =  scrape_obj.get_all_children(ch,ne,0,'',win,winrect)
-                            #import json
-                            allobjs["view"] = a
+                            objects =  scrape_obj.get_all_children(ch,ne,0,'',win,winrect,str(wxobject.backend_process).strip())
+                            allobjs["view"] = objects
                         except Exception as e:
                             logger.print_on_console(e)
                         return allobjs
@@ -227,9 +244,9 @@ class Scrape:
                 pass
             return allobjects
 
-    def get_all_children(self,ch,ne,i,path,win,winrect):
+    def get_all_children(self,ch,ne,i,path,win,winrect,backend_process):
         try:
-            for i in range (len(ch)):
+            for i in range(len(ch)):
                  hiddentag = 'Yes'
                  text = ''
                  new_text=''
@@ -237,57 +254,84 @@ class Scrape:
                  text_old=''
                  parent = ''
                  coordinates = ''
-                 children = ch[i]
                  canselectmultiple='false'
-                 tag = children.friendly_class_name()
+                 tag = ch[i].friendly_class_name()
                  log.info(tag)
 ##                 if tag == 'Button' or tag =='RadioButton' or tag == 'Edit' or tag == 'ComboBox' or tag == 'Static' or tag == 'GroupBox' or tag == 'CheckBox' or tag== 'ListView' or tag == 'ListBox'or tag == 'TreeView'or tag == 'TabControl' or tag == 'DateTimePicker'  or tag == 'Toolbar':
-                 coordinates = children.client_rect()
-                 cor = children.rectangle()
+                 try:
+                    coordinates = ch[i].client_rect()
+                 except:
+                    """ Logic to find height and width for non hwndwrapper elements """
+                    coordinates_obj=Rectangle()
+                    coordinates_obj.set_coordinates(ch[i])
+                    pass
+                 cor = ch[i].rectangle()
                  properties = ''
                  try:
                      try:
-                        properties = json.loads(json.dumps(children.get_properties(    ), default=lambda x: str(x)))
+                        properties = json.loads(json.dumps(ch[i].get_properties(    ), default=lambda x: str(x)))
                      except Exception as e:
-                        #----hardcoding only done for 32bit python as its not performing via children.get_properties
+                        #----hardcoding only done for 32bit python as its not performing via ch[i].get_properties
                         #----' id {0}'.format(button.idCommand)) or
                         #----RuntimeError: GetButtonInfo failed for "element" with command id XXXX occours when one of the properties not correct
                         #----Please Refer SWAPY application and check the element ,if all the properties are not populating , chances are this
-                        #--- error will occour.I have noticed most of the time children.texts() is the problem hence setting it to u''
+                        #--- error will occour.I have noticed most of the time ch[i].texts() is the problem hence setting it to u''
                         try:
-                            getProperties={u'is_enabled': children.is_enabled(),
-                                           u'is_visible': children.is_visible(),
-                                           u'style': children.style(),
-                                           u'fonts': children.fonts(),
-                                           u'client_rects': children.client_rects(),
+                            getProperties={u'is_enabled': ch[i].is_enabled(),
+                                           u'is_visible': ch[i].is_visible(),
+                                           u'style': ch[i].style(),
+                                           u'fonts': ch[i].fonts(),
+                                           u'client_rects': ch[i].client_rects(),
                                            u'texts': u'',
-                                           u'class_name': children.class_name(),
-                                           u'is_unicode': children.is_unicode(),
-                                           u'control_id': children.control_id(),
-                                           u'menu_items': children.menu_items(),
-                                           u'user_data': children.user_data(),
-                                           u'friendly_class_name': children.friendly_class_name(),
-                                           u'control_count': children.control_count(),
-                                           u'exstyle': children.exstyle(),
-                                           u'context_help_id': children.context_help_id(),
-                                           u'rectangle': children.rectangle()
+                                           u'class_name': ch[i].class_name(),
+                                           u'is_unicode': ch[i].is_unicode(),
+                                           u'control_id': ch[i].control_id(),
+                                           u'menu_items': ch[i].menu_items(),
+                                           u'user_data': ch[i].user_data(),
+                                           u'friendly_class_name': ch[i].friendly_class_name(),
+                                           u'control_count': ch[i].control_count(),
+                                           u'exstyle': ch[i].exstyle(),
+                                           u'context_help_id': ch[i].context_help_id(),
+                                           u'rectangle': ch[i].rectangle()
                                           }
                             properties = json.loads(json.dumps(getProperties, default=lambda x: str(x)))
                         except Exception as e:
-                            logger.print_on_console (e)
+                            """Some properties dont exists in ele<uia> when comapred to ele<win32>"""
+                            try:
+                                getProperties={u'is_enabled': ch[i].is_enabled(),
+                                           u'is_visible': ch[i].is_visible(),
+                                           u'style': u'',
+                                           u'fonts': u'',
+                                           u'client_rects': u'',
+                                           u'texts': u'',
+                                           u'class_name': ch[i].class_name(),
+                                           u'is_unicode': u'',
+                                           u'control_id': u'',
+                                           u'menu_items':u'',
+                                           u'user_data': u'',
+                                           u'friendly_class_name': ch[i].friendly_class_name(),
+                                           u'control_count': u'',
+                                           u'exstyle': u'',
+                                           u'context_help_id':u'',
+                                           u'rectangle': ch[i].rectangle()
+                                          }
+                                properties = json.loads(json.dumps(getProperties, default=lambda x: str(x)))
+                            except Exception as e:
+                                logger.print_on_console (e)
+                                pass
                      if properties['is_visible'] == True :
                          properties["url"] =  win.texts()[0] if len(win.texts())>0 else ""
-                         properties['control_id'] = children.element_info.control_id
-                         properties['parent'] = children.element_info.parent.class_name
-                         handle = children.handle
+                         properties['control_id'] = ch[i].element_info.control_id
+                         properties['parent'] = ch[i].element_info.parent.class_name
+                         handle = ch[i].handle
                          text_initial = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
                          text=text_initial
                          if text =='':
-                            t = children.texts()
+                            t = ch[i].texts()
                             if len(t) >= 2:
                                 text = t[1]
                          if text == '':
-                            text = children.friendly_class_name()
+                            text = ch[i].friendly_class_name()
                          text_old = text.strip()
                          text=text_old
                          url = properties['url']
@@ -326,18 +370,24 @@ class Scrape:
                          elif tag == 'DateTimePicker':
                             tag = 'datepicker'
                             text= str(text) + '_dtp'
+                         elif tag == 'Table' or tag == 'Tabel':
+                            tag = 'table'
+                            text= str(text) + '_tbl'
                          else:
                             tag = 'label'
                             if not isinstance(text,basestring):
                                 text=str(text)+'_elmnt'
                             else:
                                 text=text+'_elmnt'
-
-
                          left = 0
                          top = 0
-                         width = coordinates.width()
-                         height = coordinates.height()
+                         try:
+                            width = coordinates.width()
+                            height = coordinates.height()
+                         except:
+                            width=coordinates_obj.width
+                            height=coordinates_obj.height
+                            pass
                          x_screen = cor.left
                          y_screen = cor.top
                          left = cor.left - winrect[0]
@@ -357,7 +407,7 @@ class Scrape:
                                     flag = True
                             #----------------------------------------------------
                             new_path=''
-                            className=children.friendly_class_name()
+                            className=ch[i].friendly_class_name()
                             if text_initial!='':
                                 try:
                                     new_text=str(text_initial)
@@ -365,7 +415,7 @@ class Scrape:
                                     new_text=text_initial.encode('ascii', 'replace')
                             else :
                                 new_text=text_old
-                            new_path=path+';'+className+';'+str(control_id)+";"+new_text
+                            new_path=path+';'+className+';'+str(control_id)+";"+new_text+';'+backend_process
                             #----------------------------------------------------
                             if not flag:
                                 ne.append({"custname":text,
@@ -387,47 +437,53 @@ class Scrape:
                                 logger.print_on_console( 'This element is duplicate')
                      else:
                         text = ''
-                        handle = children.handle
+                        handle = ch[i].handle
                         text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
                  except Exception as e:
-                    logger.print_on_console( e)
+                    import traceback
+                    traceback.print_exc()
+                    logger.print_on_console(e)
         except Exception as e:
-            logger.print_on_console( e)
+            import traceback
+            traceback.print_exc()
+            logger.print_on_console(e)
         return ne
 
-    def full_scrape(self,app_uia,wxobject):
+    def full_scrape(self,wxobject):
         allobjects = {}
         try:
-            win = app_uia.top_window()
-            ch = win.children()
-            a = ''
+            #=====================================check for uia
+            if str(wxobject.backend_process).strip() =='A':
+                win = desktop_launch_keywords.app_win32.top_window()
+                ch=win.children()
+            elif str(wxobject.backend_process).strip() =='B':
+                win = desktop_launch_keywords.app_uia.top_window()
+                ch=win.children()[:]
+                for i in range(0,len(ch)):
+                    if len(ch[i].children()):
+                        c=ch[i].children()
+                        for a in c:
+                            ch.append(a)
+            #===================================================
             ne = []
             obj = desktop_launch_keywords.Launch_Keywords()
             obj.set_to_foreground()
             obj.bring_Window_Front()
             winrect = desktop_launch_keywords.win_rect;
-            a =  self.get_all_children(ch,ne,0,'',win,winrect)
-            allobjects = a
-##            import json
-##            try:
-##                wxobject.Hide()
-##                time.sleep(2)
-##                img=desktop_scrape.obj.captureScreenshot()
-##                img.save('out.png')
-##                with open("out.png", "rb") as image_file:
-##                    encoded_string = base64.b64encode(image_file.read())
-##                allobjects['mirror'] =encoded_string.encode('UTF-8').strip()
-##            except Exception as e:
-##                img=obj.capture_window( win32gui.GetDesktopWindow())
-##                img.save('out.png')
-##                with open("out.png", "rb") as image_file:
-##                    encoded_string = base64.b64encode(image_file.read())
-##                allobjects['mirror'] =encoded_string.encode('UTF-8').strip()
-##            with open('domelements.json', 'w') as outfile:
-##                allobjects["view"] = a
-##                json.dump(allobjects, outfile, indent=4, sort_keys=False)
-##                outfile.close()
-
+            allobjects =  self.get_all_children(ch,ne,0,'',win,winrect,str(wxobject.backend_process).strip())
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             logger.print_on_console(e)
         return allobjects
+
+class Rectangle:
+    def __init__(self):
+        self.height = None
+        self.width = None
+    def set_coordinates(self,child):
+        try:
+            self.height= int(child.rectangle().bottom)-int(child.rectangle().top)
+            self.width= int(child.rectangle().right)-int(child.rectangle().left)
+        except Exception as e:
+            logger.print_on_console('Error fetching object coordinates',e)

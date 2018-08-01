@@ -200,7 +200,7 @@ class MainNamespace(BaseNamespace):
     def on_LAUNCH_DESKTOP(self, *args):
         con = controller.Controller()
         global browsername
-        browsername = args[0]
+        browsername = args
         con.get_all_the_imports('Desktop')
         import desktop_scrape
         global desktopScrapeObj
