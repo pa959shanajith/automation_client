@@ -80,20 +80,16 @@ class Scrape:
                                     first_ele = tempobjects[i]
                                     actualelement = first_ele
                                     next_ele = tempobjects[i+1]
-                                    if ((first_ele['x_screen'] > next_ele['x_screen']) and (first_ele['y_screen'] > next_ele['y_screen'])):
-                                        actualelement = first_ele
-                                        break
-                                    elif ((first_ele['x_screen'] < next_ele['x_screen']) and (first_ele['y_screen'] < next_ele['y_screen'])):
-                                        actualelement = next_ele
-                                        break
+                                    if((first_ele['x_screen']>next_ele['x_screen']) and (first_ele['y_screen']>next_ele['y_screen'])):
+                                        tempobjects[i+1]=first_ele
+                                        actualelement=first_ele
+                                    else:
+                                        actualelement=next_ele
                                 except Exception as e:
                                     break
                             """calling dispatcher methods to check if the scrapped elements actually exist or not, if not present fails and returns an exception"""
                             disp_obj = desktop_dispatcher.DesktopDispatcher()
-                            if str(wxobject.backend_process).strip() !='B':
-                                ele = disp_obj.get_desktop_element(actualelement['xpath'],actualelement['url'])
-                            elif  str(wxobject.backend_process).strip() =='B':
-                                ele = disp_obj.get_desktop_element(actualelement['xpath'],actualelement['url'])
+                            ele = disp_obj.get_desktop_element(actualelement['xpath'],actualelement['url'])
                             global actualobjects
                             if actualelement not in actualobjects:#------check to remove duplicate elements
                                 actualobjects.append(actualelement)
@@ -128,6 +124,8 @@ class Scrape:
                             objects =  scrape_obj.get_all_children(ch,ne,0,'',win,winrect,str(wxobject.backend_process).strip())
                             allobjs["view"] = objects
                         except Exception as e:
+                            import traceback
+                            traceback.print_exc()
                             logger.print_on_console(e)
                         return allobjs
 
@@ -323,17 +321,48 @@ class Scrape:
                          properties["url"] =  win.texts()[0] if len(win.texts())>0 else ""
                          properties['control_id'] = ch[i].element_info.control_id
                          properties['parent'] = ch[i].element_info.parent.class_name
-                         handle = ch[i].handle
-                         text_initial = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
-                         text=text_initial
-                         if text =='':
-                            t = ch[i].texts()
-                            if len(t) >= 2:
-                                text = t[1]
-                         if text == '':
-                            text = ch[i].friendly_class_name()
-                         text_old = text.strip()
-                         text=text_old
+                         if backend_process=='A':
+                             handle = ch[i].handle
+                             text_initial = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
+                             text=text_initial
+                             if text =='':
+                                t = ch[i].texts()
+                                if len(t) >= 2:
+                                    text = t[1]
+                             if text == '':
+                                text = ch[i].friendly_class_name()
+                             text_old = text
+                             text=text_old
+                         elif backend_process=='B':
+                            text_initial=ch[i].texts()
+                            text=text_initial
+                            if type(text)==list:
+                                if text[0] =='':
+                                    handle = ch[i].handle
+                                    text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
+                                    if text=='' or text==None:
+                                        text = ch[i].friendly_class_name()
+                                else:
+                                    try:
+                                        if type(text[0])==list:
+                                            try:
+                                                text=str(text[0][0])
+                                            except:
+                                                text=text[0][0].encode('ascii', 'replace')
+                                        else:
+                                            text=str(text[0])
+                                    except:
+                                        text=text[0].encode('ascii', 'replace')
+                            else:
+                                if text=='' or text[0]=='':
+                                    handle = ch[i].handle
+                                    text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
+                                    if text=='' or None:
+                                        text= ch[i].friendly_class_name()
+                                else:
+                                    text=text_initial[0]
+                            text_old = text
+                            text=text_old
                          url = properties['url']
                          parent = properties['parent']
                          rectangle = properties['rectangle']
@@ -361,6 +390,10 @@ class Scrape:
                             tag = 'list'
                             canselectmultiple="true"
                             text= str(text) + '_lst'
+                         elif tag == 'ListItem':
+                            tag = 'list'
+                            canselectmultiple="true"
+                            text= str(text) + '_lst_elmnt'
                          elif tag == 'TabControl':
                             tag = 'tab'
                             text= str(text) + '_tab'
@@ -370,9 +403,9 @@ class Scrape:
                          elif tag == 'DateTimePicker':
                             tag = 'datepicker'
                             text= str(text) + '_dtp'
-                         elif tag == 'Table' or tag == 'Tabel':
-                            tag = 'table'
-                            text= str(text) + '_tbl'
+                         elif tag == 'Tabel':
+                            tag = 'tabel'
+                            text= str(text) + '_tabel'
                          else:
                             tag = 'label'
                             if not isinstance(text,basestring):
@@ -409,10 +442,16 @@ class Scrape:
                             new_path=''
                             className=ch[i].friendly_class_name()
                             if text_initial!='':
-                                try:
-                                    new_text=str(text_initial)
-                                except:
-                                    new_text=text_initial.encode('ascii', 'replace')
+                                if type(text_initial)==list:
+                                    try:
+                                        new_text=', '.join([x.encode('utf-8') for x in text_initial])
+                                    except:
+                                        new_text=', '.join(str(v) for v in text_initial)
+                                else:
+                                    try:
+                                        new_text=str(text_initial)
+                                    except:
+                                        new_text=text_initial.encode('ascii', 'replace')
                             else :
                                 new_text=text_old
                             new_path=path+';'+className+';'+str(control_id)+";"+new_text+';'+backend_process

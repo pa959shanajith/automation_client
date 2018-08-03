@@ -304,7 +304,7 @@ class DesktopDispatcher:
             if len(x_var)==5:
                 """checking for backend process"""
                 xname=x_var[3]
-                backend=x_var[4]
+                backend=x_var[4].strip()
         else:
             xpath=xPath
             prev_flag=True # setting prev_flag to True since the xpath recieved is of an old test case.
@@ -379,6 +379,8 @@ class DesktopDispatcher:
                     logger.print_on_console("Unable to get desktop element because :",e)
         elif backend =='B':
             try:
+                import pythoncom
+                pythoncom.CoInitialize()
                 win = desktop_launch_keywords.app_uia.top_window()
                 ch=win.children()[:]
                 for i in range(0,len(ch)):
@@ -398,7 +400,7 @@ class DesktopDispatcher:
             except Exception as e:
                 import traceback
                 traceback.print_exc()
-                logger.print_on_console('Unable to get desktop element because :',e)
+                logger.print_on_console("Unable to get desktop element because :",e)
         return ele
 
     def get_desktop_static_element(self,xclass,xconID,app):

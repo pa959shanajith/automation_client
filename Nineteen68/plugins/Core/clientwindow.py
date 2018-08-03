@@ -1174,7 +1174,7 @@ class Config_window(wx.Frame):
         self.rbox4 = wx.RadioBox(self.panel, label = 'Retrieve URL', pos = (80,248), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
-            if isConfigJson['configuration']['retrieveURL']==lblList[0].lower():
+            if isConfigJson['configuration']['retrieveURL']==lblList[0]:
                 self.rbox4.SetSelection(0)
             else:
                 self.rbox4.SetSelection(1)
