@@ -45,21 +45,25 @@ if sys.platform == 'win32':
 
 if __name__ == "__main__":
     app = wx.App()
+    appName = "Nineteen68 ICE"
     import clientwindow as cw_obj
     cw_obj.configvalues = configvalues
-    cw = cw_obj.ClientWindow()
-    print('*******************************************************************************************************')
-    print('=========================================Nineteen68 Client Window======================================')
-    print('*******************************************************************************************************')
+    cw = cw_obj.ClientWindow(appName)
+    print('********************************************************************************************************')
+    print('============================================ '+appName+' ============================================')
+    print('********************************************************************************************************')
     if configMissingFlag:
-        logger.print_on_console( "Configure Nineteen68 Client by navigating to Configuration ->Edit ->Edit Config")
-        log.info("Configure Nineteen68 Client by navigating to Configuration ->Edit ->Edit Config")
+        err = "Configure "+appName+" by navigating to Edit -> Configuration"
+        logger.print_on_console(err)
+        log.info(err)
     elif jsonSyntaxErrorFlag:
-        logger.print_on_console( "[Error]: Syntax error in config.json file, please check and restart the client window.")
-        log.info("[Error]: Syntax error in config.json file, and please check and restart the client window.")
+        err = "[Error]: Syntax error in config.json file, and please check and restart "+appName+"."
+        logger.print_on_console(err)
+        log.info(err)
         log.error(configvalues['errorflag'])
     elif cw.logfilename_error_flag:
-        logger.print_on_console( "[Error]: Please provide a valid logfile path in config.json file and restart the client window.")
-        log.info("[Error]: Please provide a valid logfile path in config.json file and restart the client window.")
+        err = "[Error]: Please provide a valid logfile path in config.json file and restart "+appName+"."
+        logger.print_on_console(err)
+        log.info(err)
         cw.logfilename_error_flag = False
     app.MainLoop()

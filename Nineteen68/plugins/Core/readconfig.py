@@ -27,11 +27,10 @@ class readConfig():
         "chrome_path":"", "bit_64":"", "logFile_Path":"", "screenShot_Flag":"",
         "queryTimeOut":"", "timeOut":"", "stepExecutionWait":"", "displayVariableTimeOut":"",
         "retrieveURL":"", "delay":"", "ignoreVisibilityCheck":"", "exception_flag":"",
-        "server_cert":"", "enableSecurityCheck":"","browser_check":""}
+        "server_cert":"", "enableSecurityCheck":"","browser_check":"","disable_server_cert":""}
         if os.path.isfile(self.config_path)==True:
             try:
-                config = json.loads(open(self.config_path).read())
-                params = config['configuration']
+                params = json.load(open(self.config_path))
                 configvalues['server_ip']=params['server_ip']
                 configvalues['server_port']=params['server_port']
                 configvalues['ignore_certificate']=params['ignore_certificate']
@@ -50,8 +49,7 @@ class readConfig():
                 configvalues['server_cert']=params['server_cert']
                 configvalues['enableSecurityCheck'] = params['enableSecurityCheck']
                 configvalues['browser_check'] = params['browser_check']
-                if params.has_key('ignore_server_certificate'):
-                    configvalues['ignore_server_certificate'] = params['ignore_server_certificate']
+                configvalues['disable_server_cert'] = params['disable_server_cert']
             except Exception as e:
                 configvalues['errorflag']=e
         else:
