@@ -424,7 +424,7 @@ class StepDescription:
         def getcolcountiris():
             return ' Get column Count of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
         def getcellvalueiris():
-            return ' Get cell value of  '+ "'" + tsp.custname +input + "'" +'in the table and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp.custname +"'"+'.'
+            return 'Get cell value of ' + "'" + tsp.custname +'['+input[0]+']['+input[1]+']'+"'" + ' in the table and save the value ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
         def verifyexistsiris():
             return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         return locals()[keyword]()
@@ -629,7 +629,7 @@ class StepDescription:
         def getcolcountiris():
             return ' Get column Count of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
         def getcellvalueiris():
-            return ' Get cell value of  '+ "'" + tsp.custname + ' ' + str(input) + "'" +'in the table and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp.custname +"'"+'.'
+            return 'Get cell value of ' + "'" + tsp.custname +'['+input[0]+']['+input[1]+']'+"'" + ' in the table and save the value ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
         def verifyexistsiris():
             return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         return locals()[keyword]()
@@ -861,7 +861,7 @@ class StepDescription:
         def getcolcountiris():
             return ' Get column Count of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
         def getcellvalueiris():
-            return ' Get cell value of  '+ "'" + tsp.custname +input + "'" +'in the table and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp.custname +"'"+'.'
+            return 'Get cell value of ' + "'" + tsp.custname +'['+input[0]+']['+input[1]+']'+"'" + ' in the table and save the value ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
         def verifyexistsiris():
             return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         return locals()[keyword]()
@@ -1335,7 +1335,7 @@ class StepDescription:
         def getcolcountiris():
             return ' Get column Count of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
         def getcellvalueiris():
-            return ' Get cell value of  '+ "'" + tsp.custname +input + "'" +'in the table and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp.custname +"'"+'.'
+            return 'Get cell value of ' + "'" + tsp.custname +'['+input[0]+']['+input[1]+']'+"'" + ' in the table and save the value ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
         def verifyexistsiris():
             return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         return locals()[keyword]()

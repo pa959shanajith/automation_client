@@ -12,6 +12,7 @@ log = logging.getLogger('iris_operations.py')
 import os
 from pytesseract import pytesseract
 import base64
+from pyrobot import Robot
 vertical = []
 horizontal = []
 verifyexists = []
@@ -132,8 +133,9 @@ def gotoobject(elem, number):
         os.remove('test.png')
     return pt
 
-def find_relative_image(constant_cord,elements,const_new_coordinates):
+def find_relative_image(elements,const_new_coordinates):
     try:
+        coordinates = []
         rel_image = ''
         if(len(elements)>2):
             im = PIL.ImageGrab.grab()
@@ -158,6 +160,7 @@ def find_relative_image(constant_cord,elements,const_new_coordinates):
             startx = int(const_new_coordinates[0]) + dist
             endx = int(const_new_coordinates[0]) + dist + width
 
+            coordinates = [startx,starty,endx,endy]
             img = image[starty:endy,startx:endx]
             cv2.imwrite('output.png',img)
             with open('output.png', "rb") as imageFile:
@@ -167,7 +170,7 @@ def find_relative_image(constant_cord,elements,const_new_coordinates):
     except Exception as e:
         log.error(e)
         logger.print_on_console("Error occured in finding relative image.")
-    return rel_image
+    return rel_image,coordinates
 
 class IRISKeywords():
     def clickiris(self,element,*args):
@@ -184,14 +187,17 @@ class IRISKeywords():
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img = find_relative_image(args[2]['cord'], elements, verifyexists)
+                img,res = find_relative_image(elements, verifyexists)
+                width = res[2] - res[0]
+                height = res[3] - res[1]
+                pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
             else:
                 img = element['cord']
-            res = None
-            if(len(args[0])==1 and args[0][0].isdigit()):
-                res = gotoobject(img,int(args[0][0])-1)
-            else:
-                res = gotoobject(img,None)
+                res = None
+                if(len(args[0])==1 and args[0][0].isdigit()):
+                    res = gotoobject(img,int(args[0][0])-1)
+                else:
+                    res = gotoobject(img,None)
             if(len(res)>0):
                 pyautogui.click()
                 status= TEST_RESULT_PASS
@@ -217,19 +223,25 @@ class IRISKeywords():
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img = find_relative_image(args[2]['cord'], elements, verifyexists)
+                img,res = find_relative_image(elements, verifyexists)
+                width = res[2] - res[0]
+                height = res[3] - res[1]
+                pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
             else:
                 img = element['cord']
-            res = None
-            if(len(args[0]) == 2 and args[0][1].isdigit()):
-                res = gotoobject(img,int(args[0][1])-1)
-            else:
-                res = gotoobject(img,None)
+                res = None
+                if(len(args[0]) == 2 and args[0][1].isdigit()):
+                    res = gotoobject(img,int(args[0][1])-1)
+                else:
+                    res = gotoobject(img,None)
             if(len(res)>0):
                 pyautogui.click()
-                pyautogui.hotkey('ctrl','a')
-                pyautogui.press('backspace')
-                pyautogui.typewrite(args[0][0], interval=0.5)
+                robot = Robot()
+                robot.ctrl_press('a')
+                time.sleep(0.5)
+                robot.key_press('backspace')
+                time.sleep(0.5)
+                pyautogui.typewrite(args[0][0], interval=0.2)
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
             else:
@@ -256,7 +268,7 @@ class IRISKeywords():
                             (const_coordintes[2],const_coordintes[3]),
                             (elem_coordinates[0], elem_coordinates[1]),
                             (elem_coordinates[2], elem_coordinates[3])]
-                    img = find_relative_image(args[2]['cord'], elements, verifyexists)
+                    img,res = find_relative_image(elements, verifyexists)
                 else:
                     img = element['cord']
                 with open("cropped.png", "wb") as f:
@@ -264,7 +276,6 @@ class IRISKeywords():
                 image = cv2.imread("cropped.png")
                 text = ''
                 if(len(args[0])==1 and args[0][0].lower().strip() == 'select'):
-                    from pyrobot import Robot
                     robot = Robot()
                     height = int(element['coordinates'][3]) - int(element['coordinates'][1])
                     pyautogui.moveTo(int(element['coordinates'][2]),int(element['coordinates'][3])-int(height/2))
@@ -315,6 +326,8 @@ class IRISKeywords():
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
                 value = text
+                logger.print_on_console('Result obtained is: ')
+                logger.print_on_console(value)
                 os.remove('cropped.png')
             else:
                 log.error("Tesseract module not found.")
@@ -338,7 +351,7 @@ class IRISKeywords():
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img = find_relative_image(args[2]['cord'], elements, verifyexists)
+                img,res = find_relative_image(elements, verifyexists)
             else:
                 img = element['cord']
             with open("cropped.png", "wb") as f:
@@ -354,6 +367,8 @@ class IRISKeywords():
             status  = TEST_RESULT_PASS
             result = TEST_RESULT_TRUE
             value = len(horizontal)-1
+            logger.print_on_console('Result obtained is: ')
+            logger.print_on_console(value)
             os.remove('cropped.png')
             os.remove('rotated.png')
         except Exception as e:
@@ -376,7 +391,7 @@ class IRISKeywords():
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img = find_relative_image(args[2]['cord'], elements, verifyexists)
+                img,res = find_relative_image(elements, verifyexists)
             else:
                 img = element['cord']
             with open("cropped.png", "wb") as f:
@@ -392,6 +407,8 @@ class IRISKeywords():
             status  = TEST_RESULT_PASS
             result = TEST_RESULT_TRUE
             value = len(vertical)-1
+            logger.print_on_console('Result obtained is: ')
+            logger.print_on_console(value)
             os.remove('cropped.png')
             os.remove('rotated.png')
         except Exception as e:
@@ -420,7 +437,7 @@ class IRISKeywords():
                             (const_coordintes[2],const_coordintes[3]),
                             (elem_coordinates[0], elem_coordinates[1]),
                             (elem_coordinates[2], elem_coordinates[3])]
-                    img = find_relative_image(args[2]['cord'], elements, verifyexists)
+                    img,res = find_relative_image(elements, verifyexists)
                 else:
                     img = element['cord']
                 with open("cropped.png", "wb") as f:
@@ -431,6 +448,8 @@ class IRISKeywords():
                     status  = TEST_RESULT_PASS
                     result = TEST_RESULT_TRUE
                     value = text
+                    logger.print_on_console('Result obtained is: ')
+                    logger.print_on_console(value)
                 os.remove('cropped.png')
             else:
                 log.error("Tesseract module not found.")
@@ -455,6 +474,7 @@ class IRISKeywords():
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
                 verifyexists = res
+                logger.print_on_console('Element exists.')
             else:
                 logger.print_on_console("Object not found.")
         except Exception as e:
