@@ -728,7 +728,7 @@ class Controller():
                             self.jumpto_previousindex.pop()
                             self.counter.pop()
                 except Exception as e:
-                    log.error(e)
+                    log.error(e,exc_info=True)
                     logger.print_on_console("Error encountered during Execution")
                     status=False
                     i=i+1
