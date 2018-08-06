@@ -78,7 +78,9 @@ MAINFRAME_FN_KEYS = { "enter": "<Enter>", "tab": "<Tab>", "home": "<Home>",
     "pf10": "<F10>", "pf11": "<F11>", "pf12": "<F12>", "pf13": "<F13>",
     "pf14": "<F14>", "pf15": "<F15>", "pf16": "<F16>", "pf17": "<F17>",
     "pf18": "<F18>", "pf19": "<F19>", "pf20": "<F20>", "pf21": "<F21>",
-    "pf22": "<F22>", "pf23": "<F23>", "pf24": "<F24>"
+    "pf22": "<F22>", "pf23": "<F23>", "pf24": "<F24>", "attention": "@A@Q",
+    "cursor select": "@A@J", "dup": "@S@x", "erase input": "@A@F", "field mark": "@S@y",
+    "insert mode": "@A@I", "sys request": "@A@H", "test request": "@A@C"
 }
 
 MF_API_DATA_EOF = "$r^mB@$"

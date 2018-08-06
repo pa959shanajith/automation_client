@@ -27,7 +27,7 @@ class readConfig():
         "chrome_path":"", "bit_64":"", "logFile_Path":"", "screenShot_Flag":"",
         "queryTimeOut":"", "timeOut":"", "stepExecutionWait":"", "displayVariableTimeOut":"",
         "retrieveURL":"", "delay":"", "ignoreVisibilityCheck":"", "exception_flag":"",
-        "server_cert":"", "enableSecurityCheck":""}
+        "server_cert":"", "enableSecurityCheck":"","browser_check":""}
         if os.path.isfile(self.config_path)==True:
             try:
                 config = json.loads(open(self.config_path).read())
@@ -49,6 +49,7 @@ class readConfig():
                 configvalues['exception_flag']=params['exception_flag']
                 configvalues['server_cert']=params['server_cert']
                 configvalues['enableSecurityCheck'] = params['enableSecurityCheck']
+                configvalues['browser_check'] = params['browser_check']
                 if params.has_key('ignore_server_certificate'):
                     configvalues['ignore_server_certificate'] = params['ignore_server_certificate']
             except Exception as e:

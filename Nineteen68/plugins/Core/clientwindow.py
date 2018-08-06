@@ -916,13 +916,22 @@ class ClientWindow(wx.Frame):
 
     def OnNodeConnect(self,event):
         try:
-            global socketIO, configvalues
+            global socketIO, configvalues, browsercheckFlag
             name = self.connectbutton.GetName()
             self.connectbutton.Disable()
             if(name == 'connect'):
                 configvalues = readconfig.readConfig().readJson() # Re-reading config values
                 port = int(configvalues['server_port'])
                 conn = httplib.HTTPConnection(configvalues['server_ip'],port)
+                try:
+                    b=str(configvalues['browser_check'])
+                    if b.lower()=='no':
+                        browsercheckFlag=True
+                    elif b.lower()=='yes':
+                        browsercheckFlag=False
+                except:
+                    import traceback
+                    traceback.print_exc()
                 conn.connect()
                 conn.close()
                 self.mythread = SocketThread(self)
@@ -1171,7 +1180,7 @@ class Config_window(wx.Frame):
         elif isConfigJson==False:
             self.server_cert.SetValue(self.defaultServerCrt)
 
-        self.rbox4 = wx.RadioBox(self.panel, label = 'Retrieve URL', pos = (80,248), choices = lblList,
+        self.rbox4 = wx.RadioBox(self.panel, label = 'Retrieve URL', pos = (12,248), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
             if isConfigJson['configuration']['retrieveURL']==lblList[0]:
@@ -1179,13 +1188,22 @@ class Config_window(wx.Frame):
             else:
                 self.rbox4.SetSelection(1)
 
-        self.rbox5 = wx.RadioBox(self.panel, label = 'Exception Flag', pos = (250,248), choices = lblList4,
+        self.rbox5 = wx.RadioBox(self.panel, label = 'Exception Flag', pos = (170,248), choices = lblList4,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
             if isConfigJson['configuration']['exception_flag']==lblList4[0].lower():
                 self.rbox5.SetSelection(0)
             else:
                 self.rbox5.SetSelection(1)
+
+        self.rbox8 = wx.RadioBox(self.panel, label = 'Browser Check', pos = (340,248), choices = lblList,
+         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson!=False:
+            if isConfigJson['configuration']['browser_check']==lblList[1]:
+                self.rbox8.SetSelection(1)
+                browsercheckFlag=True
+            else:
+                self.rbox8.SetSelection(0)
 
         self.rbox6 = wx.RadioBox(self.panel, label = 'Ignore Visibility Check', pos = (80,300), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
@@ -1239,6 +1257,7 @@ class Config_window(wx.Frame):
         stepExecutionWait=self.step_exe_wait.GetValue()
         displayVariableTimeOut=self.disp_var_timeout.GetValue()
         server_cert=self.server_cert.GetValue()
+        browser_check=self.rbox8.GetStringSelection()
         #----------------creating data dictionary
         data['server_ip'] = server_add.strip()
         data['server_port'] = server_port.strip()
@@ -1257,6 +1276,7 @@ class Config_window(wx.Frame):
         data['enableSecurityCheck'] = enableSecurityCheck.strip()
         data['exception_flag'] = exception_flag.strip().lower()
         data['server_cert'] =server_cert.strip()
+        data['browser_check']=browser_check.strip()
         #data['ignoreServerCertificate'] = False
         config_data['configuration']=data
         if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='':
@@ -1338,6 +1358,12 @@ class Config_window(wx.Frame):
                 self.ch_path.SetForegroundColour((255,0,0))
             else:
                 self.ch_path.SetLabel('Chrome Path')
+                self.ch_path.SetForegroundColour((0,0,0))
+            if data['browser_check']=='':
+                self.ch_path.SetLabel('Browser Check*')
+                self.ch_path.SetForegroundColour((255,0,0))
+            else:
+                self.ch_path.SetLabel('Browser Check')
                 self.ch_path.SetForegroundColour((0,0,0))
 
 
@@ -1464,8 +1490,11 @@ def check_browser():
             browser_ver = driver.capabilities['version']
             browser_ver1 = browser_ver.encode('utf-8')
             browser_ver = int(browser_ver1[:2])
-            driver.close()
-            driver.quit()
+            try:
+                driver.close()
+                driver.quit()
+            except:
+                pass
             driver=None
             for i in CHROME_DRIVER_VERSION:
                 if a == i[0]:
@@ -1487,13 +1516,16 @@ def check_browser():
             caps['marionette'] = True
             from selenium.webdriver.firefox.options import Options
             options = Options()
-            options.add_argument('-headless')
+            options.add_argument('--headless')
             driver = webdriver.Firefox(capabilities=caps,firefox_options=options, executable_path=GECKODRIVER_PATH)
             browser_ver=driver.capabilities['browserVersion']
             browser_ver1 = browser_ver.encode('utf-8')
             browser_ver = float(browser_ver1[:4])
-            driver.close()
-            driver.quit()
+            try:
+                driver.close()
+                driver.quit()
+            except:
+                pass
             driver=None
             for i in FIREFOX_BROWSER_VERSION:
                 if a == i[0]:
