@@ -1,4 +1,4 @@
-import wx
+##import wx
 import sys
 import os
 import time
@@ -922,6 +922,12 @@ class ClientWindow(wx.Frame):
             if(name == 'connect'):
                 port = int(configvalues['server_port'])
                 conn = httplib.HTTPConnection(configvalues['server_ip'],port)
+                try:
+                    logfilename = configvalues["logFile_Path"].replace("\\","\\\\")
+                    logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename},disable_existing_loggers=False)
+                except Exception as e:
+                    self.logfilename_error_flag = True
+                    log.error(e)
                 conn.connect()
                 conn.close()
                 self.mythread = SocketThread(self)
@@ -1396,11 +1402,13 @@ class Config_window(wx.Frame):
         dlg.Destroy()
     """This method open a file selector dialog , from where file path can be set """
     def fileBrowser_logfilepath(self,event):
-        dlg = wx.FileDialog(self, message="Choose a file ...",defaultDir=self.currentDirectory,defaultFile="", wildcard="Log file (*.log)|*.log|" \
-            "All files (*.*)|*.*", style=wx.FD_SAVE)
+        dlg = wx.DirDialog (None, "Choose a folder", "", wx.DD_DEFAULT_STYLE)
         if dlg.ShowModal() == wx.ID_OK:
-            path = dlg.GetPath()
-            self.log_file_path.SetValue(path)
+            log_path = dlg.GetPath()
+            log_path= log_path+"\TestautoV2.log"
+            f = open(log_path, "a+")
+            f.close()
+            self.log_file_path.SetValue(log_path)
         dlg.Destroy()
     """This method open a file selector dialog , from where file path can be set """
     def fileBrowser_servcert(self,event):
