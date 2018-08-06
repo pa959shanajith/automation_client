@@ -1,4 +1,4 @@
-##import wx
+import wx
 import sys
 import os
 import time
@@ -688,7 +688,7 @@ class ClientWindow(wx.Frame):
         self.action=''
         self.debug_mode=False
         self.choice='Normal'
-        global wxObject
+        global wxObject,browsercheckFlag
         wxObject = self
         self.iconpath = IMAGES_PATH +"/slk.ico"
         self.connect_img=wx.Image(IMAGES_PATH +"/connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
@@ -808,6 +808,10 @@ class ClientWindow(wx.Frame):
             self.connectbutton.Disable()
             self.rbox.Disable()
         threading.Timer(0.2,self.verifyMACAddress).start()
+        if configvalues['browser_check'].lower()=='no':
+            browsercheckFlag=True
+        else:
+            browsercheckFlag=False
 
     """
     Menu Items:
@@ -922,12 +926,6 @@ class ClientWindow(wx.Frame):
             if(name == 'connect'):
                 port = int(configvalues['server_port'])
                 conn = httplib.HTTPConnection(configvalues['server_ip'],port)
-                try:
-                    logfilename = configvalues["logFile_Path"].replace("\\","\\\\")
-                    logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename},disable_existing_loggers=False)
-                except Exception as e:
-                    self.logfilename_error_flag = True
-                    log.error(e)
                 conn.connect()
                 conn.close()
                 self.mythread = SocketThread(self)
@@ -1079,7 +1077,7 @@ class Config_window(wx.Frame):
         #----------------------------------
         global socketIO
         wx.Frame.__init__(self, parent, title=title,
-                   pos=(300, 150), size=(470, 450), style = wx.CAPTION|wx.CLIP_CHILDREN|wx.STAY_ON_TOP)
+                   pos=(300, 150), size=(470, 450), style = wx.CAPTION|wx.CLIP_CHILDREN)
         self.SetBackgroundColour('#e6e7e8')
         self.iconpath = IMAGES_PATH +"/slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
@@ -1224,7 +1222,7 @@ class Config_window(wx.Frame):
             else:
                 self.rbox9.SetSelection(1)
 
-        self.error_msg=wx.StaticText( self.panel, label="", pos=(85,360),size=(350, 28), style=0, name="")
+        self.error_msg=wx.StaticText(self.panel, label="", pos=(85,360),size=(350, 28), style=0, name="")
         wx.Button(self.panel, label="Save",pos=(100,388), size=(100, 28)).Bind(wx.EVT_BUTTON, self.config_check)
         wx.Button(self.panel, label="Close",pos=(250,388), size=(100, 28)).Bind(wx.EVT_BUTTON, self.close)
 
@@ -1429,6 +1427,11 @@ class Config_window(wx.Frame):
             browsercheckFlag=True
         else:
             browsercheckFlag=False
+        try:
+            logfilename = configvalues["logFile_Path"].replace("\\","\\\\")
+            logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename},disable_existing_loggers=False)
+        except Exception as e:
+            log.error(e)
         msg = '--Edit Config closed--'
         logger.print_on_console(msg)
         log.info(msg)
