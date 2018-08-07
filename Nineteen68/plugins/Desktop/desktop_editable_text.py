@@ -1,8 +1,8 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
-# Purpose:
+# Name:        desktop_editable_text.py
+# Purpose:     This module handles textbox/edit related keywords. Also has methods to verify parent and performs cursor position correction.
 #
-# Author:      rakesh.v
+# Author:      rakesh.v,anas.ahmed
 #
 # Created:     17-11-2016
 # Copyright:   (c) rakesh.v 2016
@@ -11,12 +11,8 @@
 import desktop_constants
 from encryption_utility import AESCipher
 import logger
-#----------------------------------------win32 imports
-##import win32gui
-##import win32process
-##import win32con
+import pythoncom
 import win32api
-#----------------------------------------win32 imports
 import desktop_launch_keywords
 import logging
 from constants import *
@@ -40,8 +36,7 @@ class Text_Box:
             if desktop_launch_keywords.window_name!=None:
                 log.info('Recieved element from the desktop dispatcher')
                 dektop_element = element
-                verify_obj = Text_Box()
-                check = verify_obj.verify_parent(element,parent)
+                check = self.verify_parent(element,parent)
                 log.debug('Parent of element while scraping')
                 log.debug(parent)
                 log.debug('Parent check status')
@@ -49,11 +44,14 @@ class Text_Box:
                 if (check):
                     log.info('Parent matched')
                     if(element.is_enabled()):
-                        self.clear_text(element,parent)
-                        input_val = text
-                        cursor_x,cursor_y = win32api.GetCursorPos()#handling cursor move
-                        element.type_keys(input_val,with_spaces = True)
-                        win32api.SetCursorPos((cursor_x,cursor_y))#handling cursor move
+                        try:
+                            element.SetEditText(text, pos_start=None, pos_end=None)
+                        except:
+                            self.clear_text(element,parent)
+                            cursor_obj=CursorPositionCorrection()
+                            cursor_obj.getOriginalPosition()
+                            element.type_keys(text,with_spaces = True)
+                            cursor_obj.setOriginalPosition()
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -88,8 +86,7 @@ class Text_Box:
             if desktop_launch_keywords.window_name!=None:
                 log.info('Recieved element from the desktop dispatcher')
                 dektop_element = element
-                verify_obj = Text_Box()
-                check = verify_obj.verify_parent(element,parent)
+                check = self.verify_parent(element,parent)
                 log.debug('Parent of element while scraping')
                 log.debug(parent)
                 log.debug('Parent check status')
@@ -98,14 +95,18 @@ class Text_Box:
                     log.info('Parent matched')
                     if(element.is_enabled()):
                         self.clear_text(element,parent)
-                        input_val = text
                         log.info('Element state is enabled')
                         encryption_obj = AESCipher()
-                        input_val_temp = encryption_obj.decrypt(input_val)
+                        input_val_temp = encryption_obj.decrypt(text)
                         if input_val_temp is not None:
-                            cursor_x,cursor_y = win32api.GetCursorPos()#handling cursor move
-                            element.type_keys(input_val_temp,with_spaces = True)
-                            win32api.SetCursorPos((cursor_x,cursor_y))#handling cursor move
+                            try:
+                                element.SetEditText(text, pos_start=None, pos_end=None)
+                            except:
+                                self.clear_text(element,parent)
+                                cursor_obj=CursorPositionCorrection()
+                                cursor_obj.getOriginalPosition()
+                                element.type_keys(text,with_spaces = True)
+                                cursor_obj.setOriginalPosition()
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -135,8 +136,7 @@ class Text_Box:
             if desktop_launch_keywords.window_name!=None:
                 log.info('Recieved element from the desktop dispatcher')
                 dektop_element = element
-                verify_obj = Text_Box()
-                check = verify_obj.verify_parent(element,parent)
+                check = self.verify_parent(element,parent)
                 log.debug('Parent of element while scraping')
                 log.debug(parent)
                 log.debug('Parent check status')
@@ -170,8 +170,7 @@ class Text_Box:
             if desktop_launch_keywords.window_name!=None:
                 log.info('Recieved element from the desktop dispatcher')
                 dektop_element = element
-                verify_obj = Text_Box()
-                check = verify_obj.verify_parent(element,parent)
+                check = self.verify_parent(element,parent)
                 log.debug('Parent of element while scraping')
                 log.debug(parent)
                 log.debug('Parent check status')
@@ -179,10 +178,14 @@ class Text_Box:
                 if (check):
                     log.info('Parent matched')
                     if(element.is_enabled()):
-                        for i in range(0,len(element.text_block())):
-                            cursor_x,cursor_y = win32api.GetCursorPos()#handling cursor move
-                            element.type_keys('^a{BACKSPACE}')
-                            win32api.SetCursorPos((cursor_x,cursor_y))#handling cursor move
+                        try:
+                            element.SetText("", pos_start=None, pos_end=None)
+                        except:
+                            cursor_obj=CursorPositionCorrection()
+                            cursor_obj.getOriginalPosition()
+                            for i in range(0,len(element.text_block())):
+                                element.type_keys('^a{BACKSPACE}')
+                            cursor_obj.setOriginalPosition()
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -213,8 +216,7 @@ class Text_Box:
                 input_val = input_val[0]
                 log.info('input value obtained')
                 log.info(input_val)
-                verify_obj = Text_Box()
-                check = verify_obj.verify_parent(element,parent)
+                check = self.verify_parent(element,parent)
                 log.debug('Parent of element while scraping')
                 log.debug(parent)
                 log.debug('Parent check status')
@@ -230,7 +232,6 @@ class Text_Box:
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
-
                 else:
                    log.info('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'
@@ -252,14 +253,30 @@ class Text_Box:
             if(parent in real_parent ):
                 status= True
             else:
-                logger.log('verify parent is false')
-                logger.print_on_console('verify parent is false')
-                status= False
-
+                #logger.log('verify parent is false')
+                #logger.print_on_console('verify parent is false')
+                """We are returning True Because , in some applications the window title changes, resulting in Failure to perform keyword level execution"""
+                status= True
         except Exception as e:
             log.error(e)
-##            logger.print_on_console(e)
+            logger.print_on_console(e)
         desktop_constants.ELEMENT_FOUND=status
         return status
 
-
+class CursorPositionCorrection:
+    """When using sendkeys or type keys, we have observed that the mouse cursor moves from the current position very haphazardly. This class aims to rectify this type of anomaly"""
+    def _init_():
+        self.cursor_x=None
+        self.cursor_y=None
+    def getOriginalPosition(self):
+        try:
+            pythoncom.CoInitialize()
+            self.cursor_x,self.cursor_y = win32api.GetCursorPos()
+        except:
+            pass
+    def setOriginalPosition(self):
+        try:
+            win32api.SetCursorPos((self.cursor_x,self.cursor_y))
+            pythoncom.CoUninitialize()
+        except:
+            pass
