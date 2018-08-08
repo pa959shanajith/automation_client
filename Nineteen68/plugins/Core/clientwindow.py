@@ -1292,12 +1292,12 @@ class Config_window(wx.Frame):
             self.ch_path.SetLabel('Chrome Path')
             self.ch_path.SetForegroundColour((0,0,0))
             #---------------------------------------resetting the static texts
-            if (os.path.isfile(data['chrome_path'])==True or str(data['chrome_path']).strip()=='default') and os.path.isfile(data['server_cert'])==True and os.path.isfile(data['logFile_Path'])==True:
+            if (os.path.isfile(data['chrome_path'])==True or str(data['chrome_path']).strip()=='default') and os.path.isfile(os.path.abspath(data['server_cert']))==True and os.path.isfile(data['logFile_Path'])==True:
                 self.jsonCreater(config_data)
             else:
                 self.error_msg.SetLabel("Marked fields '^' contain invalid path, Data not saved")
                 self.error_msg.SetForegroundColour((0,0,255))
-                if os.path.isfile(data['server_cert'])!=True:
+                if os.path.isfile(os.path.abspath(data['server_cert']))!=True:
                     self.sev_cert.SetLabel('Server Cert^')
                     self.sev_cert.SetForegroundColour((0,0,255))
                 else:
@@ -1367,7 +1367,7 @@ class Config_window(wx.Frame):
     """jsonCreater saves the data in json form, location of file to be saved must be defined. This method will overwrite the existing .json file"""
     def jsonCreater(self,data):
         try:
-            if wx.MessageBox("Config file has been edited , Would you like to save?","Confirm Save",wx.ICON_QUESTION | wx.YES_NO) == wx.YES:
+            if wx.MessageBox("Config file has been edited, Would you like to save?","Confirm Save",wx.ICON_QUESTION | wx.YES_NO) == wx.YES:
                 # Write JSON file
                 with io.open('./Lib/config.json', 'w', encoding='utf8') as outfile:
                     str_ = json.dumps(data,indent=4, sort_keys=True,separators=(',', ': '), ensure_ascii=False)
@@ -1400,10 +1400,10 @@ class Config_window(wx.Frame):
         dlg.Destroy()
     """This method open a file selector dialog , from where file path can be set """
     def fileBrowser_logfilepath(self,event):
-        dlg = wx.DirDialog (None, "Choose a folder", "", wx.DD_DEFAULT_STYLE)
+        dlg = wx.DirDialog(None, "Choose a folder", "", wx.DD_DEFAULT_STYLE)
         if dlg.ShowModal() == wx.ID_OK:
             log_path = dlg.GetPath()
-            log_path= log_path+"\TestautoV2.log"
+            log_path= os.path.normpath(log_path+"/TestautoV2.log")
             f = open(log_path, "a+")
             f.close()
             self.log_file_path.SetValue(log_path)
