@@ -326,8 +326,6 @@ class IRISKeywords():
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
                 value = text
-                logger.print_on_console('Result obtained is: ')
-                logger.print_on_console(value)
                 os.remove('cropped.png')
             else:
                 log.error("Tesseract module not found.")
@@ -367,8 +365,6 @@ class IRISKeywords():
             status  = TEST_RESULT_PASS
             result = TEST_RESULT_TRUE
             value = len(horizontal)-1
-            logger.print_on_console('Result obtained is: ')
-            logger.print_on_console(value)
             os.remove('cropped.png')
             os.remove('rotated.png')
         except Exception as e:
@@ -407,8 +403,6 @@ class IRISKeywords():
             status  = TEST_RESULT_PASS
             result = TEST_RESULT_TRUE
             value = len(vertical)-1
-            logger.print_on_console('Result obtained is: ')
-            logger.print_on_console(value)
             os.remove('cropped.png')
             os.remove('rotated.png')
         except Exception as e:
@@ -448,8 +442,6 @@ class IRISKeywords():
                     status  = TEST_RESULT_PASS
                     result = TEST_RESULT_TRUE
                     value = text
-                    logger.print_on_console('Result obtained is: ')
-                    logger.print_on_console(value)
                 os.remove('cropped.png')
             else:
                 log.error("Tesseract module not found.")
