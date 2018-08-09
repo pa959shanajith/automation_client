@@ -1086,7 +1086,7 @@ class Config_window(wx.Frame):
         self.panel = wx.Panel(self)
 
         self.currentDirectory = os.environ["NINETEEN68_HOME"]
-        self.defaultServerCrt ='./Scripts/CA_BUNDLE/server.crt'
+        self.defaultServerCrt = './Scripts/CA_BUNDLE/server.crt'
 
         self.sev_add=wx.StaticText( self.panel, label="Server Address", pos=(12,8 ),size=(90, 28), style=0, name="")
         self.server_add=wx.TextCtrl(self.panel, pos=(100,8 ), size=(140,-1))
@@ -1140,10 +1140,11 @@ class Config_window(wx.Frame):
         self.sev_cert=wx.StaticText( self.panel, label="Server Cert", pos=(12,158),size=(85, 28), style=0, name="")
         self.server_cert=wx.TextCtrl(self.panel, pos=(100,158), size=(310,-1))
         wx.Button(self.panel, label="...",pos=(415,158), size=(30, -1)).Bind(wx.EVT_BUTTON, self.fileBrowser_servcert)
-        if isConfigJson!=False:
-            self.server_cert.SetValue(isConfigJson['server_cert'])
-        elif isConfigJson==False:
+        if (not isConfigJson) or (isConfigJson and isConfigJson['server_cert']==self.defaultServerCrt):
+            self.defaultServerCrt = os.path.normpath(self.currentDirectory+'/Scripts/CA_BUNDLE/server.crt')
             self.server_cert.SetValue(self.defaultServerCrt)
+        else:
+            self.server_cert.SetValue(isConfigJson['server_cert'])
 
         lblList = ['Yes', 'No']
         lblList2 = ['64-bit', '32-bit']
@@ -1292,12 +1293,12 @@ class Config_window(wx.Frame):
             self.ch_path.SetLabel('Chrome Path')
             self.ch_path.SetForegroundColour((0,0,0))
             #---------------------------------------resetting the static texts
-            if (os.path.isfile(data['chrome_path'])==True or str(data['chrome_path']).strip()=='default') and os.path.isfile(os.path.abspath(data['server_cert']))==True and os.path.isfile(data['logFile_Path'])==True:
+            if (os.path.isfile(data['chrome_path'])==True or str(data['chrome_path']).strip()=='default') and os.path.isfile(data['server_cert'])==True and os.path.isfile(data['logFile_Path'])==True:
                 self.jsonCreater(config_data)
             else:
                 self.error_msg.SetLabel("Marked fields '^' contain invalid path, Data not saved")
                 self.error_msg.SetForegroundColour((0,0,255))
-                if os.path.isfile(os.path.abspath(data['server_cert']))!=True:
+                if os.path.isfile(data['server_cert'])!=True:
                     self.sev_cert.SetLabel('Server Cert^')
                     self.sev_cert.SetForegroundColour((0,0,255))
                 else:
