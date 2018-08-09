@@ -66,6 +66,7 @@ class Text_Box:
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status,result,verb,err_msg
 
@@ -121,6 +122,7 @@ class Text_Box:
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status,result,verb,err_msg
 
@@ -155,6 +157,7 @@ class Text_Box:
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status,result,output,err_msg
 
@@ -200,6 +203,7 @@ class Text_Box:
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
     def verify_text(self, element , parent , input_val, *args):
@@ -239,6 +243,7 @@ class Text_Box:
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status,result,verb,err_msg
 

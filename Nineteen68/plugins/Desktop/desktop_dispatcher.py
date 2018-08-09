@@ -374,9 +374,11 @@ class DesktopDispatcher:
                 try:
                     ele = ch[int(index)]
                 except Exception as e:
+                    log.error(e)
                     import traceback
                     traceback.print_exc()
-                    logger.print_on_console("Unable to get desktop element because :",e)
+                    logger.print_on_console("Unable to get desktop element because :")
+                    logger.print_on_console(e)
         elif backend =='B':
             try:
                 import pythoncom
@@ -398,9 +400,11 @@ class DesktopDispatcher:
                     ch = ele.children()
                     ele = ch[int(index)]
             except Exception as e:
+                log.error(e)
                 import traceback
                 traceback.print_exc()
-                logger.print_on_console("Unable to get desktop element because :",e)
+                logger.print_on_console("Unable to get desktop element because :")
+                logger.print_on_console(e)
         return ele
 
     def get_desktop_static_element(self,xclass,xconID,app):

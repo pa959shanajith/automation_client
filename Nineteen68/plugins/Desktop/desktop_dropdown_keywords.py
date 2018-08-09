@@ -16,11 +16,9 @@ import desktop_constants
 import desktop_editable_text
 import time
 from constants import *
-#editable_text=desktop_editable_text.Text_Box()
 import logging
 log = logging.getLogger('dropdown_keywords.py')
 class Dropdown_Keywords():
-
         def selectValueByIndex(self,element,parent,input_val, *args):
             if(len(input_val)>1):
                 text = input_val[2]
@@ -121,6 +119,7 @@ class Dropdown_Keywords():
             except Exception as exception:
                 log.error(exception)
                 logger.print_on_console(exception)
+                err_msg=desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
         def getValueByIndex(self,element,parent,input_val, *args):
@@ -222,8 +221,7 @@ class Dropdown_Keywords():
                 traceback.print_exc()
                 log.error(exception)
                 logger.print_on_console(exception)
-
-
+                err_msg=desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
         def getCount(self,element,parent, *args):
@@ -259,7 +257,6 @@ class Dropdown_Keywords():
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
-
                     else:
                       log.info('Element not present on the page where operation is trying to be performed')
                       err_msg='Element not present on the page where operation is trying to be performed'
@@ -267,6 +264,7 @@ class Dropdown_Keywords():
             except Exception as exception:
                 log.error(exception)
                 logger.print_on_console(exception)
+                err_msg=desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
         def verifyCount(self,element,parent,input_val, *args):
@@ -312,8 +310,7 @@ class Dropdown_Keywords():
                 log.error(exception)
                 import traceback
                 traceback.print_exc()
-                err_msg= "ERROR OCCURRED ",exception
-
+                err_msg=desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
 
@@ -342,7 +339,8 @@ class Dropdown_Keywords():
                             except Exception as e :
                                 import traceback
                                 traceback.print_exc()
-                                err_msg= "ERROR OCCURRED ",e
+                                err_msg=desktop_constants.ERROR_MSG
+                                log.error(e)
                         elif checkName == 'ListView' or 'ListBox':
                             if checkName =='ListBox':
                                 if element.is_active() == False:
@@ -382,7 +380,6 @@ class Dropdown_Keywords():
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                         #=========================================================
-
                else:
                    log.info('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'
@@ -391,8 +388,7 @@ class Dropdown_Keywords():
                 import traceback
                 traceback.print_exc()
                 log.error(exception)
-                err_msg= "ERROR OCCURRED ",exception
-
+                err_msg=desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
         def verifySelected(self,element,parent,input_val, *args):
@@ -483,7 +479,7 @@ class Dropdown_Keywords():
                     traceback.print_exc()
                     log.error(exception)
                     logger.print_on_console(exception)
-
+                    err_msg=desktop_constants.ERROR_MSG
                 return status,result,verb,err_msg
 
         def selectValueByText(self,element,parent,input_val, *args):
@@ -592,6 +588,7 @@ class Dropdown_Keywords():
             except Exception as exception:
                 log.error(exception)
                 logger.print_on_console(exception)
+                err_msg=desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
 
@@ -662,6 +659,7 @@ class Dropdown_Keywords():
                 traceback.print_exc()
                 log.error(exception)
                 logger.print_on_console(exception)
+                err_msg=desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
 
@@ -734,6 +732,7 @@ class Dropdown_Keywords():
                 traceback.print_exc()
                 log.error(exception)
                 logger.print_on_console(exception)
+                err_msg=desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
         def selectAllValues(self,element,parent,*args):
@@ -795,7 +794,7 @@ class Dropdown_Keywords():
                 traceback.print_exc()
                 log.error(exception)
                 logger.print_on_console(exception)
-
+                err_msg=desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
         def deSelectAll(self,element,parent,*args):
@@ -853,8 +852,7 @@ class Dropdown_Keywords():
                 traceback.print_exc()
                 log.error(exception)
                 logger.print_on_console(exception)
-
-
+                err_msg=desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
 
@@ -963,11 +961,8 @@ class Dropdown_Keywords():
                 traceback.print_exc()
                 log.error(exception)
                 logger.print_on_console(exception)
-
+                err_msg=desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
-
-
-
 
 
         def selectMultpleValuesByIndexs(self,element,parent,input_val, *args):
@@ -1059,7 +1054,7 @@ class Dropdown_Keywords():
             except Exception as exception:
                 log.error(exception)
                 logger.print_on_console(exception)
-
+                err_msg=desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
 
@@ -1140,8 +1135,7 @@ class Dropdown_Keywords():
             except Exception as exception:
                 log.error(exception)
                 logger.print_on_console(exception)
-
-
+                err_msg=desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
         def multiListGetter(self,cols,elelist,input_val):
@@ -1159,7 +1153,10 @@ class Dropdown_Keywords():
                         Matrix[j][k]=elelist[index_i].encode("utf-8")
                         index_i=index_i+1
                     except Exception as e:
-                        print"Error Occured",e
+                        import traceback
+                        traceback.print_exc()
+                        logger.print_on_console("Error occoured in populating the 2D matrix")
+                        og.error(e)
             #-------------------------------------------------populating the 2D list
             #-------------------------------------------------printing the 2D list
 ##                                print"printing the 2D list"
@@ -1189,7 +1186,8 @@ class Dropdown_Keywords():
             except Exception as e:
                 import traceback
                 traceback.print_exc()
-                print "Error happened :",e
+                logger.print_on_console("Error occoured in populating the new matrix")
+                log.error(e)
             #-------------------------------------------------poulating the new martix
             #-------------------------------------------------printing the new 2D list
 ##            print"printing the new 2D list"

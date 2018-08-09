@@ -418,6 +418,7 @@ class Launch_Keywords():
                     logger.print_on_console('The given window name is not found')
                     term = TERMINATE
         except Exception as e:
+            err_msg=desktop_constants.ERROR_MSG
             logger.print_on_console(e)
 
         return status,result,verb,err_msg
@@ -458,6 +459,7 @@ class Launch_Keywords():
             import traceback
             traceback.print_exc()
             logger.print_on_console(e)
+            err_msg=desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
 
@@ -535,6 +537,7 @@ class Launch_Keywords():
             logger.print_on_console ('Exception : menu item not present use send function keys (Ex: For Help - About :  ALT , H, A)')
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status, result, verb, err_msg
 
@@ -555,6 +558,7 @@ class Launch_Keywords():
             logger.print_on_console ('Exception : Maximize window error ')
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status, result, verb, err_msg
 
@@ -576,6 +580,7 @@ class Launch_Keywords():
             logger.print_on_console (  'Exception : Minimize  window error ')
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status, result, verb, err_msg
 

@@ -57,6 +57,7 @@ class ButtonLinkKeyword():
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status,result,verb,err_msg
 
@@ -96,6 +97,7 @@ class ButtonLinkKeyword():
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
     def press(self, element , parent  , *args):
@@ -139,7 +141,6 @@ class ButtonLinkKeyword():
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
-
                     else:
                         log.info('Element state does not allow to perform the operation')
                         logger.print_on_console('Element state does not allow to perform the operation')
@@ -151,6 +152,7 @@ class ButtonLinkKeyword():
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
     def verify_button_name(self, element , parent , input, *args):
@@ -196,6 +198,7 @@ class ButtonLinkKeyword():
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status,result,verb,err_msg
 
@@ -234,6 +237,7 @@ class ButtonLinkKeyword():
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status,result,text,err_msg
 
@@ -274,6 +278,7 @@ class ButtonLinkKeyword():
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status,result,verb,err_msg
 
@@ -312,6 +317,7 @@ class ButtonLinkKeyword():
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status,result,link_text,err_msg
 
@@ -350,8 +356,6 @@ class ButtonLinkKeyword():
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
-
-
                 else:
                     log.info('Element not present on the page where operation is trying to be performed')
                     err_msg = 'Element not present on the page where operation is trying to be performed'
@@ -359,5 +363,6 @@ class ButtonLinkKeyword():
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status,result,verb,err_msg

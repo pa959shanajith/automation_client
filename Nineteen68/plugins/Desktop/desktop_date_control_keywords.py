@@ -139,8 +139,7 @@ class DateControlKeywords():
             traceback.print_exc()
             log.error(exception)
             logger.print_on_console(exception)
-
-
+            err_msg=desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
     def getDate(self,element,parent,input_val, *args):
@@ -227,8 +226,7 @@ class DateControlKeywords():
             traceback.print_exc()
             log.error(exception)
             logger.print_on_console(exception)
-
-
+            err_msg=desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
 
@@ -246,4 +244,3 @@ class DateControlKeywords():
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-

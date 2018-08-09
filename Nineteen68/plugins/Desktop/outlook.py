@@ -122,7 +122,7 @@ class OutlookKeywords:
                 traceback.print_exc()
                 log.error(e)
                 logger.print_on_console('Check the given path')
-                error_msg="ERROR OCCURED ",e
+                error_msg=desktop_constants.ERROR_MSG
             return status,method_output,result,error_msg
 
 
@@ -194,7 +194,7 @@ class OutlookKeywords:
                 traceback.print_exc()
                 log.error(e)
                 logger.print_on_console('Error: No such mail found')
-                error_msg="ERROR OCCURED ",e
+                error_msg=desktop_constants.ERROR_MSG
             return status,method_output,result,error_msg
 
         def GetFromMailId(self,input,*args):
@@ -218,7 +218,7 @@ class OutlookKeywords:
                 traceback.print_exc()
                 log.error(e)
                 logger.print_on_console('Error : No such mail id found')
-                error_msg="ERROR OCCURED ",e
+                error_msg=desktop_constants.ERROR_MSG
             return status,method_output,res,error_msg
 
 
@@ -251,7 +251,7 @@ class OutlookKeywords:
                 traceback.print_exc()
                 log.error(e)
                 logger.print_on_console('Error : mail does''t have such info')
-                error_msg="ERROR OCCURED ",e
+                error_msg=desktop_constants.ERROR_MSG
             return status,method_output,res,error_msg
 
         def GetSubject(self,input,*args):
@@ -275,7 +275,7 @@ class OutlookKeywords:
                 traceback.print_exc()
                 log.error(e)
                 logger.print_on_console('Error : No subject found')
-                error_msg="ERROR OCCURED ",e
+                error_msg=desktop_constants.ERROR_MSG
             return status,method_output,res,error_msg
 
         def GetToMailID(self,input,*args):
@@ -299,7 +299,7 @@ class OutlookKeywords:
                 traceback.print_exc()
                 log.error(e)
                 logger.print_on_console('Error : No such mail id found')
-                error_msg="ERROR OCCURED ",e
+                error_msg=desktop_constants.ERROR_MSG
             return status,method_output,res,error_msg
 
 
@@ -326,7 +326,7 @@ class OutlookKeywords:
                     traceback.print_exc()
                     log.error(e)
                     logger.print_on_console('Error : No Body found')
-                    error_msg="ERROR OCCURED ",e
+                    error_msg=desktop_constants.ERROR_MSG
             return status,method_output,res,error_msg
 
 
@@ -353,7 +353,7 @@ class OutlookKeywords:
                 traceback.print_exc()
                 log.error(e)
                 logger.print_on_console('Wrong input given')
-                error_msg="ERROR OCCURED ",e
+                error_msg=desktop_constants.ERROR_MSG
             return status,method_output,res,error_msg
 
         """Internal method to search for a folder in given folder"""
@@ -397,7 +397,8 @@ class OutlookKeywords:
                     except Exception as e:
                         import traceback
                         traceback.print_exc()
-                        print "Error at mailSegregator",e
+                        logger.print_on_console("Error at mailSegregator")
+                        log.error(e)
                     return mSegList
                 """To segregate msg objects by 'To' address and then by day/date/time """
                 """Returns a List of msg objects"""
@@ -416,7 +417,8 @@ class OutlookKeywords:
                     except Exception as e:
                         import traceback
                         traceback.print_exc()
-                        print "Error in timeSegregator",e
+                        logger.print_on_console("Error in timeSegregator")
+                        log.error(e)
                     return sortedList
 
                 mailSegList=mailSegregator(all_inbox_msgs,To_add,From_add,sub)
@@ -426,9 +428,7 @@ class OutlookKeywords:
                 import traceback
                 traceback.print_exc()
                 logger.print_on_console('Error at mail segregator')
-
             return segregatedList
-
 #------------------------------------------------------------------------------------------------------------Send email function
 
         def send_to_mail(self,input,*args):
@@ -456,7 +456,7 @@ class OutlookKeywords:
                     status=desktop_constants.TEST_RESULT_PASS
                     method_output=desktop_constants.TEST_RESULT_TRUE
                 except Exception as e:
-                    error_msg="ERROR OCCURED ",e
+                    error_msg=desktop_constants.ERROR_MSG
                     import traceback
                     traceback.print_exc()
             else:
@@ -482,7 +482,7 @@ class OutlookKeywords:
                         status=desktop_constants.TEST_RESULT_PASS
                         method_output=desktop_constants.TEST_RESULT_TRUE
                     except Exception as e:
-                        error_msg="ERROR OCCURED ",e
+                        error_msg=desktop_constants.ERROR_MSG
                         import traceback
                         traceback.print_exc()
                 else:
@@ -509,7 +509,7 @@ class OutlookKeywords:
                         status=desktop_constants.TEST_RESULT_PASS
                         method_output=desktop_constants.TEST_RESULT_TRUE
                     except Exception as e:
-                        error_msg="ERROR OCCURED ",e
+                        error_msg=desktop_constants.ERROR_MSG
                         import traceback
                         traceback.print_exc()
                 else:
@@ -537,7 +537,7 @@ class OutlookKeywords:
                         status=desktop_constants.TEST_RESULT_PASS
                         method_output=desktop_constants.TEST_RESULT_TRUE
                     except Exception as e:
-                        error_msg="ERROR OCCURED ",e
+                        error_msg=desktop_constants.ERROR_MSG
                         import traceback
                         traceback.print_exc()
                 else:
@@ -561,7 +561,7 @@ class OutlookKeywords:
                         status=desktop_constants.TEST_RESULT_PASS
                         method_output=desktop_constants.TEST_RESULT_TRUE
                     except Exception as e:
-                        error_msg="ERROR OCCURED ",e
+                        error_msg=desktop_constants.ERROR_MSG
                         import traceback
                         traceback.print_exc()
                 else:
@@ -590,7 +590,7 @@ class OutlookKeywords:
                             status=desktop_constants.TEST_RESULT_PASS
                             method_output=desktop_constants.TEST_RESULT_TRUE
                     except Exception as e:
-                        error_msg="ERROR OCCURED ",e
+                        error_msg=desktop_constants.ERROR_MSG
                         import traceback
                         traceback.print_exc()
                 else:
@@ -626,7 +626,7 @@ class OutlookKeywords:
                         status=desktop_constants.TEST_RESULT_PASS
                         method_output=desktop_constants.TEST_RESULT_TRUE
                 except Exception as e:
-                    error_msg="ERROR OCCURED ",e
+                    error_msg=desktop_constants.ERROR_MSG
                     import traceback
                     traceback.print_exc()
             else:
