@@ -229,10 +229,10 @@ class UtilWebKeywords:
                 flag=False
                 unselectable_val=webelement.get_attribute('unselectable')
                 log.info('unselectable_val ',unselectable_val)
-                if (unselectable_val and unselectable_val.lower()=='on'):
+                if (unselectable_val!=None and unselectable_val.lower()=='on'):
                     flag=True
                 log.info('Disabled flag value ',flag)
-                if not(webelement.is_enabled) or flag:
+                if not(webelement.is_enabled()) or flag:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                     info_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
@@ -245,6 +245,7 @@ class UtilWebKeywords:
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
+
 
     def verify_hidden(self,webelement,*args):
         status=TEST_RESULT_FAIL
