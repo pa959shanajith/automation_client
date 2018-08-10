@@ -98,13 +98,23 @@ class DesktopDispatcher:
 #-----------------------------------------------------------------for custom objects
         try:
             if objectname==desktop_constants.CUSTOM and teststepproperty.custom_flag:
+                backendType=='A'
                 ele_type=input[0].lower()
                 if ele_type in self.get_ele_type:
                     ele_type=self.get_ele_type[ele_type]
+                try:
+                    if len(input)==3:
+                        input.append(backendType)
+                    elif len(input)>=3:
+                        if input[3]=='B':
+                            backendType='B'
+                except:
+                    import traceback
+                    traceback.print_exc()
                 parent_xpath=teststepproperty.parent_xpath
                 if (keyword in self.custom_dict and ele_type in self.custom_dict[keyword]):
                     try:
-                        custom_desktop_element=self.desktop_custom_object_obj.getobjectforcustom(parent_xpath,ele_type,input[1])
+                        custom_desktop_element=self.desktop_custom_object_obj.getobjectforcustom(parent_xpath,ele_type,input[1],backendType)
                     except:
                         pass
                     if(custom_desktop_element != '' or None):

@@ -562,8 +562,8 @@ class StringOperation:
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
             except Exception as e:
-                logger.print_on_console(e)
-                err_msg=e
+                log.error(e)
+                err_msg='Error Occured'
                 import traceback
                 traceback.print_exc()
             return status,result,output,err_msg
@@ -587,8 +587,8 @@ class StringOperation:
             status=generic_constants.TEST_RESULT_PASS
             result=generic_constants.TEST_RESULT_TRUE
         except Exception as e:
-            logger.print_on_console(e)
-            err_msg=e
+            log.error(e)
+            err_msg='Error Occured'
             import traceback
             traceback.print_exc()
         return status,result,output,err_msg

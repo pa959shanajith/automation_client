@@ -390,10 +390,6 @@ class Scrape:
                             tag = 'list'
                             canselectmultiple="true"
                             text= str(text) + '_lst'
-                         elif tag == 'ListItem':
-                            tag = 'list'
-                            canselectmultiple="true"
-                            text= str(text) + '_lst_elmnt'
                          elif tag == 'TabControl':
                             tag = 'tab'
                             text= str(text) + '_tab'
@@ -525,4 +521,5 @@ class Rectangle:
             self.height= int(child.rectangle().bottom)-int(child.rectangle().top)
             self.width= int(child.rectangle().right)-int(child.rectangle().left)
         except Exception as e:
-            logger.print_on_console('Error fetching object coordinates',e)
+            logger.print_on_console('Error fetching object coordinates')
+            log.error(e)
