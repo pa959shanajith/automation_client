@@ -403,9 +403,9 @@ class Scrape:
                          elif tag == 'DateTimePicker':
                             tag = 'datepicker'
                             text= str(text) + '_dtp'
-                         elif tag == 'Tabel':
-                            tag = 'tabel'
-                            text= str(text) + '_tabel'
+                         elif tag == 'Table':
+                            tag = 'table'
+                            text= str(text) + '_table'
                          else:
                             tag = 'label'
                             if not isinstance(text,basestring):

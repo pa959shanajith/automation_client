@@ -198,7 +198,16 @@ class DesktopDispatcher:
 ##                    'selecttreeelement':self.tree_keywords_obj.select_element,
                     'selecttreenode':self.tree_keywords_obj.click_tree_element,
 ##                    'doubleclicktreenode':self.tree_keywords_obj.double_click_tree_element,
-                    'getnodenamebyindex':self.tree_keywords_obj.getElementTextByIndex
+                    'getnodenamebyindex':self.tree_keywords_obj.getElementTextByIndex,
+                    'getcellvalue':self.table_keywords_obj.get_cell_value,
+                    'getcolcount':self.table_keywords_obj.get_col_count,
+                    'getcolnumbytext':self.table_keywords_obj.get_col_num_by_text,
+                    'getrowcount':self.table_keywords_obj.get_row_count,
+                    'getrownumbytext':self.table_keywords_obj.get_row_num_by_text,
+                    'selectrow':self.table_keywords_obj.select_row,
+                    'clickcell':self.table_keywords_obj.click_cell,
+                    'doubleclickcell':self.table_keywords_obj.double_click_cell,
+                    'vaerifycellvalue':self.table_keywords_obj.verify_cell_value
                 }
             if(iris_flag):
                 import iris_operations
