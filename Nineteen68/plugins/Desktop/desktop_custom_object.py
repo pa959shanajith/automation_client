@@ -25,7 +25,7 @@ import win32api
 import time
 from desktop_launch_keywords import Launch_Keywords
 from constants import *
-from desktop_scraping import Rectangle
+import desktop_scraping
 
 log = logging.getLogger('desktop_custom_object.py')
 class CustomObjectHandler():
@@ -44,7 +44,8 @@ class CustomObjectHandler():
                     coordinates = ch[i].client_rect()
                  except:
                     """ Logic to find height and width for non hwndwrapper elements """
-                    Rectangle().set_coordinates(ch[i])
+                    coordinates_obj=desktop_scraping.Rectangle()
+                    coordinates_obj.set_coordinates(ch[i])
                     pass
                  cor = ch[i].rectangle()
                  properties = ''
