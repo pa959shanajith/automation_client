@@ -23,7 +23,6 @@ import win32process
 from threading import Thread
 from constants import *
 import desktop_launch_keywords
-import desktop_scrape
 import base64
 import logger
 ctrldownflag = False

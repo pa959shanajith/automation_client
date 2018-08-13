@@ -18,6 +18,7 @@ import desktop_dropdown_keywords
 import desktop_tab_control_keywords
 import desktop_date_control_keywords
 import desktop_treeview_keywords
+import desktop_table_keywords
 import screenshot_keywords
 import json
 import logger
@@ -46,6 +47,7 @@ class DesktopDispatcher:
     date_control_keywords_obj = desktop_date_control_keywords.DateControlKeywords()
     desktop_custom_object_obj =desktop_custom_object.CustomObjectHandler()
     tree_keywords_obj=desktop_treeview_keywords.Tree_View_Keywords()
+    table_keywords_obj=desktop_table_keywords.Table_Keywords()
 ##    outook_obj=outlook.OutlookKeywords()
 
     def __init__(self):
@@ -98,7 +100,7 @@ class DesktopDispatcher:
 #-----------------------------------------------------------------for custom objects
         try:
             if objectname==desktop_constants.CUSTOM and teststepproperty.custom_flag:
-                backendType=='A'
+                backendType='A'
                 ele_type=input[0].lower()
                 if ele_type in self.get_ele_type:
                     ele_type=self.get_ele_type[ele_type]
