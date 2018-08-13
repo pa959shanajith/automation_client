@@ -1158,7 +1158,7 @@ class Config_window(wx.Frame):
             else:
                 self.rbox1.SetSelection(1)
 
-        self.rbox2 = wx.RadioBox(self.panel, label = 'IE Architecture Type', pos = (170,188), choices = lblList2,
+        self.rbox2 = wx.RadioBox(self.panel, label = 'IE Architecture Type', pos = (130,188), choices = lblList2,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
             val2=isConfigJson['bit_64']
@@ -1167,7 +1167,31 @@ class Config_window(wx.Frame):
             else:
                 self.rbox2.SetSelection(1)
 
-        self.rbox3 = wx.RadioBox(self.panel, label = 'ScreenShot Flag', pos = (340,188), choices = lblList3,
+        self.rbox9 = wx.RadioBox(self.panel, label = 'Disable Server Certificate Check', pos = (260,188), choices = lblList,
+         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson!=False:
+            if isConfigJson['disable_server_cert'].title() == lblList[0]:
+                self.rbox9.SetSelection(0)
+            else:
+                self.rbox9.SetSelection(1)
+
+        self.rbox5 = wx.RadioBox(self.panel, label = 'Exception Flag', pos = (12,248), choices = lblList4,
+         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson!=False:
+            if isConfigJson['exception_flag']==lblList4[0].lower():
+                self.rbox5.SetSelection(0)
+            else:
+                self.rbox5.SetSelection(1)
+
+        self.rbox6 = wx.RadioBox(self.panel, label = 'Ignore Visibility Check', pos = (150,248), choices = lblList,
+         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson!=False:
+            if isConfigJson['ignoreVisibilityCheck']==lblList[0]:
+                self.rbox6.SetSelection(0)
+            else:
+                self.rbox6.SetSelection(1)
+
+        self.rbox3 = wx.RadioBox(self.panel, label = 'ScreenShot Flag', pos = (340,308), choices = lblList3,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
             if isConfigJson['screenShot_Flag']==lblList3[0]:
@@ -1175,7 +1199,7 @@ class Config_window(wx.Frame):
             else:
                 self.rbox3.SetSelection(1)
 
-        self.rbox4 = wx.RadioBox(self.panel, label = 'Retrieve URL', pos = (12,248), choices = lblList,
+        self.rbox4 = wx.RadioBox(self.panel, label = 'Retrieve URL', pos = (12,308), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
             if isConfigJson['retrieveURL']==lblList[0]:
@@ -1183,13 +1207,7 @@ class Config_window(wx.Frame):
             else:
                 self.rbox4.SetSelection(1)
 
-        self.rbox6 = wx.RadioBox(self.panel, label = 'Ignore Visibility Check', pos = (140,248), choices = lblList,
-         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False:
-            if isConfigJson['ignoreVisibilityCheck']==lblList[0]:
-                self.rbox6.SetSelection(0)
-            else:
-                self.rbox6.SetSelection(1)
+
 
         self.rbox7 = wx.RadioBox(self.panel, label = 'Enable Security Check', pos = (310,248), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
@@ -1199,15 +1217,9 @@ class Config_window(wx.Frame):
             else:
                 self.rbox7.SetSelection(1)
 
-        self.rbox5 = wx.RadioBox(self.panel, label = 'Exception Flag', pos = (12,308), choices = lblList4,
-         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False:
-            if isConfigJson['exception_flag']==lblList4[0].lower():
-                self.rbox5.SetSelection(0)
-            else:
-                self.rbox5.SetSelection(1)
 
-        self.rbox8 = wx.RadioBox(self.panel, label = 'Browser Check', pos = (140,308), choices = lblList,
+
+        self.rbox8 = wx.RadioBox(self.panel, label = 'Browser Check', pos = (120,308), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
             if isConfigJson['browser_check']==lblList[1]:
@@ -1215,13 +1227,15 @@ class Config_window(wx.Frame):
             else:
                 self.rbox8.SetSelection(0)
 
-        self.rbox9 = wx.RadioBox(self.panel, label = 'Disable Server Certificate Check', pos = (260,308), choices = lblList,
+        self.rbox10 = wx.RadioBox(self.panel, label = 'Highlight Check', pos = (220,308), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
-            if isConfigJson['disable_server_cert'].title() == lblList[0]:
-                self.rbox9.SetSelection(0)
+            if isConfigJson['highlight_check']==lblList[1]:
+                self.rbox10.SetSelection(1)
             else:
-                self.rbox9.SetSelection(1)
+                self.rbox10.SetSelection(0)
+
+
 
         self.error_msg=wx.StaticText(self.panel, label="", pos=(85,360),size=(350, 28), style=0, name="")
         wx.Button(self.panel, label="Save",pos=(100,388), size=(100, 28)).Bind(wx.EVT_BUTTON, self.config_check)
@@ -1256,6 +1270,7 @@ class Config_window(wx.Frame):
         server_cert=self.server_cert.GetValue()
         browser_check=self.rbox8.GetStringSelection()
         disable_server_cert=self.rbox9.GetStringSelection()
+        highlight_check=self.rbox10.GetStringSelection()
         #----------------creating data dictionary
         data['server_ip'] = server_add.strip()
         data['server_port'] = server_port.strip()
@@ -1276,6 +1291,7 @@ class Config_window(wx.Frame):
         data['server_cert'] =server_cert.strip()
         data['browser_check']=browser_check.strip()
         data['disable_server_cert'] = disable_server_cert.strip()
+        data['highlight_check'] = highlight_check.strip()
         config_data=data
         if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='':
             #---------------------------------------resetting the static texts

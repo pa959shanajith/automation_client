@@ -27,7 +27,7 @@ class readConfig():
         "chrome_path":"", "bit_64":"", "logFile_Path":"", "screenShot_Flag":"",
         "queryTimeOut":"", "timeOut":"", "stepExecutionWait":"", "displayVariableTimeOut":"",
         "retrieveURL":"", "delay":"", "ignoreVisibilityCheck":"", "exception_flag":"",
-        "server_cert":"", "enableSecurityCheck":"","browser_check":"","disable_server_cert":""}
+        "server_cert":"", "enableSecurityCheck":"","browser_check":"","disable_server_cert":"","highlight_check":""}
         if os.path.isfile(self.config_path)==True:
             try:
                 params = json.load(open(self.config_path))
@@ -50,6 +50,7 @@ class readConfig():
                 configvalues['enableSecurityCheck'] = params['enableSecurityCheck']
                 configvalues['browser_check'] = params['browser_check']
                 configvalues['disable_server_cert'] = params['disable_server_cert']
+                configvalues['highlight_check'] = params['highlight_check']
             except Exception as e:
                 configvalues['errorflag']=e
         else:
