@@ -440,6 +440,7 @@ class DateOperation:
             dict={'dd/MM/yyyy': '%d/%m/%Y',
             'MMMM dd, yyyy': '%B %d, %Y',
             'MM/dd/yyyy': '%m/%d/%Y',
+            'yyMMdd': '%y%m%d',
             'yyyy/MM/dd': '%Y/%m/%d',
             'dd/MMM/yyyy': '%d/%b/%Y',
             'MMM/dd/yyyy':'%b/%d/%Y',

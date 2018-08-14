@@ -70,7 +70,10 @@ class FileOperations:
 
               '.txt_get_line_number':self.txt.get_linenumber,
               '.xls_get_line_number':self.xls_obj.get_linenumber_xls,
-              '.xlsx_get_line_number':self.xlsx_obj.get_linenumber_xlsx
+              '.xlsx_get_line_number':self.xlsx_obj.get_linenumber_xlsx,
+
+              '.xlsx_create_file':self.xlsx_obj.create_file_xlsx,
+              '.xls_create_file':self.xls_obj.create_file_xls
               }
 
     def create_file(self,inputpath,file_name):
@@ -90,13 +93,23 @@ class FileOperations:
             log.debug('reading the inputs')
             inputpath=inputpath.strip()
             log.debug(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
-##            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
+
             if not (input is None and input is '') and self.folder.validateFolderName(file_name) :
-                if not os.path.isfile(inputpath+'/'+file_name):
-                    log.debug('opening the file')
-                    open(inputpath+'/'+file_name, 'w').close()
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
+                if not os.path.isfile(inputpath + '/' + file_name):
+                    log.debug('creating the file')
+                    fullpath = inputpath + '/' + file_name
+                    file_extension,status_get_ext = self.__get_ext(fullpath)
+                    if status_get_ext and file_extension is not None and file_extension in generic_constants.EXCEL_TYPES:
+                        status_excel_create_file,e_msg = self.dict[file_extension + '_create_file'](fullpath,'Sheet1')
+                        if status_excel_create_file and e_msg is None:
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                        else:
+                            err_msg = e_msg
+                    else:
+                        open(fullpath, 'w').close()
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg=generic_constants.FILE_EXISTS
             else:
@@ -284,7 +297,7 @@ class FileOperations:
             if file_ext in generic_constants.FILE_TYPES:
                 status=True
             else:
-                log.debug(generic_constants.INVALID_FILE_FORMAT)
+                log.info(generic_constants.INVALID_FILE_FORMAT)
                 err_msg=generic_constants.INVALID_FILE_FORMAT
             return file_ext,status
         except Exception as e:

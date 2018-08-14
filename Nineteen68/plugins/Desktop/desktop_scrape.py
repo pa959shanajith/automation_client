@@ -1,8 +1,8 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
-# Purpose:
+# Name:        desktop_scrape.py
+# Purpose:     acts as a control for scraped objects
 #
-# Author:      wasimakram.sutar
+# Author:      wasimakram.sutar,anas.ahmed
 #
 # Created:     29/05/2017
 # Copyright:   (c) wasimakram.sutar 2017
@@ -27,7 +27,7 @@ import base64
 #-------------------
 
 cropandaddobj = None
-
+backend_process = None
 obj=None
 
 class ScrapeWindow(wx.Frame):
@@ -41,13 +41,31 @@ class ScrapeWindow(wx.Frame):
         obj = desktop_launch_keywords.Launch_Keywords()
         self.socketIO = socketIO
         self.core_utilsobject = core_utils.CoreUtils()
-        windowname=filePath.split(';')[0]
+        windowname=filePath[0]
+        pid=filePath[1]
+        self.backend_process=filePath[2]
+        global backend_process
+        backend_process=self.backend_process
         input_val=[]
-        input_val.append(windowname)
-        input_val.append(5)
-        status = obj.find_window_and_attach(input_val)
+        if (windowname!=None or windowname.strip()!='') and (pid==None or pid ==''):
+            input_val.append(windowname)
+            input_val.append(5)
+            status = obj.find_window_and_attach(input_val)
+        elif (windowname==None or windowname.strip()=='') and (pid!=None or pid !=''):
+            input_val.append(int(pid))
+            input_val.append(5)
+            status = obj.find_window_and_attach_pid(input_val)
+        elif (windowname!=None or windowname.strip()!='') and (pid!=None or pid !=''):
+            input_val.append(windowname)
+            input_val.append(5)
+            status = obj.find_window_and_attach(input_val)
+            if status[0].lower() == 'fail':
+                input_val=[]
+                input_val.append(int(pid))
+                input_val.append(5)
+                status = obj.find_window_and_attach_pid(input_val)
         self.irisFlag = irisFlag
-        if desktop_launch_keywords.app_uia != None and status[0].lower() != 'fail':
+        if desktop_launch_keywords.app_uia != None and desktop_launch_keywords.app_win32 != None and status[0].lower() != 'fail':
             if status!=TERMINATE:
                 self.panel = wx.Panel(self)
                 self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd",pos=(12,8 ), size=(175, 28))
@@ -77,30 +95,26 @@ class ScrapeWindow(wx.Frame):
     #----------------------------------------------------------------------
     def clickandadd(self,event):
         state = event.GetEventObject().GetValue()
-        app_uia = desktop_launch_keywords.app_uia
-        window_name = desktop_launch_keywords.window_name
-        if app_uia != None:
+        if desktop_launch_keywords.app_uia != None and desktop_launch_keywords.app_win32 != None:
             if state == True:
                 self.fullscrapebutton.Disable()
                 if(self.irisFlag):
                     self.cropbutton.Disable()
-    ##        self.comparebutton.Disable()
                 desktop_scraping_obj.clickandadd('STARTCLICKANDADD',self)
                 event.GetEventObject().SetLabel("Stop ClickAndAdd")
                 logger.print_on_console( 'click and add initiated, select the elements from AUT')
 
             else:
                 data={}
-                d = desktop_scraping_obj.clickandadd('STOPCLICKANDADD',self)
+                data['view'] = desktop_scraping_obj.clickandadd('STOPCLICKANDADD',self)
                 event.GetEventObject().SetLabel("Start ClickAndAdd")
                 logger.print_on_console('Stopped click and add')
-                objc=desktop_launch_keywords.Launch_Keywords()
                 #--------------
                 self.Hide()
                 time.sleep(1)
                 #--------------
                 try:
-                    img=objc.captureScreenshot()
+                    img=obj.captureScreenshot()
                     img.save('out.png')
                     with open("out.png", "rb") as image_file:
                               encoded_string = base64.b64encode(image_file.read())
@@ -115,7 +129,6 @@ class ScrapeWindow(wx.Frame):
                         traceback.print_exc()
                         logger.print_on_console('Error occured while capturing Screenshot ')
                 data['mirror'] =encoded_string.encode('UTF-8').strip()
-                data['view'] = d
                 #10 is the limit of MB set as per Nineteen68 standards
                 if self.core_utilsobject.getdatasize(str(data),'mb') < 10:
                     self.socketIO.emit('scrape',data)
@@ -135,19 +148,15 @@ class ScrapeWindow(wx.Frame):
         self.startbutton.Disable()
         if(self.irisFlag):
             self.cropbutton.Disable()
-##        print 'desktop_scraping_obj:',desktop_scraping_obj
-####        self.comparebutton.Disable()
-        app_uia = desktop_launch_keywords.app_uia
-        if app_uia != None:
+        if desktop_launch_keywords.app_uia != None and desktop_launch_keywords.app_win32 != None:
             data={}
-            d = desktop_scraping_obj.full_scrape(app_uia,self)
-            objc=desktop_launch_keywords.Launch_Keywords()
+            data['view'] = desktop_scraping_obj.full_scrape(self)
             #-------------
             self.Hide()
             time.sleep(1)
             #--------------
             try:
-                img=objc.captureScreenshot()
+                img=obj.captureScreenshot()
                 img.save('out.png')
                 with open("out.png", "rb") as image_file:
                           encoded_string = base64.b64encode(image_file.read())
@@ -162,7 +171,6 @@ class ScrapeWindow(wx.Frame):
                     traceback.print_exc()
                     logger.print_on_console('Error occured while capturing Screenshot ')
             data['mirror'] =encoded_string.encode('UTF-8').strip()
-            data['view'] = d
             if self.core_utilsobject.getdatasize(str(data),'mb') < 10:
                 self.socketIO.emit('scrape',data)
             else:
@@ -196,6 +204,3 @@ class ScrapeWindow(wx.Frame):
             self.Close()
             event.GetEventObject().SetLabel("Start IRIS")
             print 'Crop and add scrape completed'
-
-
-

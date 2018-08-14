@@ -417,9 +417,8 @@ class Reporting:
             outfile.close()
         except Exception as e:
             log.debug(self.report_json)
-            import traceback
-            log.debug(traceback.print_exc())
-            traceback.print_exc()
+            log.error(e,exc_info=True)
+
 
     def save_report_json_conditioncheck(self,filename):
         try:
@@ -431,9 +430,7 @@ class Reporting:
             outfile.close()
         except Exception as e:
             log.debug(self.report_json_condition_check)
-            import traceback
-            log.debug(traceback.print_exc())
-            traceback.print_exc()
+            log.error(e,exc_info=True)
 
     def save_report_json_conditioncheck_testcase_empty(self,filename,description):
         try:
@@ -447,7 +444,5 @@ class Reporting:
             outfile.close()
         except Exception as e:
             log.debug(self.report_json_condition_check_testcase_empty)
-            import traceback
-            log.debug(traceback.print_exc())
-            traceback.print_exc()
+            log.error(e,exc_info=True)
 

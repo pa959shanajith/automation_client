@@ -76,6 +76,7 @@ class Tab_Control_Keywords():
             except Exception as exception:
                 log.error(exception)
                 logger.print_on_console(exception)
+                err_msg=desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
 
@@ -129,8 +130,7 @@ class Tab_Control_Keywords():
                 traceback.print_exc()
                 log.error(exception)
                 logger.print_on_console(exception)
-
-
+                err_msg=desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
 
         def verifySelectedTab(self,element,parent,input_val, *args):
@@ -184,7 +184,7 @@ class Tab_Control_Keywords():
                     traceback.print_exc()
                     log.error(exception)
                     logger.print_on_console(exception)
-
+                    err_msg=desktop_constants.ERROR_MSG
                 return status,result,verb,err_msg
 
         def selectTabByText(self,element,parent,input_val, *args):
@@ -249,6 +249,5 @@ class Tab_Control_Keywords():
             except Exception as exception:
                 log.error(exception)
                 logger.print_on_console(exception)
+                err_msg=desktop_constants.ERROR_MSG
             return status,result,verb,err_msg
-
-

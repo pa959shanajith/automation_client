@@ -54,6 +54,7 @@ class ElementKeywords():
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status,result,verb,err_msg
 
@@ -91,6 +92,7 @@ class ElementKeywords():
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status,result,verb,err_msg
 
@@ -132,6 +134,7 @@ class ElementKeywords():
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status,result,verb,err_msg
 
@@ -162,7 +165,6 @@ class ElementKeywords():
                     status = desktop_constants.TEST_RESULT_PASS
                     result = desktop_constants.TEST_RESULT_TRUE
                     log.info(STATUS_METHODOUTPUT_UPDATE)
-
                 else:
                    log.info('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'
@@ -170,6 +172,7 @@ class ElementKeywords():
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status,result,output,err_msg
 
@@ -219,6 +222,7 @@ class ElementKeywords():
         except Exception as exception:
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status,result,verb,err_msg
 

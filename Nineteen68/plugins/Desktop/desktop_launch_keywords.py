@@ -20,6 +20,7 @@ import  datetime
 import os
 import desktop_constants
 import ctypes
+import psutil
 import re
 import time
 from PIL import ImageGrab
@@ -33,6 +34,8 @@ window_name=None
 window_handle=None
 window_pid=None
 app_uia = None
+app_win32=None
+backend_process=None
 import logging
 log = logging.getLogger('launch_keywords.py')
 class Launch_Keywords():
@@ -338,6 +341,7 @@ class Launch_Keywords():
         global window_handle
         global window_pid
         global app_uia
+        global app_win32
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
@@ -382,7 +386,8 @@ class Launch_Keywords():
                                 window_handle=title_matched_windows[0]
                                 window_pid=self.get_window_pid(self.windowname)
                                 self.windowHandle=title_matched_windows[0]
-                                app_uia = Application().connect(process = window_pid)
+                                app_win32 = Application(backend='win32').connect(process = window_pid)
+                                app_uia = Application(backend='uia').connect(process = window_pid)
                                 status=desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 break
@@ -404,7 +409,8 @@ class Launch_Keywords():
                             window_handle=title_matched_windows[0]
                             window_pid=self.get_window_pid(self.windowname)
                             self.windowHandle=title_matched_windows[0]
-                            app_uia = Application().connect(process = window_pid)
+                            app_win32 = Application(backend='win32').connect(process = window_pid)
+                            app_uia = Application(backend='uia').connect(process = window_pid)
                             status=desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                             break
@@ -412,8 +418,48 @@ class Launch_Keywords():
                     logger.print_on_console('The given window name is not found')
                     term = TERMINATE
         except Exception as e:
+            err_msg=desktop_constants.ERROR_MSG
             logger.print_on_console(e)
 
+        return status,result,verb,err_msg
+
+    def find_window_and_attach_pid(self,input_val,*args):
+        global window_name
+        global window_handle
+        global window_pid
+        global app_uia
+        global app_win32
+        status=desktop_constants.TEST_RESULT_FAIL
+        result=desktop_constants.TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
+        self.windowname =''
+        launch_time_out = 0
+        try:
+            if len(input_val) == 2:
+                launch_time_out = input_val[1]
+            if not(input_val[0] is None and input_val[0] is ''):
+                if psutil.pid_exists(input_val[0]):
+                    start_time = time.time()
+                    window_pid=input_val[0]
+                    app_win32 = Application(backend='win32').connect(process = window_pid)
+                    app_uia = Application(backend='uia').connect(process = window_pid)
+                    self.windowHandle=app_win32.top_window().handle
+                    window_handle=self.windowHandle
+                    self.windowname=self.getWindowText(window_handle)
+                    window_name=self.windowname
+                    logger.print_on_console('Given windowname is :'+self.windowname)
+                    logger.print_on_console('Select the type of scrape (Full scrape/Click and Add) from scrape window')
+                    status=desktop_constants.TEST_RESULT_PASS
+                    result = desktop_constants.TEST_RESULT_TRUE
+                else:
+                    logger.print_on_console('The given Process-ID does not exist')
+                    term = TERMINATE
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            logger.print_on_console(e)
+            err_msg=desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
 
@@ -491,6 +537,7 @@ class Launch_Keywords():
             logger.print_on_console ('Exception : menu item not present use send function keys (Ex: For Help - About :  ALT , H, A)')
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status, result, verb, err_msg
 
@@ -511,6 +558,7 @@ class Launch_Keywords():
             logger.print_on_console ('Exception : Maximize window error ')
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status, result, verb, err_msg
 
@@ -532,6 +580,7 @@ class Launch_Keywords():
             logger.print_on_console (  'Exception : Minimize  window error ')
             log.error(exception)
             logger.print_on_console(exception)
+            err_msg=desktop_constants.ERROR_MSG
         log.info(RETURN_RESULT)
         return status, result, verb, err_msg
 

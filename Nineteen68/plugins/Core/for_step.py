@@ -29,7 +29,7 @@ class For():
         self.stepnum=stepnum
         self.executed=executed
         self.status=constants.TEST_RESULT_PASS
-        self.apptype=apptype,
+        self.apptype=apptype
         self.count=0
         self.additionalinfo = additionalinfo
         self.parent_id=0

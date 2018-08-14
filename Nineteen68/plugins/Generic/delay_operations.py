@@ -26,25 +26,26 @@ class Delay_keywords:
         try:
             import time
             if not(input is None or input is ''):
-                input=int(input)
                 if  (type(input) is int):
+                    input=int(input)
                     log.info('Wait for :' + str(input) + 'seconds')
                     logger.print_on_console('Wait for :' , str(input) , 'seconds')
                     time.sleep(input)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                 log.error(INVALID_INPUT)
-                 err_msg=INVALID_INPUT
-                 logger.print_on_console(INVALID_INPUT)
+                    err_msg = INVALID_INPUT+". Only numbers are allowed"
+                    log.error(err_msg)
+                    logger.print_on_console(err_msg)
             else:
                 log.error(INVALID_INPUT)
                 err_msg=INVALID_INPUT
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
+            err_msg = "Error occurred for during wait"
+            log.error(err_msg)
             log.error(e)
-
-            logger.print_on_console(e)
+            logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
     def pause(self,*args):
@@ -58,9 +59,10 @@ class Delay_keywords:
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
+            err_msg = "Error occurred for during pause"
+            log.error(err_msg)
             log.error(e)
-
-            logger.print_on_console(e)
+            logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
     def display_variable_value(self,*args):
@@ -117,5 +119,3 @@ class Delay_keywords:
         if err_msg!=None:
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg,display_input
-
-

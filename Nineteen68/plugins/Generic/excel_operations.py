@@ -1003,7 +1003,26 @@ class ExcelXLS:
             logger.print_on_console(err_msg)
         return status,err_msg
 
+    def create_file_xls(self,excel_path,sheet_name,*args):
+        """
+        def : create_file_xls
+        purpose : creates an xls file using provided path
+        param : excel_path,sheet_name
+        return : bool
 
+        """
+        status=False
+        err_msg=None
+        try:
+            wb = xlwt.Workbook()
+            wb.add_sheet(sheet_name)
+            wb.save(excel_path)
+            status = True
+        except Exception as e:
+            log.error(e)
+            err_msg='Error occurred creating .xls file '
+            logger.print_on_console(err_msg)
+        return status,err_msg
 
 class ExcelXLSX:
 
@@ -1448,6 +1467,29 @@ class ExcelXLSX:
         except Exception as e:
             log.error(e)
             err_msg='Error occurred writing to .xlsx file '
+            logger.print_on_console(err_msg)
+        return status,err_msg
+
+    def create_file_xlsx(self,excel_path,sheet_name,*args):
+        """
+        def : create_file_xlsx
+        purpose : creates an xlsx file using provided path
+        param : excel_path,sheet_name
+        return : bool
+
+        """
+        status=False
+        err_msg=None
+        try:
+            from openpyxl import Workbook
+            wb = Workbook()
+            ws = wb.active
+            ws.title = sheet_name
+            wb.save(excel_path)
+            status = True
+        except Exception as e:
+            log.error(e)
+            err_msg='Error occurred creating .xlsx file '
             logger.print_on_console(err_msg)
         return status,err_msg
 

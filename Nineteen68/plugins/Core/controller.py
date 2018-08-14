@@ -309,7 +309,7 @@ class Controller():
         # Notify so thread will wake after lock released
         try:
             self.conthread.pause_cond.notify()
-        # Now release the lock
+            # Now release the lock
             self.conthread.pause_cond.release()
         except Exception as e:
             log.error('Debug is not paused to Resume')
@@ -324,7 +324,6 @@ class Controller():
         with self.conthread.pause_cond:
             while self.conthread.paused:
                 self.conthread.pause_cond.wait()
-        log.debug('Wait is sover')
 
     def methodinvocation(self,index,*args):
         global pause_flag
@@ -524,7 +523,7 @@ class Controller():
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         log.info('Result obtained is: ')
         log.info(display_keyword_response)
-        if tsp.apptype.lower()=='desktop' or tsp.apptype.lower()=='sap' or tsp.apptype.lower()=='desktopjava':
+        if tsp.apptype.lower()=='desktop' or tsp.apptype.lower()=='sap' or tsp.apptype.lower()=='desktopjava' or (tsp.cord!='' and tsp.cord!=None):
             if result[2]!='9cc33d6fe25973868b30f4439f09901a':
                 logger.print_on_console('Result obtained is: ',result[2])
             elif result:
@@ -728,7 +727,7 @@ class Controller():
                             self.jumpto_previousindex.pop()
                             self.counter.pop()
                 except Exception as e:
-                    log.error(e)
+                    log.error(e,exc_info=True)
                     logger.print_on_console("Error encountered during Execution")
                     status=False
                     i=i+1

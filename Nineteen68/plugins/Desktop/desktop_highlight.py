@@ -2,28 +2,47 @@
 # Name:        desktop_highlight.py
 # Purpose:     Highlight the selected element from the elements tree in Scrape screen, this feature is basically used to identify the right object
 #
-# Author:      wasimakram.sutar
+# Author:      wasimakram.sutar,anas.ahmed
 #
 # Created:     22/06/2017
 # Copyright:   (c) wasimakram.sutar 2017
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-
 import desktop_launch_keywords
-from pywinauto.application import Application
 import logger
 import time
 from desktop_editable_text import Text_Box
 
-
 class highLight():
 
-    def get_desktop_element(self,xpath,url,app):
+    def get_desktop_element(self,xPath,url):
         #logic to find the desktop element using the xpath
+        if ";" in xPath:
+            x_var=xPath.split(';')
+            xpath=x_var[0]
+            if len(x_var)==5:
+                backend=x_var[4]
+        else:
+            xpath=xPath
         ele = ''
         try:
-            win = app.top_window()
-            ch = win.children()
+            #=========================================================
+            try:
+                if str(backend).strip()=='B':
+                    win = desktop_launch_keywords.app_uia.top_window()
+                    ch=win.children()[:]
+                    for i in range(0,len(ch)):
+                        if len(ch[i].children()):
+                            c=ch[i].children()
+                            for a in c:
+                                ch.append(a)
+                elif str(backend).strip()=='A':
+                    win = desktop_launch_keywords.app_win32.top_window()
+                    ch = win.children()
+            except:
+                win = desktop_launch_keywords.app_win32.top_window()
+                ch = win.children()
+            #=========================================================
             split_xpath = xpath.split('/')
             parent = split_xpath[0]
             index = parent[parent.index('[') + 1 : parent.index(']')]
@@ -40,19 +59,18 @@ class highLight():
     def highlight_desktop_element(self,ele):
         try:
             ele.draw_outline(thickness=5)
-            time.sleep(2)
+            #time.sleep(2)
             logger.print_on_console('Element highlight completed successfully...')
         except Exception as e:
             logger.print_on_console( e)
 
     def highLiht_element(self,objname,parent,*args):
         try:
-            app_uia = desktop_launch_keywords.app_uia
             obj = desktop_launch_keywords.Launch_Keywords()
             obj.set_to_foreground()
             obj.bring_Window_Front()
             time.sleep(1)
-            element = self.get_desktop_element(objname,parent,app_uia)
+            element = self.get_desktop_element(objname,parent)
             verify_obj = Text_Box()
             check = verify_obj.verify_parent(element,parent)
             if check:
@@ -61,7 +79,3 @@ class highLight():
                 logger.print_on_console('Element highlight failed...')
         except Exception as e:
             logger.print_on_console('Element highlight failed...')
-
-
-
-

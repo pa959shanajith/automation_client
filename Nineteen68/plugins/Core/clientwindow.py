@@ -200,7 +200,7 @@ class MainNamespace(BaseNamespace):
     def on_LAUNCH_DESKTOP(self, *args):
         con = controller.Controller()
         global browsername
-        browsername = args[0]
+        browsername = args
         con.get_all_the_imports('Desktop')
         import desktop_scrape
         global desktopScrapeObj
@@ -475,7 +475,7 @@ class SocketThread(threading.Thread):
         server_port = int(configvalues['server_port'])
         server_IP = configvalues['server_ip']
         server_cert = configvalues['server_cert']
-        if configvalues.has_key("ignore_server_certificate"):
+        if configvalues.has_key("disable_server_cert") and configvalues["disable_server_cert"]=="Yes":
             server_cert = False
         else:
             if os.path.exists(server_cert) == False:
@@ -672,23 +672,24 @@ class RedirectText(object):
 
 
 class ClientWindow(wx.Frame):
-    def __init__(self):
-        wx.Frame.__init__(self, parent=None,id=-1, title="ICE Engine",
-                   pos=(300, 150),  size=(800, 730),style=wx.DEFAULT_FRAME_STYLE & ~ (wx.MAXIMIZE_BOX)  )
+    def __init__(self, appName):
+        wx.Frame.__init__(self, parent=None,id=-1, title=appName,
+                   pos=(300, 150),  size=(800, 730),style=wx.DEFAULT_FRAME_STYLE & ~ (wx.MAXIMIZE_BOX))
         self.SetBackgroundColour('#e6e7e8')
         ##self.ShowFullScreen(True,wx.ALL)
         ##self.SetBackgroundColour('#D0D0D0')
         self.logfilename_error_flag = False
         self.is_config_present_flag = True
         self.debugwindow = None
-        self.new = None
+        self.scrapewindow = None
+        self.pausewindow = None
         self.id =id
         self.mainclass = self
         self.mythread = None
         self.action=''
         self.debug_mode=False
         self.choice='Normal'
-        global wxObject
+        global wxObject,browsercheckFlag
         wxObject = self
         self.iconpath = IMAGES_PATH +"/slk.ico"
         self.connect_img=wx.Image(IMAGES_PATH +"/connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
@@ -808,6 +809,10 @@ class ClientWindow(wx.Frame):
             self.connectbutton.Disable()
             self.rbox.Disable()
         threading.Timer(0.2,self.verifyMACAddress).start()
+        if configvalues['browser_check'].lower()=='no':
+            browsercheckFlag=True
+        else:
+            browsercheckFlag=False
 
     """
     Menu Items:
@@ -896,31 +901,33 @@ class ClientWindow(wx.Frame):
 
     def OnTerminate(self, event, *args):
         self.killDebugWindow()
-        scrape_window_open=self.killScrapeWindow()
+        if self.killScrapeWindow():
+            socketIO.emit('scrape','Terminate')
+        self.killPauseWindow()
         if(len(args) > 0 and args[0]=="term_exec"):
             controller.disconnect_flag=True
             print ""
-            logger.print_on_console('---------Terminating all active operations-------')
+            msg = "---------Terminating all active operations-------"
         else:
-            logger.print_on_console('---------Termination Started-------')
-            if scrape_window_open == True:
-                socketIO.emit('scrape','Terminate')
+            msg ="---------Termination Started-------"
+        logger.print_on_console(msg)
+        log.info(msg)
         controller.terminate_flag=True
         #Handling the case where user clicks terminate when the execution is paused
         #Resume the execution
         if controller.pause_flag:
-            self.resume(False)
+            controller.pause_flag=False
+            wxObject.mythread.resume(False)
 
     def OnClear(self,event):
         self.log.Clear()
 
     def OnNodeConnect(self,event):
         try:
-            global socketIO, configvalues
+            global socketIO
             name = self.connectbutton.GetName()
             self.connectbutton.Disable()
             if(name == 'connect'):
-                configvalues = readconfig.readConfig().readJson() # Re-reading config values
                 port = int(configvalues['server_port'])
                 conn = httplib.HTTPConnection(configvalues['server_ip'],port)
                 conn.connect()
@@ -957,8 +964,8 @@ class ClientWindow(wx.Frame):
         flag=False
         try:
             if (self.debugwindow != None) and (bool(self.debugwindow) != False):
-                self.debugwindow.Close()
-                flag=True
+                self.debugwindow.Destroy()
+                flag = True
             self.debugwindow = None
         except Exception as e:
             log.error("Error while killing debug window")
@@ -969,12 +976,25 @@ class ClientWindow(wx.Frame):
         #Close the scrape window
         flag=False
         try:
-            if (self.new != None) and (bool(self.new) != False):
-                self.new.Close()
-                flag=True
-            self.new = None
+            if (self.scrapewindow != None) and (bool(self.scrapewindow) != False):
+                self.scrapewindow.Destroy()
+                flag = True
+            self.scrapewindow = None
         except Exception as e:
             log.error("Error while killing scrape window")
+            log.error(e)
+        return flag
+
+    def killPauseWindow(self):
+        #Close the pause/display window
+        flag=False
+        try:
+            if (self.pausewindow != None) and (bool(self.pausewindow) != False):
+                self.pausewindow.OnOk()
+                flag = True
+            self.pausewindow = None
+        except Exception as e:
+            log.error("Error while killing pause window")
             log.error(e)
         return flag
 
@@ -988,23 +1008,23 @@ class ClientWindow(wx.Frame):
             if(os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
                 con.get_all_the_imports('IRIS')
         if mobileScrapeFlag==True:
-            self.new = mobileScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
+            self.scrapewindow = mobileScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
             mobileScrapeFlag=False
         elif qcConFlag==True:
-            self.new = qcConObj.QcWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = qcdata,socketIO = socketIO)
+            self.scrapewindow = qcConObj.QcWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = qcdata,socketIO = socketIO)
             qcConFlag=False
         elif mobileWebScrapeFlag==True:
-            self.new = mobileWebScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",browser = browsername,socketIO = socketIO)
+            self.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",browser = browsername,socketIO = socketIO)
             mobileWebScrapeFlag=False
         elif desktopScrapeFlag==True:
-            self.new = desktopScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+            self.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             desktopScrapeFlag=False
             browsername = ''
         elif sapScrapeFlag==True:
-            self.new = sapScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+            self.scrapewindow = sapScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             sapScrapeFlag=False
         elif oebsScrapeFlag==True:
-            self.new = oebsScrapeObj.ScrapeDispatcher(parent = None,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+            self.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = None,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             oebsScrapeFlag=False
         elif debugFlag == True:
             self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
@@ -1017,7 +1037,7 @@ class ClientWindow(wx.Frame):
                 con.get_all_the_imports('Web')
                 con.get_all_the_imports('WebScrape')
                 import Nineteen68_WebScrape
-                self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data,irisFlag = irisFlag)
+                self.scrapewindow = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data,irisFlag = irisFlag)
                 browsername = ''
             else:
                 import pause_display_operation
@@ -1025,10 +1045,10 @@ class ClientWindow(wx.Frame):
                 flag,inputvalue = o.getflagandinput()
                 if flag == 'pause':
                     #call pause logic
-                    self.new = pause_display_operation.Pause(parent = None,id = -1, title="SLK Nineteen68 - Pause")
+                    self.pausewindow = pause_display_operation.Pause(parent = None,id = -1, title="SLK Nineteen68 - Pause")
                 elif flag == 'display':
                     #call display logic
-                    self.new = pause_display_operation.Display(parent = self,id = -1, title="SLK Nineteen68 - Display Variable",input = inputvalue)
+                    self.pausewindow = pause_display_operation.Display(parent = self,id = -1, title="SLK Nineteen68 - Display Variable",input = inputvalue)
 
     def verifyMACAddress(self):
         flag = False
@@ -1074,145 +1094,166 @@ class Config_window(wx.Frame):
         #----------------------------------
         global socketIO
         wx.Frame.__init__(self, parent, title=title,
-                   pos=(300, 150),  size=(470, 450) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
+                   pos=(300, 150), size=(470, 450), style = wx.CAPTION|wx.CLIP_CHILDREN)
         self.SetBackgroundColour('#e6e7e8')
-        self.iconpath = os.environ["NINETEEN68_HOME"] + "\\Nineteen68\\plugins\\Core\\Images" + "\\slk.ico"
+        self.iconpath = IMAGES_PATH +"/slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         self.socketIO = socketIO
         self.panel = wx.Panel(self)
 
         self.currentDirectory = os.environ["NINETEEN68_HOME"]
-        self.defaultServerCrt ='./Scripts/CA_BUNDLE/server.crt'
+        self.defaultServerCrt = './Scripts/CA_BUNDLE/server.crt'
 
         self.sev_add=wx.StaticText( self.panel, label="Server Address", pos=(12,8 ),size=(90, 28), style=0, name="")
         self.server_add=wx.TextCtrl(self.panel, pos=(100,8 ), size=(140,-1))
         if isConfigJson!=False:
-            self.server_add.SetValue(isConfigJson['configuration']['server_ip'])
+            self.server_add.SetValue(isConfigJson['server_ip'])
 
         self.sev_port=wx.StaticText( self.panel, label="Server Port", pos=(270,8 ),size=(70, 28), style=0, name="")
         self.server_port=wx.TextCtrl(self.panel, pos=(340,8 ), size=(105,-1))
         if isConfigJson!=False:
-            self.server_port.SetValue(isConfigJson['configuration']['server_port'])
+            self.server_port.SetValue(isConfigJson['server_port'])
+
+        self.ch_path=wx.StaticText( self.panel, label="Chrome Path", pos=(12,38),size=(80, 28), style=0, name="")
+        self.chrome_path=wx.TextCtrl(self.panel, pos=(100,38), size=(310,-1))
+        wx.Button(self.panel, label="...",pos=(415,38), size=(30, -1)).Bind(wx.EVT_BUTTON, self.fileBrowser_chpath)
+        if isConfigJson!=False:
+            self.chrome_path.SetValue(isConfigJson['chrome_path'])
+        else:
+            self.chrome_path.SetValue('default')
+
+        self.log_fpath=wx.StaticText( self.panel, label="Log File Path", pos=(12,68),size=(80, 28), style=0, name="")
+        self.log_file_path=wx.TextCtrl(self.panel, pos=(100,68), size=(310,-1))
+        wx.Button(self.panel, label="...",pos=(415,68), size=(30, -1)).Bind(wx.EVT_BUTTON, self.fileBrowser_logfilepath)
+        if isConfigJson!=False:
+            self.log_file_path.SetValue(isConfigJson['logFile_Path'])
+
+        self.qu_timeout=wx.StaticText( self.panel, label="Query Timeout", pos=(12,98),size=(85, 28), style=0, name="")
+        self.query_timeout=wx.TextCtrl(self.panel, pos=(100,98), size=(80,-1))
+        if isConfigJson!=False:
+            self.query_timeout.SetValue(isConfigJson['queryTimeOut'])
+
+        wx.StaticText( self.panel, label="Time Out", pos=(185,98),size=(50, 28), style=0, name="")
+        self.time_out=wx.TextCtrl(self.panel, pos=(240,98), size=(80,-1))
+        if isConfigJson!=False:
+            self.time_out.SetValue(isConfigJson['timeOut'])
+
+        wx.StaticText( self.panel, label="Delay", pos=(325,98),size=(40, 28), style=0, name="")
+        self.delay=wx.TextCtrl(self.panel, pos=(360,98), size=(85,-1))
+        if isConfigJson!=False:
+            self.delay.SetValue(isConfigJson['delay'])
+
+        wx.StaticText( self.panel, label="Step Execution Wait", pos=(12,128),size=(120, 28), style=0, name="")
+        self.step_exe_wait=wx.TextCtrl(self.panel, pos=(130,128), size=(80,-1))
+        if isConfigJson!=False:
+            self.step_exe_wait.SetValue(isConfigJson['stepExecutionWait'])
+
+        wx.StaticText( self.panel, label="Display Variable Timeout", pos=(225,128),size=(140, 28), style=0, name="")
+        self.disp_var_timeout=wx.TextCtrl(self.panel, pos=(360,128), size=(85,-1))
+        if isConfigJson!=False:
+            self.disp_var_timeout.SetValue(isConfigJson['displayVariableTimeOut'])
+
+        self.sev_cert=wx.StaticText( self.panel, label="Server Cert", pos=(12,158),size=(85, 28), style=0, name="")
+        self.server_cert=wx.TextCtrl(self.panel, pos=(100,158), size=(310,-1))
+        wx.Button(self.panel, label="...",pos=(415,158), size=(30, -1)).Bind(wx.EVT_BUTTON, self.fileBrowser_servcert)
+        if (not isConfigJson) or (isConfigJson and isConfigJson['server_cert']==self.defaultServerCrt):
+            self.defaultServerCrt = os.path.normpath(self.currentDirectory+'/Scripts/CA_BUNDLE/server.crt')
+            self.server_cert.SetValue(self.defaultServerCrt)
+        else:
+            self.server_cert.SetValue(isConfigJson['server_cert'])
 
         lblList = ['Yes', 'No']
         lblList2 = ['64-bit', '32-bit']
         lblList3 = ['All', 'Fail']
         lblList4 = ['False', 'True']
-        self.rbox1 = wx.RadioBox(self.panel, label = 'Ignore Certificate', pos = (12,38), choices = lblList,
+        self.rbox1 = wx.RadioBox(self.panel, label = 'Ignore Certificate', pos = (12,188), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
-            if isConfigJson['configuration']['ignore_certificate']==lblList[0]:
+            if isConfigJson['ignore_certificate']==lblList[0]:
                 self.rbox1.SetSelection(0)
             else:
                 self.rbox1.SetSelection(1)
 
-        self.rbox2 = wx.RadioBox(self.panel, label = 'IE Architecture Type', pos = (170,38), choices = lblList2,
+        self.rbox2 = wx.RadioBox(self.panel, label = 'IE Architecture Type', pos = (130,188), choices = lblList2,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
-            val2=isConfigJson['configuration']['bit_64']
-            if isConfigJson['configuration']['bit_64'] =='Yes':
+            val2=isConfigJson['bit_64']
+            if isConfigJson['bit_64'] =='Yes':
                 self.rbox2.SetSelection(0)
             else:
                 self.rbox2.SetSelection(1)
 
-        self.rbox3 = wx.RadioBox(self.panel, label = 'ScreenShot Flag', pos = (340,38), choices = lblList3,
+        self.rbox9 = wx.RadioBox(self.panel, label = 'Disable Server Certificate Check', pos = (260,188), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
-            if isConfigJson['configuration']['screenShot_Flag']==lblList3[0]:
-                self.rbox3.SetSelection(0)
+            if isConfigJson['disable_server_cert'].title() == lblList[0]:
+                self.rbox9.SetSelection(0)
             else:
-                self.rbox3.SetSelection(1)
+                self.rbox9.SetSelection(1)
 
-        self.ch_path=wx.StaticText( self.panel, label="Chrome Path", pos=(12,98 ),size=(80, 28), style=0, name="")
-        self.chrome_path=wx.TextCtrl(self.panel, pos=(100,98 ), size=(310,-1))
-        wx.Button(self.panel, label="...",pos=(415,98 ), size=(30, -1)).Bind(wx.EVT_BUTTON, self.fileBrowser_chpath)
-        if isConfigJson!=False:
-            self.chrome_path.SetValue(isConfigJson['configuration']['chrome_path'])
-        else:
-            self.chrome_path.SetValue('default')
-
-        self.log_fpath=wx.StaticText( self.panel, label="Log File Path", pos=(12,128 ),size=(80, 28), style=0, name="")
-        self.log_file_path=wx.TextCtrl(self.panel, pos=(100,128 ), size=(310,-1))
-        wx.Button(self.panel, label="...",pos=(415,128 ), size=(30, -1)).Bind(wx.EVT_BUTTON, self.fileBrowser_logfilepath)
-        if isConfigJson!=False:
-            self.log_file_path.SetValue(isConfigJson['configuration']['logFile_Path'])
-
-        self.qu_timeout=wx.StaticText( self.panel, label="Query Timeout", pos=(12,158 ),size=(85, 28), style=0, name="")
-        self.query_timeout=wx.TextCtrl(self.panel, pos=(100,158 ), size=(80,-1))
-        if isConfigJson!=False:
-            self.query_timeout.SetValue(isConfigJson['configuration']['queryTimeOut'])
-
-        wx.StaticText( self.panel, label="Time Out", pos=(185,158 ),size=(50, 28), style=0, name="")
-        self.time_out=wx.TextCtrl(self.panel, pos=(240,158 ), size=(80,-1))
-        if isConfigJson!=False:
-            self.time_out.SetValue(isConfigJson['configuration']['timeOut'])
-
-        wx.StaticText( self.panel, label="Delay", pos=(325,158 ),size=(40, 28), style=0, name="")
-        self.delay=wx.TextCtrl(self.panel, pos=(360,158 ), size=(85,-1))
-        if isConfigJson!=False:
-            self.delay.SetValue(isConfigJson['configuration']['delay'])
-
-        wx.StaticText( self.panel, label="Step Execution Wait", pos=(12,188 ),size=(120, 28), style=0, name="")
-        self.step_exe_wait=wx.TextCtrl(self.panel, pos=(130,188 ), size=(80,-1))
-        if isConfigJson!=False:
-            self.step_exe_wait.SetValue(isConfigJson['configuration']['stepExecutionWait'])
-
-        wx.StaticText( self.panel, label="Display Variable Timeout", pos=(225,188 ),size=(140, 28), style=0, name="")
-        self.disp_var_timeout=wx.TextCtrl(self.panel, pos=(360,188 ), size=(85,-1))
-        if isConfigJson!=False:
-            self.disp_var_timeout.SetValue(isConfigJson['configuration']['displayVariableTimeOut'])
-
-        self.sev_cert=wx.StaticText( self.panel, label="Server Cert", pos=(12,218 ),size=(85, 28), style=0, name="")
-        self.server_cert=wx.TextCtrl(self.panel, pos=(100,218 ), size=(310,-1))
-        wx.Button(self.panel, label="...",pos=(415,218 ), size=(30, -1)).Bind(wx.EVT_BUTTON, self.fileBrowser_servcert)
-        if isConfigJson!=False:
-            self.server_cert.SetValue(isConfigJson['configuration']['server_cert'])
-        elif isConfigJson==False:
-            self.server_cert.SetValue(self.defaultServerCrt)
-
-        self.rbox4 = wx.RadioBox(self.panel, label = 'Retrieve URL', pos = (80,248), choices = lblList,
+        self.rbox5 = wx.RadioBox(self.panel, label = 'Exception Flag', pos = (12,248), choices = lblList4,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
-            if isConfigJson['configuration']['retrieveURL']==lblList[0].lower():
-                self.rbox4.SetSelection(0)
-            else:
-                self.rbox4.SetSelection(1)
-
-        self.rbox5 = wx.RadioBox(self.panel, label = 'Exception Flag', pos = (250,248), choices = lblList4,
-         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False:
-            if isConfigJson['configuration']['exception_flag']==lblList4[0].lower():
+            if isConfigJson['exception_flag']==lblList4[0].lower():
                 self.rbox5.SetSelection(0)
             else:
                 self.rbox5.SetSelection(1)
 
-        self.rbox6 = wx.RadioBox(self.panel, label = 'Ignore Visibility Check', pos = (80,300), choices = lblList,
+        self.rbox6 = wx.RadioBox(self.panel, label = 'Ignore Visibility Check', pos = (150,248), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
-            if isConfigJson['configuration']['ignoreVisibilityCheck']==lblList[0]:
+            if isConfigJson['ignoreVisibilityCheck']==lblList[0]:
                 self.rbox6.SetSelection(0)
             else:
                 self.rbox6.SetSelection(1)
 
-        self.rbox7 = wx.RadioBox(self.panel, label = 'Enable Security Check', pos = (250,300), choices = lblList,
+        self.rbox3 = wx.RadioBox(self.panel, label = 'ScreenShot Flag', pos = (340,308), choices = lblList3,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
-            if isConfigJson['configuration']['enableSecurityCheck']==lblList[0]:
+            if isConfigJson['screenShot_Flag']==lblList3[0]:
+                self.rbox3.SetSelection(0)
+            else:
+                self.rbox3.SetSelection(1)
+
+        self.rbox4 = wx.RadioBox(self.panel, label = 'Retrieve URL', pos = (12,308), choices = lblList,
+         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson!=False:
+            if isConfigJson['retrieveURL']==lblList[0]:
+                self.rbox4.SetSelection(0)
+            else:
+                self.rbox4.SetSelection(1)
+
+        self.rbox7 = wx.RadioBox(self.panel, label = 'Enable Security Check', pos = (310,248), choices = lblList,
+         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson!=False:
+            if isConfigJson['enableSecurityCheck']==lblList[0]:
                 self.rbox7.SetSelection(0)
             else:
                 self.rbox7.SetSelection(1)
 
-        self.error_msg=wx.StaticText( self.panel, label="", pos=(85,360 ),size=(350, 28), style=0, name="")
+        self.rbox8 = wx.RadioBox(self.panel, label = 'Browser Check', pos = (115,308), choices = lblList,
+         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson!=False:
+            if isConfigJson['browser_check']==lblList[1]:
+                self.rbox8.SetSelection(1)
+            else:
+                self.rbox8.SetSelection(0)
 
-        wx.ToggleButton(self.panel, label="Save",pos=(100,388 ), size=(100, 28)).Bind(wx.EVT_TOGGLEBUTTON, self.config_check)
+        self.rbox10 = wx.RadioBox(self.panel, label = 'Highlight Check', pos = (225,308), choices = lblList,
+         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson!=False:
+            if isConfigJson['highlight_check']==lblList[1]:
+                self.rbox10.SetSelection(1)
+            else:
+                self.rbox10.SetSelection(0)
 
-        wx.Button(self.panel, label="Close",pos=(250,388 ), size=(100, 28)).Bind(wx.EVT_BUTTON, self.close)
+        self.error_msg=wx.StaticText(self.panel, label="", pos=(85,360),size=(350, 28), style=0, name="")
+        wx.Button(self.panel, label="Save",pos=(100,388), size=(100, 28)).Bind(wx.EVT_BUTTON, self.config_check)
+        wx.Button(self.panel, label="Close",pos=(250,388), size=(100, 28)).Bind(wx.EVT_BUTTON, self.close)
+
         self.Centre()
-
-        style = self.GetWindowStyle()
-        self.SetWindowStyle( style|wx.STAY_ON_TOP )
-        wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
+        wx.Frame(self.panel)
         self.Show()
 
     """This method verifies and checks if correct data is present,then creates a dictionary and sends this dictionary to jsonCreater()"""
@@ -1230,7 +1271,6 @@ class Config_window(wx.Frame):
         enableSecurityCheck=self.rbox7.GetStringSelection()
         server_add=self.server_add.GetValue()
         server_port=self.server_port.GetValue()
-
         chrome_path=self.chrome_path.GetValue()
         logFile_Path=self.log_file_path.GetValue()
         queryTimeOut=self.query_timeout.GetValue()
@@ -1239,6 +1279,9 @@ class Config_window(wx.Frame):
         stepExecutionWait=self.step_exe_wait.GetValue()
         displayVariableTimeOut=self.disp_var_timeout.GetValue()
         server_cert=self.server_cert.GetValue()
+        browser_check=self.rbox8.GetStringSelection()
+        disable_server_cert=self.rbox9.GetStringSelection()
+        highlight_check=self.rbox10.GetStringSelection()
         #----------------creating data dictionary
         data['server_ip'] = server_add.strip()
         data['server_port'] = server_port.strip()
@@ -1257,8 +1300,10 @@ class Config_window(wx.Frame):
         data['enableSecurityCheck'] = enableSecurityCheck.strip()
         data['exception_flag'] = exception_flag.strip().lower()
         data['server_cert'] =server_cert.strip()
-        #data['ignoreServerCertificate'] = False
-        config_data['configuration']=data
+        data['browser_check']=browser_check.strip()
+        data['disable_server_cert'] = disable_server_cert.strip()
+        data['highlight_check'] = highlight_check.strip()
+        config_data=data
         if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='':
             #---------------------------------------resetting the static texts
             self.error_msg.SetLabel("")
@@ -1339,12 +1384,18 @@ class Config_window(wx.Frame):
             else:
                 self.ch_path.SetLabel('Chrome Path')
                 self.ch_path.SetForegroundColour((0,0,0))
+            if data['browser_check']=='':
+                self.ch_path.SetLabel('Browser Check*')
+                self.ch_path.SetForegroundColour((255,0,0))
+            else:
+                self.ch_path.SetLabel('Browser Check')
+                self.ch_path.SetForegroundColour((0,0,0))
 
 
     """jsonCreater saves the data in json form, location of file to be saved must be defined. This method will overwrite the existing .json file"""
     def jsonCreater(self,data):
         try:
-            if wx.MessageBox("Config file has been edited , Would you like to save?","Confirm Save",wx.ICON_QUESTION | wx.YES_NO) == wx.YES:
+            if wx.MessageBox("Config file has been edited, Would you like to save?","Confirm Save",wx.ICON_QUESTION | wx.YES_NO) == wx.YES:
                 # Write JSON file
                 with io.open('./Lib/config.json', 'w', encoding='utf8') as outfile:
                     str_ = json.dumps(data,indent=4, sort_keys=True,separators=(',', ': '), ensure_ascii=False)
@@ -1377,11 +1428,13 @@ class Config_window(wx.Frame):
         dlg.Destroy()
     """This method open a file selector dialog , from where file path can be set """
     def fileBrowser_logfilepath(self,event):
-        dlg = wx.FileDialog(self, message="Choose a file ...",defaultDir=self.currentDirectory,defaultFile="", wildcard="Log file (*.log)|*.log|" \
-            "All files (*.*)|*.*", style=wx.FD_SAVE)
+        dlg = wx.DirDialog(None, "Choose a folder", "", wx.DD_DEFAULT_STYLE)
         if dlg.ShowModal() == wx.ID_OK:
-            path = dlg.GetPath()
-            self.log_file_path.SetValue(path)
+            log_path = dlg.GetPath()
+            log_path= os.path.normpath(log_path+"/TestautoV2.log")
+            f = open(log_path, "a+")
+            f.close()
+            self.log_file_path.SetValue(log_path)
         dlg.Destroy()
     """This method open a file selector dialog , from where file path can be set """
     def fileBrowser_servcert(self,event):
@@ -1396,6 +1449,17 @@ class Config_window(wx.Frame):
     def close(self,event):
         self.Close()
         self.Destroy()
+        global configvalues, browsercheckFlag
+        configvalues = readconfig.readConfig().readJson() # Re-reading config values
+        if configvalues['browser_check'].lower()=='no':
+            browsercheckFlag=True
+        else:
+            browsercheckFlag=False
+        try:
+            logfilename = configvalues["logFile_Path"].replace("\\","\\\\")
+            logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename},disable_existing_loggers=False)
+        except Exception as e:
+            log.error(e)
         msg = '--Edit Config closed--'
         logger.print_on_console(msg)
         log.info(msg)
@@ -1427,21 +1491,15 @@ class DebugWindow(wx.Frame):
         log.info('Event Triggered to Resume Debug')
         controller.pause_flag=False
         wxObject.mythread.resume(False)
-        self.Close()
         wxObject.debugwindow = None
+        self.Destroy()
 
     def OnContinue(self, event):
         logger.print_on_console('Event Triggered to Resume')
         log.info('Event Triggered to Resume')
-        self.resume(True)
-
-    def resume(self,debug_mode):
         controller.pause_flag=False
         wxObject.mythread.resume(debug_mode)
 
-    def OnExit(self, event):
-        self.Close()
-        wxObject.debugwindow = None
 
 def check_browser():
     try:
@@ -1464,8 +1522,11 @@ def check_browser():
             browser_ver = driver.capabilities['version']
             browser_ver1 = browser_ver.encode('utf-8')
             browser_ver = int(browser_ver1[:2])
-            driver.close()
-            driver.quit()
+            try:
+                driver.close()
+                driver.quit()
+            except:
+                pass
             driver=None
             for i in CHROME_DRIVER_VERSION:
                 if a == i[0]:
@@ -1487,13 +1548,16 @@ def check_browser():
             caps['marionette'] = True
             from selenium.webdriver.firefox.options import Options
             options = Options()
-            options.add_argument('-headless')
+            options.add_argument('--headless')
             driver = webdriver.Firefox(capabilities=caps,firefox_options=options, executable_path=GECKODRIVER_PATH)
             browser_ver=driver.capabilities['browserVersion']
             browser_ver1 = browser_ver.encode('utf-8')
             browser_ver = float(browser_ver1[:4])
-            driver.close()
-            driver.quit()
+            try:
+                driver.close()
+                driver.quit()
+            except:
+                pass
             driver=None
             for i in FIREFOX_BROWSER_VERSION:
                 if a == i[0]:

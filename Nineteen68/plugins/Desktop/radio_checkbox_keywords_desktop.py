@@ -191,6 +191,5 @@ class Radio_Checkbox_keywords():
         except Exception as exception:
             import traceback
             traceback.print_exc()
-            #Exceptions.error(exception)
             err_msg = desktop_constants.ERROR_MSG
         return status,result,flag,err_msg
