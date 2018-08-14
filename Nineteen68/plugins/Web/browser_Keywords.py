@@ -352,7 +352,7 @@ class BrowserKeywords():
                 if (page_title is ''):
                     page_title= driver_obj.current_url
                 page_title.strip()
-##                logger.print_on_console('Page title is ',page_title)
+                logger.print_on_console('Page title is ',page_title)
                 log.info('Page title is ' + page_title)
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
