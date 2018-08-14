@@ -11,14 +11,17 @@
 
 import wx
 import threading
-
 import time
 import os
+import controller
+import readconfig
+import logger
+import logging
+log = logging.getLogger('delay_operations.py')
 dispflag = ''
 dispinput = None
 cont = None
-import controller
-import readconfig
+
 class Pause(wx.Frame):
     def __init__(self, parent,id, title):
         wx.Frame.__init__(self, parent, title=title,
@@ -44,9 +47,9 @@ class Pause(wx.Frame):
         self.Show()
 
 
-    def OnOk(self, event):
-        self.Destroy()
+    def OnOk(self, *event):
         self.resume_execution()
+        self.Destroy()
 
     def resume_execution(self):
         global cont
@@ -57,7 +60,8 @@ class Pause(wx.Frame):
             # Now release the lock
             cont.pause_cond.release()
         except Exception as e:
-            print('Debug is not paused to Resume')
+            log.error('Debug is not paused to Resume')
+            log.error(e)
 
     def pause_execution(self):
         global cont
@@ -99,10 +103,10 @@ class Display(wx.Frame):
         t = threading.Timer(interval,self.OnOk)
         t.start()
 
-    def OnOk(self, event):
+    def OnOk(self, *event):
         if(self):
-            self.Destroy()
             self.resume_execution()
+            self.Destroy()
 
     def resume_execution(self):
         global cont
@@ -113,7 +117,8 @@ class Display(wx.Frame):
             # Now release the lock
             cont.pause_cond.release()
         except Exception as e:
-            print('Debug is not paused to Resume')
+            log.error('Debug is not paused to Resume')
+            log.error(e)
 
 
 class PauseAndDisplay:

@@ -990,8 +990,7 @@ class ClientWindow(wx.Frame):
         flag=False
         try:
             if (self.pausewindow != None) and (bool(self.pausewindow) != False):
-                self.pausewindow.resume_execution()
-                self.pausewindow.Destroy()
+                self.pausewindow.OnOk()
                 flag = True
             self.pausewindow = None
         except Exception as e:
@@ -1225,8 +1224,6 @@ class Config_window(wx.Frame):
             else:
                 self.rbox4.SetSelection(1)
 
-
-
         self.rbox7 = wx.RadioBox(self.panel, label = 'Enable Security Check', pos = (310,248), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
@@ -1235,9 +1232,7 @@ class Config_window(wx.Frame):
             else:
                 self.rbox7.SetSelection(1)
 
-
-
-        self.rbox8 = wx.RadioBox(self.panel, label = 'Browser Check', pos = (120,308), choices = lblList,
+        self.rbox8 = wx.RadioBox(self.panel, label = 'Browser Check', pos = (115,308), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
             if isConfigJson['browser_check']==lblList[1]:
@@ -1245,15 +1240,13 @@ class Config_window(wx.Frame):
             else:
                 self.rbox8.SetSelection(0)
 
-        self.rbox10 = wx.RadioBox(self.panel, label = 'Highlight Check', pos = (220,308), choices = lblList,
+        self.rbox10 = wx.RadioBox(self.panel, label = 'Highlight Check', pos = (225,308), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
             if isConfigJson['highlight_check']==lblList[1]:
                 self.rbox10.SetSelection(1)
             else:
                 self.rbox10.SetSelection(0)
-
-
 
         self.error_msg=wx.StaticText(self.panel, label="", pos=(85,360),size=(350, 28), style=0, name="")
         wx.Button(self.panel, label="Save",pos=(100,388), size=(100, 28)).Bind(wx.EVT_BUTTON, self.config_check)
