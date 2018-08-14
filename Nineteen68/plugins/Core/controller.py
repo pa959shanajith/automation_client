@@ -309,7 +309,7 @@ class Controller():
         # Notify so thread will wake after lock released
         try:
             self.conthread.pause_cond.notify()
-        # Now release the lock
+            # Now release the lock
             self.conthread.pause_cond.release()
         except Exception as e:
             log.error('Debug is not paused to Resume')
@@ -324,7 +324,6 @@ class Controller():
         with self.conthread.pause_cond:
             while self.conthread.paused:
                 self.conthread.pause_cond.wait()
-        log.debug('Wait is sover')
 
     def methodinvocation(self,index,*args):
         global pause_flag

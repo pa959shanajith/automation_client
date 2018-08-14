@@ -681,7 +681,8 @@ class ClientWindow(wx.Frame):
         self.logfilename_error_flag = False
         self.is_config_present_flag = True
         self.debugwindow = None
-        self.new = None
+        self.scrapewindow = None
+        self.pausewindow = None
         self.id =id
         self.mainclass = self
         self.mythread = None
@@ -900,20 +901,23 @@ class ClientWindow(wx.Frame):
 
     def OnTerminate(self, event, *args):
         self.killDebugWindow()
-        scrape_window_open=self.killScrapeWindow()
+        if self.killScrapeWindow():
+            socketIO.emit('scrape','Terminate')
+        self.killPauseWindow()
         if(len(args) > 0 and args[0]=="term_exec"):
             controller.disconnect_flag=True
             print ""
-            logger.print_on_console('---------Terminating all active operations-------')
+            msg = "---------Terminating all active operations-------"
         else:
-            logger.print_on_console('---------Termination Started-------')
-            if scrape_window_open == True:
-                socketIO.emit('scrape','Terminate')
+            msg ="---------Termination Started-------"
+        logger.print_on_console(msg)
+        log.info(msg)
         controller.terminate_flag=True
         #Handling the case where user clicks terminate when the execution is paused
         #Resume the execution
         if controller.pause_flag:
-            self.resume(False)
+            controller.pause_flag=False
+            wxObject.mythread.resume(False)
 
     def OnClear(self,event):
         self.log.Clear()
@@ -960,8 +964,8 @@ class ClientWindow(wx.Frame):
         flag=False
         try:
             if (self.debugwindow != None) and (bool(self.debugwindow) != False):
-                self.debugwindow.Close()
-                flag=True
+                self.debugwindow.Destroy()
+                flag = True
             self.debugwindow = None
         except Exception as e:
             log.error("Error while killing debug window")
@@ -972,12 +976,26 @@ class ClientWindow(wx.Frame):
         #Close the scrape window
         flag=False
         try:
-            if (self.new != None) and (bool(self.new) != False):
-                self.new.Close()
-                flag=True
-            self.new = None
+            if (self.scrapewindow != None) and (bool(self.scrapewindow) != False):
+                self.scrapewindow.Destroy()
+                flag = True
+            self.scrapewindow = None
         except Exception as e:
             log.error("Error while killing scrape window")
+            log.error(e)
+        return flag
+
+    def killPauseWindow(self):
+        #Close the pause/display window
+        flag=False
+        try:
+            if (self.pausewindow != None) and (bool(self.pausewindow) != False):
+                self.pausewindow.resume_execution()
+                self.pausewindow.Destroy()
+                flag = True
+            self.pausewindow = None
+        except Exception as e:
+            log.error("Error while killing pause window")
             log.error(e)
         return flag
 
@@ -991,23 +1009,23 @@ class ClientWindow(wx.Frame):
             if(os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
                 con.get_all_the_imports('IRIS')
         if mobileScrapeFlag==True:
-            self.new = mobileScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
+            self.scrapewindow = mobileScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
             mobileScrapeFlag=False
         elif qcConFlag==True:
-            self.new = qcConObj.QcWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = qcdata,socketIO = socketIO)
+            self.scrapewindow = qcConObj.QcWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = qcdata,socketIO = socketIO)
             qcConFlag=False
         elif mobileWebScrapeFlag==True:
-            self.new = mobileWebScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",browser = browsername,socketIO = socketIO)
+            self.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",browser = browsername,socketIO = socketIO)
             mobileWebScrapeFlag=False
         elif desktopScrapeFlag==True:
-            self.new = desktopScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+            self.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             desktopScrapeFlag=False
             browsername = ''
         elif sapScrapeFlag==True:
-            self.new = sapScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+            self.scrapewindow = sapScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             sapScrapeFlag=False
         elif oebsScrapeFlag==True:
-            self.new = oebsScrapeObj.ScrapeDispatcher(parent = None,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+            self.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = None,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             oebsScrapeFlag=False
         elif debugFlag == True:
             self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
@@ -1020,7 +1038,7 @@ class ClientWindow(wx.Frame):
                 con.get_all_the_imports('Web')
                 con.get_all_the_imports('WebScrape')
                 import Nineteen68_WebScrape
-                self.new = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data,irisFlag = irisFlag)
+                self.scrapewindow = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data,irisFlag = irisFlag)
                 browsername = ''
             else:
                 import pause_display_operation
@@ -1028,10 +1046,10 @@ class ClientWindow(wx.Frame):
                 flag,inputvalue = o.getflagandinput()
                 if flag == 'pause':
                     #call pause logic
-                    self.new = pause_display_operation.Pause(parent = None,id = -1, title="SLK Nineteen68 - Pause")
+                    self.pausewindow = pause_display_operation.Pause(parent = None,id = -1, title="SLK Nineteen68 - Pause")
                 elif flag == 'display':
                     #call display logic
-                    self.new = pause_display_operation.Display(parent = self,id = -1, title="SLK Nineteen68 - Display Variable",input = inputvalue)
+                    self.pausewindow = pause_display_operation.Display(parent = self,id = -1, title="SLK Nineteen68 - Display Variable",input = inputvalue)
 
     def verifyMACAddress(self):
         flag = False
@@ -1480,21 +1498,15 @@ class DebugWindow(wx.Frame):
         log.info('Event Triggered to Resume Debug')
         controller.pause_flag=False
         wxObject.mythread.resume(False)
-        self.Close()
         wxObject.debugwindow = None
+        self.Destroy()
 
     def OnContinue(self, event):
         logger.print_on_console('Event Triggered to Resume')
         log.info('Event Triggered to Resume')
-        self.resume(True)
-
-    def resume(self,debug_mode):
         controller.pause_flag=False
         wxObject.mythread.resume(debug_mode)
 
-    def OnExit(self, event):
-        self.Close()
-        wxObject.debugwindow = None
 
 def check_browser():
     try:
