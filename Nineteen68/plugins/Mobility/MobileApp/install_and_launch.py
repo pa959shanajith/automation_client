@@ -13,6 +13,9 @@ from appium import webdriver
 import logging
 log = logging.getLogger('install_and_launch.py')
 import logger
+import time
+import subprocess
+import os
 from constants import *
 driver = None
 import mobile_app_constants
@@ -30,7 +33,6 @@ class LaunchAndInstall():
 
             if platform.system() == 'Darwin':
                 import appium
-##                import time
                 from appium import webdriver
                 LaunchAndInstall().start_server()
                 desired_caps = {}
@@ -62,7 +64,6 @@ class LaunchAndInstall():
                 global device_id
                 device_id=input_val[2]
                 import appium
-                import time
                 from appium import webdriver
                 LaunchAndInstall().start_server()
                 desired_caps = {}
@@ -82,7 +83,6 @@ class LaunchAndInstall():
                 self.driver_obj = driver
                 status = mobile_app_constants.TEST_RESULT_PASS
                 result = mobile_app_constants.TEST_RESULT_TRUE
-                ##            import time
                 ##            time.sleep(20)
                 ##            page_source = driver.page_source
                 ##            print page_source
@@ -94,21 +94,14 @@ class LaunchAndInstall():
 
     def start_server(self):
         try:
-            import subprocess
-            import os
             curdir = os.environ["NINETEEN68_HOME"]
-
             if (platform.system() != 'Darwin'):
-                path = curdir + '\\Nineteen68\\plugins\\Mobility\\MobileApp\\node_modules\\appium\\build\\lib\\main.js'
-                nodePath = os.environ["NINETEEN68_HOME"] + "\\Drivers" + '\\node.exe'
-                proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None,
-                                        close_fds=True)
+                path = curdir + '/Nineteen68/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
+                nodePath = curdir + "/Drivers" + '/node.exe'
+                proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
             else:
                 path = curdir + '/Nineteen68/plugins/Mobility/node_modules/appium/build/lib/main.js'
-                proc = subprocess.Popen(path, shell=False, stdin=None, stdout=None, stderr=None,
-                                        close_fds=True)
-
-            import time
+                proc = subprocess.Popen(path, shell=False, stdin=None, stdout=None, stderr=None, close_fds=True)
             time.sleep(15)
             logger.print_on_console('Server started')
         except Exception as e:
@@ -120,7 +113,6 @@ class LaunchAndInstall():
         try:
             if platform.system() != 'Darwin':
                 import psutil
-                import os
                 processes = psutil.net_connections()
                 for line in processes:
                     p =  line.laddr
@@ -130,7 +122,6 @@ class LaunchAndInstall():
                         os.system("TASKKILL /F /PID " + str(line.pid))
 
             else:
-                import os
                 os.system("killall -9 node")
         except Exception as e:
             log.error(e)

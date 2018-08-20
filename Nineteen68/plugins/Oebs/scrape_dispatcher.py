@@ -31,7 +31,7 @@ class ScrapeDispatcher(wx.Frame):
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(200, 150) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
         self.SetBackgroundColour('#e6e7e8')
-        self.iconpath = os.environ["NINETEEN68_HOME"] + "\\Nineteen68\\plugins\\Core\\Images" + "\\slk.ico"
+        self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         global obj
         obj = utils.Utils()

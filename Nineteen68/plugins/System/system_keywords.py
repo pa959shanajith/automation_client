@@ -149,7 +149,6 @@ class System_Keywords():
         pass
 
     def executeCommand(self,command_data=None):
-
         result_data=''
         err_msg=None
         machine_name=None
@@ -166,7 +165,7 @@ class System_Keywords():
                 wmi_ref=self.getWmi(machine_name)
                 if wmi_ref is not None:
                     if machine_name is None:
-                        path_outfile=os.environ["NINETEEN68_HOME"]+"//Nineteen68//plugins//System//nineteen68_system.txt"
+                        path_outfile=os.environ["NINETEEN68_HOME"]+"/Nineteen68/plugins/System/nineteen68_system.txt"
                         process_id, process_status = wmi_ref.Win32_Process.Create(CommandLine="cmd /c "+command_toexecute+" > "+path_outfile)
                     else:
                         file_name=None

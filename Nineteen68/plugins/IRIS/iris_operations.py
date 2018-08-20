@@ -16,6 +16,8 @@ from pyrobot import Robot
 vertical = []
 horizontal = []
 verifyexists = []
+TESSERACT_PATH = os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR'
+TESSERACT_PATH_EXISTS = os.path.isdir(TESSERACT_PATH)
 
 def remove_duplicates(lines):
     # remove duplicate lines (lines within 10 pixels of eachother)
@@ -257,9 +259,9 @@ class IRISKeywords():
         err_msg=None
         value = OUTPUT_CONSTANT
         try:
-            if(os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR')):
-                pytesseract.tesseract_cmd = os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR/tesseract'
-                os.environ["TESSDATA_PREFIX"] = os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR/tessdata'
+            if(TESSERACT_PATH_EXISTS):
+                pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
+                os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
                 img = None
                 if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
                     elem_coordinates = element['coordinates']
@@ -420,9 +422,9 @@ class IRISKeywords():
         col = int(args[0][1])
         try:
             self.getrowcountiris(element)
-            if(os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR')):
-                pytesseract.tesseract_cmd = os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR/tesseract'
-                os.environ["TESSDATA_PREFIX"] = os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR/tessdata'
+            if(TESSERACT_PATH_EXISTS):
+                pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
+                os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
                 img = None
                 if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
                     elem_coordinates = element['coordinates']

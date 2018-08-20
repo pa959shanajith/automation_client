@@ -46,7 +46,8 @@ icesession = None
 plugins_list = []
 configvalues = None
 CONFIG_PATH= os.environ["NINETEEN68_HOME"] + '/Lib/config.json'
-IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images"
+IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images/"
+os.environ["IMAGES_PATH"] = IMAGES_PATH
 CERTIFICATE_PATH = os.environ["NINETEEN68_HOME"] + "/Scripts/CA_BUNDLE"
 LOGCONFIG_PATH = os.environ["NINETEEN68_HOME"] + "/logging.conf"
 DRIVERS_PATH = os.environ["NINETEEN68_HOME"] + "/Drivers"
@@ -496,9 +497,15 @@ class SocketThread(threading.Thread):
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
         icesession_enc = core_utils_obj.wrap(json.dumps(icesession), ice_ndac_key)
         params={'username':username,'icesession':icesession_enc}
-        socketIO = SocketIO(temp_server_IP,server_port,MainNamespace,verify=server_cert,cert=client_cert,params=params)
-        socketIO.wait()
-
+        try:
+            socketIO = SocketIO(temp_server_IP,server_port,MainNamespace,verify=server_cert,cert=client_cert,params=params)
+            socketIO.wait()
+        except Exception as e:
+            if str(e).startswith("[Certifiate Mismatch]"):
+                msg = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
+                #msg = msg.replace("[Certifiate Mismatch] ",'')
+                logger.print_on_console(msg)
+                self.wxobject.connectbutton.Enable()
 
 class Parallel(threading.Thread):
     """Test Worker Thread Class."""
@@ -691,9 +698,9 @@ class ClientWindow(wx.Frame):
         self.choice='Normal'
         global wxObject,browsercheckFlag
         wxObject = self
-        self.iconpath = IMAGES_PATH +"/slk.ico"
-        self.connect_img=wx.Image(IMAGES_PATH +"/connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        self.disconnect_img=wx.Image(IMAGES_PATH +"/disconnect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.iconpath = IMAGES_PATH +"slk.ico"
+        self.connect_img=wx.Image(IMAGES_PATH +"connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.disconnect_img=wx.Image(IMAGES_PATH +"disconnect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
 
 
         """Check if config file is present"""
@@ -777,17 +784,17 @@ class ClientWindow(wx.Frame):
         box.Add(self.breakpoint, 1, wx.ALL|wx.EXPAND, 5)
         self.breakpoint.Disable()
 
-        self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/killStaleProcess.png", wx.BITMAP_TYPE_ANY), wx.Point(360, 555), wx.Size(50, 42))
+        self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"killStaleProcess.png", wx.BITMAP_TYPE_ANY), wx.Point(360, 555), wx.Size(50, 42))
         self.cancelbutton.Bind(wx.EVT_LEFT_DOWN, self.OnKillProcess)
         self.cancelbutton.SetToolTip(wx.ToolTip("To kill Stale process"))
         self.cancel_label=wx.StaticText(self.panel, -1, 'Kill Stale Process', wx.Point(340, 600), wx.Size(100, 70))
 
-        self.terminatebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/terminate.png", wx.BITMAP_TYPE_ANY), wx.Point(475, 555), wx.Size(50, 42))
+        self.terminatebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"terminate.png", wx.BITMAP_TYPE_ANY), wx.Point(475, 555), wx.Size(50, 42))
         self.terminatebutton.Bind(wx.EVT_LEFT_DOWN, self.OnTerminate)
         self.terminatebutton.SetToolTip(wx.ToolTip("To Terminate the execution"))
         self.terminate_label=wx.StaticText(self.panel, -1, 'Terminate', wx.Point(475, 600), wx.Size(100, 70))
 
-        self.clearbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/clear.png", wx.BITMAP_TYPE_ANY), wx.Point(590, 555), wx.Size(50, 42))
+        self.clearbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"clear.png", wx.BITMAP_TYPE_ANY), wx.Point(590, 555), wx.Size(50, 42))
         self.clearbutton.Bind(wx.EVT_LEFT_DOWN, self.OnClear)
         self.clearbutton.SetToolTip(wx.ToolTip("To clear the console area"))
         self.clear_label=wx.StaticText(self.panel, -1, 'Clear', wx.Point(600, 600), wx.Size(100, 70))
@@ -1002,7 +1009,6 @@ class ClientWindow(wx.Frame):
         global mobileScrapeFlag,qcConFlag,mobileWebScrapeFlag,desktopScrapeFlag
         global sapScrapeFlag,debugFlag,browsername,action,oebsScrapeFlag
         global socketIO,data
-        global irisFlag
         con = controller.Controller()
         if(irisFlag == True):
             if(os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
@@ -1074,7 +1080,7 @@ class ClientWindow(wx.Frame):
                     index = index + 1
                 if(system_mac in mac_addr):
                     flag = True
-                    if(system_mac in irisMAC):
+                    if ((system_mac in irisMAC) and os.path.isdir(os.environ["NINETEEN68_HOME"]+'/Nineteen68/plugins/IRIS')):
                         irisFlag = True
                         controller.iris_flag = True
         except:
@@ -1096,7 +1102,7 @@ class Config_window(wx.Frame):
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150), size=(470, 450), style = wx.CAPTION|wx.CLIP_CHILDREN)
         self.SetBackgroundColour('#e6e7e8')
-        self.iconpath = IMAGES_PATH +"/slk.ico"
+        self.iconpath = IMAGES_PATH +"slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         self.socketIO = socketIO
@@ -1460,6 +1466,7 @@ class Config_window(wx.Frame):
             logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename},disable_existing_loggers=False)
         except Exception as e:
             log.error(e)
+        wxObject.connectbutton.Enable()
         msg = '--Edit Config closed--'
         logger.print_on_console(msg)
         log.info(msg)
@@ -1470,14 +1477,14 @@ class DebugWindow(wx.Frame):
             style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
         ##style = wx.CAPTION|wx.CLIP_CHILDREN
-        self.iconpath = IMAGES_PATH +"/slk.ico"
+        self.iconpath = IMAGES_PATH +"slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         self.panel = wx.Panel(self)
-        self.continue_debugbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/play.png", wx.BITMAP_TYPE_ANY), (65, 15), (35, 28))
+        self.continue_debugbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"play.png", wx.BITMAP_TYPE_ANY), (65, 15), (35, 28))
         self.continue_debugbutton.Bind(wx.EVT_LEFT_DOWN, self.Resume)
         self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution"))
-        self.continuebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"/step.png", wx.BITMAP_TYPE_ANY), (105, 15), (35, 28))
+        self.continuebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"step.png", wx.BITMAP_TYPE_ANY), (105, 15), (35, 28))
         self.continuebutton.Bind(wx.EVT_LEFT_DOWN, self.OnContinue)
         self.continuebutton.SetToolTip(wx.ToolTip("To Resume the execution "))
         self.Centre()
