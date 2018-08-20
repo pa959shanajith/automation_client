@@ -62,6 +62,10 @@ class MainNamespace(BaseNamespace):
             if(allow_connect):
                 logger.print_on_console('Normal Mode: Connection to the Nineteen68 Server established')
                 wxObject.schedule.Enable()
+                wxObject.cancelbutton.Enable()
+                wxObject.terminatebutton.Enable()
+                wxObject.clearbutton.Enable()
+                wxObject.rbox.Enable()
                 if browsercheckFlag == False:
                     browsercheckFlag = check_browser()
                 log.info('Normal Mode: Connection to the Nineteen68 Server established')
@@ -1105,23 +1109,26 @@ class Config_window(wx.Frame):
         self.iconpath = IMAGES_PATH +"slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
+        self.updated = False
         self.socketIO = socketIO
         self.panel = wx.Panel(self)
 
         self.currentDirectory = os.environ["NINETEEN68_HOME"]
         self.defaultServerCrt = './Scripts/CA_BUNDLE/server.crt'
 
-        self.sev_add=wx.StaticText( self.panel, label="Server Address", pos=(12,8 ),size=(90, 28), style=0, name="")
+        self.sev_add=wx.StaticText(self.panel, label="Server Address", pos=(12,8 ),size=(90, 28), style=0, name="")
         self.server_add=wx.TextCtrl(self.panel, pos=(100,8 ), size=(140,-1))
         if isConfigJson!=False:
             self.server_add.SetValue(isConfigJson['server_ip'])
 
-        self.sev_port=wx.StaticText( self.panel, label="Server Port", pos=(270,8 ),size=(70, 28), style=0, name="")
+        self.sev_port=wx.StaticText(self.panel, label="Server Port", pos=(270,8 ),size=(70, 28), style=0, name="")
         self.server_port=wx.TextCtrl(self.panel, pos=(340,8 ), size=(105,-1))
         if isConfigJson!=False:
             self.server_port.SetValue(isConfigJson['server_port'])
+        else:
+            self.server_port.SetValue("8443")
 
-        self.ch_path=wx.StaticText( self.panel, label="Chrome Path", pos=(12,38),size=(80, 28), style=0, name="")
+        self.ch_path=wx.StaticText(self.panel, label="Chrome Path", pos=(12,38),size=(80, 28), style=0, name="")
         self.chrome_path=wx.TextCtrl(self.panel, pos=(100,38), size=(310,-1))
         wx.Button(self.panel, label="...",pos=(415,38), size=(30, -1)).Bind(wx.EVT_BUTTON, self.fileBrowser_chpath)
         if isConfigJson!=False:
@@ -1129,38 +1136,46 @@ class Config_window(wx.Frame):
         else:
             self.chrome_path.SetValue('default')
 
-        self.log_fpath=wx.StaticText( self.panel, label="Log File Path", pos=(12,68),size=(80, 28), style=0, name="")
+        self.log_fpath=wx.StaticText(self.panel, label="Log File Path", pos=(12,68),size=(80, 28), style=0, name="")
         self.log_file_path=wx.TextCtrl(self.panel, pos=(100,68), size=(310,-1))
         wx.Button(self.panel, label="...",pos=(415,68), size=(30, -1)).Bind(wx.EVT_BUTTON, self.fileBrowser_logfilepath)
         if isConfigJson!=False:
             self.log_file_path.SetValue(isConfigJson['logFile_Path'])
 
-        self.qu_timeout=wx.StaticText( self.panel, label="Query Timeout", pos=(12,98),size=(85, 28), style=0, name="")
+        self.qu_timeout=wx.StaticText(self.panel, label="Query Timeout", pos=(12,98),size=(85, 28), style=0, name="")
         self.query_timeout=wx.TextCtrl(self.panel, pos=(100,98), size=(80,-1))
         if isConfigJson!=False:
             self.query_timeout.SetValue(isConfigJson['queryTimeOut'])
+        else:
+            self.query_timeout.SetValue("3")
 
-        wx.StaticText( self.panel, label="Time Out", pos=(185,98),size=(50, 28), style=0, name="")
+        wx.StaticText(self.panel, label="Time Out", pos=(185,98),size=(50, 28), style=0, name="")
         self.time_out=wx.TextCtrl(self.panel, pos=(240,98), size=(80,-1))
         if isConfigJson!=False:
             self.time_out.SetValue(isConfigJson['timeOut'])
+        else:
+            self.time_out.SetValue("1")
 
-        wx.StaticText( self.panel, label="Delay", pos=(325,98),size=(40, 28), style=0, name="")
+        wx.StaticText(self.panel, label="Delay", pos=(325,98),size=(40, 28), style=0, name="")
         self.delay=wx.TextCtrl(self.panel, pos=(360,98), size=(85,-1))
         if isConfigJson!=False:
             self.delay.SetValue(isConfigJson['delay'])
+        else:
+            self.delay.SetValue("0.3")
 
-        wx.StaticText( self.panel, label="Step Execution Wait", pos=(12,128),size=(120, 28), style=0, name="")
+        wx.StaticText(self.panel, label="Step Execution Wait", pos=(12,128),size=(120, 28), style=0, name="")
         self.step_exe_wait=wx.TextCtrl(self.panel, pos=(130,128), size=(80,-1))
         if isConfigJson!=False:
             self.step_exe_wait.SetValue(isConfigJson['stepExecutionWait'])
+        else:
+            self.step_exe_wait.SetValue("1")
 
-        wx.StaticText( self.panel, label="Display Variable Timeout", pos=(225,128),size=(140, 28), style=0, name="")
+        wx.StaticText(self.panel, label="Display Variable Timeout", pos=(225,128),size=(140, 28), style=0, name="")
         self.disp_var_timeout=wx.TextCtrl(self.panel, pos=(360,128), size=(85,-1))
         if isConfigJson!=False:
             self.disp_var_timeout.SetValue(isConfigJson['displayVariableTimeOut'])
 
-        self.sev_cert=wx.StaticText( self.panel, label="Server Cert", pos=(12,158),size=(85, 28), style=0, name="")
+        self.sev_cert=wx.StaticText(self.panel, label="Server Cert", pos=(12,158),size=(85, 28), style=0, name="")
         self.server_cert=wx.TextCtrl(self.panel, pos=(100,158), size=(310,-1))
         wx.Button(self.panel, label="...",pos=(415,158), size=(30, -1)).Bind(wx.EVT_BUTTON, self.fileBrowser_servcert)
         if (not isConfigJson) or (isConfigJson and isConfigJson['server_cert']==self.defaultServerCrt):
@@ -1175,84 +1190,73 @@ class Config_window(wx.Frame):
         lblList4 = ['False', 'True']
         self.rbox1 = wx.RadioBox(self.panel, label = 'Ignore Certificate', pos = (12,188), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False:
-            if isConfigJson['ignore_certificate']==lblList[0]:
-                self.rbox1.SetSelection(0)
-            else:
-                self.rbox1.SetSelection(1)
+        if isConfigJson!=False and isConfigJson['ignore_certificate'].title()==lblList[0]:
+            self.rbox1.SetSelection(0)
+        else:
+            self.rbox1.SetSelection(1)
 
         self.rbox2 = wx.RadioBox(self.panel, label = 'IE Architecture Type', pos = (130,188), choices = lblList2,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False:
-            val2=isConfigJson['bit_64']
-            if isConfigJson['bit_64'] =='Yes':
-                self.rbox2.SetSelection(0)
-            else:
-                self.rbox2.SetSelection(1)
+        if isConfigJson!=False and isConfigJson['bit_64'].title() != 'Yes':
+            self.rbox2.SetSelection(1)
+        else:
+            self.rbox2.SetSelection(0)
 
         self.rbox9 = wx.RadioBox(self.panel, label = 'Disable Server Certificate Check', pos = (260,188), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False:
-            if isConfigJson['disable_server_cert'].title() == lblList[0]:
-                self.rbox9.SetSelection(0)
-            else:
-                self.rbox9.SetSelection(1)
+        if isConfigJson!=False and isConfigJson['disable_server_cert'].title() == lblList[0]:
+            self.rbox9.SetSelection(0)
+        else:
+            self.rbox9.SetSelection(1)
 
         self.rbox5 = wx.RadioBox(self.panel, label = 'Exception Flag', pos = (12,248), choices = lblList4,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False:
-            if isConfigJson['exception_flag']==lblList4[0].lower():
-                self.rbox5.SetSelection(0)
-            else:
-                self.rbox5.SetSelection(1)
+        if isConfigJson!=False and isConfigJson['exception_flag'].title()!=lblList4[0]:
+            self.rbox5.SetSelection(1)
+        else:
+            self.rbox5.SetSelection(0)
 
         self.rbox6 = wx.RadioBox(self.panel, label = 'Ignore Visibility Check', pos = (150,248), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False:
-            if isConfigJson['ignoreVisibilityCheck']==lblList[0]:
-                self.rbox6.SetSelection(0)
-            else:
-                self.rbox6.SetSelection(1)
+        if isConfigJson!=False and isConfigJson['ignoreVisibilityCheck'].title()==lblList[0]:
+            self.rbox6.SetSelection(0)
+        else:
+            self.rbox6.SetSelection(1)
 
         self.rbox3 = wx.RadioBox(self.panel, label = 'ScreenShot Flag', pos = (340,308), choices = lblList3,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False:
-            if isConfigJson['screenShot_Flag']==lblList3[0]:
-                self.rbox3.SetSelection(0)
-            else:
-                self.rbox3.SetSelection(1)
+        if isConfigJson!=False and isConfigJson['screenShot_Flag'].title()!=lblList3[0]:
+            self.rbox3.SetSelection(1)
+        else:
+            self.rbox3.SetSelection(0)
 
         self.rbox4 = wx.RadioBox(self.panel, label = 'Retrieve URL', pos = (12,308), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False:
-            if isConfigJson['retrieveURL']==lblList[0]:
-                self.rbox4.SetSelection(0)
-            else:
-                self.rbox4.SetSelection(1)
+        if isConfigJson!=False and isConfigJson['retrieveURL'].title()!=lblList[0]:
+            self.rbox4.SetSelection(1)
+        else:
+            self.rbox4.SetSelection(0)
 
         self.rbox7 = wx.RadioBox(self.panel, label = 'Enable Security Check', pos = (310,248), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False:
-            if isConfigJson['enableSecurityCheck']==lblList[0]:
-                self.rbox7.SetSelection(0)
-            else:
-                self.rbox7.SetSelection(1)
+        if isConfigJson!=False and isConfigJson['enableSecurityCheck'].title()==lblList[0]:
+            self.rbox7.SetSelection(0)
+        else:
+            self.rbox7.SetSelection(1)
 
         self.rbox8 = wx.RadioBox(self.panel, label = 'Browser Check', pos = (115,308), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False:
-            if isConfigJson['browser_check']==lblList[1]:
-                self.rbox8.SetSelection(1)
-            else:
-                self.rbox8.SetSelection(0)
+        if isConfigJson!=False and isConfigJson['browser_check'].title()!=lblList[0]:
+            self.rbox8.SetSelection(1)
+        else:
+            self.rbox8.SetSelection(0)
 
         self.rbox10 = wx.RadioBox(self.panel, label = 'Highlight Check', pos = (225,308), choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False:
-            if isConfigJson['highlight_check']==lblList[1]:
-                self.rbox10.SetSelection(1)
-            else:
-                self.rbox10.SetSelection(0)
+        if isConfigJson!=False and isConfigJson['highlight_check'].title()==lblList[0]:
+            self.rbox10.SetSelection(0)
+        else:
+            self.rbox10.SetSelection(1)
 
         self.error_msg=wx.StaticText(self.panel, label="", pos=(85,360),size=(350, 28), style=0, name="")
         wx.Button(self.panel, label="Save",pos=(100,388), size=(100, 28)).Bind(wx.EVT_BUTTON, self.config_check)
@@ -1408,6 +1412,7 @@ class Config_window(wx.Frame):
                     outfile.write(unicode(str_))
                 logger.print_on_console('--Configuration saved--')
                 log.info('--Configuration saved--')
+                self.updated = True
         except Exception as e:
             msg = "Error while updating configuration"
             logger.print_on_console(msg)
@@ -1466,7 +1471,9 @@ class Config_window(wx.Frame):
             logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename},disable_existing_loggers=False)
         except Exception as e:
             log.error(e)
-        wxObject.connectbutton.Enable()
+        if self.updated:
+            self.updated = False
+            wxObject.connectbutton.Enable()
         msg = '--Edit Config closed--'
         logger.print_on_console(msg)
         log.info(msg)
