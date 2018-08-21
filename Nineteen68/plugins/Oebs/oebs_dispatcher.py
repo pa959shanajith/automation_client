@@ -101,7 +101,7 @@ class OebsDispatcher:
             else:
                  self.print_error('ERR_CUSTOM_NOTFOUND')
                  self.print_error('ERR_PRECONDITION_NOTMET')
-        message=[tsp.url,objectname,tsp.name,input,tsp.outputval]
+        message=[windowname,objectname,tsp.name,input,tsp.outputval]
         return message
 
     def dispatcher(self,tsp,input,iris_flag,*message):
