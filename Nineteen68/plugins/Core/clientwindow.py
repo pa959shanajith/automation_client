@@ -54,6 +54,17 @@ DRIVERS_PATH = os.environ["NINETEEN68_HOME"] + "/Drivers"
 CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver.exe"
 GECKODRIVER_PATH = DRIVERS_PATH + '/geckodriver.exe'
 
+""" Override SocketIO library's warn method used for logging.
+    This is needed because this library doesn't gives anything to stdout or stderr
+    on exception/warning. Hence Adding custom check and raising exception. Ref #1847.
+"""
+def socketIO_warn_override(self, msg, *attrs):
+    self._log(logging.WARNING, msg, *attrs)
+    if ("[SSL: CERTIFICATE_VERIFY_FAILED]" in msg) or ("hostname" in msg and "doesn't match " in msg):
+        raise ValueError("[Certifiate Mismatch] "+ msg)
+SocketIO._warn = socketIO_warn_override
+
+
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
         global action,wxObject,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag
@@ -504,12 +515,13 @@ class SocketThread(threading.Thread):
         try:
             socketIO = SocketIO(temp_server_IP,server_port,MainNamespace,verify=server_cert,cert=client_cert,params=params)
             socketIO.wait()
-        except Exception as e:
-            if str(e).startswith("[Certifiate Mismatch]"):
-                msg = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
-                #msg = msg.replace("[Certifiate Mismatch] ",'')
-                logger.print_on_console(msg)
-                self.wxobject.connectbutton.Enable()
+        except ValueError as e:
+            msg = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
+            if "_ssl.c" in msg:
+                msg = msg[:msg.index("(_ssl")]
+            #msg = msg.replace("[Certifiate Mismatch] ",'')
+            logger.print_on_console(msg)
+            self.wxobject.connectbutton.Enable()
 
 class Parallel(threading.Thread):
     """Test Worker Thread Class."""
