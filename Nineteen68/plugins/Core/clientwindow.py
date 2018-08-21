@@ -690,7 +690,8 @@ class ClientWindow(wx.Frame):
         ##self.ShowFullScreen(True,wx.ALL)
         ##self.SetBackgroundColour('#D0D0D0')
         self.logfilename_error_flag = False
-        self.is_config_present_flag = True
+        # Check if config file is present
+        self.is_config_present_flag = os.path.isfile(CONFIG_PATH)
         self.debugwindow = None
         self.scrapewindow = None
         self.pausewindow = None
@@ -706,10 +707,6 @@ class ClientWindow(wx.Frame):
         self.connect_img=wx.Image(IMAGES_PATH +"connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.disconnect_img=wx.Image(IMAGES_PATH +"disconnect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
 
-
-        """Check if config file is present"""
-        if os.path.isfile(CONFIG_PATH)!=True:
-            self.is_config_present_flag = False
         """
         Creating Root Logger using logger file config and setting logfile path,which is in config.json
         """
@@ -784,7 +781,7 @@ class ClientWindow(wx.Frame):
         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
 
         self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
-        self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(230, 598), size=(60,20), style = wx.TE_RICH)
+        self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(225, 595), size=(60,20), style = wx.TE_RICH)
         box.Add(self.breakpoint, 1, wx.ALL|wx.EXPAND, 5)
         self.breakpoint.Disable()
 
@@ -1110,8 +1107,10 @@ class Config_window(wx.Frame):
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         self.updated = False
+        self.connectEnabled = wxObject.connectbutton.IsEnabled()
         self.socketIO = socketIO
         self.panel = wx.Panel(self)
+        wxObject.connectbutton.Disable()
 
         self.currentDirectory = os.environ["NINETEEN68_HOME"]
         self.defaultServerCrt = './Scripts/CA_BUNDLE/server.crt'
@@ -1471,8 +1470,7 @@ class Config_window(wx.Frame):
             logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename},disable_existing_loggers=False)
         except Exception as e:
             log.error(e)
-        if self.updated:
-            self.updated = False
+        if self.updated or self.connectEnabled:
             wxObject.connectbutton.Enable()
         msg = '--Edit Config closed--'
         logger.print_on_console(msg)
