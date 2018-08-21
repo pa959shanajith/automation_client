@@ -1160,28 +1160,28 @@ class Config_window(wx.Frame):
         else:
             self.query_timeout.SetValue("3")
 
-        wx.StaticText(self.panel, label="Time Out", pos=(185,98),size=(50, 28), style=0, name="")
+        self.timeOut=wx.StaticText(self.panel, label="Time Out", pos=(185,98),size=(50, 28), style=0, name="")
         self.time_out=wx.TextCtrl(self.panel, pos=(240,98), size=(80,-1))
         if isConfigJson!=False:
             self.time_out.SetValue(isConfigJson['timeOut'])
         else:
             self.time_out.SetValue("1")
 
-        wx.StaticText(self.panel, label="Delay", pos=(325,98),size=(40, 28), style=0, name="")
+        self.delayText=wx.StaticText(self.panel, label="Delay", pos=(325,98),size=(40, 28), style=0, name="")
         self.delay=wx.TextCtrl(self.panel, pos=(360,98), size=(85,-1))
         if isConfigJson!=False:
             self.delay.SetValue(isConfigJson['delay'])
         else:
             self.delay.SetValue("0.3")
 
-        wx.StaticText(self.panel, label="Step Execution Wait", pos=(12,128),size=(120, 28), style=0, name="")
+        self.stepExecWait=wx.StaticText(self.panel, label="Step Execution Wait", pos=(12,128),size=(120, 28), style=0, name="")
         self.step_exe_wait=wx.TextCtrl(self.panel, pos=(130,128), size=(80,-1))
         if isConfigJson!=False:
             self.step_exe_wait.SetValue(isConfigJson['stepExecutionWait'])
         else:
             self.step_exe_wait.SetValue("1")
 
-        wx.StaticText(self.panel, label="Display Variable Timeout", pos=(225,128),size=(140, 28), style=0, name="")
+        self.dispVarTimeOut=wx.StaticText(self.panel, label="Display Variable Timeout", pos=(225,128),size=(140, 28), style=0, name="")
         self.disp_var_timeout=wx.TextCtrl(self.panel, pos=(360,128), size=(85,-1))
         if isConfigJson!=False:
             self.disp_var_timeout.SetValue(isConfigJson['displayVariableTimeOut'])
@@ -1325,7 +1325,7 @@ class Config_window(wx.Frame):
         data['disable_server_cert'] = disable_server_cert.strip()
         data['highlight_check'] = highlight_check.strip()
         config_data=data
-        if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='':
+        if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['timeOut']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='':
             #---------------------------------------resetting the static texts
             self.error_msg.SetLabel("")
             self.sev_add.SetLabel('Server Address')
@@ -1340,6 +1340,14 @@ class Config_window(wx.Frame):
             self.sev_cert.SetForegroundColour((0,0,0))
             self.ch_path.SetLabel('Chrome Path')
             self.ch_path.SetForegroundColour((0,0,0))
+            self.delayText.SetLabel('Delay')
+            self.delayText.SetForegroundColour((0,0,0))
+            self.timeOut.SetLabel('Time Out')
+            self.timeOut.SetForegroundColour((0,0,0))
+            self.stepExecWait.SetLabel('Step Execution Wait')
+            self.stepExecWait.SetForegroundColour((0,0,0))
+            self.dispVarTimeOut.SetLabel('Display Variable Timeout')
+            self.dispVarTimeOut.SetForegroundColour((0,0,0))
             #---------------------------------------resetting the static texts
             if (os.path.isfile(data['chrome_path'])==True or str(data['chrome_path']).strip()=='default') and os.path.isfile(data['server_cert'])==True and os.path.isfile(data['logFile_Path'])==True:
                 self.jsonCreater(config_data)
@@ -1411,6 +1419,36 @@ class Config_window(wx.Frame):
             else:
                 self.ch_path.SetLabel('Browser Check')
                 self.ch_path.SetForegroundColour((0,0,0))
+            if data['browser_check']=='':
+                self.ch_path.SetLabel('Browser Check*')
+                self.ch_path.SetForegroundColour((255,0,0))
+            else:
+                self.ch_path.SetLabel('Browser Check')
+                self.ch_path.SetForegroundColour((0,0,0))
+            if data['delay']=='':
+                self.delayText.SetLabel('Delay*')
+                self.delayText.SetForegroundColour((255,0,0))
+            else:
+                self.delayText.SetLabel('Delay')
+                self.delayText.SetForegroundColour((0,0,0))
+            if data['timeOut']=='':
+                self.timeOut.SetLabel('Time Out*')
+                self.timeOut.SetForegroundColour((255,0,0))
+            else:
+                self.timeOut.SetLabel('Time Out')
+                self.timeOut.SetForegroundColour((0,0,0))
+            if data['stepExecutionWait']=='':
+                self.stepExecWait.SetLabel('Step Execution Wait*')
+                self.stepExecWait.SetForegroundColour((255,0,0))
+            else:
+                self.stepExecWait.SetLabel('Step Execution Wait')
+                self.stepExecWait.SetForegroundColour((0,0,0))
+            if data['displayVariableTimeOut']=='':
+                self.dispVarTimeOut.SetLabel('Display Variable Timeout*')
+                self.dispVarTimeOut.SetForegroundColour((255,0,0))
+            else:
+                self.dispVarTimeOut.SetLabel('Display Variable Timeout')
+                self.dispVarTimeOut.SetForegroundColour((0,0,0))
 
 
     """jsonCreater saves the data in json form, location of file to be saved must be defined. This method will overwrite the existing .json file"""
