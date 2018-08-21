@@ -1325,7 +1325,7 @@ class Config_window(wx.Frame):
         data['disable_server_cert'] = disable_server_cert.strip()
         data['highlight_check'] = highlight_check.strip()
         config_data=data
-        if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['timeOut']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='':
+        if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='':
             #---------------------------------------resetting the static texts
             self.error_msg.SetLabel("")
             self.sev_add.SetLabel('Server Address')
@@ -1412,12 +1412,6 @@ class Config_window(wx.Frame):
                 self.ch_path.SetForegroundColour((255,0,0))
             else:
                 self.ch_path.SetLabel('Chrome Path')
-                self.ch_path.SetForegroundColour((0,0,0))
-            if data['browser_check']=='':
-                self.ch_path.SetLabel('Browser Check*')
-                self.ch_path.SetForegroundColour((255,0,0))
-            else:
-                self.ch_path.SetLabel('Browser Check')
                 self.ch_path.SetForegroundColour((0,0,0))
             if data['browser_check']=='':
                 self.ch_path.SetLabel('Browser Check*')
