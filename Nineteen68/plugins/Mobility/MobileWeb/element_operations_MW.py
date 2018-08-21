@@ -85,12 +85,12 @@ class ElementKeywords:
                    else:
                         logger.print_on_console('Element Text mismatched')
                         log.info('Element Text mismatched')
-                        logger.print_on_console('Expected: ',text)
+                        logger.print_on_console('Expected: ',input)
                         log.info('Expected:')
-                        log.info(text)
-                        logger.print_on_console('Actual: ',input)
-                        log.info('Actual:')
                         log.info(input)
+                        logger.print_on_console('Actual: ',text)
+                        log.info('Actual:')
+                        log.info(text)
                 else:
                     log.error(INVALID_INPUT)
                     err_msg=INVALID_INPUT
@@ -279,12 +279,12 @@ class ElementKeywords:
                     else:
                         logger.print_on_console('Tool tip Text mismatched')
                         log.info('Tool tip Text mismatched')
-                        logger.print_on_console('Expected: ',tool_tip)
+                        logger.print_on_console('Expected: ',input)
                         log.info('Expected:')
-                        log.info(tool_tip)
-                        logger.print_on_console('Actual: ',input)
-                        log.info('Actual:')
                         log.info(input)
+                        logger.print_on_console('Actual: ',tool_tip)
+                        log.info('Actual:')
+                        log.info(tool_tip)
                 else:
                     log.error(INVALID_INPUT)
                     err_msg=INVALID_INPUT
