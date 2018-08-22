@@ -477,10 +477,9 @@ class SocketThread(threading.Thread):
     """Test Worker Thread Class."""
 
     #----------------------------------------------------------------------
-    def __init__(self,wxObject):
+    def __init__(self):
         """Init Worker Thread Class."""
         threading.Thread.__init__(self)
-        self.wxobject = wxObject
         self.start()
 
     #----------------------------------------------------------------------
@@ -521,7 +520,7 @@ class SocketThread(threading.Thread):
                 msg = msg[:msg.index("(_ssl")]
             #msg = msg.replace("[Certifiate Mismatch] ",'')
             logger.print_on_console(msg)
-            self.wxobject.connectbutton.Enable()
+            wxObject.connectbutton.Enable()
 
 class Parallel(threading.Thread):
     """Test Worker Thread Class."""
@@ -952,7 +951,7 @@ class ClientWindow(wx.Frame):
                 conn = httplib.HTTPConnection(configvalues['server_ip'],port)
                 conn.connect()
                 conn.close()
-                self.mythread = SocketThread(self)
+                self.mythread = SocketThread()
             else:
                 self.OnTerminate(event,"term_exec")
                 logger.print_on_console('Disconnected from Nineteen68 server')
