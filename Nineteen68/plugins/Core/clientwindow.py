@@ -1023,8 +1023,7 @@ class ClientWindow(wx.Frame):
         global socketIO,data
         con = controller.Controller()
         if(irisFlag == True):
-            if(os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
-                con.get_all_the_imports('IRIS')
+            con.get_all_the_imports('IRIS')
         if mobileScrapeFlag==True:
             self.scrapewindow = mobileScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
             mobileScrapeFlag=False
