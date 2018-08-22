@@ -14,6 +14,7 @@ import logging
 from constants import *
 import core_utils
 import dynamic_variable_handler
+import time
 log = logging.getLogger('delay_operations.py')
 
 class Delay_keywords:
@@ -24,23 +25,21 @@ class Delay_keywords:
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            import time
             if not(input is None or input is ''):
-                if  (type(input) is int):
-                    input=int(input)
-                    log.info('Wait for :' + str(input) + 'seconds')
-                    logger.print_on_console('Wait for :' , str(input) , 'seconds')
-                    time.sleep(input)
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
-                else:
-                    err_msg = INVALID_INPUT+". Only numbers are allowed"
-                    log.error(err_msg)
-                    logger.print_on_console(err_msg)
+                input=int(input)
+                log.info('Wait for :' + str(input) + 'seconds')
+                logger.print_on_console('Wait for :' , str(input) , 'seconds')
+                time.sleep(input)
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
             else:
                 log.error(INVALID_INPUT)
                 err_msg=INVALID_INPUT
                 logger.print_on_console(INVALID_INPUT)
+        except ValueError:
+            err_msg = INVALID_INPUT+". Only numbers are allowed"
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         except Exception as e:
             err_msg = "Error occurred for during wait"
             log.error(err_msg)

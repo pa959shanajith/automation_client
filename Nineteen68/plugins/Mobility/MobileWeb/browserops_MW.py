@@ -18,6 +18,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import time
 import subprocess
 import os
+import subprocess
 import re
 import platform
 ##import psutil
@@ -53,26 +54,17 @@ class BrowserOperations():
 
     def start_server(self):
         try:
-
-            import subprocess
-            import os
 ##            maindir = os.getcwd()
 ##            os.chdir('..')
             curdir = os.environ["NINETEEN68_HOME"]
-
             if (platform.system() != 'Darwin'):
-                path = curdir + '\\Nineteen68\\plugins\\Mobility\\MobileApp\\node_modules\\appium\\build\\lib\\main.js'
-                nodePath = os.environ["NINETEEN68_HOME"] + "\\Drivers" + '\\node.exe'
-                proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None,
-                                        close_fds=True)
+                path = curdir + '/Nineteen68/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
+                nodePath = curdir + "/Drivers/node.exe"
+                proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
             else:
                 path = curdir + '/Nineteen68/plugins/Mobility/node_modules/appium/build/lib/main.js'
-                proc = subprocess.Popen(path, shell=False, stdin=None, stdout=None, stderr=None,
-                                        close_fds=True)
-
-            import time
+                proc = subprocess.Popen(path, shell=False, stdin=None, stdout=None, stderr=None, close_fds=True)
             time.sleep(15)
-
             logger.print_on_console('Server started')
         except Exception as e:
             logger.print_on_console('Exception in starting server')

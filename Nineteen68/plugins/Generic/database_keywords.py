@@ -70,6 +70,10 @@ class DatabaseOperation():
         param : database type, IP, port number , database name, username , password , query
         return : boolean
         """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             encryption_obj = AESCipher()
             decrypted_password = encryption_obj.decrypt(password)
@@ -179,6 +183,10 @@ class DatabaseOperation():
         param : database type, IP, port number , database name, username , password , query
         return : data
         """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             encryption_obj = AESCipher()
             decrypted_password = encryption_obj.decrypt(password)
@@ -319,6 +327,10 @@ class DatabaseOperation():
         param : database type, IP, port number , database name, username , password , query , Filename , sheetname
         return : bool
         """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             encryption_obj = AESCipher()
             decrypted_password = encryption_obj.decrypt(password)
@@ -466,6 +478,10 @@ class DatabaseOperation():
         param : database type, IP, port number , database name, username , password , query , Filename , sheetname
         return : bool
         """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg=None
         try:
             encryption_obj = AESCipher()
             decrypted_password = encryption_obj.decrypt(password)
@@ -503,8 +519,8 @@ class DatabaseOperation():
         param : input_path
         return : bool,filetype
         """
+        status=False
         try:
-            status=False
             filename,file_ext=os.path.splitext(input_path)
             if file_ext in generic_constants.FILE_TYPES:
                 status=True
@@ -529,7 +545,7 @@ class DatabaseOperation():
             wb = xlwt.Workbook()
             ws = wb.add_sheet(generic_constants.DATABASE_SHEET)
             maindir = os.environ["NINETEEN68_HOME"]
-            path = maindir +'//Nineteen68//plugins//Generic' + generic_constants.DATABASE_FILE_XLS
+            path = maindir +'/Nineteen68/plugins/Generic' + generic_constants.DATABASE_FILE_XLS
             wb.save(path)
         except Exception as e:
             log.error(e)
@@ -549,7 +565,7 @@ class DatabaseOperation():
             wb = xlwt.Workbook()
             ws = wb.add_sheet(generic_constants.DATABASE_SHEET)
             maindir = os.environ["NINETEEN68_HOME"]
-            path = maindir +'//Nineteen68//plugins//Generic' + generic_constants.DATABASE_FILE_XLSX
+            path = maindir +'/Nineteen68/plugins/Generic' + generic_constants.DATABASE_FILE_XLSX
             wb.save(path)
         except Exception as e:
             log.error(e)
@@ -567,7 +583,7 @@ class DatabaseOperation():
         path=None
         try:
             maindir = os.environ["NINETEEN68_HOME"]
-            path = maindir +'//Nineteen68//plugins//Generic' + generic_constants.DATABASE_FILE_CSV
+            path = maindir +'/Nineteen68/plugins/Generic' + generic_constants.DATABASE_FILE_CSV
             with open(path,'wb') as file:
                 pass
             file.close()

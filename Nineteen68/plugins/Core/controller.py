@@ -164,8 +164,7 @@ class Controller():
     def __load_oebs(self):
         try:
             self.get_all_the_imports('Oebs')
-            global iris_flag
-            if(iris_flag and os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
+            if iris_flag:
                 self.get_all_the_imports('IRIS')
             import oebs_dispatcher
             self.oebs_dispatcher_obj = oebs_dispatcher.OebsDispatcher()
@@ -180,8 +179,7 @@ class Controller():
 ##            self.get_all_the_imports('ImageProcessing')
             self.get_all_the_imports('WebScrape')
             self.get_all_the_imports('Web')
-            global iris_flag
-            if(iris_flag and os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
+            if iris_flag:
                 self.get_all_the_imports('IRIS')
             import web_dispatcher
             self.web_dispatcher_obj = web_dispatcher.Dispatcher()
@@ -193,9 +191,8 @@ class Controller():
 
     def __load_desktop(self):
         try:
-            global iris_flag
             self.get_all_the_imports('Desktop')
-            if(iris_flag and os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
+            if iris_flag:
                 self.get_all_the_imports('IRIS')
             import desktop_dispatcher
             self.desktop_dispatcher_obj = desktop_dispatcher.DesktopDispatcher()
@@ -207,9 +204,8 @@ class Controller():
 
     def __load_sap(self):
         try:
-            global iris_flag
             self.get_all_the_imports('SAP')
-            if(iris_flag and os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/IRIS')):
+            if iris_flag:
                 self.get_all_the_imports('IRIS')
             import sap_dispatcher
             self.sap_dispatcher_obj = sap_dispatcher.SAPDispatcher()

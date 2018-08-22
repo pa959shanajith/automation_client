@@ -136,8 +136,6 @@ class DropdownKeywords():
                     log.info(err_msg)
 
         except Exception as e:
-            import traceback
-            print (traceback.format_exc(()))
             log.error(e)
             logger.print_on_console(e)
         log.info(RETURN_RESULT)
@@ -1686,51 +1684,47 @@ class DropdownKeywords():
     def selectByAbsoluteValue(self,webelement,input,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
-        visibilityFlag=True
         verb = OUTPUT_CONSTANT
         err_msg=None
         if webelement is not None:
-            if (input is not None) :
-                if len(input)==5:
-                    if webelement.tag_name=='table':
-                        dropVal=input[2]
-                        row_num=int(input[0])-1
-                        col_num=int(input[1])-1
-                        inp_val = input[4]
-                        try:
-                            if dropVal.lower()=='dropdown':
-                                driver=browser_Keywords.driver_obj
-                                log.debug('got the driver instance from browser keyword')
-                                visibleFlag=True
-                                if visibleFlag==True:
-                                    from table_keywords import TableOperationKeywords
-                                    tableops = TableOperationKeywords()
-                                    cell=tableops.javascriptExecutor(webelement,row_num,col_num)
-                                    element_list=cell.find_elements_by_xpath('.//*')
-                                    if len(list(element_list))>0:
-                                        xpath=tableops.getElemntXpath(element_list[0])
-                                        cell=browser_Keywords.driver_obj.find_element_by_xpath(xpath)
-                                        log.debug('checking for element not none')
-                                        if(cell!=None):
-                                            log.debug('checking for element enabled')
-                                            if cell.is_enabled():
-                                                if len(inp_val.strip()) != 0:
-                                                    select = Select(cell)
-                                                    iList = select.options
-                                                else:
-                                                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                                    log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                    else:
-                                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                        except Exception as e:
-                            log.error(e)
-
-                            logger.print_on_console(e)
-                            err_msg=e
-                elif (len(input) == 1):
+            if len(input)==5:
+                if webelement.tag_name=='table':
+                    dropVal=input[2]
+                    row_num=int(input[0])-1
+                    col_num=int(input[1])-1
+                    inp_val = input[4]
+                    try:
+                        if dropVal.lower()=='dropdown':
+                            driver=browser_Keywords.driver_obj
+                            log.debug('got the driver instance from browser keyword')
+                            from table_keywords import TableOperationKeywords
+                            tableops = TableOperationKeywords()
+                            cell=tableops.javascriptExecutor(webelement,row_num,col_num)
+                            element_list=cell.find_elements_by_xpath('.//*')
+                            if len(list(element_list))>0:
+                                xpath=tableops.getElemntXpath(element_list[0])
+                                cell=browser_Keywords.driver_obj.find_element_by_xpath(xpath)
+                                log.debug('checking for element not none')
+                                if(cell!=None):
+                                    log.debug('checking for element enabled')
+                                    if cell.is_enabled():
+                                        if len(inp_val.strip()) != 0:
+                                            select = Select(cell)
+                                            iList = select.options
+                                        else:
+                                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                            log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                            else:
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                    except Exception as e:
+                        log.error(e)
+                        logger.print_on_console(e)
+                        err_msg=e
+            elif (len(input) == 1):
+                if(webelement.is_enabled()):
                     if input[0] != '':
                         try:
                             inp_val = input[0]
@@ -1741,6 +1735,19 @@ class DropdownKeywords():
                             if len(inp_val.strip()) != 0:
                                 select = Select(webelement)
                                 iList = select.options
+                                temp=[]
+                                for i in range (0,len(iList)):
+                                    internal_val = iList[i].text
+                                    temp.append(internal_val)
+                                if (inp_val in temp):
+                                    select.select_by_visible_text(inp_val)
+                                    status=webconstants.TEST_RESULT_PASS
+                                    result=webconstants.TEST_RESULT_TRUE
+                                    log.info('Values Match')
+                                else:
+                                    logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                             else:
                                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                 log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -1754,33 +1761,13 @@ class DropdownKeywords():
                         log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 else:
-                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                    log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                try:
-                    if inp_val !='':
-                        temp=[]
-                        for i in range (0,len(iList)):
-                            internal_val = iList[i].text
-                            temp.append(internal_val)
-                        if (inp_val in temp):
-                            select.select_by_visible_text(inp_val)
-                            status=webconstants.TEST_RESULT_PASS
-                            result=webconstants.TEST_RESULT_TRUE
-                            log.info('Values Match')
-                        else:
-                            logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                            log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                            err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                    else:
-                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-
-                except Exception as e:
-                    log.error(e)
-                    logger.print_on_console(e)
-                    err_msg=e
+                    err_msg = ERROR_CODE_DICT['ERR_OBJECT_DISABLED']
+                    logger.print_on_console(err_msg)
+                    log.info(err_msg)
+            else:
+                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         return status,result,verb,err_msg
 
 

@@ -29,7 +29,7 @@ class Pause(wx.Frame):
         self.SetBackgroundColour('#e6e7e8')
         self.panel = wx.Panel(self)
         self.sizer = wx.GridBagSizer(1, 2)
-        self.iconpath = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images" + "/slk.ico"
+        self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
 
@@ -78,7 +78,7 @@ class Display(wx.Frame):
         wx.Frame.__init__(self, parent, title="Nineteen68 - DisplayValue",   size=(400, 300),style=wx.STAY_ON_TOP|wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
         self.SetBackgroundColour('#e6e7e8')
         self.panel = wx.Panel(self)
-        self.iconpath = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images" + "/slk.ico"
+        self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         self.t = wx.TextCtrl(self.panel, wx.ID_ANY,  size=(380, 200),  style = wx.TE_MULTILINE|wx.TE_READONLY)

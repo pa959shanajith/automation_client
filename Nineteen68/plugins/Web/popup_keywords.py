@@ -134,12 +134,12 @@ class PopupKeywords():
             else:
                 logger.print_on_console('Alert Text mismatched')
                 log.info('Alert Text mismatched')
-                logger.print_on_console('Expected: ',text)
+                logger.print_on_console('Expected: ',input)
                 log.info('Expected:')
-                log.info(text)
-                logger.print_on_console('Actual: ',input)
-                log.info('Actual:')
                 log.info(input)
+                logger.print_on_console('Actual: ',text)
+                log.info('Actual:')
+                log.info(text)
         except Exception as e:
             logger.print_on_console(EXCEPTION_OCCURED,e)
             log.error(EXCEPTION_OCCURED)

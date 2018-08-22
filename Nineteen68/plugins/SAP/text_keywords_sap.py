@@ -14,6 +14,9 @@ import logger
 from encryption_utility import AESCipher
 from saputil_operations import SapUtilKeywords
 from sap_launch_keywords import Launch_Keywords
+import logging
+log = logging.getLogger('text_keywords_sap.py')
+
 class Text_Keywords():
 
     def __init__(self):
