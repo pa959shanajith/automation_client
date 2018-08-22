@@ -265,7 +265,8 @@ class Launch_Keywords():
                             logger.print_on_console('Connected to SAP')
                             status=sap_constants.TEST_RESULT_PASS
                             result = sap_constants.TEST_RESULT_TRUE
-                        except:
+                        except Exception as e:
+                            log.error(e)
                             logger.print_on_console('Given Server description is incorrect')
                             err_msg='Given Server discription is incorrect'
                             term = TERMINATE
@@ -273,7 +274,8 @@ class Launch_Keywords():
                         logger.print_on_console('The given window name is not found')
                         err_msg='Not connected to SAP Logon , window not found'
                         term = TERMINATE
-                except:
+                except Exception as e:
+                    log.error(e)
                     logger.print_on_console('SAP Logon window does not exist')
                     err_msg='SAP Logon window does not exist'
                     term = TERMINATE
@@ -283,6 +285,9 @@ class Launch_Keywords():
         except Exception as e:
             log.error(e)
             logger.print_on_console("Could not find specified window name")
+            term = TERMINATE
+        if(term!=None):
+            return term
         return status,result,verb,err_msg
 
 
