@@ -1109,9 +1109,63 @@ class Config_window(wx.Frame):
         #----------------------------------
         isConfigJson=self.readconfigJson()
         #----------------------------------
+
+        #------------------------------------Different co-ordinates for Windows and Mac
+        if platform.system()=='Windows':
+            config_fields= {
+            "Frame":[(300, 150),(470,450)],
+            "S_address":[(12,8 ),(90, 28),(100,8 ),(140,-1)],
+            "S_port": [(270,8 ),(70, 28),(340,8 ), (105,-1)],
+            "Chrm_path":[(12,38),(80, 28),(100,38), (310,-1),(415,38),(30, -1)],
+            "Log_path":[(12,68),(80, 28),(100,68), (310,-1),(415,68),(30, -1)],
+            "Q_timeout":[(12,98),(85, 28),(100,98), (80,-1)],
+            "Timeout":[(185,98),(50, 28),(240,98), (80,-1)],
+            "Delay":[(325,98),(40, 28),(360,98), (85,-1)],
+            "Step_exec":[(12,128),(120, 28),(130,128),(80,-1)],
+            "Disp_var":[(225,128),(140, 28),(360,128), (85,-1)],
+            "S_cert":[(12,158),(85, 28),(100,158),(310,-1),(415,158),(30, -1)],
+            "Ignore_cert":[(12,188)],
+            "IE_arch":[(150,188)],
+            "Dis_s_cert":[(290,188)],
+            "Ex_flag":[(12,248)],
+            "Ignore_v_check":[(150,248)],
+            "S_flag":[(340,308)],
+            "Ret_url":[(12,308)],
+            "En_secu_check":[(308,248)],
+            "Brow_ch":[(115,308)],
+            "High_ch":[ (225,308)],
+            "Save":[(100,388), (100, 28)],
+            "Close":[(250,388), (100, 28)]
+        }
+        else:
+            config_fields={
+            "Frame":[(300, 150),(555,460)],
+            "S_address":[(12,8),(90,28),(116,8 ),(140,-1)],
+            "S_port": [(352,8),(70,28),(430,8 ),(105,-1)],
+            "Chrm_path":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
+            "Log_path":[(12,68),(80, 28),(116,68),(382,-1),(504,68),(30, -1)],
+            "Q_timeout":[(12,98),(85, 28),(116,98), (80,-1)],
+            "Timeout":[(255,98),(50, 28),(290,98),(80,-1)],
+            "Delay":[(404,98),(40, 28),(448,98), (85,-1)],
+            "Step_exec":[(12,128),(120, 28),(142,128),(80,-1)],
+            "Disp_var":[(288,128),(140, 28),(448,128),(85,-1)],
+            "S_cert":[(12,158),(85, 28),(116,158),(382,-1),(504,158),(30, -1)],
+            "Ignore_cert":[(12,248)],
+            "IE_arch":[(158,188)],
+            "Dis_s_cert":[(335,188)],
+            "Ex_flag":[(12,188)],
+            "Ignore_v_check":[(170,248)],
+            "S_flag":[(396,308)],
+            "Ret_url":[(12,308)],
+            "En_secu_check":[(358,248)],
+            "Brow_ch":[(130,308)],
+            "High_ch":[(260,308)],
+            "Save":[(135,388),(100, 28)],
+            "Close":[(285,388),(100, 28)]
+        }
         global socketIO
         wx.Frame.__init__(self, parent, title=title,
-                   pos=(300, 150), size=(470, 450), style = wx.CAPTION|wx.CLIP_CHILDREN)
+                   pos=config_fields["Frame"][0], size=config_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
         self.SetBackgroundColour('#e6e7e8')
         self.iconpath = IMAGES_PATH +"slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
@@ -1125,68 +1179,68 @@ class Config_window(wx.Frame):
         self.currentDirectory = os.environ["NINETEEN68_HOME"]
         self.defaultServerCrt = './Scripts/CA_BUNDLE/server.crt'
 
-        self.sev_add=wx.StaticText(self.panel, label="Server Address", pos=(12,8 ),size=(90, 28), style=0, name="")
-        self.server_add=wx.TextCtrl(self.panel, pos=(100,8 ), size=(140,-1))
+        self.sev_add=wx.StaticText(self.panel, label="Server Address", pos=config_fields["S_address"][0],size=config_fields["S_address"][1], style=0, name="")
+        self.server_add=wx.TextCtrl(self.panel, pos=config_fields["S_address"][2], size=config_fields["S_address"][3])
         if isConfigJson!=False:
             self.server_add.SetValue(isConfigJson['server_ip'])
 
-        self.sev_port=wx.StaticText(self.panel, label="Server Port", pos=(270,8 ),size=(70, 28), style=0, name="")
-        self.server_port=wx.TextCtrl(self.panel, pos=(340,8 ), size=(105,-1))
+        self.sev_port=wx.StaticText(self.panel, label="Server Port", pos=config_fields["S_port"][0],size=config_fields["S_port"][1], style=0, name="")
+        self.server_port=wx.TextCtrl(self.panel, pos=config_fields["S_port"][2], size=config_fields["S_port"][3])
         if isConfigJson!=False:
             self.server_port.SetValue(isConfigJson['server_port'])
         else:
             self.server_port.SetValue("8443")
 
-        self.ch_path=wx.StaticText(self.panel, label="Chrome Path", pos=(12,38),size=(80, 28), style=0, name="")
-        self.chrome_path=wx.TextCtrl(self.panel, pos=(100,38), size=(310,-1))
-        wx.Button(self.panel, label="...",pos=(415,38), size=(30, -1)).Bind(wx.EVT_BUTTON, self.fileBrowser_chpath)
+        self.ch_path=wx.StaticText(self.panel, label="Chrome Path", pos=config_fields["Chrm_path"][0],size=config_fields["Chrm_path"][1], style=0, name="")
+        self.chrome_path=wx.TextCtrl(self.panel, pos=config_fields["Chrm_path"][2], size=config_fields["Chrm_path"][3])
+        wx.Button(self.panel, label="...", pos=config_fields["Chrm_path"][4], size=config_fields["Chrm_path"][5]).Bind(wx.EVT_BUTTON, self.fileBrowser_chpath)
         if isConfigJson!=False:
             self.chrome_path.SetValue(isConfigJson['chrome_path'])
         else:
             self.chrome_path.SetValue('default')
 
-        self.log_fpath=wx.StaticText(self.panel, label="Log File Path", pos=(12,68),size=(80, 28), style=0, name="")
-        self.log_file_path=wx.TextCtrl(self.panel, pos=(100,68), size=(310,-1))
-        wx.Button(self.panel, label="...",pos=(415,68), size=(30, -1)).Bind(wx.EVT_BUTTON, self.fileBrowser_logfilepath)
+        self.log_fpath=wx.StaticText(self.panel, label="Log File Path", pos=config_fields["Log_path"][0],size=config_fields["Log_path"][1], style=0, name="")
+        self.log_file_path=wx.TextCtrl(self.panel, pos=config_fields["Log_path"][2], size=config_fields["Log_path"][3])
+        wx.Button(self.panel, label="...",pos=config_fields["Log_path"][4], size=config_fields["Log_path"][5]).Bind(wx.EVT_BUTTON, self.fileBrowser_logfilepath)
         if isConfigJson!=False:
             self.log_file_path.SetValue(isConfigJson['logFile_Path'])
 
-        self.qu_timeout=wx.StaticText(self.panel, label="Query Timeout", pos=(12,98),size=(85, 28), style=0, name="")
-        self.query_timeout=wx.TextCtrl(self.panel, pos=(100,98), size=(80,-1))
+        self.qu_timeout=wx.StaticText(self.panel, label="Query Timeout", pos=config_fields["Q_timeout"][0],size=config_fields["Q_timeout"][1], style=0, name="")
+        self.query_timeout=wx.TextCtrl(self.panel, pos=config_fields["Q_timeout"][2], size=config_fields["Q_timeout"][3])
         if isConfigJson!=False:
             self.query_timeout.SetValue(isConfigJson['queryTimeOut'])
         else:
             self.query_timeout.SetValue("3")
 
-        self.timeOut=wx.StaticText(self.panel, label="Time Out", pos=(185,98),size=(50, 28), style=0, name="")
-        self.time_out=wx.TextCtrl(self.panel, pos=(240,98), size=(80,-1))
+        self.timeOut=wx.StaticText(self.panel, label="Time Out", pos=config_fields["Timeout"][0],size=config_fields["Timeout"][1], style=0, name="")
+        self.time_out=wx.TextCtrl(self.panel, pos=config_fields["Timeout"][2], size=config_fields["Timeout"][3])
         if isConfigJson!=False:
             self.time_out.SetValue(isConfigJson['timeOut'])
         else:
             self.time_out.SetValue("1")
 
-        self.delayText=wx.StaticText(self.panel, label="Delay", pos=(325,98),size=(40, 28), style=0, name="")
-        self.delay=wx.TextCtrl(self.panel, pos=(360,98), size=(85,-1))
+        self.delayText=wx.StaticText(self.panel, label="Delay", pos=config_fields["Delay"][0],size=config_fields["Delay"][1], style=0, name="")
+        self.delay=wx.TextCtrl(self.panel, pos=config_fields["Delay"][2], size=config_fields["Delay"][3])
         if isConfigJson!=False:
             self.delay.SetValue(isConfigJson['delay'])
         else:
             self.delay.SetValue("0.3")
 
-        self.stepExecWait=wx.StaticText(self.panel, label="Step Execution Wait", pos=(12,128),size=(120, 28), style=0, name="")
-        self.step_exe_wait=wx.TextCtrl(self.panel, pos=(130,128), size=(80,-1))
+        self.stepExecWait=wx.StaticText(self.panel, label="Step Execution Wait", pos=config_fields["Step_exec"][0],size=config_fields["Step_exec"][1], style=0, name="")
+        self.step_exe_wait=wx.TextCtrl(self.panel, pos=config_fields["Step_exec"][2], size=config_fields["Step_exec"][3])
         if isConfigJson!=False:
             self.step_exe_wait.SetValue(isConfigJson['stepExecutionWait'])
         else:
             self.step_exe_wait.SetValue("1")
 
-        self.dispVarTimeOut=wx.StaticText(self.panel, label="Display Variable Timeout", pos=(225,128),size=(140, 28), style=0, name="")
-        self.disp_var_timeout=wx.TextCtrl(self.panel, pos=(360,128), size=(85,-1))
+        self.dispVarTimeOut=wx.StaticText(self.panel, label="Display Variable Timeout", pos=config_fields["Disp_var"][0],size=config_fields["Disp_var"][1], style=0, name="")
+        self.disp_var_timeout=wx.TextCtrl(self.panel, pos=config_fields["Disp_var"][2], size=config_fields["Disp_var"][3])
         if isConfigJson!=False:
             self.disp_var_timeout.SetValue(isConfigJson['displayVariableTimeOut'])
 
-        self.sev_cert=wx.StaticText(self.panel, label="Server Cert", pos=(12,158),size=(85, 28), style=0, name="")
-        self.server_cert=wx.TextCtrl(self.panel, pos=(100,158), size=(310,-1))
-        wx.Button(self.panel, label="...",pos=(415,158), size=(30, -1)).Bind(wx.EVT_BUTTON, self.fileBrowser_servcert)
+        self.sev_cert=wx.StaticText(self.panel, label="Server Cert", pos=config_fields["S_cert"][0],size=config_fields["S_cert"][1], style=0, name="")
+        self.server_cert=wx.TextCtrl(self.panel, pos=config_fields["S_cert"][2], size=config_fields["S_cert"][3])
+        wx.Button(self.panel, label="...",pos=config_fields["S_cert"][4], size=config_fields["S_cert"][5]).Bind(wx.EVT_BUTTON, self.fileBrowser_servcert)
         if (not isConfigJson) or (isConfigJson and isConfigJson['server_cert']==self.defaultServerCrt):
             self.defaultServerCrt = os.path.normpath(self.currentDirectory+'/Scripts/CA_BUNDLE/server.crt')
             self.server_cert.SetValue(self.defaultServerCrt)
@@ -1197,70 +1251,70 @@ class Config_window(wx.Frame):
         lblList2 = ['64-bit', '32-bit']
         lblList3 = ['All', 'Fail']
         lblList4 = ['False', 'True']
-        self.rbox1 = wx.RadioBox(self.panel, label = 'Ignore Certificate', pos = (12,188), choices = lblList,
+        self.rbox1 = wx.RadioBox(self.panel, label = 'Ignore Certificate', pos = config_fields["Ignore_cert"][0], choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['ignore_certificate'].title()==lblList[0]:
             self.rbox1.SetSelection(0)
         else:
             self.rbox1.SetSelection(1)
 
-        self.rbox2 = wx.RadioBox(self.panel, label = 'IE Architecture Type', pos = (130,188), choices = lblList2,
+        self.rbox2 = wx.RadioBox(self.panel, label = 'IE Architecture Type', pos = config_fields["IE_arch"][0], choices = lblList2,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['bit_64'].title() != 'Yes':
             self.rbox2.SetSelection(1)
         else:
             self.rbox2.SetSelection(0)
 
-        self.rbox9 = wx.RadioBox(self.panel, label = 'Disable Server Certificate Check', pos = (260,188), choices = lblList,
+        self.rbox9 = wx.RadioBox(self.panel, label = 'Disable Server Cert Check', pos = config_fields["Dis_s_cert"][0], choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['disable_server_cert'].title() == lblList[0]:
             self.rbox9.SetSelection(0)
         else:
             self.rbox9.SetSelection(1)
 
-        self.rbox5 = wx.RadioBox(self.panel, label = 'Exception Flag', pos = (12,248), choices = lblList4,
+        self.rbox5 = wx.RadioBox(self.panel, label = 'Exception Flag', pos = config_fields["Ex_flag"][0], choices = lblList4,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['exception_flag'].title()!=lblList4[0]:
             self.rbox5.SetSelection(1)
         else:
             self.rbox5.SetSelection(0)
 
-        self.rbox6 = wx.RadioBox(self.panel, label = 'Ignore Visibility Check', pos = (150,248), choices = lblList,
+        self.rbox6 = wx.RadioBox(self.panel, label = 'Ignore Visibility Check', pos = config_fields["Ignore_v_check"][0], choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['ignoreVisibilityCheck'].title()==lblList[0]:
             self.rbox6.SetSelection(0)
         else:
             self.rbox6.SetSelection(1)
 
-        self.rbox3 = wx.RadioBox(self.panel, label = 'ScreenShot Flag', pos = (340,308), choices = lblList3,
+        self.rbox3 = wx.RadioBox(self.panel, label = 'ScreenShot Flag', pos = config_fields["S_flag"][0], choices = lblList3,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['screenShot_Flag'].title()!=lblList3[0]:
             self.rbox3.SetSelection(1)
         else:
             self.rbox3.SetSelection(0)
 
-        self.rbox4 = wx.RadioBox(self.panel, label = 'Retrieve URL', pos = (12,308), choices = lblList,
+        self.rbox4 = wx.RadioBox(self.panel, label = 'Retrieve URL', pos = config_fields["Ret_url"][0], choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['retrieveURL'].title()!=lblList[0]:
             self.rbox4.SetSelection(1)
         else:
             self.rbox4.SetSelection(0)
 
-        self.rbox7 = wx.RadioBox(self.panel, label = 'Enable Security Check', pos = (310,248), choices = lblList,
+        self.rbox7 = wx.RadioBox(self.panel, label = 'Enable Security Check', pos = config_fields["En_secu_check"][0], choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['enableSecurityCheck'].title()==lblList[0]:
             self.rbox7.SetSelection(0)
         else:
             self.rbox7.SetSelection(1)
 
-        self.rbox8 = wx.RadioBox(self.panel, label = 'Browser Check', pos = (115,308), choices = lblList,
+        self.rbox8 = wx.RadioBox(self.panel, label = 'Browser Check', pos = config_fields["Brow_ch"][0], choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['browser_check'].title()!=lblList[0]:
             self.rbox8.SetSelection(1)
         else:
             self.rbox8.SetSelection(0)
 
-        self.rbox10 = wx.RadioBox(self.panel, label = 'Highlight Check', pos = (225,308), choices = lblList,
+        self.rbox10 = wx.RadioBox(self.panel, label = 'Highlight Check', pos = config_fields["High_ch"][0], choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['highlight_check'].title()==lblList[0]:
             self.rbox10.SetSelection(0)
@@ -1268,8 +1322,8 @@ class Config_window(wx.Frame):
             self.rbox10.SetSelection(1)
 
         self.error_msg=wx.StaticText(self.panel, label="", pos=(85,360),size=(350, 28), style=0, name="")
-        wx.Button(self.panel, label="Save",pos=(100,388), size=(100, 28)).Bind(wx.EVT_BUTTON, self.config_check)
-        wx.Button(self.panel, label="Close",pos=(250,388), size=(100, 28)).Bind(wx.EVT_BUTTON, self.close)
+        wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1]).Bind(wx.EVT_BUTTON, self.config_check)
+        wx.Button(self.panel, label="Close",pos=config_fields["Close"][0], size=config_fields["Close"][1]).Bind(wx.EVT_BUTTON, self.close)
 
         self.Centre()
         wx.Frame(self.panel)
@@ -1346,6 +1400,18 @@ class Config_window(wx.Frame):
             self.stepExecWait.SetForegroundColour((0,0,0))
             self.dispVarTimeOut.SetLabel('Display Variable Timeout')
             self.dispVarTimeOut.SetForegroundColour((0,0,0))
+
+            #---------------------------------------creating the file in specified path
+            try:
+                f = open(data['logFile_Path'], "a+")
+                f.close()
+            except Exception as e:
+                msg = "Either logfile path doesn't exists or user doesn't have sufficient privileges."
+                logger.print_on_console(msg)
+                log.error(msg)
+                log.error(e)
+                data['logFile_Path'] = ''
+
             #---------------------------------------resetting the static texts
             if (os.path.isfile(data['chrome_path'])==True or str(data['chrome_path']).strip()=='default') and os.path.isfile(data['server_cert'])==True and os.path.isfile(data['logFile_Path'])==True:
                 self.jsonCreater(config_data)
@@ -1484,8 +1550,6 @@ class Config_window(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             log_path = dlg.GetPath()
             log_path= os.path.normpath(log_path+"/TestautoV2.log")
-            f = open(log_path, "a+")
-            f.close()
             self.log_file_path.SetValue(log_path)
         dlg.Destroy()
     """This method open a file selector dialog , from where file path can be set """
