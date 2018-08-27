@@ -1098,8 +1098,19 @@ class ClientWindow(wx.Frame):
             pass
         if not flag:
             logger.print_on_console("Unauthorized: Access denied, system is not registered with Nineteen68")
-            self.connectbutton.Disable()
+            self.DisableAll()
         return flag
+
+    def DisableAll(self):
+        self.menubar.EnableTop(0,False)
+        self.menubar.EnableTop(1,False)
+        self.connectbutton.Disable()
+        self.schedule.Disable()
+        self.rbox.Disable()
+        self.cancelbutton.Disable()
+        self.terminatebutton.Disable()
+        self.clearbutton.Disable()
+
 
 """Checks if config file is present, if not prompts the user to enter config file details"""
 class Config_window(wx.Frame):
