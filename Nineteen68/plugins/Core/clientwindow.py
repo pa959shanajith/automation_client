@@ -1477,12 +1477,6 @@ class Config_window(wx.Frame):
             else:
                 self.ch_path.SetLabel('Chrome Path')
                 self.ch_path.SetForegroundColour((0,0,0))
-            if data['browser_check']=='':
-                self.ch_path.SetLabel('Browser Check*')
-                self.ch_path.SetForegroundColour((255,0,0))
-            else:
-                self.ch_path.SetLabel('Browser Check')
-                self.ch_path.SetForegroundColour((0,0,0))
             if data['delay']=='':
                 self.delayText.SetLabel('Delay*')
                 self.delayText.SetForegroundColour((255,0,0))
