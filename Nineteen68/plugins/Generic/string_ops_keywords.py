@@ -13,7 +13,10 @@ import random
 import logger
 import generic_constants
 import core_utils
-import win32clipboard
+import platform
+import subprocess
+if platform.system() == "Windows":
+    import win32clipboard
 
 import logging
 from constants import *
@@ -543,30 +546,37 @@ class StringOperation:
         return status,result,output,err_msg
 
     def save_to_clip_board(self,input_val,*args):
-            """
-            def : save_to_clip_board
-            purpose : to save data on clipboard
-            param  : string
-            return : string
-            """
-            status=generic_constants.TEST_RESULT_FAIL
-            result=generic_constants.TEST_RESULT_FALSE
-            err_msg=None
-            output=OUTPUT_CONSTANT
-            try:
-                # set clipboard data
+        """
+        def : save_to_clip_board
+        purpose : to save data on clipboard
+        param  : string
+        return : string
+        """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        try:
+            if platform.system() == "Windows":
                 win32clipboard.OpenClipboard()
                 win32clipboard.EmptyClipboard()
                 win32clipboard.SetClipboardText(input_val)
                 win32clipboard.CloseClipboard()
                 status=generic_constants.TEST_RESULT_PASS
-                result=generic_constants.TEST_RESULT_TRUE
-            except Exception as e:
-                log.error(e)
-                err_msg='Error Occured'
-                import traceback
-                traceback.print_exc()
-            return status,result,output,err_msg
+            elif platform.system() == "Darwin":
+                p = subprocess.Popen(['pbcopy'], stdin=subprocess.PIPE)
+                p.stdin.write(data)
+                p.stdin.close()
+                retcode = p.wait()
+                if str(retcode)=="0":
+                    status=generic_constants.TEST_RESULT_PASS
+            result=generic_constants.TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg="Error while saving data to clipboard"
+            log.error(err_msg)
+            log.error(e)
+            logger.print_on_console(err_msg)
+        return status,result,output,err_msg
 
     def get_from_clip_board(self,*args):
         """
@@ -580,36 +590,21 @@ class StringOperation:
         err_msg=None
         output=OUTPUT_CONSTANT
         try:
-            # set clipboard data
-            win32clipboard.OpenClipboard()
-            output = win32clipboard.GetClipboardData()
-            win32clipboard.CloseClipboard()
-            status=generic_constants.TEST_RESULT_PASS
+            if platform.system() == "Windows":
+                win32clipboard.OpenClipboard()
+                output = win32clipboard.GetClipboardData()
+                win32clipboard.CloseClipboard()
+                status=generic_constants.TEST_RESULT_PASS
+            elif platform.system() == "Darwin":
+                p = subprocess.Popen(['pbpaste'], stdout=subprocess.PIPE)
+                retcode = p.wait()
+                output = p.stdout.read()
+                if str(retcode)=="0":
+                    status=generic_constants.TEST_RESULT_PASS
             result=generic_constants.TEST_RESULT_TRUE
         except Exception as e:
+            err_msg="Error while saving data to clipboard"
+            log.error(err_msg)
             log.error(e)
-            err_msg='Error Occured'
-            import traceback
-            traceback.print_exc()
+            logger.print_on_console(err_msg)
         return status,result,output,err_msg
-
-
-##obj =StringOperation()
-##obj.toLowerCase('RAkESH')
-##obj.toUpperCase('raKesh')
-##obj.concatenate("I am ","Rakesh","SV")
-##obj.trim(' Rake  ')
-##obj.getStringLength('RAKESH')
-##obj.replace("Rakesh","esh"," ")
-##obj.split("Rak esh"," ")
-##obj.getSubString("hello","1")
-##obj.getSubString("RAKESH","5-6")
-##obj.find("Rakesh","z")
-##obj.left("Rakesh SV","7")
-##obj.right("RakeshSV",7)
-##obj.getStringLength("\"\"")
-##obj.stringGeneration('char','1')
-
-
-
-
