@@ -701,8 +701,9 @@ class ClientWindow(wx.Frame):
         ##self.ShowFullScreen(True,wx.ALL)
         ##self.SetBackgroundColour('#D0D0D0')
         self.logfilename_error_flag = False
-        # Check if config file is present
-        self.is_config_present_flag = os.path.isfile(CONFIG_PATH)
+        # Check if config file is present and valid
+        self.is_config_missing = configvalues.has_key('configmissing')
+        self.is_config_invalid = configvalues.has_key('errorflag')
         self.debugwindow = None
         self.scrapewindow = None
         self.pausewindow = None
@@ -821,7 +822,7 @@ class ClientWindow(wx.Frame):
         self.Centre()
         self.Show()
 		#747 disable buttons if any flag raised (Himanshu)
-        if (self.logfilename_error_flag)==True or self.is_config_present_flag==False:
+        if self.logfilename_error_flag or self.is_config_invalid or self.is_config_missing:
             self.cancelbutton.Disable()
             self.terminatebutton.Disable()
             self.clearbutton.Disable()

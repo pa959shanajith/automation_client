@@ -18,12 +18,6 @@ os.environ["NINETEEN68_HOME"] = args.NINETEEN68_HOME
 
 configobj = readconfig.readConfig()
 configvalues = configobj.readJson()
-jsonSyntaxErrorFlag = False
-configMissingFlag = False
-if configvalues.has_key('errorflag'):
-    jsonSyntaxErrorFlag = True
-elif configvalues.has_key('configmissing'):
-    configMissingFlag = True
 
 """
 This code snippet blocks the inheritance of file handlers from
@@ -52,11 +46,11 @@ if __name__ == "__main__":
     print('********************************************************************************************************')
     print('============================================ '+appName+' ============================================')
     print('********************************************************************************************************')
-    if configMissingFlag:
+    if cw.is_config_missing:
         err = "Configure "+appName+" by navigating to Edit -> Configuration"
         logger.print_on_console(err)
         log.info(err)
-    elif jsonSyntaxErrorFlag:
+    elif cw.is_config_invalid:
         err = "[Error]: Syntax error in config.json file, and please check and restart "+appName+"."
         logger.print_on_console(err)
         log.info(err)
