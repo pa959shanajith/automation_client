@@ -40,19 +40,16 @@ configvalues = configobj.readJson()
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
 class TestThread(threading.Thread):
     """Test Worker Thread Class."""
-    #----------------------------------------------------------------------
     def __init__(self,url):
         """Init Worker Thread Class."""
         threading.Thread.__init__(self)
         self.url=url
-        self.start()
-          # start the thread
-    #----------------------------------------------------------------------
+
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
-        time.sleep(2)
-        driver_obj.get(self.url[0])
+        time.sleep(1)
+        driver_obj.get(self.url)
 
 
 
@@ -204,7 +201,8 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
-    def navigateToURL(self ,webelement, url , *args):
+
+    def navigateToURL(self, webelement, url, *args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -213,7 +211,7 @@ class BrowserKeywords():
             url = url[0]
             if not (url is None and url is ''):
                 url.strip()
-                if url[0:4].lower()!='http' and url[0:4].lower()!='file':
+                if url[0:7].lower()!='http://' and url[0:5].lower()!='file:':
                     url='http://'+url
                 driver_obj.get(url)
                 #ignore certificate implementation
@@ -249,9 +247,7 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return
 
-
-
-    def navigate_with_authenticate(self ,webelement, url , *args):
+    def navigate_with_authenticate(self, webelement, url, *args):
         """
         def : navigate_with_authenticate
         purpose : To open a URL which throws a popup and automatically fill
@@ -266,30 +262,6 @@ class BrowserKeywords():
         err_msg=None
 
         try:
-            inputURL = url[0]
-            if not (inputURL is None and inputURL is ''):
-                inputURL.strip()
-                if inputURL[0:4].lower()!='http' and inputURL[0:4].lower()!='file':
-                    inputURL='http://'+inputURL
-                driver_obj.get(inputURL)
-                #ignore certificate implementation23
-
-                try:
-                    ignore_certificate = configvalues['ignore_certificate']
-                    if ((ignore_certificate.lower() == 'yes') and ((driver_obj.title !=None) and ('Certificate' in driver_obj.title))):
-                        driver_obj.execute_script("""document.getElementById('overridelink').click();""")
-                except Exception as k:
-                    logger.print_on_console('Exception while ignoring the certificate')
-                logger.print_on_console('Navigated to URL')
-                log.info('Navigated to URL')
-                status=webconstants.TEST_RESULT_PASS
-                result=webconstants.TEST_RESULT_TRUE
-            else:
-                logger.print_on_console(webconstants.INVALID_INPUT)
-        except Exception as e:
-            err_msg=self.__web_driver_exception(e)
-
-        try:
             if (url[0] is not None and url[0] != '')\
              and (url[1] is not None and url[1] != '')\
               and (url[2] is not None and url[2] != ''):
@@ -297,11 +269,19 @@ class BrowserKeywords():
                 encryption_obj = AESCipher()
                 input_val = encryption_obj.decrypt(url[2])
                 url[2]=input_val
-                t=TestThread(url)
+                inputURL = url[0]
+                if not (inputURL is None and inputURL is ''):
+                    inputURL.strip()
+                    if inputURL[0:7].lower()!='http://' and inputURL[0:5].lower()!='file:':
+                        inputURL='http://'+inputURL
+                t=TestThread(inputURL)
+                t.start()
                 if len(url)>3:
-                    url[3]=int(url[3])
-                    timeout=url[3]
-                    time.sleep(int(timeout))
+                    try:
+                        url[3]=int(url[3])
+                    except:
+                        url[3]=6
+                    time.sleep(int(url[3]))
                 else:
                     time.sleep(6)
 
@@ -317,21 +297,26 @@ class BrowserKeywords():
                     obj.execute_key('spacebar',1)
                     obj.execute_key('tab',1)
                     obj.execute_key('enter',1)
-                    status=webconstants.TEST_RESULT_PASS
-                    result=webconstants.TEST_RESULT_TRUE
                 else:
                     obj=SF()
                     username=url[1].strip()
-                    match_found_flag = False
                     password=url[2]
                     obj.type(username)
                     obj.execute_key('tab',1)
                     obj.type(password)
                     obj.execute_key('tab',1)
                     obj.execute_key('enter',1)
-                    status=webconstants.TEST_RESULT_PASS
-                    result=webconstants.TEST_RESULT_TRUE
-
+                t.join()
+                try:
+                    ignore_certificate = configvalues['ignore_certificate']
+                    if ((ignore_certificate.lower() == 'yes') and ((driver_obj.title !=None) and ('Certificate' in driver_obj.title))):
+                        driver_obj.execute_script("""document.getElementById('overridelink').click();""")
+                except Exception as k:
+                    logger.print_on_console('Exception while ignoring the certificate')
+                logger.print_on_console('Navigated to URL')
+                log.info('Navigated to URL')
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
             else:
                 logger.print_on_console(webconstants.INVALID_INPUT)
                 log.error(webconstants.INVALID_INPUT)
@@ -339,7 +324,6 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
-
 
     def getPageTitle(self,*args):
         status=webconstants.TEST_RESULT_FAIL

@@ -29,7 +29,9 @@ import core_utils
 from xlrd.sheet import ctype_text
 import itertools
 import csv
-import win32api
+import platform
+if platform.system() == "Windows":
+    import win32api
 
 class ExcelFile:
 
