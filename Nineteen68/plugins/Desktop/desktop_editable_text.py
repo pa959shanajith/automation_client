@@ -247,25 +247,8 @@ class Text_Box:
         log.info(RETURN_RESULT)
         return status,result,verb,err_msg
 
-
-
     def verify_parent(self,element,parent):
-        status=False
-        try:
-            status = True
-##            app_uia = desktop_launch_keywords.app_uia
-##            win = app_uia.top_window()
-##            real_parent = win.texts()[0]
-##            if(parent in real_parent ):
-##                status= True
-##            else:
-##                #logger.log('verify parent is false')
-##                #logger.print_on_console('verify parent is false')
-##                """We are returning True Because , in some applications the window title changes, resulting in Failure to perform keyword level execution"""
-##                status= True
-        except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
+        status=True
         desktop_constants.ELEMENT_FOUND=status
         return status
 
