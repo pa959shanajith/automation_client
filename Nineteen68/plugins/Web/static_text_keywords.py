@@ -5,25 +5,26 @@
 # Author:      wasimakram.sutar
 #
 # Created:     24-11-2016
+#
+# Modified By: nikunj.jain (27-08-2018)
+#
 # Copyright:   (c) wasimakram.sutar 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
 import logger
-
 import browser_Keywords
 from webconstants import *
 from constants import *
-##import ftfy
 import core_utils
-sourcetext= ''
-separator = '~@~'
+text_occurrences = 0
 import logging
-log = logging.getLogger('static_text_keywords.py')
-tags = ['html','body','form','meta','script','head','style','link','noscript']
-text_javascript = """function stext_content(f) {     var sfirstText = '';     var stextdisplay = '';     for (var z = 0; z < f.childNodes.length; z++) {         var scurNode = f.childNodes[z];         swhitespace = /^\s*$/;         if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {             sfirstText = scurNode.nodeValue;             stextdisplay = stextdisplay + sfirstText;         }     }     return (stextdisplay); }; return stext_content(arguments[0])"""
+log = logging.getLogger(__name__)
+occurrences_javascript = """function occurrences(string, subString, allowOverlapping) {      string += "";     subString += "";     if (subString.length <= 0) return (string.length + 1);      var n = 0,pos = 0,step = allowOverlapping ? 1 : subString.length;      while (true) {         pos = string.indexOf(subString, pos);         if (pos >= 0) {             ++n;             pos += step;         } else break;     }     return n; }; function saddNodesOuter(sarray, scollection) { 	for (var i = 0; scollection && scollection.length && i < scollection.length; i++) { 		sarray.push(scollection[i]); 	} }; function stext_content(f) { 	var sfirstText = ''; 	var stextdisplay = ''; 	for (var z = 0; z < f.childNodes.length; z++) { 		var scurNode = f.childNodes[z]; 		swhitespace = /^\s*$/; 		if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) { 			sfirstText = scurNode.nodeValue; 			stextdisplay = stextdisplay + sfirstText; 		} 	} 	return (stextdisplay); }; var sae = []; var substr = arguments[0]; var sele = arguments.length > 1 ? arguments[1].getElementsByTagName('*') :  document.getElementsByTagName('*'); var text_occurrences = 0; saddNodesOuter(sae, sele);  for(var j=0;j<sae.length;j++){ 	stagname = sae[j].tagName.toLowerCase(); 	 	if (stagname != 'script' && stagname != 'meta' && stagname != 'html' && stagname != 'head' && stagname != 'style' && stagname != 'body' && stagname != 'form' && stagname != 'link' && stagname != 'noscript' && stagname != 'option' && stagname != '!' && stagname != 'code' && stagname != 'pre' && stagname != 'br' && stagname != 'animatetransform' && stagname != 'noembed') { 		text_occurrences += occurrences(stext_content(sae[j]),substr); 	} 	 }; return text_occurrences;bstr = arguments[0]; var sele = arguments.length > 1 ? arguments[1].getElementsByTagName('*') :  document.getElementsByTagName('*'); var text_occurrences = 0; saddNodesOuter(sae, sele);  for(var j=0;j<sae.length;j++){ 	stagname = sae[j].tagName.toLowerCase(); 	 	if (stagname != 'script' && stagname != 'meta' && stagname != 'html' && stagname != 'head' && stagname != 'style' && stagname != 'body' && stagname != 'form' && stagname != 'link' && stagname != 'noscript' && stagname != 'option' && stagname != '!' && stagname != 'code' && stagname != 'pre' && stagname != 'br' && stagname != 'animatetransform' && stagname != 'noembed') { 		text_occurrences += occurrences(stext_content(sae[j]),substr); 	} 	 }; return text_occurrences;"""
 class StaticTextKeywords:
-    def switchtoiframe(self,mypath):
+
+    """Method to switch to frames and iframes"""
+    def switch_to_iframe(self,mypath):
         cond_flag = False
         try:
             indiframes = mypath.split("/")
@@ -41,234 +42,82 @@ class StaticTextKeywords:
                         cond_flag = False
                         break
         except Exception as e:
-            Exceptions.error(e)
+            log.error(e)
             cond_flag = False
         return cond_flag
 
-    def get_source1(self,myipath):
-        global sourcetext
-        path = myipath
-        for iframes in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(FRAME)))):
-            path = myipath + str(iframes) + 'f' +  '/'
-            if self.switchtoiframe(path):
-                elements = browser_Keywords.driver_obj.find_elements_by_tag_name("*")
-                for element in elements:
-                    try:
-                        if element.tag_name.lower() not in tags:
-                            text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
-##                            import ftfy
-##                            text = ftfy.fix_text(text)
-                            text = text.replace('\n','')
-                            text = text.strip()
-                            if len(text) != 0:
-                                sourcetext = sourcetext + separator + text
-                    except Exception as e:
-                        log.error(e)
-                for frames in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(IFRAME)))):
-                    inpath = path + str(frames) + 'i' +  '/'
-                    if self.switchtoiframe(inpath):
-                        elements = browser_Keywords.driver_obj.find_elements_by_tag_name("*")
-                        for element in elements:
-                            try:
-                                if element.tag_name.lower() not in tags:
-                                    text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
-##                                    import ftfy
-##                                    text = ftfy.fix_text(text)
-                                    text = text.replace('\n','')
-                                    text = text.strip()
-                                    if len(text) != 0:
-                                        sourcetext = sourcetext + separator + text
-                            except Exception as e:
-                                log.error(e)
-                    self.get_source1(ipath)
-                for frames in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(FRAME)))):
-                    inpath = path + str(frames) + 'f' +  '/'
-                    if self.switchtoiframe(inpath):
-                        elements = browser_Keywords.driver_obj.find_elements_by_tag_name("*")
-                        for element in elements:
-                            try:
-                                if element.tag_name.lower() not in tags:
-                                    text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
-##                                    import ftfy
-##                                    text = ftfy.fix_text(text)
-                                    text = text.replace('\n','')
-                                    text = text.strip()
-                                    if len(text) != 0:
-                                        sourcetext = sourcetext + separator + text
-                            except Exception as e:
-                                log.error(e)
-                    self.get_source1(ipath)
-                self.get_source1(path)
+    """Method to get count of text inside frames (and iframes) recursively"""
+    def get_text_count_frames(self,frame_path,actual_text,coreutilsobj):
+        global text_occurrences
+        for frame in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(FRAME)))):
+            path = frame_path + str(frame) + 'f' +  '/'
+            if self.switch_to_iframe(path):
+                log.debug('switched to frame %s', path)
+                try:
+                    text_occurrences = text_occurrences + int(browser_Keywords.driver_obj.execute_script(occurrences_javascript,actual_text))
+                except Exception as e:
+                    log.error(e)
+                self.get_text_count_frames(path,actual_text,coreutilsobj)
+                self.get_text_count_iframes(path,actual_text,coreutilsobj)
+            else:
+                log.info('could not switch to frame %s', path)
 
-
-    def get_source2(self,myipath):
-        global sourcetext
-        path = myipath
-        for iframes in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(IFRAME)))):
-            path = myipath + str(iframes) + 'i' +  '/'
-            if self.switchtoiframe(path):
-                elements = browser_Keywords.driver_obj.find_elements_by_tag_name("*")
-                for element in elements:
-                    try:
-                        if element.tag_name.lower() not in tags:
-                            text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
-##                            import ftfy
-##                            text = ftfy.fix_text(text)
-                            text = text.replace('\n','')
-                            text = text.strip()
-                            if len(text) != 0:
-                                sourcetext = sourcetext + separator + text
-                    except Exception as e:
-                        log.error(e)
-                for frames in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(FRAME)))):
-                    inpath = path + str(frames) + 'f' +  '/'
-                    if self.switchtoiframe(inpath):
-                       elements = browser_Keywords.driver_obj.find_elements_by_tag_name("*")
-                       for element in elements:
-                            try:
-                                if element.tag_name.lower() not in tags:
-                                    text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
-##                                    import ftfy
-##                                    text = ftfy.fix_text(text)
-                                    text = text.replace('\n','')
-                                    text = text.strip()
-                                    if len(text) != 0:
-                                        sourcetext = sourcetext + separator + text
-                            except Exception as e:
-                                log.error(e)
-                    self.get_source2(inpath)
-                for frames in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(IFRAME)))):
-                    inpath = path + str(frames) + 'i' +  '/'
-                    if self.switchtoiframe(inpath):
-                       elements = browser_Keywords.driver_obj.find_elements_by_tag_name("*")
-                       for element in elements:
-                            try:
-                                if element.tag_name.lower() not in tags:
-                                    text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
-##                                    import ftfy
-##                                    text = ftfy.fix_text(text)
-                                    text = text.replace('\n','')
-                                    text = text.strip()
-                                    if len(text) != 0:
-                                        sourcetext = sourcetext + separator + text
-                            except Exception as e:
-                                log.error(e)
-                    self.get_source2(inpath)
-                self.get_source2(path)
-
+    """Method to get count of text inside iframes (and frames) recursively"""
+    def get_text_count_iframes(self,iframe_path,actual_text,coreutilsobj):
+        global text_occurrences
+        for iframe in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(IFRAME)))):
+            path = iframe_path + str(iframe) + 'i' +  '/'
+            if self.switch_to_iframe(path):
+                log.debug('switched to iframe %s', path)
+                try:
+                    text_occurrences = text_occurrences + int(browser_Keywords.driver_obj.execute_script(occurrences_javascript,actual_text))
+                except Exception as e:
+                    log.error(e)
+                self.get_text_count_iframes(path,actual_text,coreutilsobj)
+                self.get_text_count_frames(path,actual_text,coreutilsobj)
+            else:
+                log.info('could not switch to iframe %s', path)
 
 
     def verify_text_exists(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        global sourcetext
-##        actualtext = str(input[0])
-        actualtext=input[0]
+        actual_text=input[0]
         coreutilsobj=core_utils.CoreUtils()
-        actualtext=coreutilsobj.get_UTF_8(actualtext)
+        actual_text=coreutilsobj.get_UTF_8(actual_text)
         err_msg=None
         output=OUTPUT_CONSTANT
-        text=''
-        text_count = 0
-        countflag = False
-        if webelement == None:
-            try:
-                if actualtext is not None or len(actualtext) > 0:
-                    elements = browser_Keywords.driver_obj.find_elements_by_tag_name("*")
-                    for element in elements:
-                        try:
-                            if element.tag_name.lower()  not in tags:
-                                text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
-##                                import ftfy
-##                                text = ftfy.fix_text(text)
-                                text = text.replace('\n','')
-                                text = text.strip()
-                                if len(text) != 0:
-                                    sourcetext = sourcetext + separator + text
-                        except Exception as e:
-                            log.error(e)
+        global text_occurrences
+        try:
+            if actual_text is not None and len(actual_text) > 0:
+                if webelement == None:
+                    text_occurrences = text_occurrences + int(browser_Keywords.driver_obj.execute_script(occurrences_javascript,actual_text))
                     browser_Keywords.driver_obj.switch_to.default_content()
-                    self.get_source1('')
+                    self.get_text_count_frames('',actual_text,coreutilsobj)
                     browser_Keywords.driver_obj.switch_to.default_content()
-                    self.get_source2('')
+                    self.get_text_count_iframes('',actual_text,coreutilsobj)
                     browser_Keywords.driver_obj.switch_to.default_content()
-
-    ##                sourcetext = ftfy.fix_text(sourcetext)
-                    texts = sourcetext.split('~@~')
-                    log.info('texts array :')
-                    log.info(texts)
-                    for i in texts:
-                        i=coreutilsobj.get_UTF_8(i)
-                        if actualtext in i:
-                            countflag = True
-                            cnt = i.count(actualtext)
-                            text_count = text_count + cnt
-
-                    sourcetext = ''
-
-                    if countflag:
-                        logger.print_on_console('Text  present')
-                        log.info('Text  present')
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
-                        output = text_count
-                        logger.print_on_console('No. of occurance of the text ',actualtext, ' is ',str(text_count),' time(s).')
-                    else:
-                        output = 0
-                        logger.print_on_console('Text not present')
-                        log.error('Text not present')
                 else:
-                    log.error(INVALID_INPUT)
-                    err_msg=INVALID_INPUT
-                    logger.print_on_console(INVALID_INPUT)
-            except Exception as e:
-                    import traceback
-                    traceback.print_exc()
-                    log.error(e)
-                    logger.print_on_console(e)
-        else:
-            try:
-                if actualtext is not None or len(actualtext) > 0:
-                    elements = webelement.find_elements_by_tag_name("*")
-                    for element in elements:
-                        try:
-                            if element.tag_name.lower()  not in tags:
-                                text = browser_Keywords.driver_obj.execute_script(text_javascript,element)
-##                                import ftfy
-##                                text = ftfy.fix_text(text)
-                                text = text.replace('\n','')
-                                text = text.strip()
-                                if len(text) != 0:
-                                    sourcetext = sourcetext + separator + text
-                        except Exception as e:
-                            log.error(e)
-                    texts = sourcetext.split('~@~')
-                    log.info('texts array :')
-                    log.info(texts)
-                    for i in texts:
-                        i=coreutilsobj.get_UTF_8(i)
-                        if actualtext in i:
-                            countflag = True
-                            cnt = i.count(actualtext)
-                            text_count = text_count + cnt
+                    text_occurrences = text_occurrences + int(browser_Keywords.driver_obj.execute_script(occurrences_javascript,actual_text,webelement))
 
-                    sourcetext = ''
-                    if countflag:
-                        logger.print_on_console('Text  present')
-                        log.info('Text  present')
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
-                        output = text_count
-                        logger.print_on_console('No. of occurance of the text ',actualtext, ' is ',str(text_count),' time(s).')
-                    else:
-                        output = 0
-                        logger.print_on_console('Text not present')
-                        log.error('Text not present')
+                if text_occurrences != 0:
+                    logger.print_on_console('Text is present')
+                    log.info('Text is present')
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+                    output = text_occurrences
+                    logger.print_on_console('No. of occurrences of the text ',actual_text, ' is ',str(text_occurrences),' time(s).')
                 else:
-                    log.error(INVALID_INPUT)
-                    err_msg=INVALID_INPUT
-                    logger.print_on_console(INVALID_INPUT)
-            except Exception as e:
-                print e
+                    output = 0
+                    logger.print_on_console('Text is not present')
+                    log.error('Text is not present')
+                text_occurrences = 0
+            else:
+                log.error(INVALID_INPUT)
+                err_msg=INVALID_INPUT
+                logger.print_on_console(INVALID_INPUT)
+        except Exception as e:
+                log.error(e)
+                logger.print_on_console(e)
         return status,methodoutput,output,err_msg
 
