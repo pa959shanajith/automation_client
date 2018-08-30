@@ -60,7 +60,11 @@ class TextboxKeywords:
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         return err_msg
 
+    def __check_visibility_from_config(self):
+        return readconfig.configvalues['ignoreVisibilityCheck'].strip().lower() == "yes"
 
+    def __check_IE_64bit_from_config(self):
+        return readconfig.configvalues['bit_64'].strip().lower() == "yes"
 
     def set_text(self,webelement,input,*args):
         """
@@ -93,7 +97,7 @@ class TextboxKeywords:
                             user_input=self.validate_input(webelement,input)
                             if user_input is not None:
                                 input=user_input
-                            if not(is_visble) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                            if not(is_visble) and self.__check_visibility_from_config():
                                 self.clear_text(webelement)
                             else:
                                 webelement.clear()
@@ -137,16 +141,13 @@ class TextboxKeywords:
                             user_input=self.validate_input(webelement,input)
                             if user_input is not None:
                                 input=user_input
-                            if not(isvisble) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                            if not(isvisble) and self.__check_visibility_from_config():
                                 self.clear_text(webelement)
                                 log.debug('Sending the value via part 1')
                                 browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
                             else:
                                 webelement.clear()
-                                configobj = readconfig.readConfig()
-                                configvalues = configobj.readJson()
-                                bit64 = configvalues['bit_64']
-                                if(isinstance(browser_Keywords.driver_obj,selenium.webdriver.Ie) and bit64.strip().lower() == "yes"):
+                                if(isinstance(browser_Keywords.driver_obj,selenium.webdriver.Ie) and self.__check_IE_64bit_from_config):
                                     for i in range (0,len(input)+1):
                                         browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input[0:i])
                                 else:
@@ -345,7 +346,7 @@ class TextboxKeywords:
                     if input is not None:
                         readonly_value=webelement.get_attribute("readonly")
                         if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
-                            if not(is_visble) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                            if not(is_visble) and self.__check_visibility_from_config():
                                 self.clear_text(webelement)
                             else:
                                 webelement.clear()
@@ -396,16 +397,13 @@ class TextboxKeywords:
                             user_input=self.validate_input(webelement,input_val)
                             if user_input is not None:
                                 input_val=user_input
-                            if not(isvisble) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                            if not(isvisble) and self.__check_visibility_from_config():
                                 self.clear_text(webelement)
                                 log.debug('Sending the value via part 1')
                                 browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
                             else:
                                 webelement.clear()
-                                configobj = readconfig.readConfig()
-                                configvalues = configobj.readJson()
-                                bit64 = configvalues['bit_64']
-                                if(isinstance(browser_Keywords.driver_obj,selenium.webdriver.Ie) and bit64.strip().lower() == "yes"):
+                                if(isinstance(browser_Keywords.driver_obj,selenium.webdriver.Ie) and self.__check_IE_64bit_from_config):
                                     for i in range (0,len(input_val)+1):
                                         browser_Keywords.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val[0:i])
                                 else:

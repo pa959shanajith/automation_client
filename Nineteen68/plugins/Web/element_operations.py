@@ -86,11 +86,12 @@ class ElementKeywords:
         methodoutput=TEST_RESULT_FALSE
         text=None
         err_msg=None
+        configvalues = readconfig.configvalues
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
                 util = UtilWebKeywords()
-                if not(util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                if not(util.is_visible(webelement)) and configvalues['ignoreVisibilityCheck'].strip().lower() == "yes":
                     log.debug('element is invisible, performing js code')
                     text = browser_Keywords.driver_obj.execute_script("""return arguments[0].innerText""",webelement)
                     logger.print_on_console('Element text: ',text)
@@ -124,13 +125,14 @@ class ElementKeywords:
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output=OUTPUT_CONSTANT
+        configvalues = readconfig.configvalues
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
                 input=input[0]
                 if input is not None:
                     util = UtilWebKeywords()
-                    if not(util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                    if not(util.is_visible(webelement)) and configvalues['ignoreVisibilityCheck'].strip().lower() == "yes":
                         text = browser_Keywords.driver_obj.execute_script("""return arguments[0].innerText""",webelement)
                     else:
                         text=self.__getelement_text(webelement)
@@ -362,8 +364,7 @@ class ElementKeywords:
         err_msg=None
         output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        configobj = readconfig.readConfig()
-        configvalues = configobj.readJson()
+        configvalues = readconfig.configvalues
         try:
             if objectname is not None:
                 delay=int(configvalues['timeOut'])

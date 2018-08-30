@@ -16,8 +16,7 @@ if args.NINETEEN68_HOME < 1:
     parser.error("Required at least 1 argument")
 os.environ["NINETEEN68_HOME"] = args.NINETEEN68_HOME
 
-configobj = readconfig.readConfig()
-configvalues = configobj.readJson()
+configvalues = readconfig.readConfig().readJson()
 
 """
 This code snippet blocks the inheritance of file handlers from

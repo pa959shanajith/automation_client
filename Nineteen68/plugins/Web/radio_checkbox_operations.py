@@ -45,8 +45,9 @@ class RadioCheckboxKeywords():
         logger.print_on_console(err_msg)
         log.error(err_msg)
         return err_msg
+
     def __check_visibility_from_config(self):
-        return readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes"
+        return readconfig.configvalues['ignoreVisibilityCheck'].strip().lower() == "yes"
 
     def select_radiobutton(self,webelement,*args):
         status=TEST_RESULT_FAIL
@@ -293,7 +294,7 @@ class RadioCheckboxKeywords():
                                     else:
                                         counter+=1
                   else:
-                            #Nineteen68#1626: commented next line, as because of this, loop was not going into next iteration 
+                            #Nineteen68#1626: commented next line, as because of this, loop was not going into next iteration
                             #eleStatus=True
                             continue
 

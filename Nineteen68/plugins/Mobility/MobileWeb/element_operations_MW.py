@@ -305,8 +305,7 @@ class ElementKeywords:
         err_msg=None
         output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        configobj = readconfig.readConfig()
-        configvalues = configobj.readJson()
+        configvalues = readconfig.configvalues
         try:
             if objectname is not None:
                 delay=int(configvalues['timeOut'])

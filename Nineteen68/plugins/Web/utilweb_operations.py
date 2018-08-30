@@ -164,7 +164,7 @@ class UtilWebKeywords:
         try:
             if webelement is not None and webelement != '':
                 #call to highlight the webelement
-                if readconfig.readConfig().readJson()['highlight_check'].strip().lower()=="yes":
+                if readconfig.configvalues['highlight_check'].strip().lower()=="yes":
                     self.highlight(webelement)
                 logger.print_on_console(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
                 log.info(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
@@ -198,9 +198,7 @@ class UtilWebKeywords:
             if webelement is not None:
                 #call to highlight the webelement
                 self.highlight(webelement)
-                configobj = readconfig.readConfig()
-                configvalues = configobj.readJson()
-                if readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower()=="no":
+                if readconfig.configvalues['ignoreVisibilityCheck'].strip().lower()=="no":
                     res=self.is_visible(webelement)
                 else:
                     res=True

@@ -65,9 +65,7 @@ class Dispatcher:
         element = None
         err_msg=None
 
-        configobj = readconfig.readConfig()
-
-        configvalues = configobj.readJson()
+        configvalues = readconfig.configvalues
         log.info('In Web dispatcher')
         custom_dict={
                     'getstatus': ['radio','checkbox'],

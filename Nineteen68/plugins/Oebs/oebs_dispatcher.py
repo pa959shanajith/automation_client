@@ -226,8 +226,7 @@ class OebsDispatcher:
                 result[3]=err_msg
             #capture screenshot feature has been implemented for OEBS
             screen_shot_obj = screenshot_keywords.Screenshot()
-            configobj = readconfig.readConfig()
-            configvalues = configobj.readJson()
+            configvalues = readconfig.configvalues
             if self.action == constants.EXECUTE:
                 if result !=constants.TERMINATE:
                     result=list(result)

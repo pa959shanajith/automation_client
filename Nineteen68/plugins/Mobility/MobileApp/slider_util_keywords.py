@@ -270,8 +270,7 @@ class SliderKeywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             dispatcher=mobile_app_dispatcher.MobileDispatcher()
-            configobj = readconfig.readConfig()
-            configvalues = configobj.readJson()
+            configvalues = readconfig.configvalues
             timeout= configvalues['timeOut']
 ##            timeout='120'
             if timeout!=None:
