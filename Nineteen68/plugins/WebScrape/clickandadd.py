@@ -13,7 +13,7 @@
 import browserops
 import platform
 from core_utils import CoreUtils
-if platform.system()!='Darwin':
+if platform.system()=='Windows':
     import win32gui
     import win32con
 import time
@@ -42,9 +42,11 @@ class Clickandadd():
             browser = browserops.browser
             log.info('Obtained browser handle and driver'
                      ' from browserops.py class .....')
-            toolwindow = win32gui.GetForegroundWindow()
+            if platform.system()=='Windows':
+                toolwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
-            actwindow = win32gui.GetForegroundWindow()
+            if platform.system()=='Windows':
+                actwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
             log.info('Minimizing the foreground window i.e tool and assuming AUT on top .....')
             javascript_hasfocus = """return(document.hasFocus());"""
@@ -100,6 +102,7 @@ class Clickandadd():
             driver.switch_to_default_content()
             status = domconstants.STATUS_SUCCESS
         except Exception as e:
+            log.error(e)
             status = domconstants.STATUS_FAIL
             print 'Error while performing start click and add scrape'
             if (isinstance(driver,webdriver.Ie)):
@@ -185,11 +188,11 @@ class Clickandadd():
             data['view'] = tempne_stopclicknadd
             data['mirror'] = screen
 
-            log.info('Creating a json object with key vie with value as return data')
+            log.info('Creating a json object with key view with value as return data')
             with open('domelements.json', 'w') as outfile:
-                log.info('Opening domelements.json file to write vie object')
+                log.info('Opening domelements.json file to write view object')
                 json.dump(data, outfile, indent=4, sort_keys=False)
-                log.info('vie is dumped into  domelements.json file ')
+                log.info('view is dumped into  domelements.json file ')
             outfile.close()
             log.info('domelements.json file closed ')
             if driver.current_url == domconstants.BLANK_PAGE:
@@ -200,10 +203,10 @@ class Clickandadd():
                 status = domconstants.STATUS_SUCCESS
                 data['scrapedurl'] = driver.current_url
         except Exception as e:
+            log.error(e)
             status = domconstants.STATUS_FAIL
             data = domconstants.STATUS_FAIL
             print 'Error while performing stop click and add scrape'
             if (isinstance(driver,webdriver.Ie)):
                 print 'Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked) and retry'
         return data
-
