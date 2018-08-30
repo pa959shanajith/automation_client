@@ -42,9 +42,6 @@ if __name__ == "__main__":
     import clientwindow as cw_obj
     cw_obj.configvalues = configvalues
     cw = cw_obj.ClientWindow(appName)
-    print('********************************************************************************************************')
-    print('============================================ '+appName+' ============================================')
-    print('********************************************************************************************************')
     if cw.is_config_missing:
         err = "Configure "+appName+" by navigating to Edit -> Configuration"
         logger.print_on_console(err)

@@ -706,7 +706,8 @@ class ClientWindow(wx.Frame):
         self.debugwindow = None
         self.scrapewindow = None
         self.pausewindow = None
-        self.id =id
+        self.id = id
+        self.appName = appName
         self.mainclass = self
         self.mythread = None
         self.action=''
@@ -828,12 +829,14 @@ class ClientWindow(wx.Frame):
             self.clearbutton.Disable()
             self.connectbutton.Disable()
             self.rbox.Disable()
-        threading.Timer(0.2,self.verifyMACAddress).start()
         self.DisableAll()
         if configvalues['browser_check'].lower()=='no':
             browsercheckFlag=True
         else:
             browsercheckFlag=False
+        self.OnClear(wx.EVT_LEFT_DOWN)
+        self.verifyMACAddress()
+
 
     """
     Menu Items:
@@ -942,6 +945,9 @@ class ClientWindow(wx.Frame):
 
     def OnClear(self,event):
         self.log.Clear()
+        print('********************************************************************************************************')
+        print('============================================ '+self.appName+' ============================================')
+        print('********************************************************************************************************')
 
     def OnNodeConnect(self,event):
         try:
@@ -1192,7 +1198,6 @@ class Config_window(wx.Frame):
             "Save":[(135,388),(100, 28)],
             "Close":[(285,388),(100, 28)]
         }
-        global socketIO
         wx.Frame.__init__(self, parent, title=title,
                    pos=config_fields["Frame"][0], size=config_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
         self.SetBackgroundColour('#e6e7e8')
@@ -1200,7 +1205,6 @@ class Config_window(wx.Frame):
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         self.updated = False
-        self.socketIO = socketIO
         self.panel = wx.Panel(self)
 
         self.currentDirectory = os.environ["NINETEEN68_HOME"]
