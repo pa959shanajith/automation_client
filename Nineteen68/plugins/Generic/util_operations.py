@@ -287,6 +287,7 @@ class UtilOperations:
         err_msg=None
         try:
             log.debug('reading the inputs')
+            output=[input1,input2]
             if input1 != None and input2 != None and input1 != '' and input2 != '' :
 #                input1=str(input1).replace('\n','').replace('\r','')
 #                input2=str(input2).replace('\n','').replace('\r','')

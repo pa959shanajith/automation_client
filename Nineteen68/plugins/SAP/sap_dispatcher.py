@@ -191,6 +191,7 @@ class SAPDispatcher:
                 dict['getcolcountiris'] = iris_object.getcolcountiris
                 dict['getcellvalueiris'] = iris_object.getcellvalueiris
                 dict['verifyexistsiris'] = iris_object.verifyexistsiris
+                dict['verifytextiris'] = iris_object.verifytextiris
 
             keyword=keyword.lower()
             if keyword in dict.keys():

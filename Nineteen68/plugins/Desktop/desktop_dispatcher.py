@@ -231,7 +231,7 @@ class DesktopDispatcher:
                 dict['getcolcountiris'] = iris_object.getcolcountiris
                 dict['getcellvalueiris'] = iris_object.getcellvalueiris
                 dict['verifyexistsiris'] = iris_object.verifyexistsiris
-
+                dict['verifytextiris'] = iris_object.verifytextiris
 
             email_dict={'getemail': 1,
                   'getfrommailid' : 2,
