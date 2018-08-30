@@ -31,12 +31,12 @@ if platform.system() != 'Darwin':
     import utils_web
 import psutil
 import readconfig
+
 import core_utils
 import time
 from sendfunction_keys import SendFunctionKeys as SF
 pid_set = set()
-configobj = readconfig.readConfig()
-configvalues = configobj.readJson()
+
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
 class TestThread(threading.Thread):
     """Test Worker Thread Class."""
@@ -56,17 +56,20 @@ class TestThread(threading.Thread):
 class BrowserKeywords():
     def __init__(self):
         self.browser_num=''
+
     def __web_driver_exception(self,e):
         log.error(e)
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         logger.print_on_console(err_msg)
         return err_msg
+
     def openBrowser(self,webelement,browser_num,*args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
         self.browser_num=browser_num[0]
+        configvalues = readconfig.configvalues
         try:
             global driver_obj
             global webdriver_list
@@ -76,8 +79,7 @@ class BrowserKeywords():
             # ref: <gitlabpath>/nineteen68v2.0/Nineteen68/issues/1556
             # Logic for config file status on `enableSecurityCheck`
             enableSecurityFlag = False
-            if ('enableSecurityCheck' in configvalues and
-                    str(configvalues['enableSecurityCheck']).lower() == 'yes'):
+            if (str(configvalues['enableSecurityCheck']).lower() == 'yes'):
                 enableSecurityFlag = True
             #Logic to make sure that logic of usage of existing driver is not applicable to execution
             if  browser_num[-1] != EXECUTE:
@@ -155,6 +157,7 @@ class BrowserKeywords():
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        configvalues = readconfig.configvalues
         try:
             global driver_obj
             global webdriver_list
@@ -162,8 +165,7 @@ class BrowserKeywords():
             # ref: <gitlabpath>/nineteen68v2.0/Nineteen68/issues/1556
             # Logic for config file status on `enableSecurityCheck`
             enableSecurityFlag = False
-            if ('enableSecurityCheck' in configvalues and
-                    str(configvalues['enableSecurityCheck']).lower() == 'yes'):
+            if (str(configvalues['enableSecurityCheck']).lower() == 'yes'):
                 enableSecurityFlag = True
             driver_obj=driver.getBrowser(self.browser_num)
             if(driver_obj == None):
@@ -209,14 +211,14 @@ class BrowserKeywords():
         err_msg=None
         try:
             url = url[0]
-            if not (url is None and url is ''):
-                url.strip()
-                if url[0:7].lower()!='http://' and url[0:5].lower()!='file:':
+            if not (url is None and url.strip() is ''):
+                url = url.strip()
+                if url[0:7].lower()!='http://' and url[0:8].lower()!='https://' and url[0:5].lower()!='file:':
                     url='http://'+url
                 driver_obj.get(url)
                 #ignore certificate implementation
                 try:
-                    ignore_certificate = configvalues['ignore_certificate']
+                    ignore_certificate = readconfig.configvalues['ignore_certificate']
                     if ((ignore_certificate.lower() == 'yes') and ((driver_obj.title !=None) and ('Certificate' in driver_obj.title))):
                         driver_obj.execute_script("""document.getElementById('overridelink').click();""")
                 except Exception as k:
@@ -270,9 +272,9 @@ class BrowserKeywords():
                 input_val = encryption_obj.decrypt(url[2])
                 url[2]=input_val
                 inputURL = url[0]
-                if not (inputURL is None and inputURL is ''):
-                    inputURL.strip()
-                    if inputURL[0:7].lower()!='http://' and inputURL[0:5].lower()!='file:':
+                if not (inputURL is None and inputURL.strip() is ''):
+                    inputURL = inputURL.strip()
+                    if inputURL[0:7].lower()!='http://' and inputURL[0:8].lower()!='https://' and inputURL[0:5].lower()!='file:':
                         inputURL='http://'+inputURL
                 t=TestThread(inputURL)
                 t.start()
@@ -308,7 +310,7 @@ class BrowserKeywords():
                     obj.execute_key('enter',1)
                 t.join()
                 try:
-                    ignore_certificate = configvalues['ignore_certificate']
+                    ignore_certificate = readconfig.configvalues['ignore_certificate']
                     if ((ignore_certificate.lower() == 'yes') and ((driver_obj.title !=None) and ('Certificate' in driver_obj.title))):
                         driver_obj.execute_script("""document.getElementById('overridelink').click();""")
                 except Exception as k:
@@ -735,6 +737,7 @@ class Singleton_DriverUtil():
         log.debug(browser_num)
         logger.print_on_console( 'BROWSER NUM: ',browser_num)
         flag1 = 0
+        configvalues = readconfig.configvalues
         if (browser_num == '1'):
             try:
                 chrome_path = configvalues['chrome_path']

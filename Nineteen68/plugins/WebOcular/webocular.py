@@ -24,8 +24,7 @@ import controller
 import webocular_constants
 #import readconfig
 #import webconstants
-#configobj = readconfig.readConfig()
-#configvalues = configobj.readJson()
+#configvalues = readconfig.configvalues
 class Webocular():
 
     def __init__(self):

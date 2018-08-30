@@ -231,7 +231,7 @@ class DesktopDispatcher:
                 dict['getcolcountiris'] = iris_object.getcolcountiris
                 dict['getcellvalueiris'] = iris_object.getcellvalueiris
                 dict['verifyexistsiris'] = iris_object.verifyexistsiris
-
+                dict['verifytextiris'] = iris_object.verifytextiris
 
             email_dict={'getemail': 1,
                   'getfrommailid' : 2,
@@ -277,8 +277,7 @@ class DesktopDispatcher:
                 err_msg=desktop_constants.INVALID_KEYWORD
                 result=list(result)
                 result[3]=err_msg
-            configobj = readconfig.readConfig()
-            configvalues = configobj.readJson()
+            configvalues = readconfig.configvalues
             screen_shot_obj = screenshot_keywords.Screenshot()
             if self.action == constants.EXECUTE:
                 if result !=constants.TERMINATE:

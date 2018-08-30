@@ -176,9 +176,7 @@ class MobileDispatcher:
                 if self.action == 'execute':
                     result=list(result)
                     screen_shot_obj = mob_screenshot.Screenshot()
-                    configobj = readconfig.readConfig()
-                    configvalues = configobj.readJson()
-
+                    configvalues = readconfig.configvalues
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
                             file_path =screen_shot_obj.captureScreenshot()
@@ -190,7 +188,6 @@ class MobileDispatcher:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
         except Exception as e:
-            import traceback
             log.error(e)
             logger.print_on_console('Exception at dispatcher')
         return result

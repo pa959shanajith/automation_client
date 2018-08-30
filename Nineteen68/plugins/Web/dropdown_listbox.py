@@ -23,11 +23,16 @@ import readconfig
 from sendfunction_keys import SendFunctionKeys
 from constants import *
 log = logging.getLogger('dropdown_listbox.py')
+
 class DropdownKeywords():
 
     def __init__(self):
         self.radioKeywordsObj=radio_checkbox_operations.RadioCheckboxKeywords()
         self.util = utilweb_operations.UtilWebKeywords()
+
+    def __check_visibility_from_config(self):
+        return readconfig.configvalues['ignoreVisibilityCheck'].strip().lower() == "yes"
+
     def selectValueByIndex(self,webelement,input,*args):
         """
         def : selectValueByIndex
@@ -49,7 +54,7 @@ class DropdownKeywords():
                         index = input[4]
 
                 if ((webelement.is_enabled())):
-                    if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                    if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                         # performing js code
                         log.debug('element is invisible, performing js code')
                         if (input is not None) :
@@ -159,7 +164,7 @@ class DropdownKeywords():
         if webelement is not None:
             ##if ((webelement.is_enabled())):
             log.info('Recieved web element from the web dispatcher')
-            if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+            if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                 # performing js code
                 log.debug('element is invisible, performing js code')
                 try:
@@ -244,7 +249,7 @@ class DropdownKeywords():
                         else:
                             webelement=self.radioKeywordsObj.getActualElement(webelement,input)
             if ((webelement.is_enabled())):
-                if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                     #performing js code
                     log.debug('element is invisible, performing js code')
                     try:
@@ -448,7 +453,7 @@ class DropdownKeywords():
         if webelement is not None :
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                     # performing js code
                     log.debug('element is invisible, performing js code')
                     try:
@@ -534,7 +539,7 @@ class DropdownKeywords():
         if webelement is not None:
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                     try:
                         # performing js code
                         log.debug('element is invisible, performing js code')
@@ -637,7 +642,7 @@ class DropdownKeywords():
         if webelement is not None:
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                     try:
                         # performing js code
                         log.debug('element is invisible, performing js code')
@@ -723,7 +728,7 @@ class DropdownKeywords():
         if webelement is not None:
             log.info('Recieved web element from the web dispatcher')
             ##if ((webelement.is_enabled())):
-            if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+            if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                 try:
                     # performing js code
                     log.debug('element is invisible, performing js code')
@@ -830,7 +835,7 @@ class DropdownKeywords():
         if webelement is not None:
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                     try:
                         # performing js code
                         log.debug('element is invisible, performing js code')
@@ -958,7 +963,7 @@ class DropdownKeywords():
         if webelement is not None:
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                     try:
                         # performing js code
                         log.debug('element is invisible, performing js code')
@@ -1067,7 +1072,7 @@ class DropdownKeywords():
         if webelement is not None:
             ##if ((webelement.is_enabled())):
             log.info('Recieved web element from the web dispatcher')
-            if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+            if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                 try:
                     # performing js code
                     log.debug('element is invisible, performing js code')
@@ -1164,7 +1169,7 @@ class DropdownKeywords():
         if webelement is not None:
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                     try:
                         # performing js code
                         log.debug('element is invisible, performing js code')
@@ -1280,7 +1285,7 @@ class DropdownKeywords():
         if webelement is not None:
             ##if ((webelement.is_enabled())):
             log.info('Recieved web element from the web dispatcher')
-            if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+            if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                 try:
                     # performing js code
                     log.debug('element is invisible, performing js code')
@@ -1379,7 +1384,7 @@ class DropdownKeywords():
         if webelement is not None:
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                     try:
                         # performing js code
                         log.debug('element is invisible, performing js code')
@@ -1454,7 +1459,7 @@ class DropdownKeywords():
         if webelement is not None:
             ##if ((webelement.is_enabled())):
             log.info('Recieved web element from the web dispatcher')
-            if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+            if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                 try:
                     # performing js code
                     log.debug('element is invisible, performing js code')
@@ -1535,7 +1540,7 @@ class DropdownKeywords():
         if webelement is not None:
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                     try:
                         # performing js code
                         log.debug('element is invisible, performing js code')
@@ -1633,7 +1638,7 @@ class DropdownKeywords():
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
                 log.debug(webelement)
-                if not (self.util.is_visible(webelement)) and readconfig.readConfig().readJson()['ignoreVisibilityCheck'].strip().lower() == "yes":
+                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                     try:
                         # performing js code
                         log.debug('element is invisible, performing js code')

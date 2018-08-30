@@ -71,10 +71,8 @@ class Pause(wx.Frame):
             while cont.paused:
                 cont.pause_cond.wait()
 
-
 class Display(wx.Frame):
     def __init__(self, parent, id,title,input):
-        str=input
         wx.Frame.__init__(self, parent, title="Nineteen68 - DisplayValue",   size=(400, 300),style=wx.STAY_ON_TOP|wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
         self.SetBackgroundColour('#e6e7e8')
         self.panel = wx.Panel(self)
@@ -83,15 +81,14 @@ class Display(wx.Frame):
         self.SetIcon(self.wicon)
         self.t = wx.TextCtrl(self.panel, wx.ID_ANY,  size=(380, 200),  style = wx.TE_MULTILINE|wx.TE_READONLY)
         self.t.Clear()
-        self.t.AppendText(str)
+        self.t.AppendText(input)
 
         self.okbutton = wx.Button(self.panel, label="OK", pos=(150, 230))
         self.okbutton.Bind(wx.EVT_BUTTON, self.OnOk)
         self.okbutton.SetFocus()
         self.Centre()
         self.Show()
-        configobj = readconfig.readConfig()
-        configvalues = configobj.readJson()
+        configvalues = readconfig.configvalues
         interval = configvalues['displayVariableTimeOut']
         if interval == '':
             interval = 3

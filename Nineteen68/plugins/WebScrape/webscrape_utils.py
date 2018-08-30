@@ -8,13 +8,14 @@
 # Copyright:   (c) nikunj.jain 2018
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-
-import win32gui
-import win32process
-import win32con
-from PIL import Image
+import platform
 import time
 import os
+if platform.system()=='Windows':
+    import win32gui
+    import win32process
+    import win32con
+from PIL import Image
 import domconstants
 import logging
 log = logging.getLogger("webscrape_utils.py")
@@ -129,7 +130,7 @@ class WebScrape_Utils:
         log.info('Switched to default content')
         for i in allframes:
             if i is not '':
-                # finds the integer number attached with frame/iframe e.g. 2 in 2f or 2i
+                # find the integer number attached with frame/iframe e.g. 2 in 2f or 2i
                 j = i.rstrip(i[-1:])
                 frame_or_iframe = domconstants.FRAME if i[-1:] == 'f' else domconstants.IFRAME
                 # now we know its frame or iframe, let's try to switch into it
@@ -141,6 +142,7 @@ class WebScrape_Utils:
                         cond_flag = False
                         break
                 except Exception as e:
+                    log.error(e)
                     cond_flag = False
         return cond_flag
 
@@ -178,12 +180,6 @@ class WebScrape_Utils:
                     webElement = None
         return webElement
 
-    """win32 utilities
-        def : bring_Window_Front
-        param : pid of the browser opened by driver
-        Brings the browser window to front
-        """
-
     """Method to check whether a given element URL belongs to frame/iframe page or to the outer page"""
     def is_iframe_frame_url(self,url):
         try:
@@ -211,6 +207,11 @@ class WebScrape_Utils:
         win32gui.EnumWindows(callback, hwnds)
         return hwnds
 
+    """win32 utilities
+        def : bring_Window_Front
+        param : pid of the browser opened by driver
+        Brings the browser window to front
+    """
     def bring_Window_Front(self, pid):
         hwnd = WebScrape_Utils.get_hwnds_for_pid(self, pid)
         winSize = len(hwnd)

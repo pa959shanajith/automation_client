@@ -65,8 +65,7 @@ class Dispatcher:
         webelement = None
         element = None
         err_msg=None
-        configobj = readconfig.readConfig()
-        configvalues = configobj.readJson()
+        configvalues = readconfig.configvalues
 
         log.info('In Web dispatcher')
         custom_dict={
@@ -308,7 +307,8 @@ class Dispatcher:
                 dict['getcolcountiris'] = iris_object.getcolcountiris
                 dict['getcellvalueiris'] = iris_object.getcellvalueiris
                 dict['verifyexistsiris'] = iris_object.verifyexistsiris
-
+                dict['verifytextiris'] = iris_object.verifytextiris
+                
             if browser_Keywords.driver_obj is not None:
                 browser_info=browser_Keywords.driver_obj.capabilities
                 reporting_obj.browser_type=browser_info.get('browserName')

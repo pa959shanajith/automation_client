@@ -191,6 +191,7 @@ class SAPDispatcher:
                 dict['getcolcountiris'] = iris_object.getcolcountiris
                 dict['getcellvalueiris'] = iris_object.getcellvalueiris
                 dict['verifyexistsiris'] = iris_object.verifyexistsiris
+                dict['verifytextiris'] = iris_object.verifytextiris
 
             keyword=keyword.lower()
             if keyword in dict.keys():
@@ -221,8 +222,7 @@ class SAPDispatcher:
                 err_msg=sap_constants.INVALID_KEYWORD
                 logger.print_on_console(err_msg)
                 result[3]=err_msg
-            configobj = readconfig.readConfig()
-            configvalues = configobj.readJson()
+            configvalues = readconfig.configvalues
             screen_shot_obj = screenshot_keywords.Screenshot()
             if self.action == constants.EXECUTE:
                 if result !=constants.TERMINATE:

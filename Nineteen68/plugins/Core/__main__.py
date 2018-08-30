@@ -16,8 +16,7 @@ if args.NINETEEN68_HOME < 1:
     parser.error("Required at least 1 argument")
 os.environ["NINETEEN68_HOME"] = args.NINETEEN68_HOME
 
-configobj = readconfig.readConfig()
-configvalues = configobj.readJson()
+configvalues = readconfig.readConfig().readJson()
 
 """
 This code snippet blocks the inheritance of file handlers from
@@ -43,9 +42,6 @@ if __name__ == "__main__":
     import clientwindow as cw_obj
     cw_obj.configvalues = configvalues
     cw = cw_obj.ClientWindow(appName)
-    print('********************************************************************************************************')
-    print('============================================ '+appName+' ============================================')
-    print('********************************************************************************************************')
     if cw.is_config_missing:
         err = "Configure "+appName+" by navigating to Edit -> Configuration"
         logger.print_on_console(err)

@@ -326,6 +326,7 @@ class Controller():
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
 		#COmapring breakpoint with the step number of tsp instead of index - (Sushma)
         tsp = handler.tspList[index]
+        testcase_details_orig=tsp.testcase_details
         #logic to handle step by step debug
         if self.debug_mode and tsp.testcase_num==self.last_tc_num:
             #logic to handle run from setp debug
@@ -367,6 +368,27 @@ class Controller():
                         logger.print_on_console('Step Execution start time is : '+start_time_string)
                         log.info('Step Execution start time is : '+start_time_string)
                         index,result = self.keywordinvocation(index,inpval,self.reporting_obj,*args)
+                        if tsp.name=='verifyValues' or tsp.name.lower()=='verifytextiris':
+                            #testcase_details_orig=tsp.testcase_details
+                            testcase_details=tsp.testcase_details
+                            if testcase_details=='':
+                                testcase_details={'actualResult_pass':'','testcaseDetails':'','actualResult_fail':''}
+                            elif type(testcase_details)==str:
+                                testcase_details=ast.literal_eval(testcase_details)
+                            new_array=result[2]
+                            if new_array[0]==None:
+                                new_array[0]='null'
+                            if new_array[1]==None:
+                                new_array[1]='null'
+                            if new_array[0]=='':
+                                new_array[0]='  '
+                            if new_array[1]=='':
+                                new_array[1]='  '
+                            testcase_details['testcaseDetails']=new_array[1]
+                            testcase_details['actualResult_pass']=new_array[0]
+                            testcase_details['actualResult_fail']=new_array[0]
+                            tsp.testcase_details=testcase_details  
+
                     else:
                         keyword_flag=False
                         start_time = datetime.now()
@@ -414,6 +436,9 @@ class Controller():
                 self.reporting_obj.generate_report_step(tsp,'',self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
             else:
                 self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
+            if tsp.name.lower()=='verifyvalues' or tsp.name.lower()=='verifytextiris':
+                tsp.testcase_details=testcase_details_orig
+
 ##      Issue #160
         if index==STOP:
             return index
@@ -469,6 +494,11 @@ class Controller():
         elif result_temp[2] != OUTPUT_CONSTANT:
             tsp.additionalinfo=result_temp[2]
             display_keyword_response=result_temp[2]
+        if tsp.name.lower()=='verifyvalues':
+            display_keyword_response=[result[1]]
+        if tsp.name.lower()=='verifytextiris':
+            display_keyword_response=[result[1]]
+            
 		#To Handle dynamic variables of DB keywords
         if tsp.name.lower() in DATABASE_KEYWORDS:
             if keyword_response != []:

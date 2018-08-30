@@ -644,8 +644,7 @@ class Singleton_DriverUtil():
         log.debug('BROWSER NUM: ')
         log.debug(browser_num)
         logger.print_on_console( 'BROWSER NUM: ',browser_num)
-        configobj = readconfig.readConfig()
-        configvalues = configobj.readJson()
+        configvalues = readconfig.configvalues
 
         if (browser_num == '1'):
             chrome_path = configvalues['chrome_path']

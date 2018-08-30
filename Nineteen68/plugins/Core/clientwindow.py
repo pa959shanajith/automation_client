@@ -16,7 +16,6 @@ from socketIO_client import SocketIO,BaseNamespace
 from constants import *
 import controller
 import readconfig
-import httplib
 import json
 import socket
 import requests
@@ -707,7 +706,8 @@ class ClientWindow(wx.Frame):
         self.debugwindow = None
         self.scrapewindow = None
         self.pausewindow = None
-        self.id =id
+        self.id = id
+        self.appName = appName
         self.mainclass = self
         self.mythread = None
         self.action=''
@@ -718,6 +718,7 @@ class ClientWindow(wx.Frame):
         self.iconpath = IMAGES_PATH +"slk.ico"
         self.connect_img=wx.Image(IMAGES_PATH +"connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.disconnect_img=wx.Image(IMAGES_PATH +"disconnect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.enabledStatus = [False,False,False,False,False,False,False]
 
         """
         Creating Root Logger using logger file config and setting logfile path,which is in config.json
@@ -754,19 +755,19 @@ class ClientWindow(wx.Frame):
         #own event
         self.loggerMenu = wx.Menu()
         self.infoItem = wx.MenuItem(self.loggerMenu, 100,text = "Info",kind = wx.ITEM_NORMAL)
-        self.loggerMenu.AppendItem(self.infoItem)
+        self.loggerMenu.Append(self.infoItem)
 
         self.debugItem = wx.MenuItem(self.loggerMenu, 101,text = "Debug",kind = wx.ITEM_NORMAL)
-        self.loggerMenu.AppendItem(self.debugItem)
+        self.loggerMenu.Append(self.debugItem)
 
         self.errorItem = wx.MenuItem(self.loggerMenu, 102,text = "Error",kind = wx.ITEM_NORMAL)
-        self.loggerMenu.AppendItem(self.errorItem)
+        self.loggerMenu.Append(self.errorItem)
 
-        self.fileMenu.AppendMenu(wx.ID_ANY, "Logger Level", self.loggerMenu)
+        self.fileMenu.Append(wx.ID_ANY, "Logger Level", self.loggerMenu)
         self.menubar.Append(self.fileMenu, '&File')
         #-----------------------------------------------------Config Menu Begins
         self.configItem = wx.MenuItem(self.editMenu, 103,text = "Configuration",kind = wx.ITEM_NORMAL)
-        self.editMenu.AppendItem(self.configItem)
+        self.editMenu.Append(self.configItem)
         self.menubar.Append(self.editMenu, '&Edit')
         #-------------------------------------------------------Config Menu Ends
         self.SetMenuBar(self.menubar)
@@ -828,11 +829,14 @@ class ClientWindow(wx.Frame):
             self.clearbutton.Disable()
             self.connectbutton.Disable()
             self.rbox.Disable()
-        threading.Timer(0.2,self.verifyMACAddress).start()
+        self.DisableAll()
         if configvalues['browser_check'].lower()=='no':
             browsercheckFlag=True
         else:
             browsercheckFlag=False
+        self.OnClear(wx.EVT_LEFT_DOWN)
+        self.verifyMACAddress()
+
 
     """
     Menu Items:
@@ -941,6 +945,9 @@ class ClientWindow(wx.Frame):
 
     def OnClear(self,event):
         self.log.Clear()
+        print('********************************************************************************************************')
+        print('============================================ '+self.appName+' ============================================')
+        print('********************************************************************************************************')
 
     def OnNodeConnect(self,event):
         try:
@@ -1098,11 +1105,16 @@ class ClientWindow(wx.Frame):
         except:
             pass
         if not flag:
-            logger.print_on_console("Unauthorized: Access denied, system is not registered with Nineteen68")
-            self.DisableAll()
+            msg = "Unauthorized: Access denied, system is not registered with Nineteen68"
+            logger.print_on_console(msg)
+            log.error(msg)
+        else: self.EnableAll()
         return flag
 
     def DisableAll(self):
+        self.enabledStatus = [self.menubar.IsEnabledTop(0),self.menubar.IsEnabledTop(1),
+            self.connectbutton.IsEnabled(),self.schedule.IsEnabled(),self.rbox.IsEnabled(),
+            self.cancelbutton.IsEnabled(),self.terminatebutton.IsEnabled(),self.clearbutton.IsEnabled()]
         self.menubar.EnableTop(0,False)
         self.menubar.EnableTop(1,False)
         self.connectbutton.Disable()
@@ -1112,12 +1124,23 @@ class ClientWindow(wx.Frame):
         self.terminatebutton.Disable()
         self.clearbutton.Disable()
 
+    def EnableAll(self):
+        if self.enabledStatus[0]: self.menubar.EnableTop(0,True)
+        if self.enabledStatus[1]: self.menubar.EnableTop(1,True)
+        if self.enabledStatus[2]: self.connectbutton.Enable()
+        if self.enabledStatus[3]: self.schedule.Enable()
+        if self.enabledStatus[4]: self.rbox.Enable()
+        if self.enabledStatus[5]: self.cancelbutton.Enable()
+        if self.enabledStatus[6]: self.terminatebutton.Enable()
+        if self.enabledStatus[7]: self.clearbutton.Enable()
+
 
 """Checks if config file is present, if not prompts the user to enter config file details"""
 class Config_window(wx.Frame):
 
     """The design of the config window is defined in the _init_() method"""
     def __init__(self, parent,id, title):
+        wxObject.DisableAll()
         #----------------------------------
         isConfigJson=self.readconfigJson()
         #----------------------------------
@@ -1175,7 +1198,6 @@ class Config_window(wx.Frame):
             "Save":[(135,388),(100, 28)],
             "Close":[(285,388),(100, 28)]
         }
-        global socketIO
         wx.Frame.__init__(self, parent, title=title,
                    pos=config_fields["Frame"][0], size=config_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
         self.SetBackgroundColour('#e6e7e8')
@@ -1183,10 +1205,7 @@ class Config_window(wx.Frame):
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         self.updated = False
-        self.connectEnabled = wxObject.connectbutton.IsEnabled()
-        self.socketIO = socketIO
         self.panel = wx.Panel(self)
-        wxObject.connectbutton.Disable()
 
         self.currentDirectory = os.environ["NINETEEN68_HOME"]
         self.defaultServerCrt = './Scripts/CA_BUNDLE/server.crt'
@@ -1520,7 +1539,7 @@ class Config_window(wx.Frame):
         try:
             if wx.MessageBox("Config file has been edited, Would you like to save?","Confirm Save",wx.ICON_QUESTION | wx.YES_NO) == wx.YES:
                 # Write JSON file
-                with io.open('./Lib/config.json', 'w', encoding='utf8') as outfile:
+                with io.open(CONFIG_PATH, 'w', encoding='utf8') as outfile:
                     str_ = json.dumps(data,indent=4, sort_keys=True,separators=(',', ': '), ensure_ascii=False)
                     outfile.write(unicode(str_))
                 logger.print_on_console('--Configuration saved--')
@@ -1582,7 +1601,8 @@ class Config_window(wx.Frame):
             logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename},disable_existing_loggers=False)
         except Exception as e:
             log.error(e)
-        if self.updated or self.connectEnabled:
+        wxObject.EnableAll()
+        if self.updated:
             wxObject.connectbutton.Enable()
         msg = '--Edit Config closed--'
         logger.print_on_console(msg)

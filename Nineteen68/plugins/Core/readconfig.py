@@ -14,7 +14,7 @@ import logging
 import constants
 import json
 import os
-
+configvalues = None
 ##log = logging.getLogger('readconfig.py')
 
 class readConfig():
@@ -23,6 +23,7 @@ class readConfig():
         self.config_path = os.environ["NINETEEN68_HOME"] + '/Lib/config.json'
 
     def readJson(self):
+        global configvalues
         configvalues={"server_ip":"", "server_port":"", "ignore_certificate":"",
         "chrome_path":"", "bit_64":"", "logFile_Path":"", "screenShot_Flag":"",
         "queryTimeOut":"", "timeOut":"", "stepExecutionWait":"", "displayVariableTimeOut":"",

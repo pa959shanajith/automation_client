@@ -203,7 +203,8 @@ class OebsDispatcher:
                 dict['getcolcountiris'] = iris_object.getcolcountiris
                 dict['getcellvalueiris'] = iris_object.getcellvalueiris
                 dict['verifyexistsiris'] = iris_object.verifyexistsiris
-
+                dict['verifytextiris'] = iris_object.verifytextiris
+                
             keyword=keyword.lower()
             if keyword in dict.keys():
                 if(tsp.cord != '' and tsp.cord != None):
@@ -226,8 +227,7 @@ class OebsDispatcher:
                 result[3]=err_msg
             #capture screenshot feature has been implemented for OEBS
             screen_shot_obj = screenshot_keywords.Screenshot()
-            configobj = readconfig.readConfig()
-            configvalues = configobj.readJson()
+            configvalues = readconfig.configvalues
             if self.action == constants.EXECUTE:
                 if result !=constants.TERMINATE:
                     result=list(result)
