@@ -209,9 +209,9 @@ class BrowserKeywords():
         err_msg=None
         try:
             url = url[0]
-            if not (url is None and url is ''):
-                url.strip()
-                if url[0:7].lower()!='http://' and url[0:5].lower()!='file:':
+            if not (url is None and url.strip() is ''):
+                URL = url.strip()
+                if url[0:7].lower()!='http://' and url[0:8].lower()!='https://' and url[0:5].lower()!='file:':
                     url='http://'+url
                 driver_obj.get(url)
                 #ignore certificate implementation
@@ -270,9 +270,9 @@ class BrowserKeywords():
                 input_val = encryption_obj.decrypt(url[2])
                 url[2]=input_val
                 inputURL = url[0]
-                if not (inputURL is None and inputURL is ''):
-                    inputURL.strip()
-                    if inputURL[0:7].lower()!='http://' and inputURL[0:5].lower()!='file:':
+                if not (inputURL is None and inputURL.strip() is ''):
+                    inputURL = inputURL.strip()
+                    if inputURL[0:7].lower()!='http://' and inputURL[0:8].lower()!='https://' and inputURL[0:5].lower()!='file:':
                         inputURL='http://'+inputURL
                 t=TestThread(inputURL)
                 t.start()
