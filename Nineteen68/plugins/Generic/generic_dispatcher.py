@@ -25,6 +25,7 @@ import delay_operations
 import sendfunction_keys
 import xml_operations
 import util_operations
+import word_operations
 import dynamic_variable
 import constants
 import logging
@@ -36,6 +37,7 @@ class GenericKeywordDispatcher:
     generic_file=file_operations.FileOperations()
     genric_folder=folder_operations.FolderOperations()
     generic_excel=excel_operations.ExcelFile()
+    generic_word=word_operations.WordFile()
     generic_database =database_keywords.DatabaseOperation()
     generic_batch=batch_operation_keyword.BatchOperationKeyword()
     generic_math=math_operation_keywords.NumericStringParser()
@@ -141,7 +143,14 @@ class GenericKeywordDispatcher:
                   'deletedynvariable':self.dyn_var_obj.delete_dyn_value,
                   'displayvariablevalue':self.generic_delay.display_variable_value,
                   'verifyvalues':self.util_operation_obj.verify_values,
-                  'getindexcount':self.util_operation_obj.getIndexCount
+                  'getindexcount':self.util_operation_obj.getIndexCount,
+                  'writewordfile': self.generic_word.writeWordFile,
+                  'readworddoc': self.generic_word.readWorddoc,
+                  'readallcheckbox': self.generic_word.readallcheckbox,
+                  'getalltablesfromdoc': self.generic_word.getAllTablesFromDoc,
+                  'readjson': self.generic_word.readjson,
+                  'readxml': self.generic_word.readxml,
+                  'readpdf': self.generic_word.readPdf
 
 
                 }
