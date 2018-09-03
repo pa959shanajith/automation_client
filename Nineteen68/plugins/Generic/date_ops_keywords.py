@@ -16,11 +16,13 @@ import generic_constants
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 import logging
+import re
 
 from constants import *
 log = logging.getLogger('date_ops_keywords.py')
 
 class DateOperation:
+
     def getCurrentDate(self,input):
         """
         def : getCurrentDate
@@ -30,6 +32,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
         err_msg=None
         try:
             if not (input is None or input is ''):
@@ -64,6 +67,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
         err_msg = None
         try:
             if not (input is None or input is ''):
@@ -99,6 +103,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
         err_msg = None
         try:
             if not (input is None or input is ''):
@@ -134,6 +139,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
         err_msg = None
         try:
             if not (input_date is None or input_date is ''):
@@ -189,6 +195,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
         err_msg = None
         try:
             if not (input_date is None or input_date is ''):
@@ -237,6 +244,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
         err_msg = None
         try:
             if not (input_date is None or input_date is ''):
@@ -288,6 +296,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
         err_msg = None
         try:
             if not (input_date is None or input_date is ''):
@@ -338,6 +347,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
         err_msg = None
         try:
             if not (inp_date is None or inp_date is ''):
@@ -345,14 +355,19 @@ class DateOperation:
                     if not (out_format is None or out_format is ''):
                         ret_inp_format = self.validate(inp_date_format)
                         ret_out_format = self.validate(out_format)
-                        if ret_inp_format != -1:
-                            if ret_out_format != -1:
-                                output=datetime.datetime.strptime(inp_date, ret_inp_format).strftime(ret_out_format)
-                                logger.print_on_console('Output is :' ,output)
-                                log.info('output is')
-                                log.info(output)
-                                status=generic_constants.TEST_RESULT_PASS
-                                result=generic_constants.TEST_RESULT_TRUE
+                        if ret_inp_format != -1 and ret_out_format != -1:
+                            dt_obj=datetime.datetime.strptime(inp_date, ret_inp_format)
+                            re_res=re.search('(\d)%y',ret_inp_format)
+                            if dt_obj.year < 2000 and re_res is not None:
+                                yrs_to_inc = int(re_res.group()[0])*100
+                                dt_obj = datetime.datetime(dt_obj.year+yrs_to_inc, dt_obj.month, dt_obj.day,
+                                    dt_obj.hour, dt_obj.minute, dt_obj.second, dt_obj.microsecond)
+                            output=dt_obj.strftime(ret_out_format)
+                            logger.print_on_console('Output is :' ,output)
+                            log.info('output is')
+                            log.info(output)
+                            status=generic_constants.TEST_RESULT_PASS
+                            result=generic_constants.TEST_RESULT_TRUE
                         else:
                            #logger.print_on_console('Format not supported')
                     #err_msg = 'Format not supported'
@@ -439,16 +454,18 @@ class DateOperation:
         try:
             dict={'dd/MM/yyyy': '%d/%m/%Y',
             'MMMM dd, yyyy': '%B %d, %Y',
+            'MMM dd, yyyy': '%b %d, %Y',
             'MM/dd/yyyy': '%m/%d/%Y',
             'yyMMdd': '%y%m%d',
+            '1yyMMdd': '1%y%m%d',
             'yyyy/MM/dd': '%Y/%m/%d',
             'dd/MMM/yyyy': '%d/%b/%Y',
             'MMM/dd/yyyy':'%b/%d/%Y',
-            'HH:mm:ss' : '%H:%M:%S',
-            'dd/MM/yyyy HH:mm:ss' :'%d/%m/%Y %H:%M:%S',
-            'MM/dd/yyyy HH:mm:ss' : '%m/%d/%Y %H:%M:%S',
-            'dd/MMM/yyyy HH:mm:ss' : '%d/%b/%Y %H:%M:%S',
-            'MMM/dd/yyyy HH:mm:ss' :'%b/%d/%Y %H:%M:%S'
+            'HH:mm:ss': '%H:%M:%S',
+            'dd/MM/yyyy HH:mm:ss':'%d/%m/%Y %H:%M:%S',
+            'MM/dd/yyyy HH:mm:ss': '%m/%d/%Y %H:%M:%S',
+            'dd/MMM/yyyy HH:mm:ss': '%d/%b/%Y %H:%M:%S',
+            'MMM/dd/yyyy HH:mm:ss':'%b/%d/%Y %H:%M:%S'
             }
             if(input in dict):
                 date_format = dict.get(input)
@@ -458,16 +475,3 @@ class DateOperation:
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-
-
-##obj =DateOperation()
-##obj.getCurrentDate("dd/MMM/yyyy")
-##obj.getCurrentTime("HH:mm:ss")
-##obj.getCurrentDateAndTime("dd/MMM/yyyy HH:mm:ss")
-##obj.changeDateFormat("03/10/2016","dd/MM/yyyy","MMM/dd/yyyy")
-##obj.dateCompare("03/10/2016","03/11/2016")
-##obj.dateCompare("03/10/2016","03/10/2016", "dd/MM/yyyy")
-##obj.validate("dd/MMMM/yyyy")
-##obj.dateDifference("03/10/2016","8893","dd/MM/yyyy")
-##obj.dateDifference("03/10/2016","29/05/1992","dd/MM/yyyy")
-##obj.dateAddition("29/05/1992","8893","dd/MM/yyyy")
