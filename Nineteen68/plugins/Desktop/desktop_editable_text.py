@@ -101,12 +101,12 @@ class Text_Box:
                         input_val_temp = encryption_obj.decrypt(text)
                         if input_val_temp is not None:
                             try:
-                                element.SetEditText(text, pos_start=None, pos_end=None)
+                                element.SetEditText(input_val_temp, pos_start=None, pos_end=None)
                             except:
                                 self.clear_text(element,parent)
                                 cursor_obj=CursorPositionCorrection()
                                 cursor_obj.getOriginalPosition()
-                                element.type_keys(text,with_spaces = True)
+                                element.type_keys(input_val_temp,with_spaces = True)
                                 cursor_obj.setOriginalPosition()
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
@@ -149,7 +149,6 @@ class Text_Box:
                     status = desktop_constants.TEST_RESULT_PASS
                     result = desktop_constants.TEST_RESULT_TRUE
                     log.info(STATUS_METHODOUTPUT_UPDATE)
-
                 else:
                    log.info('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'

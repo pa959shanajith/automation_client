@@ -255,16 +255,16 @@ class Util_Keywords():
                             if(element != None):
                                 obj = desktop_launch_keywords.Launch_Keywords()
                                 obj.set_to_foreground()
-                                winrect = desktop_launch_keywords.win_rect;
+                                #winrect = desktop_launch_keywords.win_rect;
                                 #CO ORDINATES WITH RESPECT TO AUT
-                                coordinates_aut = element.client_rect()
+                                #coordinates_aut = element.client_rect()
                                 #CO ORDINATES WITH RESPECT TO SCREEN
                                 coordinates_screen = element.rectangle()
                                 left = 0
                                 top = 0
                                 #get the width, height lef and top
-                                width = coordinates_aut.width()
-                                height = coordinates_aut.height()
+                                #width = coordinates_aut.width()
+                                #height = coordinates_aut.height()
                                 left = coordinates_screen.left + 8
                                 top = coordinates_screen.top + 8
                                 if top < 0:
