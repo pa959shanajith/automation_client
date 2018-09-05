@@ -4,7 +4,6 @@ import string
 import json
 from lxml import etree
 import docx
-import win32com.client as win32
 from pprint import pprint
 import xmltodict
 import pythoncom
@@ -15,7 +14,7 @@ import subprocess
 import logging
 log = logging.getLogger('word_operations.py')
 import logger
-import PyPDF2
+import platform
 
 class WordFile():
     def writeWordFile(self, filename, filetext, operation, file_encoding = None, *args):
@@ -165,36 +164,36 @@ class WordFile():
         result = TEST_RESULT_FALSE
         output = OUTPUT_CONSTANT
         err_msg = None
-
         try:
-            if os.path.exists(os.path.normpath(filename)):
-                pythoncom.CoInitialize()
-                word = win32.Dispatch("Word.Application")
-                word.Documents.Open(filename)
-                doc = word.ActiveDocument
-                tables = []
-                log.debug("Read All Tables => FileName:"+filename+", Total Number of Tables : "+str(doc.Tables.Count))
-                for t in range(doc.Tables.Count):
-                    table = []
-                    comTable =  doc.Tables(t+1)
-                    for r in range(comTable.Rows.Count):
-                        row = []
-                        for c in range(comTable.Rows(r+1).Range.Columns.Count):
-                            try:
-                                row.insert(c, comTable.Cell(Row=r+1, Column=c+1).Range.Text.encode('utf-8').replace('\r\x07','').replace('\r','\n').strip() )
-                                log.debug("table = "+str(t+1)+" row = "+str(r+1)+" column = "+str(c+1)+" :    Value =="+comTable.Cell(Row=r+1, Column=c+1).Range.Text)
-                            except Exception as e:
-                                pass
-                        table.insert(r, row)
-                    tables.insert(t, table)
-                output = tables
-                status = TEST_RESULT_PASS
-                result = TEST_RESULT_TRUE
-            else:
-                err_msg = ERROR_CODE_DICT['ERR_FILE_NOT_FOUND_EXCEPTION']
-                logger.print_on_console("getAllTablesFromDoc => Error : File not Found")
-                ##err_json = {"ERR_CODE": err_code, "ERR_MSG": ERROR_CODE_DICT['ERR_FILE_NOT_FOUND']}
-                log.error(err_msg)
+            if platform.system() == "Windows":
+                import win32com.client as win32
+                if os.path.exists(os.path.normpath(filename)):
+                    pythoncom.CoInitialize()
+                    word = win32.Dispatch("Word.Application")
+                    word.Documents.Open(filename)
+                    doc = word.ActiveDocument
+                    tables = []
+                    log.debug("Read All Tables => FileName:"+filename+", Total Number of Tables : "+str(doc.Tables.Count))
+                    for t in range(doc.Tables.Count):
+                        table = []
+                        comTable =  doc.Tables(t+1)
+                        for r in range(comTable.Rows.Count):
+                            row = []
+                            for c in range(comTable.Rows(r+1).Range.Columns.Count):
+                                try:
+                                    row.insert(c, comTable.Cell(Row=r+1, Column=c+1).Range.Text.encode('utf-8').replace('\r\x07','').replace('\r','\n').strip() )
+                                    log.debug("table = "+str(t+1)+" row = "+str(r+1)+" column = "+str(c+1)+" :    Value =="+comTable.Cell(Row=r+1, Column=c+1).Range.Text)
+                                except Exception as e:
+                                    pass
+                            table.insert(r, row)
+                        tables.insert(t, table)
+                    output = tables
+                    status = TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
+                else:
+                    err_msg = ERROR_CODE_DICT['ERR_FILE_NOT_FOUND_EXCEPTION']
+                    logger.print_on_console("getAllTablesFromDoc => Error : File not Found")
+                    log.error(err_msg)
         except Exception as e:
             err_msg = ERROR_CODE_DICT['ERR_EXCEPTION']
             ##err_json = {"ERR_CODE": err_code, "ERR_MSG": ERROR_CODE_DICT['ERR_EXCEPTION'], "STACK_TRACE": str(e)}

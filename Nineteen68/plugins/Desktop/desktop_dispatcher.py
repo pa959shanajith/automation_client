@@ -258,7 +258,7 @@ class DesktopDispatcher:
                     self.launch_keywords_obj.verifyWindowTitle()
                     if objectname != '' and teststepproperty.cord != None and teststepproperty.cord != '':
                         if(desktop_launch_keywords.window_name != None):
-                            SetForegroundWindow(find_window(title=desktop_launch_keywords.window_name))
+                            SetForegroundWindow(find_window(title=self.launch_keywords_obj.windowname))
                         obj_props = teststepproperty.objectname.split(';')
                         coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
                         ele = {'cord': teststepproperty.cord, 'coordinates': coord}

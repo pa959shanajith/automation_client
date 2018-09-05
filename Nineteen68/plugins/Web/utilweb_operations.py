@@ -494,7 +494,7 @@ class UtilWebKeywords:
                         logger.print_on_console(value)
                         offset=int(value)
                         robot=pyrobot.Robot()
-                        robot.set_mouse_pos(int(location.get('x')+9),int(location.get('y')+offset))
+                        robot.set_mouse_pos(int(location.get('x')+18),int(location.get('y')+offset+18))
                         log.debug('hover performed')
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
