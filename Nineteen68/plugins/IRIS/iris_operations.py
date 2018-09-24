@@ -507,7 +507,7 @@ class IRISKeywords():
                 if(verifytext == text):
                     status= TEST_RESULT_PASS
                     result = TEST_RESULT_TRUE
-                    value = [verifytext,text]
+                value = [verifytext,text]
                 os.remove('cropped.png')
                 
             else:
