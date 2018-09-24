@@ -80,10 +80,7 @@ class MainNamespace(BaseNamespace):
                     browsercheckFlag = check_browser()
                 log.info('Normal Mode: Connection to the Nineteen68 Server established')
             else:
-                if socketIO != None:
-                    log.info('Closing the socket')
-                    socketIO.disconnect()
-                    log.info(socketIO)
+                threading.Timer(1,wxObject.killSocket).start()
 
         elif(str(args[0]) == 'schedulingEnabled'):
             logger.print_on_console('Schedule Mode Enabled')
@@ -108,11 +105,6 @@ class MainNamespace(BaseNamespace):
                     if(response.has_key('err_msg')):
                         err_res=response['err_msg']
                 if(err_res is not None):
-                    wxObject.schedule.Disable()
-                    ##if socketIO != None:
-                    ##    log.info('Closing the socket')
-                    ##    socketIO.disconnect()
-                    ##    log.info(socketIO)
                     logger.print_on_console(err_res)
                     log.info(err_res)
                 else:
@@ -126,6 +118,16 @@ class MainNamespace(BaseNamespace):
                 logger.print_on_console('Error while checking connection request')
                 log.info('Error while checking connection request')
                 log.error(e)
+
+        elif(str(args[0]) == 'fail'):
+            fail_msg = "Fail"
+            if len(args) > 1 and args[1]=="conn":
+                fail_msg+="ed to connect to Nineteen68 Server"
+            if len(args) > 1 and args[1]=="disconn":
+                fail_msg+="ed to disconnect from Nineteen68 Server"
+            logger.print_on_console(fail_msg)
+            log.info(fail_msg)
+            threading.Timer(0.1,wxObject.killSocket).start()
 
     def on_webscrape(self,*args):
         global action,wxObject,browsername,desktopScrapeFlag,data
@@ -463,14 +465,14 @@ class MainNamespace(BaseNamespace):
     def on_killSession(self,*args):
         global wxObject
         try:
-            user = args[0]
-            wxObject.OnNodeConnect(wx.EVT_BUTTON)
-            msg = 'Connection terminated remotely by ' + user
+            msg = 'Connection termination request triggered remotely by ' + args[0]
             logger.print_on_console(msg)
             log.info(msg)
+            threading.Timer(1,wxObject.OnNodeConnect,[wx.EVT_BUTTON]).start()
         except Exception as e:
             log.error(e)
             logger.print_on_console('Exception while Remote Disconnect')
+
 
 class SocketThread(threading.Thread):
     """Test Worker Thread Class."""
@@ -749,7 +751,7 @@ class ClientWindow(wx.Frame):
         self.fileMenu = wx.Menu()
         self.editMenu = wx.Menu()
         #own event
-        self.Bind( wx.EVT_CHOICE, self.test)
+        self.Bind(wx.EVT_CHOICE, self.test)
         ##self.Bind(wx.EVT_CHOICE, self.debug)
         ##self.Bind(wx.EVT_CLOSE, self.closeScrapeWindow)
         #own event
@@ -836,7 +838,7 @@ class ClientWindow(wx.Frame):
             browsercheckFlag=False
         self.OnClear(wx.EVT_LEFT_DOWN)
         self.verifyMACAddress()
-
+        self.connectbutton.SetFocus()
 
     """
     Menu Items:
@@ -905,12 +907,7 @@ class ClientWindow(wx.Frame):
         controller.disconnect_flag=True
         global socketIO
         logger.print_on_console('Disconnected from Nineteen68 server')
-        if socketIO != None:
-            log.info('Sending Socket disconnect request')
-            socketIO.emit('unavailableLocalServer')
-            socketIO.disconnect()
-            del socketIO
-            socketIO = None
+        self.killSocket(True)
         self.killDebugWindow()
         self.killScrapeWindow()
         self.Destroy()
@@ -923,12 +920,12 @@ class ClientWindow(wx.Frame):
     def OnKillProcess(self, event):
         controller.kill_process()
 
-    def OnTerminate(self, event, *args):
+    def OnTerminate(self, event, state=''):
         self.killDebugWindow()
         if self.killScrapeWindow():
             socketIO.emit('scrape','Terminate')
         self.killPauseWindow()
-        if(len(args) > 0 and args[0]=="term_exec"):
+        if(state=="term_exec"):
             controller.disconnect_flag=True
             print ""
             msg = "---------Terminating all active operations-------"
@@ -962,13 +959,8 @@ class ClientWindow(wx.Frame):
                 self.mythread = SocketThread()
             else:
                 self.OnTerminate(event,"term_exec")
+                self.killSocket(True)
                 logger.print_on_console('Disconnected from Nineteen68 server')
-                if socketIO is not None:
-                    log.info('Sending Socket disconnect request')
-                    socketIO.emit('unavailableLocalServer')
-                    socketIO.disconnect()
-                    del socketIO
-                    socketIO = None
                 self.connectbutton.SetBitmapLabel(self.connect_img)
                 self.connectbutton.SetName('connect')
                 self.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
@@ -984,6 +976,22 @@ class ClientWindow(wx.Frame):
             self.clearbutton.Disable()
             self.connectbutton.Enable()
             self.rbox.Disable()
+            log.error(e)
+
+    def killSocket(self, disconn=False):
+        #Disconnects socket client
+        global socketIO
+        try:
+            if socketIO is not None:
+                if disconn:
+                    log.info('Sending Socket disconnect request')
+                    socketIO.emit('unavailableLocalServer')
+                socketIO.disconnect()
+                del socketIO
+                socketIO = None
+                log.info('Disconnected from Nineteen68 server')
+        except Exception as e:
+            log.error("Error while disconnecting from server")
             log.error(e)
 
     def killDebugWindow(self):
