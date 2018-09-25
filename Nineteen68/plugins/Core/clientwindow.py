@@ -258,7 +258,13 @@ class MainNamespace(BaseNamespace):
                         path = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Qc/QcController.exe"
                         pid = subprocess.Popen(path, shell=True)
                         soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        soc.connect(("localhost",10000))
+                        try:
+                            soc.connect(("localhost",10000))
+                        except socket.error as e:
+                            log.error(e)
+                            if '[Errno 10061]' in str(e):
+                                time.sleep(15)
+                                soc.connect(("localhost",10000))
 
                     data_to_send = json.dumps(qcdata).encode('utf-8')
                     data_to_send+='#E&D@Q!C#'
@@ -272,7 +278,9 @@ class MainNamespace(BaseNamespace):
                     if('Fail@f@!l' in client_data):
                         client_data=client_data[:client_data.find('@f@!l')]
                         logger.print_on_console('Error occurred in QC')
-                    socketIO.emit('qcresponse',client_data)
+                        socketIO.emit('qcresponse','Error:Qc Operations')
+                    else:
+                        socketIO.emit('qcresponse',client_data)
                 else:
                     socketIO.emit('qcresponse','Error:data recevied empty')
             else:
