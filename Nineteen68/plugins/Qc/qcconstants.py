@@ -1,7 +1,0 @@
-SEMICOLON = ';'
-
-COMMA = ','
-
-TEST_RESULT_PASS = 'Pass'
-
-TEST_RESULT_FAIL = 'Fail'
