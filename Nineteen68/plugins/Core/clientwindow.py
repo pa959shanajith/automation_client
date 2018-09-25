@@ -923,7 +923,7 @@ class ClientWindow(wx.Frame):
         if platform.system() == "Windows":
             os.system("TASKKILL /F /IM QcController.exe")
             os.system("TASKKILL /F /IM nineteen68MFapi.exe")
-        exit()
+        sys.exit(0)
 
     def OnKillProcess(self, event):
         controller.kill_process()
@@ -1103,10 +1103,7 @@ class ClientWindow(wx.Frame):
                 key = "".join(f.readlines()[1:-1]).replace("\n","").replace("\r","")
                 key = core_utils_obj.unwrap(key, mac_verification_key)
                 mac_addr = key[36:-36]
-                if ("," in mac_addr):
-                    mac_addr = (mac_addr.replace('-',':').replace(' ','')).lower().split(",")
-                else:
-                    mac_addr = [mac_addr.replace('-',':').replace(' ','').lower()]
+                mac_addr = (mac_addr.replace('-',':').replace(' ','')).lower().split(",")
                 index = 0
                 for mac in mac_addr:
                     if(str(mac).startswith("iris")):
@@ -1240,7 +1237,8 @@ class Config_window(wx.Frame):
 
         self.ch_path=wx.StaticText(self.panel, label="Chrome Path", pos=config_fields["Chrm_path"][0],size=config_fields["Chrm_path"][1], style=0, name="")
         self.chrome_path=wx.TextCtrl(self.panel, pos=config_fields["Chrm_path"][2], size=config_fields["Chrm_path"][3])
-        wx.Button(self.panel, label="...", pos=config_fields["Chrm_path"][4], size=config_fields["Chrm_path"][5]).Bind(wx.EVT_BUTTON, self.fileBrowser_chpath)
+        self.chrome_path_btn=wx.Button(self.panel, label="...", pos=config_fields["Chrm_path"][4], size=config_fields["Chrm_path"][5])
+        self.chrome_path_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_chpath)
         if isConfigJson!=False:
             self.chrome_path.SetValue(isConfigJson['chrome_path'])
         else:
@@ -1248,7 +1246,8 @@ class Config_window(wx.Frame):
 
         self.log_fpath=wx.StaticText(self.panel, label="Log File Path", pos=config_fields["Log_path"][0],size=config_fields["Log_path"][1], style=0, name="")
         self.log_file_path=wx.TextCtrl(self.panel, pos=config_fields["Log_path"][2], size=config_fields["Log_path"][3])
-        wx.Button(self.panel, label="...",pos=config_fields["Log_path"][4], size=config_fields["Log_path"][5]).Bind(wx.EVT_BUTTON, self.fileBrowser_logfilepath)
+        self.log_file_path_btn=wx.Button(self.panel, label="...",pos=config_fields["Log_path"][4], size=config_fields["Log_path"][5])
+        self.log_file_path_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_logfilepath)
         if isConfigJson!=False:
             self.log_file_path.SetValue(isConfigJson['logFile_Path'])
 
@@ -1287,7 +1286,8 @@ class Config_window(wx.Frame):
 
         self.sev_cert=wx.StaticText(self.panel, label="Server Cert", pos=config_fields["S_cert"][0],size=config_fields["S_cert"][1], style=0, name="")
         self.server_cert=wx.TextCtrl(self.panel, pos=config_fields["S_cert"][2], size=config_fields["S_cert"][3])
-        wx.Button(self.panel, label="...",pos=config_fields["S_cert"][4], size=config_fields["S_cert"][5]).Bind(wx.EVT_BUTTON, self.fileBrowser_servcert)
+        self.server_cert_btn=wx.Button(self.panel, label="...",pos=config_fields["S_cert"][4], size=config_fields["S_cert"][5])
+        self.server_cert_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_servcert)
         if (not isConfigJson) or (isConfigJson and isConfigJson['server_cert']==self.defaultServerCrt):
             self.defaultServerCrt = os.path.normpath(self.currentDirectory+'/Scripts/CA_BUNDLE/server.crt')
             self.server_cert.SetValue(self.defaultServerCrt)
@@ -1369,8 +1369,19 @@ class Config_window(wx.Frame):
             self.rbox10.SetSelection(1)
 
         self.error_msg=wx.StaticText(self.panel, label="", pos=(85,360),size=(350, 28), style=0, name="")
-        wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1]).Bind(wx.EVT_BUTTON, self.config_check)
-        wx.Button(self.panel, label="Close",pos=config_fields["Close"][0], size=config_fields["Close"][1]).Bind(wx.EVT_BUTTON, self.close)
+        self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])
+        self.save_btn.Bind(wx.EVT_BUTTON, self.config_check)
+        self.close_btn=wx.Button(self.panel, label="Close",pos=config_fields["Close"][0], size=config_fields["Close"][1])
+        self.close_btn.Bind(wx.EVT_BUTTON, self.close)
+
+        if wxObject.connectbutton.GetName().lower() != "connect":
+            self.sev_add.Enable(False)
+            self.server_add.Enable(False)
+            self.sev_port.Enable(False)
+            self.server_port.Enable(False)
+            self.sev_cert.Enable(False)
+            self.server_cert.Enable(False)
+            self.server_cert_btn.Enable(False)
 
         self.Centre()
         wx.Frame(self.panel)
@@ -1658,7 +1669,7 @@ class DebugWindow(wx.Frame):
         logger.print_on_console('Event Triggered to Resume')
         log.info('Event Triggered to Resume')
         controller.pause_flag=False
-        wxObject.mythread.resume(debug_mode)
+        wxObject.mythread.resume(True)
 
 
 def check_browser():

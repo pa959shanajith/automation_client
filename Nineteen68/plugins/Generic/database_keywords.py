@@ -55,7 +55,6 @@ class DatabaseOperation():
 
         except Exception as e:
             log.error(e)
-
             logger.print_on_console(e)
             err_msg = str(e)
         finally:
@@ -82,7 +81,6 @@ class DatabaseOperation():
             log.error(e)
             err_msg = str(e)
             logger.print_on_console(err_msg)
-
         return status,result,verb,err_msg
 
 
@@ -131,7 +129,6 @@ class DatabaseOperation():
 ##            else:
 ##                log.info('Output column missing required value')
 ##                logger.print_on_console('Output column missing required value')
-
         except Exception as e:
             log.error(e)
             err_msg = 'Database Login failed'
@@ -173,8 +170,6 @@ class DatabaseOperation():
                 cursor.close()
                 cnxn.close()
             return value
-
-
 
     def secureGetData(self, ip , port , userName , password, dbName, query, dbtype,*args):
         """
