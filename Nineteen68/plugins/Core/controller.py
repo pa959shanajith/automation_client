@@ -387,7 +387,7 @@ class Controller():
                             testcase_details['testcaseDetails']=new_array[1]
                             testcase_details['actualResult_pass']=new_array[0]
                             testcase_details['actualResult_fail']=new_array[0]
-                            tsp.testcase_details=testcase_details  
+                            tsp.testcase_details=testcase_details
 
                     else:
                         keyword_flag=False
@@ -497,8 +497,7 @@ class Controller():
         if tsp.name.lower()=='verifyvalues':
             display_keyword_response=[result[1]]
         if tsp.name.lower()=='verifytextiris':
-            display_keyword_response=[result[1]]
-            
+            display_keyword_response=result[1]
 		#To Handle dynamic variables of DB keywords
         if tsp.name.lower() in DATABASE_KEYWORDS:
             if keyword_response != []:
@@ -550,7 +549,7 @@ class Controller():
         log.info('Result obtained is: ')
         log.info(display_keyword_response)
         if tsp.apptype.lower()=='desktop' or tsp.apptype.lower()=='sap' or tsp.apptype.lower()=='desktopjava' or (tsp.cord!='' and tsp.cord!=None):
-            if result[2]!='9cc33d6fe25973868b30f4439f09901a':
+            if result[2]!='9cc33d6fe25973868b30f4439f09901a' and tsp.name.lower()!='verifytextiris':
                 logger.print_on_console('Result obtained is: ',result[2])
             elif result:
                 logger.print_on_console('Result obtained is: ',result[1])
