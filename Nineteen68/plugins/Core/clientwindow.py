@@ -80,10 +80,7 @@ class MainNamespace(BaseNamespace):
                     browsercheckFlag = check_browser()
                 log.info('Normal Mode: Connection to the Nineteen68 Server established')
             else:
-                if socketIO != None:
-                    log.info('Closing the socket')
-                    socketIO.disconnect()
-                    log.info(socketIO)
+                threading.Timer(1,wxObject.killSocket).start()
 
         elif(str(args[0]) == 'schedulingEnabled'):
             logger.print_on_console('Schedule Mode Enabled')
@@ -108,11 +105,6 @@ class MainNamespace(BaseNamespace):
                     if(response.has_key('err_msg')):
                         err_res=response['err_msg']
                 if(err_res is not None):
-                    wxObject.schedule.Disable()
-                    ##if socketIO != None:
-                    ##    log.info('Closing the socket')
-                    ##    socketIO.disconnect()
-                    ##    log.info(socketIO)
                     logger.print_on_console(err_res)
                     log.info(err_res)
                 else:
@@ -126,6 +118,16 @@ class MainNamespace(BaseNamespace):
                 logger.print_on_console('Error while checking connection request')
                 log.info('Error while checking connection request')
                 log.error(e)
+
+        elif(str(args[0]) == 'fail'):
+            fail_msg = "Fail"
+            if len(args) > 1 and args[1]=="conn":
+                fail_msg+="ed to connect to Nineteen68 Server"
+            if len(args) > 1 and args[1]=="disconn":
+                fail_msg+="ed to disconnect from Nineteen68 Server"
+            logger.print_on_console(fail_msg)
+            log.info(fail_msg)
+            threading.Timer(0.1,wxObject.killSocket).start()
 
     def on_webscrape(self,*args):
         global action,wxObject,browsername,desktopScrapeFlag,data
@@ -256,7 +258,13 @@ class MainNamespace(BaseNamespace):
                         path = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Qc/QcController.exe"
                         pid = subprocess.Popen(path, shell=True)
                         soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        soc.connect(("localhost",10000))
+                        try:
+                            soc.connect(("localhost",10000))
+                        except socket.error as e:
+                            log.error(e)
+                            if '[Errno 10061]' in str(e):
+                                time.sleep(15)
+                                soc.connect(("localhost",10000))
 
                     data_to_send = json.dumps(qcdata).encode('utf-8')
                     data_to_send+='#E&D@Q!C#'
@@ -270,7 +278,9 @@ class MainNamespace(BaseNamespace):
                     if('Fail@f@!l' in client_data):
                         client_data=client_data[:client_data.find('@f@!l')]
                         logger.print_on_console('Error occurred in QC')
-                    socketIO.emit('qcresponse',client_data)
+                        socketIO.emit('qcresponse','Error:Qc Operations')
+                    else:
+                        socketIO.emit('qcresponse',client_data)
                 else:
                     socketIO.emit('qcresponse','Error:data recevied empty')
             else:
@@ -463,14 +473,14 @@ class MainNamespace(BaseNamespace):
     def on_killSession(self,*args):
         global wxObject
         try:
-            user = args[0]
-            wxObject.OnNodeConnect(wx.EVT_BUTTON)
-            msg = 'Connection terminated remotely by ' + user
+            msg = 'Connection termination request triggered remotely by ' + args[0]
             logger.print_on_console(msg)
             log.info(msg)
+            threading.Timer(1,wxObject.OnNodeConnect,[wx.EVT_BUTTON]).start()
         except Exception as e:
             log.error(e)
             logger.print_on_console('Exception while Remote Disconnect')
+
 
 class SocketThread(threading.Thread):
     """Test Worker Thread Class."""
@@ -749,7 +759,7 @@ class ClientWindow(wx.Frame):
         self.fileMenu = wx.Menu()
         self.editMenu = wx.Menu()
         #own event
-        self.Bind( wx.EVT_CHOICE, self.test)
+        self.Bind(wx.EVT_CHOICE, self.test)
         ##self.Bind(wx.EVT_CHOICE, self.debug)
         ##self.Bind(wx.EVT_CLOSE, self.closeScrapeWindow)
         #own event
@@ -836,7 +846,7 @@ class ClientWindow(wx.Frame):
             browsercheckFlag=False
         self.OnClear(wx.EVT_LEFT_DOWN)
         self.verifyMACAddress()
-
+        self.connectbutton.SetFocus()
 
     """
     Menu Items:
@@ -905,12 +915,7 @@ class ClientWindow(wx.Frame):
         controller.disconnect_flag=True
         global socketIO
         logger.print_on_console('Disconnected from Nineteen68 server')
-        if socketIO != None:
-            log.info('Sending Socket disconnect request')
-            socketIO.emit('unavailableLocalServer')
-            socketIO.disconnect()
-            del socketIO
-            socketIO = None
+        self.killSocket(True)
         self.killDebugWindow()
         self.killScrapeWindow()
         self.Destroy()
@@ -918,17 +923,17 @@ class ClientWindow(wx.Frame):
         if platform.system() == "Windows":
             os.system("TASKKILL /F /IM QcController.exe")
             os.system("TASKKILL /F /IM nineteen68MFapi.exe")
-        exit()
+        sys.exit(0)
 
     def OnKillProcess(self, event):
         controller.kill_process()
 
-    def OnTerminate(self, event, *args):
+    def OnTerminate(self, event, state=''):
         self.killDebugWindow()
         if self.killScrapeWindow():
             socketIO.emit('scrape','Terminate')
         self.killPauseWindow()
-        if(len(args) > 0 and args[0]=="term_exec"):
+        if(state=="term_exec"):
             controller.disconnect_flag=True
             print ""
             msg = "---------Terminating all active operations-------"
@@ -962,13 +967,8 @@ class ClientWindow(wx.Frame):
                 self.mythread = SocketThread()
             else:
                 self.OnTerminate(event,"term_exec")
+                self.killSocket(True)
                 logger.print_on_console('Disconnected from Nineteen68 server')
-                if socketIO is not None:
-                    log.info('Sending Socket disconnect request')
-                    socketIO.emit('unavailableLocalServer')
-                    socketIO.disconnect()
-                    del socketIO
-                    socketIO = None
                 self.connectbutton.SetBitmapLabel(self.connect_img)
                 self.connectbutton.SetName('connect')
                 self.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
@@ -984,6 +984,22 @@ class ClientWindow(wx.Frame):
             self.clearbutton.Disable()
             self.connectbutton.Enable()
             self.rbox.Disable()
+            log.error(e)
+
+    def killSocket(self, disconn=False):
+        #Disconnects socket client
+        global socketIO
+        try:
+            if socketIO is not None:
+                if disconn:
+                    log.info('Sending Socket disconnect request')
+                    socketIO.emit('unavailableLocalServer')
+                socketIO.disconnect()
+                del socketIO
+                socketIO = None
+                log.info('Disconnected from Nineteen68 server')
+        except Exception as e:
+            log.error("Error while disconnecting from server")
             log.error(e)
 
     def killDebugWindow(self):
@@ -1087,10 +1103,7 @@ class ClientWindow(wx.Frame):
                 key = "".join(f.readlines()[1:-1]).replace("\n","").replace("\r","")
                 key = core_utils_obj.unwrap(key, mac_verification_key)
                 mac_addr = key[36:-36]
-                if ("," in mac_addr):
-                    mac_addr = (mac_addr.replace('-',':').replace(' ','')).lower().split(",")
-                else:
-                    mac_addr = [mac_addr.replace('-',':').replace(' ','').lower()]
+                mac_addr = (mac_addr.replace('-',':').replace(' ','')).lower().split(",")
                 index = 0
                 for mac in mac_addr:
                     if(str(mac).startswith("iris")):
@@ -1224,7 +1237,8 @@ class Config_window(wx.Frame):
 
         self.ch_path=wx.StaticText(self.panel, label="Chrome Path", pos=config_fields["Chrm_path"][0],size=config_fields["Chrm_path"][1], style=0, name="")
         self.chrome_path=wx.TextCtrl(self.panel, pos=config_fields["Chrm_path"][2], size=config_fields["Chrm_path"][3])
-        wx.Button(self.panel, label="...", pos=config_fields["Chrm_path"][4], size=config_fields["Chrm_path"][5]).Bind(wx.EVT_BUTTON, self.fileBrowser_chpath)
+        self.chrome_path_btn=wx.Button(self.panel, label="...", pos=config_fields["Chrm_path"][4], size=config_fields["Chrm_path"][5])
+        self.chrome_path_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_chpath)
         if isConfigJson!=False:
             self.chrome_path.SetValue(isConfigJson['chrome_path'])
         else:
@@ -1232,7 +1246,8 @@ class Config_window(wx.Frame):
 
         self.log_fpath=wx.StaticText(self.panel, label="Log File Path", pos=config_fields["Log_path"][0],size=config_fields["Log_path"][1], style=0, name="")
         self.log_file_path=wx.TextCtrl(self.panel, pos=config_fields["Log_path"][2], size=config_fields["Log_path"][3])
-        wx.Button(self.panel, label="...",pos=config_fields["Log_path"][4], size=config_fields["Log_path"][5]).Bind(wx.EVT_BUTTON, self.fileBrowser_logfilepath)
+        self.log_file_path_btn=wx.Button(self.panel, label="...",pos=config_fields["Log_path"][4], size=config_fields["Log_path"][5])
+        self.log_file_path_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_logfilepath)
         if isConfigJson!=False:
             self.log_file_path.SetValue(isConfigJson['logFile_Path'])
 
@@ -1271,7 +1286,8 @@ class Config_window(wx.Frame):
 
         self.sev_cert=wx.StaticText(self.panel, label="Server Cert", pos=config_fields["S_cert"][0],size=config_fields["S_cert"][1], style=0, name="")
         self.server_cert=wx.TextCtrl(self.panel, pos=config_fields["S_cert"][2], size=config_fields["S_cert"][3])
-        wx.Button(self.panel, label="...",pos=config_fields["S_cert"][4], size=config_fields["S_cert"][5]).Bind(wx.EVT_BUTTON, self.fileBrowser_servcert)
+        self.server_cert_btn=wx.Button(self.panel, label="...",pos=config_fields["S_cert"][4], size=config_fields["S_cert"][5])
+        self.server_cert_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_servcert)
         if (not isConfigJson) or (isConfigJson and isConfigJson['server_cert']==self.defaultServerCrt):
             self.defaultServerCrt = os.path.normpath(self.currentDirectory+'/Scripts/CA_BUNDLE/server.crt')
             self.server_cert.SetValue(self.defaultServerCrt)
@@ -1353,8 +1369,19 @@ class Config_window(wx.Frame):
             self.rbox10.SetSelection(1)
 
         self.error_msg=wx.StaticText(self.panel, label="", pos=(85,360),size=(350, 28), style=0, name="")
-        wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1]).Bind(wx.EVT_BUTTON, self.config_check)
-        wx.Button(self.panel, label="Close",pos=config_fields["Close"][0], size=config_fields["Close"][1]).Bind(wx.EVT_BUTTON, self.close)
+        self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])
+        self.save_btn.Bind(wx.EVT_BUTTON, self.config_check)
+        self.close_btn=wx.Button(self.panel, label="Close",pos=config_fields["Close"][0], size=config_fields["Close"][1])
+        self.close_btn.Bind(wx.EVT_BUTTON, self.close)
+
+        if wxObject.connectbutton.GetName().lower() != "connect":
+            self.sev_add.Enable(False)
+            self.server_add.Enable(False)
+            self.sev_port.Enable(False)
+            self.server_port.Enable(False)
+            self.sev_cert.Enable(False)
+            self.server_cert.Enable(False)
+            self.server_cert_btn.Enable(False)
 
         self.Centre()
         wx.Frame(self.panel)
@@ -1642,7 +1669,7 @@ class DebugWindow(wx.Frame):
         logger.print_on_console('Event Triggered to Resume')
         log.info('Event Triggered to Resume')
         controller.pause_flag=False
-        wxObject.mythread.resume(debug_mode)
+        wxObject.mythread.resume(True)
 
 
 def check_browser():
