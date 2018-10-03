@@ -29,13 +29,14 @@ from core_utils import CoreUtils
 from webscrape_utils import WebScrape_Utils
 
 class Fullscrape():
-    def fullscrape(self):
+    def fullscrape(self,scrape_option):
         start_time = time.clock()
         data = {}
         driver = browserops.driver
         webscrape_utils_obj = WebScrape_Utils()
         try:
             log.info(' Inside fullscrape method .....')
+            log.info('scrape_option is: %s',scrape_option)
             hwndg = browserops.hwndg
             maindir = os.environ["NINETEEN68_HOME"]
             screen_shot_path = maindir + '/Nineteen68/plugins/WebScrape' + domconstants.SCREENSHOT_IMG
@@ -62,7 +63,14 @@ class Fullscrape():
                     break
             tempne = []
             log.info('Performing the full scrape operation on default/outer page')
-            tempreturn = driver.execute_script(webscrape_utils_obj.javascript_fullscrape, driver.current_url)
+            if scrape_option[0].lower() == 'select a section using xpath':
+                if len(scrape_option) > 1 and len(scrape_option[1]) > 0:
+                    reference_element = driver.find_element_by_xpath(scrape_option[1])
+                    tempreturn = []
+                    scrape_option[1] = reference_element
+                else:
+                    raise ValueError('invalid xpath')
+            tempreturn = driver.execute_script(webscrape_utils_obj.javascript_fullscrape, driver.current_url,scrape_option)
             log.info('full scrape operation on default/outer page is done and data is obtained')
             tempne.extend(tempreturn)
 
@@ -72,7 +80,7 @@ class Fullscrape():
                     path = myipath + str(iframes) + 'i' + '/'
                     if webscrape_utils_obj.switchtoframe_webscrape(driver,currenthandle,path):
                         log.debug('switched to iframe/frame %s', path)
-                        temp = driver.execute_script(webscrape_utils_obj.javascript_fullscrape, path)
+                        temp = driver.execute_script(webscrape_utils_obj.javascript_fullscrape, path,scrape_option)
                         if temp is not None:
                             log.debug('full scrape operation on iframe %s is done and data is obtained',path)
                             tempne.extend(temp)
@@ -87,7 +95,7 @@ class Fullscrape():
                     path = myipath + str(frames) + 'f' +  '/'
                     if webscrape_utils_obj.switchtoframe_webscrape(driver,currenthandle,path):
                         log.debug('switched to iframe/frame %s', path)
-                        temp = driver.execute_script(webscrape_utils_obj.javascript_fullscrape, path)
+                        temp = driver.execute_script(webscrape_utils_obj.javascript_fullscrape, path,scrape_option)
                         if temp is not None:
                             log.debug('full scrape operation on frame %s is done and data is obtained',path)
                             tempne.extend(temp)
@@ -96,7 +104,8 @@ class Fullscrape():
                     else:
                         log.info('could not switch to iframe/frame %s', path)
 
-            if platform.system()=='Windows':
+            # scrape through iframes/frames iff OS is windows and scrape_option is not the xpath one
+            if platform.system() == 'Windows' and scrape_option[0].lower() != 'select a section using xpath':
                 callback_fullscrape_iframes('', tempne)
                 driver.switch_to.window(currenthandle)
                 callback_fullscrape_frames('', tempne)
@@ -153,8 +162,11 @@ class Fullscrape():
         except Exception as e:
             status = domconstants.STATUS_FAIL
             data = domconstants.STATUS_FAIL
-            print 'Error while performing full scrape'
             log.error(e)
+            ename = type(e).__name__
+            if ename in ('NoSuchElementException','ValueError','InvalidSelectorException'):
+                print "Invalid input, provide a valid xpath of the element to start the section"
+            print 'Error while performing full scrape'
             if (isinstance(driver,webdriver.Ie)):
                 print 'Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked) and retry'
         return data
