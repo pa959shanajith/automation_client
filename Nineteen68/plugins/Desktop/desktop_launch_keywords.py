@@ -59,11 +59,8 @@ class Launch_Keywords():
             if len(input_val)==1:
                 filePath=input_val[0]
                 timeout=5
-                file_Name = self.getTaskName(filePath)
-                title_matched_windows = self.getProcessWindows(file_Name)
-                if len(title_matched_windows)>=1:
-                    self.windowHandle=title_matched_windows[0]
-                    self.windowname=self.getWindowText(self.windowHandle)
+                file_Name = self.getProcessName(filePath)
+                if (self.checkExistance(file_Name)):
                     logger.print_on_console(self.windowname+' Application already open')
                     verb = self.windowname
                 else:
@@ -85,6 +82,9 @@ class Launch_Keywords():
                                 status=desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 verb = "Application Launched"
+                    else:
+                        term =TERMINATE
+                        logger.print_on_console('The file does not exists')
             else:
                 term =TERMINATE
                 logger.print_on_console('The file does not exists')
@@ -612,11 +612,20 @@ class Launch_Keywords():
         except Exception as e:
             logger.print_on_console ('AUT closed')
 
-    def getTaskName(self,filePath):
+    def getProcessName(self,filepath):
         try:
-            language, codepage = win32api.GetFileVersionInfo(filePath, '\\VarFileInfo\\Translation')[0]
-            stringFileInfo = u'\\StringFileInfo\\%04X%04X\\%s' % (language, codepage, "FileDescription")
-            description = win32api.GetFileVersionInfo(filePath, stringFileInfo)
+            filepath=os.path.normpath(filepath)
+            self.list=filepath.split('\\')
+            self.processName=self.list[len(self.list)-1]
         except:
-            description = ""
-        return description
+            logger.print_on_console("Error in given file path! Please provide the valid file path")
+        return self.processName
+
+    def checkExistance(self,filename):
+        cmd = 'WMIC PROCESS get description'
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+        for line in proc.stdout:
+            line=line.strip()
+            if filename==line:
+                return True
+        return False
