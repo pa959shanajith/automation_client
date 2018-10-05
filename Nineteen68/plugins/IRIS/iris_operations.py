@@ -476,7 +476,7 @@ class IRISKeywords():
                 logger.print_on_console("Object not found.")
         except Exception as e:
             log.error(e)
-            logger.print_on_console("Error occured in verifyexists")
+            logger.print_on_console("Error occured in verifyexistsiris")
         return status,result,value,err_msg
 
     def verifytextiris(self,element,*args):
@@ -486,10 +486,10 @@ class IRISKeywords():
         value = [args[0][0],'null']
         try:
             verifytext = args[0][0]
-            logger.print_on_console("input text is:", verifytext)
-            if(os.path.isdir(os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR')):
-                pytesseract.tesseract_cmd = os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR/tesseract'
-                os.environ["TESSDATA_PREFIX"] = os.environ["NINETEEN68_HOME"] + '/Scripts/Tesseract-OCR/tessdata'
+            text = ''
+            if(TESSERACT_PATH_EXISTS):
+                pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
+                os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
                 img = None
                 if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
                     elem_coordinates = element['coordinates']
@@ -498,24 +498,26 @@ class IRISKeywords():
                             (const_coordintes[2],const_coordintes[3]),
                             (elem_coordinates[0], elem_coordinates[1]),
                             (elem_coordinates[2], elem_coordinates[3])]
-                    img = find_relative_image(args[2]['cord'], elements, verifyexists)
+                    img,res = find_relative_image(elements, verifyexists)
                 else:
                     img = element['cord']
                 with open("cropped.png", "wb") as f:
                     f.write(img.decode('base64'))
                 image = cv2.imread("cropped.png")
-                text = ''
                 text = get_ocr(image)
-                logger.print_on_console("actual text is:", text)
+                if(isinstance(text,unicode)):
+                    text = text.encode('utf-8')
                 if(verifytext == text):
                     status= TEST_RESULT_PASS
                     result = TEST_RESULT_TRUE
+                else:
+                    logger.print_on_console("Expected value is:", verifytext)
+                    logger.print_on_console("Actual value is:", text)
                 value = [verifytext,text]
                 os.remove('cropped.png')
-
             else:
                 log.error("Tesseract module not found.")
         except Exception as e:
             log.error(e)
-            logger.print_on_console("Error occured in gettextiris")
+            logger.print_on_console("Error occured in verifytextiris")
         return status,result,value,err_msg
