@@ -4,4 +4,4 @@ suds==0.4
 
 lxml==3.6.4
 
-Zeep(Not as Pip)
+zeep==0.16.0

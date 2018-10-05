@@ -12,7 +12,6 @@ from datetime import datetime
 import core_utils
 import logger
 import threading
-from socketIO_client import SocketIO,BaseNamespace
 from constants import *
 import controller
 import readconfig
@@ -20,6 +19,10 @@ import json
 import socket
 import requests
 import io
+try:
+    from socketlib_override import SocketIO,BaseNamespace
+except ImportError:
+    from socketIO_client import SocketIO,BaseNamespace
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -52,16 +55,6 @@ LOGCONFIG_PATH = os.environ["NINETEEN68_HOME"] + "/logging.conf"
 DRIVERS_PATH = os.environ["NINETEEN68_HOME"] + "/Drivers"
 CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver.exe"
 GECKODRIVER_PATH = DRIVERS_PATH + '/geckodriver.exe'
-
-""" Override SocketIO library's warn method used for logging.
-    This is needed because this library doesn't gives anything to stdout or stderr
-    on exception/warning. Hence Adding custom check and raising exception. Ref #1847.
-"""
-def socketIO_warn_override(self, msg, *attrs):
-    self._log(logging.WARNING, msg, *attrs)
-    if ("[SSL: CERTIFICATE_VERIFY_FAILED]" in msg) or ("hostname" in msg and "doesn't match " in msg):
-        raise ValueError("[Certifiate Mismatch] "+ msg)
-SocketIO._warn = socketIO_warn_override
 
 
 class MainNamespace(BaseNamespace):
@@ -964,7 +957,7 @@ class ClientWindow(wx.Frame):
                 conn = httplib.HTTPConnection(configvalues['server_ip'],port)
                 conn.connect()
                 conn.close()
-                self.mythread = SocketThread()
+                self.socketthread = SocketThread()
             else:
                 self.OnTerminate(event,"term_exec")
                 self.killSocket(True)
@@ -998,6 +991,7 @@ class ClientWindow(wx.Frame):
                 del socketIO
                 socketIO = None
                 log.info('Disconnected from Nineteen68 server')
+                wxObject.socketthread.join()
         except Exception as e:
             log.error("Error while disconnecting from server")
             log.error(e)
