@@ -286,12 +286,16 @@ class MainNamespace(BaseNamespace):
         con = controller.Controller()
         global browsername
         con = controller.Controller()
-        if str(args[0]).endswith('apk'):
+        if str(args[4]==u'ios'):
+            browsername = args[0] + ";" + args[1] + ";" + args[2]+";" + args[3]+";" + args[4]
+        elif str(args[0]).endswith('apk'):
             browsername = args[0]+";"+args[1]
+        """
         elif str(args[0]).endswith('app'):
             browsername = args[0] + ";" + args[2]+";" + args[3]
         elif str(args[0]).endswith('ipa'):
             browsername = args[0] + ";" + args[2] + ";" + args[3]+";" + args[4]
+        """
         con =controller.Controller()
         if platform.system()=='Darwin':
             con.get_all_the_imports('Mobility/MobileApp')

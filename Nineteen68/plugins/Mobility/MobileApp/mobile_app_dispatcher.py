@@ -33,6 +33,13 @@ import DatePicker_Keywords_Mobility
 import TimePicker_Keywords_Mobility
 import picker_wheel_ios
 import table_keywords_native
+import client_ios
+import socket
+import commands
+import os
+import subprocess
+import platform
+import time
 apptypes = None
 
 log = logging.getLogger('mobile_app_dispatcher.py')
@@ -54,17 +61,31 @@ class MobileDispatcher:
     time_keywords_object=TimePicker_Keywords_Mobility.Time_Keywords()
     number_picker_object=Number_picker_Keywords.Number_Picker()
     seekBar_object=seekBar_Mobility.Seek_Bar_Keywords()
+    ios_client_object=client_ios.ios_client()
     def __init__(self):
         self.exception_flag=''
 
 
     def dispatcher(self,teststepproperty,input,reporting_obj):
         global ELEMENT_FOUND
-        result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE)
+        #result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE)
+
         objectname = teststepproperty.objectname
+        object_name_ios = objectname
+
+
+
+
+
         output = teststepproperty.outputval
         objectname = objectname.strip()
+
+
         keyword = teststepproperty.name.lower()
+        #hello= teststepproperty.custname
+        #print keyword
+        #print input
+
         global apptypes
         apptypes=teststepproperty.apptype
         err_msg=None
@@ -154,19 +175,160 @@ class MobileDispatcher:
                     'gettime' : self.time_keywords_object.Get_Time,
                     'setnumber':self.number_picker_object.Select_Number,
                     'setminvalue':self.seekBar_object.Set_Min_Value,
-                    'setmidvalue':self.seekBar_object.Set_Mid_Value,
+                    'setminvalue':self.seekBar_object.Set_Mid_Value,
                     'setmaxvalue':self.seekBar_object.Set_Max_Value
 
 
                 }
             ELEMENT_FOUND=True
             if keyword in dict.keys():
-                driver = install_and_launch.driver
-                if keyword==WAIT_FOR_ELEMENT_EXISTS:
-                    result=dict[keyword](objectname,input)
+
+
+
+                # input[0]=bundleid,input[1]=os version ,input[2]=IP,,input[3]=device_name
+                if platform.system() == 'Darwin':
+
+
+                    #current_dir = (os.getcwd())
+                    dir_path = os.path.dirname(os.path.realpath(__file__))
+
+
+                    # set IP
+                    if (commands.getoutput('pgrep xcodebuild') == ''):
+                        try:
+
+                            with open(
+                                            dir_path + "/Nineteen68UITests/data.txt",
+                                    'wb') as f:
+                                f.write(input[2])  # send IP
+                        except Exception as e:
+                            print e
+
+                        # set run command
+                        try:
+
+                            with open(dir_path + "/run.command", "wb") as f:
+                                f.write("#! /bin/bash \n")
+                                f.write(
+                                    "cd " + dir_path + "\n")
+                                f.write(
+                                    "xcodebuild -workspace Nineteen68.xcworkspace -scheme Nineteen68 -destination name=" +
+                                    input[3] + " OS=" + input[1] + " test")
+                        except Exception as e:
+                            print e
+
+                        # subprocess.call("chmod a+x run.command")
+                        try:
+                            subprocess.Popen(dir_path +"/run.command", shell=True)
+                            #time.sleep(20)
+
+                        except:
+                            print "xcode server is down"
+
+
+
+
+                    if(keyword == "launchapplication"):
+                        global ip
+                        ip = input[2]
+
+                    if object_name_ios == " ":
+                        label = ""
+                        label_type = ""
+                    else:
+                        label = object_name_ios.split("&$#")[0]
+                        label_type =object_name_ios.split("&$#")[1]
+                    input_text=input[0]
+                    #print "keyword = "+ keyword
+                    #print "label = "+ label
+                    #print "labeltype = "+ label_type
+                    #print "input = "+ input_text
+
+
+                    length_keyword = len(keyword.encode('utf-8'))
+                    length_input_text = len(input_text.encode('utf-8'))
+                    try:
+                        length_label = len(label.encode('utf-8'))
+                    except:
+                        length_label = len(label.decode('utf-8').encode('utf-8'))
+
+                    length_label_type = len(label_type.encode('utf-8'))
+
+
+                    # create socket
+                    while True:
+                        try:
+                            clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                            clientsocket.connect((ip, 8022))
+                            clientsocket.send("execu")
+                            break
+                        except:
+                            time.sleep(1)
+
+
+                    # keyword
+                    clientsocket.send(str(len(str(length_keyword))))
+                    clientsocket.send(str(length_keyword))
+                    clientsocket.send(keyword)
+
+                    # label
+                    if label == "":
+                        clientsocket.send("0")
+                    else:
+                        clientsocket.send(str(len(str(length_label))))
+                        clientsocket.send(str(length_label))
+                        clientsocket.send(label)
+
+                    # label type
+                    if label_type == "":
+                        clientsocket.send("0")
+                    else:
+                        clientsocket.send(str(len(str(length_label_type))))
+                        clientsocket.send(str(length_label_type))
+                        clientsocket.send(label_type)
+
+                    # input
+                    if input_text == "":
+                        clientsocket.send("0")
+                    else:
+                        clientsocket.send(str(len(str(length_input_text))))
+                        clientsocket.send(str(length_input_text))
+                        clientsocket.send(input_text)
+
+                    data = clientsocket.recv(100000)
+                    string_data = data.decode('utf-8')
+                    if (keyword == "launchapplication" and string_data == ""):
+                        result = MobileDispatcher().dispatcher(teststepproperty,input,reporting_obj)
+                        return result
+
+
+
+
+                    if string_data == ("passval") or string_data == ("pass"):
+                        if string_data == ("passval"):
+                            data = clientsocket.recv(100000)
+                            string_data = data.decode('utf-8')
+                            output = string_data
+                            #print output
+                        if string_data == ("pass"):
+                            output = None
+                        status = TEST_RESULT_PASS
+                        result1 = True
+                        err_msg = None
+                    else:
+                        status = TEST_RESULT_FAIL
+                        result1 = False
+                        output = None
+                        err_msg = None
+                    result=(status,result1,output,err_msg)
+
                 else:
-                    webelement=self.getMobileElement(driver,objectname)
-                    result=dict[keyword](webelement,input)
+                    driver = install_and_launch.driver
+                    if keyword==WAIT_FOR_ELEMENT_EXISTS:
+                        result=dict[keyword](objectname,input)
+                    else:
+                        webelement=self.getMobileElement(driver,objectname)
+                        result=dict[keyword](webelement,input)
                 if not(ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE
             else:
@@ -176,7 +338,9 @@ class MobileDispatcher:
                 if self.action == 'execute':
                     result=list(result)
                     screen_shot_obj = mob_screenshot.Screenshot()
-                    configvalues = readconfig.configvalues
+                    configobj = readconfig.readConfig()
+                    configvalues = configobj.readJson()
+
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
                             file_path =screen_shot_obj.captureScreenshot()
@@ -188,6 +352,7 @@ class MobileDispatcher:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
         except Exception as e:
+            import traceback
             log.error(e)
             logger.print_on_console('Exception at dispatcher')
         return result

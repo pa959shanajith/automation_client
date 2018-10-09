@@ -3,3 +3,4 @@
 *.exe
 *.log
 *.json
+*.DS_Store
