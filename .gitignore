@@ -1,6 +1,5 @@
-#ignore *.pyc files,*.exe, *.log,*.json files 
+#ignore *.pyc files,*.exe, *.log files 
 *.pyc
 *.exe
 *.log
-*.json
 *.DS_Store
