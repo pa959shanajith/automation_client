@@ -1,7 +1,7 @@
 ▪XCODE VERSION - 9.4.1
 
 KEYWORDS SUPPORTED-
-	1.	launchapplication
+	1.	launchapplication -Bundle_id;OS_version;IP_address;Device_name
 	2.	press
 	3.	presselement
 	4.	toggleon
