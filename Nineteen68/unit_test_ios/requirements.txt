@@ -1,0 +1,42 @@
+▪XCODE VERSION - 9.4.1
+
+KEYWORDS SUPPORTED-
+	1.	launchapplication
+	2.	press
+	3.	presselement
+	4.	toggleon
+	5.	toggleoff
+	6.	getstatus
+	7.	unselectcheckbox
+	8.	backpress
+	9.	selectradiobutton
+	10.	selectcheckbox
+	11.	longpress
+	12.	longpresselement
+	13.	getbuttonname
+	14.	getelementtext
+	15.	verifybuttonname
+	16.	verifyelementtext
+	17.	verifyelementexists
+	18.	verifyelementdoesnotexists
+	19.	verifyexists
+	20.	verifyhidden
+	21.	verifyvisible
+	22.	verifyelementenabled
+	23.	verifyenabled
+	24.	verifyelementdisabled
+	25.	verifydisabled
+	26.	settext
+	27.	sendvalue
+	28.	setsecuretext
+	29.	setslidevalue
+	30.	doubletap
+	31.	swipeup
+	32.	swipedown
+	33.	swipeleft
+	34.	swiperight
+	35.	gettext
+	36.	cleartext
+	37.	waitforelementexists
+	38.	setvalue
+	39.	getvalue
