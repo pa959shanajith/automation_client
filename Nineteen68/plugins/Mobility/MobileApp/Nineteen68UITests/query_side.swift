@@ -105,4 +105,3 @@ class query_side{
     
 }
 
-

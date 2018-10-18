@@ -15,9 +15,9 @@ func server(ip : String) -> (TCPServer) {
 
     //start server
 
-    let server = TCPServer(address: ip, port: 8022)
-    server.listen()
-    return server
+    let server_ = TCPServer(address: ip, port: 8022)
+    server_.listen()
+    return server_
     
     
 }

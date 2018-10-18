@@ -13,7 +13,7 @@ var bundle_id = ""
 class execution_side{
     
     func execution(client:TCPClient)->[String] {
-        print("Start")
+        
         
         //read keyword
         func read_keyword()->(String){
@@ -93,13 +93,14 @@ class execution_side{
         
         
         let keyword = read_keyword()
-        print(keyword)
+       
         let label = read_label()
-        print(label)
+        
         let labeltype = read_label_type()
-        print(labeltype)
+        
         let input = read_input()
-        print(input)
+         print(keyword,label,labeltype,input)
+       
     
 
         var result : [String] = ["temp"]

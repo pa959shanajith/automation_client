@@ -46,7 +46,9 @@ class type_box_operations{
                 }
                 return "pass"
             }
+            errrorhandle().send_error(message: "textbox doesn't exists")
             return "fail"
+            
         }
         if querytype[label].exists{
             querytype[label].tap()
@@ -56,6 +58,7 @@ class type_box_operations{
             }
             return "pass"
         }
+        errrorhandle().send_error(message: "textbox doesn't exists")
         return "fail"
     }
     
@@ -69,8 +72,10 @@ class type_box_operations{
                 if XCUIApplication(bundleIdentifier: bundle_id).buttons["Done"].exists{
                     XCUIApplication(bundleIdentifier: bundle_id).buttons["Done"].tap()
                 }
+                
                 return "pass"
             }
+            errrorhandle().send_error(message: "secured textbox doesn't exist")
             return "fail"
         }
         if querytype[label].exists{
@@ -81,6 +86,7 @@ class type_box_operations{
             }
             return "pass"
         }
+        errrorhandle().send_error(message: "secured textbox doesn't exists")
         return "fail"
         
     }
@@ -94,12 +100,14 @@ class type_box_operations{
                 querytype.element(boundBy: i!).clearAndEnterText("")
                 return "pass"
             }
+            errrorhandle().send_error(message: "textbox doesn't exists")
             return "fail"
         }
         if querytype[label].exists{
             querytype[label].clearAndEnterText("")
             return "pass"
         }
+        errrorhandle().send_error(message: "textbox doesn't exists")
         return "fail"
         
     }
@@ -114,12 +122,14 @@ class type_box_operations{
             if querytype.element(boundBy: i!).exists{
                 return querytype.element(boundBy: i!).value as! String
             }
+            errrorhandle().send_error(message: "textbox doesn't exists")
             return "fail"
         }
         if querytype[label].exists{
             return querytype[label].value as! String
             
         }
+        errrorhandle().send_error(message: "textbox doesn't exists")
         return "fail"
     }
     

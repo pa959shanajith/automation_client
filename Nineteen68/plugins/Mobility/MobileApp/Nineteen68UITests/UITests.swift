@@ -15,9 +15,31 @@ import Foundation
 
 class UITests: Nineteen68UITests {
     var bundle_id = ""
+    var error_msg = ""
 
+    public class UITestObserver: NSObject, XCTestObservation {
+        public func testCase(_ testCase: XCTestCase,
+                             didFailWithDescription description: String,
+                             inFile filePath: String?,
+                             atLine lineNumber: Int) {
+            print("failure description    : \(description)")
+            
+            errrorhandle().send_error(message: description)
+            
+        }
+    }
+    override func setUp() {
+        super.setUp()
+        
+        //XCUIApplication().launch()
+        XCTestObservationCenter.shared.addTestObserver(UITestObserver())
+        
+    }
+    
+    
     func testRefreshControl() {
-        continueAfterFailure = true
+       
+        continueAfterFailure = false
         var status = "running"
         //READ IP address of the mobile
         let testBundle = Bundle(for: type(of: self))
@@ -31,49 +53,70 @@ class UITests: Nineteen68UITests {
             print("failed to read")
             print(error)
         }
-        
-        //start the server
-        let server_side = server(ip : read_ip)
+        if Nineteen68UITests.controll_variables.server_status == "down"{
+            //start the server
+            Nineteen68UITests.controll_variables.server_side = server(ip : read_ip)
+            Nineteen68UITests.controll_variables.server_status = "up"
+        }
         print("xcode server is running")
-        
         //perform query or execution and return result
+
         while status=="running"{
+            Nineteen68UITests.controll_variables.client = Nineteen68UITests.controll_variables.server_side.accept()
             
-            let client = server_side.accept()
-            print("Newclient from:\(client?.address)[\(String(describing: client?.port))]")
-            let data = client?.read(5)
+            while Nineteen68UITests.controll_variables.client == nil{
+                
+                Nineteen68UITests.controll_variables.server_side = server(ip : read_ip)
+                Nineteen68UITests.controll_variables.client = Nineteen68UITests.controll_variables.server_side.accept()
+
+            }
+            
+            
+            print("Newclient from:\(controll_variables.client?.address)[\(String(describing: controll_variables.client?.port))]")
+            let data = Nineteen68UITests.controll_variables.client?.read(5)
             let str = NSString(bytes: data!, length: data!.count, encoding: String.Encoding.utf8.rawValue)
             
             if str == "query"{
                 
-                let query_status = query_side().query(client: client!)
-                print(query_status)
+                let query_status = query_side().query(client: Nineteen68UITests.controll_variables.client!)
+                //print(query_status)
                 
             }
         
             if str == "execu"{
-                var result = execution_side().execution(client: client!)
+                var result = execution_side().execution(client: Nineteen68UITests.controll_variables.client!)
                 print(result)
                 if result[0] == "pass"{
                     let data2 = "pass".data(using: .utf8)
-                    client?.send(data:data2!)
+                    Nineteen68UITests.controll_variables.client?.send(data:data2!)
+          
                 }
                 else if result[0] == "fail"{
-                    let data2 = "fail".data(using: .utf8)
-                    client?.send(data:data2!)
+                    if Nineteen68UITests.controll_variables.message == ""{
+                        let data2 = "fail".data(using: .utf8)
+                        Nineteen68UITests.controll_variables.client?.send(data:data2!)
+                    }
+                    else {
+                        Nineteen68UITests.controll_variables.message = ""
+                    }
                 }
                 else {
+                    
                     let passdata = "passval".data(using: .utf8)
-                    client?.send(data:passdata!)
+                    controll_variables.client?.send(data:passdata!)
                     let data1 = (result[0]).data(using: .utf8)
-                    client?.send(data:data1!)
+                    controll_variables.client?.send(data:data1!)
+            
                 }
             }
             if str == "stop!"{
                 status = "stop" 
             }
+
         }
         
+        
     }
+
 }
 

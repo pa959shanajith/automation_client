@@ -84,19 +84,35 @@ class xcelement_query {
                     }
                     else if type == "statictexts"{
                         if label != ""{
-                        let screenshot = XCUIScreen.main.screenshot()
-                        let screenshot_image = screenshot.image
-                        dict["xpath"] = "bound"+String(i) + "&$#"+type
-                        dict["height"] = maindict[type]!.element(boundBy: i).frame.size.height * screenshot_image.scale
-                        dict["width"] = maindict[type]!.element(boundBy: i).frame.size.width * screenshot_image.scale
-                        dict["top"] = maindict[type]!.element(boundBy: i).frame.origin.y * screenshot_image.scale
-                        dict["left"] = maindict[type]!.element(boundBy: i).frame.origin.x * screenshot_image.scale
-                        dict["reference"] = ""
-                        dict["text"] = "ios"
-                        dict["enabled"] = "true"
-                        dict["id"] = ""
-                        dict["tempId"] = ""
-                            array.append(dict)
+                            if label.count <= 50{
+                                let screenshot = XCUIScreen.main.screenshot()
+                                let screenshot_image = screenshot.image
+                                dict["height"] = maindict[type]!.element(boundBy: i).frame.size.height * screenshot_image.scale
+                                dict["width"] = maindict[type]!.element(boundBy: i).frame.size.width * screenshot_image.scale
+                                dict["top"] = maindict[type]!.element(boundBy: i).frame.origin.y * screenshot_image.scale
+                                dict["left"] = maindict[type]!.element(boundBy: i).frame.origin.x * screenshot_image.scale
+                                dict["reference"] = ""
+                                dict["text"] = "ios"
+                                dict["enabled"] = "true"
+                                dict["id"] = ""
+                                dict["tempId"] = ""
+                                array.append(dict)
+                            }
+                            else{
+                                let screenshot = XCUIScreen.main.screenshot()
+                                let screenshot_image = screenshot.image
+                                dict["xpath"] = "bound"+String(i) + "&$#"+type
+                                dict["height"] = maindict[type]!.element(boundBy: i).frame.size.height * screenshot_image.scale
+                                dict["width"] = maindict[type]!.element(boundBy: i).frame.size.width * screenshot_image.scale
+                                dict["top"] = maindict[type]!.element(boundBy: i).frame.origin.y * screenshot_image.scale
+                                dict["left"] = maindict[type]!.element(boundBy: i).frame.origin.x * screenshot_image.scale
+                                dict["reference"] = ""
+                                dict["text"] = "ios"
+                                dict["enabled"] = "true"
+                                dict["id"] = ""
+                                dict["tempId"] = ""
+                                array.append(dict)
+                            }
                         }
                         
                     }

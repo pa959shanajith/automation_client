@@ -51,6 +51,9 @@ class performing_guestures{
     
 
     func tap(querytype:XCUIElementQuery,label:String)-> String{
+        
+
+        
         if label.hasPrefix("bound") {
            let str_label = String(label.dropFirst(5))
            let i = Int(str_label)
@@ -58,6 +61,7 @@ class performing_guestures{
                 querytype.element(boundBy: i!).tap()
                 return "pass"
             }
+            errrorhandle().send_error(message: "tap action failed element doesn't exist")
             return "fail"
         }
         else{
@@ -66,6 +70,7 @@ class performing_guestures{
                  element.tap()
                 return "pass"
             }
+            errrorhandle().send_error(message: "tap action failed element doesn't exist")
             return "fail"
         }
 
@@ -81,6 +86,7 @@ class performing_guestures{
                 querytype.element(boundBy: i!).press(forDuration: forDuration)
                 return "pass"
             }
+            errrorhandle().send_error(message: "longpress failed element doesn't exist")
             return "fail"
         }
         else{
@@ -88,6 +94,7 @@ class performing_guestures{
                 element.press(forDuration: forDuration)
                 return "pass"
             }
+            errrorhandle().send_error(message: "longpress element doesn't exist")
             return "fail"
         }
   
@@ -95,6 +102,10 @@ class performing_guestures{
     
     // set_to -> between 0 to 1
     func adjusting_Slider(querytype:XCUIElementQuery,label:String,set_to:CGFloat) -> String {
+        if set_to > 1 {
+            errrorhandle().send_error(message: "adjusting slider input should lie in between 0 and 1")
+            return "fail"
+        }
         let element = querytype[label]
         if label.hasPrefix("bound") {
             let str_label = String(label.dropFirst(5))
@@ -113,6 +124,7 @@ class performing_guestures{
                 //querytype.element(boundBy: i!).adjust(toNormalizedSliderPosition: set_to)
                 return "pass"
             }
+            errrorhandle().send_error(message: "adjusting slider action failed element doesn't exist")
             return "fail"
         }
         else{
@@ -130,6 +142,7 @@ class performing_guestures{
                 return "pass"
 
             }
+            errrorhandle().send_error(message: "adjusting slider action failed element doesn't exist")
             return "fail"
         }
        
@@ -145,6 +158,7 @@ class performing_guestures{
                 querytype.element(boundBy: i!).doubleTap()
                 return "pass"
             }
+            errrorhandle().send_error(message: "element doesn't exist")
             return "fail"
         }
         else{
@@ -153,6 +167,7 @@ class performing_guestures{
                 element.doubleTap()
                 return "pass"
             }
+            errrorhandle().send_error(message: "element doesn't exist")
             return "fail"
         }
         
@@ -167,6 +182,7 @@ class performing_guestures{
                 querytype.element(boundBy: i!).swipeUp()
                 return "pass"
             }
+            errrorhandle().send_error(message: "element doesn't exist")
             return "fail"
         }
         else{
@@ -175,6 +191,7 @@ class performing_guestures{
                 element.swipeUp()
                 return "pass"
             }
+            errrorhandle().send_error(message: "element doesn't exist")
             return "fail"
         }
     }
@@ -190,6 +207,7 @@ class performing_guestures{
                 querytype.element(boundBy: i!).swipeDown()
                 return "pass"
             }
+            errrorhandle().send_error(message: "element doesn't exist")
             return "fail"
         }
         else{
@@ -198,6 +216,7 @@ class performing_guestures{
                 element.swipeDown()
                 return "pass"
             }
+            errrorhandle().send_error(message: "element doesn't exist")
             return "fail"
         }
     }
@@ -212,6 +231,7 @@ class performing_guestures{
                 querytype.element(boundBy: i!).swipeRight()
                 return "pass"
             }
+            errrorhandle().send_error(message: "element doesn't exist")
             return "fail"
         }
         else{
@@ -220,6 +240,7 @@ class performing_guestures{
                 element.swipeRight()
                 return "pass"
             }
+            errrorhandle().send_error(message: "element doesn't exist")
             return "fail"
         }
         
@@ -236,6 +257,7 @@ class performing_guestures{
                 querytype.element(boundBy: i!).swipeLeft()
                 return "pass"
             }
+            errrorhandle().send_error(message: "element doesn't exist")
             return "fail"
         }
         else{
@@ -244,6 +266,7 @@ class performing_guestures{
                 element.swipeLeft()
                 return "pass"
             }
+            errrorhandle().send_error(message: "element doesn't exist")
             return "fail"
         }
   
@@ -264,6 +287,7 @@ class performing_guestures{
                     }
                 }
             else{
+                errrorhandle().send_error(message: "element doesn't exist")
                 return "fail"
             }
         
@@ -280,6 +304,7 @@ class performing_guestures{
                 }
             }
             else{
+                errrorhandle().send_error(message: "element doesn't exist")
                 return "fail"
             }
     }
@@ -300,6 +325,7 @@ class performing_guestures{
                 }
             }
             else{
+                errrorhandle().send_error(message: "element doesn't exist")
                 return "fail"
             }
             
@@ -317,6 +343,7 @@ class performing_guestures{
                 }
             }
             else{
+                errrorhandle().send_error(message: "element doesn't exist")
                 return "fail"
             }
         }
@@ -339,6 +366,7 @@ class performing_guestures{
                 }
             }
             else{
+                errrorhandle().send_error(message: "element doesn't exist")
                 return "fail"
             }
             
@@ -355,6 +383,7 @@ class performing_guestures{
                 }
             }
             else{
+                errrorhandle().send_error(message: "element doesn't exist")
                 return "fail"
             }
         }
@@ -369,6 +398,7 @@ class performing_guestures{
         if element.exists{
             return element.press(forDuration: forDuration,thenDragTo: thenDragTo)
         }else {
+            errrorhandle().send_error(message: "element doesn't exist")
             print("element does not exists")
         }
     }
@@ -385,6 +415,7 @@ class performing_guestures{
                 
             }
             else{
+                errrorhandle().send_error(message: "element doesn't exist")
                 return "fail"
             }
             
@@ -398,6 +429,7 @@ class performing_guestures{
 
             }
             else {
+                errrorhandle().send_error(message: "element doesn't exist")
                 return "fail"
             }
         }
@@ -413,6 +445,7 @@ class performing_guestures{
                 
             }
             else{
+                errrorhandle().send_error(message: "element doesn't exist")
                 return "fail"
             }
             
@@ -426,6 +459,7 @@ class performing_guestures{
                 
             }
             else {
+                errrorhandle().send_error(message: "element doesn't exist")
                 return "fail"
             }
         }

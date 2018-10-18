@@ -67,6 +67,7 @@ class MobileDispatcher:
 
 
     def dispatcher(self,teststepproperty,input,reporting_obj):
+
         global ELEMENT_FOUND
         #result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE)
 
@@ -193,8 +194,10 @@ class MobileDispatcher:
                     dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
+
                     # set IP
                     if (commands.getoutput('pgrep xcodebuild') == ''):
+
                         try:
 
                             with open(
@@ -214,14 +217,16 @@ class MobileDispatcher:
                                 f.write(
                                     "xcodebuild -workspace Nineteen68.xcworkspace -scheme Nineteen68 -destination name=" +
                                     input[3] + " OS=" + input[1] + " test")
+
                         except Exception as e:
                             print e
 
                         # subprocess.call("chmod a+x run.command")
                         try:
-                            subprocess.Popen(dir_path +"/run.command", shell=True)
-                            #time.sleep(20)
 
+
+                            subprocess.Popen( dir_path +"/run.command", shell=True)
+                            #time.sleep(20)
                         except:
                             print "xcode server is down"
 
@@ -232,12 +237,14 @@ class MobileDispatcher:
                         global ip
                         ip = input[2]
 
-                    if object_name_ios == " ":
+
+                    if object_name_ios == " " or keyword == "launchapplication":
                         label = ""
                         label_type = ""
                     else:
                         label = object_name_ios.split("&$#")[0]
                         label_type =object_name_ios.split("&$#")[1]
+
                     input_text=input[0]
                     #print "keyword = "+ keyword
                     #print "label = "+ label
@@ -295,20 +302,40 @@ class MobileDispatcher:
                         clientsocket.send(str(length_input_text))
                         clientsocket.send(input_text)
 
+
+
+
                     data = clientsocket.recv(100000)
                     string_data = data.decode('utf-8')
+
+
+
                     if (keyword == "launchapplication" and string_data == ""):
                         result = MobileDispatcher().dispatcher(teststepproperty,input,reporting_obj)
                         return result
 
+                    if ( string_data == "" ):
+                        result = MobileDispatcher().dispatcher(teststepproperty,input,reporting_obj)
+                        return result
 
 
+                    if string_data == "error":
+                        data = clientsocket.recv(100000)
+                        string_data = data.decode('utf-8')
+                        log.error(string_data)
+                        logger.print_on_console(string_data)
+                        status = TEST_RESULT_FAIL
+                        result1 = False
+                        output = None
+                        err_msg = None
 
-                    if string_data == ("passval") or string_data == ("pass"):
+
+                    elif string_data == ("passval") or string_data == ("pass"):
                         if string_data == ("passval"):
                             data = clientsocket.recv(100000)
                             string_data = data.decode('utf-8')
                             output = string_data
+
                             #print output
                         if string_data == ("pass"):
                             output = None
@@ -354,7 +381,7 @@ class MobileDispatcher:
         except Exception as e:
             import traceback
             log.error(e)
-            logger.print_on_console('Exception at dispatcher')
+            #logger.print_on_console('Exception at dispatcher')
         return result
 
     def getMobileElement(self,driver,objectname):
