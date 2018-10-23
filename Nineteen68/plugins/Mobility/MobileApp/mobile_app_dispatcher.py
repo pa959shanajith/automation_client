@@ -33,7 +33,6 @@ import DatePicker_Keywords_Mobility
 import TimePicker_Keywords_Mobility
 import picker_wheel_ios
 import table_keywords_native
-import client_ios
 import socket
 import commands
 import os
@@ -61,7 +60,6 @@ class MobileDispatcher:
     time_keywords_object=TimePicker_Keywords_Mobility.Time_Keywords()
     number_picker_object=Number_picker_Keywords.Number_Picker()
     seekBar_object=seekBar_Mobility.Seek_Bar_Keywords()
-    ios_client_object=client_ios.ios_client()
     def __init__(self):
         self.exception_flag=''
 

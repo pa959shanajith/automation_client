@@ -274,8 +274,8 @@ class InstallAndLaunch():
             import traceback
             traceback.print_exc()
             logger.print_on_console("Error occured in scraping")
-            self.stop_server()
-            return finalJson
+        self.stop_server()
+        return finalJson
 
 
 

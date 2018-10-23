@@ -31,7 +31,6 @@ class ScrapeWindow(wx.Frame):
 
         self.socketIO = socketIO
 
-        print filePath
 
 
 
@@ -39,22 +38,22 @@ class ScrapeWindow(wx.Frame):
         apk_path=filePath.split(';')[0]
         serial=filePath.split(';')[1]
 
-
-        if filePath.split(';')[4]== "ios":
+        if str(apk_path).endswith("apk"):
+            status = obj.installApplication(apk_path, None, serial, None)
+        elif filePath.split(';')[4]== "ios":
             deviceName = filePath.split(';')[0]
             platform_version = filePath.split(';')[1]
             bundle_id = filePath.split(';')[2]
             Ip_Address = filePath.split(';')[3]
             status = obj.installApplication(deviceName, platform_version,bundle_id,Ip_Address,"ios")
-        elif str(apk_path).endswith("ipa"):
-            platform_version = filePath.split(';')[2]
-            device_udid = filePath.split(';')[3]
-            status = obj.installApplication(apk_path,platform_version,serial,device_udid)
-        elif str(apk_path).endswith("app"):
-            platform_version = filePath.split(';')[2]
-            status = obj.installApplication(apk_path, platform_version, serial, None)
-        elif str(apk_path).endswith("apk"):
-            status = obj.installApplication(apk_path, None, serial, None)
+    ##    elif str(apk_path).endswith("ipa"):
+    ##        platform_version = filePath.split(';')[2]
+    ##        device_udid = filePath.split(';')[3]
+    ##        status = obj.installApplication(apk_path,platform_version,serial,device_udid)
+    ##    elif str(apk_path).endswith("app"):
+    ##       platform_version = filePath.split(';')[2]
+    ##        status = obj.installApplication(apk_path, platform_version, serial, None)
+
 ##        input_val=[]
 ##        input_val.append(fileLoc)
 ##        input_val.append(windowname)
