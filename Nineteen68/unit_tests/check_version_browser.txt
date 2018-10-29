@@ -1,0 +1,8 @@
+
+
+#usage: input expectedresult
+
+D:\MasterNew\Nineteen68\Nineteen68\unit_tests\ice_const.json true
+D:\MasterNew\Nineteen68\Nineteen68\unit_tests\ice_const1.json true
+D:\MasterNew\Nineteen68\Nineteen68\unit_tests\ice_const2.json false
+D:\MasterNew\Nineteen68\Nineteen68\unit_tests\ice_const3.json false
