@@ -47,6 +47,7 @@ allow_connect = False
 icesession = None
 plugins_list = []
 configvalues = None
+ICE_CONST= os.environ["NINETEEN68_HOME"] + '/Lib/ice_const.json'
 CONFIG_PATH= os.environ["NINETEEN68_HOME"] + '/Lib/config.json'
 IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images/"
 os.environ["IMAGES_PATH"] = IMAGES_PATH
@@ -1669,6 +1670,22 @@ class DebugWindow(wx.Frame):
 def check_browser():
     try:
         try:
+            try:
+                if os.path.isfile(ICE_CONST)==True:
+                    params = json.load(open(ICE_CONST))
+                    configvalues['CHROME_VERSION'] = params['CHROME_VERSION']
+                    configvalues['FIREFOX_VERSION'] = params['FIREFOX_VERSION']
+                    if configvalues['CHROME_VERSION'] != "":
+                        for k,v in configvalues['CHROME_VERSION'].items():
+                            CHROME_DRIVER_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
+                    if configvalues['FIREFOX_VERSION'] != "":
+                        for k,v in configvalues['FIREFOX_VERSION'].items():
+                            FIREFOX_BROWSER_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
+                else:
+                    logger.print_on_console("Please enter valid ice_const.json path")
+            except Exception as e:
+                logger.print_on_console("Please enter valid ice_const.json")
+                log.error(e)
             global chromeFlag,firefoxFlag
             logger.print_on_console('Checking for browser versions...')
             import subprocess
@@ -1678,7 +1695,7 @@ def check_browser():
             p = subprocess.Popen('chromedriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
             for line in iter(p.stdout.readline, b''):
                 a.append(str(line))
-            a=float(a[0][13:17])
+            a=a[0][13:17]
             choptions1 = webdriver.ChromeOptions()
             if str(configvalues['chrome_path']).lower()!="default":
                 choptions1.binary_location=str(configvalues['chrome_path'])
@@ -1693,9 +1710,9 @@ def check_browser():
             except:
                 pass
             driver=None
-            for i in CHROME_DRIVER_VERSION:
-                if a == i[0]:
-                    if browser_ver >= i[1] and browser_ver <= i[2]:
+            for k,v in CHROME_DRIVER_VERSION.items():
+                if a == k:
+                    if browser_ver >= v[0] and browser_ver <= v[1]:
                         chromeFlag=True
             if chromeFlag == False :
                 logger.print_on_console('WARNING!! : Chrome version',browser_ver,' is not supported.')
@@ -1708,7 +1725,7 @@ def check_browser():
             a=[]
             for line in iter(p.stdout.readline, b''):
                 a.append(str(line))
-            a=float(a[0][12:16])
+            a=a[0][12:16]
             caps=webdriver.DesiredCapabilities.FIREFOX
             caps['marionette'] = True
             from selenium.webdriver.firefox.options import Options
@@ -1724,9 +1741,9 @@ def check_browser():
             except:
                 pass
             driver=None
-            for i in FIREFOX_BROWSER_VERSION:
-                if a == i[0]:
-                    if browser_ver >= i[1] or browser_ver <= i[2]:
+            for k,v in FIREFOX_BROWSER_VERSION.items():
+                if a == k:
+                    if browser_ver >= v[0] or browser_ver <= v[1]:
                         firefoxFlag=True
             if firefoxFlag == False:
                 logger.print_on_console('WARNING!! : Firefox version',browser_ver,' is not supported.')
