@@ -34,7 +34,7 @@ browserops_obj=browserops.BrowserOperations()
 from webscrape_utils import WebScrape_Utils
 
 class Clickandadd():
-    def startclickandadd(self):
+    def startclickandadd(self,window_handle_number):
         driver = browserops.driver
         webscrape_utils_obj = WebScrape_Utils()
         try:
@@ -52,16 +52,21 @@ class Clickandadd():
             javascript_hasfocus = """return(document.hasFocus());"""
             time.sleep(6)
             browserops_obj.checkPopups()
-            for eachdriverhand in driver.window_handles:
-                log.info('Iterating through the number of windows open by the driver')
-                driver.switch_to.window(eachdriverhand)
-                log.info('Switching to each handle and checking weather it has focus ')
 
-                if (driver.execute_script(javascript_hasfocus)):
-                    log.info('Got the window which has the focus')
-                    global currenthandle
-                    currenthandle = eachdriverhand
-                    break
+            if window_handle_number is not None and window_handle_number > 0:
+                driver.switch_to.window(driver.window_handles[window_handle_number])
+                currenthandle = driver.window_handles[window_handle_number]
+            else:
+                for eachdriverhand in driver.window_handles:
+                    log.info('Iterating through the number of windows open by the driver')
+                    driver.switch_to.window(eachdriverhand)
+                    log.info('Switching to each handle and checking weather it has focus ')
+
+                    if (driver.execute_script(javascript_hasfocus)):
+                        log.info('Got the window which has the focus')
+                        global currenthandle
+                        currenthandle = eachdriverhand
+                        break
 
             driver.switch_to.window(currenthandle)
             log.info('Performing the start click and add operation on default/outer page')
@@ -140,7 +145,7 @@ class Clickandadd():
                     else:
                         log.info('could not switch to iframe/frame %s', path)
 
-            """Method to perform Stop ClickAndAdd on iframes (and frames) recursively"""
+            """Method to perform Stop ClickAndAdd on frames (and iframes) recursively"""
             def callback_scrape_stop_cna_frames(myipath, tempne_stopclicknadd):
                 for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
                     path = myipath + str(frames) + 'f' + '/'

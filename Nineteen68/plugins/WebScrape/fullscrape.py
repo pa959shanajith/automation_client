@@ -29,7 +29,7 @@ from core_utils import CoreUtils
 from webscrape_utils import WebScrape_Utils
 
 class Fullscrape():
-    def fullscrape(self,scrape_option):
+    def fullscrape(self,scrape_option,window_handle_number):
         start_time = time.clock()
         data = {}
         driver = browserops.driver
@@ -52,15 +52,19 @@ class Fullscrape():
             browserops_obj.checkPopups()
             javascript_hasfocus = """return(document.hasFocus());"""
 ##            time.sleep(6)
-            for eachdriverhand in driver.window_handles:
-                log.info('Iterating through the number of windows open by the driver')
-                driver.switch_to.window(eachdriverhand)
-                log.info('Switching to each handle and checking weather it has focus ')
-                if (driver.execute_script(javascript_hasfocus)):
-                    log.info('Got the window which has the focus')
-                    global currenthandle
-                    currenthandle = eachdriverhand
-                    break
+            if window_handle_number is not None and window_handle_number > 0:
+                driver.switch_to.window(driver.window_handles[window_handle_number])
+                currenthandle = driver.window_handles[window_handle_number]
+            else:
+                for eachdriverhand in driver.window_handles:
+                    log.info('Iterating through the number of windows open by the driver')
+                    driver.switch_to.window(eachdriverhand)
+                    log.info('Switching to each handle and checking weather it has focus ')
+                    if (driver.execute_script(javascript_hasfocus)):
+                        log.info('Got the window which has the focus')
+                        global currenthandle
+                        currenthandle = eachdriverhand
+                        break
             tempne = []
             log.info('Performing the full scrape operation on default/outer page')
             if scrape_option[0].lower() == 'select a section using xpath':
