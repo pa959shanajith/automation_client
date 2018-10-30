@@ -541,9 +541,20 @@ class Controller():
                             logger.print_on_console("The index count for the dynamic variable is " + "Row: "+str(row) + " and Column: "+str(col))
                         else:
                             logger.print_on_console('Result obtained is ',display_keyword_response)
+                    elif tsp.apptype.lower()=='system':
+                        if result[2]!='9cc33d6fe25973868b30f4439f09901a':
+                            logger.print_on_console('Result obtained is: ',result[2])
+                        elif result:
+                            logger.print_on_console('Result obtained is: ',result[1])
                 else:
-                    logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i])
-                    if not isinstance(display_keyword_response[i],basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
+                    if tsp.apptype.lower()=='system':
+                        if result[2]!='9cc33d6fe25973868b30f4439f09901a':
+                            logger.print_on_console('Result obtained is: ',result[2])
+                        elif result:
+                            logger.print_on_console('Result obtained is: ',result[1])
+                    else:
+                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i])
+                        if not isinstance(display_keyword_response[i],basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
             else:
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         log.info('Result obtained is: ')
