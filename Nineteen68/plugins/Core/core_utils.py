@@ -14,10 +14,9 @@ import sys
 import logging
 log = logging.getLogger("core_utils.py")
 import os
+import codecs
 from Crypto.Cipher import AES
-BS=16
-iv='0'*16
-##key='Nineeteen68@ScrapeNineeteen68@Sc'
+
 
 class CoreUtils():
 
@@ -58,36 +57,33 @@ class CoreUtils():
         except Exception as e:
             log.info(e)
 
-    def pad(self,data):
-        data=data.encode('utf-8')
+    def pad(self, data):
+        BS = 16
         padding = BS - len(data) % BS
-        return data + padding * chr(padding)
+        return data + padding * chr(padding).encode('utf-8')
 
-    def unpad(self,data):
-        data=data.decode('utf-8')
+    def unpad(self, data):
         return data[0:-ord(data[-1])]
 
-    def unwrap(self,hex_data,key):
-        data = ''.join(map(chr, bytearray.fromhex(hex_data)))
-        aes = AES.new(key, AES.MODE_CBC, iv)
-        return self.unpad(aes.decrypt(data))
+    def unwrap(self, hex_data, key, iv=b'0'*16):
+        data = codecs.decode(hex_data, 'hex')
+        aes = AES.new(key.encode('utf-8'), AES.MODE_CBC, iv)
+        return self.unpad(aes.decrypt(data).decode('utf-8'))
 
-    def wrap(self,data,key):
-        aes = AES.new(key, AES.MODE_CBC, iv)
-        return aes.encrypt(self.pad(data)).encode('hex')
+    def wrap(self, data, key, iv=b'0'*16):
+        aes = AES.new(key.encode('utf-8'), AES.MODE_CBC, iv)
+        hex_data = aes.encrypt(self.pad(data.encode('utf-8')))
+        return codecs.encode(hex_data, 'hex')
 
-    def scrape_unwrap(self,hex_data):
-        data = ''.join(map(chr, bytearray.fromhex(hex_data)))
-        scrape_key = "".join(['N','i','n','e','e','t','e','e','n','6','8','@','S','e',
+    def scrape_unwrap(self, hex_data):
+        key = "".join(['N','i','n','e','e','t','e','e','n','6','8','@','S','e',
             'c','u','r','e','S','c','r','a','p','e','D','a','t','a','P','a','t','h'])
-        aes = AES.new(scrape_key, AES.MODE_CBC, iv)
-        return self.unpad(aes.decrypt(data))
+        return self.unwrap(hex_data, key)
 
-    def scrape_wrap(self,data):
-        scrape_key = "".join(['N','i','n','e','e','t','e','e','n','6','8','@','S','e',
+    def scrape_wrap(self, data):
+        key = "".join(['N','i','n','e','e','t','e','e','n','6','8','@','S','e',
             'c','u','r','e','S','c','r','a','p','e','D','a','t','a','P','a','t','h'])
-        aes = AES.new(scrape_key, AES.MODE_CBC, iv)
-        return aes.encrypt(self.pad(data)).encode('hex')
+        return self.wrap(data, key)
 
     def getMacAddress(self):
         mac=""

@@ -1682,9 +1682,9 @@ def check_browser():
                         for k,v in configvalues['FIREFOX_VERSION'].items():
                             FIREFOX_BROWSER_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
                 else:
-                    logger.print_on_console("Please enter valid ice_const.json path")
+                    logger.print_on_console("Unable to locate ICE parameters")
             except Exception as e:
-                logger.print_on_console("Please enter valid ice_const.json")
+                logger.print_on_console("Unable to locate ICE parameters")
                 log.error(e)
             global chromeFlag,firefoxFlag
             logger.print_on_console('Checking for browser versions...')
