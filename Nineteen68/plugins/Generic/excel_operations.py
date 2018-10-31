@@ -30,7 +30,7 @@ from xlrd.sheet import ctype_text
 import itertools
 import csv
 import platform
-if platform.system() == "Windows":
+if SYSTEM_OS == "Windows":
     import win32api
 
 class ExcelFile:

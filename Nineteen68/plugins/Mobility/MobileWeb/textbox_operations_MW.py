@@ -147,12 +147,12 @@ class TextboxKeywords:
                                 browser_Keywords_MW.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
                             else:
                                 webelement.clear()
-                                if platform.system()== "Darwin":
+                                if SYSTEM_OS== "Darwin":
                                     log.debug('Sending the value via part 1')
                                     browser_Keywords_MW.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
                                 else:
                                     log.debug('Sending the value via part 2')
-                                    if platform.system()!= "Darwin":
+                                    if SYSTEM_OS!= "Darwin":
                                         webelement.send_keys(input)
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
@@ -243,7 +243,7 @@ class TextboxKeywords:
                         obj=UtilWebKeywords()
                         if obj.is_visible(webelement):
                             webelement.clear()
-                            if platform.system() != "Darwin":
+                            if SYSTEM_OS != "Darwin":
                                 from selenium.webdriver.common.keys import Keys
                                 webelement.send_keys(Keys.BACK_SPACE)
                         else:

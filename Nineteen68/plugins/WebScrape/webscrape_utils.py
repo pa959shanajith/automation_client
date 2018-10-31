@@ -8,10 +8,10 @@
 # Copyright:   (c) nikunj.jain 2018
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-import platform
 import time
 import os
-if platform.system()=='Windows':
+from constants import SYSTEM_OS
+if SYSTEM_OS=='Windows':
     import win32gui
     import win32process
     import win32con

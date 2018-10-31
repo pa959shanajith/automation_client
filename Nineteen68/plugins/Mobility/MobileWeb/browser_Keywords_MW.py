@@ -26,7 +26,7 @@ drivermap = []
 log = logging.getLogger('browser_Keywords_MW.py')
 import utils_web_MW
 import psutil
-if platform.system()!='Darwin':
+if SYSTEM_OS!='Darwin':
     import win32gui
     import win32api
 import readconfig
@@ -65,7 +65,7 @@ class BrowserKeywords():
 ##            maindir = os.getcwd()
 ##            os.chdir('..')
             curdir = os.environ["NINETEEN68_HOME"]
-            if(platform.system()!='Darwin'):
+            if(SYSTEM_OS!='Darwin'):
                 path = curdir + '/Nineteen68/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
                 nodePath = curdir + "/Drivers/node.exe"
                 proc = subprocess.Popen([nodePath, path], shell=True,stdin=None, stdout=None, stderr=None, close_fds=True)
@@ -85,7 +85,7 @@ class BrowserKeywords():
             err_msg = None
             ##        self.browser_num=browser_num[0]
             try:
-                if platform.system()== 'Darwin':
+                if SYSTEM_OS== 'Darwin':
                     self.start_server()
                     global driver_obj
                     global driver
@@ -181,7 +181,7 @@ class BrowserKeywords():
                     ##            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Using Pid handle is obtained')
             except Exception as e:
                 err_msg = 'ERROR OCURRED WHILE OPENING BROWSER'
-                if platform.system() == 'Darwin':
+                if SYSTEM_OS == 'Darwin':
                     curdir = os.environ["NINETEEN68_HOME"]
                     path_node_modules = curdir + '/Nineteen68/plugins/Mobility/node_modules'
                     if not os.path.exists(path_node_modules):
@@ -412,7 +412,7 @@ class BrowserKeywords():
 
     def stop_server(self):
             try:
-                if platform.system()!= 'Darwin':
+                if SYSTEM_OS!= 'Darwin':
                     import psutil
                     import os
                     processes = psutil.net_connections()
@@ -453,7 +453,7 @@ class BrowserKeywords():
 ##                if(len(winHandles) == 1):
 ##                    webdriver_list.pop(len(webdriver_list)-1)
 ##                    print 'Kill driver logic'
-          if platform.system()== 'Darwin':
+          if SYSTEM_OS== 'Darwin':
             driver_obj.quit()
           else:
             driver_obj.close()

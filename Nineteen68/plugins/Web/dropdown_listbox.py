@@ -113,7 +113,7 @@ class DropdownKeywords():
                                             if (input_val == i):
                                                 if (isinstance(browser_Keywords.driver_obj, webdriver.Firefox)):
                                                     iList[i].click()
-                                                elif platform.system() == 'Darwin':
+                                                elif SYSTEM_OS == 'Darwin':
                                                     scroll = """arguments[0].scrollIntoView()"""
                                                     browser_Keywords.driver_obj.execute_script(scroll, webelement)
                                                     jstext = """for (var j = 0; j < arguments[1].length; j++) {for (var i = 0; i < arguments[0].length; i++) {if ( i == arguments[1][j]) {arguments[0][i].selected = true;}}}"""
@@ -378,7 +378,7 @@ class DropdownKeywords():
                                             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                                         if (flag):
                                             import platform
-                                            if platform.system() == 'Darwin':
+                                            if SYSTEM_OS == 'Darwin':
                                                 input_list = [inp_val]
                                                 scroll = """arguments[0].scrollIntoView()"""
                                                 browser_Keywords.driver_obj.execute_script(scroll, webelement)
@@ -1015,7 +1015,7 @@ class DropdownKeywords():
                                     log.info('iListSize is')
                                     log.info(iListSize)
                                     flag = False
-                                    if platform.system() == 'Darwin':
+                                    if SYSTEM_OS == 'Darwin':
                                         input_list = [input]
                                         scroll = """arguments[0].scrollIntoView()"""
                                         browser_Keywords.driver_obj.execute_script(scroll, webelement)
@@ -1220,7 +1220,7 @@ class DropdownKeywords():
                                 select = Select(webelement)
                                 iList = select.options
                                 iListSize = len(iList)
-                                if platform.system() == 'Darwin':
+                                if SYSTEM_OS == 'Darwin':
                                     jscount = 0
                                     scroll = """arguments[0].scrollIntoView()"""
                                     browser_Keywords.driver_obj.execute_script(scroll, webelement)
@@ -1407,7 +1407,7 @@ class DropdownKeywords():
                             select = Select(webelement)
                             iList = select.options
                             iListSize = len(iList)
-                            if platform.system()=='Darwin':
+                            if SYSTEM_OS=='Darwin':
                                 size=0
                                 scroll = """arguments[0].scrollIntoView()"""
                                 browser_Keywords.driver_obj.execute_script(scroll, webelement)
@@ -1659,7 +1659,7 @@ class DropdownKeywords():
                         log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                         try:
                             select = Select(webelement)
-                            if platform.system() == 'Darwin':
+                            if SYSTEM_OS == 'Darwin':
                                 scroll = """arguments[0].scrollIntoView()"""
                                 browser_Keywords.driver_obj.execute_script(scroll, webelement)
                                 jsdeselect = """for (var i = 0; i < arguments[0].length; i++) {arguments[0][i].selected = false;}"""

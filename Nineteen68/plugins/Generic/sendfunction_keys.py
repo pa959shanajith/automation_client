@@ -8,8 +8,8 @@
 # Copyright:   (c) sushma.p 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-import platform
-if platform.system() != 'Darwin':
+from constants import SYSTEM_OS
+if SYSTEM_OS != 'Darwin':
     from pyrobot import Robot
 from generic_constants import *
 from constants import *
@@ -25,7 +25,7 @@ log = logging.getLogger('sendfunction_keys.py')
 class SendFunctionKeys:
 
     def sendfunction_keys(self,input,*args):
-        
+
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None

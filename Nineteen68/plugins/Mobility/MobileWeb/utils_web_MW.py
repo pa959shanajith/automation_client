@@ -14,8 +14,8 @@ import sys
 
 
 import logging
-import  platform
-if platform.system()!='Darwin':
+from constants import SYSTEM_OS
+if SYSTEM_OS!='Darwin':
     from pyrobot import Robot
     import win32gui
     import win32process

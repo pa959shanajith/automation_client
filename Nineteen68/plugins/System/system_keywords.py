@@ -19,6 +19,7 @@ import logging
 import pythoncom
 import traceback
 from ast import literal_eval
+from constants import SYSTEM_OS
 log = logging.getLogger('system_keywords.py')
 from encryption_utility import AESCipher
 
@@ -65,7 +66,7 @@ class System_Keywords():
         status = system_constants.TEST_RESULT_FAIL
         result = system_constants.TEST_RESULT_FALSE
         try:
-            if machine_name is not None or platform.system().lower()=="windows":
+            if machine_name is not None or SYSTEM_OS.lower()=="windows":
                 wmi_ref,error=self.getWmi(machine_name)
                 if wmi_ref is not None:
                     os_details = wmi_ref.Win32_OperatingSystem()
@@ -80,7 +81,7 @@ class System_Keywords():
                     err_msg=error
                     pass
             else:
-                os_info['system'] = platform.system()
+                os_info['system'] = SYSTEM_OS
                 os_info['machine'] = platform.machine()
                 os_info['version'] = platform.version()
                 os_info['platform_info'] = platform.platform()
@@ -105,7 +106,7 @@ class System_Keywords():
         status = system_constants.TEST_RESULT_FAIL
         result = system_constants.TEST_RESULT_FALSE
         try:
-            if machine_name is not None or platform.system().lower()=="windows":
+            if machine_name is not None or SYSTEM_OS.lower()=="windows":
                 wmi_ref,error=self.getWmi(machine_name)
                 if wmi_ref is not None:
                     for p in wmi_ref.Win32_Product():
@@ -119,7 +120,7 @@ class System_Keywords():
                 else:
                     err_msg=error
                     pass
-            elif platform.system().lower()=="darwin":
+            elif SYSTEM_OS.lower()=="darwin":
                 #find / -iname *.app
                 pass
             else:
@@ -146,7 +147,7 @@ class System_Keywords():
         status = system_constants.TEST_RESULT_FAIL
         result = system_constants.TEST_RESULT_FALSE
         try:
-            if machine_name is not None or platform.system().lower()=="windows":
+            if machine_name is not None or SYSTEM_OS.lower()=="windows":
                 wmi_ref,error=self.getWmi(machine_name)
                 if wmi_ref is not None:
                     for process in wmi_ref.Win32_Process():
@@ -193,7 +194,7 @@ class System_Keywords():
             elif len(command_data)==5:
                 machine_name = command_data[1:4]
                 path_outfile= command_data[4]
-            if machine_name is not None or platform.system().lower()=="windows":
+            if machine_name is not None or SYSTEM_OS.lower()=="windows":
                 wmi_ref,error=self.getWmi(machine_name)
                 if wmi_ref is not None:
                     if machine_name is None:
@@ -225,7 +226,7 @@ class System_Keywords():
                 else:
                     err_msg=error
                     pass
-            elif platform.system().lower()=="darwin":
+            elif SYSTEM_OS.lower()=="darwin":
                 pass
             else:
                 pass

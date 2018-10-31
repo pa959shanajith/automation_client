@@ -11,8 +11,8 @@
 import os
 import sys
 import logging
-import platform
-if platform.system()=='Windows':
+from constants import SYSTEM_OS
+if SYSTEM_OS=='Windows':
     from pyrobot import Robot
     import win32gui
     import win32gui

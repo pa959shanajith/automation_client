@@ -11,9 +11,9 @@
 #-------------------------------------------------------------------------------
 
 import browserops
-import platform
+from constants import SYSTEM_OS
 from core_utils import CoreUtils
-if platform.system()=='Windows':
+if SYSTEM_OS=='Windows':
     import win32gui
     import win32con
 import time
@@ -42,10 +42,10 @@ class Clickandadd():
             browser = browserops.browser
             log.info('Obtained browser handle and driver'
                      ' from browserops.py class .....')
-            if platform.system()=='Windows':
+            if SYSTEM_OS=='Windows':
                 toolwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
-            if platform.system()=='Windows':
+            if SYSTEM_OS=='Windows':
                 actwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
             log.info('Minimizing the foreground window i.e tool and assuming AUT on top .....')

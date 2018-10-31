@@ -79,7 +79,7 @@ class Radio_Button_Keywords():
 
                         log.debug('performing the action')
                         import platform
-                        if platform.system() == 'Darwin':
+                        if SYSTEM_OS == 'Darwin':
                            classname= webelement.get_attribute("type")
                         else:
                            classname= webelement.get_attribute("className")
@@ -87,7 +87,7 @@ class Radio_Button_Keywords():
                             output=webelement.text
                             output=str(output).upper()
                             import platform
-                            if platform.system() == 'Darwin':
+                            if SYSTEM_OS == 'Darwin':
                                 if output == 'TRUE':
                                     output = 'On'
                                 else:

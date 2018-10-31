@@ -6,6 +6,8 @@ import logging.config
 import argparse
 import logger
 import readconfig
+import platform
+from constants import SYSTEM_OS
 log = logging.getLogger('main.py')
 
 parser = argparse.ArgumentParser(description="Nineteen68 Platform")
@@ -39,6 +41,7 @@ if sys.platform == 'win32':
 if __name__ == "__main__":
     app = wx.App()
     appName = "Nineteen68 ICE"
+    SYSTEM_OS = platform.system()
     import clientwindow as cw_obj
     cw_obj.configvalues = configvalues
     cw = cw_obj.ClientWindow(appName)

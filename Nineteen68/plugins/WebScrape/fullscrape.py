@@ -11,8 +11,8 @@
 #-------------------------------------------------------------------------------
 
 import browserops
-import platform
-if platform.system()=='Windows':
+from constants import SYSTEM_OS
+if SYSTEM_OS=='Windows':
     import win32gui
     import win32con
 import json
@@ -41,12 +41,12 @@ class Fullscrape():
             maindir = os.environ["NINETEEN68_HOME"]
             screen_shot_path = maindir + '/Nineteen68/plugins/WebScrape' + domconstants.SCREENSHOT_IMG
             log.info('Obtained browser handle and driver from browserops.py class .....')
-            if platform.system()=='Windows':
+            if SYSTEM_OS=='Windows':
                 toolwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
             log.info(' Minimizing the foreground window i.e tool and assuming AUT on top .....')
             time.sleep(2)
-            if platform.system()=='Windows':
+            if SYSTEM_OS=='Windows':
                 actwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
             browserops_obj.checkPopups()
@@ -109,7 +109,7 @@ class Fullscrape():
                         log.info('could not switch to iframe/frame %s', path)
 
             # scrape through iframes/frames iff OS is windows and scrape_option is not the xpath one
-            if platform.system() == 'Windows' and scrape_option[0].lower() != 'select a section using xpath':
+            if SYSTEM_OS == 'Windows' and scrape_option[0].lower() != 'select a section using xpath':
                 callback_fullscrape_iframes('', tempne)
                 driver.switch_to.window(currenthandle)
                 callback_fullscrape_frames('', tempne)

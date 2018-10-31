@@ -5,7 +5,7 @@ from selenium import webdriver
 import browserops_MW
 import clickandadd_MW
 import fullscrape_MW
-
+from constants import SYSTEM_OS
 from socketIO_client import SocketIO,BaseNamespace
 import time
 import objectspy_MW
@@ -32,14 +32,14 @@ class ScrapeWindow(wx.Frame):
         self.panel = wx.Panel(self)
         self.core_utilsobject = core_utils.CoreUtils()
 
-        #if platform.system()== "Darwin":
+        #if SYSTEM_OS== "Darwin":
         self.startbutton = wx.ToggleButton(self.panel, label="Start clickandadd",pos=(12,8 ), size=(175, 28))
         self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd_MW)   # need to implement OnExtract()
         self.fullscrape_MWbutton = wx.Button(self.panel, label="Full Scrape",pos=(12,48 ), size=(175, 28))
         self.fullscrape_MWbutton.Bind(wx.EVT_BUTTON, self.fullscrape_MW)   # need to implement OnExtract()
 
 ##            self.fullscrape_MWbutton.SetToolTip(wx.ToolTip("To perform fullscrape_MW Scraping"))
-        #if platform.system() != "Darwin":
+        #if SYSTEM_OS != "Darwin":
         # self.comparebutton = wx.ToggleButton(self.panel, label="Compare",pos=(12,68 ), size=(175, 28))
         # self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)   # need to implement OnExtract()
         self.Centre()

@@ -17,7 +17,7 @@ import uuid,json
 import os
 import subprocess
 import time
-import platform
+from constants import SYSTEM_OS
 from mobile_app_constants import *
 import logger
 ##log = logging.getLogger('android_scrapping.py')
@@ -48,7 +48,7 @@ class InstallAndLaunch():
             ##            os.chdir('..')
             curdir = os.environ["NINETEEN68_HOME"]
 
-            if (platform.system() != 'Darwin'):
+            if (SYSTEM_OS != 'Darwin'):
                 path = curdir + '/Nineteen68/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
                 nodePath = curdir + "/Drivers/node.exe"
                 proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
@@ -65,7 +65,7 @@ class InstallAndLaunch():
 
     def stop_server(self):
         try:
-            if platform.system() != 'Darwin':
+            if SYSTEM_OS != 'Darwin':
                 import psutil
                 processes = psutil.net_connections()
                 for line in processes:
@@ -85,7 +85,7 @@ class InstallAndLaunch():
         self.driver=None
         from appium import webdriver
         try:
-            if platform.system() == 'Darwin':
+            if SYSTEM_OS == 'Darwin':
                 self.start_server()
                 desired_caps = {}
                 desired_caps['platformName'] = 'iOS'
@@ -184,10 +184,10 @@ class BuildJson:
         global counter
         for i in range(len(XpathList)):
             text=''
-            # print platform.system()
+            # print SYSTEM_OS
             if label[i] != '':
                 text=label[i]
-            elif platform.system()!='Darwin' and content_desc[i]  != '':
+            elif SYSTEM_OS!='Darwin' and content_desc[i]  != '':
                 text=content_desc[i]
 
             if text=='' or text==None:
@@ -199,7 +199,7 @@ class BuildJson:
                 custnamelist.append(text)
                 counter=counter+1
 
-            if platform.system()!='Darwin':
+            if SYSTEM_OS!='Darwin':
                 xpath = resource_id[i] + ';' + XpathList[i]
                 ele_bounds=re.findall('\d+',rectangle[i])
     ##            bounds={'x':ele_bounds[0],
@@ -213,7 +213,7 @@ class BuildJson:
                     'text': text,
                     'id': resource_id[i], 'custname': text,
                     'reference': str(uuid.uuid4()),'enabled':enabled[i],'left':ele_bounds[0],'top':ele_bounds[1],'width':width,'height':height})
-            elif platform.system()=='Darwin':
+            elif SYSTEM_OS=='Darwin':
                 xpath =  XpathList[i]
                 ScrapeList.append({'xpath': xpath, 'tag': class_name[i],
                    'text': text,
@@ -284,7 +284,7 @@ class Exact(xml.sax.handler.ContentHandler):
         elements_list = attrs.getQNames()
         label_flag = False
         for x in attrs.getQNames():
-            if platform.system()=='Darwin':
+            if SYSTEM_OS=='Darwin':
                 value = attrs.getValue(x)
                 # if x.lower()=='text':
                 if x.lower() == 'label':
@@ -329,7 +329,7 @@ class Exact(xml.sax.handler.ContentHandler):
 
                     # elif x.lower()=='checked':
                     # 	checked.append(value)
-            elif platform.system()!='Darwin':
+            elif SYSTEM_OS!='Darwin':
                 value=attrs.getValue(x)
 
                 if x.lower()=='text':
@@ -360,7 +360,7 @@ class Exact(xml.sax.handler.ContentHandler):
 
                 elif x.lower()=='checked':
                         checked.append(value)
-        if platform.system() == 'Darwin':
+        if SYSTEM_OS == 'Darwin':
             if label_flag == False and len(elements_list) > 0:
                 label.append(qName)
         curobj=self

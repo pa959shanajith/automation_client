@@ -126,7 +126,7 @@ class Controller():
         try:
             if self.mobile_web_dispatcher_obj==None:
                 import platform
-                if platform.system() == 'Darwin':
+                if SYSTEM_OS == 'Darwin':
                     self.get_all_the_imports('Mobility/MobileWeb')
                 else:
                     self.get_all_the_imports('Mobility')
@@ -141,7 +141,7 @@ class Controller():
         try:
             if self.mobile_app_dispatcher_obj==None:
                 import platform
-                if platform.system()=='Darwin':
+                if SYSTEM_OS=='Darwin':
                     self.get_all_the_imports('Mobility/MobileApp')
                 else:
                     self.get_all_the_imports('Mobility')
@@ -1167,7 +1167,7 @@ def kill_process():
     import tempfile
     import psutil
     import os,shutil
-    if platform.system() == 'Darwin':
+    if SYSTEM_OS == 'Darwin':
         try:
             import browserops_MW
             browserops_MW.driver.quit()

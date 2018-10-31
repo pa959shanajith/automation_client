@@ -23,7 +23,7 @@ import logging
 import seekBar_Mobility
 import logger
 from mobile_app_constants import *
-import constants
+from constants import *
 import action_keyowrds_app
 import mob_screenshot
 import readconfig
@@ -198,7 +198,7 @@ class MobileDispatcher:
         global ELEMENT_FOUND
         if objectname.strip() != '':
             import platform
-            if platform.system()=='Darwin':
+            if SYSTEM_OS=='Darwin':
                 objectname = objectname.replace("/AppiumAUT[1]/", "/")
                 print objectname
             identifiers = objectname.split(';')
@@ -207,7 +207,7 @@ class MobileDispatcher:
             try:
                 log.debug('trying to find mobileElement by Id')
                 import platform
-                if platform.system()=='Darwin':
+                if SYSTEM_OS=='Darwin':
                     mobileElement = driver.find_element_by_xpath(objectname)
                 else:
                     mobileElement = driver.find_element_by_xpath(identifiers[1])

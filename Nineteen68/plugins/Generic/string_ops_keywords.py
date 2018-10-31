@@ -13,9 +13,9 @@ import random
 import logger
 import generic_constants
 import core_utils
-import platform
+from constants import SYSTEM_OS
 import subprocess
-if platform.system() == "Windows":
+if SYSTEM_OS == "Windows":
     import win32clipboard
 
 import logging
@@ -557,13 +557,13 @@ class StringOperation:
         err_msg=None
         output=OUTPUT_CONSTANT
         try:
-            if platform.system() == "Windows":
+            if SYSTEM_OS == "Windows":
                 win32clipboard.OpenClipboard()
                 win32clipboard.EmptyClipboard()
                 win32clipboard.SetClipboardText(input_val)
                 win32clipboard.CloseClipboard()
                 status=generic_constants.TEST_RESULT_PASS
-            elif platform.system() == "Darwin":
+            elif SYSTEM_OS == "Darwin":
                 p = subprocess.Popen(['pbcopy'], stdin=subprocess.PIPE)
                 p.stdin.write(data)
                 p.stdin.close()
@@ -590,12 +590,12 @@ class StringOperation:
         err_msg=None
         output=OUTPUT_CONSTANT
         try:
-            if platform.system() == "Windows":
+            if SYSTEM_OS == "Windows":
                 win32clipboard.OpenClipboard()
                 output = win32clipboard.GetClipboardData()
                 win32clipboard.CloseClipboard()
                 status=generic_constants.TEST_RESULT_PASS
-            elif platform.system() == "Darwin":
+            elif SYSTEM_OS == "Darwin":
                 p = subprocess.Popen(['pbpaste'], stdout=subprocess.PIPE)
                 retcode = p.wait()
                 output = p.stdout.read()

@@ -42,7 +42,7 @@ class Textbox_keywords():
 
                         log.debug('Setting the text')
                         import platform
-                        if platform.system() == 'Darwin':
+                        if SYSTEM_OS == 'Darwin':
                             element.clear()
                             element.set_value(text)
                             status=TEST_RESULT_PASS
@@ -89,7 +89,7 @@ class Textbox_keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         import platform
-                        if platform.system() == 'Darwin':
+                        if SYSTEM_OS == 'Darwin':
                             element.clear()
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
@@ -141,7 +141,7 @@ class Textbox_keywords():
                     log.info(input)
                     if input is not None:
                         import platform
-                        if platform.system() == 'Darwin':
+                        if SYSTEM_OS == 'Darwin':
                             webelement.clear()
                             encryption_obj = AESCipher()
                             input_val = encryption_obj.decrypt(input)
@@ -195,7 +195,7 @@ class Textbox_keywords():
 
                         log.debug('Sending the keys')
                         import platform
-                        if platform.system() == 'Darwin':
+                        if SYSTEM_OS == 'Darwin':
                             element.clear()
                             element.set_value(text)
                             status=TEST_RESULT_PASS
