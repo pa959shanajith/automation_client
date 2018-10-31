@@ -542,13 +542,13 @@ class Controller():
                         else:
                             logger.print_on_console('Result obtained is ',display_keyword_response)
                     elif tsp.apptype.lower()=='system':
-                        if result[2]!='9cc33d6fe25973868b30f4439f09901a':
+                        if result[2]!=OUTPUT_CONSTANT :
                             logger.print_on_console('Result obtained is: ',result[2])
                         elif result:
                             logger.print_on_console('Result obtained is: ',result[1])
                 else:
                     if tsp.apptype.lower()=='system':
-                        if result[2]!='9cc33d6fe25973868b30f4439f09901a':
+                        if result[2]!=OUTPUT_CONSTANT :
                             logger.print_on_console('Result obtained is: ',result[2])
                         elif result:
                             logger.print_on_console('Result obtained is: ',result[1])

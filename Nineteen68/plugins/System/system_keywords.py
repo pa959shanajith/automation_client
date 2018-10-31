@@ -18,6 +18,7 @@ import time
 import logging
 import pythoncom
 import traceback
+from constants import OUTPUT_CONSTANT
 from ast import literal_eval
 from constants import SYSTEM_OS
 log = logging.getLogger('system_keywords.py')
@@ -33,8 +34,6 @@ class System_Keywords():
     def getWmi(self,machine_name):
         """Method that creates a COM object related to the machine name(required);user name(optional);password(optional)"""
         wmi_ref=None
-        err_msg=None
-        error=None
         try:
             pythoncom.CoInitialize()
             if machine_name is not None:
@@ -47,8 +46,7 @@ class System_Keywords():
         except Exception as error:
             traceback.print_exc()
             log.error(error)
-            err_msg = error
-        return wmi_ref,error
+        return wmi_ref
 
     def removingUnicodeSign(self,val):
         """Method that removes unicode signs form an input unicode string"""
@@ -67,7 +65,7 @@ class System_Keywords():
         result = system_constants.TEST_RESULT_FALSE
         try:
             if machine_name is not None or SYSTEM_OS.lower()=="windows":
-                wmi_ref,error=self.getWmi(machine_name)
+                wmi_ref=self.getWmi(machine_name)
                 if wmi_ref is not None:
                     os_details = wmi_ref.Win32_OperatingSystem()
                     for iterator in os_details:
@@ -78,7 +76,6 @@ class System_Keywords():
                     status=system_constants.TEST_RESULT_PASS
                     result = system_constants.TEST_RESULT_TRUE
                 else:
-                    err_msg=error
                     pass
             else:
                 os_info['system'] = SYSTEM_OS
@@ -91,8 +88,7 @@ class System_Keywords():
         except Exception as e:
             traceback.print_exc()
             log.error(e)
-            if err_msg ==None:
-                err_msg =system_constants.ERROR_CODE_DICT['ERR_OS_INFO']
+            err_msg =system_constants.ERROR_CODE_DICT['ERR_OS_INFO']
             status = system_constants.TEST_RESULT_FAIL
             result = system_constants.TEST_RESULT_FALSE
             os_info=OUTPUT_CONSTANT
@@ -107,7 +103,7 @@ class System_Keywords():
         result = system_constants.TEST_RESULT_FALSE
         try:
             if machine_name is not None or SYSTEM_OS.lower()=="windows":
-                wmi_ref,error=self.getWmi(machine_name)
+                wmi_ref=self.getWmi(machine_name)
                 if wmi_ref is not None:
                     for p in wmi_ref.Win32_Product():
                         #apps_data.append({'caption':p.Caption,'version':p.Version,'name':p.Name,'vendor':p.Vendor})
@@ -118,7 +114,6 @@ class System_Keywords():
                     status=system_constants.TEST_RESULT_PASS
                     result=system_constants.TEST_RESULT_TRUE
                 else:
-                    err_msg=error
                     pass
             elif SYSTEM_OS.lower()=="darwin":
                 #find / -iname *.app
@@ -129,8 +124,7 @@ class System_Keywords():
         except Exception as e:
             traceback.print_exc()
             log.error(e)
-            if err_msg ==None:
-                err_msg = system_constants.ERROR_CODE_DICT['ERR_GET_INSTALLED_APP']
+            err_msg = system_constants.ERROR_CODE_DICT['ERR_GET_INSTALLED_APP']
             status = system_constants.TEST_RESULT_FAIL
             result = system_constants.TEST_RESULT_FALSE
             apps_data=OUTPUT_CONSTANT
@@ -148,7 +142,7 @@ class System_Keywords():
         result = system_constants.TEST_RESULT_FALSE
         try:
             if machine_name is not None or SYSTEM_OS.lower()=="windows":
-                wmi_ref,error=self.getWmi(machine_name)
+                wmi_ref=self.getWmi(machine_name)
                 if wmi_ref is not None:
                     for process in wmi_ref.Win32_Process():
                         #process_data.append({"pid":process.ProcessId,"pname":process.Name})
@@ -159,13 +153,11 @@ class System_Keywords():
                     status=system_constants.TEST_RESULT_PASS
                     result=system_constants.TEST_RESULT_TRUE
                 else:
-                    err_msg=error
                     pass
         except Exception as e:
             traceback.print_exc()
             log.error(e)
-            if err_msg ==None:
-                err_msg = system_constants.ERROR_CODE_DICT['ERR_GET_ALL_PROCESS']
+            err_msg = system_constants.ERROR_CODE_DICT['ERR_GET_ALL_PROCESS']
             status = system_constants.TEST_RESULT_FAIL
             result = system_constants.TEST_RESULT_FALSE
             process_data=OUTPUT_CONSTANT
@@ -195,7 +187,7 @@ class System_Keywords():
                 machine_name = command_data[1:4]
                 path_outfile= command_data[4]
             if machine_name is not None or SYSTEM_OS.lower()=="windows":
-                wmi_ref,error=self.getWmi(machine_name)
+                wmi_ref=self.getWmi(machine_name)
                 if wmi_ref is not None:
                     if machine_name is None:
                         path_outfile=os.environ["NINETEEN68_HOME"]+"/Nineteen68/plugins/System/nineteen68_system.txt"
@@ -224,7 +216,6 @@ class System_Keywords():
                     status=system_constants.TEST_RESULT_PASS
                     result=system_constants.TEST_RESULT_TRUE
                 else:
-                    err_msg=error
                     pass
             elif SYSTEM_OS.lower()=="darwin":
                 pass
@@ -238,8 +229,7 @@ class System_Keywords():
         except Exception as e:
             traceback.print_exc()
             log.error(e)
-            if err_msg ==None:
-                err_msg = system_constants.ERROR_CODE_DICT['ERR_EXECUTE_COMMAND']
+            err_msg = system_constants.ERROR_CODE_DICT['ERR_EXECUTE_COMMAND']
             status = system_constants.TEST_RESULT_FAIL
             result = system_constants.TEST_RESULT_FALSE
             result_data=OUTPUT_CONSTANT
