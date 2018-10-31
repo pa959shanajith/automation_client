@@ -43,7 +43,6 @@ if __name__ == "__main__":
     appName = "Nineteen68 ICE"
     global SYSTEM_OS
     constants.SYSTEM_OS = platform.system()
-    SYSTEM_OS = platform.system()
     import clientwindow as cw_obj
     cw_obj.configvalues = configvalues
     cw = cw_obj.ClientWindow(appName)
