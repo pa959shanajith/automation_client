@@ -83,6 +83,8 @@ class GenericKeywordDispatcher:
                   'getcurrentdate' : self.generic_date.getCurrentDate,
                   'getcurrenttime' : self.generic_date.getCurrentTime,
                   'getcurrentdateandtime': self.generic_date.getCurrentDateAndTime,
+                  'getcurrentday' : self.generic_date.getCurrentDay,
+                  'getcurrentdaydateandtime' : self.generic_date.getCurrentDayDateAndTime,
                   'datedifference' : self.generic_date.dateDifference,
                   'dateaddition'    : self.generic_date.dateAddition,
                   'monthaddition'  :self.generic_date.monthAddition,
