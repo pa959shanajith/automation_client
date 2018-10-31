@@ -14,12 +14,11 @@ import logger
 import webconstants_MW
 import time
 from selenium import webdriver
-import platform
-if platform.system()!='Darwin':
+from constants import *
+if SYSTEM_OS!='Darwin':
     from pyrobot import Robot,Keys
 import browser_Keywords_MW
 import logging
-from constants import *
 
 
 ##driver = browser_Keywords.driver_obj

@@ -126,7 +126,7 @@ class Controller():
         try:
             if self.mobile_web_dispatcher_obj==None:
                 import platform
-                if platform.system() == 'Darwin':
+                if SYSTEM_OS == 'Darwin':
                     self.get_all_the_imports('Mobility/MobileWeb')
                 else:
                     self.get_all_the_imports('Mobility')
@@ -141,7 +141,7 @@ class Controller():
         try:
             if self.mobile_app_dispatcher_obj==None:
                 import platform
-                if platform.system()=='Darwin':
+                if SYSTEM_OS=='Darwin':
                     self.get_all_the_imports('Mobility/MobileApp')
                 else:
                     self.get_all_the_imports('Mobility')
@@ -541,9 +541,20 @@ class Controller():
                             logger.print_on_console("The index count for the dynamic variable is " + "Row: "+str(row) + " and Column: "+str(col))
                         else:
                             logger.print_on_console('Result obtained is ',display_keyword_response)
+                    elif tsp.apptype.lower()=='system':
+                        if result[2]!=OUTPUT_CONSTANT :
+                            logger.print_on_console('Result obtained is: ',result[2])
+                        elif result:
+                            logger.print_on_console('Result obtained is: ',result[1])
                 else:
-                    logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i])
-                    if not isinstance(display_keyword_response[i],basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
+                    if tsp.apptype.lower()=='system':
+                        if result[2]!=OUTPUT_CONSTANT :
+                            logger.print_on_console('Result obtained is: ',result[2])
+                        elif result:
+                            logger.print_on_console('Result obtained is: ',result[1])
+                    else:
+                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i])
+                        if not isinstance(display_keyword_response[i],basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
             else:
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         log.info('Result obtained is: ')
@@ -1156,7 +1167,7 @@ def kill_process():
     import tempfile
     import psutil
     import os,shutil
-    if platform.system() == 'Darwin':
+    if SYSTEM_OS == 'Darwin':
         try:
             import browserops_MW
             browserops_MW.driver.quit()

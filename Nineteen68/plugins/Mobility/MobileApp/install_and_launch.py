@@ -31,7 +31,7 @@ class LaunchAndInstall():
         logger.print_on_console(input_val, ' is the input')
         try:
 
-            if platform.system() == 'Darwin':
+            if SYSTEM_OS == 'Darwin':
                 import appium
                 from appium import webdriver
                 LaunchAndInstall().start_server()
@@ -95,7 +95,7 @@ class LaunchAndInstall():
     def start_server(self):
         try:
             curdir = os.environ["NINETEEN68_HOME"]
-            if (platform.system() != 'Darwin'):
+            if (SYSTEM_OS != 'Darwin'):
                 path = curdir + '/Nineteen68/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
                 nodePath = curdir + "/Drivers" + '/node.exe'
                 proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
@@ -111,7 +111,7 @@ class LaunchAndInstall():
 
     def stop_server(self):
         try:
-            if platform.system() != 'Darwin':
+            if SYSTEM_OS != 'Darwin':
                 import psutil
                 processes = psutil.net_connections()
                 for line in processes:

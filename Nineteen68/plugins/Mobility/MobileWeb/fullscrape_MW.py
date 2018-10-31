@@ -10,8 +10,8 @@
 #-------------------------------------------------------------------------------
 
 import browserops_MW
-import platform
-if platform.system() != "Darwin":
+from constants import SYSTEM_OS
+if SYSTEM_OS != "Darwin":
         import win32gui
         import win32con
 import time
@@ -35,17 +35,17 @@ class fullscrape_MW():
             driver = browserops_MW.driver
             hwndg = browserops_MW.hwndg
             log.info('Obtained browser handle and driver from browserops_MW.py class .....')
-            if platform.system() != "Darwin":
+            if SYSTEM_OS != "Darwin":
                 toolwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
             log.info(' Minimizing the foreground window i.e tool and assuming AUT on top .....')
             time.sleep(2)
-            if platform.system() != "Darwin":
+            if SYSTEM_OS != "Darwin":
                 actwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
             javascript_hasfocus = """return(document.hasFocus());"""
 ##            time.sleep(6)
-            if platform.system()!="Darwin":
+            if SYSTEM_OS!="Darwin":
                 for eachdriverhand in driver.window_handles:
                     log.info('Iterating through the number of windows open by the driver')
                     driver.switch_to.window(eachdriverhand)
@@ -67,7 +67,7 @@ class fullscrape_MW():
                 cond_flag = False
                 log.info('Splitting Iframe/frame url by /')
                 indiframes = mypath.split("/")
-                if platform.system()!= "Darwin":
+                if SYSTEM_OS!= "Darwin":
                     driver.switch_to.window(currenthandle)
                 log.info(' Switched to current window handle')
                 for i in indiframes:
@@ -149,11 +149,11 @@ class fullscrape_MW():
                         callback_scrape2(path, tempne)
             callback_scrape1('', tempne)
             log.info('full scrape operation on iframe/frame pages is completed')
-            if platform.system()!= "Darwin":
+            if SYSTEM_OS!= "Darwin":
                 driver.switch_to.window(currenthandle)
             callback_scrape2('', tempne)
             log.info('full scrape operation on iframe/frame pages is completed')
-            if platform.system() != "Darwin":
+            if SYSTEM_OS != "Darwin":
                 driver.switch_to.window(currenthandle)
             tempne = json.dumps(tempne)
             tempne = json.loads(tempne)

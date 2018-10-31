@@ -19,7 +19,7 @@ from appium.webdriver.common.touch_action import TouchAction
 import logging
 import logger
 import platform
-if platform.system()!='Darwin':
+if SYSTEM_OS!='Darwin':
     import browser_Keywords_MW
 import time
 from selenium import webdriver

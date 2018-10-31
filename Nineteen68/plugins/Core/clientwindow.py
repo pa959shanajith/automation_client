@@ -244,7 +244,7 @@ class MainNamespace(BaseNamespace):
         data_stream=None
         client_data=None
         try:
-            if platform.system() == "Windows":
+            if SYSTEM_OS == "Windows":
                 if len(args) > 0:
                     qcdata = args[0]
                     if soc is None:
@@ -294,7 +294,7 @@ class MainNamespace(BaseNamespace):
         elif str(args[0]).endswith('ipa'):
             browsername = args[0] + ";" + args[2] + ";" + args[3]+";" + args[4]
         con =controller.Controller()
-        if platform.system()=='Darwin':
+        if SYSTEM_OS=='Darwin':
             con.get_all_the_imports('Mobility/MobileApp')
         else:
             con.get_all_the_imports('Mobility')
@@ -311,7 +311,7 @@ class MainNamespace(BaseNamespace):
         global browsername
         browsername = args[0]+";"+args[1]
         con =controller.Controller()
-        if platform.system()=='Darwin':
+        if SYSTEM_OS=='Darwin':
             con.get_all_the_imports('Mobility/MobileWeb')
         else:
             con.get_all_the_imports('Mobility')
@@ -425,7 +425,7 @@ class MainNamespace(BaseNamespace):
     def on_update_screenshot_path(self,*args):
         spath=args[0]
         import constants
-        if(platform.system()=='Darwin'):
+        if(SYSTEM_OS=='Darwin'):
             spath=spath["mac"]
         else:
             spath=spath["default"]
@@ -914,7 +914,7 @@ class ClientWindow(wx.Frame):
         self.killScrapeWindow()
         self.Destroy()
         controller.kill_process()
-        if platform.system() == "Windows":
+        if SYSTEM_OS == "Windows":
             os.system("TASKKILL /F /IM QcController.exe")
             os.system("TASKKILL /F /IM nineteen68MFapi.exe")
         sys.exit(0)
@@ -1154,7 +1154,7 @@ class Config_window(wx.Frame):
         #----------------------------------
 
         #------------------------------------Different co-ordinates for Windows and Mac
-        if platform.system()=='Windows':
+        if SYSTEM_OS=='Windows':
             config_fields= {
             "Frame":[(300, 150),(470,450)],
             "S_address":[(12,8 ),(90, 28),(100,8 ),(140,-1)],
@@ -1682,9 +1682,9 @@ def check_browser():
                         for k,v in configvalues['FIREFOX_VERSION'].items():
                             FIREFOX_BROWSER_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
                 else:
-                    logger.print_on_console("Please enter valid ice_const.json path")
+                    logger.print_on_console("Unable to locate ICE parameters")
             except Exception as e:
-                logger.print_on_console("Please enter valid ice_const.json")
+                logger.print_on_console("Unable to locate ICE parameters")
                 log.error(e)
             global chromeFlag,firefoxFlag
             logger.print_on_console('Checking for browser versions...')

@@ -11,7 +11,6 @@
 
 
 from constants import *
-import constants
 from mobile_app_constants import *
 from appium.webdriver.common.touch_action import TouchAction
 
@@ -19,7 +18,7 @@ from appium.webdriver.common.touch_action import TouchAction
 import logging
 import logger
 import platform
-if platform.system()!='Darwin':
+if SYSTEM_OS!='Darwin':
     import install_and_launch
 import time
 from selenium import webdriver

@@ -47,7 +47,7 @@ class CustomKeyword:
     def switch_to_parent(self):
         log.debug('Switching to Parent')
         curr_window_handle=browser_Keywords_MW.driver_obj.current_window_handle
-        if platform.system()!="Darwin":
+        if SYSTEM_OS!="Darwin":
             browser_Keywords_MW.driver_obj.switch_to.window(curr_window_handle)
         log.debug('Switched to Parent ')
         log.debug('curr_window_handle')
@@ -63,7 +63,7 @@ class CustomKeyword:
 
 ##            logger.print_on_console('Url is '+url)
             indiframes = url.split('/')
-            if platform.system()!= "Darwin":
+            if SYSTEM_OS!= "Darwin":
                 browser_Keywords_MW.driver_obj.switch_to.window(curr_window_handle)
             else:
                 browser_Keywords_MW.driver_obj.switch_to.default_content()

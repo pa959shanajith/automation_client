@@ -25,7 +25,7 @@ import clientwindow
 drivermap = []
 log = logging.getLogger('browser_Keywords.py')
 import platform
-if platform.system() != 'Darwin':
+if SYSTEM_OS != 'Darwin':
     import win32gui
     import win32api
     import utils_web
@@ -109,7 +109,7 @@ class BrowserKeywords():
             if(driver_obj == None):
                 result = TERMINATE
             else:
-                if platform.system()!='Darwin':
+                if SYSTEM_OS!='Darwin':
                     utilobject = utils_web.Utils()
                     pid = None
                     if (self.browser_num == '1'):
@@ -456,7 +456,7 @@ class BrowserKeywords():
                         break
                 count = count - 2
                 webdriver_list[driver_instance].quit()
-                if platform.system() == 'Darwin':
+                if SYSTEM_OS == 'Darwin':
 
                         import os
                         os.system("killall -9 Safari")

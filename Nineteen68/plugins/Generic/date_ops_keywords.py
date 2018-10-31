@@ -130,6 +130,58 @@ class DateOperation:
             logger.print_on_console(err_msg)
         return status,result,output,err_msg
 
+    def getCurrentDay(self,input=None):
+        """
+        def : getCurrentDay
+        purpose : to retreieve current day
+        param  : string
+        return : string
+        """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            cur_day = datetime.datetime.now()
+            output = cur_day.strftime('%A')
+            logger.print_on_console('Output is :' ,output)
+            log.info('output is')
+            log.info(output)
+            status=generic_constants.TEST_RESULT_PASS
+            result=generic_constants.TEST_RESULT_TRUE
+        except Exception as e:
+            log.error(e)
+            err_msg=generic_constants.ERR_MSG1+' getCurrentDay'
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
+        return status,result,output,err_msg
+
+    def getCurrentDayDateAndTime(self,input=None):
+        """
+        def : getCurrentDayDateAndTime
+        purpose : to retreieve current day,date and time
+        param  : string
+        return : string
+        """
+        status=generic_constants.TEST_RESULT_FAIL
+        result=generic_constants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            cur_day = datetime.datetime.now()
+            output = cur_day.strftime('%A %d/%m/%Y %H:%M:%S')
+            logger.print_on_console('Output is :' ,output)
+            log.info('output is')
+            log.info(output)
+            status=generic_constants.TEST_RESULT_PASS
+            result=generic_constants.TEST_RESULT_TRUE
+        except Exception as e:
+            log.error(e)
+            err_msg=generic_constants.ERR_MSG1+' getCurrentDayDateAndTime'
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
+        return status,result,output,err_msg
+
     def dateDifference(self,input_date, date_or_count ,date_format):
         """
         def : dateDifference

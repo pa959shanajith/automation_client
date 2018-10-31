@@ -17,8 +17,8 @@ import browser_Keywords
 from utils_web import Utils
 import webconstants
 from webconstants import *
-import platform
-if platform.system()!='Darwin':
+from constants import SYSTEM_OS
+if SYSTEM_OS!='Darwin':
     from pyrobot import Robot
     import win32gui
     import pyrobot
@@ -487,7 +487,7 @@ class UtilWebKeywords:
                         break
             if webelement is not None:
                 location=webelement.location
-                if platform.system() != 'Darwin':
+                if SYSTEM_OS != 'Darwin':
                     if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
                         javascript = "return window.mozInnerScreenY"
                         value=browser_Keywords.driver_obj.execute_script(javascript)
@@ -506,7 +506,7 @@ class UtilWebKeywords:
                         robot=pyrobot.Robot()
                         obj.mouse_move(int(location.get('x'))+9,int(location.get('y')+rect[1]+6))
                         log.debug('hover performed')
-                if platform.system() == 'Darwin':
+                if SYSTEM_OS == 'Darwin':
                     try:
                         ##clickinfo = browser_Keywords.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
                         hover = webdriver.ActionChains(browser_Keywords.driver_obj).move_to_element(webelement)
