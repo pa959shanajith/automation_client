@@ -9,6 +9,7 @@ from socketIO_client import SocketIO,BaseNamespace
 import time
 import objectspy
 import core_utils
+import logger
 import logging
 from webscrape_utils import WebScrape_Utils
 cropandaddobj = None
@@ -41,9 +42,11 @@ class ScrapeWindow(wx.Frame):
         self.scrape_type = None
         self.invalid_urls = ["about:blank","data:,",""]
         self.invalid_url_msg = "There is no URL in the browser selected or the URL is empty/blank. Please load the webpage and then start performing the desired action."
+        self.parent = parent
         if status == False:
             self.socketIO.emit('scrape',status)
             self.driver.close()
+            self.parent.schedule.Enable()
             self.Close()
         else:
             try:
@@ -96,6 +99,7 @@ class ScrapeWindow(wx.Frame):
                 self.Show()
             except Exception as e:
                 log.error(e)
+                self.parent.schedule.Enable()
 
     def OnExit(self, event):
         self.Close()
@@ -150,6 +154,7 @@ class ScrapeWindow(wx.Frame):
             else:
                 print 'Scraped data exceeds max. Limit.'
                 self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
+            self.parent.schedule.Enable()
             self.Close()
             print 'Click and add scrape  completed'
 
@@ -170,6 +175,7 @@ class ScrapeWindow(wx.Frame):
             else:
                 print 'data exceeds max. Limit.'
                 self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
+            self.parent.schedule.Enable()
             self.Close()
 
     def fullscrape(self,event):
@@ -220,6 +226,7 @@ class ScrapeWindow(wx.Frame):
         else:
             print 'Scraped data exceeds max. Limit.'
             self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
+        self.parent.schedule.Enable()
         self.Close()
 
     def cropandadd(self,event):
@@ -236,11 +243,11 @@ class ScrapeWindow(wx.Frame):
             cv2.destroyAllWindows()
             time.sleep(1)
             d = cropandaddobj.stopcropandadd()
-            print 'Scrapped data saved successfully in domelements.json file'
+            logger.print_on_console('Scrapped data saved successfully in domelements.json file')
             self.socketIO.emit('scrape', d)
+            self.parent.schedule.Enable()
             self.Close()
-            event.GetEventObject().SetLabel("Start IRIS")
-            print 'Crop and add scrape completed'
+            logger.print_on_console('Crop and add scrape completed')
 
     def OnFullscrapeChoice(self,event):
         selected_choice = self.fullscrapedropdown.GetValue()

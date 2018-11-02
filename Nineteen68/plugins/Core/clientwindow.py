@@ -19,6 +19,7 @@ import json
 import socket
 import requests
 import io
+import handler
 try:
     from socketlib_override import SocketIO,BaseNamespace
 except ImportError:
@@ -47,6 +48,7 @@ allow_connect = False
 icesession = None
 plugins_list = []
 configvalues = None
+execution_flag = False
 ICE_CONST= os.environ["NINETEEN68_HOME"] + '/Lib/ice_const.json'
 CONFIG_PATH= os.environ["NINETEEN68_HOME"] + '/Lib/config.json'
 IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images/"
@@ -123,33 +125,6 @@ class MainNamespace(BaseNamespace):
             log.info(fail_msg)
             threading.Timer(0.1,wxObject.killSocket).start()
 
-    def on_webscrape(self,*args):
-        global action,wxObject,browsername,desktopScrapeFlag,data
-        args = list(args)
-        d = args[0]
-        action = d['action']
-        task = d['task']
-        data = {}
-        if action == 'scrape':
-            if str(task) == 'OPEN BROWSER CH':
-                browsername = '1'
-            elif str(task) == 'OPEN BROWSER IE':
-                browsername = '3'
-            elif str(task) == 'OPEN BROWSER FX':
-                browsername = '2'
-            elif str(task) == 'OPEN BROWSER SF':
-                browsername = '6'
-        elif action == 'compare':
-            data['view'] = d['viewString']
-            data['scrapedurl'] = d['scrapedurl']
-            if str(task) == 'OPEN BROWSER CH':
-                browsername = '1'
-            elif str(task) == 'OPEN BROWSER IE':
-                browsername = '3'
-            elif str(task) == 'OPEN BROWSER FX':
-                browsername = '2'
-        wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
-
     def on_focus(self, *args):
         appType=args[2]
         appType=appType.lower()
@@ -186,12 +161,25 @@ class MainNamespace(BaseNamespace):
 ##            var = args[0][:i]
             highlightObj.highlight_element(args[0])
 
-
     def on_executeTestSuite(self, *args):
-        global wxObject,socketIO
-        args=list(args)
-        socketIO.emit('return_status_executeTestSuite','success')
-        wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode)
+        try:
+            global wxObject,socketIO,execution_flag
+            args=list(args)
+            if(not execution_flag):
+                socketIO.emit('return_status_executeTestSuite',{'status':'success'})
+                wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode)
+            else:
+                obj = handler.Handler()
+                suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path=obj.parse_json_execute(args[0])
+                data = {'scenario_ids':scenarioIds,'execution_id':execution_id,'time':str(datetime.now())}
+                emsg='Execution already in progress. Skipping current request.'
+                log.warn(emsg)
+                logger.print_on_console(emsg)
+                """sending scenario details for skipped execution to update the same in reports."""
+                socketIO.emit('return_status_executeTestSuite',{'status':'skipped','data':data})
+        except Exception as e:
+            logger.print_on_console('Exception in executeTestSuite')
+            log.error(e)
 
     def on_debugTestCase(self, *args):
         global wxObject
@@ -207,6 +195,33 @@ class MainNamespace(BaseNamespace):
             global debugFlag
             debugFlag = True
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+
+    def on_webscrape(self,*args):
+        global action,wxObject,browsername,desktopScrapeFlag,data
+        args = list(args)
+        d = args[0]
+        action = d['action']
+        task = d['task']
+        data = {}
+        if action == 'scrape':
+            if str(task) == 'OPEN BROWSER CH':
+                browsername = '1'
+            elif str(task) == 'OPEN BROWSER IE':
+                browsername = '3'
+            elif str(task) == 'OPEN BROWSER FX':
+                browsername = '2'
+            elif str(task) == 'OPEN BROWSER SF':
+                browsername = '6'
+        elif action == 'compare':
+            data['view'] = d['viewString']
+            data['scrapedurl'] = d['scrapedurl']
+            if str(task) == 'OPEN BROWSER CH':
+                browsername = '1'
+            elif str(task) == 'OPEN BROWSER IE':
+                browsername = '3'
+            elif str(task) == 'OPEN BROWSER FX':
+                browsername = '2'
+        wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_LAUNCH_DESKTOP(self, *args):
         con = controller.Controller()
@@ -235,53 +250,6 @@ class MainNamespace(BaseNamespace):
         except Exception as e:
             logger.print_on_console('Error in SAP')
             log.error(e)
-
-    def on_qclogin(self, *args):
-        global qcdata
-        global soc
-        global socketIO
-        server_data=''
-        data_stream=None
-        client_data=None
-        try:
-            if SYSTEM_OS == "Windows":
-                if len(args) > 0:
-                    qcdata = args[0]
-                    if soc is None:
-                        import subprocess
-                        path = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Qc/QcController.exe"
-                        pid = subprocess.Popen(path, shell=True)
-                        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        try:
-                            soc.connect(("localhost",10000))
-                        except socket.error as e:
-                            log.error(e)
-                            if '[Errno 10061]' in str(e):
-                                time.sleep(15)
-                                soc.connect(("localhost",10000))
-
-                    data_to_send = json.dumps(qcdata).encode('utf-8')
-                    data_to_send+='#E&D@Q!C#'
-                    soc.send(data_to_send)
-                    while True:
-                        data_stream= soc.recv(1024)
-                        server_data+=data_stream
-                        if '#E&D@Q!C#' in server_data:
-                            break
-                    client_data= server_data[:server_data.find('#E&D@Q!C#')]
-                    if('Fail@f@!l' in client_data):
-                        client_data=client_data[:client_data.find('@f@!l')]
-                        logger.print_on_console('Error occurred in QC')
-                        socketIO.emit('qcresponse','Error:Qc Operations')
-                    else:
-                        socketIO.emit('qcresponse',client_data)
-                else:
-                    socketIO.emit('qcresponse','Error:data recevied empty')
-            else:
-                 socketIO.emit('qcresponse','Error:Failed in running Qc')
-        except Exception as e:
-            log.error(e)
-            socketIO.emit('qcresponse','Error:Qc Operations')
 
     def on_LAUNCH_MOBILE(self, *args):
         con = controller.Controller()
@@ -368,6 +336,53 @@ class MainNamespace(BaseNamespace):
         response=str(response)
         print response
         socketIO.emit('result_wsdl_ServiceGenerator',response)
+
+    def on_qclogin(self, *args):
+        global qcdata
+        global soc
+        global socketIO
+        server_data=''
+        data_stream=None
+        client_data=None
+        try:
+            if SYSTEM_OS == "Windows":
+                if len(args) > 0:
+                    qcdata = args[0]
+                    if soc is None:
+                        import subprocess
+                        path = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Qc/QcController.exe"
+                        pid = subprocess.Popen(path, shell=True)
+                        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        try:
+                            soc.connect(("localhost",10000))
+                        except socket.error as e:
+                            log.error(e)
+                            if '[Errno 10061]' in str(e):
+                                time.sleep(15)
+                                soc.connect(("localhost",10000))
+
+                    data_to_send = json.dumps(qcdata).encode('utf-8')
+                    data_to_send+='#E&D@Q!C#'
+                    soc.send(data_to_send)
+                    while True:
+                        data_stream= soc.recv(1024)
+                        server_data+=data_stream
+                        if '#E&D@Q!C#' in server_data:
+                            break
+                    client_data= server_data[:server_data.find('#E&D@Q!C#')]
+                    if('Fail@f@!l' in client_data):
+                        client_data=client_data[:client_data.find('@f@!l')]
+                        logger.print_on_console('Error occurred in QC')
+                        socketIO.emit('qcresponse','Error:Qc Operations')
+                    else:
+                        socketIO.emit('qcresponse',client_data)
+                else:
+                    socketIO.emit('qcresponse','Error:data recevied empty')
+            else:
+                 socketIO.emit('qcresponse','Error:Failed in running Qc')
+        except Exception as e:
+            log.error(e)
+            socketIO.emit('qcresponse','Error:Qc Operations')
 
     def on_render_screenshot(self,*args):
         try:
@@ -614,10 +629,11 @@ class TestThread(threading.Thread):
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
-        global socketIO
+        global socketIO,execution_flag
         try:
             self.wxObject.cancelbutton.Disable()
             self.wxObject.terminatebutton.Enable()
+            self.wxObject.schedule.Disable()
             runfrom_step=1
             if self.action==DEBUG:
                 self.debug_mode=False
@@ -631,9 +647,7 @@ class TestThread(threading.Thread):
                             runfrom_step=int(runfrom_step)
                         except Exception as e:
                             runfrom_step=0
-                self.wxObject.rbox.Disable()
-            else:
-                self.wxObject.rbox.Disable()
+            self.wxObject.rbox.Disable()
             self.wxObject.breakpoint.Disable()
             self.con = controller.Controller()
             self.wxObject.terminatebutton.Enable()
@@ -644,6 +658,7 @@ class TestThread(threading.Thread):
             if(self.action == DEBUG):
                 apptype = (self.json_data)[0]['apptype']
             else:
+                execution_flag = True
                 apptype =(self.json_data)['apptype']
             if(apptype == "DesktopJava"):
                 apptype = "oebs"
@@ -664,8 +679,6 @@ class TestThread(threading.Thread):
             self.wxObject.breakpoint.Enable()
             self.wxObject.cancelbutton.Enable()
             self.wxObject.terminatebutton.Disable()
-            self.wxObject.mythread=None
-            import handler
             testcasename = handler.testcasename
             if self.action==DEBUG:
                 self.wxObject.killDebugWindow()
@@ -684,7 +697,9 @@ class TestThread(threading.Thread):
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
                     socketIO.emit('result_executeTestSuite',status)
-
+        self.wxObject.mythread = None
+        execution_flag = False
+        self.wxObject.schedule.Enable()
 
 
 class RedirectText(object):
@@ -923,6 +938,7 @@ class ClientWindow(wx.Frame):
         controller.kill_process()
 
     def OnTerminate(self, event, state=''):
+        global execution_flag
         self.killDebugWindow()
         if self.killScrapeWindow():
             socketIO.emit('scrape','Terminate')
@@ -941,6 +957,8 @@ class ClientWindow(wx.Frame):
         if controller.pause_flag:
             controller.pause_flag=False
             wxObject.mythread.resume(False)
+        self.schedule.Enable()
+        execution_flag = False
 
     def OnClear(self,event):
         self.log.Clear()
@@ -1041,26 +1059,27 @@ class ClientWindow(wx.Frame):
         global sapScrapeFlag,debugFlag,browsername,action,oebsScrapeFlag
         global socketIO,data
         con = controller.Controller()
+        self.schedule.Disable()
         if(irisFlag == True):
             con.get_all_the_imports('IRIS')
         if mobileScrapeFlag==True:
-            self.scrapewindow = mobileScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
+            self.scrapewindow = mobileScrapeObj.ScrapeWindow(parent = self,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
             mobileScrapeFlag=False
         elif qcConFlag==True:
             self.scrapewindow = qcConObj.QcWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = qcdata,socketIO = socketIO)
             qcConFlag=False
         elif mobileWebScrapeFlag==True:
-            self.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",browser = browsername,socketIO = socketIO)
+            self.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = self,id = -1, title="SLK Nineteen68 - Mobile Scrapper",browser = browsername,socketIO = socketIO)
             mobileWebScrapeFlag=False
         elif desktopScrapeFlag==True:
-            self.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+            self.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = self,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             desktopScrapeFlag=False
             browsername = ''
         elif sapScrapeFlag==True:
-            self.scrapewindow = sapScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+            self.scrapewindow = sapScrapeObj.ScrapeWindow(parent = self,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             sapScrapeFlag=False
         elif oebsScrapeFlag==True:
-            self.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = None,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+            self.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = self,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             oebsScrapeFlag=False
         elif debugFlag == True:
             self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
@@ -1073,7 +1092,7 @@ class ClientWindow(wx.Frame):
                 con.get_all_the_imports('Web')
                 con.get_all_the_imports('WebScrape')
                 import Nineteen68_WebScrape
-                self.scrapewindow = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data,irisFlag = irisFlag)
+                self.scrapewindow = Nineteen68_WebScrape.ScrapeWindow(parent = self,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data,irisFlag = irisFlag)
                 browsername = ''
             else:
                 import pause_display_operation

@@ -36,7 +36,7 @@ class ScrapeWindow(wx.Frame):
         self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.core_utilsobject = core_utils.CoreUtils()
-
+        self.parent = parent
         global obj
         obj = sap_launch_keywords.Launch_Keywords()
         self.socketIO = socketIO
@@ -66,7 +66,7 @@ class ScrapeWindow(wx.Frame):
             self.Show()
         else:
             self.socketIO.emit('scrape','Fail')
-
+            self.parent.schedule.Enable()
 
 
     def clickandadd(self,event):
@@ -104,7 +104,7 @@ class ScrapeWindow(wx.Frame):
             else:
                 logger.print_on_console('Scraped data exceeds max. Limit.')
                 self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
-
+            self.parent.schedule.Enable()
             os.remove("out.png")
             self.Close()
 
@@ -141,9 +141,9 @@ class ScrapeWindow(wx.Frame):
         if self.core_utilsobject.getdatasize(str(data),'mb') < 10:
             self.socketIO.emit('scrape',data)
         else:
-            print 'Scraped data exceeds max. Limit.'
+            logger.print_on_console('Scraped data exceeds max. Limit.')
             self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
-
+        self.parent.schedule.Enable()
         os.remove("out.png")
         self.Close()
 
@@ -164,5 +164,5 @@ class ScrapeWindow(wx.Frame):
             time.sleep(1)
             d = cropandaddobj.stopcropandadd()
             self.socketIO.emit('scrape',d)
+            self.parent.schedule.Enable()
             self.Close()
-            event.GetEventObject().SetLabel("Start IRIS")
