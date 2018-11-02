@@ -90,9 +90,8 @@ class ScrapeWindow(wx.Frame):
             self.Show()
         else:
             self.socketIO.emit('scrape','Fail')
-            self.parent.schedule.Enable()
             self.Close()
-
+            self.parent.schedule.Enable()
 
      #----------------------------------------------------------------------
 ##    def OnExit(self, event):
@@ -149,11 +148,8 @@ class ScrapeWindow(wx.Frame):
         if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
             self.socketIO.emit('scrape',d)
         else:
-            print 'Scraped data exceeds max. Limit.'
+            logger.print_on_console('Scraped data exceeds max. Limit.')
             self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
         self.parent.schedule.Enable()
         self.Close()
         logger.print_on_console('Full scrape  completed')
-
-
-

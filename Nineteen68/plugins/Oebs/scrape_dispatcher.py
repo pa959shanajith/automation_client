@@ -198,8 +198,8 @@ class ScrapeDispatcher(wx.Frame):
             cv2.destroyAllWindows()
             time.sleep(1)
             d = cropandaddobj.stopcropandadd()
-            print 'Scrapped data saved successfully in domelements.json file'
+            logger.print_on_console('Scrapped data saved successfully in domelements.json file')
             self.socketIO.emit('scrape',d)
             self.parent.schedule.Enable()
             self.Close()
-            print 'Crop and add scrape completed'
+            logger.print_on_console('Crop and add scrape completed')

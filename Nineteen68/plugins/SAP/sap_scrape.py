@@ -141,7 +141,7 @@ class ScrapeWindow(wx.Frame):
         if self.core_utilsobject.getdatasize(str(data),'mb') < 10:
             self.socketIO.emit('scrape',data)
         else:
-            print 'Scraped data exceeds max. Limit.'
+            logger.print_on_console('Scraped data exceeds max. Limit.')
             self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
         self.parent.schedule.Enable()
         os.remove("out.png")
@@ -166,4 +166,3 @@ class ScrapeWindow(wx.Frame):
             self.socketIO.emit('scrape',d)
             self.parent.schedule.Enable()
             self.Close()
-            event.GetEventObject().SetLabel("Start IRIS")

@@ -132,8 +132,7 @@ class MainNamespace(BaseNamespace):
         action = d['action']
         task = d['task']
         data = {}
-        if(wxObject.schedule.GetValue()==False):
-            wxObject.schedule.Disable()
+        wxObject.schedule.Disable()
         if action == 'scrape':
             if str(task) == 'OPEN BROWSER CH':
                 browsername = '1'
@@ -195,8 +194,6 @@ class MainNamespace(BaseNamespace):
         try:
             global wxObject,socketIO,execution_flag
             args=list(args)
-            if(wxObject.schedule.GetValue()==False):
-                wxObject.schedule.Disable()
             if(not execution_flag):
                 socketIO.emit('return_status_executeTestSuite',{'status':'success'})
                 wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode)
@@ -204,7 +201,9 @@ class MainNamespace(BaseNamespace):
                 obj = handler.Handler()
                 suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path=obj.parse_json_execute(args[0])
                 data = {'scenario_ids':scenarioIds,'execution_id':execution_id,'time':str(datetime.now())}
-                logger.print_on_console('Execution already in progress. Skipping current request.')
+                emsg='Execution already in progress. Skipping current request.'
+                log.warn(emsg)
+                logger.print_on_console(emsg)
                 """sending scenario details for skipped execution to update the same in reports."""
                 socketIO.emit('return_status_executeTestSuite',{'status':'skipped','data':data})
         except Exception as e:
@@ -214,8 +213,6 @@ class MainNamespace(BaseNamespace):
     def on_debugTestCase(self, *args):
         global wxObject
         args=list(args)
-        if(wxObject.schedule.GetValue()==False):
-            wxObject.schedule.Disable()
         wxObject.mythread = TestThread(wxObject,DEBUG,args[0],wxObject.debug_mode)
         wxObject.choice=wxObject.rbox.GetStringSelection()
         logger.print_on_console(str(wxObject.choice)+' is Selected')
@@ -238,8 +235,6 @@ class MainNamespace(BaseNamespace):
         desktopScrapeObj=desktop_scrape
         global desktopScrapeFlag
         desktopScrapeFlag=True
-        if(wxObject.schedule.GetValue()==False):
-            wxObject.schedule.Disable()
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_LAUNCH_SAP(self, *args):
@@ -253,8 +248,6 @@ class MainNamespace(BaseNamespace):
             sapScrapeObj=sap_scrape
             global sapScrapeFlag
             sapScrapeFlag=True
-            if(wxObject.schedule.GetValue()==False):
-                wxObject.schedule.Disable()
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
         except Exception as e:
             logger.print_on_console('Error in SAP')
@@ -327,8 +320,6 @@ class MainNamespace(BaseNamespace):
         mobileScrapeObj=mobile_app_scrape
         global mobileScrapeFlag
         mobileScrapeFlag=True
-        if(wxObject.schedule.GetValue()==False):
-            wxObject.schedule.Disable()
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_LAUNCH_MOBILE_WEB(self, *args):
@@ -344,8 +335,6 @@ class MainNamespace(BaseNamespace):
         import mobile_web_scrape
         mobileWebScrapeObj=mobile_web_scrape
         mobileWebScrapeFlag=True
-        if(wxObject.schedule.GetValue()==False):
-            wxObject.schedule.Disable()
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_LAUNCH_OEBS(self, *args):
@@ -358,8 +347,6 @@ class MainNamespace(BaseNamespace):
         import scrape_dispatcher
         oebsScrapeObj=scrape_dispatcher
         oebsScrapeFlag=True
-        if(wxObject.schedule.GetValue()==False):
-            wxObject.schedule.Disable()
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_wsdl_listOfOperation(self, *args):
@@ -648,6 +635,7 @@ class TestThread(threading.Thread):
         try:
             self.wxObject.cancelbutton.Disable()
             self.wxObject.terminatebutton.Enable()
+            self.wxObject.schedule.Disable()
             runfrom_step=1
             if self.action==DEBUG:
                 self.debug_mode=False
@@ -661,9 +649,7 @@ class TestThread(threading.Thread):
                             runfrom_step=int(runfrom_step)
                         except Exception as e:
                             runfrom_step=0
-                self.wxObject.rbox.Disable()
-            else:
-                self.wxObject.rbox.Disable()
+            self.wxObject.rbox.Disable()
             self.wxObject.breakpoint.Disable()
             self.con = controller.Controller()
             self.wxObject.terminatebutton.Enable()
@@ -674,6 +660,7 @@ class TestThread(threading.Thread):
             if(self.action == DEBUG):
                 apptype = (self.json_data)[0]['apptype']
             else:
+                execution_flag = True
                 apptype =(self.json_data)['apptype']
             if(apptype == "DesktopJava"):
                 apptype = "oebs"
@@ -681,8 +668,6 @@ class TestThread(threading.Thread):
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE
             else:
-                if self.action==EXECUTE:
-                    execution_flag = True
                 status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO,soc)
 
             logger.print_on_console('Execution status',status)
@@ -696,8 +681,6 @@ class TestThread(threading.Thread):
             self.wxObject.breakpoint.Enable()
             self.wxObject.cancelbutton.Enable()
             self.wxObject.terminatebutton.Disable()
-            self.wxObject.mythread=None
-            import handler
             testcasename = handler.testcasename
             if self.action==DEBUG:
                 self.wxObject.killDebugWindow()
@@ -707,8 +690,6 @@ class TestThread(threading.Thread):
                     socketIO.emit('result_debugTestCaseWS',status)
             elif self.action==EXECUTE:
                 socketIO.emit('result_executeTestSuite',status)
-                execution_flag = False
-            self.wxObject.schedule.Enable()
         except Exception as e:
             log.error(e)
             status=TERMINATE
@@ -718,8 +699,9 @@ class TestThread(threading.Thread):
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
                     socketIO.emit('result_executeTestSuite',status)
-                    execution_flag = False
-                self.wxObject.schedule.Enable()
+        self.wxObject.mythread = None
+        execution_flag = False
+        self.wxObject.schedule.Enable()
 
 
 class RedirectText(object):
@@ -958,6 +940,7 @@ class ClientWindow(wx.Frame):
         controller.kill_process()
 
     def OnTerminate(self, event, state=''):
+        global execution_flag
         self.killDebugWindow()
         if self.killScrapeWindow():
             socketIO.emit('scrape','Terminate')
@@ -976,6 +959,8 @@ class ClientWindow(wx.Frame):
         if controller.pause_flag:
             controller.pause_flag=False
             wxObject.mythread.resume(False)
+        self.schedule.Enable()
+        execution_flag = False
 
     def OnClear(self,event):
         self.log.Clear()
@@ -1076,6 +1061,7 @@ class ClientWindow(wx.Frame):
         global sapScrapeFlag,debugFlag,browsername,action,oebsScrapeFlag
         global socketIO,data
         con = controller.Controller()
+        self.schedule.Disable()
         if(irisFlag == True):
             con.get_all_the_imports('IRIS')
         if mobileScrapeFlag==True:

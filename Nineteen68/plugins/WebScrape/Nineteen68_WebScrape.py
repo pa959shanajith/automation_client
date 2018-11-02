@@ -9,6 +9,7 @@ from socketIO_client import SocketIO,BaseNamespace
 import time
 import objectspy
 import core_utils
+import logger
 import logging
 from webscrape_utils import WebScrape_Utils
 cropandaddobj = None
@@ -98,6 +99,7 @@ class ScrapeWindow(wx.Frame):
                 self.Show()
             except Exception as e:
                 log.error(e)
+                self.parent.schedule.Enable()
 
     def OnExit(self, event):
         self.Close()
@@ -241,12 +243,11 @@ class ScrapeWindow(wx.Frame):
             cv2.destroyAllWindows()
             time.sleep(1)
             d = cropandaddobj.stopcropandadd()
-            print 'Scrapped data saved successfully in domelements.json file'
+            logger.print_on_console('Scrapped data saved successfully in domelements.json file')
             self.socketIO.emit('scrape', d)
             self.parent.schedule.Enable()
             self.Close()
-            event.GetEventObject().SetLabel("Start IRIS")
-            print 'Crop and add scrape completed'
+            logger.print_on_console('Crop and add scrape completed')
 
     def OnFullscrapeChoice(self,event):
         selected_choice = self.fullscrapedropdown.GetValue()
