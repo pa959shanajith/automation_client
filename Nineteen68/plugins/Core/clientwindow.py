@@ -125,34 +125,6 @@ class MainNamespace(BaseNamespace):
             log.info(fail_msg)
             threading.Timer(0.1,wxObject.killSocket).start()
 
-    def on_webscrape(self,*args):
-        global action,wxObject,browsername,desktopScrapeFlag,data
-        args = list(args)
-        d = args[0]
-        action = d['action']
-        task = d['task']
-        data = {}
-        wxObject.schedule.Disable()
-        if action == 'scrape':
-            if str(task) == 'OPEN BROWSER CH':
-                browsername = '1'
-            elif str(task) == 'OPEN BROWSER IE':
-                browsername = '3'
-            elif str(task) == 'OPEN BROWSER FX':
-                browsername = '2'
-            elif str(task) == 'OPEN BROWSER SF':
-                browsername = '6'
-        elif action == 'compare':
-            data['view'] = d['viewString']
-            data['scrapedurl'] = d['scrapedurl']
-            if str(task) == 'OPEN BROWSER CH':
-                browsername = '1'
-            elif str(task) == 'OPEN BROWSER IE':
-                browsername = '3'
-            elif str(task) == 'OPEN BROWSER FX':
-                browsername = '2'
-        wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
-
     def on_focus(self, *args):
         appType=args[2]
         appType=appType.lower()
@@ -189,7 +161,6 @@ class MainNamespace(BaseNamespace):
 ##            var = args[0][:i]
             highlightObj.highlight_element(args[0])
 
-
     def on_executeTestSuite(self, *args):
         try:
             global wxObject,socketIO,execution_flag
@@ -225,6 +196,33 @@ class MainNamespace(BaseNamespace):
             debugFlag = True
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
+    def on_webscrape(self,*args):
+        global action,wxObject,browsername,desktopScrapeFlag,data
+        args = list(args)
+        d = args[0]
+        action = d['action']
+        task = d['task']
+        data = {}
+        if action == 'scrape':
+            if str(task) == 'OPEN BROWSER CH':
+                browsername = '1'
+            elif str(task) == 'OPEN BROWSER IE':
+                browsername = '3'
+            elif str(task) == 'OPEN BROWSER FX':
+                browsername = '2'
+            elif str(task) == 'OPEN BROWSER SF':
+                browsername = '6'
+        elif action == 'compare':
+            data['view'] = d['viewString']
+            data['scrapedurl'] = d['scrapedurl']
+            if str(task) == 'OPEN BROWSER CH':
+                browsername = '1'
+            elif str(task) == 'OPEN BROWSER IE':
+                browsername = '3'
+            elif str(task) == 'OPEN BROWSER FX':
+                browsername = '2'
+        wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+
     def on_LAUNCH_DESKTOP(self, *args):
         con = controller.Controller()
         global browsername
@@ -252,53 +250,6 @@ class MainNamespace(BaseNamespace):
         except Exception as e:
             logger.print_on_console('Error in SAP')
             log.error(e)
-
-    def on_qclogin(self, *args):
-        global qcdata
-        global soc
-        global socketIO
-        server_data=''
-        data_stream=None
-        client_data=None
-        try:
-            if SYSTEM_OS == "Windows":
-                if len(args) > 0:
-                    qcdata = args[0]
-                    if soc is None:
-                        import subprocess
-                        path = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Qc/QcController.exe"
-                        pid = subprocess.Popen(path, shell=True)
-                        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        try:
-                            soc.connect(("localhost",10000))
-                        except socket.error as e:
-                            log.error(e)
-                            if '[Errno 10061]' in str(e):
-                                time.sleep(15)
-                                soc.connect(("localhost",10000))
-
-                    data_to_send = json.dumps(qcdata).encode('utf-8')
-                    data_to_send+='#E&D@Q!C#'
-                    soc.send(data_to_send)
-                    while True:
-                        data_stream= soc.recv(1024)
-                        server_data+=data_stream
-                        if '#E&D@Q!C#' in server_data:
-                            break
-                    client_data= server_data[:server_data.find('#E&D@Q!C#')]
-                    if('Fail@f@!l' in client_data):
-                        client_data=client_data[:client_data.find('@f@!l')]
-                        logger.print_on_console('Error occurred in QC')
-                        socketIO.emit('qcresponse','Error:Qc Operations')
-                    else:
-                        socketIO.emit('qcresponse',client_data)
-                else:
-                    socketIO.emit('qcresponse','Error:data recevied empty')
-            else:
-                 socketIO.emit('qcresponse','Error:Failed in running Qc')
-        except Exception as e:
-            log.error(e)
-            socketIO.emit('qcresponse','Error:Qc Operations')
 
     def on_LAUNCH_MOBILE(self, *args):
         con = controller.Controller()
@@ -385,6 +336,53 @@ class MainNamespace(BaseNamespace):
         response=str(response)
         print response
         socketIO.emit('result_wsdl_ServiceGenerator',response)
+
+    def on_qclogin(self, *args):
+        global qcdata
+        global soc
+        global socketIO
+        server_data=''
+        data_stream=None
+        client_data=None
+        try:
+            if SYSTEM_OS == "Windows":
+                if len(args) > 0:
+                    qcdata = args[0]
+                    if soc is None:
+                        import subprocess
+                        path = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Qc/QcController.exe"
+                        pid = subprocess.Popen(path, shell=True)
+                        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        try:
+                            soc.connect(("localhost",10000))
+                        except socket.error as e:
+                            log.error(e)
+                            if '[Errno 10061]' in str(e):
+                                time.sleep(15)
+                                soc.connect(("localhost",10000))
+
+                    data_to_send = json.dumps(qcdata).encode('utf-8')
+                    data_to_send+='#E&D@Q!C#'
+                    soc.send(data_to_send)
+                    while True:
+                        data_stream= soc.recv(1024)
+                        server_data+=data_stream
+                        if '#E&D@Q!C#' in server_data:
+                            break
+                    client_data= server_data[:server_data.find('#E&D@Q!C#')]
+                    if('Fail@f@!l' in client_data):
+                        client_data=client_data[:client_data.find('@f@!l')]
+                        logger.print_on_console('Error occurred in QC')
+                        socketIO.emit('qcresponse','Error:Qc Operations')
+                    else:
+                        socketIO.emit('qcresponse',client_data)
+                else:
+                    socketIO.emit('qcresponse','Error:data recevied empty')
+            else:
+                 socketIO.emit('qcresponse','Error:Failed in running Qc')
+        except Exception as e:
+            log.error(e)
+            socketIO.emit('qcresponse','Error:Qc Operations')
 
     def on_render_screenshot(self,*args):
         try:
