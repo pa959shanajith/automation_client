@@ -41,6 +41,7 @@ class ScrapeWindow(wx.Frame):
         obj = desktop_launch_keywords.Launch_Keywords()
         self.socketIO = socketIO
         self.core_utilsobject = core_utils.CoreUtils()
+        self.parent = parent
         windowname=filePath[0]
         pid=filePath[1]
         self.backend_process=filePath[2]
@@ -88,7 +89,7 @@ class ScrapeWindow(wx.Frame):
         else:
             self.socketIO.emit('scrape','Fail')
             logger.print_on_console('Wrong window name, Please check the window name and provide valid one')
-
+        self.parent.schedule.Enable()
         windowname = ''
      #----------------------------------------------------------------------
 
@@ -136,6 +137,7 @@ class ScrapeWindow(wx.Frame):
                     logger.print_on_console( 'Scraped data exceeds max. Limit.')
                     self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
                 os.remove("out.png")
+                self.parent.schedule.Enable()
                 self.Close()
                 logger.print_on_console('Click and add scrape  completed successfully...')
         else:
@@ -177,6 +179,7 @@ class ScrapeWindow(wx.Frame):
                 logger.print_on_console( 'Scraped data exceeds max. Limit.')
                 self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
             os.remove("out.png")
+            self.parent.schedule.Enable()
             self.Close()
             logger.print_on_console('Full scrape  completed successfully...')
         else:
@@ -201,6 +204,7 @@ class ScrapeWindow(wx.Frame):
             d = cropandaddobj.stopcropandadd()
             print 'Scrapped data saved successfully in domelements.json file'
             self.socketIO.emit('scrape',d)
+            self.parent.schedule.Enable()
             self.Close()
             event.GetEventObject().SetLabel("Start IRIS")
             print 'Crop and add scrape completed'

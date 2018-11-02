@@ -39,6 +39,7 @@ class ScrapeDispatcher(wx.Frame):
         self.scrape_obj=oebs_fullscrape.FullScrape()
         self.core_utilsobject = core_utils.CoreUtils()
         self.irisFlag = irisFlag
+        self.parent = parent
         global windownametoscrape
         windownametoscrape = filePath
         self.socketIO = socketIO
@@ -69,9 +70,8 @@ class ScrapeDispatcher(wx.Frame):
             wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
             self.Show()
         else:
-
             self.socketIO.emit('scrape','wrongWindowName')
-
+            self.parent.schedule.Enable()
 
     def clickandadd(self,event):
         state = event.GetEventObject().GetValue()
@@ -119,6 +119,7 @@ class ScrapeDispatcher(wx.Frame):
 
     ##            wx.MessageBox('CLICKANDADD: Scrape completed', 'Info',wx.OK | wx.ICON_INFORMATION)
             self.Close()
+            self.parent.schedule.Enable()
     ##            event.GetEventObject().SetLabel("Start ClickAndAdd")
             logger.print_on_console('Click and add scrape  completed')
 
@@ -153,7 +154,7 @@ class ScrapeDispatcher(wx.Frame):
         else:
             print 'Scraped data exceeds max. Limit.'
             self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
-
+        self.parent.schedule.Enable()
         self.Close()
         logger.print_on_console('Full scrape  completed')
 
@@ -199,5 +200,6 @@ class ScrapeDispatcher(wx.Frame):
             d = cropandaddobj.stopcropandadd()
             print 'Scrapped data saved successfully in domelements.json file'
             self.socketIO.emit('scrape',d)
+            self.parent.schedule.Enable()
             self.Close()
             print 'Crop and add scrape completed'

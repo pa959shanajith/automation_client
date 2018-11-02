@@ -31,7 +31,7 @@ class ScrapeWindow(wx.Frame):
         status = obj.openBrowser(browser)
         self.panel = wx.Panel(self)
         self.core_utilsobject = core_utils.CoreUtils()
-
+        self.parent = parent
         #if SYSTEM_OS== "Darwin":
         self.startbutton = wx.ToggleButton(self.panel, label="Start clickandadd",pos=(12,8 ), size=(175, 28))
         self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd_MW)   # need to implement OnExtract()
@@ -79,6 +79,7 @@ class ScrapeWindow(wx.Frame):
                 self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
 
 ##            wx.MessageBox('clickandadd_MW: Scrape completed', 'Info',wx.OK | wx.ICON_INFORMATION)
+            self.parent.schedule.Enable()
             self.Close()
             event.GetEventObject().SetLabel("Start clickandadd_MW")
             print 'Click and add scrape  completed'
@@ -116,7 +117,7 @@ class ScrapeWindow(wx.Frame):
         else:
             print 'Scraped data exceeds max. Limit.'
             self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
-
+        self.parent.schedule.Enable()
         self.Close()
         if d != 'FAIL':
             print 'Full scrape  completed'
