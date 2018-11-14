@@ -988,6 +988,10 @@ class Controller():
                                 log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                                 os.chdir(self.cur_dir)
                                 filename='Scenario'+str(i  + 1)+'.json'
+                                #check if user has manually terminated during execution, then check if the teststep data and overallstatus is [] if so poputale default values in teststep data and overallstatus
+                                if terminate_flag ==True and execute_flag==True:
+                                    if con.reporting_obj.report_json['rows']==[] and con.reporting_obj.report_json['overallstatus']==[]:
+                                        con.reporting_obj.add_to_reporting_obj()
                                 con.reporting_obj.save_report_json(filename)
                                 socketIO.emit('result_executeTestSuite',self.getreport_data(suite_id,scenario_id,con,execution_id))
                                 obj.clearList(con)
