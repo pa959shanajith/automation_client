@@ -319,6 +319,8 @@ class MainNamespace(BaseNamespace):
         import wsdlgenerator
         wsgen_inputs=eval(str(args[0]))
         wsdlurl = wsgen_inputs['wsdlurl']
+        # Trimming URL for the following defect fix (1263 : Regression_WebService_WSDL : Request header and body are not loaded on click of "Add" button for WSDL)
+        wsdlurl = wsdlurl.strip()
         operations = wsgen_inputs['operations']
         soapVersion = wsgen_inputs['soapVersion']
         wsdl_object = wsdlgenerator.BodyGenarator(wsdlurl,operations,soapVersion)
