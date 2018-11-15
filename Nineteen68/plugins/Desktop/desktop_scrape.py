@@ -48,10 +48,12 @@ class ScrapeWindow(wx.Frame):
         global backend_process
         backend_process=self.backend_process
         input_val=[]
+        verify_pname = None
         if (windowname!=None or windowname.strip()!='') and (pid==None or pid ==''):
             input_val.append(windowname)
             input_val.append(5)
             status = obj.find_window_and_attach(input_val)
+            verify_pname = status[0].lower()
         elif (windowname==None or windowname.strip()=='') and (pid!=None or pid !=''):
             input_val.append(int(pid))
             input_val.append(5)
@@ -87,9 +89,13 @@ class ScrapeWindow(wx.Frame):
             else:
                 self.socketIO.emit('scrape','Fail')
                 self.parent.schedule.Enable()
+        elif verify_pname == 'fail':
+            self.socketIO.emit('scrape','Fail')
+            logger.print_on_console('Wrong Window Name, Please check the Window Name and provide valid one')
+            self.parent.schedule.Enable()
         else:
             self.socketIO.emit('scrape','Fail')
-            logger.print_on_console('Wrong window name, Please check the window name and provide valid one')
+            logger.print_on_console('Wrong Process Id, Please check the Process Id and provide valid one')
             self.parent.schedule.Enable()
         windowname = ''
      #----------------------------------------------------------------------

@@ -23,6 +23,10 @@ class StepDescription:
             return 'Get current date of the system and save the date '+ "'" + str(output)+ "'" + ' in '+ "'"+ tsp.outputval+ "'"
         def getcurrentdateandtime():
             return 'Get current date and time of the system and save the date and time '+"'"+ inputval[0] +"' and '"+ inputval[1] + "'"+ ' in '+"'"+ tsp.outputval+"'"
+        def getcurrentday():
+            return 'Get current day of the system and save the day '+ "'" + str(output)+ "'" + ' in '+ "'"+ tsp.outputval+ "'"
+        def getcurrentdaydateandtime():
+            return 'Get current day date time of the system and save the day date time '+"'"+ str(output) + "'"+ ' in '+"'"+ tsp.outputval+"'"
         def dateaddition():
             return "Add the date '"+ inputval[0] + "' to '"+ inputval[1]+ "' number of days and save the date '" + output + "' in '"+ tsp.outputval+"'"
         def datecompare():
@@ -429,7 +433,7 @@ class StepDescription:
         def verifyexistsiris():
             return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         def verifytextiris():
-            return ' Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'             
+            return ' Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'
         return locals()[keyword]()
 
     def sap(self,keyword,tsp,inputval,input,output,con,reporting_obj):
@@ -636,7 +640,7 @@ class StepDescription:
         def verifyexistsiris():
             return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         def verifytextiris():
-            return ' Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'              
+            return ' Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'
         return locals()[keyword]()
 
 
@@ -870,7 +874,7 @@ class StepDescription:
         def verifyexistsiris():
             return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         def verifytextiris():
-            return ' Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'             
+            return ' Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'
         return locals()[keyword]()
 
     def mobileapp(self,keyword,tsp,inputval,input,output,con,reporting_obj):
@@ -1346,7 +1350,7 @@ class StepDescription:
         def verifyexistsiris():
             return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         def verifytextiris():
-            return ' Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'              
+            return ' Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'
         return locals()[keyword]()
 
 
