@@ -827,7 +827,12 @@ class Singleton_DriverUtil():
 ##                    browser_ver1 = browser_ver.encode('utf-8')
 ##                    browser_ver = float(browser_ver1[:4])
                     if(clientwindow.firefoxFlag == True):
-                        driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH)
+                        if str(configvalues['firefox_path']).lower()!="default":
+                            from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+                            binary = FirefoxBinary(str(configvalues['firefox_path']))
+                            driver = webdriver.Firefox(capabilities=caps, firefox_binary=binary, executable_path=webconstants.GECKODRIVER_PATH)
+                        else:
+                            driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH)
                         drivermap.append(driver)
                         driver.maximize_window()
                         logger.print_on_console('Firefox browser started using geckodriver')
