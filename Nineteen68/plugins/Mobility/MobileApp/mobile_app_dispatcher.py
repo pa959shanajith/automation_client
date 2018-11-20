@@ -68,7 +68,7 @@ class MobileDispatcher:
         global apptypes
         apptypes=teststepproperty.apptype
         err_msg=None
-        result=[constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
+        result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
 
         try:
             dict={'settext':self.textbox_keywords_object.set_text,
@@ -168,7 +168,7 @@ class MobileDispatcher:
                     webelement=self.getMobileElement(driver,objectname)
                     result=dict[keyword](webelement,input)
                 if not(ELEMENT_FOUND) and self.exception_flag:
-                    result=constants.TERMINATE
+                    result=TERMINATE
             else:
                 err_msg=INVALID_KEYWORD
                 result[3]=err_msg
@@ -185,7 +185,7 @@ class MobileDispatcher:
                         file_path = screen_shot_obj.captureScreenshot()
                         result.append(file_path[2])
         except TypeError as e:
-            err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
+            err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
         except Exception as e:
             log.error(e)
