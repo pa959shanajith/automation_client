@@ -319,6 +319,8 @@ class MainNamespace(BaseNamespace):
         import wsdlgenerator
         wsgen_inputs=eval(str(args[0]))
         wsdlurl = wsgen_inputs['wsdlurl']
+        # Trimming URL for the following defect fix (1263 : Regression_WebService_WSDL : Request header and body are not loaded on click of "Add" button for WSDL)
+        wsdlurl = wsdlurl.strip()
         operations = wsgen_inputs['operations']
         soapVersion = wsgen_inputs['soapVersion']
         wsdl_object = wsdlgenerator.BodyGenarator(wsdlurl,operations,soapVersion)
@@ -1175,55 +1177,57 @@ class Config_window(wx.Frame):
         #------------------------------------Different co-ordinates for Windows and Mac
         if SYSTEM_OS=='Windows':
             config_fields= {
-            "Frame":[(300, 150),(470,450)],
+            "Frame":[(300, 150),(470,480)],
             "S_address":[(12,8 ),(90, 28),(100,8 ),(140,-1)],
             "S_port": [(270,8 ),(70, 28),(340,8 ), (105,-1)],
             "Chrm_path":[(12,38),(80, 28),(100,38), (310,-1),(415,38),(30, -1)],
-            "Log_path":[(12,68),(80, 28),(100,68), (310,-1),(415,68),(30, -1)],
-            "Q_timeout":[(12,98),(85, 28),(100,98), (80,-1)],
-            "Timeout":[(185,98),(50, 28),(240,98), (80,-1)],
-            "Delay":[(325,98),(40, 28),(360,98), (85,-1)],
-            "Step_exec":[(12,128),(120, 28),(130,128),(80,-1)],
-            "Disp_var":[(225,128),(140, 28),(360,128), (85,-1)],
-            "S_cert":[(12,158),(85, 28),(100,158),(310,-1),(415,158),(30, -1)],
-            "Ignore_cert":[(12,188)],
-            "IE_arch":[(150,188)],
-            "Dis_s_cert":[(290,188)],
-            "Ex_flag":[(12,248)],
-            "Ignore_v_check":[(150,248)],
-            "S_flag":[(340,308)],
-            "Ret_url":[(12,308)],
-            "En_secu_check":[(308,248)],
-            "Brow_ch":[(115,308)],
-            "High_ch":[ (225,308)],
-            "Save":[(100,388), (100, 28)],
-            "Close":[(250,388), (100, 28)]
+            "Ffox_path":[(12,68),(80, 28),(100,68), (310,-1),(415,68),(30, -1)],
+            "Log_path":[(12,98),(80, 28),(100,98), (310,-1),(415,98),(30, -1)],
+            "Q_timeout":[(12,128),(85, 28),(100,128), (80,-1)],
+            "Timeout":[(185,128),(50, 28),(240,128), (80,-1)],
+            "Delay":[(325,128),(40, 28),(360,128), (85,-1)],
+            "Step_exec":[(12,158),(120, 28),(130,158),(80,-1)],
+            "Disp_var":[(225,158),(140, 28),(360,158), (85,-1)],
+            "S_cert":[(12,188),(85, 28),(100,188),(310,-1),(415,188),(30, -1)],
+            "Ignore_cert":[(12,218)],
+            "IE_arch":[(150,218)],
+            "Dis_s_cert":[(290,218)],
+            "Ex_flag":[(12,278)],
+            "Ignore_v_check":[(150,278)],
+            "S_flag":[(340,338)],
+            "Ret_url":[(12,338)],
+            "En_secu_check":[(308,278)],
+            "Brow_ch":[(115,338)],
+            "High_ch":[ (225,338)],
+            "Save":[(100,418), (100, 28)],
+            "Close":[(250,418), (100, 28)]
         }
         else:
             config_fields={
-            "Frame":[(300, 150),(555,460)],
+            "Frame":[(300, 150),(555,490)],
             "S_address":[(12,8),(90,28),(116,8 ),(140,-1)],
             "S_port": [(352,8),(70,28),(430,8 ),(105,-1)],
             "Chrm_path":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
-            "Log_path":[(12,68),(80, 28),(116,68),(382,-1),(504,68),(30, -1)],
-            "Q_timeout":[(12,98),(85, 28),(116,98), (80,-1)],
-            "Timeout":[(225,98),(50, 28),(290,98),(80,-1)],
-            "Delay":[(404,98),(40, 28),(448,98), (85,-1)],
-            "Step_exec":[(12,128),(120, 28),(142,128),(80,-1)],
-            "Disp_var":[(288,128),(140, 28),(448,128),(85,-1)],
-            "S_cert":[(12,158),(85, 28),(116,158),(382,-1),(504,158),(30, -1)],
-            "Ignore_cert":[(12,248)],
-            "IE_arch":[(158,188)],
-            "Dis_s_cert":[(335,188)],
-            "Ex_flag":[(12,188)],
-            "Ignore_v_check":[(170,248)],
-            "S_flag":[(396,308)],
-            "Ret_url":[(12,308)],
-            "En_secu_check":[(358,248)],
-            "Brow_ch":[(130,308)],
-            "High_ch":[(260,308)],
-            "Save":[(135,388),(100, 28)],
-            "Close":[(285,388),(100, 28)]
+            "Ffox_path":[(12,68),(80,28),(116,68),(382,-1),(504,68),(30, -1)],
+            "Log_path":[(12,98),(80, 28),(116,98),(382,-1),(504,98),(30, -1)],
+            "Q_timeout":[(12,128),(85, 28),(116,128), (80,-1)],
+            "Timeout":[(225,128),(50, 28),(290,128),(80,-1)],
+            "Delay":[(404,128),(40, 28),(448,128), (85,-1)],
+            "Step_exec":[(12,158),(120, 28),(142,158),(80,-1)],
+            "Disp_var":[(288,158),(140, 28),(448,158),(85,-1)],
+            "S_cert":[(12,188),(85, 28),(116,188),(382,-1),(504,188),(30, -1)],
+            "Ignore_cert":[(12,278)],
+            "IE_arch":[(158,218)],
+            "Dis_s_cert":[(335,218)],
+            "Ex_flag":[(12,218)],
+            "Ignore_v_check":[(170,278)],
+            "S_flag":[(396,338)],
+            "Ret_url":[(12,338)],
+            "En_secu_check":[(358,278)],
+            "Brow_ch":[(130,338)],
+            "High_ch":[(260,338)],
+            "Save":[(135,418),(100, 28)],
+            "Close":[(285,418),(100, 28)]
         }
         wx.Frame.__init__(self, parent, title=title,
                    pos=config_fields["Frame"][0], size=config_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
@@ -1257,6 +1261,15 @@ class Config_window(wx.Frame):
             self.chrome_path.SetValue(isConfigJson['chrome_path'])
         else:
             self.chrome_path.SetValue('default')
+
+        self.ff_path=wx.StaticText(self.panel, label="Firefox Path", pos=config_fields["Ffox_path"][0],size=config_fields["Ffox_path"][1], style=0, name="")
+        self.firefox_path=wx.TextCtrl(self.panel, pos=config_fields["Ffox_path"][2], size=config_fields["Ffox_path"][3])
+        self.firefox_path_btn=wx.Button(self.panel, label="...", pos=config_fields["Ffox_path"][4], size=config_fields["Ffox_path"][5])
+        self.firefox_path_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_ffpath)
+        if isConfigJson!=False:
+            self.firefox_path.SetValue(isConfigJson['firefox_path'])
+        else:
+            self.firefox_path.SetValue('default')
 
         self.log_fpath=wx.StaticText(self.panel, label="Log File Path", pos=config_fields["Log_path"][0],size=config_fields["Log_path"][1], style=0, name="")
         self.log_file_path=wx.TextCtrl(self.panel, pos=config_fields["Log_path"][2], size=config_fields["Log_path"][3])
@@ -1382,7 +1395,7 @@ class Config_window(wx.Frame):
         else:
             self.rbox10.SetSelection(1)
 
-        self.error_msg=wx.StaticText(self.panel, label="", pos=(85,360),size=(350, 28), style=0, name="")
+        self.error_msg=wx.StaticText(self.panel, label="", pos=(85,390),size=(350, 28), style=0, name="")
         self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])
         self.save_btn.Bind(wx.EVT_BUTTON, self.config_check)
         self.close_btn=wx.Button(self.panel, label="Close",pos=config_fields["Close"][0], size=config_fields["Close"][1])
@@ -1417,6 +1430,7 @@ class Config_window(wx.Frame):
         server_add=self.server_add.GetValue()
         server_port=self.server_port.GetValue()
         chrome_path=self.chrome_path.GetValue()
+        firefox_path=self.firefox_path.GetValue()
         logFile_Path=self.log_file_path.GetValue()
         queryTimeOut=self.query_timeout.GetValue()
         time_out=self.time_out.GetValue()
@@ -1432,6 +1446,7 @@ class Config_window(wx.Frame):
         data['server_port'] = server_port.strip()
         data['ignore_certificate'] = ignore_certificate.strip()
         data['chrome_path'] = chrome_path.strip()
+        data['firefox_path'] = firefox_path.strip()
         data['bit_64'] = bit_64.strip()
         data['logFile_Path'] = logFile_Path.strip()
         data['screenShot_Flag'] = screenShot_Flag.strip()
@@ -1449,7 +1464,7 @@ class Config_window(wx.Frame):
         data['disable_server_cert'] = disable_server_cert.strip()
         data['highlight_check'] = highlight_check.strip()
         config_data=data
-        if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='':
+        if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='' and data['firefox_path']!='':
             #---------------------------------------resetting the static texts
             self.error_msg.SetLabel("")
             self.sev_add.SetLabel('Server Address')
@@ -1463,6 +1478,8 @@ class Config_window(wx.Frame):
             self.sev_cert.SetLabel('Server Cert')
             self.sev_cert.SetForegroundColour((0,0,0))
             self.ch_path.SetLabel('Chrome Path')
+            self.ch_path.SetForegroundColour((0,0,0))
+            self.ch_path.SetLabel('Firefox Path')
             self.ch_path.SetForegroundColour((0,0,0))
             self.delayText.SetLabel('Delay')
             self.delayText.SetForegroundColour((0,0,0))
@@ -1485,7 +1502,7 @@ class Config_window(wx.Frame):
                 data['logFile_Path'] = ''
 
             #---------------------------------------resetting the static texts
-            if (os.path.isfile(data['chrome_path'])==True or str(data['chrome_path']).strip()=='default') and os.path.isfile(data['server_cert'])==True and os.path.isfile(data['logFile_Path'])==True:
+            if (os.path.isfile(data['chrome_path'])==True or str(data['chrome_path']).strip()=='default') and os.path.isfile(data['server_cert'])==True and os.path.isfile(data['logFile_Path'])==True and (os.path.isfile(data['firefox_path'])==True or str(data['firefox_path']).strip()=='default'):
                 self.jsonCreater(config_data)
             else:
                 self.error_msg.SetLabel("Marked fields '^' contain invalid path, Data not saved")
@@ -1502,6 +1519,13 @@ class Config_window(wx.Frame):
                     self.ch_path.SetForegroundColour((0,0,0))
                 elif  os.path.isfile(data['chrome_path'])!=True:
                     self.ch_path.SetLabel('Chrome Path^')
+                    self.ch_path.SetForegroundColour((0,0,255))
+
+                if os.path.isfile(data['firefox_path'])==True or str(data['firefox_path']).strip()=='default':
+                    self.ch_path.SetLabel('Firefox Path')
+                    self.ch_path.SetForegroundColour((0,0,0))
+                elif  os.path.isfile(data['firefox_path'])!=True:
+                    self.ch_path.SetLabel('Firefox Path^')
                     self.ch_path.SetForegroundColour((0,0,255))
 
                 if os.path.isfile(data['logFile_Path'])!=True:
@@ -1548,6 +1572,12 @@ class Config_window(wx.Frame):
                 self.ch_path.SetForegroundColour((255,0,0))
             else:
                 self.ch_path.SetLabel('Chrome Path')
+                self.ch_path.SetForegroundColour((0,0,0))
+            if data['firefox_path']=='':
+                self.ch_path.SetLabel('Firefox Path*')
+                self.ch_path.SetForegroundColour((255,0,0))
+            else:
+                self.ch_path.SetLabel('Firefox Path')
                 self.ch_path.SetForegroundColour((0,0,0))
             if data['delay']=='':
                 self.delayText.SetLabel('Delay*')
@@ -1609,6 +1639,14 @@ class Config_window(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             self.chrome_path.SetValue(path)
+        dlg.Destroy()
+    """This method open a file selector dialog , from where file path can be set """
+    def fileBrowser_ffpath(self,event):
+        dlg = wx.FileDialog(self, message="Choose a file ...",defaultDir=self.currentDirectory,defaultFile="", wildcard="Firefox executable (*firefox.exe)|*firefox.exe|" \
+            "All files (*.*)|*.*", style=wx.FD_SAVE)
+        if dlg.ShowModal() == wx.ID_OK:
+            path = dlg.GetPath()
+            self.firefox_path.SetValue(path)
         dlg.Destroy()
     """This method open a file selector dialog , from where file path can be set """
     def fileBrowser_logfilepath(self,event):
@@ -1692,13 +1730,11 @@ def check_browser():
             try:
                 if os.path.isfile(ICE_CONST)==True:
                     params = json.load(open(ICE_CONST))
-                    configvalues['CHROME_VERSION'] = params['CHROME_VERSION']
-                    configvalues['FIREFOX_VERSION'] = params['FIREFOX_VERSION']
-                    if configvalues['CHROME_VERSION'] != "":
-                        for k,v in configvalues['CHROME_VERSION'].items():
+                    if params['CHROME_VERSION'] != "":
+                        for k,v in params['CHROME_VERSION'].items():
                             CHROME_DRIVER_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
-                    if configvalues['FIREFOX_VERSION'] != "":
-                        for k,v in configvalues['FIREFOX_VERSION'].items():
+                    if params['FIREFOX_VERSION'] != "":
+                        for k,v in params['FIREFOX_VERSION'].items():
                             FIREFOX_BROWSER_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
                 else:
                     logger.print_on_console("Unable to locate ICE parameters")
@@ -1750,7 +1786,12 @@ def check_browser():
             from selenium.webdriver.firefox.options import Options
             options = Options()
             options.add_argument('--headless')
-            driver = webdriver.Firefox(capabilities=caps,firefox_options=options, executable_path=GECKODRIVER_PATH)
+            if str(configvalues['firefox_path']).lower()!="default":
+                from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+                binary = FirefoxBinary(str(configvalues['firefox_path']))
+                driver = webdriver.Firefox(capabilities=caps,firefox_options=options,firefox_binary=binary, executable_path=GECKODRIVER_PATH)
+            else:
+                driver = webdriver.Firefox(capabilities=caps,firefox_options=options, executable_path=GECKODRIVER_PATH)
             browser_ver=driver.capabilities['browserVersion']
             browser_ver1 = browser_ver.encode('utf-8')
             browser_ver = float(browser_ver1[:4])
