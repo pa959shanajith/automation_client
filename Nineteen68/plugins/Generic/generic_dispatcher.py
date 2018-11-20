@@ -199,6 +199,10 @@ class GenericKeywordDispatcher:
             else:
                 err_msg=generic_constants.INVALID_KEYWORD
                 result[3]=err_msg
+            if self.action ==constants.EXECUTE and keyword =='capturescreenshot':
+                if result != constants.TERMINATE:
+                    result=list(result)
+                    result.append(result[2])
          except TypeError as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg

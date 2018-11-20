@@ -737,6 +737,8 @@ class Controller():
         start_time_string=self.scenario_start_time.strftime(TIME_FORMAT)
         logger.print_on_console('Scenario Execution start time is : '+start_time_string,'\n')
         global pause_flag
+        if self.generic_dispatcher_obj is not None and self.generic_dispatcher_obj.action is None:
+            self.generic_dispatcher_obj.action=action
         while (i < len(tsplist)):
             #Check for 'terminate_flag' before execution
             if not(terminate_flag):
