@@ -86,6 +86,7 @@ class Controller():
     mainframe_dispatcher_obj = None
     system_dispatcher_obj = None
     def __init__(self):
+        self.action=None
         self.get_all_the_imports(CORE)
         self.__load_generic()
         self.cur_dir= os.getcwd()
@@ -99,7 +100,6 @@ class Controller():
         self.scenario_ellapsed_time=''
         self.reporting_obj=reporting.Reporting()
         self.conthread=None
-        self.action=None
         self.counter=[]
         self.jumpto_previousindex=[]
         self.verify_exists=False

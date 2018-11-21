@@ -49,6 +49,9 @@ class GenericKeywordDispatcher:
     util_operation_obj=util_operations.UtilOperations()
     dyn_var_obj=dynamic_variable.DynamicVariables()
 
+
+    def __init__(self):
+        self.action=None
 	#Call to fetch data in database keywords
     def fetch_data(self,input):
         output=None
