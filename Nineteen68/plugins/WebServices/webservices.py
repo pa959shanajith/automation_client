@@ -367,7 +367,7 @@ class WSkeywords:
                 self.baseReqBody = json.dumps(self.baseReqBody)
                 if (not(self.client_cert_path == '' and self.client_cert_path == None)):
                     #if client certificates exists
-                    response = self.client_Authentication()
+                    response,err_msg = self.client_Authentication()
                 elif(not(self.auth_uname == '' and self.auth_uname == None)
                         and not (self.auth_pass == '' and self.auth_pass == None)):
                     #if only basic authentication required
@@ -1028,4 +1028,14 @@ class WSkeywords:
                 err_msg = e
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
+
+     def aes_decript(self,encrypted_data):
+        decrypted_data = ''
+        try:
+            encrypt_obj=encryption_utility.AESCipher()
+            decrypted_data=encrypt_obj.decrypt(encrypted_data)
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+        return decrypted_data
 
