@@ -26,6 +26,7 @@ currenthandle = ''
 status = domconstants.STATUS_FAIL
 browserops_obj=browserops.BrowserOperations()
 from core_utils import CoreUtils
+import logger
 from webscrape_utils import WebScrape_Utils
 
 class Fullscrape():
@@ -169,8 +170,8 @@ class Fullscrape():
             log.error(e)
             ename = type(e).__name__
             if ename in ('NoSuchElementException','ValueError','InvalidSelectorException'):
-                print "Invalid input, provide a valid xpath of the element to start the section"
-            print 'Error while performing full scrape'
+                logger.print_on_console("Invalid input, provide a valid xpath of the element to start the section")
+                logger.print_on_console('Error while performing full scrape')
             if (isinstance(driver,webdriver.Ie)):
-                print 'Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked) and retry'
+                logger.logger.print_on_console( 'Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked) and retry')
         return data

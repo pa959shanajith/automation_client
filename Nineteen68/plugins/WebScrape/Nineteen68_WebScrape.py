@@ -138,11 +138,11 @@ class ScrapeWindow(wx.Frame):
                 self.socketIO.emit('scrape',status)
                 self.Close()
             else:
-                print 'click and add initiated, select the elements from AUT'
+                logger.print_on_console('click and add initiated, select the elements from AUT')
 
         else:
             d = clickandaddoj.stopclickandadd()
-            print 'Scrapped data saved successfully in domelements.json file'
+            logger.print_on_console('Scrapped data saved successfully in domelements.json file')
 
             # Check the limit of data size as per Nineteen68 standards
             if self.core_utilsobject.getdatasize(str(d),'mb') < self.webscrape_utils_obj.SCRAPE_DATA_LIMIT:
@@ -152,11 +152,11 @@ class ScrapeWindow(wx.Frame):
                 else:
                     self.socketIO.emit('scrape',d)
             else:
-                print 'Scraped data exceeds max. Limit.'
+                logger.print_on_console('Scraped data exceeds max. Limit.')
                 self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
             self.parent.schedule.Enable()
             self.Close()
-            print 'Click and add scrape  completed'
+            logger.print_on_console('Click and add scrape  completed')
 
     def compare(self,event):
         state = event.GetEventObject().GetValue()
@@ -171,9 +171,9 @@ class ScrapeWindow(wx.Frame):
                         self.socketIO.emit('scrape',d)
                 else:
                     self.socketIO.emit('scrape',d)
-                    print 'Compare completed'
+                    logger.print_on_console('Compare completed')
             else:
-                print 'data exceeds max. Limit.'
+                logger.print_on_console('data exceeds max. Limit.')
                 self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
             self.parent.schedule.Enable()
             self.Close()
@@ -188,7 +188,7 @@ class ScrapeWindow(wx.Frame):
             if(self.irisFlag):
                 self.cropbutton.Disable()
 
-            print 'Performing fullscrape using option: ',self.scrape_selected_option[0]
+            logger.print_on_console('Performing fullscrape using option: ',self.scrape_selected_option[0])
             if not isinstance(self.driver,webdriver.Ie) and len(self.driver.window_handles) > 1 and not self.window_selected:
                 self.fullscrapebutton.Hide()
                 self.startbutton.Hide()
@@ -212,7 +212,7 @@ class ScrapeWindow(wx.Frame):
         elif self.scrape_selected_option[0] == self.scrapeoptions[-2]:
             self.scrape_selected_option.append(self.fullscrapedropdown.GetValue().lower())
         if len(self.scrape_selected_option) > 1:
-            print "value is: ",self.scrape_selected_option[1]
+            logger.print_on_console("value is: ",self.scrape_selected_option[1])
         d = fullscrapeobj.fullscrape(self.scrape_selected_option,self.window_handle_number)
 
         '''Check the limit of data size as per Nineteen68 standards'''
@@ -222,9 +222,9 @@ class ScrapeWindow(wx.Frame):
                     self.socketIO.emit('scrape',d)
             else:
                 self.socketIO.emit('scrape',d)
-                print 'Full scrape  completed'
+                logger.print_on_console('Full scrape  completed')
         else:
-            print 'Scraped data exceeds max. Limit.'
+            logger.print_on_console('Scraped data exceeds max. Limit.')
             self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
         self.parent.schedule.Enable()
         self.Close()
@@ -285,12 +285,12 @@ class ScrapeWindow(wx.Frame):
         if self.window_handle_number < len(self.driver.window_handles) - 1:
             self.window_handle_number += 1
             self.driver.switch_to.window(self.driver.window_handles[self.window_handle_number])
-            print "Currently selected window/tab's URL: ", self.driver.current_url
+            logger.print_on_console("Currently selected window/tab's URL: ", self.driver.current_url)
 
     def on_prev(self,event):
         if self.window_handle_number > 0:
             self.window_handle_number -= 1
             self.driver.switch_to.window(self.driver.window_handles[self.window_handle_number])
-            print "Currently selected window/tab's URL: ", self.driver.current_url
+            logger.print_on_console("Currently selected window/tab's URL: ", self.driver.current_url)
 
 
