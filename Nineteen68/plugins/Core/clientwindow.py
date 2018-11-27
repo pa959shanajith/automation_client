@@ -1445,8 +1445,14 @@ class Config_window(wx.Frame):
         data['server_ip'] = server_add.strip()
         data['server_port'] = server_port.strip()
         data['ignore_certificate'] = ignore_certificate.strip()
-        data['chrome_path'] = chrome_path.strip()
-        data['firefox_path'] = firefox_path.strip()
+        if chrome_path.strip()!='default' and chrome_path.strip().lower()=='default':
+            data['chrome_path']='default'
+        else:
+            data['chrome_path'] = chrome_path.strip()
+        if firefox_path.strip()!='default' and firefox_path.strip().lower()=='default':
+            data['firefox_path']='default'
+        else:
+            data['firefox_path'] = firefox_path.strip()
         data['bit_64'] = bit_64.strip()
         data['logFile_Path'] = logFile_Path.strip()
         data['screenShot_Flag'] = screenShot_Flag.strip()
@@ -1522,11 +1528,11 @@ class Config_window(wx.Frame):
                     self.ch_path.SetForegroundColour((0,0,255))
 
                 if os.path.isfile(data['firefox_path'])==True or str(data['firefox_path']).strip()=='default':
-                    self.ch_path.SetLabel('Firefox Path')
-                    self.ch_path.SetForegroundColour((0,0,0))
+                    self.ff_path.SetLabel('Firefox Path')
+                    self.ff_path.SetForegroundColour((0,0,0))
                 elif  os.path.isfile(data['firefox_path'])!=True:
-                    self.ch_path.SetLabel('Firefox Path^')
-                    self.ch_path.SetForegroundColour((0,0,255))
+                    self.ff_path.SetLabel('Firefox Path^')
+                    self.ff_path.SetForegroundColour((0,0,255))
 
                 if os.path.isfile(data['logFile_Path'])!=True:
                     self.log_fpath.SetLabel('Log File Path^')
@@ -1574,11 +1580,11 @@ class Config_window(wx.Frame):
                 self.ch_path.SetLabel('Chrome Path')
                 self.ch_path.SetForegroundColour((0,0,0))
             if data['firefox_path']=='':
-                self.ch_path.SetLabel('Firefox Path*')
-                self.ch_path.SetForegroundColour((255,0,0))
+                self.ff_path.SetLabel('Firefox Path*')
+                self.ff_path.SetForegroundColour((255,0,0))
             else:
-                self.ch_path.SetLabel('Firefox Path')
-                self.ch_path.SetForegroundColour((0,0,0))
+                self.ff_path.SetLabel('Firefox Path')
+                self.ff_path.SetForegroundColour((0,0,0))
             if data['delay']=='':
                 self.delayText.SetLabel('Delay*')
                 self.delayText.SetForegroundColour((255,0,0))
