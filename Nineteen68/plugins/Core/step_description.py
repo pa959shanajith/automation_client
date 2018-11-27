@@ -276,6 +276,8 @@ class StepDescription:
             return 'Fetch the entire body ' +"'"+ output+"'"+ ' that was received as a response.'
         def addclientcertificate():
             return 'Add the certificate(s) provided to the Web Service.'
+        def setbasicauth():
+            return 'Basic authentication for the Webservice with username '+"'"+inputval[0]+"'"+" and password "+"'"+inputval[1]+"'"+"."
         def getservercertificate():
             return 'Fetch the Server certificate and save it in '+ "'"+inputval[1] +"'"+ '.'
         def executerequest():

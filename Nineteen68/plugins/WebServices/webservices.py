@@ -92,7 +92,8 @@ class WSkeywords:
             os.remove("TRUSTSTORECERT.pem")
         except Exception as fileremovalexc:
             log.error(fileremovalexc)
-            logger.print_on_console(fileremovalexc)
+            if self.client_cert_path != '' and self.client_cert_path != None:
+                logger.print_on_console(fileremovalexc)
 
      def setEndPointURL(self,url):
         """
@@ -697,6 +698,13 @@ class WSkeywords:
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
+    # keyword accepts only JKS,PEM and CERT/CRT/CER-KEY types
+    # JKS:
+    # input: <<clcert.jks>>;<<clkey.jks>>(opt);<<jkspass>>;<<servcert.jks>>(opt)
+    # PEM:
+    # input: <<clcert.pem>>;<<clkey.pem>>;<<pempass>>(opt);<<servcert.pem>>(opt)
+    # CERT/CER/CRT-KEY
+    # input: <<clcert.cert>>;<<clkey.cert>>;<<certpass>>(opt);<<servcert.cert>>(opt)
 
      def addClientCertificate(self,client_cert,client_key,keystore_pass,server_cert):
         status = ws_constants.TEST_RESULT_FAIL
@@ -1026,6 +1034,32 @@ class WSkeywords:
            else:
                 logger.print_on_console(e)
                 err_msg = e
+        log.info(RETURN_RESULT)
+        return status,methodoutput,output,err_msg
+
+     def setBasicAuth(self,uname,password):
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if (not(uname == '' and uname == None) and
+                not(password == '' and password == None)):
+                    self.auth_uname = uname
+                    self.auth_pass = self.aes_decript(password)
+                    log.debug(STATUS_METHODOUTPUT_UPDATE)
+                    logger.print_on_console('Basic Authentication enabled.')
+                    status = ws_constants.TEST_RESULT_PASS
+                    methodoutput = ws_constants.TEST_RESULT_TRUE
+            else:
+                log.info(ws_constants.METHOD_INVALID_INPUT)
+                err_msg = ws_constants.METHOD_INVALID_INPUT
+                logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
+        except Exception as e:
+            log.error(e)
+            err_msg = e
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
