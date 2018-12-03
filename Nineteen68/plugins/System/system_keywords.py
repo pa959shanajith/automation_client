@@ -215,17 +215,31 @@ class System_Keywords():
                     time.sleep(2)
                     status=system_constants.TEST_RESULT_PASS
                     result=system_constants.TEST_RESULT_TRUE
+                    log.debug("Executed command in remote/local machine and stored result in nineteen68_system.txt")
                 else:
                     pass
             elif SYSTEM_OS.lower()=="darwin":
                 pass
             else:
                 pass
-            f= open(path_outfile,"r")
-            for i in f:
-                result_data+=i
-            if not result_data:
-                raise Exception('Command not found or Unable to connect to machine')
+            if process_status == 0:
+                try:
+                    f= open(path_outfile,"r")
+                    for i in f:
+                        result_data+=i
+                    if not result_data:
+                        raise Exception('Command not found or Unable to connect to machine')
+                except Exception as e:
+                    log.error(e)
+                    log.error(system_constants.ACCESS_DENIED)
+                    log.debug(system_constants.ACCESS_DENIED)
+                    logger.print_on_console(system_constants.ACCESS_DENIED)
+                    err_msg = system_constants.ACCESS_DENIED
+                    status = system_constants.TEST_RESULT_FAIL
+                    result = system_constants.TEST_RESULT_FALSE
+                    result_data=OUTPUT_CONSTANT
+            else:
+                raise RuntimeError, "Issue while creating process: %d" % process_status
         except Exception as e:
             traceback.print_exc()
             log.error(e)
