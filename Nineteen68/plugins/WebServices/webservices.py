@@ -745,18 +745,18 @@ class WSkeywords:
                             err_msg = 'Feature not Supported.'
                             logger.print_on_console('Feature not Supported.')
                         else:
-                            err_msg = 'Invalid Input: File not found'
-                            logger.print_on_console('Invalid Input: File not found')
+                            err_msg = 'Invalid Input'
+                            logger.print_on_console('Invalid Input')
                 else:
-                    err_msg = 'Invalid Input: File not found'
-                    logger.print_on_console('Invalid Input: File not found')
+                    err_msg = 'Invalid Input'
+                    logger.print_on_console('Invalid Input')
             else:
                 err_msg = ERR_AUTH_COMPONENT_MISSING
                 logger.print_on_console(ERR_AUTH_COMPONENT_MISSING)
         except Exception as e:
             log.error(e)
-            err_msg = e
-            logger.print_on_console(e)
+            err_msg = str(e)
+            logger.print_on_console(str(e))
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -776,8 +776,9 @@ class WSkeywords:
                 try:
                     privatepemfile  = self.cert_formatter(pk.pkey_pkcs8, "PRIVATE KEY")
                     self.certdetails['PRIVATE KEY'] = privatepemfile
-                except:
+                except Exception as e:
                      logger.print_on_console('there is no private key with pkcs8')
+                     log.error(e)
 
                 for c in pk.cert_chain:
                     certpemfile = self.cert_formatter(c[1], "CERTIFICATE")
@@ -811,7 +812,7 @@ class WSkeywords:
 
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
+            logger.print_on_console(str(e))
         return extract_status
 
 
@@ -890,7 +891,7 @@ class WSkeywords:
                 err_msg = 'Certificate Mismatched.'
                 logger.print_on_console('Certificate Mismatched.')
             else:
-                err_msg = e
+                err_msg = str(e)
                 logger.print_on_console(e)
         return response,err_msg
 
