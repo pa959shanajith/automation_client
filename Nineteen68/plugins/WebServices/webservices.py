@@ -365,7 +365,6 @@ class WSkeywords:
         try:
             if ws_constants.CONTENT_TYPE_JSON in self.content_type.lower():
 
-                self.baseReqBody = json.dumps(self.baseReqBody)
                 if (not(self.client_cert_path == '' and self.client_cert_path == None)):
                     #if client certificates exists
                     response,err_msg = self.client_Authentication()
@@ -377,7 +376,11 @@ class WSkeywords:
                     #if only server certificate
                     response = self.server_Verification()
                 else:
-                    response = requests.post(self.baseEndPointURL,data = json.dumps(self.baseReqBody), headers=self.baseReqHeader)
+                    try:
+                        req_body=json.loads(self.baseReqBody)
+                    except:
+                        req_body=self.baseReqBody
+                    response = requests.post(self.baseEndPointURL,data = json.dumps(req_body), headers=self.baseReqHeader)
 
                 if response != None and response != False:
                     self.clearCertFiles()
