@@ -53,7 +53,7 @@ class XMLOperations():
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
         block_count = 0
-        block_number=0
+        block_number=-1
         err_msg=None
         exception_json=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -79,10 +79,13 @@ class XMLOperations():
                 #json logic
                 json_obj_dict=self.build_dict(json_obj)
                 if(json_obj_dict.has_key(input_tag)):
-                    print json_obj_dict
+                    log.info(json_obj_dict)
                     value=json_obj_dict[input_tag]
                     if isinstance(value,list):
-                        block_count=len(value[block_number])
+                        if block_number>-1:
+                            block_count=len(value[block_number])
+                        else:
+                            block_count=len(value)
                     elif isinstance(value,dict) or isinstance(value,unicode) or isinstance(value,str):
                         block_count=1
                     if(block_count>0):
@@ -143,7 +146,7 @@ class XMLOperations():
         log.info(RETURN_RESULT)
         return status,methodoutput,block_count,err_msg
 
-    def get_tag_value(self,input_string,block_number,input_tag,child_tag):
+    def get_tag_value(self,input_string,block_number,input_tag,child_tag,*args):
         """
         def : get_tag_value
         purpose : get_tag_value is used to get the Tag Value of the specified tag in the given XML
@@ -178,7 +181,7 @@ class XMLOperations():
             else:
 ##                items = root.getiterator(str(input_tag))
                 items = root.getiterator(input_tag)
-##            items = root.getiterator(str(input_tag))
+            log.info(items)
             log.debug('Getting children node from the root')
             if len(items) > 0:
                 log.debug('There are children in the root node, get the total number of children')
@@ -186,7 +189,11 @@ class XMLOperations():
                 block_number = int(block_number)
                 block = items[block_number-1].getchildren()
 ##                log.info('Block number: ' + str(block_number))
-                log.info('Block number: ',block_number)
+                log.info('Block number: ')
+                log.info(block_number)
+                if len(block)==0:
+                    block=[items[0]]
+
                 for child in block:
                     log.info('Iterating child in the block')
                     # added condition in 'or' for SOAP types
@@ -194,7 +201,7 @@ class XMLOperations():
 ##                                and child.tag.split('}')[1] == str(child_tag)):
                     if child.tag == child_tag or ('}' in child.tag
                         and child.tag.split('}')[1] == child_tag):
-                        log.info('Child mathed with the input child tag')
+                        log.info('Child matched with the input child tag')
                         if len(args)>0:
                             attribute=args[0]
                             attribute_dict=child.attrib
@@ -221,9 +228,7 @@ class XMLOperations():
                     else:
                         invalidinput = True
                 if status == TEST_RESULT_FAIL:
-                    err
-                    log.info(INVALID_INPUT + 'Please check the input tag')
-                    logger.print_on_console(INVALID_INPUT , 'Please check the input tag')
+                    err_msg=INVALID_INPUT + ' Please check the input tag'
         except Exception as e:
             log.error(e)
             if isinstance(e,ValueError):
@@ -279,7 +284,8 @@ class XMLOperations():
                     if(block_count>0 and block_number>0):
                         if isinstance(json_value,dict):
                             tag_value=json_value.values()
-                            log.info('Tag value is ',tag_value)
+                            log.info('Tag value is ')
+                            log.info(tag_value)
                             if len(tag_value)>=block_number:
                                 blockvalue=tag_value[block_number-1]
                             else:
@@ -289,6 +295,9 @@ class XMLOperations():
                                 blockvalue=json_value[block_number-1]
                             else:
                                 err_msg='Invalid block_number'
+                        elif isinstance(json_value,str) or isinstance(json_value,unicode):
+                            blockvalue=json_value
+
                         log.info('Block value is ',blockvalue)
                         logger.print_on_console("Block value is ",blockvalue)
                         if len(blockvalue)>0:
