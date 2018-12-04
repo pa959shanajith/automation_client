@@ -918,7 +918,7 @@ class ClientWindow(wx.Frame):
                 logger.print_on_console(msg)
                 log.info(msg)
                 log.error(e)
-        elif id==152:      # When user selects Tools > Generate PDF Report
+        elif id==152:      # When user selects Tools > Generate PDF Report (Batch)
             try:
                 if (self.pluginPDF!= None) and (bool(self.pluginPDF) != False):
                     msg = 'Report PDF generation plugin is already active'

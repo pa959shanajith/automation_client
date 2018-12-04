@@ -76,17 +76,17 @@ class GeneratePDFReport(wx.Frame):
         self.panel = wx.Panel(self)
         self.sizer = wx.GridBagSizer(5, 3)
 
-        self.l1=wx.StaticText(self.panel, label="Source JSON", pos=(12,34), style=0, name="")
+        self.l1=wx.StaticText(self.panel, label="Source json file", pos=(12,34), style=0, name="")
         self.t1=wx.TextCtrl(self.panel, pos=(120,30), size=(150,-1))
         self.btnsource = wx.Button(self.panel, label="...", pos=(290,30), size=(40,25), name="source")
         self.btnsource.Bind(wx.EVT_BUTTON, self.getFile)
 
-        self.l2=wx.StaticText(self.panel, label="Target PDF Path", pos=(12,74), style=0, name="")
+        self.l2=wx.StaticText(self.panel, label="Target pdf folder", pos=(12,74), style=0, name="")
         self.t2=wx.TextCtrl(self.panel, pos=(120,70), size=(150,-1))
         self.btntarget= wx.Button(self.panel, label="...", pos=(290,70), size=(40,25), name="target")
         self.btntarget.Bind(wx.EVT_BUTTON, self.getFile)
 
-        self.l3=wx.StaticText(self.panel, label="Filename", pos=(12,114), style=0, name="")
+        self.l3=wx.StaticText(self.panel, label="Target pdf filename", pos=(12,114), style=0, name="")
         self.t3=wx.TextCtrl(self.panel, pos=(120,110), size=(150,-1))
 
         self.l4=wx.StaticText(self.panel, label=" ", pos=(12,150), style=0, name="")
