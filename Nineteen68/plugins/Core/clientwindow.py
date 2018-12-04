@@ -32,6 +32,7 @@ wxObject = None
 browsername = None
 qcdata = None
 soc=None
+pdfgentool = None
 qcConFlag=False
 browsercheckFlag=False
 chromeFlag=False
@@ -727,6 +728,7 @@ class ClientWindow(wx.Frame):
         self.debugwindow = None
         self.scrapewindow = None
         self.pausewindow = None
+        self.pluginPDF = None
         self.id = id
         self.appName = appName
         self.mainclass = self
@@ -769,28 +771,29 @@ class ClientWindow(wx.Frame):
         self.menubar = wx.MenuBar()
         self.fileMenu = wx.Menu()
         self.editMenu = wx.Menu()
+        self.toolMenu = wx.Menu()
         #own event
         self.Bind(wx.EVT_CHOICE, self.test)
-        ##self.Bind(wx.EVT_CHOICE, self.debug)
-        ##self.Bind(wx.EVT_CLOSE, self.closeScrapeWindow)
         #own event
         self.loggerMenu = wx.Menu()
         self.infoItem = wx.MenuItem(self.loggerMenu, 100,text = "Info",kind = wx.ITEM_NORMAL)
         self.loggerMenu.Append(self.infoItem)
-
         self.debugItem = wx.MenuItem(self.loggerMenu, 101,text = "Debug",kind = wx.ITEM_NORMAL)
         self.loggerMenu.Append(self.debugItem)
-
         self.errorItem = wx.MenuItem(self.loggerMenu, 102,text = "Error",kind = wx.ITEM_NORMAL)
         self.loggerMenu.Append(self.errorItem)
-
         self.fileMenu.Append(wx.ID_ANY, "Logger Level", self.loggerMenu)
         self.menubar.Append(self.fileMenu, '&File')
-        #-----------------------------------------------------Config Menu Begins
+
         self.configItem = wx.MenuItem(self.editMenu, 103,text = "Configuration",kind = wx.ITEM_NORMAL)
         self.editMenu.Append(self.configItem)
         self.menubar.Append(self.editMenu, '&Edit')
-        #-------------------------------------------------------Config Menu Ends
+
+        self.pdfReportItem = wx.MenuItem(self.toolMenu, 151,text = "Generate PDF Report",kind = wx.ITEM_NORMAL)
+        self.toolMenu.Append(self.pdfReportItem)
+        self.pdfReportBatchItem = wx.MenuItem(self.toolMenu, 152,text = "Generate PDF Report (Batch)",kind = wx.ITEM_NORMAL)
+        self.toolMenu.Append(self.pdfReportBatchItem)
+        self.menubar.Append(self.toolMenu, '&Tools')
         self.SetMenuBar(self.menubar)
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
@@ -866,6 +869,7 @@ class ClientWindow(wx.Frame):
       2. Edit client configuration
     """
     def menuhandler(self, event):
+        global pdfgentool
         id = event.GetId()
         if id == 100:     # When user selects INFO level
             logger.print_on_console( '--Logger level : INFO selected--')
@@ -893,6 +897,42 @@ class ClientWindow(wx.Frame):
                 Config_window(parent = None,id = -1, title="Nineteen68 Configuration")
             except Exception as e:
                 msg = "Error while updating configuration"
+                logger.print_on_console(msg)
+                log.info(msg)
+                log.error(e)
+        elif id==151:      # When user selects Tools > Generate PDF Report
+            try:
+                if (self.pluginPDF!= None) and (bool(self.pluginPDF) != False):
+                    msg = 'Report PDF generation plugin is already active'
+                else:
+                    if pdfgentool is None:
+                        con = controller.Controller()
+                        con.get_all_the_imports('PdfReport')
+                        import pdfReportGenerator as pdfgentool
+                    msg = 'Initializing Report PDF generation plugin'
+                    self.pluginPDF = pdfgentool.GeneratePDFReport("PDF Report Generator", pdfgentool.pdfkit_conf)
+                logger.print_on_console(msg)
+                log.info(msg)
+            except Exception as e:
+                msg = "Error while loading PDF generation plugin"
+                logger.print_on_console(msg)
+                log.info(msg)
+                log.error(e)
+        elif id==152:      # When user selects Tools > Generate PDF Report (Batch)
+            try:
+                if (self.pluginPDF!= None) and (bool(self.pluginPDF) != False):
+                    msg = 'Report PDF generation plugin is already active'
+                else:
+                    if pdfgentool is None:
+                        con = controller.Controller()
+                        con.get_all_the_imports('PdfReport')
+                        import pdfReportGenerator as pdfgentool
+                    msg = 'Initializing Report PDF generation plugin (Batch mode)'
+                    self.pluginPDF = pdfgentool.GeneratePDFReportBatch("PDF Report Generator - Batch Mode", pdfgentool.pdfkit_conf)
+                logger.print_on_console(msg)
+                log.info(msg)
+            except Exception as e:
+                msg = "Error while loading PDF generation plugin (Batch mode)"
                 logger.print_on_console(msg)
                 log.info(msg)
                 log.error(e)
@@ -1445,14 +1485,8 @@ class Config_window(wx.Frame):
         data['server_ip'] = server_add.strip()
         data['server_port'] = server_port.strip()
         data['ignore_certificate'] = ignore_certificate.strip()
-        if chrome_path.strip()!='default' and chrome_path.strip().lower()=='default':
-            data['chrome_path']='default'
-        else:
-            data['chrome_path'] = chrome_path.strip()
-        if firefox_path.strip()!='default' and firefox_path.strip().lower()=='default':
-            data['firefox_path']='default'
-        else:
-            data['firefox_path'] = firefox_path.strip()
+        data['chrome_path'] = chrome_path.strip() if chrome_path.strip().lower()!='default' else 'default'
+        data['firefox_path'] = firefox_path.strip() if firefox_path.strip().lower()!='default' else 'default'
         data['bit_64'] = bit_64.strip()
         data['logFile_Path'] = logFile_Path.strip()
         data['screenShot_Flag'] = screenShot_Flag.strip()
