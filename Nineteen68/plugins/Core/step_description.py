@@ -257,7 +257,7 @@ class StepDescription:
         def setwholebody():
             return 'Set the entire body ' +"'"+ input+"'"+ ' that needs to be sent in the request'
         def setoperations():
-            return 'Set the Operation ' +"'"+ input+"'"+ 'that needs to be performed on the request'
+            return 'Set the Operation ' +"'"+ input+"'"+ ' that needs to be performed on the request'
         def setmethods():
             return 'Set the method type ' +"'"+ input +"'"+ ' for the operation.'
         def setheadertemplate():
@@ -267,7 +267,7 @@ class StepDescription:
         def settagvalue():
             return 'Set the Tag Value ' +"'"+ input +"'"+ ' for the tag '+ "'" + tsp.custname + "'" + '.'
         def setheader():
-            return 'Set the header '+"'"+ input +"'"+ ' that needs to be sent in the request.'
+            return 'Set the header '+"'"+ input.replace("##","|") +"'"+ ' that needs to be sent in the request.'
         def settagattribute():
             return 'Set the Tag attribute ' +"'"+ input +"'"+ ' for the tag '+ "'" + tsp.custname + "'" + '.'
         def getheader():
@@ -275,7 +275,9 @@ class StepDescription:
         def getbody():
             return 'Fetch the entire body ' +"'"+ output+"'"+ ' that was received as a response.'
         def addclientcertificate():
-            return 'Add the certificate present in the '+"'"+ inputval[0]+"'"+ ' to the '+ "'"+inputval[1] +"'"+ '.'
+            return 'Add the certificate(s) provided to the Web Service.'
+        def setbasicauth():
+            return 'Basic authentication for the Webservice with username '+"'"+inputval[0]+"'"+" and password "+"'"+inputval[1]+"'"+"."
         def getservercertificate():
             return 'Fetch the Server certificate and save it in '+ "'"+inputval[1] +"'"+ '.'
         def executerequest():

@@ -109,9 +109,9 @@ class Clickandadd():
         except Exception as e:
             log.error(e)
             status = domconstants.STATUS_FAIL
-            print 'Error while performing start click and add scrape'
+            logger.print_on_console('Error while performing start click and add scrape')
             if (isinstance(driver,webdriver.Ie)):
-                print 'Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked) and retry'
+                logger.print_on_console('Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked) and retry')
         return status
 
     def stopclickandadd(self):
@@ -211,7 +211,7 @@ class Clickandadd():
             log.error(e)
             status = domconstants.STATUS_FAIL
             data = domconstants.STATUS_FAIL
-            print 'Error while performing stop click and add scrape'
+            logger.print_on_console('Error while performing stop click and add scrape')
             if (isinstance(driver,webdriver.Ie)):
-                print 'Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked) and retry'
+                logger.print_on_console('Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked) and retry')
         return data

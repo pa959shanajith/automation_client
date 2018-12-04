@@ -34,7 +34,9 @@ class Dispatcher:
                   'settagvalue' : self.webservice.setTagValue,
                   'getservercertificate' : self.webservice.getServerCertificate,
                   'settagattribute':self.webservice.setTagAttribute,
-                  'setheadertemplate':self.webservice.setHeaderTemplate
+                  'setheadertemplate':self.webservice.setHeaderTemplate,
+                  # Authentication methods
+                  'setbasicauth': self.webservice.setBasicAuth
                 }
             if keyword in dict.keys():
                 if keyword in ['settagvalue','settagattribute']:

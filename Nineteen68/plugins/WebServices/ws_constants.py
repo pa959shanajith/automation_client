@@ -43,6 +43,10 @@ ERR_SET_WHOLE_BODY='Invalid input : Whole Body is invalid or missing.'
 
 ERR_SET_TAG_VALUE='Request body is empty'
 
+ERR_AUTH_COMPONENT_MISSING = 'Invalid Input: Authentication component missing'
+
+ERR_INVALID_FILE = 'Invalid Input: Issue with file path.'
+
 ##TYPE_XML="""Content-Type:text/xml;"""
 ##
 ##TYPE_JSON="""Content-Type:application/json;"""

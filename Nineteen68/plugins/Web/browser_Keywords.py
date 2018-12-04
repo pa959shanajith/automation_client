@@ -140,9 +140,28 @@ class BrowserKeywords():
                         pid_set.add(pid)
                     hwndg = utilobject.bring_Window_Front(pid)
                 webdriver_list.append(driver_obj)
-                parent_handle = driver_obj.current_window_handle
-                self.update_recent_handle(parent_handle)
-                all_handles.append(parent_handle)
+                parent_handle =  None
+                try:
+                    parent_handle = driver_obj.current_window_handle
+                except Exception as nosuchWindowExc:
+                    log.error(nosuchWindowExc)
+                    log.warn("A window or tab was closed manually from the browser!")
+                if parent_handle is not None:
+                    self.update_recent_handle(parent_handle)
+                    all_handles.append(parent_handle)
+                elif len(all_handles) > 0:
+                    driver_handles = driver_obj.window_handles
+                    switch_to_handle = None
+                    for handle in all_handles:
+                        if handle in driver_handles:
+                            switch_to_handle = handle
+                            break
+                    if switch_to_handle is not None:
+                        log.info("driver will now switch to the first window/tab")
+                        driver_obj.switch_to.window(switch_to_handle)
+                    else:
+                        log.info("driver will now switch to any available window/tab")
+                        driver_obj.switch_to.window(driver_handles[0])
                 logger.print_on_console('Browser opened')
                 log.info('Browser opened')
                 status=webconstants.TEST_RESULT_PASS

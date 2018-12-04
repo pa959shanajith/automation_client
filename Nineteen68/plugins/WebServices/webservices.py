@@ -14,7 +14,7 @@
 # Copyright:   (c) vishvas.a 2017
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-
+import os
 """logger - File which prints the code loggers """
 import logger
 
@@ -38,7 +38,7 @@ from xml.etree import ElementTree as etree
 
 import logging
 from constants import *
-
+import encryption_utility
 import handler
 log = logging.getLogger('webservices.py')
 class WSkeywords:
@@ -56,6 +56,14 @@ class WSkeywords:
         self.modifiedTemplate = ''
         self.verify=''
         self.content_type=''
+        # Certificate elements
+        self.server_cert_path = None
+        self.server_key_path = None
+        self.client_cert_path = None
+        self.client_key_path = None
+        self.certdetails = {}
+        self.auth_uname = ''
+        self.auth_pass = ''
 
      def clearValues(self):
         self.baseEndPointURL=''
@@ -68,6 +76,24 @@ class WSkeywords:
         self.modifiedTemplate = ''
         self.verify=''
         self.content_type=''
+        # Certificate elements
+        self.server_cert_path = None
+        self.server_key_path = None
+        self.client_cert_path = None
+        self.client_key_path = None
+        self.certdetails = {}
+        self.auth_uname = ''
+        self.auth_pass = ''
+     def clearCertFiles(self):
+        try:
+            os.remove("PRIVATECERT.pem")
+            os.remove("PRIVATEKEY.pem")
+            os.remove("RSAPRIVATEKEY.pem")
+            os.remove("TRUSTSTORECERT.pem")
+        except Exception as fileremovalexc:
+            log.error(fileremovalexc)
+            if self.client_cert_path != '' and self.client_cert_path != None:
+                logger.print_on_console(fileremovalexc)
 
      def setEndPointURL(self,url):
         """
@@ -309,7 +335,7 @@ class WSkeywords:
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        output=None
+        output=OUTPUT_CONSTANT
         try:
             logger.print_on_console('Status code: ',response.status_code)
             log.info('Status code: ')
@@ -334,16 +360,55 @@ class WSkeywords:
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        output=None
+        output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            if  ws_constants.CONTENT_TYPE_JSON in self.content_type.lower():
-                response = requests.post(self.baseEndPointURL,data = json.dumps(self.baseReqBody), headers=self.baseReqHeader)
-                status,methodoutput,output=self.__saveResults(response)
+            if ws_constants.CONTENT_TYPE_JSON in self.content_type.lower():
+
+                if (not(self.client_cert_path == '' and self.client_cert_path == None)):
+                    #if client certificates exists
+                    response,err_msg = self.client_Authentication()
+                elif(not(self.auth_uname == '' and self.auth_uname == None)
+                        and not (self.auth_pass == '' and self.auth_pass == None)):
+                    #if only basic authentication required
+                    response = self.basic_Authentication()
+                elif(not(self.server_cert_path == '' and self.server_cert_path == None)):
+                    #if only server certificate
+                    response = self.server_Verification()
+                else:
+                    try:
+                        req_body=json.loads(self.baseReqBody)
+                    except:
+                        req_body=self.baseReqBody
+                    response = requests.post(self.baseEndPointURL,data = json.dumps(req_body), headers=self.baseReqHeader)
+
+                if response != None and response != False:
+                    self.clearCertFiles()
+                    status,methodoutput,output=self.__saveResults(response)
+                else:
+                    err_msg=ws_constants.METHOD_INVALID_INPUT
+                    log.error(err_msg)
             elif ws_constants.CONTENT_TYPE_XML in self.content_type.lower() or ws_constants.CONTENT_TYPE_SOAP_XML in self.content_type.lower():
                 if not (self.baseEndPointURL is '' and self.baseReqBody is '' and self.baseReqHeader is ''):
-                    response = requests.post(self.baseEndPointURL,data=self.baseReqBody,headers=self.baseReqHeader)
-                    status,methodoutput,output=self.__saveResults(response)
+                    if (not(self.client_cert_path == '' and self.client_cert_path == None)):
+                        #if client certificates exists
+                        response = self.client_Authentication()
+                    elif(not(self.auth_uname == '' and self.auth_uname == None)
+                            and not (self.auth_pass == '' and self.auth_pass == None)):
+                        #if only basic authentication required
+                        response = self.basic_Authentication()
+                    elif(not(self.server_cert_path == '' and self.server_cert_path == None)):
+                        #if only server certificate
+                        response = self.server_Verification()
+                    else:
+                        response = requests.post(self.baseEndPointURL,data=self.baseReqBody,headers=self.baseReqHeader)
+
+                    if response != None and response != False:
+                        self.clearCertFiles()
+                        status,methodoutput,output=self.__saveResults(response)
+                    else:
+                        err_msg=ws_constants.METHOD_INVALID_INPUT
+                        log.error(err_msg)
                 else:
                     err_msg=ws_constants.METHOD_INVALID_INPUT
                     log.error(err_msg)
@@ -493,7 +558,7 @@ class WSkeywords:
         #data size check
         import sys
         try:
-            if(result[2] != None):
+            if(result[2] != None and result[2] != OUTPUT_CONSTANT):
                 headerresp = ''
                 res = result[2]
                 if type(res) == tuple:
@@ -636,23 +701,202 @@ class WSkeywords:
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
+    # keyword accepts only JKS,PEM and CERT/CRT/CER-KEY types
+    # JKS:
+    # input: <<clcert.jks>>;<<clkey.jks>>(opt);<<jkspass>>;<<servcert.jks>>(opt)
+    # PEM:
+    # input: <<clcert.pem>>;<<clkey.pem>>;<<pempass>>(opt);<<servcert.pem>>(opt)
+    # CERT/CER/CRT-KEY
+    # input: <<clcert.cert>>;<<clkey.cert>>;<<certpass>>(opt);<<servcert.cert>>(opt)
 
-     def addClientCertificate(self,filepath_key,filepath_cert,url):
+     def addClientCertificate(self,client_cert,client_key,keystore_pass,server_cert):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         err_msg=None
         output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            response=requests.get(url, cert=(filepath_cert, filepath_key))
-            log.debug(STATUS_METHODOUTPUT_UPDATE)
-            status = ws_constants.TEST_RESULT_PASS
-            methodoutput = ws_constants.TEST_RESULT_TRUE
+##            response=requests.get(url, cert=(filepath_cert, filepath_key))
+##            log.debug(STATUS_METHODOUTPUT_UPDATE)
+##            status = ws_constants.TEST_RESULT_PASS
+##            methodoutput = ws_constants.TEST_RESULT_TRUE
+            if (client_cert != '' and client_cert != None):
+                if (os.path.exists(client_cert) == True):
+                    # if client trusted cert and client trusted key files are given seperate
+                    # possible types cert/cer/crt and pem
+                    if (client_key != '' and client_key != None):
+                        if (os.path.exists(client_cert) == True):
+                            logger.print_on_console('Feature not Supported.')
+                        else:
+                            logger.print_on_console('Invalid Input: File not found')
+                    # if client trusted cert and client trusted key files are combined
+                    # possible types pem and jks
+                    else:
+                        filename,file_ext=os.path.splitext(client_cert)
+                        if file_ext.lower() == '.jks':
+                            if keystore_pass != '' and keystore_pass != None:
+                                keystore_pass = self.aes_decript(keystore_pass)
+                                extract_status = self.extract_jks(client_cert,keystore_pass)
+                                if extract_status:
+                                    logger.print_on_console('Certificate/s have been enabled.')
+                                    status = ws_constants.TEST_RESULT_PASS
+                                    methodoutput = ws_constants.TEST_RESULT_TRUE
+                            else:
+                                err_msg = ERR_AUTH_COMPONENT_MISSING
+                                logger.print_on_console(ERR_AUTH_COMPONENT_MISSING)
+                        elif file_ext.lower() == '.pem':
+                            err_msg = 'Feature not Supported.'
+                            logger.print_on_console('Feature not Supported.')
+                        else:
+                            err_msg = 'Invalid Input'
+                            logger.print_on_console('Invalid Input')
+                else:
+                    err_msg = 'Invalid Input'
+                    logger.print_on_console('Invalid Input')
+            else:
+                err_msg = ERR_AUTH_COMPONENT_MISSING
+                logger.print_on_console(ERR_AUTH_COMPONENT_MISSING)
+        except Exception as e:
+            log.error(e)
+            err_msg = str(e)
+            logger.print_on_console(str(e))
+        log.info(RETURN_RESULT)
+        return status,methodoutput,output,err_msg
+
+     def extract_jks(self,client_cert,keystore_pass):
+        extract_status = False
+        try:
+            import jks
+            keystore = jks.KeyStore.load(client_cert, keystore_pass)#,'serverkey')
+            # if any of the keys in the store use a password that is not the same as the store password:
+            # keystore.entries["key1"].decrypt("key_password")
+            for alias, pk in keystore.private_keys.items():
+                #print("Private key: %s" % pk.alias)
+                if pk.algorithm_oid == jks.util.RSA_ENCRYPTION_OID:
+                    rsaprivatepemfile = self.cert_formatter(pk.pkey, "RSA PRIVATE KEY")
+                    self.certdetails['RSA PRIVATE KEY'] = rsaprivatepemfile
+
+                try:
+                    privatepemfile  = self.cert_formatter(pk.pkey_pkcs8, "PRIVATE KEY")
+                    self.certdetails['PRIVATE KEY'] = privatepemfile
+                except Exception as e:
+                     logger.print_on_console('there is no private key with pkcs8')
+                     log.error(e)
+
+                for c in pk.cert_chain:
+                    certpemfile = self.cert_formatter(c[1], "CERTIFICATE")
+                    self.certdetails['PRIVATE CERT'] =certpemfile
+
+            for alias, c in keystore.certs.items():
+                #logger.print_on_console("Certificate:",c.alias)
+                truststorepemfile = self.cert_formatter(c.cert, "CERTIFICATE")
+                self.certdetails['TRUSTSTORE CERT'] = truststorepemfile
+
+            for alias, secretkey in keystore.secret_keys.items():
+                logger.print_on_console("------------------------------------")
+                logger.print_on_console("Secret key: %s" % secretkey.alias)
+                logger.print_on_console(" Algorithm: %s" % secretkey.algorithm)
+                logger.print_on_console(" Key size: %d bits" % secretkey.key_size)
+                logger.print_on_console(" Key: %s" % "".join("{:02x"
+                +"}".format(bytedata) for bytedata in bytearray(secretkey.key)))
+                logger.print_on_console("------------------------------------")
+
+            for each in self.certdetails:
+                extract_status = True
+                filecreated = open(each.replace(" ","")+".pem","w")
+                filecreated.write(self.certdetails[each])
+                filecreated.close()
+                self.client_cert_path = "PRIVATECERT.pem"
+                if self.certdetails['RSA PRIVATE KEY'] == "":
+                    self.client_key_path = "PRIVATEKEY.pem"
+                else:
+                    self.client_key_path = "RSAPRIVATEKEY.pem"
+                self.server_cert_path = "TRUSTSTORECERT.pem"
+
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(str(e))
+        return extract_status
+
+
+     def cert_formatter(self,certdata_bytes,certtype):
+        try:
+            import base64, textwrap
+            pemfile = ""
+            pemfile=("-----BEGIN "+ certtype+"-----\n"
+            +"\n".join(textwrap.wrap(base64.b64encode(certdata_bytes).decode('ascii'), 64))
+            +"\n-----END "+certtype+"-----")
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-        log.info(RETURN_RESULT)
-        return status,methodoutput,output,err_msg
+        return pemfile
+
+
+     def server_Verification(self):
+        logger.print_on_console('This feature is not available')
+        return ''
+
+     def basic_Authentication(self):
+        logger.print_on_console('This feature is not available')
+        return ''
+
+
+     def client_Authentication(self):
+        response=False
+        err_msg = None
+        try:
+            cert = (self.client_cert_path, self.client_key_path)
+            if (cert != (None, None)):
+            # if basic auth details are available
+                if (not(self.auth_uname == '' and self.auth_uname == None)
+                    and not (self.auth_pass == '' and self.auth_pass == None)):
+                    # if server side certificates are available
+                    if (not (self.server_cert_path == '' and self.server_cert_path == None)):
+                        log.debug('TWO WAY HANDSHAKE with basic authentication')
+                        response = requests.post(self.baseEndPointURL,
+                                                    data = self.baseReqBody,
+                                                    headers=self.baseReqHeader,
+                                                    cert=cert,
+                                                    verify=self.server_cert_path,
+                                                    auth=(self.auth_uname,self.auth_pass))
+                    else:
+                        log.debug('ONE WAY HANDSHAKE with basic authentication')
+                        response = requests.post(self.baseEndPointURL,
+                                                        data = self.baseReqBody,
+                                                        headers=self.baseReqHeader,
+                                                        cert=cert,
+                                                        verify=False,
+                                                        auth=(self.auth_uname,self.auth_pass))
+                else:
+                    if (not (self.server_cert_path == '' and self.server_cert_path == None)):
+                        log.debug('TWO WAY HANDSHAKE without basic authentication')
+                        response = requests.post(self.baseEndPointURL,
+                                                    data = self.baseReqBody,
+                                                    headers=self.baseReqHeader,
+                                                    cert=cert,
+                                                    verify=self.server_cert_path
+                                                    #auth=(self.auth_uname,self.auth_pass)
+                                                    )
+                    else:
+                        log.debug('ONE WAY HANDSHAKE without basic authentication')
+                        response = requests.post(self.baseEndPointURL,
+                                                        data = self.baseReqBody,
+                                                        headers=self.baseReqHeader,
+                                                        cert=cert,
+                                                        verify=False
+                                                        #auth=(self.auth_uname,self.auth_pass)
+                                                        )
+            else:
+                response = requests.post(self.baseEndPointURL,data=self.baseReqBody,headers=self.baseReqHeader)
+        except Exception as e:
+            log.error(e)
+            if '[SSL: CERTIFICATE_VERIFY_FAILED]' in str(e):
+                err_msg = 'Certificate Mismatched.'
+                logger.print_on_console('Certificate Mismatched.')
+            else:
+                err_msg = str(e)
+                logger.print_on_console(e)
+        return response,err_msg
 
      def parse_xml(self,input_xml,path,value,attribute_name,flag):
         template = etree.fromstring(input_xml)
@@ -788,8 +1032,48 @@ class WSkeywords:
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
         except Exception as e:
            log.error(e)
-
-           logger.print_on_console(e)
+           if ('EOF occurred in violation of protocol' in str(e)) or ('Errno' in str(e)):
+                logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
+                err_msg = ws_constants.METHOD_INVALID_INPUT
+           else:
+                logger.print_on_console(e)
+                err_msg = e
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
+
+     def setBasicAuth(self,uname,password):
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if (not(uname == '' and uname == None) and
+                not(password == '' and password == None)):
+                    self.auth_uname = uname
+                    self.auth_pass = self.aes_decript(password)
+                    log.debug(STATUS_METHODOUTPUT_UPDATE)
+                    logger.print_on_console('Basic Authentication enabled.')
+                    status = ws_constants.TEST_RESULT_PASS
+                    methodoutput = ws_constants.TEST_RESULT_TRUE
+            else:
+                log.info(ws_constants.METHOD_INVALID_INPUT)
+                err_msg = ws_constants.METHOD_INVALID_INPUT
+                logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
+        except Exception as e:
+            log.error(e)
+            err_msg = e
+            logger.print_on_console(e)
+        log.info(RETURN_RESULT)
+        return status,methodoutput,output,err_msg
+
+     def aes_decript(self,encrypted_data):
+        decrypted_data = ''
+        try:
+            encrypt_obj=encryption_utility.AESCipher()
+            decrypted_data=encrypt_obj.decrypt(encrypted_data)
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+        return decrypted_data
 
