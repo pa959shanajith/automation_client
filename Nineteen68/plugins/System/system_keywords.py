@@ -29,6 +29,7 @@ class System_Keywords():
 
     def __init__(self):
         self.encryption_obj = AESCipher()
+        self.access_denied_flag=False
         pass
 
     def getWmi(self,machine_name):
@@ -40,7 +41,11 @@ class System_Keywords():
                 if len(machine_name)==3:
                     wmi_ref = wmi.WMI(computer=machine_name[0], user=machine_name[1], password=self.encryption_obj.decrypt(machine_name[2]))
                 else:
-                    wmi_ref = wmi.WMI(machine_name[0])
+                    try:
+                        wmi_ref = wmi.WMI(machine_name[0])
+                    except Exception as e:
+                        log.error(e)
+                        self.access_denied_flag=True
             else:
                 wmi_ref = wmi.WMI()
         except Exception as error:
@@ -61,6 +66,7 @@ class System_Keywords():
         """Output: returns the systems's OS name;machine name;OS version;OS Architecture in a dictionary format"""
         os_info={}
         err_msg=None
+        self.access_denied_flag=False
         status = system_constants.TEST_RESULT_FAIL
         result = system_constants.TEST_RESULT_FALSE
         try:
@@ -92,6 +98,10 @@ class System_Keywords():
             status = system_constants.TEST_RESULT_FAIL
             result = system_constants.TEST_RESULT_FALSE
             os_info=OUTPUT_CONSTANT
+        if self.access_denied_flag==True:
+            err_msg = system_constants.ACCESS_DENIED
+            logger.print_on_console(system_constants.ACCESS_DENIED)
+            os_info=OUTPUT_CONSTANT
         return status,result,os_info,err_msg
 
     def getAllInstalledApps(self,machine_name=None):
@@ -99,6 +109,7 @@ class System_Keywords():
         """Output: returns the systems's apps_data as a list"""
         apps_data=[]
         err_msg=None
+        self.access_denied_flag=False
         status = system_constants.TEST_RESULT_FAIL
         result = system_constants.TEST_RESULT_FALSE
         try:
@@ -128,6 +139,10 @@ class System_Keywords():
             status = system_constants.TEST_RESULT_FAIL
             result = system_constants.TEST_RESULT_FALSE
             apps_data=OUTPUT_CONSTANT
+        if self.access_denied_flag==True:
+            err_msg = system_constants.ACCESS_DENIED
+            logger.print_on_console(system_constants.ACCESS_DENIED)
+            apps_data=OUTPUT_CONSTANT
         return status,result,apps_data,err_msg
 
     def getInstalledAppInfo(self,app_name,machine_name=None):
@@ -138,6 +153,7 @@ class System_Keywords():
         """Output: returns the systems's process_data as a list"""
         process_data=[]
         err_msg=None
+        self.access_denied_flag=False
         status = system_constants.TEST_RESULT_FAIL
         result = system_constants.TEST_RESULT_FALSE
         try:
@@ -161,6 +177,10 @@ class System_Keywords():
             status = system_constants.TEST_RESULT_FAIL
             result = system_constants.TEST_RESULT_FALSE
             process_data=OUTPUT_CONSTANT
+        if self.access_denied_flag==True:
+            err_msg = system_constants.ACCESS_DENIED
+            logger.print_on_console(system_constants.ACCESS_DENIED)
+            process_data=OUTPUT_CONSTANT
         return status,result,process_data,err_msg
 
     def getProcessInfo(self):
@@ -171,6 +191,7 @@ class System_Keywords():
         """Output: executes command in local machine ,where the user has set the path"""
         result_data=''
         err_msg=None
+        self.access_denied_flag=False
         machine_name=None
         path_outfile=None
         path_attrib=None
@@ -186,10 +207,10 @@ class System_Keywords():
             elif len(command_data)==5:
                 machine_name = command_data[1:4]
                 path_outfile= command_data[4]
-            if machine_name is not None or SYSTEM_OS.lower()=="windows":
+            if machine_name[0] is not None or SYSTEM_OS.lower()=="windows":
                 wmi_ref=self.getWmi(machine_name)
                 if wmi_ref is not None:
-                    if machine_name is None:
+                    if machine_name[0] is None:
                         path_outfile=os.environ["NINETEEN68_HOME"]+"/Nineteen68/plugins/System/nineteen68_system.txt"
                         process_id, process_status = wmi_ref.Win32_Process.Create(CommandLine="cmd /c "+command_toexecute+" > "+path_outfile)
                     else:
@@ -246,6 +267,10 @@ class System_Keywords():
             err_msg = system_constants.ERROR_CODE_DICT['ERR_EXECUTE_COMMAND']
             status = system_constants.TEST_RESULT_FAIL
             result = system_constants.TEST_RESULT_FALSE
+            result_data=OUTPUT_CONSTANT
+        if self.access_denied_flag==True:
+            err_msg = system_constants.ACCESS_DENIED
+            logger.print_on_console(system_constants.ACCESS_DENIED)
             result_data=OUTPUT_CONSTANT
         return status,result,result_data,err_msg
 
