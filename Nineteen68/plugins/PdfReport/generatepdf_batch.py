@@ -46,10 +46,7 @@ class WatchThread(threading.Thread):
                 log.debug(">>>>>>>>"+source+'/'+filename)
                 try:
                     with open(report_path, 'wb+') as output, open(source+'/'+filename, 'rb') as input:
-                        dat = json.loads(input.read())
-                        filename = filename.replace(".json","")
-                        dat['overallstatus'][0]['scenarioName'] = filename
-                        output.write(json.dumps(dat))
+                        output.write(input.read()))
                         #output.write(data)
                     #shutil.copyfile(source, os.getcwd())
                     #os.rename(filename, report_path)
