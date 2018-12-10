@@ -966,9 +966,9 @@ class ClientWindow(wx.Frame):
         controller.disconnect_flag=True
         global socketIO
         logger.print_on_console('Disconnected from Nineteen68 server')
+        stat = self.killChildWindow()
+        if stat[1]: socketIO.emit('scrape','Terminate')
         self.killSocket(True)
-        self.killDebugWindow()
-        self.killScrapeWindow()
         self.Destroy()
         controller.kill_process()
         if SYSTEM_OS == "Windows":
@@ -981,10 +981,8 @@ class ClientWindow(wx.Frame):
 
     def OnTerminate(self, event, state=''):
         global execution_flag
-        self.killDebugWindow()
-        if self.killScrapeWindow():
-            socketIO.emit('scrape','Terminate')
-        self.killPauseWindow()
+        stat = self.killChildWindow()
+        if stat[1]: socketIO.emit('scrape','Terminate')
         if(state=="term_exec"):
             controller.disconnect_flag=True
             print ""
@@ -1057,8 +1055,9 @@ class ClientWindow(wx.Frame):
             log.error("Error while disconnecting from server")
             log.error(e)
 
-    def killDebugWindow(self):
+    def killChildWindow(self):
         #Close the debug window
+        stat = []
         flag=False
         try:
             if (self.debugwindow != None) and (bool(self.debugwindow) != False):
@@ -1066,11 +1065,10 @@ class ClientWindow(wx.Frame):
                 flag = True
             self.debugwindow = None
         except Exception as e:
-            log.error("Error while killing debug window")
+            log.error("Error while closing debug window")
             log.error(e)
-        return flag
+        stat.append(flag)
 
-    def killScrapeWindow(self):
         #Close the scrape window
         flag=False
         try:
@@ -1079,11 +1077,10 @@ class ClientWindow(wx.Frame):
                 flag = True
             self.scrapewindow = None
         except Exception as e:
-            log.error("Error while killing scrape window")
+            log.error("Error while closing scrape window")
             log.error(e)
-        return flag
+        stat.append(flag)
 
-    def killPauseWindow(self):
         #Close the pause/display window
         flag=False
         try:
@@ -1092,9 +1089,22 @@ class ClientWindow(wx.Frame):
                 flag = True
             self.pausewindow = None
         except Exception as e:
-            log.error("Error while killing pause window")
+            log.error("Error while closing pause window")
             log.error(e)
-        return flag
+        stat.append(flag)
+
+        #Close the PDF plugin window
+        flag=False
+        try:
+            if (self.pluginPDF != None) and (bool(self.pluginPDF) != False):
+                self.pluginPDF.OnClose()
+                flag = True
+            self.pluginPDF = None
+        except Exception as e:
+            log.error("Error while unloading PDF plugin")
+            log.error(e)
+        stat.append(flag)
+        return stat
 
     def test(self,event):
         global mobileScrapeFlag,qcConFlag,mobileWebScrapeFlag,desktopScrapeFlag
