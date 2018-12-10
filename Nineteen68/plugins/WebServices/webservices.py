@@ -365,14 +365,14 @@ class WSkeywords:
         try:
             if ws_constants.CONTENT_TYPE_JSON in self.content_type.lower():
 
-                if (not(self.client_cert_path == '' and self.client_cert_path == None)):
+                if (not(self.client_cert_path == '' or self.client_cert_path == None)):
                     #if client certificates exists
                     response,err_msg = self.client_Authentication()
-                elif(not(self.auth_uname == '' and self.auth_uname == None)
-                        and not (self.auth_pass == '' and self.auth_pass == None)):
+                elif(not(self.auth_uname == '' or self.auth_uname == None)
+                        and not (self.auth_pass == '' or self.auth_pass == None)):
                     #if only basic authentication required
                     response = self.basic_Authentication()
-                elif(not(self.server_cert_path == '' and self.server_cert_path == None)):
+                elif(not(self.server_cert_path == '' or self.server_cert_path == None)):
                     #if only server certificate
                     response = self.server_Verification()
                 else:
@@ -390,14 +390,14 @@ class WSkeywords:
                     log.error(err_msg)
             elif ws_constants.CONTENT_TYPE_XML in self.content_type.lower() or ws_constants.CONTENT_TYPE_SOAP_XML in self.content_type.lower():
                 if not (self.baseEndPointURL is '' and self.baseReqBody is '' and self.baseReqHeader is ''):
-                    if (not(self.client_cert_path == '' and self.client_cert_path == None)):
+                    if (not(self.client_cert_path == '' or self.client_cert_path == None)):
                         #if client certificates exists
                         response = self.client_Authentication()
-                    elif(not(self.auth_uname == '' and self.auth_uname == None)
-                            and not (self.auth_pass == '' and self.auth_pass == None)):
+                    elif(not(self.auth_uname == '' or self.auth_uname == None)
+                            and not (self.auth_pass == '' or self.auth_pass == None)):
                         #if only basic authentication required
                         response = self.basic_Authentication()
-                    elif(not(self.server_cert_path == '' and self.server_cert_path == None)):
+                    elif(not(self.server_cert_path == '' or self.server_cert_path == None)):
                         #if only server certificate
                         response = self.server_Verification()
                     else:
