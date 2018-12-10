@@ -32,7 +32,9 @@ class dispatch {
              "activityIndicators":XCUIApplication(bundleIdentifier: bundle_id).activityIndicators,
              "progressIndicators":XCUIApplication(bundleIdentifier: bundle_id).progressIndicators,
              "textViews":XCUIApplication(bundleIdentifier: bundle_id).textViews,
-             "XCUIElementTypePickerWheel":XCUIApplication(bundleIdentifier: bundle_id).pickerWheels]
+             "XCUIElementTypePickerWheel":XCUIApplication(bundleIdentifier: bundle_id).pickerWheels,
+             "empty":XCUIApplication(bundleIdentifier: bundle_id).mattes
+        ]
         
         
         switch action {
@@ -62,13 +64,15 @@ class dispatch {
         case "verifyhidden":return verify().verify_hidden(bundle_id: bundle_id, label: label, querytype:  maindict[key]!)
         case "verifyvisible":return verify().verify_visible(bundle_id: bundle_id, label: label, querytype:  maindict[key]!)
         case "LaunchApplication":return run_and_kill().App_Launch(bundle_id: bundle_id)
+        case "closeapplication":return run_and_kill().close_application(bundle_id: bundle_id)
         case "setvalue": return performing_guestures().set_value(querytype: maindict[key]!, label: label, input: input_text)
         case "getvalue": return performing_guestures().get_value(querytype: maindict[key]!, label: label)
         case "verifytext": return verify().verify_text(bundle_id: bundle_id, label: label, querytype: maindict[key]!, input: input_text)
 
         
         default:
-            print("invalid action")
+            errrorhandle().send_error(message: "keyword is not supported")
+            return "fail"
         }
     return "pass"
     

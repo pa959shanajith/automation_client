@@ -37,7 +37,7 @@ class execution_side{
             var num=strnum!
             var len = Int(num.intValue)
             if len == 0 {
-                return "0"
+                return "empty"
             }
             data = client.read(len)
             strnum = NSString(bytes: data!, length: data!.count, encoding: String.Encoding.utf8.rawValue)
@@ -57,7 +57,7 @@ class execution_side{
             var num=strnum!
             var len = Int(num.intValue)
             if len == 0 {
-                return "0"
+                return "empty"
             }
             data = client.read(len)
             strnum = NSString(bytes: data!, length: data!.count, encoding: String.Encoding.utf8.rawValue)
@@ -78,7 +78,7 @@ class execution_side{
         var num=strnum!
         var len = Int(num.intValue)
             if len == 0 {
-                return "0"
+                return ""
             }
         data = client.read(len)
         strnum = NSString(bytes: data!, length: data!.count, encoding: String.Encoding.utf8.rawValue)
@@ -107,6 +107,7 @@ class execution_side{
         switch keyword {
       
         case "launchapplication": bundle_id = input ; result[0] = dispatch().get_value(bundle_id: input,action: "LaunchApplication");return result
+        case "closeapplication": result[0] = dispatch().get_value(bundle_id: bundle_id, action: "closeapplication");return result
             
         case "press": result[0] = dispatch().get_value(bundle_id: bundle_id, action: "tap" , label : label,key : labeltype);return result
         case "presselement":result[0] =  dispatch().get_value(bundle_id: bundle_id, action: "tap" , label : label,key : labeltype);return result
@@ -191,7 +192,8 @@ class execution_side{
 
 
         default:
-            return(["no keyword found"])
+            errrorhandle().send_error(message: "keyword is not supported")
+            return ["fail"]
         }
         
         

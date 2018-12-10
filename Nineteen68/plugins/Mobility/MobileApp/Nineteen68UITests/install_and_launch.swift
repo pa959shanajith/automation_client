@@ -17,14 +17,13 @@ class run_and_kill{
     
     func App_Launch(bundle_id:String)->String{
         let app=XCUIApplication(bundleIdentifier: bundle_id)
-        if app.exists {
-            app.launch()
-            return "pass"
-        }
-        else {
-            errrorhandle().send_error(message: "invalid bundle id")
-            return "fail"
-        }
+        app.launch()
+        return "pass"
+    }
+    
+    func close_application(bundle_id:String)-> String{
+        XCUIApplication(bundleIdentifier: bundle_id).terminate()
+        return "pass"
     }
     
     //launch app with siri

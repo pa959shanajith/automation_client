@@ -175,6 +175,10 @@ class performing_guestures{
     
     
     func swipe_up(querytype:XCUIElementQuery,label:String)-> String{
+        if (label == "empty") {
+            XCUIApplication(bundleIdentifier: bundle_id).swipeUp()
+            return "pass"
+        }
         if label.hasPrefix("bound") {
             let str_label = String(label.dropFirst(5))
             let i = Int(str_label)
@@ -200,6 +204,10 @@ class performing_guestures{
     
     
     func swipe_down(querytype:XCUIElementQuery,label:String)-> String{
+        if (label == "empty") {
+            XCUIApplication(bundleIdentifier: bundle_id).swipeDown()
+            return "pass"
+        }
         if label.hasPrefix("bound") {
             let str_label = String(label.dropFirst(5))
             let i = Int(str_label)
@@ -224,6 +232,10 @@ class performing_guestures{
     
     
     func swipe_right(querytype:XCUIElementQuery,label:String)-> String{
+        if (label == "empty") {
+            XCUIApplication(bundleIdentifier: bundle_id).swipeRight()
+            return "pass"
+        }
         if label.hasPrefix("bound") {
             let str_label = String(label.dropFirst(5))
             let i = Int(str_label)
@@ -250,6 +262,10 @@ class performing_guestures{
     
     
     func swipe_left(querytype:XCUIElementQuery,label:String)-> String {
+        if (label == "empty") {
+            XCUIApplication(bundleIdentifier: bundle_id).swipeLeft()
+            return "pass"
+        }
         if label.hasPrefix("bound") {
             let str_label = String(label.dropFirst(5))
             let i = Int(str_label)
@@ -474,19 +490,4 @@ class performing_guestures{
     
     }
 
-    
-
-
-    
-
-
-
-
-/*
- 
- func pinch(withScale: CGFloat, velocity: CGFloat)
- Sends a pinching gesture with two touches.
- 
- func rotate(CGFloat, withVelocity: CGFloat)
- Sends a rotation gesture with two touches.*/
 
