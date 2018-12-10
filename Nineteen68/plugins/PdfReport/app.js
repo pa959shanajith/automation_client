@@ -1,24 +1,44 @@
 
 var source = $("#ajax-comment").html();
 
-Handlebars.registerHelper("getColor", function(overAllStatus) {
+Handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
+    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
+
+Handlebars.registerHelper('ifnotEquals', function(arg1, arg2, options) {
+    return (arg1 != arg2) ? options.fn(this) : options.inverse(this);
+});
+
+Handlebars.registerHelper('getStyle', function(StepDescription) {
+    if(StepDescription.indexOf("Testscriptname") !== -1 || StepDescription.indexOf("TestCase Name") !== -1) return "bold";
+    else return;
+});
+
+Handlebars.registerHelper('getClass', function(StepDescription) {
+    if(StepDescription.indexOf("Testscriptname") !== -1 || StepDescription.indexOf("TestCase Name") !== -1) return "collapsible-tc demo1 txtStepDescription";
+    else return "rDstepDes tabCont";
+});
+
+Handlebars.registerHelper('getColor', function(overAllStatus) {
 	if(overAllStatus == "Pass") return "green";
 	else if(overAllStatus == "Fail")    return "red";
 	else if(overAllStatus == "Terminate")    return "#faa536";
 });
 
-Handlebars.registerHelper("validateImageID", function (path,slno) {
+Handlebars.registerHelper('validateImageID', function(path,slno) {
 	if(path!=null) return "#img-"+slno;
 	else return '';
 });
 
-Handlebars.registerHelper("validateImagePath", function (path) {
+Handlebars.registerHelper('validateImagePath', function(path) {
 	if(path!=null) return 'block';
 	else return 'none';
 });
 
-Handlebars.registerHelper("rehash", function(path) {
-	return path;
+Handlebars.registerHelper('getDataURI', function(uri) {
+	var f="data:image/PNG;base64,";
+	if(uri=="fail" || uri=="unavailableLocalServer") return f;
+	else return f+uri;
 });
 
 var template = Handlebars.compile(source);
@@ -181,8 +201,8 @@ function adddetails(obj){
 
 
 $.getJSON("report.json",function(data){
-	data1 = adddetails(data);
-	var dat = template(data1);
+	//data1 = adddetails(data);
+	var dat = template(data);
 	$("#maincontainer1").append(dat);   
 	$('.ss').each(function(i,elem){
 		$('#'+$($("[num='img-"+i+"']")[0]).attr('num')).attr('src',$(elem).text());
