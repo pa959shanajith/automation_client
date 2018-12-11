@@ -17,7 +17,7 @@ class WatchThread(threading.Thread):
     def run(self):
         source = self.src
         target = self.tgt
-        log.debug(source,target)
+        log.debug(str(source)+", "+str(target))
         '''
         with open(source) as f:
             lines = f.readlines()
@@ -26,7 +26,7 @@ class WatchThread(threading.Thread):
             with open(report_path, "w") as f1:
                 f1.writelines(lines)
         '''
-        log.debug("1",os.listdir(source))
+        log.debug("1"+str(os.listdir(source)))
         path_to_watch = source
         #before = dict ([(f, None) for f in os.listdir (path_to_watch)])
         before = []
@@ -37,29 +37,31 @@ class WatchThread(threading.Thread):
             after = dict ([(f, None) for f in os.listdir (path_to_watch)])
             added = [f for f in after if not f in before]
             removed = [f for f in before if not f in after]
-            if added: log.debug("Added: ", ", ".join (added))
-            if removed: log.debug("Removed: ", ", ".join (removed))
+            if added: log.debug("Added: "+", ".join (added))
+            if removed: log.debug("Removed: "+", ".join (removed))
             before = after
             for filename in added:
-                if(filename.split('.')[-1].lower() != 'json'):
+                extn=filename.split('.')[-1].lower()
+                file_name=filename.split('.')[0]
+                if(extn != 'json'):
                     continue
                 log.debug(">>>>>>>>"+source+'/'+filename)
                 try:
                     with open(report_path, 'wb+') as output, open(source+'/'+filename, 'rb') as input:
-                        output.write(input.read()))
+                        output.write(input.read())
                         #output.write(data)
                     #shutil.copyfile(source, os.getcwd())
                     #os.rename(filename, report_path)
-                    pdfkit.from_file(template_path, filename+'.pdf', options=opts, configuration=pdfkit_conf)
+                    pdfkit.from_file(template_path, file_name+'.pdf', options=opts, configuration=pdfkit_conf)
                     try:
                         try:
-                            os.remove(target+"\\"+filename+'.pdf')
+                            os.remove(target+"\\"+file_name+'.pdf')
                         except:
                             pass
-                        shutil.move(os.getcwd()+"\\"+filename+'.pdf', target)
-                        logger.print_on_console(filename+".pdf Created Successfully")
+                        shutil.move(os.getcwd()+"\\"+file_name+'.pdf', target)
+                        logger.print_on_console(file_name+".pdf Created Successfully")
                     except Exception as e:
-                        emsg = filename+".pdf Created Successfully. Fail to move "+os.getcwd()+"\\"+filename+'.pdf'+" to "+ target
+                        emsg = file_name+".pdf Created Successfully. Fail to move "+os.getcwd()+"\\"+file_name+'.pdf'+" to "+ target
                         logger.print_on_console(emsg)
                         log.error(emsg)
                         log.error(e)
