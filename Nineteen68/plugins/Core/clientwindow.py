@@ -189,7 +189,7 @@ class MainNamespace(BaseNamespace):
         wxObject.choice=wxObject.rbox.GetStringSelection()
         logger.print_on_console(str(wxObject.choice)+' is Selected')
         if wxObject.choice == 'Normal':
-            wxObject.killDebugWindow()
+            wxObject.killChildWindow(debug=True)
         wxObject.debug_mode=False
         wxObject.breakpoint.Disable()
         if wxObject.choice in ['Stepwise','RunfromStep']:
@@ -684,7 +684,7 @@ class TestThread(threading.Thread):
             self.wxObject.terminatebutton.Disable()
             testcasename = handler.testcasename
             if self.action==DEBUG:
-                self.wxObject.killDebugWindow()
+                self.wxObject.killChildWindow(debug=True)
                 if (len(testcasename) > 0 or apptype.lower() not in plugins_list):
                     socketIO.emit('result_debugTestCase',status)
                 else:
@@ -696,7 +696,7 @@ class TestThread(threading.Thread):
             status=TERMINATE
             if socketIO is not None:
                 if self.action==DEBUG:
-                    self.wxObject.killDebugWindow()
+                    self.wxObject.killChildWindow(debug=True)
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
                     socketIO.emit('result_executeTestSuite',status)
@@ -948,7 +948,7 @@ class ClientWindow(wx.Frame):
         if self.choice == 'Normal':
             self.breakpoint.Clear()
             self.breakpoint.Disable()
-            self.killDebugWindow()
+            self.killChildWindow(debug=True)
         self.debug_mode=False
         self.breakpoint.Disable()
         if self.choice in ['Stepwise','RunfromStep']:
@@ -966,7 +966,7 @@ class ClientWindow(wx.Frame):
         controller.disconnect_flag=True
         global socketIO
         logger.print_on_console('Disconnected from Nineteen68 server')
-        stat = self.killChildWindow()
+        stat = self.killChildWindow(True,True,True,True)
         if stat[1]: socketIO.emit('scrape','Terminate')
         self.killSocket(True)
         self.Destroy()
@@ -981,7 +981,7 @@ class ClientWindow(wx.Frame):
 
     def OnTerminate(self, event, state=''):
         global execution_flag
-        stat = self.killChildWindow()
+        stat = self.killChildWindow(True,True,True,True)
         if stat[1]: socketIO.emit('scrape','Terminate')
         if(state=="term_exec"):
             controller.disconnect_flag=True
@@ -1055,54 +1055,58 @@ class ClientWindow(wx.Frame):
             log.error("Error while disconnecting from server")
             log.error(e)
 
-    def killChildWindow(self):
+    def killChildWindow(self, debug=False, scrape=False, display=False, pdf=False):
         #Close the debug window
         stat = []
         flag=False
-        try:
-            if (self.debugwindow != None) and (bool(self.debugwindow) != False):
-                self.debugwindow.Destroy()
-                flag = True
-            self.debugwindow = None
-        except Exception as e:
-            log.error("Error while closing debug window")
-            log.error(e)
+        if debug:
+            try:
+                if (self.debugwindow != None) and (bool(self.debugwindow) != False):
+                    self.debugwindow.Destroy()
+                    flag = True
+                self.debugwindow = None
+            except Exception as e:
+                log.error("Error while closing debug window")
+                log.error(e)
         stat.append(flag)
 
         #Close the scrape window
         flag=False
-        try:
-            if (self.scrapewindow != None) and (bool(self.scrapewindow) != False):
-                self.scrapewindow.Destroy()
-                flag = True
-            self.scrapewindow = None
-        except Exception as e:
-            log.error("Error while closing scrape window")
-            log.error(e)
+        if scrape:
+            try:
+                if (self.scrapewindow != None) and (bool(self.scrapewindow) != False):
+                    self.scrapewindow.Destroy()
+                    flag = True
+                self.scrapewindow = None
+            except Exception as e:
+                log.error("Error while closing scrape window")
+                log.error(e)
         stat.append(flag)
 
         #Close the pause/display window
         flag=False
-        try:
-            if (self.pausewindow != None) and (bool(self.pausewindow) != False):
-                self.pausewindow.OnOk()
-                flag = True
-            self.pausewindow = None
-        except Exception as e:
-            log.error("Error while closing pause window")
-            log.error(e)
+        if display:
+            try:
+                if (self.pausewindow != None) and (bool(self.pausewindow) != False):
+                    self.pausewindow.OnOk()
+                    flag = True
+                self.pausewindow = None
+            except Exception as e:
+                log.error("Error while closing pause window")
+                log.error(e)
         stat.append(flag)
 
         #Close the PDF plugin window
         flag=False
-        try:
-            if (self.pluginPDF != None) and (bool(self.pluginPDF) != False):
-                self.pluginPDF.OnClose()
-                flag = True
-            self.pluginPDF = None
-        except Exception as e:
-            log.error("Error while unloading PDF plugin")
-            log.error(e)
+        if pdf:
+            try:
+                if (self.pluginPDF != None) and (bool(self.pluginPDF) != False):
+                    self.pluginPDF.OnClose()
+                    flag = True
+                self.pluginPDF = None
+            except Exception as e:
+                log.error("Error while unloading PDF plugin")
+                log.error(e)
         stat.append(flag)
         return stat
 
