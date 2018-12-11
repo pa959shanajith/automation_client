@@ -19,10 +19,10 @@ class WatchThread(threading.Thread):
         source = self.src
         target = self.tgt
         dest_file = self.dst
-        log.debug(source,target)
-        log.debug(source, os.getcwd())
+        log.debug(str(source)+", "+str(target))
+        log.debug(str(source)+", "+os.getcwd())
         filename = source.split('\\')[-1]
-        log.debug("source: " ,filename)
+        log.debug("source: "+filename)
         '''
         with open(source) as f:
             lines = f.readlines()
