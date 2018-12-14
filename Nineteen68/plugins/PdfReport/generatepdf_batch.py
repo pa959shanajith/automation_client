@@ -1,4 +1,5 @@
-import os, json, wx, shutil, threading, time, pdfkit
+import os, json, wx, shutil, threading, time
+from pdfkitlib_override import pdfkit
 import logger
 import logging
 log = logging.getLogger('generatepdf_batch.py')

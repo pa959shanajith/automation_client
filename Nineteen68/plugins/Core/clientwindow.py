@@ -493,6 +493,14 @@ class MainNamespace(BaseNamespace):
             log.error(e)
             logger.print_on_console('Exception while Remote Disconnect')
 
+    def on_disconnect(self, *args):
+        logger.print_on_console('Disconnected from Nineteen68 server')
+        wxObject.connectbutton.SetBitmapLabel(wxObject.connect_img)
+        wxObject.connectbutton.SetName('connect')
+        wxObject.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
+        wxObject.schedule.Disable()
+        wxObject.connectbutton.Enable()
+
 
 class SocketThread(threading.Thread):
     """Test Worker Thread Class."""
