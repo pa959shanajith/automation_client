@@ -1,4 +1,5 @@
-import os, json, wx, shutil, threading, pdfkit
+import os, json, wx, shutil, threading
+from pdfkitlib_override import pdfkit
 import logger
 import logging
 log = logging.getLogger('generatepdf.py')
@@ -95,7 +96,7 @@ class GeneratePDFReport(wx.Frame):
         self.Centre()
         self.Show()
 
-    def OnClose(self, event):
+    def OnClose(self, *event):
         self.Destroy()
         try:
             os.remove(report_path)

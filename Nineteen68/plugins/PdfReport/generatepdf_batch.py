@@ -1,4 +1,5 @@
-import os, json, wx, shutil, threading, time, pdfkit
+import os, json, wx, shutil, threading, time
+from pdfkitlib_override import pdfkit
 import logger
 import logging
 log = logging.getLogger('generatepdf_batch.py')
@@ -102,7 +103,7 @@ class GeneratePDFReportBatch(wx.Frame):
         self.Centre()
         self.Show()
 
-    def OnClose(self, event):
+    def OnClose(self, *event):
         if self.watchThread is not None:
             self.watchThread.keep_running = False
             self.watchThread.join()

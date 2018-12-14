@@ -9,7 +9,8 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import os, pdfkit
+import os
+from pdfkitlib_override import pdfkit
 from generatepdf import GeneratePDFReport
 from generatepdf_batch import GeneratePDFReportBatch
 
