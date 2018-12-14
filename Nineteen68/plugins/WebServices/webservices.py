@@ -337,6 +337,8 @@ class WSkeywords:
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         output=OUTPUT_CONSTANT
         try:
+            if type(response) == tuple:
+                response=response[0]
             logger.print_on_console('Status code: ',response.status_code)
             log.info('Status code: ')
             log.info(response.status_code)
@@ -851,7 +853,7 @@ class WSkeywords:
                 if (not(self.auth_uname == '' and self.auth_uname == None)
                     and not (self.auth_pass == '' and self.auth_pass == None)):
                     # if server side certificates are available
-                    if (not (self.server_cert_path == '' and self.server_cert_path == None)):
+                    if (not (self.server_cert_path == '' or self.server_cert_path == None)):
                         log.debug('TWO WAY HANDSHAKE with basic authentication')
                         response = requests.post(self.baseEndPointURL,
                                                     data = self.baseReqBody,
@@ -868,7 +870,7 @@ class WSkeywords:
                                                         verify=False,
                                                         auth=(self.auth_uname,self.auth_pass))
                 else:
-                    if (not (self.server_cert_path == '' and self.server_cert_path == None)):
+                    if (not (self.server_cert_path == '' or self.server_cert_path == None)):
                         log.debug('TWO WAY HANDSHAKE without basic authentication')
                         response = requests.post(self.baseEndPointURL,
                                                     data = self.baseReqBody,
