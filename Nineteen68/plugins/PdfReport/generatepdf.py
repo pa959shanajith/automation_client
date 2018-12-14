@@ -96,7 +96,7 @@ class GeneratePDFReport(wx.Frame):
         self.Centre()
         self.Show()
 
-    def OnClose(self, event):
+    def OnClose(self, *event):
         self.Destroy()
         try:
             os.remove(report_path)

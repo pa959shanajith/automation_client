@@ -103,7 +103,7 @@ class GeneratePDFReportBatch(wx.Frame):
         self.Centre()
         self.Show()
 
-    def OnClose(self, event):
+    def OnClose(self, *event):
         if self.watchThread is not None:
             self.watchThread.keep_running = False
             self.watchThread.join()
