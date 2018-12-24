@@ -10,18 +10,39 @@
 #-------------------------------------------------------------------------------
 
 import xml.etree.ElementTree as ET
-
+import ast
 import logger
 from generic_constants import *
 import core_utils
 
-
+import json
 import logging
 from constants import *
 from lxml import etree
 log = logging.getLogger('xml_operations.py')
 class XMLOperations():
-    def get_block_count(self,input_string,input_tag):
+
+    def build_dict(self,json_obj):
+     keys={}
+     if isinstance(json_obj,dict):
+      for key,value in json_obj.items():
+         if isinstance(value,dict):
+            keys[key]=value
+            keys.update(self.build_dict(value))
+         elif isinstance(value,list):
+             keys[key]=value
+             log.debug(key,value)
+             val=None
+             if len(value)>0:
+                val=self.build_dict(value[0])
+             if val!=None:
+                keys.update(val)
+         else:
+            keys[key]=value
+      return keys
+
+
+    def get_block_count(self,input_string,input_tag,*args):
         """
         def : get_block_count
         purpose : get the count of blocks present in the input XML
@@ -32,44 +53,92 @@ class XMLOperations():
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
         block_count = 0
+        block_number=-1
         err_msg=None
+        exception_json=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-##            root = ET.fromstring(str(input_string))
+
+            encoded_inp_string=input_string
+            json_obj=None
             if isinstance(input_string,unicode):
-                root = ET.fromstring(input_string.encode('utf-8'))
+                encoded_inp_string=input_string.encode('utf-8')
+            try:
+                json_obj=json.loads(encoded_inp_string)
+                if len(args)>0:
+                    block_number=int(args[0])-1
+            except Exception as e:
+               try:
+                    json_obj=ast.literal_eval(encoded_inp_string)
+               except Exception as e:
+                    log.error(e)
+                    exception_json=e
+
+##            print json_obj
+            if json_obj != None:
+                #json logic
+                json_obj_dict=self.build_dict(json_obj)
+                if(json_obj_dict.has_key(input_tag)):
+                    log.info(json_obj_dict)
+                    value=json_obj_dict[input_tag]
+                    if isinstance(value,list):
+                        if block_number>-1:
+                            block_count=len(value[block_number])
+                        else:
+                            block_count=len(value)
+                    elif isinstance(value,dict) or isinstance(value,unicode) or isinstance(value,str):
+                        block_count=1
+                    if(block_count>0):
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                    log.info("Number of blocks in input Json :", block_count)
+                    logger.print_on_console("Number of blocks in input Json:  ",block_count)
+                else:
+                    err_msg=ERR_XML
+
             else:
-                root = ET.fromstring(input_string)
-            log.debug('Root object created with input string')
-            items=[]
-            ##vishvas.a 17/06/06 Defect #578 ALM
-            #this condition checks if the XML type received is SOAP type
-            #if true then "items" tag names are added using looping
-            #else the regular flow continues
-            if 'Envelope' in root.tag and root.tag.split('}')[1] == 'Envelope':
-                for elem in root.iter():
-                    tag = elem.tag.split('}')[1]
-                    if tag == input_tag:
-                        items.append(tag)
-            else:
-##                items = root.getiterator(str(input_tag))
-                items = root.getiterator(input_tag)
-##            items = root.getiterator(str(input_tag))
-            log.debug('Getting children node from the root')
-            if len(items) > 0:
-                log.debug('There are children in the root node, get the total number of children')
-                block_count = len(items)
-##                log.info('Number of blocks in input XML :'+ str( block_count))
-                log.info('Number of blocks in input XML :', block_count)
-                logger.print_on_console("Number of blocks in input XML:  ",block_count)
-                log.info(STATUS_METHODOUTPUT_UPDATE)
-                status = TEST_RESULT_PASS
-                methodoutput = TEST_RESULT_TRUE
+                root = ET.fromstring(encoded_inp_string)
+                log.debug('Root object created with input string')
+                items=[]
+                ##vishvas.a 17/06/06 Defect #578 ALM
+                #this condition checks if the XML type received is SOAP type
+                #if true then "items" tag names are added using looping
+                #else the regular flow continues
+                if 'Envelope' in root.tag and root.tag.split('}')[1] == 'Envelope':
+                    for elem in root.iter():
+                        tag = elem.tag.split('}')[1]
+                        if tag == input_tag:
+                            items.append(tag)
+                else:
+    ##                items = root.getiterator(str(input_tag))
+                    items = root.getiterator(input_tag)
+    ##            items = root.getiterator(str(input_tag))
+                log.debug('Getting children node from the root')
+                if len(items) > 0:
+                    log.debug('There are children in the root node, get the total number of children')
+                    block_count = len(items)
+    ##                log.info('Number of blocks in input XML :'+ str( block_count))
+                    log.info('Number of blocks in input XML :', block_count)
+                    logger.print_on_console("Number of blocks in input XML:  ",block_count)
+                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
+
+
+
+
+
         except Exception as e:
             log.error(e)
             if isinstance(e,ET.ParseError):
                 err_msg=ERR_XML
+            elif isinstance(exception_json,ValueError):
+                err_msg="Invalid json input"
+
             else:
+                print e
+                import traceback
+                traceback.print_exc()
                 err_msg=EXCEPTION_OCCURED
         if err_msg!=None:
             log.error(err_msg)
@@ -77,7 +146,7 @@ class XMLOperations():
         log.info(RETURN_RESULT)
         return status,methodoutput,block_count,err_msg
 
-    def get_tag_value(self,input_string,block_number,input_tag,child_tag):
+    def get_tag_value(self,input_string,block_number,input_tag,child_tag,*args):
         """
         def : get_tag_value
         purpose : get_tag_value is used to get the Tag Value of the specified tag in the given XML
@@ -112,7 +181,7 @@ class XMLOperations():
             else:
 ##                items = root.getiterator(str(input_tag))
                 items = root.getiterator(input_tag)
-##            items = root.getiterator(str(input_tag))
+            log.info(items)
             log.debug('Getting children node from the root')
             if len(items) > 0:
                 log.debug('There are children in the root node, get the total number of children')
@@ -120,7 +189,11 @@ class XMLOperations():
                 block_number = int(block_number)
                 block = items[block_number-1].getchildren()
 ##                log.info('Block number: ' + str(block_number))
-                log.info('Block number: ',block_number)
+                log.info('Block number: ')
+                log.info(block_number)
+                if len(block)==0:
+                    block=[items[0]]
+
                 for child in block:
                     log.info('Iterating child in the block')
                     # added condition in 'or' for SOAP types
@@ -128,19 +201,34 @@ class XMLOperations():
 ##                                and child.tag.split('}')[1] == str(child_tag)):
                     if child.tag == child_tag or ('}' in child.tag
                         and child.tag.split('}')[1] == child_tag):
-                        log.info('Child mathed with the input child tag')
-                        tagvalue =  child.text
-                        logger.print_on_console('Tag : ',input_tag, 'Tag Value : ',tagvalue)
-                        log.info('Got the child text value and stored in tagvalue')
-                        log.info(STATUS_METHODOUTPUT_UPDATE)
-                        status = TEST_RESULT_PASS
-                        methodoutput = TEST_RESULT_TRUE
+                        log.info('Child matched with the input child tag')
+                        if len(args)>0:
+                            attribute=args[0]
+                            attribute_dict=child.attrib
+                            if attribute_dict.has_key(attribute):
+                                tagvalue=attribute_dict[attribute]
+                                logger.print_on_console('Tag Attribute : ',attribute, ' Tag Value : ',tagvalue)
+                                log.info('Got the child attribute value and stored in tagvalue')
+                                log.info(STATUS_METHODOUTPUT_UPDATE)
+                                status = TEST_RESULT_PASS
+                                methodoutput = TEST_RESULT_TRUE
+                            else:
+                                logger.print_on_console('Invalid attribute key')
+                                log.info('Invalid attribute key')
+
+
+                        else:
+                            tagvalue =  child.text
+                            logger.print_on_console('Tag : ',input_tag, ' Tag Value : ',tagvalue)
+                            log.info('Got the child text value and stored in tagvalue')
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                            status = TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
+                        break
                     else:
                         invalidinput = True
                 if status == TEST_RESULT_FAIL:
-                    err
-                    log.info(INVALID_INPUT + 'Please check the input tag')
-                    logger.print_on_console(INVALID_INPUT , 'Please check the input tag')
+                    err_msg=INVALID_INPUT + ' Please check the input tag'
         except Exception as e:
             log.error(e)
             if isinstance(e,ValueError):
@@ -167,60 +255,106 @@ class XMLOperations():
         methodoutput = TEST_RESULT_FALSE
         block_count = 0
         blockvalue = []
+        exception_json=None
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-##            root = ET.fromstring(str(input_string))
+            encoded_inp_string=input_string
+            json_obj=None
             if isinstance(input_string,unicode):
-                root = ET.fromstring(input_string.encode('utf-8'))
+                encoded_inp_string=input_string.encode('utf-8')
+            try:
+                json_obj=json.loads(encoded_inp_string)
+
+            except Exception as e:
+                try:
+                    json_obj=ast.literal_eval(encoded_inp_string)
+                except Exception as e:
+                    log.error(e)
+                    exception_json=e
+
+
+            if json_obj != None:
+                #json logic
+                json_obj_dict=self.build_dict(json_obj)
+                if(json_obj_dict.has_key(input_tag)):
+                    json_value=json_obj_dict[input_tag]
+                    block_count=len(json_value)
+                    block_number = int(block_number)
+                    if(block_count>0 and block_number>0):
+                        if isinstance(json_value,dict):
+                            tag_value=json_value.values()
+                            log.info('Tag value is ')
+                            log.info(tag_value)
+                            if len(tag_value)>=block_number:
+                                blockvalue=tag_value[block_number-1]
+                            else:
+                                err_msg='Invalid block_number'
+                        elif isinstance(json_value,list):
+                            if len(json_value)>=block_number:
+                                blockvalue=json_value[block_number-1]
+                            else:
+                                err_msg='Invalid block_number'
+                        elif isinstance(json_value,str) or isinstance(json_value,unicode):
+                            blockvalue=json_value
+
+                        log.info('Block value is ',blockvalue)
+                        logger.print_on_console("Block value is ",blockvalue)
+                        if len(blockvalue)>0:
+                            status = TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
+                    else:
+                        err_msg='Tag value empty/Invalid block_number'
+                else:
+                    err_msg=ERR_XML
             else:
                 root = ET.fromstring(input_string)
-            log.debug('Root object created with input string')
-            blocks=[]
-            ##vishvas.a 17/06/06 Defect #578 ALM
-            #this condition checks if the XML type received is SOAP type
-            #if true then "blocks" are added using looping
-            #else the regular flow continues
-            if 'Envelope' in root.tag and root.tag.split('}')[1] == 'Envelope':
-                for elem in root.iter():
-                    tag = elem.tag.split('}')[1]
-                    if tag == input_tag:
-                        blocks.append(elem)
-            else:
-##                blocks = root.getiterator(str(input_tag))
-                blocks = root.getiterator(input_tag)
-##            blocks = root.getiterator(str(input_tag))
-            log.debug('Getting children node from the root')
-            if len(blocks) > 0:
-                log.debug('There are children in the root node, get the total number of children')
-                block_count = len(blocks)
-                block_number = int(block_number)
-##                log.info('Block number: ' + str(block_number))
-                log.info('Block number: ',block_number)
-                block = blocks[block_number-1].getchildren()
-                log.info('Iterating child in the block')
-                for child in block:
-                    log.info('Child text :',child.text)
-##                    log.info('Child text :'+str(child.text))
-                    if '}' in child.tag:
-                        if child.text != None:
-                            blockvalue.append(  '<' + child.tag.split('}')[1]  + '>' + child.text +  '</' + child.tag.split('}')[1]  + '>')
+                log.debug('Root object created with input string')
+                blocks=[]
+                ##vishvas.a 17/06/06 Defect #578 ALM
+                #this condition checks if the XML type received is SOAP type
+                #if true then "blocks" are added using looping
+                #else the regular flow continues
+                if 'Envelope' in root.tag and root.tag.split('}')[1] == 'Envelope':
+                    for elem in root.iter():
+                        tag = elem.tag.split('}')[1]
+                        if tag == input_tag:
+                            blocks.append(elem)
+                else:
+                    blocks = root.getiterator(input_tag)
+                log.debug('Getting children node from the root')
+                if len(blocks) > 0:
+                    log.debug('There are children in the root node, get the total number of children')
+                    block_count = len(blocks)
+                    block_number = int(block_number)
+                    log.info('Block number: ',block_number)
+                    block = blocks[block_number-1].getchildren()
+                    log.info('Iterating child in the block')
+                    for child in block:
+                        log.info('Child text :',child.text)
+                        if '}' in child.tag:
+                            if child.text != None:
+                                blockvalue.append(  '<' + child.tag.split('}')[1]  + '>' + child.text +  '</' + child.tag.split('}')[1]  + '>')
+                            else:
+                                blockvalue.append(  '<' + child.tag.split('}')[1]  + '/>')
                         else:
-                            blockvalue.append(  '<' + child.tag.split('}')[1]  + '/>')
-                    else:
-                        blockvalue.append(  '<' + child.tag + '>' + child.text +  '</' + child.tag + '>')
-                status = TEST_RESULT_PASS
-                methodoutput = TEST_RESULT_TRUE
-                log.info(STATUS_METHODOUTPUT_UPDATE)
-                if status == TEST_RESULT_FAIL:
-                    log.info(INVALID_INPUT + ' Please check the input tag' )
+                            blockvalue.append(  '<' + child.tag + '>' + child.text +  '</' + child.tag + '>')
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
+                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                    if status == TEST_RESULT_FAIL:
+                        log.info(INVALID_INPUT + ' Please check the input tag' )
         except Exception as e:
-            log.error(e)
+            log.error(e,exc_info=True)
             if isinstance(e,ValueError):
                 err_msg=ERR_XML_BLOCK
             elif isinstance(e,ET.ParseError):
                 err_msg=ERR_XML
+            elif isinstance(exception_json,ValueError):
+                err_msg='Invalid Json format'
             else:
+                import traceback
+                traceback.print_exc()
                 err_msg=EXCEPTION_OCCURED
         if err_msg!=None:
             log.error(err_msg)

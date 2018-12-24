@@ -49,6 +49,9 @@ class GenericKeywordDispatcher:
     util_operation_obj=util_operations.UtilOperations()
     dyn_var_obj=dynamic_variable.DynamicVariables()
 
+
+    def __init__(self):
+        self.action=None
 	#Call to fetch data in database keywords
     def fetch_data(self,input):
         output=None
@@ -83,6 +86,8 @@ class GenericKeywordDispatcher:
                   'getcurrentdate' : self.generic_date.getCurrentDate,
                   'getcurrenttime' : self.generic_date.getCurrentTime,
                   'getcurrentdateandtime': self.generic_date.getCurrentDateAndTime,
+                  'getcurrentday' : self.generic_date.getCurrentDay,
+                  'getcurrentdaydateandtime' : self.generic_date.getCurrentDayDateAndTime,
                   'datedifference' : self.generic_date.dateDifference,
                   'dateaddition'    : self.generic_date.dateAddition,
                   'monthaddition'  :self.generic_date.monthAddition,
@@ -197,6 +202,10 @@ class GenericKeywordDispatcher:
             else:
                 err_msg=generic_constants.INVALID_KEYWORD
                 result[3]=err_msg
+            if self.action ==constants.EXECUTE and keyword =='capturescreenshot':
+                if result != constants.TERMINATE:
+                    result=list(result)
+                    result.append(result[2])
          except TypeError as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg

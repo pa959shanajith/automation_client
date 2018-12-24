@@ -11,7 +11,6 @@
 
 
 from constants import *
-import constants
 from mobile_app_constants import *
 from appium.webdriver.common.touch_action import TouchAction
 
@@ -19,7 +18,7 @@ from appium.webdriver.common.touch_action import TouchAction
 import logging
 import logger
 import platform
-if platform.system()!='Darwin':
+if SYSTEM_OS!='Darwin':
     import install_and_launch
 import time
 from selenium import webdriver
@@ -37,8 +36,8 @@ class Action_Key_App():
 
 
     def action_key(self,webelement,inputs,*args):
-        status=constants.TEST_RESULT_FAIL
-        methodoutput=constants.TEST_RESULT_FALSE
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
         visibilityFlag=True
         output=OUTPUT_CONSTANT
         err_msg=None
@@ -115,16 +114,16 @@ class Action_Key_App():
                                 break
                     else :
                         logger.print_on_console('Invalid Input')
-                        status=constants.TEST_RESULT_FAIL
-                        methodoutput=constants.TEST_RESULT_FALSE
+                        status=TEST_RESULT_FAIL
+                        methodoutput=TEST_RESULT_FALSE
                 else :
                     logger.print_on_console('Invalid Input')
-                    status=constants.TEST_RESULT_FAIL
-                    methodoutput=constants.TEST_RESULT_FALSE
+                    status=TEST_RESULT_FAIL
+                    methodoutput=TEST_RESULT_FALSE
             else :
                     logger.print_on_console('Invalid Input')
-                    status=constants.TEST_RESULT_FAIL
-                    methodoutput=constants.TEST_RESULT_FALSE
+                    status=TEST_RESULT_FAIL
+                    methodoutput=TEST_RESULT_FALSE
 
 
 

@@ -180,14 +180,12 @@ class Text_Box:
                 if (check):
                     log.info('Parent matched')
                     if(element.is_enabled()):
-                        try:
-                            element.SetText("", pos_start=None, pos_end=None)
-                        except:
-                            cursor_obj=CursorPositionCorrection()
-                            cursor_obj.getOriginalPosition()
-                            for i in range(0,len(element.text_block())):
-                                element.type_keys('^a{BACKSPACE}')
-                            cursor_obj.setOriginalPosition()
+                        cursor_obj=CursorPositionCorrection()
+                        cursor_obj.getOriginalPosition()
+                        for i in range(0,len(element.text_block())):
+                            element.type_keys('^a{BACKSPACE}')
+                        cursor_obj.setOriginalPosition()
+                        element.SetText("", pos_start=None, pos_end=None)
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)

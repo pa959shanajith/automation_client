@@ -14,8 +14,8 @@ import logger
 import webconstants
 import time
 from selenium import webdriver
-import platform
-if platform.system()!='Darwin':
+from constants import SYSTEM_OS
+if SYSTEM_OS!='Darwin':
     from pyrobot import Robot, Keys
 import browser_Keywords
 import logging
@@ -69,7 +69,7 @@ class ButtonLinkKeyword():
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
 
-                    elif platform.system() == 'Darwin':
+                    elif SYSTEM_OS == 'Darwin':
                         try:
                             clickinfo = browser_Keywords.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
                             log.info('Click operation performed using javascript click')
@@ -472,7 +472,7 @@ class ButtonLinkKeyword():
                 log.debug(webelement)
                 log.debug('Check for the element enable')
                 if webelement.is_enabled():
-                    if platform.system() != 'Darwin':
+                    if SYSTEM_OS != 'Darwin':
                         if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
                             log.debug('Mozilla Firefox Instance')
                             clickinfo = browser_Keywords.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
@@ -488,7 +488,7 @@ class ButtonLinkKeyword():
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                                 status = webconstants.TEST_RESULT_PASS
                                 methodoutput = webconstants.TEST_RESULT_TRUE
-                    elif platform.system() == 'Darwin':
+                    elif SYSTEM_OS == 'Darwin':
                         if  self.__click_for_file_upload(browser_Keywords.driver_obj,webelement):
                             filestatus =self.__upload_operation(inputfile)
                             log.info(STATUS_METHODOUTPUT_UPDATE)

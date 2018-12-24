@@ -15,6 +15,7 @@ import time
 import domconstants
 import browserops
 import logging
+import logger
 import os
 from selenium import webdriver
 from core_utils import CoreUtils
@@ -120,10 +121,7 @@ class Object_Mapper():
                 json.dump(self.data, outfile, indent=4, sort_keys=False)
             self.status  = domconstants.STATUS_SUCCESS
         except Exception as e:
-            import traceback
-            traceback.print_exc()
-            print e
-            print "Error while comparing objects"
+            logger.print_on_console("Error while comparing objects")
             log.error(e)
 
         self.data['action'] = 'compare'

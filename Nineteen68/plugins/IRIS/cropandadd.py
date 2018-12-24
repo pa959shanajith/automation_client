@@ -15,6 +15,7 @@ from pywinauto.findwindows import find_window
 from pywinauto.win32functions import SetForegroundWindow
 import os
 import time
+import controller
 
 class Cropandadd():
     def startcropandadd(self,wx_window):
@@ -23,8 +24,14 @@ class Cropandadd():
             time.sleep(1)
             im = PIL.ImageGrab.grab()
             im.save('test.png')
-
+            image_orig = cv2.imread("test.png")
             screen = screeninfo.get_monitors()[0]
+            overlay = image_orig.copy()
+            output = image_orig.copy()
+            cv2.rectangle(overlay, (0, 0), im.size,(220,220,220), -1)
+            alpha=0.4
+            cv2.addWeighted(overlay, alpha, output, 1 - alpha,0, output)
+            cv2.imwrite('test.png',output)
             im1 = Image.open('test.png')
             wx_window.Show()
             image = np.array(im1)
@@ -52,7 +59,7 @@ class Cropandadd():
                 elif event == cv2.EVENT_LBUTTONUP:
                     drawing1 = False
                     self.data['scrapetype'] = 'caa'
-                    RGB_img_crop = self.RGB_img_c[iy:y,ix:x]
+                    RGB_img_crop = image_orig[iy:y,ix:x]
                     cv2.imwrite("cropped.png", RGB_img_crop)
                     with open("cropped.png", "rb") as imageFile:
                         RGB_img_crop_im = base64.b64encode(imageFile.read())
@@ -69,10 +76,10 @@ class Cropandadd():
                     else:
                         cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),1)
                     self.RGB_img_c = np.copy(self.RGB_img)
+                    self.RGB_img[(iy+1):(y-1),(ix+1):(x-1)]=image_orig[(iy+1):(y-1),(ix+1):(x-1)]
+                    self.RGB_img_c = np.copy(self.RGB_img)
                     constant_image = False
 
-
-            #img = np.zeros((512,512,3), np.uint8)
             cv2.namedWindow('image',cv2.WND_PROP_FULLSCREEN)
             cv2.setMouseCallback('image',draw_rect)
             cv2.moveWindow('image', screen.x - 1, screen.y - 1)
@@ -84,14 +91,15 @@ class Cropandadd():
                     flag = True
                     SetForegroundWindow(find_window(title='image'))
                 k = cv2.waitKey(1) & 0xFF
+                if(controller.terminate_flag):
+                    self.stopflag = True
+                    cv2.destroyAllWindows()
                 if self.stopflag:
                     if(os.path.isfile("test.png")):
                         os.remove("test.png")
                     if(os.path.isfile("cropped.png")):
                         os.remove("cropped.png")
                     break
-
-            #cv2.destroyAllWindows()
         except Exception as e:
             log.error(e)
             logger.print_on_console("Error occured in capturing iris object")

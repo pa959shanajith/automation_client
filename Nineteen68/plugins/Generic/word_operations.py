@@ -165,7 +165,7 @@ class WordFile():
         output = OUTPUT_CONSTANT
         err_msg = None
         try:
-            if platform.system() == "Windows":
+            if SYSTEM_OS == "Windows":
                 import win32com.client as win32
                 if os.path.exists(os.path.normpath(filename)):
                     pythoncom.CoInitialize()

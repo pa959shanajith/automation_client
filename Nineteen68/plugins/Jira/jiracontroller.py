@@ -40,8 +40,12 @@ class JiraWindow():
             username= data['username']
             password = data['password']
             url = data['url']
-            jira_options = {'server': url}
-            jira = JIRA(options=jira_options,basic_auth=(username,password))
+            if(';' in url):
+                jira_options = {'server':url.split(';')[0],'verify':False}
+                jira = JIRA(options=jira_options,basic_auth=(username,password),proxies={'http':url.split(';')[1],'https':url.split(';')[1]})
+            else:
+                jira_options = {'server': url}
+                jira = JIRA(options=jira_options,basic_auth=(username,password))
             project_id = data['project']
             summary = data['summary']
             issue_type = data['issuetype']
@@ -69,11 +73,14 @@ class JiraWindow():
                 else:
                     flag = True
                 if(flag):
-                    issue_dict = {'project': {'id': project_id},'summary': summary,'description': description,'issuetype': {'name': issue_type},'priority':{'name' : priority},'labels':label}
+                    if(issue_type == 'Story' or issue_type == 'Epic'):
+                        issue_dict = {'project': {'id': project_id},'summary': summary,'description': description,'issuetype': {'name': issue_type},'labels':label}
+                    else:
+                        issue_dict = {'project': {'id': project_id},'summary': summary,'description': description,'issuetype': {'name': issue_type},'priority':{'name' : priority},'labels':label}
                     if(issue_type=='Sub-task'):
                         issue_dict['parent']={'id':parentid}
                     create_issues = jira.create_issue(issue_dict)
-                    issue_id = create_issues.id
+                    issue_id = create_issues.key
                     if attachement_path != '' and check == True:
                         try:
                             file_obj = None
@@ -85,13 +92,14 @@ class JiraWindow():
                             attachement_object=jira.add_attachment(create_issues.id,file_obj)
                             file_obj.close()
                         except Exception as e:
+                            log.error(e)
                             socket.emit('issue_id','Fail')
                             logger.print_on_console('Error in reading/loading file')
         except Exception as e:
+            log.error(e)
             socket.emit('issue_id','Fail')
             logger.print_on_console('Failed to create issue')
         if issue_id != None:
-            x =jira.kill_session()
             logger.print_on_console('Issue id created is ',issue_id)
             socket.emit('issue_id',issue_id)
         else:
@@ -112,8 +120,15 @@ class JiraWindow():
         data['priority'] = []
         jira = None
         try:
-            jira_options = {'server': jira_credentials['jira_serverlocation']}
-            jira = JIRA(options=jira_options,basic_auth=(jira_credentials['jira_uname'],jira_credentials['jira_pwd']))
+            if(';' in jira_credentials['jira_serverlocation']):
+                log.debug('Connecting to JIRA through proxy')
+                jira_server = jira_credentials['jira_serverlocation'].split(';')[0]
+                jira_proxy = jira_credentials['jira_serverlocation'].split(';')[1]
+                jira_options = {'server':jira_server,'verify':False}
+                jira = JIRA(options=jira_options,basic_auth=(jira_credentials['jira_uname'],jira_credentials['jira_pwd']),proxies={'http':jira_proxy,'https':jira_proxy})
+            else:
+                jira_options = {'server': jira_credentials['jira_serverlocation']}
+                jira = JIRA(options=jira_options,basic_auth=(jira_credentials['jira_uname'],jira_credentials['jira_pwd']))
             projects_list = jira.projects()
             issue_types = jira.issue_types()
             priority_list = jira.priorities()
@@ -123,8 +138,6 @@ class JiraWindow():
                 data['issuetype'].append({'id': item.id , 'name':item.name})
             for index,item in enumerate(priority_list):
                 data['priority'].append({'id': item.id , 'name':item.name})
-            if(jira != None):
-                x =jira.kill_session()
             socket.emit('auto_populate',data)
         except Exception as e:
             log.error(e)

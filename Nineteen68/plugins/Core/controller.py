@@ -86,6 +86,7 @@ class Controller():
     mainframe_dispatcher_obj = None
     system_dispatcher_obj = None
     def __init__(self):
+        self.action=None
         self.get_all_the_imports(CORE)
         self.__load_generic()
         self.cur_dir= os.getcwd()
@@ -99,7 +100,6 @@ class Controller():
         self.scenario_ellapsed_time=''
         self.reporting_obj=reporting.Reporting()
         self.conthread=None
-        self.action=None
         self.counter=[]
         self.jumpto_previousindex=[]
         self.verify_exists=False
@@ -126,7 +126,7 @@ class Controller():
         try:
             if self.mobile_web_dispatcher_obj==None:
                 import platform
-                if platform.system() == 'Darwin':
+                if SYSTEM_OS == 'Darwin':
                     self.get_all_the_imports('Mobility/MobileWeb')
                 else:
                     self.get_all_the_imports('Mobility')
@@ -141,7 +141,7 @@ class Controller():
         try:
             if self.mobile_app_dispatcher_obj==None:
                 import platform
-                if platform.system()=='Darwin':
+                if SYSTEM_OS=='Darwin':
                     self.get_all_the_imports('Mobility/MobileApp')
                 else:
                     self.get_all_the_imports('Mobility')
@@ -541,18 +541,29 @@ class Controller():
                             logger.print_on_console("The index count for the dynamic variable is " + "Row: "+str(row) + " and Column: "+str(col))
                         else:
                             logger.print_on_console('Result obtained is ',display_keyword_response)
+                    elif tsp.apptype.lower()=='system':
+                        if result[2]!=OUTPUT_CONSTANT :
+                            logger.print_on_console('Result obtained is: ',result[2])
+                        elif result:
+                            logger.print_on_console('Result obtained is: ',result[1])
                 else:
-                    logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i])
-                    if not isinstance(display_keyword_response[i],basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
+                    if tsp.apptype.lower()=='system':
+                        if result[2]!=OUTPUT_CONSTANT :
+                            logger.print_on_console('Result obtained is: ',result[2])
+                        elif result:
+                            logger.print_on_console('Result obtained is: ',result[1])
+                    else:
+                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i])
+                        if not isinstance(display_keyword_response[i],basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
             else:
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         log.info('Result obtained is: ')
         log.info(display_keyword_response)
-        """if tsp.apptype.lower()=='desktop' or tsp.apptype.lower()=='sap' or tsp.apptype.lower()=='desktopjava' or (tsp.cord!='' and tsp.cord!=None):"""
-        if result[2]!='9cc33d6fe25973868b30f4439f09901a' and tsp.name.lower()!='verifytextiris':
-            logger.print_on_console('Result obtained is: ',result[2])
-        elif result:
-            logger.print_on_console('Result obtained is: ',result[1])
+        if tsp.apptype.lower()=='desktop' or tsp.apptype.lower()=='sap' or tsp.apptype.lower()=='desktopjava' or (tsp.cord!='' and tsp.cord!=None):
+            if result[2]!='9cc33d6fe25973868b30f4439f09901a' and tsp.name.lower()!='verifytextiris':
+                logger.print_on_console('Result obtained is: ',result[2])
+            elif result:
+                logger.print_on_console('Result obtained is: ',result[1])
         if tsp.apptype.lower()=='generic' and (tsp.name.lower()=='savetoclipboard' or tsp.name.lower()=='getfromclipboard'):
             if result[2]!='9cc33d6fe25973868b30f4439f09901a':
                 logger.print_on_console('Result obtained is: ',result[2])
@@ -726,6 +737,8 @@ class Controller():
         start_time_string=self.scenario_start_time.strftime(TIME_FORMAT)
         logger.print_on_console('Scenario Execution start time is : '+start_time_string,'\n')
         global pause_flag
+        if self.generic_dispatcher_obj is not None and self.generic_dispatcher_obj.action is None:
+            self.generic_dispatcher_obj.action=action
         while (i < len(tsplist)):
             #Check for 'terminate_flag' before execution
             if not(terminate_flag):
@@ -977,6 +990,10 @@ class Controller():
                                 log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                                 os.chdir(self.cur_dir)
                                 filename='Scenario'+str(i  + 1)+'.json'
+                                #check if user has manually terminated during execution, then check if the teststep data and overallstatus is [] if so poputale default values in teststep data and overallstatus
+                                if terminate_flag ==True and execute_flag==True:
+                                    if con.reporting_obj.report_json['rows']==[] and con.reporting_obj.report_json['overallstatus']==[]:
+                                        con.reporting_obj.add_to_reporting_obj()
                                 con.reporting_obj.save_report_json(filename)
                                 socketIO.emit('result_executeTestSuite',self.getreport_data(suite_id,scenario_id,con,execution_id))
                                 obj.clearList(con)
@@ -1156,7 +1173,7 @@ def kill_process():
     import tempfile
     import psutil
     import os,shutil
-    if platform.system() == 'Darwin':
+    if SYSTEM_OS == 'Darwin':
         try:
             import browserops_MW
             browserops_MW.driver.quit()

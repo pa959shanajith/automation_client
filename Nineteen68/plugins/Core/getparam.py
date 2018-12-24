@@ -521,7 +521,7 @@ class GetParam():
         #(iteration_count<loop_count-1) condition i smade to avoid adding of  the Iteration completed message of last iteration step twice t
         # the report
         #since it is added in the 'methodInvocation' in controller
-        if self.name.lower() != ENDLOOP and (iteration_count<loop_count-2):
+        if self.name.lower() != ENDLOOP and (iteration_count<loop_count):
             reporting_obj.generate_report_step(self,'',step_description,'3.00',False)
         reporting_obj.remove_nested_flag()
         #Reporting part ends

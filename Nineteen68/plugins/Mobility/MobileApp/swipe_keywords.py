@@ -91,7 +91,7 @@ class SliderKeywords():
         try:
             x_Value,max_y,min_y=self.find_coordinates_vertical()
             #Swipe from down to up
-            if platform.system() == 'Darwin':
+            if SYSTEM_OS == 'Darwin':
                 install_and_launch.driver.execute_script('mobile: scroll', {'direction': 'down'})
             else:
                 install_and_launch.driver.swipe(x_Value, max_y, x_Value, min_y, 3000)
@@ -155,7 +155,7 @@ class SliderKeywords():
 ##            startx,starty,endx=self.find_coordinates_vertical()
             #Swipe from up to bottom
             import platform
-            if platform.system() == 'Darwin':
+            if SYSTEM_OS == 'Darwin':
                 install_and_launch.driver.back()
             else:
                 install_and_launch.driver.keyevent(4)

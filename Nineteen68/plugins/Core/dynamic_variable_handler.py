@@ -84,7 +84,7 @@ class DynamicVariables:
 
     #To Store the output from keyword as an array if it is multiple values
     def store_as_array(self,variable,value):
-        if not(isinstance(value[0],list)):
+        if len(value)>0 and not(isinstance(value[0],list)):
             variable=variable[0:len(variable)-1]
             for i in range(len(value)):
                 dynamic_variable_map[variable+'['+str(i)+']}']=value[i]
@@ -113,17 +113,29 @@ class DynamicVariables:
                 dynamic_variable_map[output_var]=output_value
 
 
+
      #To Check if the given pattern of the variable matches '{a}'
     def check_for_dynamicvariables(self,outputval):
         #checks whether the given variable is dynamic or not
         status = TEST_RESULT_FALSE
+        json_flag=False
         if outputval != None and outputval != '':
             if outputval.startswith('{') and outputval.endswith('}'):
-                status = TEST_RESULT_TRUE
-            elif '{' in outputval and '}' in outputval:
-                var_list=re.findall("\{(.*?)\}",outputval)
-                if len(var_list)>0:
-                    status = TEST_RESULT_TRUE
+                try:
+                    if type(outputval)==dict:
+                        status = TEST_RESULT_FALSE
+                        json_flag=True
+                    else:
+                        ast.literal_eval(str(outputval))
+                        status = TEST_RESULT_FALSE
+                        json_flag=True
+                except Exception as e:
+                    log.debug('Not a json input')
+            if not(json_flag):
+                if '{' in outputval and '}' in outputval:
+                    var_list=re.findall("\{(.*?)\}",outputval)
+                    if len(var_list)>0:
+                        status = TEST_RESULT_TRUE
 
         return status
 

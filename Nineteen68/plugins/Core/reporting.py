@@ -446,3 +446,35 @@ class Reporting:
             log.debug(self.report_json_condition_check_testcase_empty)
             log.error(e,exc_info=True)
 
+    def add_to_reporting_obj(self):
+        """
+        Method created to handle issue #1897
+        If the rows and overallstatus of the reporting object are []; then it sends [] via socket,
+        this causes the reports to not be generated for the scenarios/suits which are terminated manually
+
+        """
+        overallstatus_array=[]
+        overallstatus_obj={}
+        overallstatus_obj[ELLAPSED_TIME]=str(datetime.now() - datetime.now())
+        overallstatus_obj[END_TIME]= datetime.now().strftime(TIME_FORMAT)
+        overallstatus_obj[BROWSER_VERSION]='N/A'
+        overallstatus_obj[START_TIME]=datetime.now().strftime(TIME_FORMAT)
+        overallstatus_obj[OVERALLSTATUS]=TERMINATE
+        overallstatus_obj[BROWSER_TYPE]='N/A'
+        overallstatus_array.append(overallstatus_obj)
+        self.report_json['overallstatus']=overallstatus_array
+        row_array=[]
+        row_obj={}
+        row_obj[ID]=0
+        row_obj[KEYWORD]=''
+        row_obj[PARENT_ID]=''
+        row_obj[COMMENTS]=''
+        row_obj[STEP]=PROGRAM_TERMINATION
+        row_obj[STEP_DESCRIPTION]=USER_TERMINATION
+        row_obj[REMARKS]=''
+        row_obj[STATUS]=TERMINATE
+        row_obj[ELLAPSED_TIME]=str(datetime.now() - datetime.now())
+        row_obj[TESTCASE_DETAILS]=''
+        row_obj[SCREENSHOT_PATH]=None
+        row_array.append(row_obj)
+        self.report_json['rows']=row_array

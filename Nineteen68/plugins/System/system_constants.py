@@ -23,6 +23,7 @@ TEST_RESULT_TRUE = "True"
 
 TEST_RESULT_FALSE = "False"
 
+ACCESS_DENIED = 'Insufficient Access Privileges'
 
 ERROR_CODE_DICT ={
                     'ERR_UNABLE_TO_CONNECT':'Unable to connect with machine',

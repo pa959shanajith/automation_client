@@ -41,16 +41,19 @@ class ScrapeWindow(wx.Frame):
         obj = desktop_launch_keywords.Launch_Keywords()
         self.socketIO = socketIO
         self.core_utilsobject = core_utils.CoreUtils()
+        self.parent = parent
         windowname=filePath[0]
         pid=filePath[1]
         self.backend_process=filePath[2]
         global backend_process
         backend_process=self.backend_process
         input_val=[]
+        verify_pname = None
         if (windowname!=None or windowname.strip()!='') and (pid==None or pid ==''):
             input_val.append(windowname)
             input_val.append(5)
             status = obj.find_window_and_attach(input_val)
+            verify_pname = status[0].lower()
         elif (windowname==None or windowname.strip()=='') and (pid!=None or pid !=''):
             input_val.append(int(pid))
             input_val.append(5)
@@ -85,10 +88,15 @@ class ScrapeWindow(wx.Frame):
                 self.Show()
             else:
                 self.socketIO.emit('scrape','Fail')
+                self.parent.schedule.Enable()
+        elif verify_pname == 'fail':
+            self.socketIO.emit('scrape','Fail')
+            logger.print_on_console('Wrong Window Name, Please check the Window Name and provide valid one')
+            self.parent.schedule.Enable()
         else:
             self.socketIO.emit('scrape','Fail')
-            logger.print_on_console('Wrong window name, Please check the window name and provide valid one')
-
+            logger.print_on_console('Wrong Process Id, Please check the Process Id and provide valid one')
+            self.parent.schedule.Enable()
         windowname = ''
      #----------------------------------------------------------------------
 
@@ -125,9 +133,10 @@ class ScrapeWindow(wx.Frame):
                         with open("out.png", "rb") as image_file:
                             encoded_string = base64.b64encode(image_file.read())
                     except Exception as e:
-                        import traceback
-                        traceback.print_exc()
-                        logger.print_on_console('Error occured while capturing Screenshot ')
+                        msg='Error occured while capturing Screenshot '
+                        log.error(msg)
+                        log.error(e)
+                        logger.print_on_console(msg)
                 data['mirror'] =encoded_string.encode('UTF-8').strip()
                 #10 is the limit of MB set as per Nineteen68 standards
                 if self.core_utilsobject.getdatasize(str(data),'mb') < 10:
@@ -136,10 +145,12 @@ class ScrapeWindow(wx.Frame):
                     logger.print_on_console( 'Scraped data exceeds max. Limit.')
                     self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
                 os.remove("out.png")
+                self.parent.schedule.Enable()
                 self.Close()
                 logger.print_on_console('Click and add scrape  completed successfully...')
         else:
             logger.print_on_console('Click and add Scrape Failed')
+            self.parent.schedule.Enable()
 
 
     #----------------------------------------------------------------------
@@ -167,9 +178,10 @@ class ScrapeWindow(wx.Frame):
                     with open("out.png", "rb") as image_file:
                         encoded_string = base64.b64encode(image_file.read())
                 except Exception as e:
-                    import traceback
-                    traceback.print_exc()
-                    logger.print_on_console('Error occured while capturing Screenshot ')
+                    msg='Error occured while capturing Screenshot '
+                    log.error(msg)
+                    log.error(e)
+                    logger.print_on_console(msg)
             data['mirror'] =encoded_string.encode('UTF-8').strip()
             if self.core_utilsobject.getdatasize(str(data),'mb') < 10:
                 self.socketIO.emit('scrape',data)
@@ -181,6 +193,7 @@ class ScrapeWindow(wx.Frame):
             logger.print_on_console('Full scrape  completed successfully...')
         else:
             logger.print_on_console('Full scrape Failed..')
+        self.parent.schedule.Enable()
 
     def cropandadd(self,event):
         state = event.GetEventObject().GetValue()
@@ -199,8 +212,8 @@ class ScrapeWindow(wx.Frame):
             cv2.destroyAllWindows()
             time.sleep(1)
             d = cropandaddobj.stopcropandadd()
-            print 'Scrapped data saved successfully in domelements.json file'
+            logger.print_on_console('Scraped data saved successfully in domelements.json file')
             self.socketIO.emit('scrape',d)
+            self.parent.schedule.Enable()
             self.Close()
-            event.GetEventObject().SetLabel("Start IRIS")
-            print 'Crop and add scrape completed'
+            logger.print_on_console('Crop and add scrape completed')

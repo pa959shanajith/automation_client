@@ -11,8 +11,8 @@
 #-------------------------------------------------------------------------------
 
 import browserops
-import platform
-if platform.system()=='Windows':
+from constants import SYSTEM_OS
+if SYSTEM_OS=='Windows':
     import win32gui
     import win32con
 import json
@@ -26,10 +26,11 @@ currenthandle = ''
 status = domconstants.STATUS_FAIL
 browserops_obj=browserops.BrowserOperations()
 from core_utils import CoreUtils
+import logger
 from webscrape_utils import WebScrape_Utils
 
 class Fullscrape():
-    def fullscrape(self,scrape_option):
+    def fullscrape(self,scrape_option,window_handle_number):
         start_time = time.clock()
         data = {}
         driver = browserops.driver
@@ -41,26 +42,30 @@ class Fullscrape():
             maindir = os.environ["NINETEEN68_HOME"]
             screen_shot_path = maindir + '/Nineteen68/plugins/WebScrape' + domconstants.SCREENSHOT_IMG
             log.info('Obtained browser handle and driver from browserops.py class .....')
-            if platform.system()=='Windows':
+            if SYSTEM_OS=='Windows':
                 toolwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
             log.info(' Minimizing the foreground window i.e tool and assuming AUT on top .....')
             time.sleep(2)
-            if platform.system()=='Windows':
+            if SYSTEM_OS=='Windows':
                 actwindow = win32gui.GetForegroundWindow()
 ##            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
             browserops_obj.checkPopups()
             javascript_hasfocus = """return(document.hasFocus());"""
 ##            time.sleep(6)
-            for eachdriverhand in driver.window_handles:
-                log.info('Iterating through the number of windows open by the driver')
-                driver.switch_to.window(eachdriverhand)
-                log.info('Switching to each handle and checking weather it has focus ')
-                if (driver.execute_script(javascript_hasfocus)):
-                    log.info('Got the window which has the focus')
-                    global currenthandle
-                    currenthandle = eachdriverhand
-                    break
+            if window_handle_number is not None and window_handle_number > 0:
+                driver.switch_to.window(driver.window_handles[window_handle_number])
+                currenthandle = driver.window_handles[window_handle_number]
+            else:
+                for eachdriverhand in driver.window_handles:
+                    log.info('Iterating through the number of windows open by the driver')
+                    driver.switch_to.window(eachdriverhand)
+                    log.info('Switching to each handle and checking weather it has focus ')
+                    if (driver.execute_script(javascript_hasfocus)):
+                        log.info('Got the window which has the focus')
+                        global currenthandle
+                        currenthandle = eachdriverhand
+                        break
             tempne = []
             log.info('Performing the full scrape operation on default/outer page')
             if scrape_option[0].lower() == 'select a section using xpath':
@@ -105,7 +110,7 @@ class Fullscrape():
                         log.info('could not switch to iframe/frame %s', path)
 
             # scrape through iframes/frames iff OS is windows and scrape_option is not the xpath one
-            if platform.system() == 'Windows' and scrape_option[0].lower() != 'select a section using xpath':
+            if SYSTEM_OS == 'Windows' and scrape_option[0].lower() != 'select a section using xpath':
                 callback_fullscrape_iframes('', tempne)
                 driver.switch_to.window(currenthandle)
                 callback_fullscrape_frames('', tempne)
@@ -165,8 +170,8 @@ class Fullscrape():
             log.error(e)
             ename = type(e).__name__
             if ename in ('NoSuchElementException','ValueError','InvalidSelectorException'):
-                print "Invalid input, provide a valid xpath of the element to start the section"
-            print 'Error while performing full scrape'
+                logger.print_on_console("Invalid input, provide a valid xpath of the element to start the section")
+                logger.print_on_console('Error while performing full scrape')
             if (isinstance(driver,webdriver.Ie)):
-                print 'Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked) and retry'
+                logger.logger.print_on_console( 'Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked) and retry')
         return data

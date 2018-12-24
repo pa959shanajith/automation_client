@@ -21,6 +21,7 @@ import os
 import subprocess
 import re
 import platform
+from constants import SYSTEM_OS
 ##import psutil
 ##import win32process
 ##import xml.etree.ElementTree as ET
@@ -57,7 +58,7 @@ class BrowserOperations():
 ##            maindir = os.getcwd()
 ##            os.chdir('..')
             curdir = os.environ["NINETEEN68_HOME"]
-            if (platform.system() != 'Darwin'):
+            if (SYSTEM_OS != 'Darwin'):
                 path = curdir + '/Nineteen68/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
                 nodePath = curdir + "/Drivers/node.exe"
                 proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
@@ -149,7 +150,7 @@ class BrowserOperations():
 
     def stop_server(self):
         try:
-            if platform.system() != 'Darwin':
+            if SYSTEM_OS != 'Darwin':
                 import psutil
                 import os
                 processes = psutil.net_connections()
@@ -188,7 +189,7 @@ class BrowserOperations():
 
     def openBrowser(self,inputs):
        try:
-           if platform.system() == "Darwin":
+           if SYSTEM_OS == "Darwin":
                global driver
                self.stop_server()
                self.start_server()
@@ -267,7 +268,7 @@ class BrowserOperations():
        except Exception as e:
             mobile_key_objects.custom_msg.append("ERROR OCURRED WHILE OPENING BROWSER")
             status = domconstants_MW.STATUS_FAIL
-            if platform.system() == 'Darwin':
+            if SYSTEM_OS == 'Darwin':
                 curdir = os.environ["NINETEEN68_HOME"]
                 path_node_modules = curdir + '/Nineteen68/plugins/Mobility/node_modules'
                 if not os.path.exists(path_node_modules):

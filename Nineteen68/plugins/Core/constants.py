@@ -423,6 +423,8 @@ STATIC_DV_NAME = "{#@#n_u_m#@#}"
 
 WEB_ELEMENT_FOUND_FROM_GetInnerTable = 'Web Element found from GetInnerTable'
 
-FIREFOX_BROWSER_VERSION = [[0.13,52,53],[0.16,52,53],[0.19,55,62],[0.21,55,62]]
+FIREFOX_BROWSER_VERSION = {"0.13":[52,53],"0.16":[52,53],"0.19":[55,62],"0.21":[55,62]}
 
-CHROME_DRIVER_VERSION = [[2.41,67,69],[2.40,66,68],[2.39,66,68],[2.38,65,67],[2.37,64,66],[2.36,63,65],[2.35,62,65]]
+CHROME_DRIVER_VERSION = {"2.41":[67,69],"2.40":[66,68],"2.39":[66,68],"2.38":[65,67],"2.37":[64,66],"2.36":[63,65],"2.35":[62,65]}
+
+SYSTEM_OS = 'Windows'

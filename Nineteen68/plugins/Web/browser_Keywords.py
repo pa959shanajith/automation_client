@@ -25,7 +25,7 @@ import clientwindow
 drivermap = []
 log = logging.getLogger('browser_Keywords.py')
 import platform
-if platform.system() != 'Darwin':
+if SYSTEM_OS != 'Darwin':
     import win32gui
     import win32api
     import utils_web
@@ -109,7 +109,7 @@ class BrowserKeywords():
             if(driver_obj == None):
                 result = TERMINATE
             else:
-                if platform.system()!='Darwin':
+                if SYSTEM_OS!='Darwin':
                     utilobject = utils_web.Utils()
                     pid = None
                     if (self.browser_num == '1'):
@@ -140,9 +140,28 @@ class BrowserKeywords():
                         pid_set.add(pid)
                     hwndg = utilobject.bring_Window_Front(pid)
                 webdriver_list.append(driver_obj)
-                parent_handle = driver_obj.current_window_handle
-                self.update_recent_handle(parent_handle)
-                all_handles.append(parent_handle)
+                parent_handle =  None
+                try:
+                    parent_handle = driver_obj.current_window_handle
+                except Exception as nosuchWindowExc:
+                    log.error(nosuchWindowExc)
+                    log.warn("A window or tab was closed manually from the browser!")
+                if parent_handle is not None:
+                    self.update_recent_handle(parent_handle)
+                    all_handles.append(parent_handle)
+                elif len(all_handles) > 0:
+                    driver_handles = driver_obj.window_handles
+                    switch_to_handle = None
+                    for handle in all_handles:
+                        if handle in driver_handles:
+                            switch_to_handle = handle
+                            break
+                    if switch_to_handle is not None:
+                        log.info("driver will now switch to the first window/tab")
+                        driver_obj.switch_to.window(switch_to_handle)
+                    else:
+                        log.info("driver will now switch to any available window/tab")
+                        driver_obj.switch_to.window(driver_handles[0])
                 logger.print_on_console('Browser opened')
                 log.info('Browser opened')
                 status=webconstants.TEST_RESULT_PASS
@@ -456,7 +475,7 @@ class BrowserKeywords():
                         break
                 count = count - 2
                 webdriver_list[driver_instance].quit()
-                if platform.system() == 'Darwin':
+                if SYSTEM_OS == 'Darwin':
 
                         import os
                         os.system("killall -9 Safari")
@@ -827,7 +846,12 @@ class Singleton_DriverUtil():
 ##                    browser_ver1 = browser_ver.encode('utf-8')
 ##                    browser_ver = float(browser_ver1[:4])
                     if(clientwindow.firefoxFlag == True):
-                        driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH)
+                        if str(configvalues['firefox_path']).lower()!="default":
+                            from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+                            binary = FirefoxBinary(str(configvalues['firefox_path']))
+                            driver = webdriver.Firefox(capabilities=caps, firefox_binary=binary, executable_path=webconstants.GECKODRIVER_PATH)
+                        else:
+                            driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH)
                         drivermap.append(driver)
                         driver.maximize_window()
                         logger.print_on_console('Firefox browser started using geckodriver')

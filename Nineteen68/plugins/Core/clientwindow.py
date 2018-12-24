@@ -19,6 +19,7 @@ import json
 import socket
 import requests
 import io
+import handler
 try:
     from socketlib_override import SocketIO,BaseNamespace
 except ImportError:
@@ -31,6 +32,7 @@ wxObject = None
 browsername = None
 qcdata = None
 soc=None
+pdfgentool = None
 qcConFlag=False
 browsercheckFlag=False
 chromeFlag=False
@@ -47,6 +49,8 @@ allow_connect = False
 icesession = None
 plugins_list = []
 configvalues = None
+execution_flag = False
+ICE_CONST= os.environ["NINETEEN68_HOME"] + '/Lib/ice_const.json'
 CONFIG_PATH= os.environ["NINETEEN68_HOME"] + '/Lib/config.json'
 IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images/"
 os.environ["IMAGES_PATH"] = IMAGES_PATH
@@ -122,33 +126,6 @@ class MainNamespace(BaseNamespace):
             log.info(fail_msg)
             threading.Timer(0.1,wxObject.killSocket).start()
 
-    def on_webscrape(self,*args):
-        global action,wxObject,browsername,desktopScrapeFlag,data
-        args = list(args)
-        d = args[0]
-        action = d['action']
-        task = d['task']
-        data = {}
-        if action == 'scrape':
-            if str(task) == 'OPEN BROWSER CH':
-                browsername = '1'
-            elif str(task) == 'OPEN BROWSER IE':
-                browsername = '3'
-            elif str(task) == 'OPEN BROWSER FX':
-                browsername = '2'
-            elif str(task) == 'OPEN BROWSER SF':
-                browsername = '6'
-        elif action == 'compare':
-            data['view'] = d['viewString']
-            data['scrapedurl'] = d['scrapedurl']
-            if str(task) == 'OPEN BROWSER CH':
-                browsername = '1'
-            elif str(task) == 'OPEN BROWSER IE':
-                browsername = '3'
-            elif str(task) == 'OPEN BROWSER FX':
-                browsername = '2'
-        wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
-
     def on_focus(self, *args):
         appType=args[2]
         appType=appType.lower()
@@ -185,12 +162,25 @@ class MainNamespace(BaseNamespace):
 ##            var = args[0][:i]
             highlightObj.highlight_element(args[0])
 
-
     def on_executeTestSuite(self, *args):
-        global wxObject,socketIO
-        args=list(args)
-        socketIO.emit('return_status_executeTestSuite','success')
-        wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode)
+        try:
+            global wxObject,socketIO,execution_flag
+            args=list(args)
+            if(not execution_flag):
+                socketIO.emit('return_status_executeTestSuite',{'status':'success'})
+                wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode)
+            else:
+                obj = handler.Handler()
+                suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path=obj.parse_json_execute(args[0])
+                data = {'scenario_ids':scenarioIds,'execution_id':execution_id,'time':str(datetime.now())}
+                emsg='Execution already in progress. Skipping current request.'
+                log.warn(emsg)
+                logger.print_on_console(emsg)
+                """sending scenario details for skipped execution to update the same in reports."""
+                socketIO.emit('return_status_executeTestSuite',{'status':'skipped','data':data})
+        except Exception as e:
+            logger.print_on_console('Exception in executeTestSuite')
+            log.error(e)
 
     def on_debugTestCase(self, *args):
         global wxObject
@@ -199,13 +189,40 @@ class MainNamespace(BaseNamespace):
         wxObject.choice=wxObject.rbox.GetStringSelection()
         logger.print_on_console(str(wxObject.choice)+' is Selected')
         if wxObject.choice == 'Normal':
-            wxObject.killDebugWindow()
+            wxObject.killChildWindow(debug=True)
         wxObject.debug_mode=False
         wxObject.breakpoint.Disable()
         if wxObject.choice in ['Stepwise','RunfromStep']:
             global debugFlag
             debugFlag = True
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+
+    def on_webscrape(self,*args):
+        global action,wxObject,browsername,desktopScrapeFlag,data
+        args = list(args)
+        d = args[0]
+        action = d['action']
+        task = d['task']
+        data = {}
+        if action == 'scrape':
+            if str(task) == 'OPEN BROWSER CH':
+                browsername = '1'
+            elif str(task) == 'OPEN BROWSER IE':
+                browsername = '3'
+            elif str(task) == 'OPEN BROWSER FX':
+                browsername = '2'
+            elif str(task) == 'OPEN BROWSER SF':
+                browsername = '6'
+        elif action == 'compare':
+            data['view'] = d['viewString']
+            data['scrapedurl'] = d['scrapedurl']
+            if str(task) == 'OPEN BROWSER CH':
+                browsername = '1'
+            elif str(task) == 'OPEN BROWSER IE':
+                browsername = '3'
+            elif str(task) == 'OPEN BROWSER FX':
+                browsername = '2'
+        wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_LAUNCH_DESKTOP(self, *args):
         con = controller.Controller()
@@ -235,53 +252,6 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console('Error in SAP')
             log.error(e)
 
-    def on_qclogin(self, *args):
-        global qcdata
-        global soc
-        global socketIO
-        server_data=''
-        data_stream=None
-        client_data=None
-        try:
-            if platform.system() == "Windows":
-                if len(args) > 0:
-                    qcdata = args[0]
-                    if soc is None:
-                        import subprocess
-                        path = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Qc/QcController.exe"
-                        pid = subprocess.Popen(path, shell=True)
-                        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        try:
-                            soc.connect(("localhost",10000))
-                        except socket.error as e:
-                            log.error(e)
-                            if '[Errno 10061]' in str(e):
-                                time.sleep(15)
-                                soc.connect(("localhost",10000))
-
-                    data_to_send = json.dumps(qcdata).encode('utf-8')
-                    data_to_send+='#E&D@Q!C#'
-                    soc.send(data_to_send)
-                    while True:
-                        data_stream= soc.recv(1024)
-                        server_data+=data_stream
-                        if '#E&D@Q!C#' in server_data:
-                            break
-                    client_data= server_data[:server_data.find('#E&D@Q!C#')]
-                    if('Fail@f@!l' in client_data):
-                        client_data=client_data[:client_data.find('@f@!l')]
-                        logger.print_on_console('Error occurred in QC')
-                        socketIO.emit('qcresponse','Error:Qc Operations')
-                    else:
-                        socketIO.emit('qcresponse',client_data)
-                else:
-                    socketIO.emit('qcresponse','Error:data recevied empty')
-            else:
-                 socketIO.emit('qcresponse','Error:Failed in running Qc')
-        except Exception as e:
-            log.error(e)
-            socketIO.emit('qcresponse','Error:Qc Operations')
-
     def on_LAUNCH_MOBILE(self, *args):
         con = controller.Controller()
         global browsername
@@ -297,7 +267,7 @@ class MainNamespace(BaseNamespace):
             browsername = args[0] + ";" + args[2] + ";" + args[3]+";" + args[4]
         """
         con =controller.Controller()
-        if platform.system()=='Darwin':
+        if SYSTEM_OS=='Darwin':
             con.get_all_the_imports('Mobility/MobileApp')
         else:
             con.get_all_the_imports('Mobility')
@@ -314,7 +284,7 @@ class MainNamespace(BaseNamespace):
         global browsername
         browsername = args[0]+";"+args[1]
         con =controller.Controller()
-        if platform.system()=='Darwin':
+        if SYSTEM_OS=='Darwin':
             con.get_all_the_imports('Mobility/MobileWeb')
         else:
             con.get_all_the_imports('Mobility')
@@ -354,6 +324,8 @@ class MainNamespace(BaseNamespace):
         import wsdlgenerator
         wsgen_inputs=eval(str(args[0]))
         wsdlurl = wsgen_inputs['wsdlurl']
+        # Trimming URL for the following defect fix (1263 : Regression_WebService_WSDL : Request header and body are not loaded on click of "Add" button for WSDL)
+        wsdlurl = wsdlurl.strip()
         operations = wsgen_inputs['operations']
         soapVersion = wsgen_inputs['soapVersion']
         wsdl_object = wsdlgenerator.BodyGenarator(wsdlurl,operations,soapVersion)
@@ -371,6 +343,53 @@ class MainNamespace(BaseNamespace):
         response=str(response)
         print response
         socketIO.emit('result_wsdl_ServiceGenerator',response)
+
+    def on_qclogin(self, *args):
+        global qcdata
+        global soc
+        global socketIO
+        server_data=''
+        data_stream=None
+        client_data=None
+        try:
+            if SYSTEM_OS == "Windows":
+                if len(args) > 0:
+                    qcdata = args[0]
+                    if soc is None:
+                        import subprocess
+                        path = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Qc/QcController.exe"
+                        pid = subprocess.Popen(path, shell=True)
+                        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        try:
+                            soc.connect(("localhost",10000))
+                        except socket.error as e:
+                            log.error(e)
+                            if '[Errno 10061]' in str(e):
+                                time.sleep(15)
+                                soc.connect(("localhost",10000))
+
+                    data_to_send = json.dumps(qcdata).encode('utf-8')
+                    data_to_send+='#E&D@Q!C#'
+                    soc.send(data_to_send)
+                    while True:
+                        data_stream= soc.recv(1024)
+                        server_data+=data_stream
+                        if '#E&D@Q!C#' in server_data:
+                            break
+                    client_data= server_data[:server_data.find('#E&D@Q!C#')]
+                    if('Fail@f@!l' in client_data):
+                        client_data=client_data[:client_data.find('@f@!l')]
+                        logger.print_on_console('Error occurred in QC')
+                        socketIO.emit('qcresponse','Error:Qc Operations')
+                    else:
+                        socketIO.emit('qcresponse',client_data)
+                else:
+                    socketIO.emit('qcresponse','Error:data recevied empty')
+            else:
+                 socketIO.emit('qcresponse','Error:Failed in running Qc')
+        except Exception as e:
+            log.error(e)
+            socketIO.emit('qcresponse','Error:Qc Operations')
 
     def on_render_screenshot(self,*args):
         try:
@@ -428,7 +447,7 @@ class MainNamespace(BaseNamespace):
     def on_update_screenshot_path(self,*args):
         spath=args[0]
         import constants
-        if(platform.system()=='Darwin'):
+        if(SYSTEM_OS=='Darwin'):
             spath=spath["mac"]
         else:
             spath=spath["default"]
@@ -477,6 +496,14 @@ class MainNamespace(BaseNamespace):
         except Exception as e:
             log.error(e)
             logger.print_on_console('Exception while Remote Disconnect')
+
+    def on_disconnect(self, *args):
+        logger.print_on_console('Disconnected from Nineteen68 server')
+        wxObject.connectbutton.SetBitmapLabel(wxObject.connect_img)
+        wxObject.connectbutton.SetName('connect')
+        wxObject.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
+        wxObject.schedule.Disable()
+        wxObject.connectbutton.Enable()
 
 
 class SocketThread(threading.Thread):
@@ -617,10 +644,11 @@ class TestThread(threading.Thread):
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
-        global socketIO
+        global socketIO,execution_flag
         try:
             self.wxObject.cancelbutton.Disable()
             self.wxObject.terminatebutton.Enable()
+            self.wxObject.schedule.Disable()
             runfrom_step=1
             if self.action==DEBUG:
                 self.debug_mode=False
@@ -634,9 +662,7 @@ class TestThread(threading.Thread):
                             runfrom_step=int(runfrom_step)
                         except Exception as e:
                             runfrom_step=0
-                self.wxObject.rbox.Disable()
-            else:
-                self.wxObject.rbox.Disable()
+            self.wxObject.rbox.Disable()
             self.wxObject.breakpoint.Disable()
             self.con = controller.Controller()
             self.wxObject.terminatebutton.Enable()
@@ -647,6 +673,7 @@ class TestThread(threading.Thread):
             if(self.action == DEBUG):
                 apptype = (self.json_data)[0]['apptype']
             else:
+                execution_flag = True
                 apptype =(self.json_data)['apptype']
             if(apptype == "DesktopJava"):
                 apptype = "oebs"
@@ -667,11 +694,9 @@ class TestThread(threading.Thread):
             self.wxObject.breakpoint.Enable()
             self.wxObject.cancelbutton.Enable()
             self.wxObject.terminatebutton.Disable()
-            self.wxObject.mythread=None
-            import handler
             testcasename = handler.testcasename
             if self.action==DEBUG:
-                self.wxObject.killDebugWindow()
+                self.wxObject.killChildWindow(debug=True)
                 if (len(testcasename) > 0 or apptype.lower() not in plugins_list):
                     socketIO.emit('result_debugTestCase',status)
                 else:
@@ -683,11 +708,13 @@ class TestThread(threading.Thread):
             status=TERMINATE
             if socketIO is not None:
                 if self.action==DEBUG:
-                    self.wxObject.killDebugWindow()
+                    self.wxObject.killChildWindow(debug=True)
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
                     socketIO.emit('result_executeTestSuite',status)
-
+        self.wxObject.mythread = None
+        execution_flag = False
+        self.wxObject.schedule.Enable()
 
 
 class RedirectText(object):
@@ -713,6 +740,7 @@ class ClientWindow(wx.Frame):
         self.debugwindow = None
         self.scrapewindow = None
         self.pausewindow = None
+        self.pluginPDF = None
         self.id = id
         self.appName = appName
         self.mainclass = self
@@ -755,28 +783,29 @@ class ClientWindow(wx.Frame):
         self.menubar = wx.MenuBar()
         self.fileMenu = wx.Menu()
         self.editMenu = wx.Menu()
+        self.toolMenu = wx.Menu()
         #own event
         self.Bind(wx.EVT_CHOICE, self.test)
-        ##self.Bind(wx.EVT_CHOICE, self.debug)
-        ##self.Bind(wx.EVT_CLOSE, self.closeScrapeWindow)
         #own event
         self.loggerMenu = wx.Menu()
         self.infoItem = wx.MenuItem(self.loggerMenu, 100,text = "Info",kind = wx.ITEM_NORMAL)
         self.loggerMenu.Append(self.infoItem)
-
         self.debugItem = wx.MenuItem(self.loggerMenu, 101,text = "Debug",kind = wx.ITEM_NORMAL)
         self.loggerMenu.Append(self.debugItem)
-
         self.errorItem = wx.MenuItem(self.loggerMenu, 102,text = "Error",kind = wx.ITEM_NORMAL)
         self.loggerMenu.Append(self.errorItem)
-
         self.fileMenu.Append(wx.ID_ANY, "Logger Level", self.loggerMenu)
         self.menubar.Append(self.fileMenu, '&File')
-        #-----------------------------------------------------Config Menu Begins
+
         self.configItem = wx.MenuItem(self.editMenu, 103,text = "Configuration",kind = wx.ITEM_NORMAL)
         self.editMenu.Append(self.configItem)
         self.menubar.Append(self.editMenu, '&Edit')
-        #-------------------------------------------------------Config Menu Ends
+
+        self.pdfReportItem = wx.MenuItem(self.toolMenu, 151,text = "Generate PDF Report",kind = wx.ITEM_NORMAL)
+        self.toolMenu.Append(self.pdfReportItem)
+        self.pdfReportBatchItem = wx.MenuItem(self.toolMenu, 152,text = "Generate PDF Report (Batch)",kind = wx.ITEM_NORMAL)
+        self.toolMenu.Append(self.pdfReportBatchItem)
+        self.menubar.Append(self.toolMenu, '&Tools')
         self.SetMenuBar(self.menubar)
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
@@ -852,6 +881,7 @@ class ClientWindow(wx.Frame):
       2. Edit client configuration
     """
     def menuhandler(self, event):
+        global pdfgentool
         id = event.GetId()
         if id == 100:     # When user selects INFO level
             logger.print_on_console( '--Logger level : INFO selected--')
@@ -882,6 +912,42 @@ class ClientWindow(wx.Frame):
                 logger.print_on_console(msg)
                 log.info(msg)
                 log.error(e)
+        elif id==151:      # When user selects Tools > Generate PDF Report
+            try:
+                if (self.pluginPDF!= None) and (bool(self.pluginPDF) != False):
+                    msg = 'Report PDF generation plugin is already active'
+                else:
+                    if pdfgentool is None:
+                        con = controller.Controller()
+                        con.get_all_the_imports('PdfReport')
+                        import pdfReportGenerator as pdfgentool
+                    msg = 'Initializing Report PDF generation plugin'
+                    self.pluginPDF = pdfgentool.GeneratePDFReport("PDF Report Generator", pdfgentool.pdfkit_conf)
+                logger.print_on_console(msg)
+                log.info(msg)
+            except Exception as e:
+                msg = "Error while loading PDF generation plugin"
+                logger.print_on_console(msg)
+                log.info(msg)
+                log.error(e)
+        elif id==152:      # When user selects Tools > Generate PDF Report (Batch)
+            try:
+                if (self.pluginPDF!= None) and (bool(self.pluginPDF) != False):
+                    msg = 'Report PDF generation plugin is already active'
+                else:
+                    if pdfgentool is None:
+                        con = controller.Controller()
+                        con.get_all_the_imports('PdfReport')
+                        import pdfReportGenerator as pdfgentool
+                    msg = 'Initializing Report PDF generation plugin (Batch mode)'
+                    self.pluginPDF = pdfgentool.GeneratePDFReportBatch("PDF Report Generator - Batch Mode", pdfgentool.pdfkit_conf)
+                logger.print_on_console(msg)
+                log.info(msg)
+            except Exception as e:
+                msg = "Error while loading PDF generation plugin (Batch mode)"
+                logger.print_on_console(msg)
+                log.info(msg)
+                log.error(e)
 
     def onChecked_Schedule(self, e):
         mode=self.schedule.GetValue()
@@ -894,7 +960,7 @@ class ClientWindow(wx.Frame):
         if self.choice == 'Normal':
             self.breakpoint.Clear()
             self.breakpoint.Disable()
-            self.killDebugWindow()
+            self.killChildWindow(debug=True)
         self.debug_mode=False
         self.breakpoint.Disable()
         if self.choice in ['Stepwise','RunfromStep']:
@@ -912,12 +978,12 @@ class ClientWindow(wx.Frame):
         controller.disconnect_flag=True
         global socketIO
         logger.print_on_console('Disconnected from Nineteen68 server')
+        stat = self.killChildWindow(True,True,True,True)
+        if stat[1]: socketIO.emit('scrape','Terminate')
         self.killSocket(True)
-        self.killDebugWindow()
-        self.killScrapeWindow()
         self.Destroy()
         controller.kill_process()
-        if platform.system() == "Windows":
+        if SYSTEM_OS == "Windows":
             os.system("TASKKILL /F /IM QcController.exe")
             os.system("TASKKILL /F /IM nineteen68MFapi.exe")
         sys.exit(0)
@@ -926,10 +992,9 @@ class ClientWindow(wx.Frame):
         controller.kill_process()
 
     def OnTerminate(self, event, state=''):
-        self.killDebugWindow()
-        if self.killScrapeWindow():
-            socketIO.emit('scrape','Terminate')
-        self.killPauseWindow()
+        global execution_flag
+        stat = self.killChildWindow(True,True,True,True)
+        if stat[1]: socketIO.emit('scrape','Terminate')
         if(state=="term_exec"):
             controller.disconnect_flag=True
             print ""
@@ -944,6 +1009,8 @@ class ClientWindow(wx.Frame):
         if controller.pause_flag:
             controller.pause_flag=False
             wxObject.mythread.resume(False)
+        self.schedule.Enable()
+        execution_flag = False
 
     def OnClear(self,event):
         self.log.Clear()
@@ -1000,70 +1067,87 @@ class ClientWindow(wx.Frame):
             log.error("Error while disconnecting from server")
             log.error(e)
 
-    def killDebugWindow(self):
+    def killChildWindow(self, debug=False, scrape=False, display=False, pdf=False):
         #Close the debug window
+        stat = []
         flag=False
-        try:
-            if (self.debugwindow != None) and (bool(self.debugwindow) != False):
-                self.debugwindow.Destroy()
-                flag = True
-            self.debugwindow = None
-        except Exception as e:
-            log.error("Error while killing debug window")
-            log.error(e)
-        return flag
+        if debug:
+            try:
+                if (self.debugwindow != None) and (bool(self.debugwindow) != False):
+                    self.debugwindow.Destroy()
+                    flag = True
+                self.debugwindow = None
+            except Exception as e:
+                log.error("Error while closing debug window")
+                log.error(e)
+        stat.append(flag)
 
-    def killScrapeWindow(self):
         #Close the scrape window
         flag=False
-        try:
-            if (self.scrapewindow != None) and (bool(self.scrapewindow) != False):
-                self.scrapewindow.Destroy()
-                flag = True
-            self.scrapewindow = None
-        except Exception as e:
-            log.error("Error while killing scrape window")
-            log.error(e)
-        return flag
+        if scrape:
+            try:
+                if (self.scrapewindow != None) and (bool(self.scrapewindow) != False):
+                    self.scrapewindow.Destroy()
+                    flag = True
+                self.scrapewindow = None
+            except Exception as e:
+                log.error("Error while closing scrape window")
+                log.error(e)
+        stat.append(flag)
 
-    def killPauseWindow(self):
         #Close the pause/display window
         flag=False
-        try:
-            if (self.pausewindow != None) and (bool(self.pausewindow) != False):
-                self.pausewindow.OnOk()
-                flag = True
-            self.pausewindow = None
-        except Exception as e:
-            log.error("Error while killing pause window")
-            log.error(e)
-        return flag
+        if display:
+            try:
+                if (self.pausewindow != None) and (bool(self.pausewindow) != False):
+                    self.pausewindow.OnOk()
+                    flag = True
+                self.pausewindow = None
+            except Exception as e:
+                log.error("Error while closing pause window")
+                log.error(e)
+        stat.append(flag)
+
+        #Close the PDF plugin window
+        flag=False
+        if pdf:
+            try:
+                if (self.pluginPDF != None) and (bool(self.pluginPDF) != False):
+                    self.pluginPDF.OnClose()
+                    flag = True
+                self.pluginPDF = None
+            except Exception as e:
+                log.error("Error while unloading PDF plugin")
+                log.error(e)
+        stat.append(flag)
+        return stat
 
     def test(self,event):
         global mobileScrapeFlag,qcConFlag,mobileWebScrapeFlag,desktopScrapeFlag
         global sapScrapeFlag,debugFlag,browsername,action,oebsScrapeFlag
         global socketIO,data
         con = controller.Controller()
+        self.schedule.Disable()
         if(irisFlag == True):
             con.get_all_the_imports('IRIS')
         if mobileScrapeFlag==True:
-            self.scrapewindow = mobileScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
+            self.scrapewindow = mobileScrapeObj.ScrapeWindow(parent = self,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
             mobileScrapeFlag=False
         elif qcConFlag==True:
             self.scrapewindow = qcConObj.QcWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = qcdata,socketIO = socketIO)
             qcConFlag=False
         elif mobileWebScrapeFlag==True:
-            self.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Mobile Scrapper",browser = browsername,socketIO = socketIO)
+            self.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = self,id = -1, title="SLK Nineteen68 - Mobile Scrapper",browser = browsername,socketIO = socketIO)
             mobileWebScrapeFlag=False
         elif desktopScrapeFlag==True:
-            self.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+            self.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = self,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             desktopScrapeFlag=False
             browsername = ''
         elif sapScrapeFlag==True:
-            self.scrapewindow = sapScrapeObj.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+            self.scrapewindow = sapScrapeObj.ScrapeWindow(parent = self,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             sapScrapeFlag=False
         elif oebsScrapeFlag==True:
-            self.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = None,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+            self.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = self,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
             oebsScrapeFlag=False
         elif debugFlag == True:
             self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
@@ -1076,7 +1160,7 @@ class ClientWindow(wx.Frame):
                 con.get_all_the_imports('Web')
                 con.get_all_the_imports('WebScrape')
                 import Nineteen68_WebScrape
-                self.scrapewindow = Nineteen68_WebScrape.ScrapeWindow(parent = None,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data,irisFlag = irisFlag)
+                self.scrapewindow = Nineteen68_WebScrape.ScrapeWindow(parent = self,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data,irisFlag = irisFlag)
                 browsername = ''
             else:
                 import pause_display_operation
@@ -1157,57 +1241,59 @@ class Config_window(wx.Frame):
         #----------------------------------
 
         #------------------------------------Different co-ordinates for Windows and Mac
-        if platform.system()=='Windows':
+        if SYSTEM_OS=='Windows':
             config_fields= {
-            "Frame":[(300, 150),(470,450)],
+            "Frame":[(300, 150),(470,480)],
             "S_address":[(12,8 ),(90, 28),(100,8 ),(140,-1)],
             "S_port": [(270,8 ),(70, 28),(340,8 ), (105,-1)],
             "Chrm_path":[(12,38),(80, 28),(100,38), (310,-1),(415,38),(30, -1)],
-            "Log_path":[(12,68),(80, 28),(100,68), (310,-1),(415,68),(30, -1)],
-            "Q_timeout":[(12,98),(85, 28),(100,98), (80,-1)],
-            "Timeout":[(185,98),(50, 28),(240,98), (80,-1)],
-            "Delay":[(325,98),(40, 28),(360,98), (85,-1)],
-            "Step_exec":[(12,128),(120, 28),(130,128),(80,-1)],
-            "Disp_var":[(225,128),(140, 28),(360,128), (85,-1)],
-            "S_cert":[(12,158),(85, 28),(100,158),(310,-1),(415,158),(30, -1)],
-            "Ignore_cert":[(12,188)],
-            "IE_arch":[(150,188)],
-            "Dis_s_cert":[(290,188)],
-            "Ex_flag":[(12,248)],
-            "Ignore_v_check":[(150,248)],
-            "S_flag":[(340,308)],
-            "Ret_url":[(12,308)],
-            "En_secu_check":[(308,248)],
-            "Brow_ch":[(115,308)],
-            "High_ch":[ (225,308)],
-            "Save":[(100,388), (100, 28)],
-            "Close":[(250,388), (100, 28)]
+            "Ffox_path":[(12,68),(80, 28),(100,68), (310,-1),(415,68),(30, -1)],
+            "Log_path":[(12,98),(80, 28),(100,98), (310,-1),(415,98),(30, -1)],
+            "Q_timeout":[(12,128),(85, 28),(100,128), (80,-1)],
+            "Timeout":[(185,128),(50, 28),(240,128), (80,-1)],
+            "Delay":[(325,128),(40, 28),(360,128), (85,-1)],
+            "Step_exec":[(12,158),(120, 28),(130,158),(80,-1)],
+            "Disp_var":[(225,158),(140, 28),(360,158), (85,-1)],
+            "S_cert":[(12,188),(85, 28),(100,188),(310,-1),(415,188),(30, -1)],
+            "Ignore_cert":[(12,218)],
+            "IE_arch":[(150,218)],
+            "Dis_s_cert":[(290,218)],
+            "Ex_flag":[(12,278)],
+            "Ignore_v_check":[(150,278)],
+            "S_flag":[(340,338)],
+            "Ret_url":[(12,338)],
+            "En_secu_check":[(308,278)],
+            "Brow_ch":[(115,338)],
+            "High_ch":[ (225,338)],
+            "Save":[(100,418), (100, 28)],
+            "Close":[(250,418), (100, 28)]
         }
         else:
             config_fields={
-            "Frame":[(300, 150),(555,460)],
+            "Frame":[(300, 150),(555,490)],
             "S_address":[(12,8),(90,28),(116,8 ),(140,-1)],
             "S_port": [(352,8),(70,28),(430,8 ),(105,-1)],
             "Chrm_path":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
-            "Log_path":[(12,68),(80, 28),(116,68),(382,-1),(504,68),(30, -1)],
-            "Q_timeout":[(12,98),(85, 28),(116,98), (80,-1)],
-            "Timeout":[(225,98),(50, 28),(290,98),(80,-1)],
-            "Delay":[(404,98),(40, 28),(448,98), (85,-1)],
-            "Step_exec":[(12,128),(120, 28),(142,128),(80,-1)],
-            "Disp_var":[(288,128),(140, 28),(448,128),(85,-1)],
-            "S_cert":[(12,158),(85, 28),(116,158),(382,-1),(504,158),(30, -1)],
-            "Ignore_cert":[(12,248)],
-            "IE_arch":[(158,188)],
-            "Dis_s_cert":[(335,188)],
-            "Ex_flag":[(12,188)],
-            "Ignore_v_check":[(170,248)],
-            "S_flag":[(396,308)],
-            "Ret_url":[(12,308)],
-            "En_secu_check":[(358,248)],
-            "Brow_ch":[(130,308)],
-            "High_ch":[(260,308)],
-            "Save":[(135,388),(100, 28)],
-            "Close":[(285,388),(100, 28)]
+            "Ffox_path":[(12,68),(80,28),(116,68),(382,-1),(504,68),(30, -1)],
+            "Log_path":[(12,98),(80, 28),(116,98),(382,-1),(504,98),(30, -1)],
+            "Q_timeout":[(12,128),(85, 28),(116,128), (80,-1)],
+            "Timeout":[(225,128),(50, 28),(290,128),(80,-1)],
+            "Delay":[(404,128),(40, 28),(448,128), (85,-1)],
+            "Step_exec":[(12,158),(120, 28),(142,158),(80,-1)],
+            "Disp_var":[(288,158),(140, 28),(448,158),(85,-1)],
+            "S_cert":[(12,188),(85, 28),(116,188),(382,-1),(504,188),(30, -1)],
+            "Ignore_cert":[(12,278)],
+            "IE_arch":[(158,218)],
+            "Dis_s_cert":[(335,218)],
+            "Ex_flag":[(12,218)],
+            "Ignore_v_check":[(170,278)],
+            "S_flag":[(396,338)],
+            "Ret_url":[(12,338)],
+            "En_secu_check":[(358,278)],
+            "Brow_ch":[(130,338)],
+            "High_ch":[(260,338)],
+            "Save":[(135,418),(100, 28)],
+            "Close":[(285,418),(100, 28)]
         }
         wx.Frame.__init__(self, parent, title=title,
                    pos=config_fields["Frame"][0], size=config_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
@@ -1241,6 +1327,15 @@ class Config_window(wx.Frame):
             self.chrome_path.SetValue(isConfigJson['chrome_path'])
         else:
             self.chrome_path.SetValue('default')
+
+        self.ff_path=wx.StaticText(self.panel, label="Firefox Path", pos=config_fields["Ffox_path"][0],size=config_fields["Ffox_path"][1], style=0, name="")
+        self.firefox_path=wx.TextCtrl(self.panel, pos=config_fields["Ffox_path"][2], size=config_fields["Ffox_path"][3])
+        self.firefox_path_btn=wx.Button(self.panel, label="...", pos=config_fields["Ffox_path"][4], size=config_fields["Ffox_path"][5])
+        self.firefox_path_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_ffpath)
+        if isConfigJson!=False:
+            self.firefox_path.SetValue(isConfigJson['firefox_path'])
+        else:
+            self.firefox_path.SetValue('default')
 
         self.log_fpath=wx.StaticText(self.panel, label="Log File Path", pos=config_fields["Log_path"][0],size=config_fields["Log_path"][1], style=0, name="")
         self.log_file_path=wx.TextCtrl(self.panel, pos=config_fields["Log_path"][2], size=config_fields["Log_path"][3])
@@ -1366,7 +1461,7 @@ class Config_window(wx.Frame):
         else:
             self.rbox10.SetSelection(1)
 
-        self.error_msg=wx.StaticText(self.panel, label="", pos=(85,360),size=(350, 28), style=0, name="")
+        self.error_msg=wx.StaticText(self.panel, label="", pos=(85,390),size=(350, 28), style=0, name="")
         self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])
         self.save_btn.Bind(wx.EVT_BUTTON, self.config_check)
         self.close_btn=wx.Button(self.panel, label="Close",pos=config_fields["Close"][0], size=config_fields["Close"][1])
@@ -1401,6 +1496,7 @@ class Config_window(wx.Frame):
         server_add=self.server_add.GetValue()
         server_port=self.server_port.GetValue()
         chrome_path=self.chrome_path.GetValue()
+        firefox_path=self.firefox_path.GetValue()
         logFile_Path=self.log_file_path.GetValue()
         queryTimeOut=self.query_timeout.GetValue()
         time_out=self.time_out.GetValue()
@@ -1415,7 +1511,8 @@ class Config_window(wx.Frame):
         data['server_ip'] = server_add.strip()
         data['server_port'] = server_port.strip()
         data['ignore_certificate'] = ignore_certificate.strip()
-        data['chrome_path'] = chrome_path.strip()
+        data['chrome_path'] = chrome_path.strip() if chrome_path.strip().lower()!='default' else 'default'
+        data['firefox_path'] = firefox_path.strip() if firefox_path.strip().lower()!='default' else 'default'
         data['bit_64'] = bit_64.strip()
         data['logFile_Path'] = logFile_Path.strip()
         data['screenShot_Flag'] = screenShot_Flag.strip()
@@ -1433,7 +1530,7 @@ class Config_window(wx.Frame):
         data['disable_server_cert'] = disable_server_cert.strip()
         data['highlight_check'] = highlight_check.strip()
         config_data=data
-        if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='':
+        if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='' and data['firefox_path']!='':
             #---------------------------------------resetting the static texts
             self.error_msg.SetLabel("")
             self.sev_add.SetLabel('Server Address')
@@ -1448,6 +1545,8 @@ class Config_window(wx.Frame):
             self.sev_cert.SetForegroundColour((0,0,0))
             self.ch_path.SetLabel('Chrome Path')
             self.ch_path.SetForegroundColour((0,0,0))
+            self.ff_path.SetLabel('Firefox Path')
+            self.ff_path.SetForegroundColour((0,0,0))
             self.delayText.SetLabel('Delay')
             self.delayText.SetForegroundColour((0,0,0))
             self.timeOut.SetLabel('Time Out')
@@ -1469,7 +1568,7 @@ class Config_window(wx.Frame):
                 data['logFile_Path'] = ''
 
             #---------------------------------------resetting the static texts
-            if (os.path.isfile(data['chrome_path'])==True or str(data['chrome_path']).strip()=='default') and os.path.isfile(data['server_cert'])==True and os.path.isfile(data['logFile_Path'])==True:
+            if (os.path.isfile(data['chrome_path'])==True or str(data['chrome_path']).strip()=='default') and os.path.isfile(data['server_cert'])==True and os.path.isfile(data['logFile_Path'])==True and (os.path.isfile(data['firefox_path'])==True or str(data['firefox_path']).strip()=='default'):
                 self.jsonCreater(config_data)
             else:
                 self.error_msg.SetLabel("Marked fields '^' contain invalid path, Data not saved")
@@ -1487,6 +1586,13 @@ class Config_window(wx.Frame):
                 elif  os.path.isfile(data['chrome_path'])!=True:
                     self.ch_path.SetLabel('Chrome Path^')
                     self.ch_path.SetForegroundColour((0,0,255))
+
+                if os.path.isfile(data['firefox_path'])==True or str(data['firefox_path']).strip()=='default':
+                    self.ff_path.SetLabel('Firefox Path')
+                    self.ff_path.SetForegroundColour((0,0,0))
+                elif  os.path.isfile(data['firefox_path'])!=True:
+                    self.ff_path.SetLabel('Firefox Path^')
+                    self.ff_path.SetForegroundColour((0,0,255))
 
                 if os.path.isfile(data['logFile_Path'])!=True:
                     self.log_fpath.SetLabel('Log File Path^')
@@ -1533,6 +1639,12 @@ class Config_window(wx.Frame):
             else:
                 self.ch_path.SetLabel('Chrome Path')
                 self.ch_path.SetForegroundColour((0,0,0))
+            if data['firefox_path']=='':
+                self.ff_path.SetLabel('Firefox Path*')
+                self.ff_path.SetForegroundColour((255,0,0))
+            else:
+                self.ff_path.SetLabel('Firefox Path')
+                self.ff_path.SetForegroundColour((0,0,0))
             if data['delay']=='':
                 self.delayText.SetLabel('Delay*')
                 self.delayText.SetForegroundColour((255,0,0))
@@ -1593,6 +1705,14 @@ class Config_window(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             self.chrome_path.SetValue(path)
+        dlg.Destroy()
+    """This method open a file selector dialog , from where file path can be set """
+    def fileBrowser_ffpath(self,event):
+        dlg = wx.FileDialog(self, message="Choose a file ...",defaultDir=self.currentDirectory,defaultFile="", wildcard="Firefox executable (*firefox.exe)|*firefox.exe|" \
+            "All files (*.*)|*.*", style=wx.FD_SAVE)
+        if dlg.ShowModal() == wx.ID_OK:
+            path = dlg.GetPath()
+            self.firefox_path.SetValue(path)
         dlg.Destroy()
     """This method open a file selector dialog , from where file path can be set """
     def fileBrowser_logfilepath(self,event):
@@ -1673,6 +1793,20 @@ class DebugWindow(wx.Frame):
 def check_browser():
     try:
         try:
+            try:
+                if os.path.isfile(ICE_CONST)==True:
+                    params = json.load(open(ICE_CONST))
+                    if params['CHROME_VERSION'] != "":
+                        for k,v in params['CHROME_VERSION'].items():
+                            CHROME_DRIVER_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
+                    if params['FIREFOX_VERSION'] != "":
+                        for k,v in params['FIREFOX_VERSION'].items():
+                            FIREFOX_BROWSER_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
+                else:
+                    logger.print_on_console("Unable to locate ICE parameters")
+            except Exception as e:
+                logger.print_on_console("Unable to locate ICE parameters")
+                log.error(e)
             global chromeFlag,firefoxFlag
             logger.print_on_console('Checking for browser versions...')
             import subprocess
@@ -1682,7 +1816,7 @@ def check_browser():
             p = subprocess.Popen('chromedriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
             for line in iter(p.stdout.readline, b''):
                 a.append(str(line))
-            a=float(a[0][13:17])
+            a=a[0][13:17]
             choptions1 = webdriver.ChromeOptions()
             if str(configvalues['chrome_path']).lower()!="default":
                 choptions1.binary_location=str(configvalues['chrome_path'])
@@ -1697,9 +1831,9 @@ def check_browser():
             except:
                 pass
             driver=None
-            for i in CHROME_DRIVER_VERSION:
-                if a == i[0]:
-                    if browser_ver >= i[1] and browser_ver <= i[2]:
+            for k,v in CHROME_DRIVER_VERSION.items():
+                if a == k:
+                    if browser_ver >= v[0] and browser_ver <= v[1]:
                         chromeFlag=True
             if chromeFlag == False :
                 logger.print_on_console('WARNING!! : Chrome version',browser_ver,' is not supported.')
@@ -1712,13 +1846,18 @@ def check_browser():
             a=[]
             for line in iter(p.stdout.readline, b''):
                 a.append(str(line))
-            a=float(a[0][12:16])
+            a=a[0][12:16]
             caps=webdriver.DesiredCapabilities.FIREFOX
             caps['marionette'] = True
             from selenium.webdriver.firefox.options import Options
             options = Options()
             options.add_argument('--headless')
-            driver = webdriver.Firefox(capabilities=caps,firefox_options=options, executable_path=GECKODRIVER_PATH)
+            if str(configvalues['firefox_path']).lower()!="default":
+                from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+                binary = FirefoxBinary(str(configvalues['firefox_path']))
+                driver = webdriver.Firefox(capabilities=caps,firefox_options=options,firefox_binary=binary, executable_path=GECKODRIVER_PATH)
+            else:
+                driver = webdriver.Firefox(capabilities=caps,firefox_options=options, executable_path=GECKODRIVER_PATH)
             browser_ver=driver.capabilities['browserVersion']
             browser_ver1 = browser_ver.encode('utf-8')
             browser_ver = float(browser_ver1[:4])
@@ -1728,9 +1867,9 @@ def check_browser():
             except:
                 pass
             driver=None
-            for i in FIREFOX_BROWSER_VERSION:
-                if a == i[0]:
-                    if browser_ver >= i[1] or browser_ver <= i[2]:
+            for k,v in FIREFOX_BROWSER_VERSION.items():
+                if a == k:
+                    if browser_ver >= v[0] or browser_ver <= v[1]:
                         firefoxFlag=True
             if firefoxFlag == False:
                 logger.print_on_console('WARNING!! : Firefox version',browser_ver,' is not supported.')

@@ -23,6 +23,10 @@ class StepDescription:
             return 'Get current date of the system and save the date '+ "'" + str(output)+ "'" + ' in '+ "'"+ tsp.outputval+ "'"
         def getcurrentdateandtime():
             return 'Get current date and time of the system and save the date and time '+"'"+ inputval[0] +"' and '"+ inputval[1] + "'"+ ' in '+"'"+ tsp.outputval+"'"
+        def getcurrentday():
+            return 'Get current day of the system and save the day '+ "'" + str(output)+ "'" + ' in '+ "'"+ tsp.outputval+ "'"
+        def getcurrentdaydateandtime():
+            return 'Get current day date time of the system and save the day date time '+"'"+ str(output) + "'"+ ' in '+"'"+ tsp.outputval+"'"
         def dateaddition():
             return "Add the date '"+ inputval[0] + "' to '"+ inputval[1]+ "' number of days and save the date '" + output + "' in '"+ tsp.outputval+"'"
         def datecompare():
@@ -253,7 +257,7 @@ class StepDescription:
         def setwholebody():
             return 'Set the entire body ' +"'"+ input+"'"+ ' that needs to be sent in the request'
         def setoperations():
-            return 'Set the Operation ' +"'"+ input+"'"+ 'that needs to be performed on the request'
+            return 'Set the Operation ' +"'"+ input+"'"+ ' that needs to be performed on the request'
         def setmethods():
             return 'Set the method type ' +"'"+ input +"'"+ ' for the operation.'
         def setheadertemplate():
@@ -263,7 +267,7 @@ class StepDescription:
         def settagvalue():
             return 'Set the Tag Value ' +"'"+ input +"'"+ ' for the tag '+ "'" + tsp.custname + "'" + '.'
         def setheader():
-            return 'Set the header '+"'"+ input +"'"+ ' that needs to be sent in the request.'
+            return 'Set the header '+"'"+ input.replace("##","|") +"'"+ ' that needs to be sent in the request.'
         def settagattribute():
             return 'Set the Tag attribute ' +"'"+ input +"'"+ ' for the tag '+ "'" + tsp.custname + "'" + '.'
         def getheader():
@@ -271,7 +275,9 @@ class StepDescription:
         def getbody():
             return 'Fetch the entire body ' +"'"+ output+"'"+ ' that was received as a response.'
         def addclientcertificate():
-            return 'Add the certificate present in the '+"'"+ inputval[0]+"'"+ ' to the '+ "'"+inputval[1] +"'"+ '.'
+            return 'Add the certificate(s) provided to the Web Service.'
+        def setbasicauth():
+            return 'Basic authentication for the Webservice with username '+"'"+inputval[0]+"'"+" and password "+"'"+inputval[1]+"'"+"."
         def getservercertificate():
             return 'Fetch the Server certificate and save it in '+ "'"+inputval[1] +"'"+ '.'
         def executerequest():
@@ -429,7 +435,7 @@ class StepDescription:
         def verifyexistsiris():
             return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         def verifytextiris():
-            return ' Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'             
+            return ' Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'
         return locals()[keyword]()
 
     def sap(self,keyword,tsp,inputval,input,output,con,reporting_obj):
@@ -636,7 +642,7 @@ class StepDescription:
         def verifyexistsiris():
             return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         def verifytextiris():
-            return ' Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'              
+            return ' Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'
         return locals()[keyword]()
 
 
@@ -870,7 +876,7 @@ class StepDescription:
         def verifyexistsiris():
             return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         def verifytextiris():
-            return ' Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'             
+            return ' Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'
         return locals()[keyword]()
 
     def mobileapp(self,keyword,tsp,inputval,input,output,con,reporting_obj):
@@ -1346,7 +1352,7 @@ class StepDescription:
         def verifyexistsiris():
             return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         def verifytextiris():
-            return ' Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'              
+            return ' Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'
         return locals()[keyword]()
 
 

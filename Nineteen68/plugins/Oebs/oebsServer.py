@@ -87,9 +87,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.buttonops_obj.getbuttonname(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -99,9 +99,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if ( accessContext):
             if str(accessContext) != 'fail':
                 self.buttonops_obj.verifybuttonname(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -111,9 +111,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.buttonops_obj.click(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -123,9 +123,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.buttonops_obj.doubleclick(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -135,9 +135,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+       # self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.txtops_obj.gettext(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -147,9 +147,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.txtops_obj.settext(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -160,9 +160,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.txtops_obj.gettextboxlength(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -172,10 +172,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if str(accessContext) != 'fail':
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           if str(accessContext) != 'fail':
                 self.txtops_obj.verifytextboxlength(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return oebs_key_objects.keyword_output
@@ -184,10 +184,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if str(accessContext) != 'fail':
+       # self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           if str(accessContext) != 'fail':
                 self.txtops_obj.verifytext(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
@@ -196,10 +196,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if str(accessContext) != 'fail':
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           if str(accessContext) != 'fail':
                 self.txtops_obj.cleartext(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
@@ -208,9 +208,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.utilops_obj.setfocus(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -219,10 +219,10 @@ class OebsKeywords:
     def verifyenabled(self,applicationname,objectname,keyword,inputs,outputs):
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
-        log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
+##        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.utilops_obj.verifyenabled(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -232,10 +232,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if str(accessContext) != 'fail':
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           if str(accessContext) != 'fail':
                 self.utilops_obj.verifydisabled(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
@@ -244,9 +244,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.utilops_obj.verifyvisible(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -256,9 +256,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.utilops_obj.verifyhidden(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -268,10 +268,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if str(accessContext) != 'fail':
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           if str(accessContext) != 'fail':
                 self.utilops_obj.verifyreadonly(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
@@ -280,9 +280,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.utilops_obj.gettooltiptext(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -292,10 +292,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if str(accessContext) != 'fail':
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           if str(accessContext) != 'fail':
                 self.utilops_obj.verifytooltiptext(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
@@ -304,9 +304,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.utilops_obj.verifyexists(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -316,10 +316,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if str(accessContext) != 'fail':
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           if str(accessContext) != 'fail':
                 self.utilops_obj.verifydoesnotexists(accessContext)
         elif (str(accessContext) == 'fail'):
             self.utilops_obj.verifydoesnotexists(accessContext)
@@ -330,9 +330,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.utilops_obj.sendfunctionkeys(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -342,10 +342,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if str(accessContext) != 'fail':
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           if str(accessContext) != 'fail':
                 self.buttonops_obj.getlinktext(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
@@ -354,10 +354,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if str(accessContext) != 'fail':
+       # self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           if str(accessContext) != 'fail':
                 self.buttonops_obj.verifylinktext(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
@@ -366,9 +366,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+       # self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.radiocheckboxops_obj.selectradiobutton(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -378,9 +378,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.radiocheckboxops_obj.selectcheckbox(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -390,9 +390,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                self.radiocheckboxops_obj.unselectcheckbox(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -402,9 +402,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.radiocheckboxops_obj.getstatus(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -414,10 +414,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if str(accessContext) != 'fail':
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           if str(accessContext) != 'fail':
                 self.dropdownlistboxops_obj.getselected(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
@@ -426,10 +426,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if str(accessContext) != 'fail':
+       # self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           if str(accessContext) != 'fail':
                 self.dropdownlistboxops_obj.verifyselectedvalue(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
@@ -439,9 +439,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 contextinfo = accessContext.getAccessibleContextInfo()
                 if(contextinfo.role == 'combo box'):
@@ -456,9 +456,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             contextinfo = accessContext.getAccessibleContextInfo()
             if(len(oebs_key_objects.keyword_input) != 0 and oebs_key_objects.keyword_input[0] !='' ):
                 if(contextinfo.role == 'combo box'):
@@ -473,9 +473,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.dropdownlistboxops_obj.verifyallvalues(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -485,10 +485,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if str(accessContext) != 'fail':
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           if str(accessContext) != 'fail':
                 self.dropdownlistboxops_obj.verifyvaluesexists(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
@@ -497,9 +497,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.dropdownlistboxops_obj.selectvaluebyindex(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -509,20 +509,21 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            self.dropdownlistboxops_obj.getvaluebyindex(accessContext)
-            if str(accessContext) != 'fail':
-                log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
-                return self.utilities_obj.clientresponse()
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           self.dropdownlistboxops_obj.getvaluebyindex(accessContext)
+           if str(accessContext) != 'fail':
+            log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
+            return self.utilities_obj.clientresponse()
 
     def selectvaluebytext(self,applicationname,objectname,keyword,inputs,outputs):
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
             if str(accessContext) != 'fail':
                 self.dropdownlistboxops_obj.selectvaluebytext(accessContext)
@@ -533,9 +534,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.dropdownlistboxops_obj.selectmultiplevaluesbyindexes(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -545,9 +546,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.dropdownlistboxops_obj.deselectall(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -557,9 +558,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.dropdownlistboxops_obj.selectallvalues(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -569,9 +570,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.dropdownlistboxops_obj.getmultiplevaluesbyindexes(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -581,9 +582,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.dropdownlistboxops_obj.verifyselectedvalues(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -593,9 +594,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.dropdownlistboxops_obj.selectmultiplevaluesbytext(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -613,9 +614,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.utilops_obj.rightclick(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -625,10 +626,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if str(accessContext) != 'fail':
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           if str(accessContext) != 'fail':
                 self.elementsops_obj.clickelement(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
@@ -637,9 +638,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.elementsops_obj.getelementtext(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -649,9 +650,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if ( accessContext):
             if str(accessContext) != 'fail':
                 self.elementsops_obj.verifyelementtext(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -661,9 +662,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+
             #contextinfo = accessContext.getAccessibleTableInfo()
             #if(contextinfo.role == 'table'):
             #accessContext = oebs_serverUtilities.looptolist(accessContext)
@@ -676,9 +678,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+
             #contextinfo = accessContext.getAccessibleTableInfo()
             #if(contextinfo.role == 'table'):
             #accessContext = oebs_serverUtilities.looptolist(accessContext)
@@ -691,9 +694,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.tableops_obj.getcellvalue(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -703,9 +706,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.tableops_obj.verifycellvalue(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -715,9 +718,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.tableops_obj.cellclick(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -748,10 +751,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if str(accessContext) != 'fail':
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           if str(accessContext) != 'fail':
                 self.scrollbarops_obj.right(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
@@ -760,9 +763,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.scrollbarops_obj.left(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -772,9 +775,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.scrollbarops_obj.up(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
@@ -784,10 +787,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if str(accessContext) != 'fail':
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           if str(accessContext) != 'fail':
                 self.scrollbarops_obj.down(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
@@ -796,10 +799,10 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if str(accessContext) != 'fail':
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           if str(accessContext) != 'fail':
                 self.internalframeops_obj.closeframe(accessContext)
         log.debug('MSG:Keyword response : %s',OEBS_INTERNALFRAMEOPS,oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
@@ -808,9 +811,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.internalframeops_obj.togglemaximize(accessContext)
         log.debug('MSG:Keyword response : %s',OEBS_INTERNALFRAMEOPS,oebs_key_objects.keyword_output)
@@ -820,9 +823,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             if str(accessContext) != 'fail':
                 self.internalframeops_obj.toggleminimize(accessContext)
         log.debug('MSG:Keyword response : %s',OEBS_INTERNALFRAMEOPS,oebs_key_objects.keyword_output)
@@ -833,7 +836,7 @@ class OebsKeywords:
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
         accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
         log.debug('MSG:Keyword response : %s',DEF_WAITFORELEMENTVISIBLE,oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
 
@@ -841,9 +844,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             self.utilops_obj.drag(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
@@ -852,9 +855,9 @@ class OebsKeywords:
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
-        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        if (oebs_key_objects.keyword_output[1]):
-            accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
             self.utilops_obj.drop(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
