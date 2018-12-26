@@ -20,7 +20,12 @@ import time
 from constants import SYSTEM_OS
 from mobile_app_constants import *
 import logger
-##log = logging.getLogger('android_scrapping.py')
+import commands
+import socket
+import base64
+import platform
+import logging
+log = logging.getLogger('android_scrapping.py')
 
 XpathList=[]
 resource_id=[]
@@ -42,10 +47,10 @@ counter=0
 driver=None
 
 class InstallAndLaunch():
+    def __init__(self):
+        self.desired_caps={}
     def start_server(self,platform_name=""):
         try:
-            import subprocess
-            import os
             ##            maindir = os.getcwd()
             ##            os.chdir('..')
             curdir = os.environ["NINETEEN68_HOME"]
@@ -68,8 +73,8 @@ class InstallAndLaunch():
         except Exception as e:
             err = 'Error while starting server'
             logger.print_on_console(err)
-            log.error(err)
-            log.error(e)
+            #log.error(err)
+            #log.error(e)
 
     def stop_server(self):
         try:
@@ -93,19 +98,17 @@ class InstallAndLaunch():
         self.driver=None
         from appium import webdriver
         try:
-            if platform.system() == 'Darwin' and platfrom_name == "ios":
-                import time
-                from appium import webdriver
+            if platform.system() == 'Darwin' :
                 self.start_server("ios")
-                desired_caps = {}
-                desired_caps['platformName'] = 'iOS'
-                desired_caps['platformVersion'] = platform_version  #ios version
-                desired_caps['bundle_id'] = device_name             # bundleid
-                desired_caps['deviceName'] = apk_path               #device name
-                desired_caps['Ip_Address'] = udid
-                desired_caps['fullReset'] = False
-                desired_caps['newCommandTimeout'] = 3600
-                desired_caps['launchTimeout'] = 180000
+                self.desired_caps = {}
+                self.desired_caps['platformName'] = 'iOS'
+                self.desired_caps['platformVersion'] = platform_version  #ios version
+                self.desired_caps['bundle_id'] = device_name             # bundleid
+                self.desired_caps['deviceName'] = apk_path               #device name
+                self.desired_caps['Ip_Address'] = udid
+                self.desired_caps['fullReset'] = False
+                self.desired_caps['newCommandTimeout'] = 3600
+                self.desired_caps['launchTimeout'] = 180000
 
                 self.driver = "pass"
 
@@ -117,7 +120,7 @@ class InstallAndLaunch():
                     try:
 
                         with open(dir_path + "/Nineteen68UITests/data.txt",'wb') as f:
-                            f.write(desired_caps['Ip_Address'])  # send IP
+                            f.write(self.desired_caps['Ip_Address'])  # send IP
                     except Exception as e:
                         print e
 
@@ -129,7 +132,7 @@ class InstallAndLaunch():
                                 "cd " + dir_path + "\n")
                             f.write(
                                 "xcodebuild -workspace Nineteen68.xcworkspace -scheme Nineteen68 -destination name=" +
-                                desired_caps["deviceName"] + " OS=" + desired_caps["platformVersion"] + " test")
+                                self.desired_caps["deviceName"] + " OS=" + self.desired_caps["platformVersion"] + " test")
                     except Exception as e:
                         print e
 
@@ -143,7 +146,7 @@ class InstallAndLaunch():
                     while True:
                         try:
                             clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                            clientsocket.connect((desired_caps['Ip_Address'], 8022))
+                            clientsocket.connect((self.desired_caps['Ip_Address'], 8022))
                             clientsocket.send("execu")
                             keyword = "launchapplication"
                             length_keyword = len(keyword.encode('utf-8'))
@@ -152,7 +155,7 @@ class InstallAndLaunch():
                             clientsocket.send(keyword)
                             clientsocket.send("0")
                             clientsocket.send("0")
-                            input_text = desired_caps['bundle_id']
+                            input_text = self.desired_caps['bundle_id']
                             length_input_text = len(input_text.encode('utf-8'))
                             clientsocket.send(str(len(str(length_input_text))))
                             clientsocket.send(str(length_input_text))
@@ -172,26 +175,26 @@ class InstallAndLaunch():
                     device_keywords_object.wifi_connect()
                 else:
                     self.start_server()
-                    desired_caps = {}
-                    desired_caps['platformName'] = 'Android'
-                    ##            desired_caps['platformVersion'] = platform_version
-                    desired_caps['deviceName'] = device_name
-                    desired_caps['udid'] = device_name
-                    desired_caps['noReset'] = True
-                    desired_caps['newCommandTimeout'] = 0
-                    ##desired_caps['app'] = 'D:\\mobility\\selendroid-test-app-0.17.0.apk'
-                    desired_caps['app'] = apk_path
-                    desired_caps['sessionOverride'] = True
-                    desired_caps['fullReset'] = False
-                    ##            desired_caps['logLevel'] = 'info
-                    desired_caps['log_level'] = False
+                    self.desired_caps = {}
+                    self.desired_caps['platformName'] = 'Android'
+                    ##            self.desired_caps['platformVersion'] = platform_version
+                    self.desired_caps['deviceName'] = device_name
+                    self.desired_caps['udid'] = device_name
+                    self.desired_caps['noReset'] = True
+                    self.desired_caps['newCommandTimeout'] = 0
+                    ##self.desired_caps['app'] = 'D:\\mobility\\selendroid-test-app-0.17.0.apk'
+                    self.desired_caps['app'] = apk_path
+                    self.desired_caps['sessionOverride'] = True
+                    self.desired_caps['fullReset'] = False
+                    ##            self.desired_caps['logLevel'] = 'info
+                    self.desired_caps['log_level'] = False
                     ##                print 'come in'
-                    self.driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
+                    self.driver = webdriver.Remote('http://localhost:4723/wd/hub', self.desired_caps)
         except Exception as e:
             err = "Not able to install or launch application"
-            logger.print_on_console(err)
-            log.error(err)
-            log.error(e)
+            logger.print_on_console(e)
+            #log.error(err)
+            #log.error(e)
         return self.driver
 
     def scrape(self):
@@ -199,10 +202,10 @@ class InstallAndLaunch():
         if platform.system() == 'Darwin':
             EOF = "final"
             fragments = ""
-            bundle_id = desired_caps['bundle_id']
+            bundle_id = self.desired_caps['bundle_id']
             length = len(bundle_id.encode('utf-8'))
             clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            clientsocket.connect((desired_caps['Ip_Address'], 8022))
+            clientsocket.connect((self.desired_caps['Ip_Address'], 8022))
             clientsocket.send("query")
             clientsocket.send(str(length))
             clientsocket.send(bundle_id)
