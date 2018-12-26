@@ -6,7 +6,6 @@ from lxml import etree
 import docx
 from pprint import pprint
 import xmltodict
-import pythoncom
 import generic_constants
 from constants import *
 import os
@@ -166,6 +165,7 @@ class WordFile():
         err_msg = None
         try:
             if SYSTEM_OS == "Windows":
+                import pythoncom
                 import win32com.client as win32
                 if os.path.exists(os.path.normpath(filename)):
                     pythoncom.CoInitialize()
