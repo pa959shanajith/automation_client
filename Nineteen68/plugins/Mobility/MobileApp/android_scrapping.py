@@ -125,14 +125,18 @@ class InstallAndLaunch():
                         print e
 
                     # set run command
+                    if (input[3].split("=")[0] == "id"):
+                        name = "id=" + self.desired_caps["deviceName"].split("=")[1]
+                    else:
+                        name = "name=" + self.desired_caps["deviceName"]
                     try:
                         with open(dir_path + "/run.command", "wb") as f:
                             f.write("#! /bin/bash \n")
                             f.write(
                                 "cd " + dir_path + "\n")
                             f.write(
-                                "xcodebuild -workspace Nineteen68.xcworkspace -scheme Nineteen68 -destination name=" +
-                                self.desired_caps["deviceName"] + " OS=" + self.desired_caps["platformVersion"] + " test")
+                                "xcodebuild -workspace Nineteen68.xcworkspace -scheme Nineteen68 -destination " +
+                                name + " OS=" + self.desired_caps["platformVersion"] + " test")
                     except Exception as e:
                         print e
 
@@ -223,9 +227,11 @@ class InstallAndLaunch():
             height_data = fragments.split("!@#$%^&*()")[2]
             width_data = fragments.split("!@#$%^&*()")[3]
 
+
             data = json.loads(data)
             from collections import OrderedDict
             jsonArray = OrderedDict()
+
             jsonArray['view'] = data
             jsonArray['mirror'] = image_data
             jsonArray['mirrorwidth'] = width_data

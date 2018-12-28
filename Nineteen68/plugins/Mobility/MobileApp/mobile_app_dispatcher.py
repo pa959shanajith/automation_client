@@ -206,15 +206,21 @@ class MobileDispatcher:
                             print e
 
                         # set run command
-                        try:
 
+
+                        if (input[3].split("=")[0] == "id"):
+                            name = "id=" +input[3].split("=")[1]
+                        else:
+                            name = "name=" + input[3]
+
+                        try:
                             with open(dir_path + "/run.command", "wb") as f:
                                 f.write("#! /bin/bash \n")
                                 f.write(
                                     "cd " + dir_path + "\n")
                                 f.write(
-                                    "xcodebuild -workspace Nineteen68.xcworkspace -scheme Nineteen68 -destination name=" +
-                                    input[3] + " OS=" + input[1] + " test")
+                                    "xcodebuild -workspace Nineteen68.xcworkspace -scheme Nineteen68 -destination " +
+                                    name + " OS=" + input[1] + " test")
 
                         except Exception as e:
                             print e
@@ -299,11 +305,26 @@ class MobileDispatcher:
                         clientsocket.send(str(len(str(length_input_text))))
                         clientsocket.send(str(length_input_text))
                         clientsocket.send(input_text)
+                    #edit
+                    EOF="terminate"
+                    fragments=""
+                    while True:
+                        chunck = clientsocket.recv(10000)
+                        if chunck.endswith(EOF):
+                            idx = chunck.index(EOF)
+                            fragments += chunck[:idx]
+                            break
+                        fragments += chunck
 
+                    img_data = fragments.split("!@#$%^&*()")[0]
+                    data = fragments.split("!@#$%^&*()")[1]
+                    try:
+                        string_value = fragments.split("!@#$%^&*()")[2]
+                    except:
+                        string_value = ""
 
+                    #edit
 
-
-                    data = clientsocket.recv(100000)
                     string_data = data.decode('utf-8')
 
 
@@ -318,10 +339,8 @@ class MobileDispatcher:
 
 
                     if string_data == "error":
-                        data = clientsocket.recv(100000)
-                        string_data = data.decode('utf-8')
-                        log.error(string_data)
-                        logger.print_on_console(string_data)
+                        log.error(string_value)
+                        logger.print_on_console(string_value)
                         status = TEST_RESULT_FAIL
                         result1 = False
                         output = None
@@ -330,9 +349,8 @@ class MobileDispatcher:
 
                     elif string_data == ("passval") or string_data == ("pass"):
                         if string_data == ("passval"):
-                            data = clientsocket.recv(100000)
-                            string_data = data.decode('utf-8')
-                            output = string_data
+                            string_value = string_value.decode('utf-8')
+                            output = string_value
 
                             #print output
                         if string_data == ("pass"):
@@ -346,6 +364,35 @@ class MobileDispatcher:
                         output = None
                         err_msg = None
                     result=(status,result1,output,err_msg)
+                    if keyword not in NON_WEBELEMENT_KEYWORDS:
+                        if self.action == 'execute':
+                            result=list(result)
+                            screen_shot_obj = mob_screenshot.Screenshot()
+                            configobj = readconfig.readConfig()
+                            configvalues = configobj.readJson()
+                            if configvalues['screenShot_Flag'].lower() == 'fail':
+                                if result[0].lower() == 'fail':
+                                    file_path =screen_shot_obj.captureScreenshot()
+                                    result.append(file_path[2])
+                            elif configvalues['screenShot_Flag'].lower() == 'all':
+                                file_path = screen_shot_obj.captureScreenshot()
+                                result.append(file_path[2])
+                            import base64
+                            try:
+                                if img_data == "":
+                                        log.error("screenshot capture failed")
+                                else:
+                                    img_data += "=" * ((4 - len(img_data) % 4) % 4)
+                                    png_recovered = base64.decodestring(img_data)
+                                    f = open(file_path[2], "w")
+                                    f.write(png_recovered)
+                                    f.close()
+                            except Exception as e:
+                                print e
+
+
+
+
 
                 else:
                     driver = install_and_launch.driver
@@ -360,19 +407,20 @@ class MobileDispatcher:
                 err_msg=INVALID_KEYWORD
                 result[3]=err_msg
             if keyword not in NON_WEBELEMENT_KEYWORDS:
-                if self.action == 'execute':
-                    result=list(result)
-                    screen_shot_obj = mob_screenshot.Screenshot()
-                    configobj = readconfig.readConfig()
-                    configvalues = configobj.readJson()
+                if platform.system() != "Darwin":
+                    if self.action == 'execute':
+                        result=list(result)
+                        screen_shot_obj = mob_screenshot.Screenshot()
+                        configobj = readconfig.readConfig()
+                        configvalues = configobj.readJson()
 
-                    if configvalues['screenShot_Flag'].lower() == 'fail':
-                        if result[0].lower() == 'fail':
-                            file_path =screen_shot_obj.captureScreenshot()
+                        if configvalues['screenShot_Flag'].lower() == 'fail':
+                            if result[0].lower() == 'fail':
+                                file_path =screen_shot_obj.captureScreenshot()
+                                result.append(file_path[2])
+                        elif configvalues['screenShot_Flag'].lower() == 'all':
+                            file_path = screen_shot_obj.captureScreenshot()
                             result.append(file_path[2])
-                    elif configvalues['screenShot_Flag'].lower() == 'all':
-                        file_path = screen_shot_obj.captureScreenshot()
-                        result.append(file_path[2])
         except TypeError as e:
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg

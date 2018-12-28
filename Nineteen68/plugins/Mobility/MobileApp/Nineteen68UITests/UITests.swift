@@ -79,22 +79,24 @@ class UITests: Nineteen68UITests {
             if str == "query"{
                 
                 let query_status = query_side().query(client: Nineteen68UITests.controll_variables.client!)
-                //print(query_status)
+                
                 
             }
         
             if str == "execu"{
                 var result = execution_side().execution(client: Nineteen68UITests.controll_variables.client!)
-                print(result)
+                errrorhandle().send_screenshot()
                 if result[0] == "pass"{
                     let data2 = "pass".data(using: .utf8)
                     Nineteen68UITests.controll_variables.client?.send(data:data2!)
+                    Nineteen68UITests.controll_variables.client?.send(string:"terminate")
           
                 }
                 else if result[0] == "fail"{
                     if Nineteen68UITests.controll_variables.message == ""{
                         let data2 = "fail".data(using: .utf8)
                         Nineteen68UITests.controll_variables.client?.send(data:data2!)
+                        Nineteen68UITests.controll_variables.client?.send(string:"terminate")
                     }
                     else {
                         Nineteen68UITests.controll_variables.message = ""
@@ -104,9 +106,10 @@ class UITests: Nineteen68UITests {
                     
                     let passdata = "passval".data(using: .utf8)
                     controll_variables.client?.send(data:passdata!)
+                    Nineteen68UITests.controll_variables.client?.send(string:"!@#$%^&*()")
                     let data1 = (result[0]).data(using: .utf8)
                     controll_variables.client?.send(data:data1!)
-            
+                    Nineteen68UITests.controll_variables.client?.send(string:"terminate")
                 }
             }
             if str == "stop!"{
