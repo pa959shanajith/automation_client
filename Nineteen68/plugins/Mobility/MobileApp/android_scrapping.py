@@ -125,6 +125,8 @@ class InstallAndLaunch():
                         print e
 
                     # set run command
+                    self.desired_caps["deviceName"] = self.desired_caps["deviceName"].split(" ")
+                    self.desired_caps["deviceName"] = "\ ".join(self.desired_caps["deviceName"])
                     if (input[3].split("=")[0] == "id"):
                         name = "id=" + self.desired_caps["deviceName"].split("=")[1]
                     else:

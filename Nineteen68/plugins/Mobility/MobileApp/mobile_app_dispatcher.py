@@ -205,9 +205,9 @@ class MobileDispatcher:
                         except Exception as e:
                             print e
 
-                        # set run command
-
-
+                    # set run command
+                        input[3] = input[3].split(" ")
+                        input[3] = "\ ".join(input[3])
                         if (input[3].split("=")[0] == "id"):
                             name = "id=" +input[3].split("=")[1]
                         else:
