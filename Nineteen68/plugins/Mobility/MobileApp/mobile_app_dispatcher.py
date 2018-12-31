@@ -220,7 +220,7 @@ class MobileDispatcher:
                                     "cd " + dir_path + "\n")
                                 f.write(
                                     "xcodebuild -workspace Nineteen68.xcworkspace -scheme Nineteen68 -destination " +
-                                    name + " OS=" + input[1] + " test")
+                                    name + " OS=" + input[1] +" >/dev/null "+ " test")
 
                         except Exception as e:
                             print e

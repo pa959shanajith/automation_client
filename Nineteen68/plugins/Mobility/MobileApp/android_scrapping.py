@@ -138,7 +138,7 @@ class InstallAndLaunch():
                                 "cd " + dir_path + "\n")
                             f.write(
                                 "xcodebuild -workspace Nineteen68.xcworkspace -scheme Nineteen68 -destination " +
-                                name + " OS=" + self.desired_caps["platformVersion"] + " test")
+                                name + " OS=" + self.desired_caps["platformVersion"] +" >/dev/null "+ " test")
                     except Exception as e:
                         print e
 
