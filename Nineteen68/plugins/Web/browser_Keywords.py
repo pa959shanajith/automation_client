@@ -761,6 +761,8 @@ class Singleton_DriverUtil():
             try:
                 chrome_path = configvalues['chrome_path']
                 exec_path = webconstants.CHROME_DRIVER_PATH
+                if  SYSTEM_OS == "Darwin":
+                    exec_path = webconstants.drivers_path+"/chromedriver"
 ##                choptions1 = webdriver.ChromeOptions()
 ##                # --headless helps to run chrome without browser window
 ##                choptions1.add_argument('--headless')
@@ -777,6 +779,7 @@ class Singleton_DriverUtil():
                     driver = webdriver.Chrome(executable_path=exec_path,chrome_options=choptions)
                     ##driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
                     drivermap.append(driver)
+                    driver.maximize_window()
                     logger.print_on_console('Chrome browser started')
                     log.info('Chrome browser started')
                 else:
@@ -788,80 +791,29 @@ class Singleton_DriverUtil():
                 log.info('Requested browser is not available')
 
         elif(browser_num == '2'):
-            import re
-            import win32api
             import os
-            import win32process
             try:
-                # search all the drives to take firefox path
-##                def find_file(root_folder, rex):
-##                    found = False
-##                    for root,dirs,files in os.walk(root_folder):
-##                        for f in files:
-##                            result = rex.search(f)
-##                            if result:
-##                                found = True
-##                                firefox_path = os.path.join(root,f)
-##                                firefox_arr = [firefox_path,found]
-##                                break
-##                        if found:
-##                            break
-##                    return firefox_arr
-##
-##                def find_file_in_all_drives(file_name):
-##                    #create a regular expression for the file
-##                    rex = re.compile(file_name)
-##                    for drive in win32api.GetLogicalDriveStrings().split('\000')[:-1]:
-##                        found = find_file( drive, rex )
-##                        path=found[0]
-##                        flag=found[1]
-##                        if flag:
-##                            break
-##                    return path
-##
-##                path = find_file_in_all_drives( 'firefox.exe' )
-##                # To fetch the version of the firefox browser
-##                info = win32api.GetFileVersionInfo(path, "\\")
-##                ms = info['ProductVersionMS']
-##                ls = info['ProductVersionLS']
-##                ver = win32api.HIWORD(ms), win32api.LOWORD(ms), win32api.HIWORD(ls), win32api.LOWORD(ls)
-##                version = ver[0]
-##
-##                # opening firefox browser through selenium if the version 47 and less than 47
-##                ignore_certificate = configvalues['ignore_certificate']
-##                profile = webdriver.FirefoxProfile()
-##                if ignore_certificate.lower() == 'yes':
-##                    profile.accept_untrusted_certs = True
-##                if int(version) < 48:
-##                    driver = webdriver.Firefox(firefox_profile=profile)
-##                    drivermap.append(driver)
-##                    driver.maximize_window()
-##                    logger.print_on_console('Firefox browser started')
-##                    log.info('Firefox browser started')
-##                else:
-                    caps=webdriver.DesiredCapabilities.FIREFOX
-                    caps['marionette'] = True
-##                    driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH)
-##                    browser_ver=driver.capabilities['browserVersion']
-##                    browser_ver1 = browser_ver.encode('utf-8')
-##                    browser_ver = float(browser_ver1[:4])
-                    if(clientwindow.firefoxFlag == True):
-                        if str(configvalues['firefox_path']).lower()!="default":
-                            from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-                            binary = FirefoxBinary(str(configvalues['firefox_path']))
-                            driver = webdriver.Firefox(capabilities=caps, firefox_binary=binary, executable_path=webconstants.GECKODRIVER_PATH)
-                        else:
-                            driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants.GECKODRIVER_PATH)
-                        drivermap.append(driver)
-                        driver.maximize_window()
-                        logger.print_on_console('Firefox browser started using geckodriver')
-                        log.info('Firefox browser started using geckodriver ')
+                caps=webdriver.DesiredCapabilities.FIREFOX
+                caps['marionette'] = True
+                if SYSTEM_OS == "Darwin":
+                    exec_path = webconstants.drivers_path+"/geckodriver"
+                else:
+                    exec_path = webconstants.GECKODRIVER_PATH
+                if(clientwindow.firefoxFlag == True):
+                    if str(configvalues['firefox_path']).lower()!="default":
+                        from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+                        binary = FirefoxBinary(str(configvalues['firefox_path']))
+                        driver = webdriver.Firefox(capabilities=caps, firefox_binary=binary, executable_path=exec_path)
                     else:
-                        driver = None
-                        logger.print_on_console("Firefox browser version not supported")
-                        log.info('Firefox browser version not supported')
-##                    logger.print_on_console("Browser version:",browser_ver)
-                    #log.info('Browser version:',browser_ver)
+                        driver = webdriver.Firefox(capabilities=caps,executable_path=exec_path)
+                    drivermap.append(driver)
+                    driver.maximize_window()
+                    logger.print_on_console('Firefox browser started using geckodriver')
+                    log.info('Firefox browser started using geckodriver ')
+                else:
+                    driver = None
+                    logger.print_on_console("Firefox browser version not supported")
+                    log.info('Firefox browser version not supported')
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 log.info('Requested browser is not available')
@@ -919,7 +871,6 @@ class Singleton_DriverUtil():
 
         elif(browser_num == '6'):
             try:
-                print 'This will be our new safari'
                 driver = webdriver.Safari()
                 driver.set_window_size(1024, 768)
                 drivermap.append(driver)
@@ -927,7 +878,7 @@ class Singleton_DriverUtil():
 
                 logger.print_on_console('Safari browser started')
                 log.info('Safari browser started')
-    ##        print __driver
+
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 log.info('Requested browser is not available')
