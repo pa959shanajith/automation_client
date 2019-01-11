@@ -261,7 +261,7 @@ class MainNamespace(BaseNamespace):
         con = controller.Controller()
         if str(args[0]).endswith('apk'):
             browsername = args[0]+";"+args[1]
-        elif str(args[4]==u'ios'):
+        elif str(args[4])=='ios':
             browsername = args[0] + ";" + args[1] + ";" + args[2]+";" + args[3]+";" + args[4]
         """
         elif str(args[0]).endswith('app'):
