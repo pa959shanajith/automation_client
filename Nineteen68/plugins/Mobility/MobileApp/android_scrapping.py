@@ -17,10 +17,15 @@ import uuid,json
 import os
 import subprocess
 import time
-from constants import SYSTEM_OS
+from constants import *
 from mobile_app_constants import *
 import logger
-##log = logging.getLogger('android_scrapping.py')
+import commands
+import socket
+import base64
+import platform
+import logging
+log = logging.getLogger('android_scrapping.py')
 
 XpathList=[]
 resource_id=[]
@@ -42,26 +47,33 @@ counter=0
 driver=None
 
 class InstallAndLaunch():
-    def start_server(self):
+    def __init__(self):
+        self.desired_caps={}
+    def start_server(self,platform_name=""):
         try:
             ##            maindir = os.getcwd()
             ##            os.chdir('..')
             curdir = os.environ["NINETEEN68_HOME"]
 
             if (SYSTEM_OS != 'Darwin'):
-                path = curdir + '/Nineteen68/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
-                nodePath = curdir + "/Drivers/node.exe"
-                proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
-            else:
+                path = curdir + '\\Nineteen68\\plugins\\Mobility\\MobileApp\\node_modules\\appium\\build\\lib\\main.js'
+                nodePath = os.environ["NINETEEN68_HOME"] + "\\Drivers" + '\\node.exe'
+                proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None,
+                                        close_fds=True)
+                time.sleep(15)
+                logger.print_on_console('Server started')
+            elif platform_name != "ios":
                 path = curdir + '/Nineteen68/plugins/Mobility/node_modules/appium/build/lib/main.js'
-                proc = subprocess.Popen(path, shell=False, stdin=None, stdout=None, stderr=None, close_fds=True)
-            time.sleep(15)
-            logger.print_on_console('Server started')
+                proc = subprocess.Popen(path, shell=False, stdin=None, stdout=None, stderr=None,
+                                        close_fds=True)
+
+                time.sleep(15)
+                logger.print_on_console('Server started')
         except Exception as e:
             err = 'Error while starting server'
             logger.print_on_console(err)
-            log.error(err)
-            log.error(e)
+            #log.error(err)
+            #log.error(e)
 
     def stop_server(self):
         try:
@@ -85,53 +97,160 @@ class InstallAndLaunch():
         self.driver=None
         from appium import webdriver
         try:
-            if SYSTEM_OS == 'Darwin':
-                self.start_server()
-                desired_caps = {}
-                desired_caps['platformName'] = 'iOS'
-                desired_caps['appiumVersion'] = '1.6.5'
-                desired_caps['platformVersion'] = platform_version
-                # desired_caps['platformVersion'] =input_val[3]
-                desired_caps['deviceName'] = device_name
-                # desired_caps['deviceName']=input_val[2]
-                desired_caps['udid'] = udid
-                # desired_caps['udid'] =input_val[1]
-                desired_caps['fullReset'] = False
-                desired_caps['newCommandTimeout'] = 3600
-                desired_caps['launchTimeout'] = 180000
-                desired_caps['app'] = apk_path
-                # desired_caps['app'] =input_val[0]
-                self.driver = webdriver.Remote('http://0.0.0.0:4723/wd/hub', desired_caps)
+            if SYSTEM_OS == 'Darwin' :
+                self.start_server("ios")
+                self.desired_caps = {}
+                self.desired_caps['platformName'] = 'iOS'
+                self.desired_caps['platformVersion'] = platform_version  #ios version
+                self.desired_caps['bundle_id'] = device_name             # bundleid
+                self.desired_caps['deviceName'] = apk_path               #device name
+                self.desired_caps['Ip_Address'] = udid
+                self.desired_caps['fullReset'] = False
+                self.desired_caps['newCommandTimeout'] = 3600
+                self.desired_caps['launchTimeout'] = 180000
+
+                self.driver = "pass"
+
+                current_dir = (os.getcwd())
+                dir_path = os.path.dirname(os.path.realpath(__file__))
+                # set IP
+
+                if (commands.getoutput('pgrep xcodebuild') == ''):
+                    try:
+
+                        with open(dir_path + "/Nineteen68UITests/data.txt",'wb') as f:
+                            f.write(self.desired_caps['Ip_Address'])  # send IP
+                    except Exception as e:
+                        print e
+
+                    # set run command
+                    self.desired_caps["deviceName"] = self.desired_caps["deviceName"].split(" ")
+                    self.desired_caps["deviceName"] = "\ ".join(self.desired_caps["deviceName"])
+                    if (self.desired_caps["deviceName"].split("=")[0] == "id"):
+                        name = self.desired_caps["deviceName"]
+                    else:
+                        name = "name=" + self.desired_caps["deviceName"]
+                    try:
+                        with open(dir_path + "/run.command", "wb") as f:
+                            f.write("#! /bin/bash \n")
+                            f.write(
+                                "cd " + dir_path + "\n")
+                            f.write(
+                                "xcodebuild -workspace Nineteen68.xcworkspace -scheme Nineteen68 -destination " +
+                                name + " OS=" + self.desired_caps["platformVersion"] +" >/dev/null "+ " test")
+                    except Exception as e:
+                        log.error(e)
+
+                    # subprocess.call("chmod a+x run.command")
+
+                    try:
+                        subprocess.Popen(dir_path + "/run.command", shell=True)
+                    except:
+                        log.error(ERROR_CODE_DICT["ERR_XCODE_DOWN"])
+
+                    timer = 0
+                    while True:
+                        try:
+                            clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                            clientsocket.connect((self.desired_caps['Ip_Address'], 8022))
+                            clientsocket.send(XCODE_EXECUTE)
+                            keyword = "launchapplication"
+                            length_keyword = len(keyword.encode('utf-8'))
+                            clientsocket.send(str(len(str(length_keyword))))
+                            clientsocket.send(str(length_keyword))
+                            clientsocket.send(keyword)
+                            clientsocket.send("0")
+                            clientsocket.send("0")
+                            input_text = self.desired_caps['bundle_id']
+                            length_input_text = len(input_text.encode('utf-8'))
+                            clientsocket.send(str(len(str(length_input_text))))
+                            clientsocket.send(str(length_input_text))
+                            clientsocket.send(input_text)
+                            data = clientsocket.recv(100000)
+                            string_data = data.decode('utf-8')
+                            if string_data == "":
+                                continue
+                            break
+                        except:
+                            timer+=1
+                            if timer == 130:
+                                log.error(ERROR_CODE_DICT["ERR_TIMEOUT"])
+                                break
+                            time.sleep(1)
+                    return self.driver
+                return self.driver
             else:
                 if device_name == 'wifi':
                     device_keywords_object = device_keywords.Device_Keywords()
                     device_keywords_object.wifi_connect()
                 else:
                     self.start_server()
-                    desired_caps = {}
-                    desired_caps['platformName'] = 'Android'
-                    ##            desired_caps['platformVersion'] = platform_version
-                    desired_caps['deviceName'] = device_name
-                    desired_caps['udid'] = device_name
-                    desired_caps['noReset'] = True
-                    desired_caps['newCommandTimeout'] = 0
-                    ##desired_caps['app'] = 'D:\\mobility\\selendroid-test-app-0.17.0.apk'
-                    desired_caps['app'] = apk_path
-                    desired_caps['sessionOverride'] = True
-                    desired_caps['fullReset'] = False
-                    ##            desired_caps['logLevel'] = 'info
-                    desired_caps['log_level'] = False
+                    self.desired_caps = {}
+                    self.desired_caps['platformName'] = 'Android'
+                    ##            self.desired_caps['platformVersion'] = platform_version
+                    self.desired_caps['deviceName'] = device_name
+                    self.desired_caps['udid'] = device_name
+                    self.desired_caps['noReset'] = True
+                    self.desired_caps['newCommandTimeout'] = 0
+                    ##self.desired_caps['app'] = 'D:\\mobility\\selendroid-test-app-0.17.0.apk'
+                    self.desired_caps['app'] = apk_path
+                    self.desired_caps['sessionOverride'] = True
+                    self.desired_caps['fullReset'] = False
+                    ##            self.desired_caps['logLevel'] = 'info
+                    self.desired_caps['log_level'] = False
                     ##                print 'come in'
-                    self.driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
+                    self.driver = webdriver.Remote('http://localhost:4723/wd/hub', self.desired_caps)
         except Exception as e:
             err = "Not able to install or launch application"
-            logger.print_on_console(err)
-            log.error(err)
-            log.error(e)
+            logger.print_on_console(e)
+            #log.error(err)
+            #log.error(e)
         return self.driver
 
     def scrape(self):
         finalJson=''
+        if SYSTEM_OS == 'Darwin':
+            EOF = "final"
+            fragments = ""
+            bundle_id = self.desired_caps['bundle_id']
+            length = len(bundle_id.encode('utf-8'))
+            clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            clientsocket.connect((self.desired_caps['Ip_Address'], 8022))
+            clientsocket.send(XCODE_SCRAPE)
+            clientsocket.send(str(length))
+            clientsocket.send(bundle_id)
+
+            while True:
+                chunck = clientsocket.recv(10000)
+                if chunck.endswith(EOF):
+                    idx = chunck.index(EOF)
+                    fragments += chunck[:idx]
+                    break
+                fragments += chunck
+
+            data = fragments.split("!@#$%^&*()")[0]
+            image_data = fragments.split("!@#$%^&*()")[1]
+            height_data = fragments.split("!@#$%^&*()")[2]
+            width_data = fragments.split("!@#$%^&*()")[3]
+
+
+            data = json.loads(data)
+            from collections import OrderedDict
+            jsonArray = OrderedDict()
+
+            jsonArray['view'] = data
+            jsonArray['mirror'] = image_data
+            jsonArray['mirrorwidth'] = width_data
+            jsonArray['mirrorheight'] = height_data
+            with open("savefile.json", 'w') as outfile:
+                logger.print_on_console('Writing scrape data to domelements.json file')
+                json.dump(jsonArray, outfile, indent=4, sort_keys=False)
+            outfile.close()
+
+
+            return jsonArray
+
+        
         if self.driver != None:
             page_source=self.driver.page_source
             parser = xml.sax.make_parser()

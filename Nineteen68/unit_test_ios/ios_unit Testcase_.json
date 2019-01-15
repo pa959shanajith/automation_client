@@ -1,0 +1,342 @@
+[
+  {
+    "stepNo": 1,
+    "objectName": " ",
+    "custname": "@Mobile",
+    "keywordVal": "LaunchApplication",
+    "inputVal": [
+      "com.bankofamerica.BofA;10.3.2;10.60.72.52;Nineteen68_21s_iPhone"
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": " ",
+    "appType": "MobileApp",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_1\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "1"
+  },
+  {
+    "stepNo": 2,
+    "objectName": " ",
+    "custname": "@Generic",
+    "keywordVal": "wait",
+    "inputVal": [
+      "10"
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": " ",
+    "appType": "Generic",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_2\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "2"
+  },
+  {
+    "stepNo": 3,
+    "objectName": "Already a customer?  Sign in or enroll.&$#Button",
+    "custname": "Already a customer?  Sign in or enroll.",
+    "keywordVal": "Press",
+    "inputVal": [
+      ""
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": "",
+    "appType": "MobileApp",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_3\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "3"
+  },
+  {
+    "stepNo": 4,
+    "objectName": "Enter your online ID &$#EditText",
+    "custname": "Enter your online ID",
+    "keywordVal": "SetText",
+    "inputVal": [
+      "hello"
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": "",
+    "appType": "MobileApp",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_4\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "4"
+  },
+  {
+    "stepNo": 5,
+    "objectName": "Set Up Touch ID. checkbox not selected&$#otherElements",
+    "custname": "Set Up Touch ID. checkbox not selected",
+    "keywordVal": "PressElement",
+    "inputVal": [
+      ""
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": "",
+    "appType": "MobileApp",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_5\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "5"
+  },
+  {
+    "stepNo": 6,
+    "objectName": "Enroll&$#Button",
+    "custname": "Enroll",
+    "keywordVal": "Press",
+    "inputVal": [
+      ""
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": "",
+    "appType": "MobileApp",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_6\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "6"
+  },
+  {
+    "stepNo": 7,
+    "objectName": " ",
+    "custname": "@Generic",
+    "keywordVal": "wait",
+    "inputVal": [
+      "6"
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": " ",
+    "appType": "Generic",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_7\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "7"
+  },
+  {
+    "stepNo": 8,
+    "objectName": "bound6&$#statictexts",
+    "custname": "1243dwasacd",
+    "keywordVal": "PressElement",
+    "inputVal": [
+      ""
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": "",
+    "appType": "MobileApp",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_8\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "8"
+  },
+  {
+    "stepNo": 9,
+    "objectName": "Get Started&$#Button",
+    "custname": "Get Started",
+    "keywordVal": "Press",
+    "inputVal": [
+      ""
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": "",
+    "appType": "MobileApp",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_9\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "9"
+  },
+  {
+    "stepNo": 10,
+    "objectName": "ATM or Debit Card&$#statictexts",
+    "custname": "ATM or Debit Card",
+    "keywordVal": "PressElement",
+    "inputVal": [
+      ""
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": "",
+    "appType": "MobileApp",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_10\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "10"
+  },
+  {
+    "stepNo": 11,
+    "objectName": "Last 6 digits of ATM or Debit Card number&$#XCUIElementTypeSecureTextField",
+    "custname": "Last 6 digits of ATM or Debit Card number",
+    "keywordVal": "SetText",
+    "inputVal": [
+      "123456"
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": "",
+    "appType": "MobileApp",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_11\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "11"
+  },
+  {
+    "stepNo": 12,
+    "objectName": "Bank of America ATM PIN&$#XCUIElementTypeSecureTextField",
+    "custname": "Bank of America ATM PIN",
+    "keywordVal": "SetText",
+    "inputVal": [
+      "123456789"
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": "",
+    "appType": "MobileApp",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_12\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "12"
+  },
+  {
+    "stepNo": 13,
+    "objectName": "Continue&$#Button",
+    "custname": "Continue",
+    "keywordVal": "Press",
+    "inputVal": [
+      ""
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": "",
+    "appType": "MobileApp",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_13\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "13"
+  },
+  {
+    "stepNo": 14,
+    "objectName": " ",
+    "custname": "@Generic",
+    "keywordVal": "wait",
+    "inputVal": [
+      "7"
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": " ",
+    "appType": "Generic",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_14\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "14"
+  },
+  {
+    "stepNo": 15,
+    "objectName": "Cancel&$#Button",
+    "custname": "Cancel",
+    "keywordVal": "Press",
+    "inputVal": [
+      ""
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": "",
+    "appType": "MobileApp",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_15\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "15"
+  },
+  {
+    "stepNo": 16,
+    "objectName": "Select Reason&$#statictexts",
+    "custname": "Select Reason",
+    "keywordVal": "PressElement",
+    "inputVal": [
+      ""
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": "",
+    "appType": "MobileApp",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_16\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "16"
+  },
+  {
+    "stepNo": 17,
+    "objectName": "I don't want to enter my Social Security number.&$#statictexts",
+    "custname": "I don't want to enter my Social Security number.",
+    "keywordVal": "PressElement",
+    "inputVal": [
+      ""
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": "",
+    "appType": "MobileApp",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_17\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "17"
+  },
+  {
+    "stepNo": 18,
+    "objectName": "Yes, Cancel&$#Button",
+    "custname": "Yes, Cancel",
+    "keywordVal": "Press",
+    "inputVal": [
+      ""
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": "",
+    "appType": "MobileApp",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_18\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "18"
+  },
+  {
+    "stepNo": 19,
+    "objectName": " ",
+    "custname": "@Mobile",
+    "keywordVal": "LaunchApplication",
+    "inputVal": [
+      "com.apple.stocks;10.3.2;10.60.72.52;Nineteen68_21s_iPhone"
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": " ",
+    "appType": "MobileApp",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_19\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "19"
+  },
+  {
+    "stepNo": 20,
+    "objectName": " ",
+    "custname": "@Generic",
+    "keywordVal": "wait",
+    "inputVal": [
+      "5"
+    ],
+    "outputVal": "",
+    "remarksStatus": "<img src=\"imgs/ic-remarks-inactive.png\" class=\"remarksIcon\">",
+    "remarks": "",
+    "url": " ",
+    "appType": "Generic",
+    "addTestCaseDetails": "<img alt=\"inActiveDetails\" title=\"\" id=\"details_20\" src=\"imgs/ic-details-inactive.png\" class=\"detailsIcon inActiveDetails\">",
+    "addTestCaseDetailsInfo": "",
+    "_id_": "20"
+  }
+]

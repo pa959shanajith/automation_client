@@ -59,6 +59,9 @@ LOGCONFIG_PATH = os.environ["NINETEEN68_HOME"] + "/logging.conf"
 DRIVERS_PATH = os.environ["NINETEEN68_HOME"] + "/Drivers"
 CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver.exe"
 GECKODRIVER_PATH = DRIVERS_PATH + '/geckodriver.exe'
+if SYSTEM_OS=='Darwin':
+    CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
+    GECKODRIVER_PATH = DRIVERS_PATH + '/geckodriver'
 
 
 class MainNamespace(BaseNamespace):
@@ -258,10 +261,14 @@ class MainNamespace(BaseNamespace):
         con = controller.Controller()
         if str(args[0]).endswith('apk'):
             browsername = args[0]+";"+args[1]
+        elif str(args[4])=='ios':
+            browsername = args[0] + ";" + args[1] + ";" + args[2]+";" + args[3]+";" + args[4]
+        """
         elif str(args[0]).endswith('app'):
             browsername = args[0] + ";" + args[2]+";" + args[3]
         elif str(args[0]).endswith('ipa'):
             browsername = args[0] + ";" + args[2] + ";" + args[3]+";" + args[4]
+        """
         con =controller.Controller()
         if SYSTEM_OS=='Darwin':
             con.get_all_the_imports('Mobility/MobileApp')
@@ -1809,7 +1816,10 @@ def check_browser():
             from selenium import webdriver
             from selenium.webdriver import ChromeOptions
             a=[]
-            p = subprocess.Popen('chromedriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
+            if SYSTEM_OS == "Darwin":
+                p = subprocess.Popen(CHROME_DRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1, cwd=DRIVERS_PATH,shell=True)
+            else:
+                p = subprocess.Popen('chromedriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
             for line in iter(p.stdout.readline, b''):
                 a.append(str(line))
             a=a[0][13:17]
@@ -1838,7 +1848,10 @@ def check_browser():
             log.error("Error in checking chrome version")
             log.error(e)
         try:
-            p = subprocess.Popen('geckodriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
+            if SYSTEM_OS == "Darwin":
+                p = subprocess.Popen(GECKODRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1, cwd=DRIVERS_PATH,shell=True)
+            else:
+                p = subprocess.Popen('geckodriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
             a=[]
             for line in iter(p.stdout.readline, b''):
                 a.append(str(line))
