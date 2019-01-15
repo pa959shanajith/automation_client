@@ -17,7 +17,7 @@ import uuid,json
 import os
 import subprocess
 import time
-from constants import SYSTEM_OS
+from constants import *
 from mobile_app_constants import *
 import logger
 import commands
@@ -55,19 +55,18 @@ class InstallAndLaunch():
             ##            os.chdir('..')
             curdir = os.environ["NINETEEN68_HOME"]
 
-            if (platform.system() != 'Darwin'):
+            if (SYSTEM_OS != 'Darwin'):
                 path = curdir + '\\Nineteen68\\plugins\\Mobility\\MobileApp\\node_modules\\appium\\build\\lib\\main.js'
                 nodePath = os.environ["NINETEEN68_HOME"] + "\\Drivers" + '\\node.exe'
                 proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None,
                                         close_fds=True)
-                import time
                 time.sleep(15)
                 logger.print_on_console('Server started')
             elif platform_name != "ios":
                 path = curdir + '/Nineteen68/plugins/Mobility/node_modules/appium/build/lib/main.js'
                 proc = subprocess.Popen(path, shell=False, stdin=None, stdout=None, stderr=None,
                                         close_fds=True)
-                import time
+
                 time.sleep(15)
                 logger.print_on_console('Server started')
         except Exception as e:
@@ -98,7 +97,7 @@ class InstallAndLaunch():
         self.driver=None
         from appium import webdriver
         try:
-            if platform.system() == 'Darwin' :
+            if SYSTEM_OS == 'Darwin' :
                 self.start_server("ios")
                 self.desired_caps = {}
                 self.desired_caps['platformName'] = 'iOS'
@@ -128,7 +127,7 @@ class InstallAndLaunch():
                     self.desired_caps["deviceName"] = self.desired_caps["deviceName"].split(" ")
                     self.desired_caps["deviceName"] = "\ ".join(self.desired_caps["deviceName"])
                     if (self.desired_caps["deviceName"].split("=")[0] == "id"):
-                        name = "id=" + self.desired_caps["deviceName"].split("=")[1]
+                        name = self.desired_caps["deviceName"]
                     else:
                         name = "name=" + self.desired_caps["deviceName"]
                     try:
@@ -140,20 +139,21 @@ class InstallAndLaunch():
                                 "xcodebuild -workspace Nineteen68.xcworkspace -scheme Nineteen68 -destination " +
                                 name + " OS=" + self.desired_caps["platformVersion"] +" >/dev/null "+ " test")
                     except Exception as e:
-                        print e
+                        log.error(e)
 
                     # subprocess.call("chmod a+x run.command")
 
                     try:
                         subprocess.Popen(dir_path + "/run.command", shell=True)
                     except:
-                        print "xcode server is down"
-                        #edit
+                        log.error(ERROR_CODE_DICT["ERR_XCODE_DOWN"])
+
+                    timer = 0
                     while True:
                         try:
                             clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                             clientsocket.connect((self.desired_caps['Ip_Address'], 8022))
-                            clientsocket.send("execu")
+                            clientsocket.send(XCODE_EXECUTE)
                             keyword = "launchapplication"
                             length_keyword = len(keyword.encode('utf-8'))
                             clientsocket.send(str(len(str(length_keyword))))
@@ -172,6 +172,10 @@ class InstallAndLaunch():
                                 continue
                             break
                         except:
+                            timer+=1
+                            if timer == 130:
+                                log.error(ERROR_CODE_DICT["ERR_TIMEOUT"])
+                                break
                             time.sleep(1)
                     return self.driver
                 return self.driver
@@ -205,14 +209,14 @@ class InstallAndLaunch():
 
     def scrape(self):
         finalJson=''
-        if platform.system() == 'Darwin':
+        if SYSTEM_OS == 'Darwin':
             EOF = "final"
             fragments = ""
             bundle_id = self.desired_caps['bundle_id']
             length = len(bundle_id.encode('utf-8'))
             clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             clientsocket.connect((self.desired_caps['Ip_Address'], 8022))
-            clientsocket.send("query")
+            clientsocket.send(XCODE_SCRAPE)
             clientsocket.send(str(length))
             clientsocket.send(bundle_id)
 

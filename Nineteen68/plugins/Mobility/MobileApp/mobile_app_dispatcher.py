@@ -174,7 +174,7 @@ class MobileDispatcher:
                     'gettime' : self.time_keywords_object.Get_Time,
                     'setnumber':self.number_picker_object.Select_Number,
                     'setminvalue':self.seekBar_object.Set_Min_Value,
-                    'setminvalue':self.seekBar_object.Set_Mid_Value,
+                    'setmidvalue':self.seekBar_object.Set_Mid_Value,
                     'setmaxvalue':self.seekBar_object.Set_Max_Value
 
 
@@ -185,7 +185,7 @@ class MobileDispatcher:
 
 
                 # input[0]=bundleid,input[1]=os version ,input[2]=IP,,input[3]=device_name
-                if platform.system() == 'Darwin':
+                if SYSTEM_OS == 'Darwin':
 
 
                     #current_dir = (os.getcwd())
@@ -209,7 +209,7 @@ class MobileDispatcher:
                         input[3] = input[3].split(" ")
                         input[3] = "\ ".join(input[3])
                         if (input[3].split("=")[0] == "id"):
-                            name = "id=" +input[3].split("=")[1]
+                            name = input[3]
                         else:
                             name = "name=" + input[3]
 
@@ -223,19 +223,14 @@ class MobileDispatcher:
                                     name + " OS=" + input[1] +" >/dev/null "+ " test")
 
                         except Exception as e:
-                            print e
+                            log.error(e)
 
                         # subprocess.call("chmod a+x run.command")
                         try:
-
-
                             subprocess.Popen( dir_path +"/run.command", shell=True)
-                            #time.sleep(20)
+
                         except:
-                            print "xcode server is down"
-
-
-
+                            log.error(ERROR_CODE_DICT["ERR_XCODE_DOWN"])
 
                     if(keyword == "launchapplication"):
                         global ip
@@ -267,13 +262,18 @@ class MobileDispatcher:
 
 
                     # create socket
+                    timer = 0
                     while True:
                         try:
                             clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                             clientsocket.connect((ip, 8022))
-                            clientsocket.send("execu")
+                            clientsocket.send(XCODE_EXECUTE)
                             break
                         except:
+                            timer+=1
+                            if timer == 130:
+                                log.error(ERROR_CODE_DICT["ERR_TIMEOUT"])
+                                break
                             time.sleep(1)
 
 
@@ -338,25 +338,25 @@ class MobileDispatcher:
                         return result
 
 
-                    if string_data == "error":
+                    if string_data == XCODE_ERROR:
                         log.error(string_value)
                         logger.print_on_console(string_value)
                         status = TEST_RESULT_FAIL
-                        result1 = False
+                        result1 = TEST_RESULT_FALSE
                         output = None
                         err_msg = None
 
 
-                    elif string_data == ("passval") or string_data == ("pass"):
-                        if string_data == ("passval"):
+                    elif string_data == (XCODE_PASSVALUE) or string_data == (XCODE_PASS):
+                        if string_data == (XCODE_PASSVALUE):
                             string_value = string_value.decode('utf-8')
                             output = string_value
 
                             #print output
-                        if string_data == ("pass"):
+                        if string_data == (XCODE_PASS):
                             output = None
                         status = TEST_RESULT_PASS
-                        result1 = True
+                        result1 = TEST_RESULT_TRUE
                         err_msg = None
                     else:
                         status = TEST_RESULT_FAIL
@@ -388,7 +388,7 @@ class MobileDispatcher:
                                     f.write(png_recovered)
                                     f.close()
                             except Exception as e:
-                                print e
+                                log.error(e)
 
 
 
@@ -407,7 +407,7 @@ class MobileDispatcher:
                 err_msg=INVALID_KEYWORD
                 result[3]=err_msg
             if keyword not in NON_WEBELEMENT_KEYWORDS:
-                if platform.system() != "Darwin":
+                if SYSTEM_OS != "Darwin":
                     if self.action == 'execute':
                         result=list(result)
                         screen_shot_obj = mob_screenshot.Screenshot()
@@ -435,7 +435,6 @@ class MobileDispatcher:
         mobileElement = None
         global ELEMENT_FOUND
         if objectname.strip() != '':
-            import platform
             if SYSTEM_OS=='Darwin':
                 objectname = objectname.replace("/AppiumAUT[1]/", "/")
                 print objectname
