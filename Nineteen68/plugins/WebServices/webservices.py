@@ -273,7 +273,7 @@ class WSkeywords:
                 if len(header_dict) !=0:
                     self.baseReqHeader=header_dict
                     log.info(header_dict)
-                    if 'Content-Type' in header_dict.keys():
+                    if 'Content-Type' in list(header_dict.keys()):
                         self.content_type=header_dict['Content-Type']
                 else:
                     self.baseReqHeader=header[0]
@@ -435,7 +435,8 @@ class WSkeywords:
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if not (self.baseEndPointURL is '' or self.baseOperation is '' or self.baseReqHeader is ''):
-                print self.baseReqHeader
+                logger.print_on_console(self.baseReqHeader)
+                log.info(self.baseReqHeader)
                 req=self.baseEndPointURL+'/'+self.baseOperation+'?'+self.baseReqHeader
             elif not (self.baseEndPointURL is ''):
                 req=self.baseEndPointURL
@@ -583,7 +584,7 @@ class WSkeywords:
             if response == '':
                 response = 'fail'
             if testcasename == '':
-                response = unicode(response, "utf-8")
+                response = str(response, "utf-8")
                 socketIO.emit('result_debugTestCaseWS',response)
         except Exception as e:
             logger.print_on_console(e)
@@ -681,7 +682,6 @@ class WSkeywords:
                         output= self.baseResBody
             elif len(args) == 2:
                 key=args[0]
-                print 'args[2]',args
                 if not(self.baseResBody is None):
                     response_body=self.baseResBody
                     if args[0] !='' and args[1]!='' and args[0] !=None and args[1]!=None:
@@ -772,7 +772,7 @@ class WSkeywords:
             keystore = jks.KeyStore.load(client_cert, keystore_pass)#,'serverkey')
             # if any of the keys in the store use a password that is not the same as the store password:
             # keystore.entries["key1"].decrypt("key_password")
-            for alias, pk in keystore.private_keys.items():
+            for alias, pk in list(keystore.private_keys.items()):
                 #print("Private key: %s" % pk.alias)
                 if pk.algorithm_oid == jks.util.RSA_ENCRYPTION_OID:
                     rsaprivatepemfile = self.cert_formatter(pk.pkey, "RSA PRIVATE KEY")
@@ -789,12 +789,12 @@ class WSkeywords:
                     certpemfile = self.cert_formatter(c[1], "CERTIFICATE")
                     self.certdetails['PRIVATE CERT'] =certpemfile
 
-            for alias, c in keystore.certs.items():
+            for alias, c in list(keystore.certs.items()):
                 #logger.print_on_console("Certificate:",c.alias)
                 truststorepemfile = self.cert_formatter(c.cert, "CERTIFICATE")
                 self.certdetails['TRUSTSTORE CERT'] = truststorepemfile
 
-            for alias, secretkey in keystore.secret_keys.items():
+            for alias, secretkey in list(keystore.secret_keys.items()):
                 logger.print_on_console("------------------------------------")
                 logger.print_on_console("Secret key: %s" % secretkey.alias)
                 logger.print_on_console(" Algorithm: %s" % secretkey.algorithm)

@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import re
-from urlparse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse
 import requests
 import tldextract
 from bs4 import BeautifulSoup

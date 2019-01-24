@@ -55,7 +55,7 @@ class BrowserOperations():
         try:
             alertObj=driver.switch_to_alert()
             alertObj.accept()
-            print 'Popup Found!\nPopup accepted.'
+            logger.print_on_console('Popup Found!\nPopup accepted.')
             log.info('Popup Found and accepted')
         except:
             log.info('No popup found')

@@ -122,7 +122,7 @@ class Dispatcher:
                                     log.info(keyword)
                                     webelement=reference_element
                                 elif len(input)>=3:
-                                    if (keyword in custom_dict and input[0].lower() in custom_dict[keyword]) or keyword in custom_dict_element.values()[0]:
+                                    if (keyword in custom_dict and input[0].lower() in custom_dict[keyword]) or keyword in list(custom_dict_element.values())[0]:
                                         webelement=self.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url)
                                         log.debug(MSG_CUSTOM_FOUND)
                                         input.reverse()
@@ -315,7 +315,7 @@ class Dispatcher:
                 reporting_obj.browser_version=browser_info.get('version')
                 if(reporting_obj.browser_version == '' or reporting_obj.browser_version == None):
                     reporting_obj.browser_version= browser_info['browserVersion']
-            if keyword in dict.keys():
+            if keyword in list(dict.keys()):
                 flag=False
                 #Finding the webelement for NON_WEBELEMENT_KEYWORDS
                 if keyword not in NON_WEBELEMENT_KEYWORDS:
@@ -539,7 +539,7 @@ class Dispatcher:
                 except Exception as webEx:
                      webElement = None
 
-            elif objectname.startswith('{') and objectname.endswith('}') and self.webelement_map.has_key(objectname):
+            elif objectname.startswith('{') and objectname.endswith('}') and objectname in self.webelement_map:
                 if len(self.webelement_map)<=4:
                     webElement=[]
                     webElement.append(self.webelement_map[objectname])

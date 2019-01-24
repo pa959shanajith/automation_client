@@ -52,7 +52,7 @@ def addNodes(shape, text, parent, child):
 		classname = "import"
 	else:
 		classname = PresentClassName
-	text = unicode(text, errors='replace')
+	text = str(text, errors='replace')
 	if parent is None:
 		return {"shape": shape, "text": text, "parent": parent, "child": child, "class": classname, "method": PresentMethodName}
 	else:
@@ -682,7 +682,7 @@ def classOrInterfaceExtraction(root):
 				else:
 					arguments = [arguments]
 				for arg in arguments:
-					if(VarStorage.has_key(arg)):
+					if(arg in VarStorage):
 						posmeth['typeOfArguments'].append(VarStorage[arg])
 	if ClassOrInterface == 'class' or (ClassOrInterface == 'nested' and Property.pop() == 'class'):
 		if ASTNode[ASTNode[root]["parent"]]["NodesPosition"] != -1:
@@ -1705,7 +1705,7 @@ def fieldExtraction(root):
 					name, list):  # Ternary Condition will be handled here
 				Vname = name.pop()  # Variable Name
 				# Variable Type and Name stored in VarStorage
-				if(ClassVariables.has_key(PresentClassName)):
+				if(PresentClassName in ClassVariables):
 					ClassVariables[PresentClassName].append(str(LocalVariableName + " " + Vname))
 				else:
 					ClassVariables[PresentClassName] = [str(LocalVariableName + " " + Vname)]
@@ -1761,14 +1761,14 @@ def fieldExtraction(root):
 				return [len(FlowChart) - 2, len(FlowChart) - 1]
 			else:
 				if name.rfind("=") != -1:  # Variable initializer id is present
-					if(ClassVariables.has_key(PresentClassName)):
+					if(PresentClassName in ClassVariables):
 						ClassVariables[PresentClassName].append(str(LocalVariableName + " " + name[:name.rfind("=")]))
 					else:
 						ClassVariables[PresentClassName] = [str(LocalVariableName + " " + name[:name.rfind("=")])]
 					VarStorage.update(
 						{name[:name.rfind("=")]: LocalVariableName})
 				else:
-					if(ClassVariables.has_key(PresentClassName)):
+					if(PresentClassName in ClassVariables):
 						ClassVariables[PresentClassName].append(str(LocalVariableName + " " + name))
 					else:
 						ClassVariables[PresentClassName] = [str(LocalVariableName + " " + name)]

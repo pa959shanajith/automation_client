@@ -16,10 +16,6 @@ class Highlight():
         def highlight(self,element):
                 if element is not None:
                     """Highlights (blinks) a Selenium Webdriver element"""
-##                            win32gui.ShowWindow(hwndg, win32con.SW_MAXIMIZE)
-##                            win32gui.SetWindowPos(hwndg, win32con.HWND_NOTOPMOST, 0, 0, 0, 0, win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
-##                            win32gui.SetWindowPos(hwndg, win32con.HWND_TOPMOST, 0, 0, 0, 0, win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
-##                            win32gui.SetWindowPos(hwndg, win32con.HWND_NOTOPMOST, 0, 0, 0, 0, win32con.SWP_SHOWWINDOW + win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
 
                     driver=browserops.driver
                     def apply_style(s, sec):
@@ -28,53 +24,17 @@ class Highlight():
                                                   element, s)
                         except Exception as e1:
                             evb = e1
-##                                    print e1
                         time.sleep(0.1)
                     try:
                         original_style = element.get_attribute('style')
                     except Exception as e6:
                         evb = e6
-##                                print e6
                     try:
                         driver.execute_script("arguments[0].scrollIntoView({block: 'end', behavior: 'smooth'});", element)
                     except Exception as e2:
                         evb = e2
-##                                print e2
                     apply_style(original_style + "background: #fff300; border: 2px solid #cc3300;outline: 2px solid #fff300;", 3)
-                    try:
-                        if (driver.capabilities['version'] != unicode(8)):
-                                print ''
-##                            apply_style(original_style, 0)
-##                        else:
-##                            apply_style(original_style + "background: 0; border: 0px none 0; outline: none", 0)
-##                            print 'dont apply previous  style'
-                    except Exception as e3:
-                        evb = e3
-##                                print e3
-##                    def is_int(url):
-##                        try:
-##                            int(url[0])
-##                            return True
-##                        except ValueError:
-##                            return False
-##
-##                    if is_int(url):
-##                        indiframes = url.split("/")
-##                        try:
-##                            driver.switch_to.default_content()
-##                        except Exception as e4:
-##                            ahgb = 1
-####                            print e4
-##                        for i in indiframes:
-##                            if i is not '':
-##                                frame_iframe = 'iframe'
-##                                j = i.rstrip(i[-1:])
-##                                if i[-1:] == 'f':
-##                                    frame_iframe = 'frame'
-##                                try:
-##                                    driver.switch_to.frame(driver.find_elements_by_tag_name(frame_iframe)[int(j)])
-##                                except Exception as l:
-##                                    abc = l
+
 
         def find_element(self,data,element):
 
@@ -82,7 +42,6 @@ class Highlight():
 
                     # find out if the highele[1] has id or name attrib
                     identifiers = highele[0].split(';')
-##                    print identifiers
                     self.url = highele[1]
 
                     try:
@@ -126,7 +85,7 @@ class Highlight():
                             element_properties = driver.execute_script(properties_script,webElement[0],self.url)
                             new_properties=element_properties[0];
                             if cmp(element,new_properties)!=0:
-                                print 'object is changed'
+                                log.info('object is changed')
                                 return new_properties
                         try:
                             driver.switch_to.default_content()
@@ -176,17 +135,12 @@ class Highlight():
                             element_properties = driver.execute_script(properties_script,webElement[0],self.url)
                             new_properties=element_properties[0];
                             if cmp(element,new_properties)!=0:
-                                print 'object is changed'
+                                log.info('object is changed')
                                 return new_properties
                             else:
                                 return element
-
-##                            try:
-##                                driver.switch_to.default_content()
-##                            except Exception as e4:
-##                                evb = e4
                         else:
-                            print 'The element '+ str(element['custname']) +'  is not found'
+                            log.info('The element '+ str(element['custname']) +'  is not found')
                             return element
 
                     #win32gui.ShowWindow(hwndg, win32con.SW_MINIMIZE)

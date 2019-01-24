@@ -65,7 +65,7 @@ class WebservicesWSDL():
             ##    for methodindex in range(0,len(obt_list_method1)):
             ##       allmethodslist.append(str('SOAP1.2-'+obt_list_method[methodindex]))
             ##    log.info(allmethodslist)
-            print allmethodslist
+            log.info(allmethodslist)
             return allmethodslist
         except Exception as e:
             logger.print_on_console('Invalid end point URl')
@@ -153,7 +153,7 @@ class BodyGenarator():
                     obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
                     obt_request_body_soap11 = etree.tostring(obt_body,pretty_print=True)
                 except:
-                    print 'No Request data to Enter'
+                    log.info('No Request data to Enter')
                     obt_request_body_soap11 = obt_body_base
                 log.info('request body of soap11')
                 log.info(obt_request_body_soap11)
@@ -170,7 +170,7 @@ class BodyGenarator():
                     obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
                     obt_request_body_soap12 = etree.tostring(obt_body,pretty_print=True)
                 except:
-                    print 'No Request data to Enter'
+                    log.info('No Request data to Enter')
                     obt_request_body_soap12 = obt_body_base
                 log.info('request body of soap12')
                 log.info(obt_request_body_soap12)
@@ -187,7 +187,7 @@ class BodyGenarator():
                     obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
                     obt_request_body_soap11 = etree.tostring(obt_body,pretty_print=True)
                 except:
-                    print 'No Request data to Enter'
+                    log.info('No Request data to Enter')
                     obt_request_body_soap11 = obt_body_base1
                 log.info('request body of soap11')
                 log.info(obt_request_body_soap11)
@@ -198,7 +198,7 @@ class BodyGenarator():
                     obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
                     obt_request_body_soap12 = etree.tostring(obt_body,pretty_print=True)
                 except:
-                    print 'No Request data to Enter'
+                    log.info('No Request data to Enter')
                     obt_request_body_soap12 = obt_body_base2
                 log.info('request body of soap12')
                 log.info(obt_request_body_soap12)

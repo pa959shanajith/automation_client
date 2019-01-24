@@ -75,7 +75,7 @@ class Clickandadd():
 
             """Method to perform Start ClickAndAdd on iframes (and frames) recursively"""
             def callback_scrape_start_cna_iframes(myipath):
-                for iframes in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                for iframes in (list(range(len(driver.find_elements_by_tag_name(domconstants.IFRAME))))):
                     path = myipath + str(iframes) + 'i' + '/'
                     if webscrape_utils_obj.switchtoframe_webscrape(driver, currenthandle, path):
                         log.debug('switched to iframe/frame %s', path)
@@ -88,7 +88,7 @@ class Clickandadd():
 
             """Method to perform Start ClickAndAdd on frames (and iframes) recursively"""
             def callback_scrape_start_cna_frames(myipath):
-                for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                for frames in (list(range(len(driver.find_elements_by_tag_name(domconstants.FRAME))))):
                     path = myipath + str(frames) + 'f' + '/'
                     if webscrape_utils_obj.switchtoframe_webscrape(driver, currenthandle, path):
                         log.debug('switched to iframe/frame %s', path)
@@ -132,7 +132,7 @@ class Clickandadd():
 
             """Method to perform Stop ClickAndAdd on iframes (and frames) recursively"""
             def callback_scrape_stop_cna_iframes(myipath, tempne_stopclicknadd):
-                for iframes in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                for iframes in (list(range(len(driver.find_elements_by_tag_name(domconstants.IFRAME))))):
                     path = myipath + str(iframes) + 'i' + '/'
                     if webscrape_utils_obj.switchtoframe_webscrape(driver, currenthandle, path):
                         log.debug('switched to iframe/frame %s', path)
@@ -147,7 +147,7 @@ class Clickandadd():
 
             """Method to perform Stop ClickAndAdd on frames (and iframes) recursively"""
             def callback_scrape_stop_cna_frames(myipath, tempne_stopclicknadd):
-                for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                for frames in (list(range(len(driver.find_elements_by_tag_name(domconstants.FRAME))))):
                     path = myipath + str(frames) + 'f' + '/'
                     if webscrape_utils_obj.switchtoframe_webscrape(driver, currenthandle, path):
                         log.debug('switched to iframe/frame %s', path)
@@ -214,4 +214,5 @@ class Clickandadd():
             logger.print_on_console('Error while performing stop click and add scrape')
             if (isinstance(driver,webdriver.Ie)):
                 logger.print_on_console('Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked) and retry')
+                log.error(e,exc_info=True)
         return data

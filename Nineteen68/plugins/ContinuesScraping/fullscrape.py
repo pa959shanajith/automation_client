@@ -87,7 +87,7 @@ class Fullscrape():
 
             def callback_scrape1(myipath, tempne):
                 path = myipath
-                for iframes in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                for iframes in (list(range(len(driver.find_elements_by_tag_name(domconstants.IFRAME))))):
                     # check if it is really a valid iframe before performing any further actions!
     ##                            if (driver.find_elements_by_tag_name('iframe')[iframes]).is_displayed():
                     #custom switchtoframe:
@@ -96,7 +96,7 @@ class Fullscrape():
                         temp = driver.execute_script(javascript_scrape, path)
                         logger.log('FILE: fullscrape.py , DEF: callback_scrape1() , MSG: full scrape operation on iframe page is done and data is obtained')
                         tempne.extend(temp)
-                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                        for frames in (list(range(len(driver.find_elements_by_tag_name(domconstants.FRAME))))):
                             inpath = path + str(frames) + 'f' +  '/'
                             if switchtoframe_scrape1(inpath):
                                 itemp = driver.execute_script(javascript_scrape, inpath)
@@ -107,7 +107,7 @@ class Fullscrape():
 
             def callback_scrape2(myipath, tempne):
                 path = myipath
-                for iframes in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                for iframes in (list(range(len(driver.find_elements_by_tag_name(domconstants.FRAME))))):
                     # check if it is really a valid iframe before performing any further actions!
     ##                            if (driver.find_elements_by_tag_name('iframe')[iframes]).is_displayed():
                     #custom switchtoframe:
@@ -116,7 +116,7 @@ class Fullscrape():
                         temp = driver.execute_script(javascript_scrape, path)
                         logger.log('FILE: fullscrape.py , DEF: callback_scrape2() , MSG: full scrape operation on frame page is done and data is obtained')
                         tempne.extend(temp)
-                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                        for frames in (list(range(len(driver.find_elements_by_tag_name(domconstants.IFRAME))))):
                             inpath = path + str(frames) + 'i' +  '/'
                             if switchtoframe_scrape1(inpath):
                                 itemp = driver.execute_script(javascript_scrape, inpath)
@@ -224,14 +224,14 @@ class Fullscrape():
 
             def callback_clicknadd1(myipath):
                 path = myipath
-                for iframes in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                for iframes in (list(range(len(driver.find_elements_by_tag_name(domconstants.IFRAME))))):
                     #custom switchtoframe:
                     path = myipath + str(iframes) + 'i' + '/'
                     if(switchtoframe_clicknadd1(path)):
                         logger.log('FILE: clickandadd.py , DEF: callback_clicknadd1() , MSG: Performing the click and add operation on iframe/frame page')
                         driver.execute_script(javascript_clicknadd, path,browser)
                         logger.log('FILE: clickandadd.py , DEF: callback_clicknadd1() , MSG: Performing the click and add operation on iframe/frame page done')
-                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                        for frames in (list(range(len(driver.find_elements_by_tag_name(domconstants.FRAME))))):
                             inpath = path + str(frames) + 'f' + '/'
                             if switchtoframe_clicknadd1(inpath):
                                 logger.log('FILE: clickandadd.py , DEF: callback_clicknadd1() , MSG: Performing the click and add operation on frame/iframe page')
@@ -241,14 +241,14 @@ class Fullscrape():
 
             def callback_clicknadd2(myipath):
                 path = myipath
-                for iframes in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                for iframes in (list(range(len(driver.find_elements_by_tag_name(domconstants.FRAME))))):
                     #custom switchtoframe:
                     path = myipath + str(iframes) + 'f' + '/'
                     if(switchtoframe_clicknadd1(path)):
                         logger.log('FILE: clickandadd.py , DEF: callback_clicknadd2() , MSG: Performing the click and add operation on frame/iframe page')
                         driver.execute_script(javascript_clicknadd, path,browser)
                         logger.log('FILE: clickandadd.py , DEF: callback_clicknadd2() , MSG: Performing the click and add operation on frame/iframe page done')
-                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                        for frames in (list(range(len(driver.find_elements_by_tag_name(domconstants.IFRAME))))):
                             inpath = path + str(frames) + 'i' + '/'
                             if switchtoframe_clicknadd1(inpath):
                                 logger.log('FILE: clickandadd.py , DEF: callback_clicknadd2() , MSG: Performing the click and add operation on iframe/frame page')
@@ -312,7 +312,7 @@ class Fullscrape():
 
             def callback_stopclicknadd1(myipath, tempne_stopclicknadd):
                 path = myipath
-                for iframes in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                for iframes in (list(range(len(driver.find_elements_by_tag_name(domconstants.IFRAME))))):
                     #custom switchtoframe:
                     path = myipath + str(iframes) + 'i' + '/'
                     if(switchtoframe_stopclicknadd1(path)):
@@ -320,7 +320,7 @@ class Fullscrape():
                         temp = driver.execute_script(javascript_stopclicknadd)
                         logger.log('FILE: clickandadd.py , DEF: callback_stopclicknadd1() , MSG: stopclicknadd operation on iframe page is done and data is obtained')
                         tempne_stopclicknadd.extend(temp)
-                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                        for frames in (list(range(len(driver.find_elements_by_tag_name(domconstants.FRAME))))):
                             inpath = path + str(frames) + 'f' + '/'
                             if switchtoframe_stopclicknadd1(inpath):
                                 itemp = driver.execute_script(javascript_stopclicknadd)
@@ -331,7 +331,7 @@ class Fullscrape():
 
             def callback_stopclicknadd2(myipath, tempne_stopclicknadd):
                 path = myipath
-                for iframes in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                for iframes in (list(range(len(driver.find_elements_by_tag_name(domconstants.FRAME))))):
                     #custom switchtoframe:
                     path = myipath + str(iframes) + 'f' + '/'
                     if(switchtoframe_stopclicknadd1(path)):
@@ -339,7 +339,7 @@ class Fullscrape():
                         temp = driver.execute_script(javascript_stopclicknadd)
                         logger.log('FILE: clickandadd.py , DEF: callback_stopclicknadd2() , MSG: stopclicknadd operation on frame page is done and data is obtained')
                         tempne_stopclicknadd.extend(temp)
-                        for frames in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                        for frames in (list(range(len(driver.find_elements_by_tag_name(domconstants.IFRAME))))):
                             inpath = path + str(frames) + 'i' + '/'
                             if switchtoframe_stopclicknadd1(inpath):
                                 logger.log('FILE: clickandadd.py , DEF: callback_stopclicknadd2() , MSG: before stopclicknadd operation on iframe page is done and data is obtained')

@@ -119,7 +119,7 @@ class Shell_Keywords():
             status=sap_constants.TEST_RESULT_FAIL
             result=sap_constants.TEST_RESULT_FALSE
             err_msg=None
-            r_int=long(input_val[0])
+            r_int=int(input_val[0])
             i_int=int(input_val[1])
             row=r_int-1
             index=i_int-1
@@ -235,7 +235,7 @@ class Shell_Keywords():
             status=sap_constants.TEST_RESULT_FAIL
             result=sap_constants.TEST_RESULT_FALSE
             err_msg=None
-            r_int=long(input_val[0])
+            r_int=int(input_val[0])
             i_int=int(input_val[1])
             row=r_int-1
             index=i_int-1
@@ -282,7 +282,7 @@ class Shell_Keywords():
             status=sap_constants.TEST_RESULT_FAIL
             result=sap_constants.TEST_RESULT_FALSE
             err_msg=None
-            r_int=long(input_val[0])
+            r_int=int(input_val[0])
             i_int=int(input_val[1])
             row=r_int-1
             index=i_int-1

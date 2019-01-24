@@ -81,7 +81,7 @@ class Fullscrape():
 
             """Method to perform fullscrape on iframes (and frames) recursively"""
             def callback_fullscrape_iframes(myipath, tempne):
-                for iframes in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                for iframes in (list(range(len(driver.find_elements_by_tag_name(domconstants.IFRAME))))):
                     path = myipath + str(iframes) + 'i' + '/'
                     if webscrape_utils_obj.switchtoframe_webscrape(driver,currenthandle,path):
                         log.debug('switched to iframe/frame %s', path)
@@ -96,7 +96,7 @@ class Fullscrape():
 
             """Method to perform fullscrape on frames (and iframes) recursively"""
             def callback_fullscrape_frames(myipath, tempne):
-                for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                for frames in (list(range(len(driver.find_elements_by_tag_name(domconstants.FRAME))))):
                     path = myipath + str(frames) + 'f' +  '/'
                     if webscrape_utils_obj.switchtoframe_webscrape(driver,currenthandle,path):
                         log.debug('switched to iframe/frame %s', path)

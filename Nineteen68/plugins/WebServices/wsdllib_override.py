@@ -44,7 +44,7 @@ def zeepClient_bind_override(self, service_name=None, port_name=None):
         if not service:
             raise ValueError("Service not found")
     else:
-        service = next(iter(self.wsdl.services.values()), None)
+        service = next(iter(list(self.wsdl.services.values())), None)
 
     if port_name:
         port = service.ports.get(port_name)
