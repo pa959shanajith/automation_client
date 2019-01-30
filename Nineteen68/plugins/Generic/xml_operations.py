@@ -25,7 +25,7 @@ class XMLOperations():
     def build_dict(self,json_obj):
      keys={}
      if isinstance(json_obj,dict):
-      for key,value in json_obj.items():
+      for key,value in list(json_obj.items()):
          if isinstance(value,dict):
             keys[key]=value
             keys.update(self.build_dict(value))
@@ -61,7 +61,7 @@ class XMLOperations():
 
             encoded_inp_string=input_string
             json_obj=None
-            if isinstance(input_string,unicode):
+            if isinstance(input_string,str):
                 encoded_inp_string=input_string.encode('utf-8')
             try:
                 json_obj=json.loads(encoded_inp_string)
@@ -78,7 +78,7 @@ class XMLOperations():
             if json_obj != None:
                 #json logic
                 json_obj_dict=self.build_dict(json_obj)
-                if(json_obj_dict.has_key(input_tag)):
+                if(input_tag in json_obj_dict):
                     log.info(json_obj_dict)
                     value=json_obj_dict[input_tag]
                     if isinstance(value,list):
@@ -86,7 +86,7 @@ class XMLOperations():
                             block_count=len(value[block_number])
                         else:
                             block_count=len(value)
-                    elif isinstance(value,dict) or isinstance(value,unicode) or isinstance(value,str):
+                    elif isinstance(value,dict) or isinstance(value,str) or isinstance(value,str):
                         block_count=1
                     if(block_count>0):
                         status = TEST_RESULT_PASS
@@ -136,9 +136,6 @@ class XMLOperations():
                 err_msg="Invalid json input"
 
             else:
-                print e
-                import traceback
-                traceback.print_exc()
                 err_msg=EXCEPTION_OCCURED
         if err_msg!=None:
             log.error(err_msg)
@@ -163,7 +160,7 @@ class XMLOperations():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
 ##            root = ET.fromstring(str(input_string))
-            if isinstance(input_string,unicode):
+            if isinstance(input_string,str):
                 root = ET.fromstring(input_string.encode('utf-8'))
             else:
                 root = ET.fromstring(input_string)
@@ -205,7 +202,7 @@ class XMLOperations():
                         if len(args)>0:
                             attribute=args[0]
                             attribute_dict=child.attrib
-                            if attribute_dict.has_key(attribute):
+                            if attribute in attribute_dict:
                                 tagvalue=attribute_dict[attribute]
                                 logger.print_on_console('Tag Attribute : ',attribute, ' Tag Value : ',tagvalue)
                                 log.info('Got the child attribute value and stored in tagvalue')
@@ -261,7 +258,7 @@ class XMLOperations():
         try:
             encoded_inp_string=input_string
             json_obj=None
-            if isinstance(input_string,unicode):
+            if isinstance(input_string,str):
                 encoded_inp_string=input_string.encode('utf-8')
             try:
                 json_obj=json.loads(encoded_inp_string)
@@ -277,13 +274,13 @@ class XMLOperations():
             if json_obj != None:
                 #json logic
                 json_obj_dict=self.build_dict(json_obj)
-                if(json_obj_dict.has_key(input_tag)):
+                if(input_tag in json_obj_dict):
                     json_value=json_obj_dict[input_tag]
                     block_count=len(json_value)
                     block_number = int(block_number)
                     if(block_count>0 and block_number>0):
                         if isinstance(json_value,dict):
-                            tag_value=json_value.values()
+                            tag_value=list(json_value.values())
                             log.info('Tag value is ')
                             log.info(tag_value)
                             if len(tag_value)>=block_number:
@@ -295,7 +292,7 @@ class XMLOperations():
                                 blockvalue=json_value[block_number-1]
                             else:
                                 err_msg='Invalid block_number'
-                        elif isinstance(json_value,str) or isinstance(json_value,unicode):
+                        elif isinstance(json_value,str) or isinstance(json_value,str):
                             blockvalue=json_value
 
                         log.info('Block value is ',blockvalue)
@@ -398,7 +395,7 @@ class XMLOperations():
             log.debug('Build xml element')
             tree1=''
             tree2=''
-            if isinstance(object_string1,unicode):
+            if isinstance(object_string1,str):
                 tree1 = etree.fromstring(object_string1.encode('utf-8'))
                 tree2 = etree.fromstring(object_string2.encode('utf-8'))
             else:
@@ -427,25 +424,4 @@ class XMLOperations():
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
-
-##if __name__ == '__main__':
-##    obj = XMLOperations()
-##
-##    inputs = []
-##    a = """<Parameter><Set><CITY>Atlanta</CITY><STATE>GA</STATE><ZIP>30301</ZIP><AREA_CODE>404</AREA_CODE><TIME_ZONE>E</TIME_ZONE></Set>-<Set><CITY>Atlanta</CITY><STATE>GA</STATE><ZIP>30302</ZIP><AREA_CODE>404</AREA_CODE><TIME_ZONE>E</TIME_ZONE></Set>-<Set><CITY>Atlanta</CITY><STATE>GA</STATE><ZIP>30303</ZIP><AREA_CODE>404</AREA_CODE><TIME_ZONE>E</TIME_ZONE></Set>-<Set><CITY>Atlanta</CITY><STATE>GA</STATE><ZIP>30304</ZIP><AREA_CODE>404</AREA_CODE><TIME_ZONE>E</TIME_ZONE></Set>-<Set><CITY>Atlanta</CITY><STATE>GA</STATE><ZIP>30305</ZIP><AREA_CODE>404</AREA_CODE><TIME_ZONE>E</TIME_ZONE></Set></Parameter>"""
-##    b = '2'
-##    c = """Set"""
-##    d = """ZIP"""
-####    inputs.append()
-##    bcount = obj.get_block_count(a,c)
-##    print bcount
-##    print """================================================="""
-##
-##    tvalue = obj.get_tag_value(a,b,c,d)
-##    print tvalue
-##
-##    print """================================================="""
-##
-##    bvalue = obj.get_block_value(a,c,b)
-##    print bvalue
 

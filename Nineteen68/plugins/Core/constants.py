@@ -278,10 +278,7 @@ ERROR_CODE_DICT ={
                     #JumpBy error messages
                     """ERR_JUMPY_STEP_DOESN'T_EXISTS""" : """Invalid input, jumpBy Step doesn't exist""",
                     """ERR_JUMPBY_CAN'T_BE_0""":"""Invalid input, jumpBy Step?cannot be '0'""",
-                    'ERR_CUSTOM_ELE_NOTFOUND':'Error occured in finding Custom element',
-                    #Xcode error messages
-                    "ERR_XCODE_DOWN":'Xcode server is down',
-                    "ERR_TIMEOUT":"Invalid IP Address socket connection failed"
+                    'ERR_CUSTOM_ELE_NOTFOUND':'Error occured in finding Custom element'
                 }
 
 STOP='stop'
@@ -426,18 +423,8 @@ STATIC_DV_NAME = "{#@#n_u_m#@#}"
 
 WEB_ELEMENT_FOUND_FROM_GetInnerTable = 'Web Element found from GetInnerTable'
 
-XCODE_EXECUTE="execu"
+FIREFOX_BROWSER_VERSION = {"0.13":[52,53],"0.16":[52,53],"0.19":[55,62],"0.21":[55,62],"0.23":[55,64]}
 
-XCODE_SCRAPE="query"
-
-XCODE_PASS="pass"
-
-XCODE_PASSVALUE="passval"
-
-XCODE_ERROR="error"
-
-FIREFOX_BROWSER_VERSION = {"0.13":[52,53],"0.16":[52,53],"0.19":[55,62],"0.21":[55,62],"0.23":[57,64]}
-
-CHROME_DRIVER_VERSION = {"2.45":[70,72],"2.41":[67,69],"2.40":[66,68],"2.39":[66,68],"2.38":[65,67],"2.37":[64,66],"2.36":[63,65],"2.35":[62,65]}
+CHROME_DRIVER_VERSION = {"2.45":[70,72],"2.44":[69,71],"2.43":[69,71],"2.41":[67,69],"2.40":[66,68],"2.39":[66,68],"2.38":[65,67],"2.37":[64,66],"2.36":[63,65],"2.35":[62,65]}
 
 SYSTEM_OS = 'Windows'

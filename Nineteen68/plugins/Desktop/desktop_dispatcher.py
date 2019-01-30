@@ -251,8 +251,8 @@ class DesktopDispatcher:
                 }
             keyword=keyword.lower()
             ele = None
-            if keyword in dict.keys():
-                if keyword=='launchapplication' or keyword=='findwindowandattach' or keyword=='selectmenu' or keyword in email_dict.keys() :
+            if keyword in list(dict.keys()):
+                if keyword=='launchapplication' or keyword=='findwindowandattach' or keyword=='selectmenu' or keyword in list(email_dict.keys()) :
                     result= dict[keyword](input,output)
                 else:
                     self.launch_keywords_obj.verifyWindowTitle()

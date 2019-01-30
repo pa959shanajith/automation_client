@@ -27,7 +27,7 @@ class DynamicVariables:
         res=False
         dyn_value=None
         variable=re.findall("\{(.*?)\[",inp_value)
-        if len(variable)>0 and variable[0] != '' and dynamic_variable_map.has_key(DB_VAR):
+        if len(variable)>0 and variable[0] != '' and DB_VAR in dynamic_variable_map:
             dbvalue=dynamic_variable_map[DB_VAR]
             temp_dbvalue=re.findall("\{(.*?)\[",dbvalue[-1])
             #To Fix issue with displaying/Fetching of Databse values
@@ -67,7 +67,7 @@ class DynamicVariables:
                         dyn_data=temp_value.tag_name
                     except:
                         dyn_data=''
-                    if not ((isinstance(temp_value,unicode))or (dyn_data !='')):
+                    if not ((isinstance(temp_value,str))or (dyn_data !='')):
                         if actual_value is not None:
                             actual_value=actual_value.replace(input_var,str(temp_value))
                     else:
@@ -144,7 +144,7 @@ class DynamicVariables:
         #returns the value of the dynamic variable if it exists otherwise returns None
 
         value=None
-        if dynamic_variable_map.has_key(variable):
+        if variable in dynamic_variable_map:
             value=dynamic_variable_map.get(variable)
         return value
 
@@ -171,9 +171,9 @@ class DynamicVariables:
                 #Check if the nested variable is again a dynamic variable or actual value
                 replacestring=nested_variable[i]
                 if self.check_for_dynamicvariables(nested_variable[i])==TEST_RESULT_TRUE:
-                    if dynamic_variable_map.has_key(nested_variable[i]):
+                    if nested_variable[i] in dynamic_variable_map:
                         replacestring = dynamic_variable_map.get(nested_variable[i])
-                if not isinstance(replacestring,basestring):
+                if not isinstance(replacestring,str):
                     replacestring = str(replacestring)
                 inputvar = inputvar.replace(nested_variable[i],replacestring)
                 value=inputvar

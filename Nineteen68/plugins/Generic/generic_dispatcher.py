@@ -159,7 +159,7 @@ class GenericKeywordDispatcher:
 
 
                 }
-            if keyword in dict.keys():
+            if keyword in list(dict.keys()):
                 if keyword in [generic_constants.DISPLAY_VARIABLE_VALUE,generic_constants.SENDFUNCTIONKEYS,generic_constants.PAUSE]:
                     actual_input=tsp.inputval[0].split(';')
                     message=list(message)

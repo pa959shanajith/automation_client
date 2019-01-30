@@ -13,8 +13,7 @@ log = logging.getLogger('main.py')
 parser = argparse.ArgumentParser(description="Nineteen68 Platform")
 parser.add_argument('--NINETEEN68_HOME', type=str, help='A Required path to Nineteen68 root location')
 args = parser.parse_args()
-
-if args.NINETEEN68_HOME < 1:
+if args.NINETEEN68_HOME is None:
     parser.error("Required at least 1 argument")
 os.environ["NINETEEN68_HOME"] = args.NINETEEN68_HOME
 

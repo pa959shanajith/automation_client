@@ -25,7 +25,7 @@ class QcWindow():
     def __init__(self,filePath):
         status=None
         try:
-            global sent,loginflag,urlflag,TD
+            global sent
             flag=0
             if(filePath["qcaction"]=='domain'):
                 try:
@@ -35,8 +35,11 @@ class QcWindow():
                     domain_dict={}
                     key="view"
                     domain_dict.setdefault(key, [])
+                    global loginflag
                     loginflag=False
+                    global TD
                     TD = win32com.client.Dispatch("TDApiOle80.TDConnection")
+                    global urlflag
                     urlflag=False
                     TD.InitConnectionEx(str(Qc_Url))
                     urlflag=True
@@ -64,16 +67,14 @@ class QcWindow():
                     self.emit_data()
                 else:
                     con.send("Fail@f@!l#E&D@Q!C#")
+            else:
+                pass
         except Exception as e:
-            log.error(e)
-            err_msg='Error in Qc action'
-            logger.print_on_console(err_msg)
-            log.error(err_msg)
+            print('Error in Qc action')
             con.send('Fail@f@!l#E&D@Q!C#')
             sent=1
 
     def getDomain(self,filePath):
-        err_msg=None
         try:
             domain_dict={}
             key="domain"
@@ -88,17 +89,13 @@ class QcWindow():
             global dictFolderJson
             dictFolderJson=json.loads(dictFolder)
         except Exception as e:
-            err_msg='Error in getting domains'
+            print('Error in getting domains')
             dictFolderJson=None
-        if err_msg is not None:
-            logger.print_on_console(err_msg)
-            log.error(err_msg)
+
         return dictFolderJson
 
 
     def getProjects(self,filePath):
-        global dictFolderJson
-        err_msg=None
         try:
             domain_name=filePath["domain"]
             projects_dict={}
@@ -110,19 +107,16 @@ class QcWindow():
                     for pro in list_projects:
                         projects_dict[key].append(str(pro))
                     dictFolder = json.dumps(projects_dict)
+                    global dictFolderJson
                     dictFolderJson=json.loads(dictFolder)
                 else:
-                    err_msg='Invalid domain selected'
+                    print('Invalid domain selected')
         except Exception as eproject:
-            err_msg='Error in fetching projects'
+            print('Error in fetching projects')
             dictFolderJson=None
-        if err_msg is not None:
-            logger.print_on_console(err_msg)
-            log.error(err_msg)
         return dictFolderJson
 
     def ListTestSetFolder(self,filePath):
-        err_msg=None
         ##The final list which contains the testsets and testset under the specified path
         try:
             testsetpath=filePath["foldername"]
@@ -177,7 +171,7 @@ class QcWindow():
                                 ice_list=TestSet_dict['TestSet']
                                 ice_list.remove(remID)
             else:
-                err_msg='Invalid connection'
+                print('Invalid connection')
             temp_dict_ts={}
             key="TestSet"
             temp_dict_ts.setdefault(key, [])
@@ -194,18 +188,14 @@ class QcWindow():
             dictFolderJson = json.dumps(OverallList)
             dictFolderJson=json.loads(dictFolderJson)
         except Exception as e:
-            err_msg='Error while fetching testsets'
+            print('Error while fetching testsets')
             dictFolderJson=None
         finally:
-            if err_msg is not None:
-               	logger.print_on_console(err_msg)
-                log.error(err_msg)
             return dictFolderJson
 
 
 
     def test_case_generator(self,filePath):
-        err_msg=None
         try:
             test_case_dict={}
             key="testcase"
@@ -236,15 +226,11 @@ class QcWindow():
             dictFolderJson = json.dumps(OverallList)
             dictFolderJson=json.loads(dictFolderJson)
         except Exception as e:
-            err_msg='Error while fetching testcases'
-        if err_msg is not None:
-            logger.print_on_console(err_msg)
-            log.error(err_msg)
+            print('Error while fetching testcases')
         return dictFolderJson
 
     def update_qc_details(self,data):
         status = False
-        err_msg=None
         try:
             qcDomain =  data['qc_domain']
             qcProject = data['qc_project']
@@ -278,10 +264,9 @@ class QcWindow():
                         obj_theRun.Refresh()
                         status = True
             else:
-                err_msg='Qc is disconnected'
+                print('Qc is disconnected')
         except Exception as e:
-            log.error(e)
-            err_msg='Error while updating QC'
+            print('Error while updating QC')
             status = False
         global dictFolderJson
         if(status):
@@ -293,9 +278,6 @@ class QcWindow():
             """
         else:
             dictFolderJson = {'QC_UpdateStatus':False}
-        if err_msg is not None:
-            logger.print_on_console(err_msg)
-            log.error(err_msg)
         return status
 
     def quit_qc(self):
@@ -315,13 +297,8 @@ class QcWindow():
             dictFolderJson=None
             return True
         except Exception as e:
-            err_msg='Error while quitting qc'
+            print('Error while quitting qc')
             con.send("Fail@f@!l#E&D@Q!C#")
-        if err_msg is not None:
-            logger.print_on_console(err_msg)
-            log.error(err_msg)
-
-
 
     def emit_data(self):
         try:
@@ -331,10 +308,7 @@ class QcWindow():
             sent=1
             con.send(data_to_send)
         except Exception as e:
-            log.error(e)
-            err_msg='Error while emitting data'
-            logger.print_on_console(err_msg)
-            log.error(err_msg)
+            print('Error while emitting data')
 
 if __name__ == '__main__':
     host = 'localhost'
@@ -359,11 +333,7 @@ if __name__ == '__main__':
                     else:
                         sent=0
             except Exception as e:
-                log.error(e)
                 con.send("Fail@f@!l#E&D@Q!C#")
                 break
     except Exception as e:
-        log.error(e)
-        err_msg='Exception occured in QC'
-        logger.print_on_console(err_msg)
-        log.error(err_msg)
+        print("Exception occured in QC")

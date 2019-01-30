@@ -46,11 +46,11 @@ class CoreUtils():
             if isinstance(value,str) or isinstance(value, list):
                 if isinstance(value, list):
                     for eachvalue in value:
-                        if not isinstance(eachvalue,unicode):
+                        if not isinstance(eachvalue,str):
                             if not all(ord(c) < 128 for c in eachvalue):
                                 value.append(eachvalue.decode('utf-8'))
                 else:
-                    if not isinstance(value,unicode):
+                    if not isinstance(value,str):
                         if not all(ord(c) < 128 for c in value):
                             value = value.decode('utf-8')
             return value

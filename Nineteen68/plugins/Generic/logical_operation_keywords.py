@@ -34,7 +34,7 @@ class logical_eval():
                 logger.print_on_console('Evaluationg the expression')
                 result=satisfiable(expression)
                 if type(result)==dict:
-                    for res in result.iterkeys():
+                    for res in result.keys():
                         status=result[res]
                         log.debug('Got the result : %s', status)
                         if status==True:

@@ -386,7 +386,7 @@ class TextFile:
 
 
                 else:
-           
+
                     content+=''.join(args)
                     try:
                         file.write(content)
@@ -395,7 +395,7 @@ class TextFile:
                 file.close()
                 log.debug('Content is written successfully')
                 status= True
-        except IOError,OSError:
+        except (IOError,OSError) as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
             err_msg=generic_constants.ERR_MSG1+'Writing to text '+generic_constants.ERR_MSG2

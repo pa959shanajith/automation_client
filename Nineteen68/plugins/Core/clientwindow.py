@@ -2,7 +2,7 @@ import wx
 import sys
 import os
 import time
-import httplib
+import http.client
 import logging
 import logging.config
 import base64
@@ -64,6 +64,7 @@ if SYSTEM_OS=='Darwin':
     GECKODRIVER_PATH = DRIVERS_PATH + '/geckodriver'
 
 
+
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
         global action,wxObject,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag
@@ -102,7 +103,7 @@ class MainNamespace(BaseNamespace):
                 if(response['id'] != icesession['ice_id'] and response['connect_time'] != icesession['connect_time']):
                     err_res="Invalid response received"
                 if(response['res'] != 'success'):
-                    if(response.has_key('err_msg')):
+                    if('err_msg' in response):
                         err_res=response['err_msg']
                 if(err_res is not None):
                     logger.print_on_console(err_res)
@@ -337,14 +338,17 @@ class MainNamespace(BaseNamespace):
         stringHeader=''
         if(responseHeader != None):
             for key in responseHeader:
-                print key,'==========',responseHeader[key]
+                logger.print_on_console(key,'==========',responseHeader[key])
+                log.info(key,'==========',responseHeader[key])
                 stringHeader = stringHeader + str(key) + ": " + str (responseHeader[key]) + "##"
         responseHeader = stringHeader
-        print 'responseHeader after:::',responseHeader
-        print 'responseBody:::::',responseBody
+        logger.print_on_console('responseHeader after:::',responseHeader)
+        logger.print_on_console('responseBody:::::',responseBody)
+        log.info(responseHeader after:::',responseHeader)
+        log.info('responseBody:::::',responseBody)
         response=responseHeader+"rEsPONseBOdY:"+responseBody
         response=str(response)
-        print response
+        logger.print_on_console(response)
         socketIO.emit('result_wsdl_ServiceGenerator',response)
 
     def on_qclogin(self, *args):
@@ -526,7 +530,7 @@ class SocketThread(threading.Thread):
         server_port = int(configvalues['server_port'])
         server_IP = configvalues['server_ip']
         server_cert = configvalues['server_cert']
-        if configvalues.has_key("disable_server_cert") and configvalues["disable_server_cert"]=="Yes":
+        if "disable_server_cert" in configvalues and configvalues["disable_server_cert"]=="Yes":
             server_cert = False
         else:
             if os.path.exists(server_cert) == False:
@@ -534,9 +538,10 @@ class SocketThread(threading.Thread):
         client_cert = (CERTIFICATE_PATH + '/client.crt', CERTIFICATE_PATH + '/client.key')
         temp_server_IP = 'https://' + server_IP
         key='USERNAME'
-        if(not(os.environ.has_key(key))):
+        if(not(key in os.environ)):
             key='USER'
         username=str(os.environ[key]).lower()
+        username='deeksha.shetty'
         core_utils_obj = core_utils.CoreUtils()
         icesession = {
             'ice_id':str(uuid.uuid4()),
@@ -738,8 +743,8 @@ class ClientWindow(wx.Frame):
         ##self.SetBackgroundColour('#D0D0D0')
         self.logfilename_error_flag = False
         # Check if config file is present and valid
-        self.is_config_missing = configvalues.has_key('configmissing')
-        self.is_config_invalid = configvalues.has_key('errorflag')
+        self.is_config_missing = 'configmissing' in configvalues
+        self.is_config_invalid = 'errorflag' in configvalues
         self.debugwindow = None
         self.scrapewindow = None
         self.pausewindow = None
@@ -816,7 +821,7 @@ class ClientWindow(wx.Frame):
         self.connectbutton.Bind(wx.EVT_BUTTON, self.OnNodeConnect)
         self.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
         self.log = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_MULTILINE|wx.TE_READONLY)
-        font1 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL,  False, u'Consolas')
+        font1 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL,  False, 'Consolas')
         self.log.SetForegroundColour((0,50,250))
         self.log.SetFont(font1)
 
@@ -1000,7 +1005,7 @@ class ClientWindow(wx.Frame):
         if stat[1]: socketIO.emit('scrape','Terminate')
         if(state=="term_exec"):
             controller.disconnect_flag=True
-            print ""
+            print("")
             msg = "---------Terminating all active operations-------"
         else:
             msg ="---------Termination Started-------"
@@ -1018,17 +1023,19 @@ class ClientWindow(wx.Frame):
     def OnClear(self,event):
         self.log.Clear()
         print('********************************************************************************************************')
-        print('============================================ '+self.appName+' ============================================')
+        print(('============================================ '+self.appName+' ============================================'))
         print('********************************************************************************************************')
 
     def OnNodeConnect(self,event):
+        con =controller.Controller()
+
         try:
             global socketIO
             name = self.connectbutton.GetName()
             self.connectbutton.Disable()
             if(name == 'connect'):
                 port = int(configvalues['server_port'])
-                conn = httplib.HTTPConnection(configvalues['server_ip'],port)
+                conn = http.client.HTTPConnection(configvalues['server_ip'],port)
                 conn.connect()
                 conn.close()
                 self.socketthread = SocketThread()
@@ -1681,7 +1688,7 @@ class Config_window(wx.Frame):
                 # Write JSON file
                 with io.open(CONFIG_PATH, 'w', encoding='utf8') as outfile:
                     str_ = json.dumps(data,indent=4, sort_keys=True,separators=(',', ': '), ensure_ascii=False)
-                    outfile.write(unicode(str_))
+                    outfile.write(str(str_))
                 logger.print_on_console('--Configuration saved--')
                 log.info('--Configuration saved--')
                 self.updated = True
@@ -1800,10 +1807,10 @@ def check_browser():
                 if os.path.isfile(ICE_CONST)==True:
                     params = json.load(open(ICE_CONST))
                     if params['CHROME_VERSION'] != "":
-                        for k,v in params['CHROME_VERSION'].items():
+                        for k,v in list(params['CHROME_VERSION'].items()):
                             CHROME_DRIVER_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
                     if params['FIREFOX_VERSION'] != "":
-                        for k,v in params['FIREFOX_VERSION'].items():
+                        for k,v in list(params['FIREFOX_VERSION'].items()):
                             FIREFOX_BROWSER_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
                 else:
                     logger.print_on_console("Unable to locate ICE parameters")
@@ -1815,15 +1822,11 @@ def check_browser():
             import subprocess
             from selenium import webdriver
             from selenium.webdriver import ChromeOptions
-            a=[]
-            if SYSTEM_OS == "Darwin":
-                p = subprocess.Popen(CHROME_DRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1, cwd=DRIVERS_PATH,shell=True)
-            else:
-                p = subprocess.Popen('chromedriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
-            for line in iter(p.stdout.readline, b''):
-                a.append(str(line))
-            a=a[0][13:17]
+            p = subprocess.Popen('chromedriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
+            a=p.stdout.readline()
+            a=a.decode('utf-8')[13:17]
             choptions1 = webdriver.ChromeOptions()
+            logger.print_on_console(str(configvalues['chrome_path']).lower())
             if str(configvalues['chrome_path']).lower()!="default":
                 choptions1.binary_location=str(configvalues['chrome_path'])
             choptions1.add_argument('--headless')
@@ -1837,25 +1840,20 @@ def check_browser():
             except:
                 pass
             driver=None
-            for k,v in CHROME_DRIVER_VERSION.items():
+            for k,v in list(CHROME_DRIVER_VERSION.items()):
                 if a == k:
                     if browser_ver >= v[0] and browser_ver <= v[1]:
                         chromeFlag=True
             if chromeFlag == False :
-                logger.print_on_console('WARNING!! : Chrome version',browser_ver,' is not supported.')
+                logger.print_on_console('WARNING!! : Chrome version ',str(browser_ver),' is not supported.')
         except Exception as e:
             logger.print_on_console("Error in checking chrome version")
             log.error("Error in checking chrome version")
-            log.error(e)
+            log.error(e,exc_info=True)
         try:
-            if SYSTEM_OS == "Darwin":
-                p = subprocess.Popen(GECKODRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1, cwd=DRIVERS_PATH,shell=True)
-            else:
-                p = subprocess.Popen('geckodriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
-            a=[]
-            for line in iter(p.stdout.readline, b''):
-                a.append(str(line))
-            a=a[0][12:16]
+            p = subprocess.Popen('geckodriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
+            a=p.stdout.readline()
+            a=a.decode('utf-8')[12:16]
             caps=webdriver.DesiredCapabilities.FIREFOX
             caps['marionette'] = True
             from selenium.webdriver.firefox.options import Options
@@ -1876,16 +1874,16 @@ def check_browser():
             except:
                 pass
             driver=None
-            for k,v in FIREFOX_BROWSER_VERSION.items():
+            for k,v in list(FIREFOX_BROWSER_VERSION.items()):
                 if a == k:
                     if browser_ver >= v[0] or browser_ver <= v[1]:
                         firefoxFlag=True
             if firefoxFlag == False:
-                logger.print_on_console('WARNING!! : Firefox version',browser_ver,' is not supported.')
+                logger.print_on_console('WARNING!! : Firefox version ',str(browser_ver),' is not supported.')
         except Exception as e:
             logger.print_on_console("Error in checking Firefox version")
             log.error("Error in checking Firefox version")
-            log.error(e)
+            log.error(e,exc_info=True)
         if chromeFlag == True and firefoxFlag == True:
             logger.print_on_console('Current version of browsers are supported')
         return True

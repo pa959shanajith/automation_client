@@ -172,7 +172,7 @@ class Dropdown_Keywords():
                                     #---------------------------------------------
 ##                                    if element.is_active() == False:
 ##                                      element.click()
-                                    items=element.items()
+                                    items=list(element.items())
                                     cols=element.column_count()
                                     elelist=element.texts()
                                     elelist.pop(0)
@@ -366,7 +366,7 @@ class Dropdown_Keywords():
                             elif checkName =='ListView':
                                 if element.is_active() == False:
                                   element.click()
-                                items=element.items()
+                                items=list(element.items())
                                 elelist=element.texts()
                                 elelist.pop(0)
                                 oldlist=len(items)
@@ -446,7 +446,7 @@ class Dropdown_Keywords():
                                        status=desktop_constants.TEST_RESULT_PASS
                                        result=desktop_constants.TEST_RESULT_TRUE
                                 if checkName == 'ListView':
-                                    items=element.items()
+                                    items=list(element.items())
                                     elelist=element.texts()
                                     elelist.pop(0)
                                     oldlist=len(elelist)
@@ -636,7 +636,7 @@ class Dropdown_Keywords():
                                     result = desktop_constants.TEST_RESULT_TRUE
 
                              elif checkName == 'ListView':
-                                 items=element.items()
+                                 items=list(element.items())
                                  items.pop(0)
                                  newlist=[]
                                  items_list=input_val
@@ -708,7 +708,7 @@ class Dropdown_Keywords():
                                     result = desktop_constants.TEST_RESULT_TRUE
 
                             if checkName == 'ListView':
-                                 items=element.items()
+                                 items=list(element.items())
                                  elelist=element.texts()
                                  elelist.pop(0)
                                  newlist=[]
@@ -774,7 +774,7 @@ class Dropdown_Keywords():
                                 elif element.friendly_class_name() == 'ListView':
                                      if element.is_active() == False:
                                        element.click()
-                                     items=element.items()
+                                     items=list(element.items())
                                      for i in range(0,len(items)):
                                           items[i].select()
                                           status = desktop_constants.TEST_RESULT_PASS
@@ -832,7 +832,7 @@ class Dropdown_Keywords():
                                 elif element.friendly_class_name() == 'ListView':
                                      if element.is_active() == False:
                                        element.click()
-                                     items=element.items()
+                                     items=list(element.items())
                                      for i in range(0,len(items)):
                                       items[i].deselect()
                                       status = desktop_constants.TEST_RESULT_PASS
@@ -909,7 +909,7 @@ class Dropdown_Keywords():
                                 #---------------------------------------------
                                 if element.is_active() == False:
                                   element.click()
-                                items=element.items()
+                                items=list(element.items())
                                 cols=element.column_count()
                                 elelist=element.texts()
                                 elelist.pop(0)
@@ -1013,7 +1013,7 @@ class Dropdown_Keywords():
 
                                 elif element.friendly_class_name() == 'ListView':
                                     item_count = element.item_count()
-                                    items=element.items()
+                                    items=list(element.items())
                                     for i in range(0,len(items)):
                                                       items[i].deselect()
                                     for i in range(0,len(item_index)):
@@ -1075,7 +1075,7 @@ class Dropdown_Keywords():
                         if(element.is_enabled()):
                             item_text=input_val
                             if checkName == 'ListView':
-                                items=element.items()
+                                items=list(element.items())
                                 elelist=element.texts()
                                 new_elelist=[]
                                 for i in range(0,len(elelist)):
@@ -1104,7 +1104,7 @@ class Dropdown_Keywords():
                                         err_msg='List is a single selection type.Could not select all values'
                                 elif checkName == 'ListView':
                                     item_count = element.item_count()
-                                    items=element.items()
+                                    items=list(element.items())
                                     for i in range(0,len(items)):
                                                       items[i].deselect()
                                     for i in range(0,len(item_text)):

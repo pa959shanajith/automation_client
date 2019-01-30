@@ -97,7 +97,7 @@ class Delay_keywords:
                         y=""
                         logger.print_on_console("Static variable doesn't exist")
 
-                    if not isinstance(y,unicode):
+                    if not isinstance(y,str):
                         y=str(y)
 ##                    display_input+=x+' = '+(y if type(y)==str else repr(y))+'\n'
 

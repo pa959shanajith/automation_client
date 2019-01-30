@@ -18,7 +18,7 @@ import folder_operations
 from file_comparison_operations import TextFile,PdfFile,XML
 import excel_operations
 import core_utils
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 
 import logging
@@ -573,7 +573,7 @@ class FileOperations:
                                 methodoutput=TEST_RESULT_TRUE
                                 Tflag=True
                     except:
-                        for src, dest in self.cp1252.items():
+                        for src, dest in list(self.cp1252.items()):
                             if src in content:
                                 content = content.replace(src, dest)
                         content = content.encode('raw_unicode_escape')
@@ -607,7 +607,7 @@ class FileOperations:
                             err_msg=result[3]
             if Tflag!=True:
                 ##content=data.encode('cp1252')
-                for src, dest in self.cp1252.items():
+                for src, dest in list(self.cp1252.items()):
                     if src in content:
                         content = content.replace(src, dest)
                 content = content.encode('raw_unicode_escape')
@@ -757,33 +757,33 @@ class FileOperations:
 
     cp1252 = {
         # from http://www.microsoft.com/typography/unicode/1252.htm
-        u"\\u20AC": u"\x80", # EURO SIGN
-        u"\\u201A": u"\x82", # SINGLE LOW-9 QUOTATION MARK
-        u"\\u0192": u"\x83", # LATIN SMALL LETTER F WITH HOOK
-        u"\\u201E": u"\x84", # DOUBLE LOW-9 QUOTATION MARK
-        u"\\u2026": u"\x85", # HORIZONTAL ELLIPSIS
-        u"\\u2020": u"\x86", # DAGGER
-        u"\\u2021": u"\x87", # DOUBLE DAGGER
-        u"\\u02C6": u"\x88", # MODIFIER LETTER CIRCUMFLEX ACCENT
-        u"\\u2030": u"\x89", # PER MILLE SIGN
-        u"\\u0160": u"\x8A", # LATIN CAPITAL LETTER S WITH CARON
-        u"\\u2039": u"\x8B", # SINGLE LEFT-POINTING ANGLE QUOTATION MARK
-        u"\\u0152": u"\x8C", # LATIN CAPITAL LIGATURE OE
-        u"\\u017D": u"\x8E", # LATIN CAPITAL LETTER Z WITH CARON
-        u"\\u2018": u"\x91", # LEFT SINGLE QUOTATION MARK
-        u"\\u2019": u"\x92", # RIGHT SINGLE QUOTATION MARK
-        u"\\u201C": u"\x93", # LEFT DOUBLE QUOTATION MARK
-        u"\\u201D": u"\x94", # RIGHT DOUBLE QUOTATION MARK
-        u"\\u2022": u"\x95", # BULLET
-        u"\\u2013": u"\x96", # EN DASH
-        u"\\u2014": u"\x97", # EM DASH
-        u"\\u02DC": u"\x98", # SMALL TILDE
-        u"\\u2122": u"\x99", # TRADE MARK SIGN
-        u"\\u0161": u"\x9A", # LATIN SMALL LETTER S WITH CARON
-        u"\\u203A": u"\x9B", # SINGLE RIGHT-POINTING ANGLE QUOTATION MARK
-        u"\\u0153": u"\x9C", # LATIN SMALL LIGATURE OE
-        u"\\u017E": u"\x9E", # LATIN SMALL LETTER Z WITH CARON
-        u"\\u0178": u"\x9F", # LATIN CAPITAL LETTER Y WITH DIAERESIS
+        "\\u20AC": "\x80", # EURO SIGN
+        "\\u201A": "\x82", # SINGLE LOW-9 QUOTATION MARK
+        "\\u0192": "\x83", # LATIN SMALL LETTER F WITH HOOK
+        "\\u201E": "\x84", # DOUBLE LOW-9 QUOTATION MARK
+        "\\u2026": "\x85", # HORIZONTAL ELLIPSIS
+        "\\u2020": "\x86", # DAGGER
+        "\\u2021": "\x87", # DOUBLE DAGGER
+        "\\u02C6": "\x88", # MODIFIER LETTER CIRCUMFLEX ACCENT
+        "\\u2030": "\x89", # PER MILLE SIGN
+        "\\u0160": "\x8A", # LATIN CAPITAL LETTER S WITH CARON
+        "\\u2039": "\x8B", # SINGLE LEFT-POINTING ANGLE QUOTATION MARK
+        "\\u0152": "\x8C", # LATIN CAPITAL LIGATURE OE
+        "\\u017D": "\x8E", # LATIN CAPITAL LETTER Z WITH CARON
+        "\\u2018": "\x91", # LEFT SINGLE QUOTATION MARK
+        "\\u2019": "\x92", # RIGHT SINGLE QUOTATION MARK
+        "\\u201C": "\x93", # LEFT DOUBLE QUOTATION MARK
+        "\\u201D": "\x94", # RIGHT DOUBLE QUOTATION MARK
+        "\\u2022": "\x95", # BULLET
+        "\\u2013": "\x96", # EN DASH
+        "\\u2014": "\x97", # EM DASH
+        "\\u02DC": "\x98", # SMALL TILDE
+        "\\u2122": "\x99", # TRADE MARK SIGN
+        "\\u0161": "\x9A", # LATIN SMALL LETTER S WITH CARON
+        "\\u203A": "\x9B", # SINGLE RIGHT-POINTING ANGLE QUOTATION MARK
+        "\\u0153": "\x9C", # LATIN SMALL LIGATURE OE
+        "\\u017E": "\x9E", # LATIN SMALL LETTER Z WITH CARON
+        "\\u0178": "\x9F", # LATIN CAPITAL LETTER Y WITH DIAERESIS
     }
 
 
