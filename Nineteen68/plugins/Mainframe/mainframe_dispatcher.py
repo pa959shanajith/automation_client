@@ -56,7 +56,7 @@ class MainframeDispatcher:
                 'closemainframe': self.mainframe_obj.close_mainframe
             }
 
-            if keyword in keyword_dict.keys():
+            if keyword in list(keyword_dict.keys()):
                 result=keyword_dict[keyword](input)
             else:
                 err_msg=INVALID_KEYWORD

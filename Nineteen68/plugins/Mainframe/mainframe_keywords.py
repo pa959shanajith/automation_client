@@ -97,7 +97,7 @@ class MainframeKeywords:
                         #Print the state of keyword on ICE console
                         logger.print_on_console("Launching " + self.emulator_type +" emulator...")
                     if self.emulator_type == MAINFRAME_EXTRA:
-                        print "Extra Emulator code"
+                        print("Extra Emulator code")
                     elif self.emulator_type == MAINFRAME_BLUEZONE:
                         result,output,err_msg =  self.bluezone_object.launch_mainframe(self.emulator_path, self.emulator_type)
                         if output == "x86":
@@ -155,7 +155,7 @@ class MainframeKeywords:
                     logger.print_on_console("Connecting to " + self.emulator_type +" emulator...")
                 if self.emulator_type == MAINFRAME_EXTRA:
                     #Logic to launch Extra Emulator goes here
-                    print "Extra Emulator code"
+                    print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg =  self.bluezone_object.connect_session(psid)
                 elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
@@ -208,7 +208,7 @@ class MainframeKeywords:
                     logger.print_on_console("Logging in to " + self.emulator_type +" emulator...")
                 if self.emulator_type == MAINFRAME_EXTRA:
                     #Logic to launch Extra Emulator goes here
-                    print "Extra Emulator code"
+                    print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.login(self.region,self.userID,self.password)
                 elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
@@ -262,7 +262,7 @@ class MainframeKeywords:
                     logger.print_on_console("Logging to " + self.emulator_type +" emulator...")
                 if self.emulator_type == MAINFRAME_EXTRA:
                     #Logic to launch Extra Emulator goes here
-                    print "Extra Emulator code"
+                    print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.login(self.region,self.userID,password)
                 elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
@@ -318,7 +318,7 @@ class MainframeKeywords:
                     logger.print_on_console("Logging off from " + self.emulator_type +" emulator...")
                 if self.emulator_type == MAINFRAME_EXTRA:
                     #Logic to launch Extra Emulator goes here
-                    print "Extra Emulator code"
+                    print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.logoff(self.option)
                 elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
@@ -376,7 +376,7 @@ class MainframeKeywords:
                     logger.print_on_console("Sending Value to " + self.emulator_type +" emulator screen...")
                 if self.emulator_type == MAINFRAME_EXTRA:
                     #Logic to launch Extra Emulator goes here
-                    print "Extra Emulator code"
+                    print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.send_value(self.text)
                 elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
@@ -426,7 +426,7 @@ class MainframeKeywords:
                     logger.print_on_console("Sending Value to " + self.emulator_type +" emulator screen...")
                 if self.emulator_type == MAINFRAME_EXTRA:
                     #Logic to launch Extra Emulator goes here
-                    print "Extra Emulator code"
+                    print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.send_value(text)
                 elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
@@ -478,7 +478,7 @@ class MainframeKeywords:
                     logger.print_on_console("Setting the text in " + self.emulator_type +" emulator screen...")
                 if self.emulator_type == MAINFRAME_EXTRA:
                     #Logic to launch Extra Emulator goes here
-                    print "Extra Emulator code"
+                    print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.set_text(row_number,column_number,text)
                 elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
@@ -531,7 +531,7 @@ class MainframeKeywords:
                     logger.print_on_console("Setting the text in " + self.emulator_type +" emulator screen...")
                 if self.emulator_type == MAINFRAME_EXTRA:
                     #Logic to launch Extra Emulator goes here
-                    print "Extra Emulator code"
+                    print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.set_text(row_number,column_number,text_plain)
                 elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
@@ -584,7 +584,7 @@ class MainframeKeywords:
                     logger.print_on_console("Sending function key to " + self.emulator_type +" emulator screen...")
                 if self.emulator_type == MAINFRAME_EXTRA:
                     #Logic to launch Extra Emulator goes here
-                    print "Extra Emulator code"
+                    print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.send_function_keys(function_key,number)
                 elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
@@ -638,7 +638,7 @@ class MainframeKeywords:
                     logger.print_on_console("Getting the text from " + self.emulator_type +" emulator screen...")
                 if self.emulator_type == MAINFRAME_EXTRA:
                     #Logic to launch Extra Emulator goes here
-                    print "Extra Emulator code"
+                    print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.get_text(row_number,column_number,length)
                 elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
@@ -687,7 +687,7 @@ class MainframeKeywords:
                     logger.print_on_console("Verifying text in " + self.emulator_type +" emulator screen...")
                 if self.emulator_type == MAINFRAME_EXTRA:
                     #Logic to launch Extra Emulator goes here
-                    print "Extra Emulator code"
+                    print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.verify_text_exists(text)
                 elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
@@ -738,7 +738,7 @@ class MainframeKeywords:
                     logger.print_on_console("Submit the job to " + self.emulator_type +" emulator screen...")
                 if self.emulator_type == MAINFRAME_EXTRA:
                     #Logic to launch Extra Emulator goes here
-                    print "Extra Emulator code"
+                    print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.submit_job(self.job_path,self.member_name)
                 elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
@@ -785,7 +785,7 @@ class MainframeKeywords:
                     logger.print_on_console("Check the job status in " + self.emulator_type +" emulator screen...")
                 if self.emulator_type == MAINFRAME_EXTRA:
                     #Logic to launch Extra Emulator goes here
-                    print "Extra Emulator code"
+                    print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.job_status(self.job_no)
                 elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
@@ -836,7 +836,7 @@ class MainframeKeywords:
                     logger.print_on_console("Set the cursor on " + self.emulator_type +" emulator screen...")
                 if self.emulator_type == MAINFRAME_EXTRA:
                     #Logic to launch Extra Emulator goes here
-                    print "Extra Emulator code"
+                    print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.set_cursor(row_number,column_number)
                 elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
@@ -875,7 +875,7 @@ class MainframeKeywords:
                 logger.print_on_console("Disconnecting from " + self.emulator_type +" emulator...")
             if self.emulator_type == MAINFRAME_EXTRA:
                 #Logic to launch Extra Emulator goes here
-                print "Extra Emulator code"
+                print("Extra Emulator code")
             elif self.emulator_type == MAINFRAME_BLUEZONE:
                 result,output,err_msg = self.bluezone_object.disconnect_session()
             elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
@@ -910,7 +910,7 @@ class MainframeKeywords:
                 logger.print_on_console("Closing " + self.emulator_type +" emulator...")
             if self.emulator_type == MAINFRAME_EXTRA:
                 #Logic to launch Extra Emulator goes here
-                print "Extra Emulator code"
+                print("Extra Emulator code")
             elif self.emulator_type == MAINFRAME_BLUEZONE:
                 result,output,err_msg = self.bluezone_object.close_mainframe()
             elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:

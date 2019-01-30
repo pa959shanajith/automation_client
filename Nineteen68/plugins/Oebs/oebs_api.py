@@ -4,7 +4,7 @@
 #This file is covered by the GNU General Public License.
 #See the file COPYING for more details.
 
-import Queue
+import queue
 from ctypes import *
 from ctypes.wintypes import *
 import win32gui
@@ -42,7 +42,7 @@ except WindowsError:
 ##        bridgeDll=cdll.windowsaccessbridge
         bridgeDll=getattr(cdll,'windowsAccessBridge-32')
         legacyAccessBridge=False
-        print "LOADED"
+        logger.print_on_console("LOADED")
     except WindowsError:
         try:
             bridgeDll=cdll.windowsaccessbridge
@@ -261,7 +261,7 @@ if bridgeDll:
 
 isRunning=False
 vmIDsToWindowHandles={}
-internalFunctionQueue=Queue.Queue(1000)
+internalFunctionQueue=queue.Queue(1000)
 internalFunctionQueue.__name__="JABHandler.internalFunctionQueue"
 
 def internalQueueFunction(func,*args,**kwargs):
@@ -337,7 +337,7 @@ class JABContext(object):
     def getAccessibleTextRange(self,start,end):
         length=((end+1)-start)
         if length<=0:
-            return u""
+            return ""
         text=create_unicode_buffer(length+1)
         bridgeDll.getAccessibleTextRange(self.vmID,self.accContext,start,end,text,length)
         return text.value
@@ -509,7 +509,7 @@ def event_gainFocus(vmID,accContext):
     while tempContext:
         try:
             tempContext=bridgeDll.getActiveDescendent(vmID,tempContext)
-            print "eventgain"
+            log.info("eventgain")
         except:
             tempContext=None
         try:
@@ -616,7 +616,7 @@ def initialize():
     if ChangeWindowMessageFilter:
         if not ChangeWindowMessageFilter(winUser.WM_COPYDATA,1):
             raise WinError()
-        for msg in xrange(winUser.WM_USER+1,65535):
+        for msg in range(winUser.WM_USER+1,65535):
             if not ChangeWindowMessageFilter(msg,1):
                 raise WinError()
     #Register java events

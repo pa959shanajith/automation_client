@@ -82,7 +82,7 @@ class KeywordOperations:
             key=self.virtualkeycodes.get(key.upper())
         elif key.lower() in self.key_mapping:
             key=self.key_mapping.get(key.lower())
-        elif key in self.special_map.keys():
+        elif key in list(self.special_map.keys()):
             key = self.special_map[key]
         return key
 

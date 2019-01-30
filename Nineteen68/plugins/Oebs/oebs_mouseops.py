@@ -114,7 +114,6 @@ def click():
     windll.user32.SendInput(2,pointer(x),sizeof(x[0]))
 
 def doubleClick():
-    print 'double click'
     windll.user32.SendInput(2,pointer(x4),sizeof(x4[0]))
     windll.user32.SendInput(2,pointer(x4),sizeof(x4[0]))
 

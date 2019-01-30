@@ -121,7 +121,7 @@ class BluezoneKeywords:
                      self.host.sendkeys(password)
                      self.host.Waitready(10,2000)
                      self.host.sendkeys(MAINFRAME_KEY_ENTER)
-                     pwdchk = self.host.WaitForText(MAINFRAME_NOT_AUTHORISED, (02, 21,5000))
+                     pwdchk = self.host.WaitForText(MAINFRAME_NOT_AUTHORISED, (0o2, 21,5000))
                      if pwdchk == 4:
                         self.host.Waitready(10,2000)
                         self.host.sendkeys(MAINFRAME_KEY_F3)
@@ -233,7 +233,7 @@ class BluezoneKeywords:
         output=OUTPUT_CONSTANT
         return_value = 0
         try:
-            if func_keys.has_key(function_key):
+            if function_key in func_keys:
                 function_key = func_keys[function_key]
                 for i in range(int(number)):
                     self.host.Waitready(10,1000)
@@ -245,7 +245,7 @@ class BluezoneKeywords:
                 err_msg = "Error: Invalid function key '"+function_key+"' provided."
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
-                logger.print_on_console("Supported keys are: "+str(", ".join(func_keys.keys())))
+                logger.print_on_console("Supported keys are: "+str(", ".join(list(func_keys.keys()))))
         except Exception as e:
             err_msg = "Error: Unable to send function key to the Emulator screen."
             log.error(err_msg)
@@ -689,7 +689,7 @@ class BluezoneAPIKeywords:
         output=OUTPUT_CONSTANT
         return_value = None
         try:
-            if func_keys.has_key(function_key):
+            if function_key in func_keys:
                 text = func_keys[function_key]
                 for i in range(int(number)):
                     data = dataTransmitter("sendvalue", text)
@@ -708,7 +708,7 @@ class BluezoneAPIKeywords:
                 err_msg = "Error: Invalid function key '"+function_key+"' provided."
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
-                logger.print_on_console("Supported keys are: "+str(", ".join(func_keys.keys())))
+                logger.print_on_console("Supported keys are: "+str(", ".join(list(func_keys.keys()))))
         except Exception as e:
             err_msg = "Error: Unable to send function key to the Emulator screen."
             log.error(err_msg)

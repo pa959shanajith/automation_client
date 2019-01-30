@@ -317,10 +317,10 @@ def MAKEWORD(lo,hi):
     return (hi<<8)+lo
 
 def LOWORD(long):
-    return long&0xFFFF
+    return int&0xFFFF
  
 def HIWORD(long):
-    return long>>16
+    return int>>16
 
 def MAKELONG(lo,hi):
     return (hi<<16)+lo

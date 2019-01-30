@@ -29,8 +29,8 @@ class EHLLAPI():
             hllapi = Ehllapi32.hllapi
             self.error = False
         except Exception as e:
-            print e
-            print "Error while looking up for installation of HLLAPI instance."
+            print(e)
+            print("Error while looking up for installation of HLLAPI instance.")
             self.error = True
 
     def hll_api(self,fnum,data,length,pos):
@@ -38,7 +38,7 @@ class EHLLAPI():
         try:
             status = hllapi(fnum,data,length,pos)
         except Exception as e:
-            print e
+            print(e)
         return status
 
     def launch(self,file_path):
@@ -48,7 +48,7 @@ class EHLLAPI():
             emulator = subprocess.Popen(file_path, shell=True)
             status['stat'] = 0
         except Exception as e:
-            print e
+            print(e)
             status["emsg"] = "Error while launching " + subprocess.os.path.basename(file_path)
             import traceback
             traceback.print_exc()
@@ -287,8 +287,8 @@ class BZWhll_API():
             emulator = win32com.client.Dispatch("BZWhll.WhllObj")
             self.error = False
         except Exception as e:
-            print e
-            print "Error while looking up for BlueZone installation."
+            print(e)
+            print("Error while looking up for BlueZone installation.")
             self.error = True
 
     def launch(self,file_path):
@@ -302,7 +302,7 @@ class BZWhll_API():
             if status["stat"] == 1:
                 status["emsg"] = "Unable to connect to default Emulator session. Use 'connect_session' keyword."
         except Exception as e:
-            print e
+            print(e)
             status["emsg"] = "Error while launching " + subprocess.os.path.basename(file_path)
         return status
 
@@ -509,7 +509,7 @@ if __name__ == '__main__':
     host = 'localhost'
     port = 10001
     DATA_EOF = "$r^mB@$"
-    print 'Nineteen68 Mainframe API started...'
+    print('Nineteen68 Mainframe API started...')
     fail_status = {"stat": -1, "emsg": "Something went wrong."}
     keyword_dict = None
     try:
@@ -556,9 +556,9 @@ if __name__ == '__main__':
                     data_to_send = encode(json.dumps(result))+DATA_EOF
                     con.send(data_to_send)
             except Exception as e:
-                print e
-                print 'Error in API while reading instructions'
+                print(e)
+                print('Error in API while reading instructions')
                 con.send(encode(json.dumps(fail_status))+DATA_EOF)
                 #break
     except Exception as e:
-        print 'Error in API'
+        print('Error in API')
