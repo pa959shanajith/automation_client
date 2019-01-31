@@ -507,6 +507,7 @@ class List_Keywords():
 
 
     def select_view_by_text(self,webelement,input,*args):
+        global flag
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -540,7 +541,6 @@ class List_Keywords():
                                         j.click()
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE
-                                        global flag
                                         flag=True
                                 else :
                                     err_msg='invalid input'
@@ -563,7 +563,6 @@ class List_Keywords():
                                         j.click()
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE
-                                        global flag
                                         flag=True
                                 else :
                                     err_msg='invalid input'
@@ -599,6 +598,7 @@ class List_Keywords():
 
 
     def select_view_by_index(self,webelement,input,*args):
+        global flag
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -632,7 +632,6 @@ class List_Keywords():
                                             obj[input].click()
                                             status=TEST_RESULT_PASS
                                             result=TEST_RESULT_TRUE
-                                            global flag
                                             flag=True
                                     else :
                                         err_msg='invalid input'
@@ -655,7 +654,6 @@ class List_Keywords():
                                         obj[input].click()
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE
-                                        global flag
                                         flag=True
                                 else :
                                     err_msg='invalid input'

@@ -244,6 +244,7 @@ class Spinner_Keywords():
 
 
     def select_value_by_text(self,webelement,input,*args):
+        global flag
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -289,7 +290,6 @@ class Spinner_Keywords():
                                         j.click()
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE
-                                        global flag
                                         flag=True
                                         break
                                 else :
@@ -315,7 +315,6 @@ class Spinner_Keywords():
                                         j.click()
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE
-                                        global flag
                                         flag=True
                                         break
                                 else :
@@ -340,7 +339,6 @@ class Spinner_Keywords():
                                                 j.click()
                                                 status=TEST_RESULT_PASS
                                                 result=TEST_RESULT_TRUE
-                                                global flag
                                                 flag=True
                                                 break
                                         else :
@@ -378,6 +376,7 @@ class Spinner_Keywords():
         return status,result,output,err_msg
 
     def verify_selected_value(self,webelement,input,*args):
+        global flag
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -429,7 +428,6 @@ class Spinner_Keywords():
                                                 if status == TEST_RESULT_PASS :
                                                     driver.back()
                                                     var='true'
-                                                global flag
                                                 flag=True
                                             else:
                                                 if var=='' :
@@ -446,7 +444,6 @@ class Spinner_Keywords():
                                         selected=j.get_attribute("text")
                                         if selected.strip() != '':
                                             if input == j.text :
-                                                global flag
                                                 flag=True
                                                 driver.back()
                                                 status=TEST_RESULT_PASS
@@ -483,7 +480,6 @@ class Spinner_Keywords():
                                                         if var=='' :
                                                             driver.back()
                                                             var='true'
-                                                        global flag
                                                         flag=True
                                                     else :
                                                         if var=='' :
@@ -533,6 +529,7 @@ class Spinner_Keywords():
 
 
     def select_value_by_index(self,webelement,input,*args):
+        global flag
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -579,7 +576,6 @@ class Spinner_Keywords():
                                     obj[input].click()
                                     status=TEST_RESULT_PASS
                                     result=TEST_RESULT_TRUE
-                                    global flag
                                     flag=True
                             else :
                                 err_msg='invalid input'
@@ -603,7 +599,6 @@ class Spinner_Keywords():
                                     obj[input].click()
                                     status=TEST_RESULT_PASS
                                     result=TEST_RESULT_TRUE
-                                    global flag
                                     flag=True
                             else :
                                 err_msg='invalid input'
@@ -629,7 +624,6 @@ class Spinner_Keywords():
                                         obj[input].click()
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE
-                                        global flag
                                         flag=True
                                 else :
                                     err_msg='invalid input'
@@ -668,6 +662,7 @@ class Spinner_Keywords():
 
 
     def select_multiple_value_by_index(self,webelement,input,*args):
+        global flag
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -713,7 +708,6 @@ class Spinner_Keywords():
                                             obj[k].click()
                                             status=TEST_RESULT_PASS
                                             result=TEST_RESULT_TRUE
-                                            global flag
                                             flag=True
                                 else :
                                     err_msg='invalid input'
@@ -746,6 +740,7 @@ class Spinner_Keywords():
 
 
     def select_multiple_value_by_text(self,webelement,input,*args):
+        global flag
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -791,7 +786,6 @@ class Spinner_Keywords():
                                                 j.click()
                                                 status=TEST_RESULT_PASS
                                                 result=TEST_RESULT_TRUE
-                                                global flag
                                                 flag=True
                                 else :
                                     err_msg='invalid input'
@@ -954,6 +948,7 @@ class Spinner_Keywords():
 
 
     def get_selected_value(self,webelement,input,*args):
+        global flag
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=None
@@ -1025,7 +1020,6 @@ class Spinner_Keywords():
                                         output=j.text
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE
-                                        global flag
                                         flag=True
                                         break
 
@@ -1034,7 +1028,6 @@ class Spinner_Keywords():
                                     selected=j.get_attribute("selected")
                                     if str(selected) == 'true':
                                         output=j.text
-                                        global flag
                                         flag=True
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE

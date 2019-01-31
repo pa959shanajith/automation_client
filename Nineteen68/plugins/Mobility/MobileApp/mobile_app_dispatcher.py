@@ -66,7 +66,7 @@ class MobileDispatcher:
 
     def dispatcher(self,teststepproperty,input,reporting_obj):
 
-        global ELEMENT_FOUND
+        global ELEMENT_FOUND,apptypes,ip
         #result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE)
 
         objectname = teststepproperty.objectname
@@ -85,7 +85,6 @@ class MobileDispatcher:
         #print keyword
         #print input
 
-        global apptypes
         apptypes=teststepproperty.apptype
         err_msg=None
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
@@ -233,7 +232,6 @@ class MobileDispatcher:
                             log.error(ERROR_CODE_DICT["ERR_XCODE_DOWN"])
 
                     if(keyword == "launchapplication"):
-                        global ip
                         ip = input[2]
 
 
