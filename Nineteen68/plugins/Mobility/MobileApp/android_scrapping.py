@@ -25,7 +25,7 @@ import socket
 import base64
 import platform
 import logging
-from import device_keywords
+import device_keywords
 log = logging.getLogger('android_scrapping.py')
 
 XpathList=[]
@@ -201,7 +201,7 @@ class InstallAndLaunch():
                     ##            self.desired_caps['logLevel'] = 'info
                     self.desired_caps['log_level'] = False
                     ##                print 'come in'
-                    from . import apk
+                    import apk
                     apkf = apk.APK(apk_path)
                     activity_name = None
                     package_name = None

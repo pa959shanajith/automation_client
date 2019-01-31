@@ -57,7 +57,7 @@ class LaunchAndInstall():
                     desired_caps['sessionOverride'] = True
                     desired_caps['fullReset'] = False
                     desired_caps['logLevel'] = 'debug'
-                    from . import apk
+                    import apk
                     apkf = apk.APK(apk_path)
                     activity_name = None
                     package_name = None
@@ -70,7 +70,7 @@ class LaunchAndInstall():
                     self.driver_obj = driver
                     status = mobile_app_constants.TEST_RESULT_PASS
                     result = mobile_app_constants.TEST_RESULT_TRUE
-                   
+
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
@@ -131,8 +131,6 @@ class LaunchAndInstall():
             status=mobile_app_constants.TEST_RESULT_PASS
             result=mobile_app_constants.TEST_RESULT_TRUE
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             log.error(e)
             logger.print_on_console(e)
         return status,result,output,err_msg
@@ -156,9 +154,3 @@ class LaunchAndInstall():
             ##err_msg = 'Exception in closing application'
         return status,result,output,err_msg
 
-
-
-##obj  = LaunchAndInstall()
-##obj.start_server()
-##obj.installApplication('x')
-##obj.stop_server()
