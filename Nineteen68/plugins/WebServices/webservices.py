@@ -93,7 +93,9 @@ class WSkeywords:
         except Exception as fileremovalexc:
             log.error(fileremovalexc)
             if self.client_cert_path != '' and self.client_cert_path != None:
-                logger.print_on_console(fileremovalexc)
+                log.error(fileremovalexc)
+                log.info(fileremovalexc)
+                logger.print_on_console('Cannot find the Certificate' )
 
      def setEndPointURL(self,url):
         """
@@ -273,7 +275,7 @@ class WSkeywords:
                 if len(header_dict) !=0:
                     self.baseReqHeader=header_dict
                     log.info(header_dict)
-                    if 'Content-Type' in list(header_dict.keys()):
+                    if 'Content-Type' in header_dict.keys():
                         self.content_type=header_dict['Content-Type']
                 else:
                     self.baseReqHeader=header[0]
@@ -354,7 +356,9 @@ class WSkeywords:
             output=(self.baseResHeader,str(self.baseResBody).replace("&gt;",">").replace("&lt;","<"))
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
+            log.info(e)
+            err_msg=ws_constants.METHOD_INVALID_INPUT
+            logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,output
 
@@ -435,8 +439,7 @@ class WSkeywords:
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if not (self.baseEndPointURL is '' or self.baseOperation is '' or self.baseReqHeader is ''):
-                logger.print_on_console(self.baseReqHeader)
-                log.info(self.baseReqHeader)
+                print self.baseReqHeader
                 req=self.baseEndPointURL+'/'+self.baseOperation+'?'+self.baseReqHeader
             elif not (self.baseEndPointURL is ''):
                 req=self.baseEndPointURL
@@ -584,7 +587,7 @@ class WSkeywords:
             if response == '':
                 response = 'fail'
             if testcasename == '':
-                response = str(response, "utf-8")
+                response = unicode(response, "utf-8")
                 socketIO.emit('result_debugTestCaseWS',response)
         except Exception as e:
             logger.print_on_console(e)
@@ -682,6 +685,7 @@ class WSkeywords:
                         output= self.baseResBody
             elif len(args) == 2:
                 key=args[0]
+                print 'args[2]',args
                 if not(self.baseResBody is None):
                     response_body=self.baseResBody
                     if args[0] !='' and args[1]!='' and args[0] !=None and args[1]!=None:
@@ -772,7 +776,7 @@ class WSkeywords:
             keystore = jks.KeyStore.load(client_cert, keystore_pass)#,'serverkey')
             # if any of the keys in the store use a password that is not the same as the store password:
             # keystore.entries["key1"].decrypt("key_password")
-            for alias, pk in list(keystore.private_keys.items()):
+            for alias, pk in keystore.private_keys.items():
                 #print("Private key: %s" % pk.alias)
                 if pk.algorithm_oid == jks.util.RSA_ENCRYPTION_OID:
                     rsaprivatepemfile = self.cert_formatter(pk.pkey, "RSA PRIVATE KEY")
@@ -789,12 +793,12 @@ class WSkeywords:
                     certpemfile = self.cert_formatter(c[1], "CERTIFICATE")
                     self.certdetails['PRIVATE CERT'] =certpemfile
 
-            for alias, c in list(keystore.certs.items()):
+            for alias, c in keystore.certs.items():
                 #logger.print_on_console("Certificate:",c.alias)
                 truststorepemfile = self.cert_formatter(c.cert, "CERTIFICATE")
                 self.certdetails['TRUSTSTORE CERT'] = truststorepemfile
 
-            for alias, secretkey in list(keystore.secret_keys.items()):
+            for alias, secretkey in keystore.secret_keys.items():
                 logger.print_on_console("------------------------------------")
                 logger.print_on_console("Secret key: %s" % secretkey.alias)
                 logger.print_on_console(" Algorithm: %s" % secretkey.algorithm)
@@ -896,8 +900,10 @@ class WSkeywords:
                 err_msg = 'Certificate Mismatched.'
                 logger.print_on_console('Certificate Mismatched.')
             else:
-                err_msg = str(e)
-                logger.print_on_console(e)
+                log.error(str(e))
+                log.info(str(e))
+                err_msg=ws_constants.METHOD_INVALID_INPUT
+                logger.print_on_console(err_msg)
         return response,err_msg
 
      def parse_xml(self,input_xml,path,value,attribute_name,flag):

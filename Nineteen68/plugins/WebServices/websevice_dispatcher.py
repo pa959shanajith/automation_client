@@ -38,7 +38,7 @@ class Dispatcher:
                   # Authentication methods
                   'setbasicauth': self.webservice.setBasicAuth
                 }
-            if keyword in list(dict.keys()):
+            if keyword in dict.keys():
                 if keyword in ['settagvalue','settagattribute']:
                     message=list(message)
                     message.append(tsp.objectname)
