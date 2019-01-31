@@ -141,7 +141,7 @@ class CustomKeyword:
                     logger.print_on_console(ERROR_CODE_DICT['ERR_NEGATIVE_ELEMENT_INDEX'])
                 else:
                     ele_type=ele_type.lower()
-                    if ele_type in self.tagtype.keys():
+                    if ele_type in list(self.tagtype.keys()):
                         ele_type=self.tagtype.get(ele_type)
                     array_index=browser_Keywords_MW.driver_obj.execute_script(FIND_INDEX_JS,reference_ele)
                     custom_element=self.find_object(array_index, ele_type, visible_text, url, ele_index,0);
@@ -181,7 +181,7 @@ class CustomKeyword:
                 log.debug('reference_ele_xpath is'+str(ele_xpath))
 
                 ele_type=ele_type.lower()
-                if ele_type in self.tagtype.keys():
+                if ele_type in list(self.tagtype.keys()):
                     ele_type=self.tagtype.get(ele_type)
                 elif ele_type=='dropdown' or ele_type=='listbox':
                     self.list_flag=self.object_count_flag[ele_type]

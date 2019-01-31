@@ -45,14 +45,14 @@ class StaticTextKeywords:
     def get_source1(self,myipath):
         global sourcetext
         path = myipath
-        for iframes in (range(len(browser_Keywords_MW.driver_obj.find_elements_by_tag_name(FRAME)))):
+        for iframes in (list(range(len(browser_Keywords_MW.driver_obj.find_elements_by_tag_name(FRAME))))):
             path = myipath + str(iframes) + 'f' +  '/'
             if self.switchtoiframe(path):
                 element = browser_Keywords_MW.driver_obj.find_element_by_tag_name(HTML)
                 text = str(element.text)
                 text = text.replace('\n','')
                 sourcetext = sourcetext + text
-                for frames in (range(len(browser_Keywords_MW.driver_obj.find_elements_by_tag_name(IFRAME)))):
+                for frames in (list(range(len(browser_Keywords_MW.driver_obj.find_elements_by_tag_name(IFRAME))))):
                     inpath = path + str(frames) + 'i' +  '/'
                     if self.switchtoiframe(inpath):
                         element = browser_Keywords_MW.driver_obj.find_element_by_tag_name(HTML)
@@ -64,14 +64,14 @@ class StaticTextKeywords:
     def get_source2(self,myipath):
         global sourcetext
         path = myipath
-        for iframes in (range(len(browser_Keywords_MW.driver_obj.find_elements_by_tag_name(IFRAME)))):
+        for iframes in (list(range(len(browser_Keywords_MW.driver_obj.find_elements_by_tag_name(IFRAME))))):
             path = myipath + str(iframes) + 'i' +  '/'
             if self.switchtoiframe(path):
                 element = browser_Keywords_MW.driver_obj.find_element_by_tag_name(HTML)
                 text = str(element.text)
                 text = text.replace('\n','')
                 sourcetext = sourcetext + text
-                for frames in (range(len(browser_Keywords_MW.driver_obj.find_elements_by_tag_name(FRAME)))):
+                for frames in (list(range(len(browser_Keywords_MW.driver_obj.find_elements_by_tag_name(FRAME))))):
                     inpath = path + str(frames) + 'f' +  '/'
                     if self.switchtoiframe(inpath):
                         element = browser_Keywords_MW.driver_obj.find_element_by_tag_name(HTML)

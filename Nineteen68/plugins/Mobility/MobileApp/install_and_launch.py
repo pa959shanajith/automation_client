@@ -29,6 +29,7 @@ class LaunchAndInstall():
         err_msg = None
         output = OUTPUT_CONSTANT
         logger.print_on_console(input_val, ' is the input')
+        global driver,device_id
         try:
 
             if SYSTEM_OS == 'Darwin':
@@ -50,7 +51,7 @@ class LaunchAndInstall():
                 desired_caps['launchTimeout'] = 180000
                 # desired_caps['app'] = '/Users/nineteen68_21/Desktop/june12/UICatalog 2017-06-12 15-13-22/UICatalog.ipa'
                 desired_caps['app'] = input_val[0]
-                global driver
+
                 driver = webdriver.Remote('http://0.0.0.0:4723/wd/hub', desired_caps)
                 self.driver_obj = driver
                 status = mobile_app_constants.TEST_RESULT_PASS
@@ -60,11 +61,8 @@ class LaunchAndInstall():
                 # time.sleep(10)
                 # driver.close_app()
             else:
-##                print 'android',input_val[0]
-                global device_id
+
                 device_id=input_val[2]
-                import appium
-                from appium import webdriver
                 LaunchAndInstall().start_server()
                 desired_caps = {}
                 desired_caps['platformName'] = 'Android'
@@ -78,7 +76,6 @@ class LaunchAndInstall():
                 desired_caps['sessionOverride'] = True
                 desired_caps['fullReset'] = False
                 desired_caps['logLevel'] = 'debug'
-                global driver
                 driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
                 self.driver_obj = driver
                 status = mobile_app_constants.TEST_RESULT_PASS

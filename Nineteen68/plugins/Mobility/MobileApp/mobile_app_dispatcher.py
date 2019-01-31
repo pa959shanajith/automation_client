@@ -34,7 +34,7 @@ import TimePicker_Keywords_Mobility
 import picker_wheel_ios
 import table_keywords_native
 import socket
-import commands
+import subprocess
 import os
 import subprocess
 import platform
@@ -180,7 +180,7 @@ class MobileDispatcher:
 
                 }
             ELEMENT_FOUND=True
-            if keyword in dict.keys():
+            if keyword in list(dict.keys()):
 
 
 
@@ -194,7 +194,7 @@ class MobileDispatcher:
 
 
                     # set IP
-                    if (commands.getoutput('pgrep xcodebuild') == ''):
+                    if (subprocess.getoutput('pgrep xcodebuild') == ''):
 
                         try:
 
@@ -203,7 +203,7 @@ class MobileDispatcher:
                                     'wb') as f:
                                 f.write(input[2])  # send IP
                         except Exception as e:
-                            print e
+                            log.error(e)
 
                     # set run command
                         input[3] = input[3].split(" ")
@@ -437,7 +437,7 @@ class MobileDispatcher:
         if objectname.strip() != '':
             if SYSTEM_OS=='Darwin':
                 objectname = objectname.replace("/AppiumAUT[1]/", "/")
-                print objectname
+                print(objectname)
             identifiers = objectname.split(';')
             log.debug('Identifiers are ')
             log.debug(identifiers)
