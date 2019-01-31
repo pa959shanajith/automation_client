@@ -344,7 +344,7 @@ class MainNamespace(BaseNamespace):
         responseHeader = stringHeader
         logger.print_on_console('responseHeader after:::',responseHeader)
         logger.print_on_console('responseBody:::::',responseBody)
-        log.info(responseHeader after:::',responseHeader)
+        log.info('responseHeader after:::',responseHeader)
         log.info('responseBody:::::',responseBody)
         response=responseHeader+"rEsPONseBOdY:"+responseBody
         response=str(response)
@@ -541,7 +541,6 @@ class SocketThread(threading.Thread):
         if(not(key in os.environ)):
             key='USER'
         username=str(os.environ[key]).lower()
-        username='deeksha.shetty'
         core_utils_obj = core_utils.CoreUtils()
         icesession = {
             'ice_id':str(uuid.uuid4()),
