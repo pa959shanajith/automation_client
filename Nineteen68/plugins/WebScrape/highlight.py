@@ -103,15 +103,17 @@ class Highlight():
                     log.info('element highlighted successfully')
                     status = domconstants.STATUS_SUCCESS
             else:
+                err_msg="Error while highlighting"
                 log.info('could not find the element')
                 status = domconstants.STATUS_FAIL
-                print "Error while highlighting"
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
-            log.error(e)
+            log.error(e,exc_info=True)
             status = domconstants.STATUS_FAIL
-            print "Error while highlighting"
             if (isinstance(self.driver,webdriver.Ie)):
-                print 'Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked)'
+                err_msg='Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked)'
+            logger.print_on_console(err_msg)
         return status
 
     def apply_style(self,element,style, sec):

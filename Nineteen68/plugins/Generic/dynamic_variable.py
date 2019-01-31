@@ -41,7 +41,7 @@ class DynamicVariables:
                 res=self.dyn_obj.check_for_dynamicvariables(variable)
                 if res==TEST_RESULT_TRUE:
                     #Check if the variable already exists
-                    if not(dynamic_variable_handler.dynamic_variable_map.has_key(variable)):
+                    if not(variable in dynamic_variable_handler.dynamic_variable_map):
                         #Add the variable to the map with the given value
                         dynamic_variable_handler.dynamic_variable_map[variable]=value
                         status=TEST_RESULT_PASS
@@ -85,7 +85,7 @@ class DynamicVariables:
                 if res==TEST_RESULT_TRUE:
                     #Check if the variable already exists
                     log.debug('Check if the variable already exists')
-                    if dynamic_variable_handler.dynamic_variable_map.has_key(variable):
+                    if variable in dynamic_variable_handler.dynamic_variable_map:
                         #Get the old value of the variable
                         log.debug('Get the old value of the variable')
                         oldvalue=self.dyn_obj.get_dynamic_value(variable)
@@ -192,7 +192,7 @@ class DynamicVariables:
                 if res==TEST_RESULT_TRUE:
                     #Check if the variable already exists
                     log.debug('Check if the variable already exists')
-                    if dynamic_variable_handler.dynamic_variable_map.has_key(variable):
+                    if variable in dynamic_variable_handler.dynamic_variable_map:
                         value=dynamic_variable_handler.dynamic_variable_map.pop(variable)
 ##                        log.debug('Variable deleted is '+str(variable)+'='+str(value))
 ##                        logger.print_on_console('Variable deleted is '+str(variable)+'='+str(value))

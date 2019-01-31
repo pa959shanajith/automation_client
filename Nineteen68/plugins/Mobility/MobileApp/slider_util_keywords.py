@@ -24,7 +24,7 @@ log = logging.getLogger('slider_util_keywords.py')
 class SliderKeywords():
 
     def set_slide_value(self, element,input_val,*args):
-        print 'in slider'
+        logger.print_on_console('in slider')
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -39,7 +39,8 @@ class SliderKeywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        print 'set value pass',input_val
+                        logger.print_on_console('set value pass')
+                        logger.print_on_console(input_val)
                         # for set value
                         element.set_value(input_val[0])
 
@@ -48,7 +49,6 @@ class SliderKeywords():
                         status = TEST_RESULT_PASS
                     else:
                         err_msg='element is disabled'
-                        print 'element is disabled'
                         log.error('element is disabled')
                         logger.print_on_console(err_msg)
                 else:
@@ -87,7 +87,6 @@ class SliderKeywords():
 
                     else:
                         err_msg='element is disabled'
-                        print 'element is disabled'
                         log.error('element is disabled')
                         logger.print_on_console(err_msg)
                 else:

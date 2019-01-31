@@ -212,9 +212,9 @@ class ExcelFile:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                     #872 return without str conversion if unicode (Himanshu)
-                            if not(type(value) is unicode):
+                            if not(type(value) is str):
                                 output=str(value)                  ##Value returned must be integer so that it will display 20 instead of 20L
-                                print 'Converted to str'
+                                log.info(info_msg)
                             else:
                                 output=value
                     else:
@@ -506,7 +506,7 @@ class ExcelXLS:
             s = workbook.get_sheet(sheetnum)
             if len(args)>0 and args[0] is not None:
                 type=args[0].lower()
-                if type in self.cell_type.keys():
+                if type in list(self.cell_type.keys()):
                     type=self.cell_type[type]
                     if type=='0.00':
                         flag=True
@@ -685,7 +685,7 @@ class ExcelXLS:
 ##            data2=file2.parse(sheetname2)
 ##            log.debug('File content2'+str(data2))
 ##            status= (str(data1)==str(data2))
-            from itertools import izip_longest
+            from itertools import zip_longest
             book1 = open_workbook(input_path1)
             book2 = open_workbook(input_path2)
             sheet1 = book1.sheet_by_name(sheetname1)
@@ -696,7 +696,7 @@ class ExcelXLS:
                     row_rb1 = sheet1.row_values(rownum)
                     row_rb2 = sheet2.row_values(rownum)
 
-                    for colnum, (c1, c2) in enumerate(izip_longest(row_rb1, row_rb2)):
+                    for colnum, (c1, c2) in enumerate(zip_longest(row_rb1, row_rb2)):
                         if c1 != c2:
                             log.debug('Row ',str(rownum+1),' Col ',str(colnum+1),' cell value 1 ',c1,' cell value 2 ',c2)
                             x = True
@@ -786,7 +786,7 @@ class ExcelXLS:
         try:
             if sheetname in xlrd.open_workbook(inputpath).sheet_names():
                 import random,string
-                dummy_sheet_name =''.join([random.choice(string.ascii_letters + string.digits) for n in xrange(10)])
+                dummy_sheet_name =''.join([random.choice(string.ascii_letters + string.digits) for n in range(10)])
                 self.create_sheet_xls(inputpath,dummy_sheet_name)
                 self.delete_sheet_xls(inputpath,sheetname)
                 self.create_sheet_xls(inputpath,sheetname)
@@ -1097,7 +1097,7 @@ class ExcelXLSX:
            cell=sheet.cell(row=row,column=col)
            if len(args)>0 and args[0] is not None:
             type=args[0].lower()
-            if type in self.cell_type.keys():
+            if type in list(self.cell_type.keys()):
                 type=self.cell_type[type]
                 if type=='0.00':
                     cell.number_format=type
@@ -1131,7 +1131,7 @@ class ExcelXLSX:
 
     def __get_formatted_date(self,val,fmt):
         from datetime import datetime
-        if fmt in self.date_formats.keys():
+        if fmt in list(self.date_formats.keys()):
             return val.strftime(self.date_formats[fmt])
         return None
 
@@ -1261,7 +1261,7 @@ class ExcelXLSX:
         inputpath=inputpath+'/'+filename
         try:
             import random,string
-            dummy_sheet_name =''.join([random.choice(string.ascii_letters + string.digits) for n in xrange(10)])
+            dummy_sheet_name =''.join([random.choice(string.ascii_letters + string.digits) for n in range(10)])
             book=load_workbook(inputpath)
             sheet=book.get_sheet_by_name(sheetname)
             book.create_sheet(dummy_sheet_name)
@@ -1529,7 +1529,7 @@ class ExcelCSV:
                 file1.close()
                 file2.close()
             try:
-                for file1_row, file2_row in itertools.izip(data_file1, data_file2):
+                for file1_row, file2_row in zip(data_file1, data_file2):
                     if file1_row == file2_row:
                         x = True
                         break

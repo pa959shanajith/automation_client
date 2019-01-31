@@ -20,6 +20,7 @@ from constants import *
 driver = None
 import mobile_app_constants
 import platform
+import device_keywords
 device_id=None
 class LaunchAndInstall():
     def installApplication(self, ele, input_val, *args):
@@ -29,63 +30,47 @@ class LaunchAndInstall():
         err_msg = None
         output = OUTPUT_CONSTANT
         logger.print_on_console(input_val, ' is the input')
+        global driver,device_id
         try:
-
-            if SYSTEM_OS == 'Darwin':
-                import appium
-                from appium import webdriver
-                LaunchAndInstall().start_server()
-                desired_caps = {}
-                desired_caps['platformName'] = 'iOS'
-                desired_caps['appiumVersion'] = '1.6.5'
-                # desired_caps['platformVersion'] = '10.3.2'
-                desired_caps['platformVersion'] = input_val[2]
-                # desired_caps['deviceName'] = 'Nineteen68_21s_iPhone'
-                desired_caps['deviceName'] = input_val[1]
-                if str(input_val[0]).endswith('ipa'):
-                    desired_caps['udid'] = input_val[3]
-                # desired_caps['udid'] = '7a8ebddd58e07318edd3dae33adefd75c24a2f65'
-                desired_caps['fullReset'] = False
-                desired_caps['newCommandTimeout'] = 3600
-                desired_caps['launchTimeout'] = 180000
-                # desired_caps['app'] = '/Users/nineteen68_21/Desktop/june12/UICatalog 2017-06-12 15-13-22/UICatalog.ipa'
-                desired_caps['app'] = input_val[0]
-                global driver
-                driver = webdriver.Remote('http://0.0.0.0:4723/wd/hub', desired_caps)
-                self.driver_obj = driver
-                status = mobile_app_constants.TEST_RESULT_PASS
-                result = mobile_app_constants.TEST_RESULT_TRUE
-                # time.sleep(10)
-                # print driver.page_source
-                # time.sleep(10)
-                # driver.close_app()
-            else:
+            if SYSTEM_OS != 'Darwin':
 ##                print 'android',input_val[0]
                 global device_id
                 device_id=input_val[2]
-                import appium
-                from appium import webdriver
-                LaunchAndInstall().start_server()
-                desired_caps = {}
-                desired_caps['platformName'] = 'Android'
-                desired_caps['platformVersion'] = input_val[1]
-                desired_caps['deviceName'] = input_val[2]
-                desired_caps['udid'] = input_val[2]
-                desired_caps['noReset'] = True
-                desired_caps['newCommandTimeout'] = 0
-                ##desired_caps['app'] = 'D:\\mobility\\selendroid-test-app-0.17.0.apk'
-                desired_caps['app'] = input_val[0]
-                desired_caps['sessionOverride'] = True
-                desired_caps['fullReset'] = False
-                desired_caps['logLevel'] = 'debug'
-                global driver
-                driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
-                self.driver_obj = driver
-                status = mobile_app_constants.TEST_RESULT_PASS
-                result = mobile_app_constants.TEST_RESULT_TRUE
-                ##            time.sleep(20)
-                ##            page_source = driver.page_source
-                ##            print page_source
+                apk_path = input_val[0]
+                if device_id == 'wifi':
+                    device_keywords_object = device_keywords.Device_Keywords()
+                    device_id = device_keywords_object.wifi_connect()
+                    logger.print_on_console("Connected device name:",device_id)
+                if device_id != '':
+                    import appium
+                    from appium import webdriver
+                    LaunchAndInstall().start_server()
+                    desired_caps = {}
+                    desired_caps['platformName'] = 'Android'
+                    desired_caps['platformVersion'] = input_val[1]
+                    desired_caps['deviceName'] = device_id
+                    desired_caps['udid'] = device_id
+                    desired_caps['noReset'] = True
+                    desired_caps['newCommandTimeout'] = 0
+                    ##desired_caps['app'] = 'D:\\mobility\\selendroid-test-app-0.17.0.apk'
+                    desired_caps['app'] = apk_path
+                    desired_caps['sessionOverride'] = True
+                    desired_caps['fullReset'] = False
+                    desired_caps['logLevel'] = 'debug'
+                    import apk
+                    apkf = apk.APK(apk_path)
+                    activity_name = None
+                    package_name = None
+                    activity_name = apkf.get_main_activity()
+                    package_name = apkf.get_package()
+                    desired_caps['appPackage'] = package_name
+                    desired_caps['appActivity'] = activity_name
+                    global driver
+                    driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
+                    self.driver_obj = driver
+                    status = mobile_app_constants.TEST_RESULT_PASS
+                    result = mobile_app_constants.TEST_RESULT_TRUE
+
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
@@ -146,8 +131,6 @@ class LaunchAndInstall():
             status=mobile_app_constants.TEST_RESULT_PASS
             result=mobile_app_constants.TEST_RESULT_TRUE
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             log.error(e)
             logger.print_on_console(e)
         return status,result,output,err_msg
@@ -171,9 +154,3 @@ class LaunchAndInstall():
             ##err_msg = 'Exception in closing application'
         return status,result,output,err_msg
 
-
-
-##obj  = LaunchAndInstall()
-##obj.start_server()
-##obj.installApplication('x')
-##obj.stop_server()

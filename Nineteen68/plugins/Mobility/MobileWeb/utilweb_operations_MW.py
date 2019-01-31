@@ -23,7 +23,7 @@ if SYSTEM_OS!='Darwin':
     import pyrobot_MW
 import table_keywords_MW
 import time
-import urllib, cStringIO
+import urllib.request, urllib.parse, urllib.error, io
 import logging
 
 
@@ -400,7 +400,6 @@ class UtilWebKeywords:
                 #print "inputt::",input
                 input=input[0]
                 if input is not None:
-                    print "none"
                     if input.lower() == "enter":
                         #print "enter"
                         webelement.send_keys(Keys.ENTER)
@@ -453,7 +452,7 @@ class UtilWebKeywords:
                 log.info(info_msg)
                 logger.print_on_console(info_msg)
                 self.__setfocus(webelement)
-                if len(args)==0 and input in self.keys_info.keys():
+                if len(args)==0 and input in list(self.keys_info.keys()):
                     if webelement.get_attribute('type')!='text':
                         webelement.send_keys(self.keys_info[input.lower()])
                         log.debug('It is not a textbox')
@@ -612,7 +611,7 @@ class UtilWebKeywords:
         try:
             from PIL import Image
             img_src = webelement.get_attribute("src")
-            file1 = cStringIO.StringIO(urllib.urlopen(img_src).read())
+            file1 = io.StringIO(urllib.request.urlopen(img_src).read())
             file2=input[0]
             log.info(INPUT_IS)
             log.info(file2)
@@ -672,7 +671,7 @@ class UtilWebKeywords:
         try:
             from PIL import Image
             img_src = webelement.get_attribute("src")
-            file1 = cStringIO.StringIO(urllib.urlopen(img_src).read())
+            file1 = io.StringIO(urllib.request.urlopen(img_src).read())
             file2=input[0]
             log.info(INPUT_IS)
             log.info(file2)

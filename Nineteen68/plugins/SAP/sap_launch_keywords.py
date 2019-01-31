@@ -204,7 +204,7 @@ class Launch_Keywords():
                 # made changes : launch will not terminate if window already exists
             else:
                 error_code=int(win32api.GetLastError())
-                if error_code in sap_constants.SAP_ERROR_CODES.keys():
+                if error_code in list(sap_constants.SAP_ERROR_CODES.keys()):
                     logger.print_on_console(sap_constants.SAP_ERROR_CODES.get(error_code))
                 else:
                     logger.print_on_console('unable to launch the application')
@@ -244,7 +244,7 @@ class Launch_Keywords():
                             ele = editEle
                         elif(edit2Exists):
                             ele = edit2Ele
-                        ele.set_edit_text(u'')
+                        ele.set_edit_text('')
                         ele.type_keys(server, with_spaces = True)
                         if (app['Log &OnButton'].exists() and app['Log &OnButton'].is_enabled()):
                             app['Log &OnButton'].click()

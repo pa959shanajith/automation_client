@@ -41,47 +41,10 @@ class ScrapeWindow(wx.Frame):
             bundle_id = filePath.split(';')[2]
             Ip_Address = filePath.split(';')[3]
             status = obj.installApplication(deviceName, platform_version,bundle_id,Ip_Address,"ios")
-##        input_val=[]
-##        input_val.append(fileLoc)
-##        input_val.append(windowname)
-##        input_val.append(5)
         if status!=None:
             self.panel = wx.Panel(self)
-    ##            self.sizer = wx.GridBagSizer(6, 5)
-    ##            self.icon = wx.StaticBitmap(self.panel, bitmap=wx.Bitmap(self.iconpath))
-    ##            self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
-    ##            self.SetIcon(self.wicon)
-    ##            self.sizer.Add(self.icon, pos=(0, 3), flag=wx.TOP | wx.RIGHT | wx.ALIGN_RIGHT,border=5)
-
-    ##            self.tbtn = wx.ToggleButton(panel , -1, "click to on")
-    ##            vbox.Add(self.tbtn,0,wx.EXPAND|wx.ALIGN_CENTER)
-    ##            self.tbtn.Bind(wx.EVT_TOGGLEBUTTON,self.OnToggle)
-
-    ##        self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd",pos=(12,8 ), size=(175, 28))
-    ##        self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)   # need to implement OnExtract()
-    ##            self.startbutton.SetToolTip(wx.ToolTip("To START Click and Add Scraping"))
-    ##            self.startbutton.Show()
-    ##            self.stopbutton = wx.Button(self.panel, label="Stop ClickAndAdd", pos=(12,8 ), size=(175, 28))
-    ##            self.stopbutton.Bind(wx.EVT_BUTTON, self.stopcliclandadd)   # need to implement OnExtract()
-    ##            self.stopbutton.SetToolTip(wx.ToolTip("To STOP Click and Add Scraping"))
-    ##            self.stopbutton.Hide()
             self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,38 ), size=(175, 28))
             self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)   # need to implement OnExtract()
-
-    ##            self.fullscrapebutton.SetToolTip(wx.ToolTip("To perform FULLSCRAPE Scraping"))
-    ##        self.comparebutton = wx.ToggleButton(self.panel, label="Compare",pos=(12,68 ), size=(175, 28))
-    ##        self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)   # need to implement OnExtract()
-    ##            self.savescrapebutton.SetToolTip(wx.ToolTip("To save SCRAPE data"))
-    ##            self.savescrapebutton.Disable()
-    ##            self.label1 = wx.StaticText(self.panel,label = "@ 2017 SLK Software Services Pvt. Ltd.",pos=(12,128 ), size=(220, 28))
-    ##            self.label1 = wx.StaticText(self.panel,label =" All Rights Reserved. Patent Pending",pos=(12,158 ), size=(220, 28))
-
-    ##            self.sizer.AddGrowableCol(2)
-    ##            self.panel.SetSizer(self.sizer)
-            self.Centre()
-    ##        status = obj.launch_application(input_val)
-    ##        print 'After call'
-
             self.Centre()
             style = self.GetWindowStyle()
             self.SetWindowStyle( style|wx.STAY_ON_TOP )

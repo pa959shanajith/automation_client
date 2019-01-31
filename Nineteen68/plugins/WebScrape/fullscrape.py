@@ -31,6 +31,7 @@ from webscrape_utils import WebScrape_Utils
 
 class Fullscrape():
     def fullscrape(self,scrape_option,window_handle_number):
+        global currenthandle
         start_time = time.clock()
         data = {}
         driver = browserops.driver
@@ -63,7 +64,6 @@ class Fullscrape():
                     log.info('Switching to each handle and checking weather it has focus ')
                     if (driver.execute_script(javascript_hasfocus)):
                         log.info('Got the window which has the focus')
-                        global currenthandle
                         currenthandle = eachdriverhand
                         break
             tempne = []
@@ -81,7 +81,7 @@ class Fullscrape():
 
             """Method to perform fullscrape on iframes (and frames) recursively"""
             def callback_fullscrape_iframes(myipath, tempne):
-                for iframes in (range(len(driver.find_elements_by_tag_name(domconstants.IFRAME)))):
+                for iframes in (list(range(len(driver.find_elements_by_tag_name(domconstants.IFRAME))))):
                     path = myipath + str(iframes) + 'i' + '/'
                     if webscrape_utils_obj.switchtoframe_webscrape(driver,currenthandle,path):
                         log.debug('switched to iframe/frame %s', path)
@@ -96,7 +96,7 @@ class Fullscrape():
 
             """Method to perform fullscrape on frames (and iframes) recursively"""
             def callback_fullscrape_frames(myipath, tempne):
-                for frames in (range(len(driver.find_elements_by_tag_name(domconstants.FRAME)))):
+                for frames in (list(range(len(driver.find_elements_by_tag_name(domconstants.FRAME))))):
                     path = myipath + str(frames) + 'f' +  '/'
                     if webscrape_utils_obj.switchtoframe_webscrape(driver,currenthandle,path):
                         log.debug('switched to iframe/frame %s', path)

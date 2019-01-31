@@ -65,24 +65,24 @@ class ScrapeWindow(wx.Frame):
             clickandadd_MWoj.startclickandadd_MW()
             event.GetEventObject().SetLabel("Stop clickandadd")
 ##            wx.MessageBox('clickandadd_MW: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
-            print 'click and add initiated, select the elements from AUT'
+            logger.print_on_console('click and add initiated, select the elements from AUT')
 
         else:
             d = clickandadd_MWoj.stopclickandadd_MW()
-            print 'Scrapped data saved successfully in domelements.json file'
+            logger.print_on_console('Scrapped data saved successfully in domelements.json file')
 
             #10 is the limit of MB set as per Nineteen68 standards
             if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
                 self.socketIO.emit('scrape',d)
             else:
-                print 'Scraped data exceeds max. Limit.'
+                logger.print_on_console('Scraped data exceeds max. Limit.')
                 self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
 
 ##            wx.MessageBox('clickandadd_MW: Scrape completed', 'Info',wx.OK | wx.ICON_INFORMATION)
             self.parent.schedule.Enable()
             self.Close()
             event.GetEventObject().SetLabel("Start clickandadd_MW")
-            print 'Click and add scrape  completed'
+            logger.print_on_console('Click and add scrape  completed')
 
     def compare(self,event):
         state = event.GetEventObject().GetValue()
@@ -101,27 +101,21 @@ class ScrapeWindow(wx.Frame):
 
     #----------------------------------------------------------------------
     def fullscrape_MW(self,event):
-        print 'Performing full scrape'
-        ##self.startbutton.Disable()
-        ##self.comparebutton.Disable()
+        logger.print_on_console('Performing full scrape')
         d = fullscrape_MWobj.fullscrape_MW()
-##        self.startbutton.Enable()
-##        self.savescrapebutton.Enable()
-##        wx.MessageBox('fullscrape_MW: Scrape completed', 'Info', wx.OK | wx.ICON_INFORMATION)
-##        print 'self.socketIO : ',self.socketIO
-##        print 'Acknoledgement id : ',self.socketIO._ack_id
+
 
         #10 is the limit of MB set as per Nineteen68 standards
         if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
             self.socketIO.emit('scrape',d)
         else:
-            print 'Scraped data exceeds max. Limit.'
+            logger.print_on_console('Scraped data exceeds max. Limit.')
             self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
         self.parent.schedule.Enable()
         self.Close()
         if d != 'FAIL':
-            print 'Full scrape  completed'
+            logger.print_on_console('Full scrape  completed')
         else:
-            print 'Full scrape not Done'
+            logger.print_on_console('Full scrape not Done')
 
 

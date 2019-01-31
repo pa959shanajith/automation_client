@@ -17,7 +17,6 @@ import logger
 import time
 import logging
 import pythoncom
-import traceback
 from constants import OUTPUT_CONSTANT
 from ast import literal_eval
 from constants import SYSTEM_OS
@@ -49,7 +48,6 @@ class System_Keywords():
             else:
                 wmi_ref = wmi.WMI()
         except Exception as error:
-            traceback.print_exc()
             log.error(error)
         return wmi_ref
 
@@ -57,7 +55,7 @@ class System_Keywords():
         """Method that removes unicode signs form an input unicode string"""
         val = repr(val).replace("u'","'")
         val = literal_eval(val)
-        if not isinstance(val,basestring):
+        if not isinstance(val,str):
             val=str(val)
         return val
 
@@ -92,7 +90,6 @@ class System_Keywords():
                 result = system_constants.TEST_RESULT_TRUE
 
         except Exception as e:
-            traceback.print_exc()
             log.error(e)
             err_msg =system_constants.ERROR_CODE_DICT['ERR_OS_INFO']
             status = system_constants.TEST_RESULT_FAIL
@@ -132,8 +129,7 @@ class System_Keywords():
             else:
                 #dpkg --get-selections
                 pass
-        except Exception as e:
-            traceback.print_exc()
+        except Exception as e:           
             log.error(e)
             err_msg = system_constants.ERROR_CODE_DICT['ERR_GET_INSTALLED_APP']
             status = system_constants.TEST_RESULT_FAIL
@@ -171,7 +167,6 @@ class System_Keywords():
                 else:
                     pass
         except Exception as e:
-            traceback.print_exc()
             log.error(e)
             err_msg = system_constants.ERROR_CODE_DICT['ERR_GET_ALL_PROCESS']
             status = system_constants.TEST_RESULT_FAIL
@@ -260,9 +255,8 @@ class System_Keywords():
                     result = system_constants.TEST_RESULT_FALSE
                     result_data=OUTPUT_CONSTANT
             else:
-                raise RuntimeError, "Issue while creating process: %d" % process_status
+                raise RuntimeError("Issue while creating process: %d" % process_status)
         except Exception as e:
-            traceback.print_exc()
             log.error(e)
             err_msg = system_constants.ERROR_CODE_DICT['ERR_EXECUTE_COMMAND']
             status = system_constants.TEST_RESULT_FAIL
@@ -273,11 +267,3 @@ class System_Keywords():
             logger.print_on_console(system_constants.ACCESS_DENIED)
             result_data=OUTPUT_CONSTANT
         return status,result,result_data,err_msg
-
-'''
-if __name__ == '__main__':
-    #test_keyword = N68System_Keywords()
-    #test_keyword.executeCommand(['ipconfig','wslk13fodc6-054'])
-    pass
-
-'''

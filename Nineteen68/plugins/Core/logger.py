@@ -32,21 +32,21 @@ def print_on_console(message,*args):
         #for loop to check if the arguments is containing unicode value
         # isunicode is updated if the arguments contain a unicode
         for values in args:
-            if isinstance(values, unicode):
+            if isinstance(values, str):
                 isunicode = True
-        if not isinstance(message,unicode) and not isunicode:
-            print sttime + ':  CONSOLE: ' +filename+':'+str(caller.lineno) +' ' +str(message),''.join(str(i) if (type(i)==unicode or type(i)==str) else  repr(i) for i in args)
+        if not isinstance(message,str) and not isunicode:
+            print(sttime + ':  CONSOLE: ' +filename+':'+str(caller.lineno) +' ' +str(message),''.join(str(i) if (type(i)==str or type(i)==str) else  repr(i) for i in args))
         else:
             # code checks if the value has a unicode and appends accordingly
             resultant=''
             for values in args:
                 resultant=resultant+values
-            print sttime + ':  CONSOLE: ' +filename+':'+str(caller.lineno) +' ' + message + resultant
+            print(sttime + ':  CONSOLE: ' +filename+':'+str(caller.lineno) +' ' + message + resultant)
     except Exception as e:
-        print e
+        print(e)
 
 def log(message):
-    print message
+    print(message)
 
 
 

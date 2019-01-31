@@ -243,7 +243,7 @@ class DatabaseOperation():
                                     if err_new==generic_constants.UNICODE_ERR:
                                         newrow=[]
                                         for ele in row:
-                                            if type(ele) == unicode:
+                                            if type(ele) == str:
                                                  ele = ele.encode('utf-8')
                                                  newrow.append(ele)
                                             else:
@@ -280,7 +280,7 @@ class DatabaseOperation():
                                         if err_new==generic_constants.UNICODE_ERR:
                                             newrow=[]
                                             for ele in row:
-                                                if type(ele) == unicode:
+                                                if type(ele) == str:
                                                      ele = ele.encode('utf-8')
                                                      newrow.append(ele)
                                                 else:
@@ -407,7 +407,7 @@ class DatabaseOperation():
                                     if err_new==generic_constants.UNICODE_ERR:
                                         newrow=[]
                                         for ele in row:
-                                            if type(ele) == unicode:
+                                            if type(ele) == str:
                                                  ele = ele.encode('utf-8')
                                                  newrow.append(ele)
                                             else:
@@ -438,7 +438,7 @@ class DatabaseOperation():
                                 if err_new==generic_constants.UNICODE_ERR:
                                     newrow=[]
                                     for ele in row:
-                                        if type(ele) == unicode:
+                                        if type(ele) == str:
                                              ele = ele.encode('utf-8')
                                              newrow.append(ele)
                                         else:

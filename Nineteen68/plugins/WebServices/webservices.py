@@ -93,7 +93,9 @@ class WSkeywords:
         except Exception as fileremovalexc:
             log.error(fileremovalexc)
             if self.client_cert_path != '' and self.client_cert_path != None:
-                logger.print_on_console(fileremovalexc)
+                log.error(fileremovalexc)
+                log.info(fileremovalexc)
+                logger.print_on_console('Cannot find the Certificate' )
 
      def setEndPointURL(self,url):
         """
@@ -354,7 +356,9 @@ class WSkeywords:
             output=(self.baseResHeader,str(self.baseResBody).replace("&gt;",">").replace("&lt;","<"))
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
+            log.info(e)
+            err_msg=ws_constants.METHOD_INVALID_INPUT
+            logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,output
 
@@ -896,8 +900,10 @@ class WSkeywords:
                 err_msg = 'Certificate Mismatched.'
                 logger.print_on_console('Certificate Mismatched.')
             else:
-                err_msg = str(e)
-                logger.print_on_console(e)
+                log.error(str(e))
+                log.info(str(e))
+                err_msg=ws_constants.METHOD_INVALID_INPUT
+                logger.print_on_console(err_msg)
         return response,err_msg
 
      def parse_xml(self,input_xml,path,value,attribute_name,flag):

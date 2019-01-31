@@ -64,26 +64,28 @@ class Device_Keywords():
 
     def wifi_connect(self,*args):
         try:
+            err_msg=None
+            device_name=[]
             android_home=os.environ['ANDROID_HOME']
             cmd=android_home+'\\platform-tools\\'
             os.chdir(cmd)
             cmd=cmd +'adb.exe'
             if android_home!=None:
                 a,b,serial,d=self.get_device_list(None)
-
                 if len(serial)!=0:
                     if ':' in serial :
                              output=subprocess.check_output([cmd, 'connect',serial])
                              if 'connected' in output :
-                                    print 'already connected to the network'
+                                    logger.print_on_console('Already connected to the network')
+                                    a1,b1,device_name,d1 = self.get_device_list(None)
                              else:
-                                    print 'connection lost please retry'
+                                    logger.print_on_console('Connection lost please retry')
                     else :
                             cm=cmd + ' tcpip 5555'
                             abc=subprocess.check_output(cm)
                             import time
                             time.sleep(5)
-                            cmmmm=cmd + '  shell ip -f inet addr show wlan0'
+                            cmmmm=cmd + ' shell ip -f inet addr show wlan0'
                             out1 = subprocess.check_output(cmmmm)
                             b=out1[out1.find('inet'):]
                             b=b.strip('inet')
@@ -92,9 +94,12 @@ class Device_Keywords():
                             c= cmd + ' connect ' +ser
                             o=subprocess.check_output(c)
                             if 'connected' in o :
-                                print ' both devices areconnected over wifi unplug the cable '
+                                logger.print_on_console('Both devices are connected over wifi unplug the cable')
+                            else:
+                                logger.print_on_console('Error connecting the device through wifi')
+                            a1,b1,device_name,d1 = self.get_device_list(None)
                 else:
-                    print 'no device found pls connect connect the device via usb '
+                    logger.print_on_console('No devices found please connect the device via usb to configure adb through WiFi')
 
                     # The first line of `adb devices` just says "List of attached devices", so
                     # skip that.
@@ -103,6 +108,10 @@ class Device_Keywords():
         except Exception as e:
             log.error(e)
             logger.print_on_console(err_msg)
+        for i in device_name:
+            if ':' in i:
+                return i
+        return ''
 
 
     def invoke_device(self,input_val,*args):

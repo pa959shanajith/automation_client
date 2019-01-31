@@ -129,7 +129,7 @@ class  JumpBy():
         unix=1
         t_obj=[]
         t_obj.append({'p':-1,'c':[],'l':0})
-        for idx,kw in condition_keywords.iteritems():
+        for idx,kw in condition_keywords.items():
             if kw=='if':
                 if cn==-1:
                     cn=0

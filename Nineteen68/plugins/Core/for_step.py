@@ -100,7 +100,7 @@ class For():
         #block to execute for
         if self.name.lower()==constants.FOR:
 
-            endForNum = self.info_dict[0].keys()[0]
+            endForNum = list(self.info_dict[0].keys())[0]
             inputval=input[0]
             try:
                 if(int(input[0]) <= 0):
@@ -155,7 +155,7 @@ class For():
     def getEndfor(self):
         index=None
         if self.info_dict is not None:
-            index= self.info_dict[0].keys()[0]
+            index= list(self.info_dict[0].keys())[0]
         return index
 
 

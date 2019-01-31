@@ -62,7 +62,7 @@ class UtilOperations:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         log.debug('reading the inputs')
-        if  not isinstance(input,unicode):
+        if  not isinstance(input,str):
             input=str(input)
         to_type=str(to_type)
         fmt_type=None

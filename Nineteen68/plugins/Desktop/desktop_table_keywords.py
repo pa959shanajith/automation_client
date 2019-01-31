@@ -185,8 +185,8 @@ class Table_Keywords():
                             value=a[j].legacy_properties()['Value'].encode('utf-8')
                             dicttab[key]=value
                         dictq[i-const]=dicttab
-                    for key1 in dictq.keys():
-                        for k,v in dictq[key1].items():
+                    for key1 in list(dictq.keys()):
+                        for k,v in list(dictq[key1].items()):
                             if v==valuei:
                                 key=key1
                                 flag+=1
@@ -234,12 +234,11 @@ class Table_Keywords():
                             value=a[j].legacy_properties()['Value'].encode('utf-8')
                             dicttab[key]=value
                         dictq[i-const]=dicttab
-                    for key1 in dictq.keys():
-                        for k,v in dictq[key1].items():
+                    for key1 in list(dictq.keys()):
+                        for k,v in list(dictq[key1].items()):
                             if v==valuei:
                                 key=k
                                 flag+=1
-                    print flag
                     if flag==1:
                         verb=key
                         status = desktop_constants.TEST_RESULT_PASS

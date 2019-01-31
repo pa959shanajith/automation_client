@@ -274,7 +274,7 @@ class Utils:
                              methodoutput=TEST_RESULT_TRUE
                     else :
                         error_code=int(win32api.GetLastError())
-                        if error_code in APPLICATION_ERROR_CODES.keys():
+                        if error_code in list(APPLICATION_ERROR_CODES.keys()):
                             err_msg=APPLICATION_ERROR_CODES.get(error_code)
                             logger.print_on_console(err_msg)
                         else:
@@ -295,7 +295,7 @@ class Utils:
         windowname=windowname[0]
         output=OUTPUT_CONSTANT
         res,err_msg=self.find_oebswindow_and_attach(windowname)
-        print ("res is :",res)
+        log.info("res is :",res)
         if res:
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE

@@ -27,4 +27,4 @@ class GenericKeywordResult():
         self.returnVal = returnVal
 
     def print_result(self):
-        print self.result,self.returnVal,self.apptype
+        print(self.result,self.returnVal,self.apptype)

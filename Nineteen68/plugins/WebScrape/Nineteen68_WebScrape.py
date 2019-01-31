@@ -268,13 +268,13 @@ class ScrapeWindow(wx.Frame):
     def resume_scraping(self,event):
         selector_window_buttons = [self.nextbutton,self.resume_scraping_button,self.prevbutton]
         scrape_window_basic_buttons = [self.fullscrapebutton, self.startbutton, self.fullscrapedropdown]
-        map(lambda button: button.Disable(),selector_window_buttons)
+        list(map(lambda button: button.Disable(),selector_window_buttons))
         if self.scrape_type == "fullscrape":
             self.perform_fullscrape()
         elif self.scrape_type == "clickandadd":
             self.perform_clickandadd()
-            map(lambda button: button.Hide(), selector_window_buttons)
-            map(lambda button: button.Show(), scrape_window_basic_buttons)
+            list(map(lambda button: button.Hide(), selector_window_buttons))
+            list(map(lambda button: button.Show(), scrape_window_basic_buttons))
             if(self.irisFlag):
                 self.cropbutton.Show()
             self.vsizer.Layout()

@@ -71,12 +71,12 @@ class If():
 
             #Check is made when elseIf is encountered to ensure it is to be executed or not
             if self.name.lower() == ELSE_IF:
-                step=handler.tspList[start_step.keys()[0]]
+                step=handler.tspList[list(start_step.keys())[0]]
                 #This check is to make sure that if the previous if/elseIf is already exeucted then do not execute next elseIf/else blocks
                 #Hence ,it should  send the index after 'endIf' step
                 if step.status==True:
                     self.parent_id=reporting_obj.get_pid()
-                    return last_target.keys()[0]
+                    return list(last_target.keys())[0]
 
             logger.print_on_console('Encountered :'+self.name+'\n')
             if len(input)>2 and input[2] is not None:
@@ -113,17 +113,17 @@ class If():
                     reporting_obj.add_pid(self.name)
                 self.status=False
                 logger.print_on_console('Invalid conditional expression\n')
-                return last_target.keys()[0]
+                return list(last_target.keys())[0]
             else:
                 self.status=False
-                return next_target.keys()[0]
+                return list(next_target.keys())[0]
 
 
 
         #block to execute else part
         elif self.name.lower() in [ELSE]:
             self.step_description='Encountered :'+self.name
-            step=handler.tspList[start_step.keys()[0]]
+            step=handler.tspList[list(start_step.keys())[0]]
             #This check is to make sure that if the previous if/elseIf is False ,only then enter the else block
             #else ,it should  send the index after 'endIf' step
             if step.status==False:
@@ -136,7 +136,7 @@ class If():
                 logger.print_on_console('***Started executing:'+self.name+'***\n')
                 return self.index+1
             else:
-                return last_target.keys()[0]
+                return list(last_target.keys())[0]
 
         #block to execute endIf
         else:
@@ -159,7 +159,7 @@ class Logical_eval():
         try:
             result=satisfiable(expression)
             if type(result)==dict:
-                for res in result.iterkeys():
+                for res in result.keys():
                     status=result[res]
                     return [status]
             else:

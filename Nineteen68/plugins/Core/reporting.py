@@ -239,7 +239,7 @@ class Reporting:
         purpose : report message if testcase is empty
         in scenario
         """
-        print "report testcase empty description:", description
+        log.info("report testcase empty description:", description)
         obj={}
         obj[ID]='1'
         obj[KEYWORD]=''
@@ -352,7 +352,7 @@ class Reporting:
             if not(ignore_stat):
                 step_description=tsp.step_description
             if step_description==ENDFOR_DESCRIPTION:
-                endfor_index=tsp.info_dict[0].keys()[0]
+                endfor_index=list(tsp.info_dict[0].keys())[0]
                 endfor_step=con.tsp_list[endfor_index]
                 step_num=''
                 step_testcase_name=endfor_step.testscript_name
@@ -402,9 +402,9 @@ class Reporting:
 
         """
 
-        print '--------------------------------------------------------------------'
-        print json.dumps(self.report_json)
-        print '--------------------------------------------------------------------'
+        print('--------------------------------------------------------------------')
+        print(json.dumps(self.report_json))
+        print('--------------------------------------------------------------------')
 
 
 

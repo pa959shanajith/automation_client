@@ -88,10 +88,6 @@ class Button_Keywords():
                     logger.print_on_console(err_msg)
 
         except Exception as e:
-            print 'error occured'
-            print e
-            import traceback
-            traceback.print_exc()
             log.error(e)
             logger.print_on_console(err_msg)
 

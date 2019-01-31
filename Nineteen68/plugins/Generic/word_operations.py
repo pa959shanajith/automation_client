@@ -1,4 +1,4 @@
-from bs4 import UnicodeDammit
+#from bs4 import UnicodeDammit
 import PyPDF2
 import string
 import json
@@ -290,31 +290,6 @@ class WordFile():
         err_msg = None
         try:
             if os.path.exists(os.path.normpath(filename)):
-##                exe_path = os.environ["NINETEEN68_HOME"] + "\Lib\site-packages\pacer_lib\pdftotext\pdftotext.exe"
-##                textFile = os.environ["NINETEEN68_HOME"] + "\Lib\site-packages\pacer_lib\pdftotext\pdftotext.txt"
-##                pdftotextProcess = subprocess.Popen([exe_path, filename, textFile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-##                out, err = pdftotextProcess.communicate()
-##                exitcode = pdftotextProcess.returncode
-##                if not exitcode == 0:
-##                    err_msg = ERROR_CODE_DICT['ERR_EXCEPTION']
-##                    log.error(err_msg)
-##                    log.error(err)#@Delete
-##                else:
-##                    log.info('Read PDF => Reading converted Text File')
-##                    fstatus, fresult, foutput_arr, ferr_msg = self.readmyfile([textFile], None, None)
-##                    if not ferr_msg:
-##                        output = foutput_arr[0]
-##                        status = TEST_RESULT_PASS
-##                        result = TEST_RESULT_TRUE
-##                    else:
-##                        err_msg = ERROR_CODE_DICT['ERR_EXCEPTION']
-##                        log.error(err_msg)
-##                        logger.print_on_console("Read PDF => Error : "+str(ferr_msg))
-##            else:
-##                err_msg = ERROR_CODE_DICT['ERR_FILE_NOT_FOUND_EXCEPTION']
-##                log.error(err_msg)
-##                logger.print_on_console("Read PDF => Error : File not Found")
-
                 pdfFileObj = open(filename, 'rb')
                 pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
                 no_of_pages = pdfReader.numPages

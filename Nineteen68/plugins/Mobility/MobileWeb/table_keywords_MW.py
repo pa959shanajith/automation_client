@@ -532,8 +532,6 @@ class TableOperationKeywords():
                 contents = browser_Keywords_MW.driver_obj.execute_script(js,webElement)
             except Exception as e:
                 Exceptions_MW.error(e)
-            print contents
-            print type(contents)
             return contents
 
         def getRowCountJs(self,webElement):

@@ -705,7 +705,7 @@ class Robot(object):
     if ord(key) in range(65, 91):
       # print('Capital =', True)
       self._capitalize(key)
-    elif key in KeyConsts.special_map.keys():
+    elif key in list(KeyConsts.special_map.keys()):
       normalized_key = KeyConsts.special_map[key]
       self._capitalize(normalized_key)
     else:

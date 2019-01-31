@@ -483,7 +483,7 @@ class ClickAndAdd:
                                 if wndNames is not 'Running applications':
                                     clicked_handle=event.Window
                                     while True:
-                                        if clicked_handle==0L:   #comparing wether parent window is same as clicked window
+                                        if clicked_handle==0:   #comparing wether parent window is same as clicked window
                                             break
                                         else:
                                             if not(clicked_handle == self.handle ):    #recursivelt getting the parent handle
@@ -497,9 +497,7 @@ class ClickAndAdd:
                                                     return False
 
                             except Exception as e:
-                                print e
-                                import traceback
-                                traceback.print_exc()
+                                log.error(e)
 
                             if (self.stopumpingmsgs is True):
                                 self.hm.UnhookKeyboard()
@@ -571,5 +569,5 @@ class ClickAndAdd:
                 self.utils_obj.save_json(ast.literal_eval(scrapeJson))
                 return scrapeJson
             except Exception as esxception:
-                print esxception
+                print(esxception)
                 pass

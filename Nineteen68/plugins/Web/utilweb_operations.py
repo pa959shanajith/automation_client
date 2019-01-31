@@ -24,7 +24,7 @@ if SYSTEM_OS!='Darwin':
     import pyrobot
 import table_keywords
 import time
-import urllib, cStringIO
+import urllib.request, urllib.parse, urllib.error, io
 import core_utils
 from selenium.webdriver.support.ui import Select
 import logging
@@ -515,12 +515,12 @@ class UtilWebKeywords:
                         status = TEST_RESULT_PASS
                         methodoutput = TEST_RESULT_TRUE
                     except Exception as e:
-                        print "e1: ", e
+                        log.error(e)
                         logger.print_on_console("Cannot perform mouseHover operation.")
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            print "e: ",e
+            log.error(e)
             err_msg=self.__web_driver_exception(e)
             logger.print_on_console("Cannot perform mouseHover operation.")
         return status,methodoutput,output,err_msg
@@ -569,7 +569,7 @@ class UtilWebKeywords:
                 log.info(info_msg)
                 logger.print_on_console(info_msg)
                 self.__setfocus(webelement)
-                if len(args)==0 and input1 in self.keys_info.keys():
+                if len(args)==0 and input1 in list(self.keys_info.keys()):
                     if webelement.get_attribute('type')!='text':
                         webelement.send_keys(self.keys_info[input1.lower()])
                         log.debug('It is not a textbox')
@@ -797,7 +797,7 @@ class UtilWebKeywords:
             from PIL import Image
             if webelement!=None and webelement !='':
                 img_src = webelement.get_attribute("src")
-                file1 = cStringIO.StringIO(urllib.urlopen(img_src).read())
+                file1 = io.StringIO(urllib.request.urlopen(img_src).read())
                 file2=input[0]
                 log.info(INPUT_IS)
                 log.info(file2)
@@ -853,7 +853,7 @@ class UtilWebKeywords:
             from PIL import Image
             if webelement!=None and webelement !='':
                 img_src = webelement.get_attribute("src")
-                file1 = cStringIO.StringIO(urllib.urlopen(img_src).read())
+                file1 = io.StringIO(urllib.request.urlopen(img_src).read())
                 file2=input[0]
                 log.info(INPUT_IS)
                 log.info(file2)

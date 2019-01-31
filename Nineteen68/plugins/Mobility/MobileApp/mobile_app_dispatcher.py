@@ -34,7 +34,7 @@ import TimePicker_Keywords_Mobility
 import picker_wheel_ios
 import table_keywords_native
 import socket
-import commands
+import subprocess
 import os
 import subprocess
 import platform
@@ -66,7 +66,7 @@ class MobileDispatcher:
 
     def dispatcher(self,teststepproperty,input,reporting_obj):
 
-        global ELEMENT_FOUND
+        global ELEMENT_FOUND,apptypes,ip
         #result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE)
 
         objectname = teststepproperty.objectname
@@ -85,7 +85,6 @@ class MobileDispatcher:
         #print keyword
         #print input
 
-        global apptypes
         apptypes=teststepproperty.apptype
         err_msg=None
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
@@ -180,7 +179,7 @@ class MobileDispatcher:
 
                 }
             ELEMENT_FOUND=True
-            if keyword in dict.keys():
+            if keyword in list(dict.keys()):
 
 
 
@@ -194,7 +193,7 @@ class MobileDispatcher:
 
 
                     # set IP
-                    if (commands.getoutput('pgrep xcodebuild') == ''):
+                    if (subprocess.getoutput('pgrep xcodebuild') == ''):
 
                         try:
 
@@ -203,7 +202,7 @@ class MobileDispatcher:
                                     'wb') as f:
                                 f.write(input[2])  # send IP
                         except Exception as e:
-                            print e
+                            log.error(e)
 
                     # set run command
                         input[3] = input[3].split(" ")
@@ -233,7 +232,6 @@ class MobileDispatcher:
                             log.error(ERROR_CODE_DICT["ERR_XCODE_DOWN"])
 
                     if(keyword == "launchapplication"):
-                        global ip
                         ip = input[2]
 
 
@@ -437,7 +435,7 @@ class MobileDispatcher:
         if objectname.strip() != '':
             if SYSTEM_OS=='Darwin':
                 objectname = objectname.replace("/AppiumAUT[1]/", "/")
-                print objectname
+                print(objectname)
             identifiers = objectname.split(';')
             log.debug('Identifiers are ')
             log.debug(identifiers)

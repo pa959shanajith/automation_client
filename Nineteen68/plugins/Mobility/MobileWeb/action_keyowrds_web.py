@@ -103,7 +103,7 @@ class Action_Key_App():
             adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
             if(len(inputs)==2):
                 inp_val= inputs[0].lower()
-                if inp_val in send_values.keys():
+                if inp_val in list(send_values.keys()):
                     input=int(inputs[1])
                     if input > 0 :
                         while True:

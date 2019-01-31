@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-from __future__ import division
+
 from pyparsing import (Literal,CaselessLiteral,Word,Combine,Group,Optional,
                        ZeroOrMore,Forward,nums,alphas,oneOf)
 import math
@@ -144,7 +144,7 @@ class NumericStringParser(object):
                 if isinstance(output,float):
                     if output % 1 == 0.0:
                         output = int(output)
-                elif isinstance(output,long):
+                elif isinstance(output,int):
                     output=str(output)
                 log.debug('Got the result : %s', output)
                 #logger.print_on_console('Got the result : ', output)

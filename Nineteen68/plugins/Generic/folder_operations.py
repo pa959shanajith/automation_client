@@ -156,7 +156,7 @@ class FolderOperations:
                         methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg=generic_constants.FOLDER_NOT_EXISTS
-                except ValueError,WindowsError:
+                except (ValueError,WindowsError) as e:
                     err_msg=ERROR_CODE_DICT['ERR_FOLDER_NOT_ACESSIBLE']
             else:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']

@@ -83,7 +83,7 @@ class OebsDispatcher:
                 ele_type=input[0].lower()
                 if ele_type in self.get_ele_type:
                     ele_type=self.get_ele_type[ele_type]
-                if (keyword in self.custom_dict and ele_type in self.custom_dict[keyword]) or keyword in self.custom_dict_element.values()[0]:
+                if (keyword in self.custom_dict and ele_type in self.custom_dict[keyword]) or keyword in list(self.custom_dict_element.values())[0]:
                     custom_oebs_element=self.oebs_keywords.getobjectforcustom(windowname,parent_xpath,ele_type,input[2])
                     log.info('custom_oebs_element')
                     log.info(custom_oebs_element)
@@ -206,7 +206,7 @@ class OebsDispatcher:
                 dict['verifytextiris'] = iris_object.verifytextiris
                 
             keyword=keyword.lower()
-            if keyword in dict.keys():
+            if keyword in list(dict.keys()):
                 if(tsp.cord != '' and tsp.cord != None):
                     obj_props = tsp.objectname.split(';')
                     coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]

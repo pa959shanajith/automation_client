@@ -233,7 +233,7 @@ class EhllapiKeywords:
         output=OUTPUT_CONSTANT
         return_value = None
         try:
-            if EHLLAPI_MNEMONICS.has_key(function_key):
+            if function_key in EHLLAPI_MNEMONICS:
                 text = EHLLAPI_MNEMONICS[function_key]
                 for i in range(number):
                     data1 = dataTransmitter("wait")
@@ -257,7 +257,7 @@ class EhllapiKeywords:
                 err_msg = "Error: Invalid function_key  '"+function_key+"' provided."
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
-                logger.print_on_console("Supported keys are: "+str(", ".join(EHLLAPI_MNEMONICS.keys())))
+                logger.print_on_console("Supported keys are: "+str(", ".join(list(EHLLAPI_MNEMONICS.keys()))))
         except Exception as e:
             err_msg = "Error: Unable to send function key to the Emulator screen."
             log.error(err_msg)

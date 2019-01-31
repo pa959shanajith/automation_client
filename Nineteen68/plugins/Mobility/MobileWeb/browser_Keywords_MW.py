@@ -79,25 +79,17 @@ class BrowserKeywords():
 
     def openBrowser(self, webelement, inputs, *args):
             ##self.start_server()
+            global driver_obj, driver, webdriver_list, parent_handle, device_id, input_list
             status = webconstants_MW.TEST_RESULT_FAIL
             result = webconstants_MW.TEST_RESULT_FALSE
             output = OUTPUT_CONSTANT
             err_msg = None
-            ##        self.browser_num=browser_num[0]
             try:
                 if SYSTEM_OS== 'Darwin':
                     self.start_server()
-                    global driver_obj
-                    global driver
-                    global webdriver_list
-                    global parent_handle
                     obj = Singleton_DriverUtil()
-                    ##            if driver_obj == None:
-                    ##                driver_obj = driver.check_available_driver(self.browser_num)
-                    ##
                     # Logic to make sure that logic of usage of existing driver is not applicable to execution
 
-                    global device_id
                     input_list = inputs
                     device_id = input_list[0]
                     time.sleep(5)
@@ -117,39 +109,22 @@ class BrowserKeywords():
                     logger.log('FILE: browserops_MW.py , DEF: openSafariBrowser() , MSG:  Navigating to blank page')
                     driver.get(domconstants_MW.BLANK_PAGE)
                     driver_obj = driver
-                    ##            p = psutil.Process(driver.service.process.pid)
-                    ##            # logging.warning(p.get_children(recursive=True))
-                    ##            pidchrome = p.children()[0]
-                    ##            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Pid is obtained')
-                    ##            # logging.warning(pidchrome.pid)
-                    ##            global hwndg
-                    ##            hwndg = util.bring_Window_Front(pidchrome.pid)
-                    ##            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Using Pid handle is obtained')
                     logger.log(
                         'FILE: browserops_MW.py , DEF: openSafariBrowser() , MSG:  Safari browser opened successfully')
                     result = webconstants_MW.TEST_RESULT_TRUE
                     status = webconstants_MW.TEST_RESULT_PASS
                 else:
-                    import subprocess
                     self.start_server()
-                    global driver_obj
-                    global driver
-                    global webdriver_list
-                    global parent_handle
                     obj = Singleton_DriverUtil()
-                    ##            if driver_obj == None:
-                    ##                driver_obj = driver.check_available_driver(self.browser_num)
-                    ##
                     # Logic to make sure that logic of usage of existing driver is not applicable to execution
 
-                    global device_id
                     input_list = inputs
                     device_id = input_list[0]
                     time.sleep(5)
                     desired_caps = {}
                     desired_caps['platformName'] = 'Android'
                     desired_caps['platformVersion'] =input_list[1]
-                    global input_list
+
                     desired_caps['deviceName'] = input_list[0]
                     desired_caps['udid'] = input_list[0]
                     desired_caps['browserName'] = 'Chrome'
@@ -170,15 +145,6 @@ class BrowserKeywords():
                         mobile_key_objects.custom_msg.append("Invalid Input")
                         status = webconstants_MW.TEST_RESULT_FAIL
                         logger.print_on_console("Invalid Input")
-
-                    ##            p = psutil.Process(driver.service.process.pid)
-                    ##            # logging.warning(p.get_children(recursive=True))
-                    ##            pidchrome = p.children()[0]
-                    ##            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Pid is obtained')
-                    ##            # logging.warning(pidchrome.pid)
-                    ##            global hwndg
-                    ##            hwndg = util.bring_Window_Front(pidchrome.pid)
-                    ##            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Using Pid handle is obtained')
             except Exception as e:
                 err_msg = 'ERROR OCURRED WHILE OPENING BROWSER'
                 if SYSTEM_OS == 'Darwin':
@@ -191,13 +157,12 @@ class BrowserKeywords():
             return status, result, output, err_msg
 
     def openNewBrowser(self,*args):
+        global driver_obj,webdriver_list
         status=webconstants_MW.TEST_RESULT_FAIL
         result=webconstants_MW.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            global driver_obj
-            global webdriver_list
             driver = Singleton_DriverUtil()
             driver_obj=driver.getBrowser(self.browser_num)
             webdriver_list.append(driver_obj)
@@ -600,7 +565,6 @@ class Singleton_DriverUtil():
 
     def chech_if_driver_exists_in_map(self,browserType):
         d = None
-        print 'browserType-----------------------------',browserType
 ##        drivermap.reverse()
         if browserType == '1':
             if len(drivermap) > 0:

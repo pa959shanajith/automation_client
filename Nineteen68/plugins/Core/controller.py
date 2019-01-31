@@ -14,9 +14,6 @@ import getparam
 import jumpTo
 import jumpBy
 from teststepproperty import TestStepProperty
-from generickeywordresult import GenericKeywordResult
-import test_debug
-import test
 import handler
 import os,sys
 import logger
@@ -88,7 +85,7 @@ class Controller():
     def __init__(self):
         self.action=None
         self.get_all_the_imports(CORE)
-        self.__load_generic()
+
         self.cur_dir= os.getcwd()
         self.previous_step=''
         self.verify_dict={'web':VERIFY_EXISTS,
@@ -110,6 +107,7 @@ class Controller():
         self.configvalues={}
         self.core_utilsobject = core_utils.CoreUtils()
         self.exception_flag=None
+        self.__load_generic()
 
     def __load_generic(self):
         try:
@@ -118,8 +116,63 @@ class Controller():
                 self.get_all_the_imports('Generic')
                 import generic_dispatcher
                 self.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
+                try:
+                    self.__load_mobile_web()
+                except Exception as e:
+                    print (e)
+
+                try:
+                    self.__load_system()
+                except Exception as e:
+                    print (e)
+
+                try:
+                    self.__load_mainframe()
+                except Exception as e:
+                    print (e)
+
+                try:
+                    self.__load_sap()
+                except Exception as e:
+                    print (e)
+
+                try:
+                    self.__load_desktop()
+                except Exception as e:
+                    print (e)
+
+                try:
+                    self.__load_web()
+                except Exception as e:
+                    print (e)
+
+                try:
+                    self.__load_oebs()
+                except Exception as e:
+                    print (e)
+
+                try:
+                    self.__load_webservice()
+                except Exception as e:
+                    print (e)
+
+                try:
+                    self.__load_mobile_app()
+                except Exception as e:
+                    print (e)
+
+
+
+
+
+
+
+
+
         except Exception as e:
             logger.print_on_console('Error loading Generic plugin')
+            import traceback
+            traceback.print_exc()
             log.error(e)
 
     def __load_mobile_web(self):
@@ -135,7 +188,7 @@ class Controller():
                 self.mobile_web_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading MobileWeb plugin')
-            log.error(e)
+            log.error(e,exc_info=True)
 
     def __load_mobile_app(self):
         try:
@@ -150,7 +203,7 @@ class Controller():
                 self.mobile_app_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading MobileApp plugin')
-            log.error(e)
+            log.error(e,exc_info=True)
 
     def __load_webservice(self):
         try:
@@ -249,21 +302,21 @@ class Controller():
             info_dict=tsp.info_dict
             if info_dict is not None:
                 if tsp.name.lower() in [ENDFOR,ENDLOOP]:
-                    index=info_dict[0].keys()[0]
+                    index=list(info_dict[0].keys())[0]
                     status=self.dangling_status(index)
                 if tsp.name.lower() in [IF,ELSE_IF,ELSE,ENDIF]:
                     if tsp.name.lower() in [IF]:
-                        status= info_dict[-1].values()[0].lower() == ENDIF
+                        status= list(info_dict[-1].values())[0].lower() == ENDIF
                         if not(status):
                             errormsg="Execution Terminated : Dangling if/for/getparam in testcase"
                     elif tsp.name.lower() in [ELSE_IF,ELSE]:
-                        status1= info_dict[-1].values()[0] == ENDIF
-                        status2= info_dict[0].keys()[0] != index
+                        status1= list(info_dict[-1].values())[0] == ENDIF
+                        status2= list(info_dict[0].keys())[0] != index
                         status = status1 and status2
                         if not(status1) and status2:
                             errormsg="Execution Terminated : Dangling if/for/getparam in testcase"
                     elif tsp.name.lower() in [ENDIF]:
-                        index=info_dict[-1].keys()[0]
+                        index=list(info_dict[-1].keys())[0]
                         status=self.dangling_status(index)
             else:
                 status=False
@@ -528,7 +581,7 @@ class Controller():
                         logger.print_on_console('Result obtained is ',display_keyword_response)
                     else:
                         logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i])
-                        if not isinstance(display_keyword_response[i],basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
+                        if not isinstance(display_keyword_response[i],str) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
                 else:
                     logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         else:
@@ -554,7 +607,7 @@ class Controller():
                             logger.print_on_console('Result obtained is: ',result[1])
                     else:
                         logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[i])
-                        if not isinstance(display_keyword_response[i],basestring) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
+                        if not isinstance(display_keyword_response[i],str) else display_keyword_response[i] for i in range(len(display_keyword_response))]))
             else:
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         log.info('Result obtained is: ')
@@ -801,7 +854,7 @@ class Controller():
     def invokewebservicekeyword(self,teststepproperty,dispatcher_obj,inputval,socket_object):
         keyword = teststepproperty.name
         if keyword.lower() == 'settagvalue' or keyword.lower() == 'settagattribute':
-            if handler.ws_templates_dict.has_key(teststepproperty.testscript_name):
+            if teststepproperty.testscript_name in handler.ws_templates_dict:
                 handler.ws_template=handler.ws_templates_dict[teststepproperty.testscript_name]
             else:
                 handler.ws_template=''
@@ -855,7 +908,7 @@ class Controller():
             flag,browser_type,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(d)
             if flag == False:
                 break
-            print '\n'
+            print('\n')
             tsplist = obj.read_step()
             for k in range(len(tsplist)):
                 if tsplist[k].name.lower() == 'openbrowser':
@@ -870,7 +923,7 @@ class Controller():
                 logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
                 log.info('Invalid step number!! Please provide run from step number')
         else:
-            print 'Invalid script'
+            print('Invalid script')
         print( '=======================================================================================================')
         log.info('***DEBUG COMPLETED***')
         logger.print_on_console('***DEBUG COMPLETED***')
@@ -957,7 +1010,7 @@ class Controller():
 
                                 if flag == False:
                                     break
-                                print '\n'
+                                print('\n')
                                 if (True in testcase_empty_flag):
                                     info_msg=str("Scenario cannot be executed, since the following testcases are empty: "+','.join(empty_testcase_names))
                                     logger.print_on_console(info_msg)

@@ -194,7 +194,7 @@ class SAPDispatcher:
                 dict['verifytextiris'] = iris_object.verifytextiris
 
             keyword=keyword.lower()
-            if keyword in dict.keys():
+            if keyword in list(dict.keys()):
                 if keyword=='serverconnect' or keyword=='launchapplication' or keyword=='starttransaction' or keyword=='toolbaraction' :
                     result= dict[keyword](input,output)
                 else:

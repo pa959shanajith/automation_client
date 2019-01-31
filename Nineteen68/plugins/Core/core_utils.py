@@ -46,11 +46,11 @@ class CoreUtils():
             if isinstance(value,str) or isinstance(value, list):
                 if isinstance(value, list):
                     for eachvalue in value:
-                        if not isinstance(eachvalue,unicode):
+                        if not isinstance(eachvalue,str):
                             if not all(ord(c) < 128 for c in eachvalue):
                                 value.append(eachvalue.decode('utf-8'))
                 else:
-                    if not isinstance(value,unicode):
+                    if not isinstance(value,str):
                         if not all(ord(c) < 128 for c in value):
                             value = value.decode('utf-8')
             return value
@@ -78,12 +78,16 @@ class CoreUtils():
     def scrape_unwrap(self, hex_data):
         key = "".join(['N','i','n','e','e','t','e','e','n','6','8','@','S','e',
             'c','u','r','e','S','c','r','a','p','e','D','a','t','a','P','a','t','h'])
+        #to convert string to bytes
+        hex_data=hex_data.encode('utf-8')
         return self.unwrap(hex_data, key)
 
     def scrape_wrap(self, data):
         key = "".join(['N','i','n','e','e','t','e','e','n','6','8','@','S','e',
             'c','u','r','e','S','c','r','a','p','e','D','a','t','a','P','a','t','h'])
-        return self.wrap(data, key)
+        enc_text=self.wrap(data, key)
+        #to convert bytes to string since concatenation should happen with rest of teh object identifiers which is not encrypted
+        return enc_text.decode('utf-8')
 
     def getMacAddress(self):
         mac=""

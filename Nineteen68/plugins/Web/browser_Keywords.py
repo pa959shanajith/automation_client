@@ -620,7 +620,7 @@ class BrowserKeywords():
                 else:
                     all_handles=new_handles
                 #parent_handle=all_handles[0]
-                recent_handles=filter(lambda a:a not in invalid_handles,recent_handles)
+                recent_handles=[a for a in recent_handles if a not in invalid_handles]
                 if len(recent_handles)>0:
                     ## Fix Nineteen68#1278
                     if driver_obj.current_window_handle != recent_handles[-1]:

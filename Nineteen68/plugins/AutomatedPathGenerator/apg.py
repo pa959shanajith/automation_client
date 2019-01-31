@@ -138,7 +138,8 @@ class AutomatedPathGenerator:
                             break
                 else:
                     flag = False
-                    print("Java file %s has Errors!!!" % (filename.split('\\')[-1]))
+                    logger.print_on_console("Java file %s has Errors!!!" % (filename.split('\\')[-1]))
+                    log.error("Java file %s has Errors!!!" % (filename.split('\\')[-1]))
         except Exception as e:
             log.error(e)
             logger.print_on_console("Error occured in open file")
@@ -160,7 +161,7 @@ class AutomatedPathGenerator:
                         output.append('+'+method)
             cls['abstract'] = False
             cls['classVariables'] = []
-            if(cls['name'] in self.ClassVariables.keys()):
+            if(cls['name'] in list(self.ClassVariables.keys())):
                 cls['classVariables'] = self.ClassVariables[cls['name']]
             name = cls['name'].split('(',1)
             cls['name'] = name[0]
@@ -200,7 +201,7 @@ class AutomatedPathGenerator:
             currentdate= datetime.now()
             beginingoftime = datetime.utcfromtimestamp(0)
             differencedate= currentdate - beginingoftime
-            start_time = long(differencedate.total_seconds() * 1000.0)
+            start_time = int(differencedate.total_seconds() * 1000.0)
             Cylomatic_Compelxity={}
             prev_classes=[]
             varstorage = None
@@ -241,13 +242,13 @@ class AutomatedPathGenerator:
                     elif(method["ParentNodeNo"] != None):
                         m = method["PosMethod"].split('(')[0]
                         for cls in self.Classes:
-                            if (m in cls["methods"].keys()):
+                            if (m in list(cls["methods"].keys())):
                                 c_target = cls["name"]
                                 break
                             elif (m == cls["name"]):
                                 c_target = cls["name"]
                                 break
-                        if(method.has_key("PresentClass")):
+                        if("PresentClass" in method):
                             c_source = method["PresentClass"].split("(")[0]
                         if(c_source != None and c_target != None):
                             if(c_source != c_target):
@@ -259,7 +260,7 @@ class AutomatedPathGenerator:
                                         if((trgt['class'].split('(')[0] == c_target) and (m in trgt['text']) and ('Method Name:' in trgt['text'])):
                                             id = trgt['id']
                                             break
-                                    if(not method_calls_count.has_key(fc['method'])):
+                                    if(fc['method'] not in method_calls_count):
                                         method_calls_count.update({fc['method']:{'within':0,'outside':0}})
                                     if(isinstance(fc['child'],list)):
                                         fc['child'].append(id)
@@ -305,12 +306,12 @@ class AutomatedPathGenerator:
                     else:
                         i = i + 1
                 for fc in self.FlowChart:
-                    if not (fc.has_key('delete')):
+                    if not ('delete' in fc):
                         test.append(fc)
 
                 currentdate = datetime.now()
                 differencedate= currentdate - beginingoftime
-                end_time = long(differencedate.total_seconds() * 1000.0)
+                end_time = int(differencedate.total_seconds() * 1000.0)
 
                 data = {"links":jsonString, "data_flow":test, "result":"success", "starttime":start_time,
                         "endtime":end_time, "method_calls_count":method_calls_count}
@@ -328,10 +329,10 @@ class AutomatedPathGenerator:
         except Exception as e:
             data = {"result":"fail"}
             self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
-            logger.print_on_console("Graph generation failed")
-            import traceback
-            print (traceback.format_exc())
+            err_msg="Graph generation failed"
+            logger.print_on_console(err_msg)
             log.error(e)
+            log.error(log.error(e))
             logger.print_on_console("Error occured while generate graph.")
 
     def extract_Complexity(self,line):

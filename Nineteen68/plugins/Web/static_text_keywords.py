@@ -49,7 +49,7 @@ class StaticTextKeywords:
     """Method to get count of text inside frames (and iframes) recursively"""
     def get_text_count_frames(self,frame_path,actual_text,coreutilsobj):
         global text_occurrences
-        for frame in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(FRAME)))):
+        for frame in (list(range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(FRAME))))):
             path = frame_path + str(frame) + 'f' +  '/'
             if self.switch_to_iframe(path):
                 log.debug('switched to frame %s', path)
@@ -65,7 +65,7 @@ class StaticTextKeywords:
     """Method to get count of text inside iframes (and frames) recursively"""
     def get_text_count_iframes(self,iframe_path,actual_text,coreutilsobj):
         global text_occurrences
-        for iframe in (range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(IFRAME)))):
+        for iframe in (list(range(len(browser_Keywords.driver_obj.find_elements_by_tag_name(IFRAME))))):
             path = iframe_path + str(iframe) + 'i' +  '/'
             if self.switch_to_iframe(path):
                 log.debug('switched to iframe %s', path)

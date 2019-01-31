@@ -18,11 +18,11 @@ class ScrapeWindow(wx.Frame):
                    pos=(300, 150),  size=(280, 350) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
         self.SetBackgroundColour(   (245,222,179))
         curdir = os.getcwd()
-        browser=raw_input("""Enter the browser name to  open : IE - Internet Explorer, CH - Google Chrome, FX - Mozilla Firefox:\n""")
+        browser=input("""Enter the browser name to  open : IE - Internet Explorer, CH - Google Chrome, FX - Mozilla Firefox:\n""")
         if browser == 'IE' or browser == 'CH' or browser == 'FX':
             browserobj.openBrowser(browser)
         else:
-            print 'Invalid browser entered'
+            log.info('Invalid browser entered')
 
         driver = browserops.driver
         self.iconpath = curdir + "\\slk.ico"
@@ -120,7 +120,7 @@ class ScrapeWindow(wx.Frame):
         self.startbutton.Enable()
         self.fullscrapebutton.Enable()
         self.savescrapebutton.Enable()
-        print 'Stopped click and add'
+        log.info('Stopped click and add')
 
     #----------------------------------------------------------------------
     def startcliclandadd(self,event):
@@ -139,11 +139,11 @@ class ScrapeWindow(wx.Frame):
         self.stopbutton.Enable()
         self.fullscrapebutton.Disable()
         self.savescrapebutton.Disable()
-        print 'click and add initiated, select the elements from AUT'
+        log.info('click and add initiated, select the elements from AUT')
 
     #----------------------------------------------------------------------
     def fullscrape(self,event):
-        print 'Performing full scrape'
+        log.info('Performing full scrape')
         self.startbutton.Disable()
         self.modulename =  self.choice1.GetString(self.choice1.GetSelection())
         self.screenname =  self.choice2.GetString(self.choice2.GetSelection())
@@ -168,11 +168,11 @@ class ScrapeWindow(wx.Frame):
         self.scrapecount = self.scrapecount + 1
         self.startbutton.Enable()
         self.savescrapebutton.Enable()
-        print 'Full scrape  completed'
+        log.info('Full scrape  completed')
 
     #----------------------------------------------------------------------
     def savescrape(self,event):
-        print 'Saving scraped data'
+        log.info('Saving scraped data')
         data = clickandadd.vie
         if len(data) > 0:
             fullscrapeobj.save_json_data()
@@ -181,19 +181,19 @@ class ScrapeWindow(wx.Frame):
         self.Close()
         driver = browserops.driver
         driver.close()
-        print 'Scrapped data saved successfully in domelements.json file'
+        log.info('Scrapped data saved successfully in domelements.json file')
 
     #----------------------------------------------------------------------
     def OnChoiceScreen(self,event):
         self.screenname =  self.choice2.GetString(self.choice2.GetSelection())
-        print "You selected "+ self.screenname +" from screen selection"
+        log.info("You selected "+ self.screenname +" from screen selection")
 
     #----------------------------------------------------------------------
     def OnChoiceModule(self,event):
         self.modulename =  self.choice1.GetString(self.choice1.GetSelection())
         self.screennames = self.modulescreens[self.modulename]
         self.choice2.SetItems(self.screennames)
-        print "You selected "+ self.modulename +" from module selection"
+        log.info("You selected "+ self.modulename +" from module selection")
 
 #----------------------------------------------------------------------
 if __name__ == '__main__':

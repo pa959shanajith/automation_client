@@ -192,7 +192,5 @@ def main(PossibleMethods, Classes, VarStorage):
                             else:
                                 PossibleMethods[i]["ParentNodeNo"] = k["position"]
     except Exception as e:
-        import traceback
-        print (traceback.format_exc())
         log.error(e)
     return PossibleMethods

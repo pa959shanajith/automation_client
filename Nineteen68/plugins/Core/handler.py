@@ -122,7 +122,7 @@ class Handler():
         for json_data in new_obj:
             #if json_data.has_key('template'):
                 #ws_template=json_data['template']
-            if json_data.has_key('testcase'):
+            if 'testcase' in json_data:
                 testcase=json_data['testcase']
                 try:
                 #Empty testcase scenerio not terminating fix Bug #246 (Himanshu)
@@ -130,7 +130,7 @@ class Handler():
                         logger.print_on_console('Testcase is empty')
                         log.info('Testcase is empty')
                         testcase_empty_flag.append(True)
-                        if json_data.has_key('testcasename'):
+                        if 'testcasename' in json_data:
                             empty_testcase_names.append(json_data['testcasename'])
                         continue
                 except Exception as e:
@@ -143,28 +143,28 @@ class Handler():
 ##                else:
 ##                script.append(testcase)
                 script.append(testcase)
-            if json_data.has_key('comments'):
+            if 'comments' in json_data:
                 comments=json_data['comments']
             #Checking if the testcase has key 'testscript_name' or 'testcasename'
             #adding the template to dict if available
-            if json_data.has_key('testscript_name'):
+            if 'testscript_name' in json_data:
                 testscript_name=json_data['testscript_name']
-                if json_data.has_key('template'):
+                if 'template' in json_data:
                     ws_templates_dict[testscript_name]=json_data['template']
                 else:
                     ws_templates_dict[testscript_name]=""
-            elif json_data.has_key('testcasename'):
+            elif 'testcasename' in json_data:
                 testscript_name=json_data['testcasename']
-                if json_data.has_key('template'):
+                if 'template' in json_data:
                     ws_templates_dict[testscript_name]=json_data['template']
                 else:
                     ws_templates_dict[testscript_name]=""
             global testcasename
             testcasename =testscript_name
             testcasename_list.append(testscript_name)
-            if json_data.has_key('browsertype'):
+            if 'browsertype' in json_data:
                 browser_type=json_data['browsertype']
-            elif json_data.has_key('browserType'):
+            elif 'browserType' in json_data:
                 browser_type=json_data['browserType']
         if(data_param_path is None or data_param_path == ''):
             flag=self.create_list(script,testcasename_list)
@@ -201,23 +201,23 @@ class Handler():
             suiteId_list=new_obj['testsuiteIds']
             execution_id=new_obj['executionId']
             for json_data,suite_id in zip(suite_details,suiteId_list):
-                if type(suite_id)==unicode:
+                if type(suite_id)==str:
                     suite_id=str(suite_id)
 
                 suite_data.append(json_data[suite_id])
-                if json_data.has_key('scenarioIds'):
+                if 'scenarioIds' in json_data:
                     scenarioIds[suite_id]=json_data['scenarioIds']
 
-                if json_data.has_key('browserType'):
+                if 'browserType' in json_data:
                     browser_type[suite_id]=json_data['browserType']
 
-                if json_data.has_key('condition'):
+                if 'condition' in json_data:
                     condition_check[suite_id]=json_data['condition']
 
-                if json_data.has_key('dataparampath'):
+                if 'dataparampath' in json_data:
                     dataparam_path[suite_id]=json_data['dataparampath']
         except Exception as e:
-            print e
+            print(e)
         return suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path
 
     def validate(self,start,end):
@@ -255,7 +255,7 @@ class Handler():
         """
         if start_index is not None:
             if not(start_index[1] == constants.ENDLOOP and keyword==constants.ENDLOOP):
-                if get_param_info.has_key(start_index) and get_param_info[start_index] is not None and (start_index != {keyword_index:keyword}):
+                if start_index in get_param_info and get_param_info[start_index] is not None and (start_index != {keyword_index:keyword}):
                     get_param_info[start_index].append({keyword_index:keyword})
                 else:
                     get_param_info[start_index]=[{keyword_index:keyword}]
@@ -272,7 +272,7 @@ class Handler():
         """
         if start_index is not None:
             if not(start_index[1] == constants.ENDIF and keyword==constants.ENDIF):
-                if if_info.has_key(start_index) and if_info[start_index] is not None and (start_index != {keyword_index:keyword}):
+                if start_index in if_info and if_info[start_index] is not None and (start_index != {keyword_index:keyword}):
                     if_info[start_index].append({keyword_index:keyword})
                 else:
                     if_info[start_index]=[{keyword_index:keyword}]
@@ -291,7 +291,7 @@ class Handler():
         flag=True
 
         if len(for_keywords) != 0:
-            start_index=for_keywords.items()[-1]
+            start_index=list(for_keywords.items())[-1]
 ##            if keyword == constants.ENDFOR and self.validate(keyword,start_index[1]):
             if keyword == constants.ENDFOR:
                 self.insert_into_fordict(keyword_index,keyword,start_index)
@@ -318,7 +318,7 @@ class Handler():
         """
         flag=True
         if len(condition_keywords)>0:
-            start_index=condition_keywords.items()[-1]
+            start_index=list(condition_keywords.items())[-1]
             if not (keyword in if_endIf) and self.validate(keyword,start_index[1]):
                 self.insert_into_ifdict(keyword_index,keyword,start_index)
                 #New change to insert even the satrt of the keyword
@@ -335,7 +335,7 @@ class Handler():
                 while(start_index[1]!=constants.IF):
                     whileflag=True
                     if (len(condition_keywords)>0):
-                        start_index=condition_keywords.items()[-1]
+                        start_index=list(condition_keywords.items())[-1]
                         self.insert_into_ifdict(keyword_index,keyword,start_index)
                         self.insert_into_ifdict(start_index[0],start_index[1],(keyword_index,keyword))
                         condition_keywords.popitem()
@@ -370,7 +370,7 @@ class Handler():
         """
         flag=True
         if len(getparam_keywords)>0:
-            start_index=getparam_keywords.items()[-1]
+            start_index=list(getparam_keywords.items())[-1]
             if keyword==constants.ENDLOOP:
                 #insert 'endLoop' key to dict
                 self.insert_into_getParamdict(keyword_index,keyword,None)
@@ -381,7 +381,7 @@ class Handler():
                 #mapping 'endloop' to it's respective steps while backtracking
                 while(start_index[1]!=constants.GETPARAM):
                     if (len(getparam_keywords)>0):
-                        start_index=getparam_keywords.items()[-1]
+                        start_index=list(getparam_keywords.items())[-1]
                         self.insert_into_getParamdict(keyword_index,keyword,start_index)
                         self.insert_into_getParamdict(start_index[0],start_index[1],(keyword_index,keyword))
                         getparam_keywords.popitem()
@@ -481,7 +481,7 @@ class Handler():
         try:
             #block which creates the step of instances of (for,endFor)
             if key_lower in for_array:
-                if not(for_info.has_key(key)):
+                if not(key in for_info):
                     self.insert_into_fordict(index,key_lower,None)
                     log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
 ##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
@@ -489,7 +489,7 @@ class Handler():
 
             #block which creates the step of instances (if,elseIf,else,endIf)
             elif key_lower in if_array:
-                if not(if_info.has_key(key)):
+                if not(key in if_info):
                     self.insert_into_ifdict(index,key_lower,None)
                     log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
 ##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
@@ -498,7 +498,7 @@ class Handler():
 
             #block which creates the step of instances of (getparam,startloop,endloop)
             elif key_lower in get_param:
-                if not(get_param_info.has_key(key)):
+                if not(key in get_param_info):
                     self.insert_into_getParamdict(index,key_lower,None)
                     log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
 ##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
@@ -553,7 +553,7 @@ class Handler():
         stepnum=step['stepNo']
         url=step['url']
         custname=step['custname']
-        if(step.has_key('cord')): 
+        if('cord' in step): 
             cord=step['cord']
         else:
             cord=None
@@ -595,7 +595,7 @@ class Handler():
                 d=eval(testcase[i])
             except Exception as e:
                 d=testcase[i]
-            if len(d)>0 and d[len(d)-1].has_key('comments'):
+            if len(d)>0 and 'comments' in d[len(d)-1]:
                 d.pop()
             testcase_copy.append(d)
             flag=self.parse_condition(d)
@@ -642,9 +642,9 @@ class Handler():
 
         """
         if len(d)==0:
-            print d,' is empty'
-        for k, v in d.items():
-            print(k,':', v)
+            print(d,' is empty')
+        for k, v in list(d.items()):
+            print((k,':', v))
 
     def clearList(self,con):
         """

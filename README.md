@@ -2,7 +2,7 @@
 
 ## Technologies Used
 * `Nineteen68 Executor`
-    * Python 2.7 - Entire Core Development
+    * Python 3.7.0 - Entire Core Development
     * Plugin Development 
 * `UX`
     * HTML5, AngularJS
@@ -13,6 +13,7 @@
 * `Database`
     * Cassandra v2.1
     * Redis v3.2.1
+    * Neo4j 3.4.1
 
 ### Core Development
 

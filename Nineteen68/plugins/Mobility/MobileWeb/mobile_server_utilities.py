@@ -46,9 +46,8 @@ def clientresponse():
         clientresp.append({
             "keywordMessage" : mobile_key_objects.custom_msg
         })
-##    global accessContext
-##    accessContext.releaseJavaObject()
-    print'RESPONSE IS', str(clientresp)
+
+    print('RESPONSE IS', str(clientresp))
     return str(clientresp)
 
 
@@ -59,4 +58,4 @@ def cleardata():
         if mobile_key_objects.custom_msg:
             del mobile_key_objects.custom_msg[:]
     except Exception as e:
-                   print 'My exception occurred'
+        log.error(e)

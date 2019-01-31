@@ -164,13 +164,13 @@ class Utilities:
                 namewithdesc=name+';'+desc
                 if(deletedobjectlist):
                     if(not(namewithdesc in deletedobjectlist)):
-                        if(objectDictWithNameDesc.has_key(namewithdesc)):
+                        if(namewithdesc in objectDictWithNameDesc):
                             objectDictWithNameDesc.pop(namewithdesc)
                             deletedobjectlist.append(namewithdesc)
                         else:
                             objectDictWithNameDesc[namewithdesc]=path
                 elif(objectDictWithNameDesc):
-                    if(objectDictWithNameDesc.has_key(namewithdesc)):
+                    if(namewithdesc in objectDictWithNameDesc):
                         objectDictWithNameDesc.pop(namewithdesc)
                         deletedobjectlist.append(namewithdesc)
                     else:
@@ -237,7 +237,7 @@ class Utilities:
             global accessContextParent
             retacc = accessContextParent
             keytocompare=name+';'+description
-            if(objectDictWithNameDesc.has_key(keytocompare)):
+            if(keytocompare in objectDictWithNameDesc):
                 xpathneeded=objectDictWithNameDesc.get(keytocompare)
                 regularexp = re.compile('(frame(.*?|\s)*[\]]+)')
                 newxpath = regularexp.findall(xpathneeded)

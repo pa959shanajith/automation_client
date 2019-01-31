@@ -148,7 +148,7 @@ class Launch_Keywords():
                         mheight=int(rect1[3])-int(rect1[1])
                         mwidth=int(rect1[2])-int(rect1[0])
                 except Exception as e:
-                    print ""
+                    log.error(e)
                 #------------------------------------------------------------------------Calc
                 if foreground!=mainhandle:
                     fg_thread, fg_process_id = win32process.GetWindowThreadProcessId(foreground)

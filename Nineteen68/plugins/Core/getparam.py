@@ -133,7 +133,7 @@ class GetParam():
                     log.info('File is accesible')
                     filereader = csv.reader(open(filepath))
                     log.info('filereader object is created')
-                    columnNamesList = filereader.next()
+                    columnNamesList = next(filereader)
                     log.info('Store the data into the set to remove the duplicate column names')
                     columnNamesSet = set(columnNamesList)
                     log.info('Comparing the length of the columnNamesList and columnNamesSet ')
@@ -189,7 +189,7 @@ class GetParam():
         return : Returns dictionary
         """
         try:
-            print len(fileinfo)
+            print(len(fileinfo))
             if len(fileinfo) > 0:
                 allRows = []
                 filepath = fileinfo[0]
@@ -500,7 +500,7 @@ class GetParam():
     def get_static_value(self,data,i,var):
         #returns the value of the static variable if it exists otherwise returns None
         value=None
-        if data.has_key(var):
+        if var in data:
             if i>=0 and i<len(data[var]):
                 value=data[var][i]
                 if value=='':
@@ -537,7 +537,7 @@ class GetParam():
     def performdataparam(self,input,con,reporting_obj):
         try:
 
-            endlopnum = self.info_dict[0].keys()[0]
+            endlopnum = list(self.info_dict[0].keys())[0]
             return_value=endlopnum + 1
             self.executed=True
 
@@ -675,7 +675,7 @@ class GetParam():
                                     step_description='Dataparam: Iteration '+str(k)+' started'
                                     reporting_obj.name='Iteration '+str(k)
                                     self.add_report_step_getparam(reporting_obj,step_description)
-                                    iterations = len(data.values()[0])
+                                    iterations = len(list(data.values())[0])
                                     while (paramindex < endlopnum):
                                         input = self.retrievestaticvariable(data,paramindex,i-1)
                                         paramindex =con.methodinvocation(paramindex,input)
@@ -726,7 +726,7 @@ class GetParam():
                                 reporting_obj.name='Iteration '+str(k)
                                 self.add_report_step_getparam(reporting_obj,step_description)
                                 #Reporting part ends
-                                iterations = len(data.values()[0])
+                                iterations = len(list(data.values())[0])
                                 while (paramindex < endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,filter)
                                     paramindex =con.methodinvocation(paramindex,input)
@@ -761,7 +761,7 @@ class GetParam():
                     step_description='Start Loop'
                     self.add_report_step_getparam(reporting_obj,step_description)
                     #Reporting part ends
-                    count=len(data.values()[0])
+                    count=len(list(data.values())[0])
                     for i in range(count):
                         if self.name.lower()==GETPARAM:
                             inputval = self.inputval[0]
@@ -776,7 +776,7 @@ class GetParam():
                                 step_description='Dataparam: Iteration '+str(k)+' started'
                                 self.add_report_step_getparam(reporting_obj,step_description)
                                 #Reporting part ends
-                                iterations = len(data.values()[0])
+                                iterations = len(list(data.values())[0])
                                 logger.print_on_console ('Iterations : ',iterations)
                                 while (paramindex < endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,i)

@@ -203,9 +203,6 @@ class DateControlKeywords():
                                     result = desktop_constants.TEST_RESULT_TRUE
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
                         except Exception as e:
-                            print e
-                            import traceback
-                            traceback.print_exc()
                             log.error(e)
                             logger.print_on_console(e)
                     else:

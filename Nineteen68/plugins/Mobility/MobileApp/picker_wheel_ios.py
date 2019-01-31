@@ -39,7 +39,9 @@ class Picker_Wheel_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        print 'set value pass',input_val
+                        log.info('set value pass',input_val)
+                        logger.print_on_console('set value pass')
+                        logger.print_on_console(input_val[0])
                         # for set value
                         element.set_value(input_val[0])
                         status = TEST_RESULT_PASS
@@ -47,7 +49,7 @@ class Picker_Wheel_Keywords():
                         methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
-                        print 'element is disabled'
+                        print('element is disabled')
                         log.error('element is disabled')
                         logger.print_on_console(err_msg)
                 else:
@@ -61,7 +63,7 @@ class Picker_Wheel_Keywords():
         return status,methodoutput,output,err_msg
 
 
-    def get_value(self, element,input_val,*args):
+    def get_value(self, element,*args):
 
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
@@ -77,7 +79,6 @@ class Picker_Wheel_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        print 'set value pass',input_val
                         # for set value
                         # element.set_value(input_val[0])
                         output=element.text
@@ -85,8 +86,7 @@ class Picker_Wheel_Keywords():
                         methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
-                        print 'element is disabled'
-                        log.error('element is disabled')
+                        log.error(err_msg)
                         logger.print_on_console(err_msg)
                 else:
                     err_msg='element is not visible'

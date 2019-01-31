@@ -262,7 +262,7 @@ class Scrape:
                                 if wndNames is not 'Running applications':
                                         clicked_handle=evnt.Window
                                         while True:
-                                            if clicked_handle==0L:   #comparing whether parent window is same as clicked window
+                                            if clicked_handle==0:   #comparing whether parent window is same as clicked window
                                                 break
                                             else:
                                                 if not(clicked_handle == self.handle ):    #recursively getting the parent handle

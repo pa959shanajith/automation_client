@@ -60,43 +60,43 @@ class CustomObjectHandler():
                         #----Please Refer SWAPY application and check the element ,if all the properties are not populating , chances are this
                         #--- error will occour.I have noticed most of the time ch[i].texts() is the problem hence setting it to u''
                         try:
-                            getProperties={u'is_enabled': ch[i].is_enabled(),
-                                           u'is_visible': ch[i].is_visible(),
-                                           u'style': ch[i].style(),
-                                           u'fonts': ch[i].fonts(),
-                                           u'client_rects': ch[i].client_rects(),
-                                           u'texts': u'',
-                                           u'class_name': ch[i].class_name(),
-                                           u'is_unicode': ch[i].is_unicode(),
-                                           u'control_id': ch[i].control_id(),
-                                           u'menu_items': ch[i].menu_items(),
-                                           u'user_data': ch[i].user_data(),
-                                           u'friendly_class_name': ch[i].friendly_class_name(),
-                                           u'control_count': ch[i].control_count(),
-                                           u'exstyle': ch[i].exstyle(),
-                                           u'context_help_id': ch[i].context_help_id(),
-                                           u'rectangle': ch[i].rectangle()
+                            getProperties={'is_enabled': ch[i].is_enabled(),
+                                           'is_visible': ch[i].is_visible(),
+                                           'style': ch[i].style(),
+                                           'fonts': ch[i].fonts(),
+                                           'client_rects': ch[i].client_rects(),
+                                           'texts': '',
+                                           'class_name': ch[i].class_name(),
+                                           'is_unicode': ch[i].is_unicode(),
+                                           'control_id': ch[i].control_id(),
+                                           'menu_items': ch[i].menu_items(),
+                                           'user_data': ch[i].user_data(),
+                                           'friendly_class_name': ch[i].friendly_class_name(),
+                                           'control_count': ch[i].control_count(),
+                                           'exstyle': ch[i].exstyle(),
+                                           'context_help_id': ch[i].context_help_id(),
+                                           'rectangle': ch[i].rectangle()
                                           }
                             properties = json.loads(json.dumps(getProperties, default=lambda x: str(x)))
                         except Exception as e:
                             """Some properties dont exists in ele<uia> when comapred to ele<win32>"""
                             try:
-                                getProperties={u'is_enabled': ch[i].is_enabled(),
-                                           u'is_visible': ch[i].is_visible(),
-                                           u'style': u'',
-                                           u'fonts': u'',
-                                           u'client_rects': u'',
-                                           u'texts': u'',
-                                           u'class_name': ch[i].class_name(),
-                                           u'is_unicode': u'',
-                                           u'control_id': u'',
-                                           u'menu_items':u'',
-                                           u'user_data': u'',
-                                           u'friendly_class_name': ch[i].friendly_class_name(),
-                                           u'control_count': u'',
-                                           u'exstyle': u'',
-                                           u'context_help_id':u'',
-                                           u'rectangle': ch[i].rectangle()
+                                getProperties={'is_enabled': ch[i].is_enabled(),
+                                           'is_visible': ch[i].is_visible(),
+                                           'style': '',
+                                           'fonts': '',
+                                           'client_rects': '',
+                                           'texts': '',
+                                           'class_name': ch[i].class_name(),
+                                           'is_unicode': '',
+                                           'control_id': '',
+                                           'menu_items':'',
+                                           'user_data': '',
+                                           'friendly_class_name': ch[i].friendly_class_name(),
+                                           'control_count': '',
+                                           'exstyle': '',
+                                           'context_help_id':'',
+                                           'rectangle': ch[i].rectangle()
                                           }
                                 properties = json.loads(json.dumps(getProperties, default=lambda x: str(x)))
                             except Exception as e:
@@ -151,7 +151,7 @@ class CustomObjectHandler():
                             text= str(text) + '_table'
                          else:
                             tag = 'label'
-                            if not isinstance(text,basestring):
+                            if not isinstance(text,str):
                                 text=str(text)+'_lbl'
                             else:
                                 text=text+'_lbl'

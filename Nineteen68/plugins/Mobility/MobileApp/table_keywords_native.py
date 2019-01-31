@@ -184,14 +184,13 @@ class Table_Keywords():
                         # check the inoput is less than cell count
                         count = len(cells)
                         if (row_num >= 0 and row_num < count):
-                            print object_type,' inhgj'
                             child_object=cells[row_num].find_elements_by_class_name(object_type)
-                            print len(child_object)
+                            log.info(len(child_object))
                             # print len(child_object),'len is',type(len(child_object)),'ghjk',type(child_object)
                             if(type_index>=0 and type_index<=len(child_object)):
                                 output=child_object[type_index].text
-                                print type(output)
-                                print output,' is the output'
+                                log.info(output,' is the output')
+                                logger.print_on_console(output)
                                 if type_raw_input=='toggle':
                                     if output == 1:
                                         output='On'
@@ -201,11 +200,15 @@ class Table_Keywords():
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                             else:
-                                print 'please provide valid input in type'
+                                err_msg='please provide valid input in type'
                         else:
-                            print 'please provide valid input'
+                            err_msg='please provide valid input'
                     else:
                         err_msg='ERR_DISABLED_OBJECT'
+                    if err_msg is not None:
+                        log.info(err_msg)
+                        logger.print_on_console(err_msg)
+
         except Exception as e:
                 log.error(e)
                 logger.print_on_console(err_msg)
@@ -282,11 +285,11 @@ class Table_Keywords():
                                     status = TEST_RESULT_PASS
                                     methodoutput = TEST_RESULT_TRUE
                                 else:
-                                    print ' fail '
+                                    print(' fail ')
                             else:
-                                print 'please provide valid input'
+                                print('please provide valid input')
                         else:
-                            print 'please provide valid input s'
+                            print('please provide valid input s')
                     else:
                         err_msg='ERR_DISABLED_OBJECT'
         except Exception as e:

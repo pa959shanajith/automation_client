@@ -26,7 +26,7 @@ import core_utils
 log = logging.getLogger('scrape_dispatcher.py')
 windownametoscrape = ''
 class ScrapeDispatcher(wx.Frame):
-    print("Enetering inside scrape window")
+    logger.print_on_console("Enetering inside scrape window")
     def __init__(self, parent,id, title,filePath,socketIO,irisFlag):
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(200, 150) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
@@ -114,7 +114,7 @@ class ScrapeDispatcher(wx.Frame):
             if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
                 self.socketIO.emit('scrape',d)
             else:
-                print 'Scraped data exceeds max. Limit.'
+                logger.print_on_console('Scraped data exceeds max. Limit.')
                 self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
 
     ##            wx.MessageBox('CLICKANDADD: Scrape completed', 'Info',wx.OK | wx.ICON_INFORMATION)
@@ -132,7 +132,7 @@ class ScrapeDispatcher(wx.Frame):
 ##        print 'desktop_scraping_obj:',desktop_scraping_obj
 ####        self.comparebutton.Disable()
         scrape_obj=oebs_fullscrape.FullScrape()
-        print("windowname to scrape : ",windownametoscrape)
+        logger.print_on_console(("windowname to scrape : ",windownametoscrape))
         d = scrape_obj.getentireobjectlist(windownametoscrape)
         try:
             self.Iconize(True)
@@ -152,7 +152,7 @@ class ScrapeDispatcher(wx.Frame):
         if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
             self.socketIO.emit('scrape',d)
         else:
-            print 'Scraped data exceeds max. Limit.'
+            logger.print_on_console('Scraped data exceeds max. Limit.')
             self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
         self.parent.schedule.Enable()
         self.Close()
@@ -175,7 +175,7 @@ class ScrapeDispatcher(wx.Frame):
                       'clickandadd':self.clickandadd_obj.clickandadd,
                     }
                 keyword=keyword.lower()
-                if keyword in dict.keys():
+                if keyword in list(dict.keys()):
                     return dict[keyword](*message)
                 else:
                     logger.print_on_console(oebs_constants.INVALID_INPUT)
