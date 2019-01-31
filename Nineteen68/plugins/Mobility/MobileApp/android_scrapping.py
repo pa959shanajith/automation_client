@@ -18,13 +18,14 @@ import os
 import subprocess
 import time
 from constants import *
-from .mobile_app_constants import *
+from mobile_app_constants import *
 import logger
 import subprocess
 import socket
 import base64
 import platform
 import logging
+import device_keywords
 log = logging.getLogger('android_scrapping.py')
 
 XpathList=[]
@@ -72,8 +73,8 @@ class InstallAndLaunch():
         except Exception as e:
             err = 'Error while starting server'
             logger.print_on_console(err)
-            #log.error(err)
-            #log.error(e)
+            log.error(err)
+            log.error(e)
 
     def stop_server(self):
         try:
@@ -182,8 +183,9 @@ class InstallAndLaunch():
             else:
                 if device_name == 'wifi':
                     device_keywords_object = device_keywords.Device_Keywords()
-                    device_keywords_object.wifi_connect()
-                else:
+                    device_name = device_keywords_object.wifi_connect()
+                    logger.print_on_console("Connected device name:",device_name)
+                if device_name != '':
                     self.start_server()
                     self.desired_caps = {}
                     self.desired_caps['platformName'] = 'Android'
@@ -199,6 +201,14 @@ class InstallAndLaunch():
                     ##            self.desired_caps['logLevel'] = 'info
                     self.desired_caps['log_level'] = False
                     ##                print 'come in'
+                    import apk
+                    apkf = apk.APK(apk_path)
+                    activity_name = None
+                    package_name = None
+                    activity_name = apkf.get_main_activity()
+                    package_name = apkf.get_package()
+                    self.desired_caps['appPackage'] = package_name
+                    self.desired_caps['appActivity'] = activity_name
                     self.driver = webdriver.Remote('http://localhost:4723/wd/hub', self.desired_caps)
         except Exception as e:
             err = "Not able to install or launch application"
@@ -250,7 +260,7 @@ class InstallAndLaunch():
 
             return jsonArray
 
-        
+
         if self.driver != None:
             page_source=self.driver.page_source
             parser = xml.sax.make_parser()
@@ -489,12 +499,10 @@ class Exact(xml.sax.handler.ContentHandler):
     def endElement(self, name):
         value = self.buffer.strip();
         if(value != ''):
-                log.info(self.xPath + "='" + self.buffer.toString() + "'")
+            log.info(self.xPath + "='" + self.buffer.toString() + "'")
 
         self.parser.setContentHandler(self.parent)
 
     def characters(self, data):
         self.buffer += data
-
-
 

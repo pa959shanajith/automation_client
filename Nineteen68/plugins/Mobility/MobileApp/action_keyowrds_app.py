@@ -11,7 +11,7 @@
 
 
 from constants import *
-from .mobile_app_constants import *
+from mobile_app_constants import *
 from appium.webdriver.common.touch_action import TouchAction
 
 

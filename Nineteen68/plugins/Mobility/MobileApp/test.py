@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from .apk import APK
+from apk import APK
 
 
 def test():
