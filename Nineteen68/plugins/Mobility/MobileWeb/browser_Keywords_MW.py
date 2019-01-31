@@ -115,10 +115,6 @@ class BrowserKeywords():
                     status = webconstants_MW.TEST_RESULT_PASS
                 else:
                     self.start_server()
-<<<<<<< HEAD
-=======
-
->>>>>>> 26e239f332128dfca1125a19a51cdcc8ed83635f
                     obj = Singleton_DriverUtil()
                     # Logic to make sure that logic of usage of existing driver is not applicable to execution
 
