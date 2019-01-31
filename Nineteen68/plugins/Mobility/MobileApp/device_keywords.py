@@ -75,9 +75,9 @@ class Device_Keywords():
                     if ':' in serial :
                              output=subprocess.check_output([cmd, 'connect',serial])
                              if 'connected' in output :
-                                    print 'already connected to the network'
+                                    logger.print_on_console('already connected to the network')
                              else:
-                                    print 'connection lost please retry'
+                                    logger.print_on_console('connection lost please retry')
                     else :
                             cm=cmd + ' tcpip 5555'
                             abc=subprocess.check_output(cm)
@@ -92,9 +92,9 @@ class Device_Keywords():
                             c= cmd + ' connect ' +ser
                             o=subprocess.check_output(c)
                             if 'connected' in o :
-                                print ' both devices areconnected over wifi unplug the cable '
+                                logger.print_on_console(' both devices areconnected over wifi unplug the cable ')
                 else:
-                    print 'no device found pls connect connect the device via usb '
+                    logger.print_on_console('no device found pls connect connect the device via usb ')
 
                     # The first line of `adb devices` just says "List of attached devices", so
                     # skip that.

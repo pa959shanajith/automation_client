@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from apk import APK
+from .apk import APK
 
 
 def test():
@@ -12,7 +12,7 @@ def test():
 ##    print apkf.cert_md5
 ##    print apkf.file_size
 ##    print apkf.androidversion
-    print apkf.package
+    print(apkf.package)
 ##    print apkf.get_android_manifest_xml()
 ##    print apkf.get_android_manifest_axml()
 ##    print apkf.is_valid_APK()
@@ -28,7 +28,7 @@ def test():
     # pip install python-magic
 ##    print apkf.get_files_types()
     # print apkf.get_dex()
-    print apkf.get_main_activity()
+    print(apkf.get_main_activity())
 ##    print apkf.get_activities()
 ##    print apkf.get_services()
 ##    print apkf.get_receivers()
