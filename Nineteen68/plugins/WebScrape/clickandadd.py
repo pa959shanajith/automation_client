@@ -38,6 +38,7 @@ class Clickandadd():
         driver = browserops.driver
         webscrape_utils_obj = WebScrape_Utils()
         try:
+            global currenthandle
             log.info('Inside startclickandadd method .....')
             browser = browserops.browser
             log.info('Obtained browser handle and driver'
@@ -64,7 +65,6 @@ class Clickandadd():
 
                     if (driver.execute_script(javascript_hasfocus)):
                         log.info('Got the window which has the focus')
-                        global currenthandle
                         currenthandle = eachdriverhand
                         break
 

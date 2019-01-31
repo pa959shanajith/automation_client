@@ -31,6 +31,7 @@ from webscrape_utils import WebScrape_Utils
 
 class Fullscrape():
     def fullscrape(self,scrape_option,window_handle_number):
+        global currenthandle
         start_time = time.clock()
         data = {}
         driver = browserops.driver
@@ -63,7 +64,6 @@ class Fullscrape():
                     log.info('Switching to each handle and checking weather it has focus ')
                     if (driver.execute_script(javascript_hasfocus)):
                         log.info('Got the window which has the focus')
-                        global currenthandle
                         currenthandle = eachdriverhand
                         break
             tempne = []

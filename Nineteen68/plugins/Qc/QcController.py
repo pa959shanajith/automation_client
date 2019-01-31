@@ -25,7 +25,7 @@ class QcWindow():
     def __init__(self,filePath):
         status=None
         try:
-            global sent
+            global sent,loginflag,TD,urlflag
             flag=0
             if(filePath["qcaction"]=='domain'):
                 try:
@@ -35,11 +35,8 @@ class QcWindow():
                     domain_dict={}
                     key="view"
                     domain_dict.setdefault(key, [])
-                    global loginflag
                     loginflag=False
-                    global TD
                     TD = win32com.client.Dispatch("TDApiOle80.TDConnection")
-                    global urlflag
                     urlflag=False
                     TD.InitConnectionEx(str(Qc_Url))
                     urlflag=True
@@ -76,6 +73,7 @@ class QcWindow():
 
     def getDomain(self,filePath):
         try:
+            global dictFolderJson
             domain_dict={}
             key="domain"
             domain_dict.setdefault(key, [])
@@ -86,7 +84,6 @@ class QcWindow():
                     for dom in listDomains:
                         domain_dict[key].append(str(dom))
             dictFolder = json.dumps(domain_dict)
-            global dictFolderJson
             dictFolderJson=json.loads(dictFolder)
         except Exception as e:
             print('Error in getting domains')
@@ -97,6 +94,7 @@ class QcWindow():
 
     def getProjects(self,filePath):
         try:
+            global dictFolderJson
             domain_name=filePath["domain"]
             projects_dict={}
             key="project"
@@ -107,7 +105,6 @@ class QcWindow():
                     for pro in list_projects:
                         projects_dict[key].append(str(pro))
                     dictFolder = json.dumps(projects_dict)
-                    global dictFolderJson
                     dictFolderJson=json.loads(dictFolder)
                 else:
                     print('Invalid domain selected')
@@ -119,6 +116,7 @@ class QcWindow():
     def ListTestSetFolder(self,filePath):
         ##The final list which contains the testsets and testset under the specified path
         try:
+            global dictFolderJson
             testsetpath=filePath["foldername"]
             domain_name=filePath["domain"]
             project_name=filePath["project"]
@@ -184,7 +182,6 @@ class QcWindow():
             OverallList=[]
             OverallList.append(folder_dict)
             OverallList.append(temp_dict_ts)
-            global dictFolderJson
             dictFolderJson = json.dumps(OverallList)
             dictFolderJson=json.loads(dictFolderJson)
         except Exception as e:
@@ -197,6 +194,7 @@ class QcWindow():
 
     def test_case_generator(self,filePath):
         try:
+            global dictFolderJson
             test_case_dict={}
             key="testcase"
             testsetpath=filePath["foldername"]
@@ -222,7 +220,6 @@ class QcWindow():
                 i=i+1
             OverallList=[]
             OverallList.append(test_case_dict)
-            global dictFolderJson
             dictFolderJson = json.dumps(OverallList)
             dictFolderJson=json.loads(dictFolderJson)
         except Exception as e:
@@ -232,6 +229,7 @@ class QcWindow():
     def update_qc_details(self,data):
         status = False
         try:
+            global dictFolderJson
             qcDomain =  data['qc_domain']
             qcProject = data['qc_project']
             tsFolder = data['qc_folder']
@@ -268,7 +266,6 @@ class QcWindow():
         except Exception as e:
             print('Error while updating QC')
             status = False
-        global dictFolderJson
         if(status):
             dictFolderJson = {'QC_UpdateStatus':True}
             """
@@ -281,8 +278,8 @@ class QcWindow():
         return status
 
     def quit_qc(self):
-        global sent
         try:
+            global sent,dictFolderJson
             sent=1
             if TD.connected==True and loginflag==True:
                 con.send('closedqc#E&D@Q!C#')
@@ -293,7 +290,6 @@ class QcWindow():
             else:
                 con.send('invalidcredentials#E&D@Q!C#')
                 TD.releaseconnection()
-            global dictFolderJson
             dictFolderJson=None
             return True
         except Exception as e:

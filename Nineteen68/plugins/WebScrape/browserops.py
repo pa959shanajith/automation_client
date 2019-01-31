@@ -51,8 +51,8 @@ class BrowserOperations():
     param : None
     """
     def checkPopups(self):
-        global driver
         try:
+            global driver
             alertObj=driver.switch_to_alert()
             alertObj.accept()
             logger.print_on_console('Popup Found!\nPopup accepted.')
