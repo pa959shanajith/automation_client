@@ -57,11 +57,11 @@ class BrowserOperations():
     param : Browser name  IE - Internet Explorer
     """
     def openIeBrowser(self):
+        global browser,driver,hwndg
         logger.log('FILE: browserops.py , DEF: openIeBrowser() , MSG: Reading config.xml file.....')
         for child in xroot:
             if(child.tag == domconstants.BIT_64):
                 try:
-                    global browser
                     browser = 3
                     util = utils_cs.Utils()
                     caps = webdriver.DesiredCapabilities.INTERNETEXPLORER
@@ -73,18 +73,15 @@ class BrowserOperations():
                     logger.log('FILE: browserops.py , DEF: openIeBrowser() , MSG:  IE capabilities are added.....')
                     if(child.text == domconstants.YES):
                         logger.log('FILE: browserops.py , DEF: openIeBrowser() , MSG: Opening IE browser.....')
-                        global driver
                         driver = webdriver.Ie(capabilities=caps, executable_path=domconstants.IEDRIVER_BIT64)
                     else:
                         logger.log('FILE: browserops.py , DEF: openIeBrowser() , MSG: Opening IE browser.....')
-                        global driver
                         driver = webdriver.Ie(capabilities=caps, executable_path=domconstants.IEDRIVER_BIT32)
                     logger.log('FILE: browserops.py , DEF: openIeBrowser() , MSG:  Navigating to blank page')
                     driver.get(domconstants.BLANK_PAGE)
                     p = psutil.Process(driver.iedriver.process.pid)
                     pidie = p.children()[0]
                     logger.log('FILE: browserops.py , DEF: openIeBrowser() , MSG:  Pid is obtained')
-                    global hwndg
                     hwndg = util.bring_Window_Front(pidie.pid)
                     logger.log('FILE: browserops.py , DEF: openIeBrowser() , MSG:  Using Pid handle is obtained')
                     logger.log('FILE: browserops.py , DEF: openIeBrowser() , MSG:  IE browser opened successfully')
@@ -99,7 +96,7 @@ class BrowserOperations():
         """
     def openChromeBrowser(self):
         try:
-            global browser
+            global browser,driver,hwndg
             browser = 1
             util = utils_cs.Utils()
             choptions = webdriver.ChromeOptions()
@@ -109,12 +106,10 @@ class BrowserOperations():
                 if(child.tag == domconstants.CHROME_PATH):
                     if(child.text == domconstants.DEFAULT):
                         logger.log('FILE: browserops.py , DEF: openChromeBrowser() , MSG: Opening Chrome browser.....')
-                        global driver
                         driver = webdriver.Chrome(chrome_options=choptions, executable_path=domconstants.CHROMEDRIVER)
                     else:
                         choptions.binary_location = child.text
                         logger.log('FILE: browserops.py , DEF: openChromeBrowser() , MSG: Opening Chrome browser.....')
-                        global driver
                         driver = webdriver.Chrome(chrome_options=choptions, executable_path=domconstants.CHROMEDRIVER)
             logger.log('FILE: browserops.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
             driver.get(domconstants.BLANK_PAGE)
@@ -123,7 +118,6 @@ class BrowserOperations():
             pidchrome = p.children()[0]
             logger.log('FILE: browserops.py , DEF: openChromeBrowser() , MSG:  Pid is obtained')
             # logging.warning(pidchrome.pid)
-            global hwndg
             hwndg = util.bring_Window_Front(pidchrome.pid)
             logger.log('FILE: browserops.py , DEF: openChromeBrowser() , MSG:  Using Pid handle is obtained')
             logger.log('FILE: browserops.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
@@ -140,11 +134,10 @@ class BrowserOperations():
     """
     def openFirefoxBrowser(self):
         try:
-            global browser
+            global browser,driver
             browser = 2
             util = utils_cs.Utils()
             logger.log('FILE: browserops.py , DEF: openFirefoxBrowser() , MSG: Opening Chrome browser.....')
-            global driver
             driver = webdriver.Firefox()
             driver.maximize_window()
             logger.log('FILE: browserops.py , DEF: openFirefoxBrowser() , MSG:  Navigating to blank page')
