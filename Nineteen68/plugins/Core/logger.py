@@ -40,9 +40,15 @@ def print_on_console(message,*args):
             # code checks if the value has a unicode and appends accordingly
             resultant=''
             for values in args:
+                if not isinstance(values,str):
+                    values=str(values)
+                if not isinstance(message,str):
+                    message=str(message)
                 resultant=resultant+values
             print(sttime + ':  CONSOLE: ' +filename+':'+str(caller.lineno) +' ' + message + resultant)
     except Exception as e:
+        import traceback
+        print(traceback.format_exc())
         print(e)
 
 def log(message):
