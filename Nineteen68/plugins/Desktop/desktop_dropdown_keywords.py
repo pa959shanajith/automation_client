@@ -179,9 +179,9 @@ class Dropdown_Keywords():
                                     oldlist=len(items)
                                     itemcount=element.item_count()
                                     newlist=[]
-                                    list = input_val
+                                    list_input = input_val
                                     item_list=[]
-                                    for item in list:
+                                    for item in list_input:
                                         #logger.print_on_console(item)
                                         item_new = (int(item)-1)*2
                                         #logger.print_on_console(item_new)
@@ -217,8 +217,6 @@ class Dropdown_Keywords():
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'
             except Exception as exception:
-                import traceback
-                traceback.print_exc()
                 log.error(exception)
                 logger.print_on_console(exception)
                 err_msg=desktop_constants.ERROR_MSG
@@ -916,9 +914,9 @@ class Dropdown_Keywords():
                                 oldlist=len(items)
                                 itemcount=element.item_count()
                                 newlist=[]
-                                list = input_val
+                                list_input = input_val
                                 item_list=[]
-                                for item in list:
+                                for item in list_input:
                                     #logger.print_on_console(item)
                                     item_new = (int(item)-1)*2
                                     #logger.print_on_console(item_new)

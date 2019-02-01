@@ -1825,7 +1825,6 @@ def check_browser():
             a=p.stdout.readline()
             a=a.decode('utf-8')[13:17]
             choptions1 = webdriver.ChromeOptions()
-            logger.print_on_console(str(configvalues['chrome_path']).lower())
             if str(configvalues['chrome_path']).lower()!="default":
                 choptions1.binary_location=str(configvalues['chrome_path'])
             choptions1.add_argument('--headless')

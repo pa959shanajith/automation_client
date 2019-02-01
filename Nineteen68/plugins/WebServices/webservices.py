@@ -439,7 +439,6 @@ class WSkeywords:
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if not (self.baseEndPointURL is '' or self.baseOperation is '' or self.baseReqHeader is ''):
-                print self.baseReqHeader
                 req=self.baseEndPointURL+'/'+self.baseOperation+'?'+self.baseReqHeader
             elif not (self.baseEndPointURL is ''):
                 req=self.baseEndPointURL
@@ -685,7 +684,6 @@ class WSkeywords:
                         output= self.baseResBody
             elif len(args) == 2:
                 key=args[0]
-                print 'args[2]',args
                 if not(self.baseResBody is None):
                     response_body=self.baseResBody
                     if args[0] !='' and args[1]!='' and args[0] !=None and args[1]!=None:

@@ -11,6 +11,7 @@ import time
 import objectspy_MW
 import core_utils
 import platform
+import logger
 
 browserobj = browserops_MW.BrowserOperations()
 clickandadd_MWoj = clickandadd_MW.clickandadd_MW()

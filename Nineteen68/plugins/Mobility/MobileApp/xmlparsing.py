@@ -28,6 +28,7 @@ name=[]
 ScrapeList=[]
 driver=None
 
+log = logging.getLogger('xmlparsing.py')
 
 class Json_fields:
 
