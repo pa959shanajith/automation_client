@@ -11,6 +11,8 @@
 
 import browserops
 import time
+import logging
+log = logging.getLogger("objectmapper.py")
 class Highlight():
 
         def highlight(self,element):
