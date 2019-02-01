@@ -14,6 +14,7 @@ import xml.sax
 import xml.parsers.expat
 import configparser
 import uuid,json
+import logging
 
 XpathList=[]
 resource_id=[]
