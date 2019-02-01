@@ -30,6 +30,8 @@ objectDict = {}
 objectDictWithNameDesc={}
 activeframename=''
 deletedobjectlist=[]
+log = logging.getLogger("mobile_server_utilities.py")
+
 
 def clientresponse():
     clientresp=[]
@@ -47,7 +49,7 @@ def clientresponse():
             "keywordMessage" : mobile_key_objects.custom_msg
         })
 
-    print('RESPONSE IS', str(clientresp))
+    log.info('RESPONSE IS', str(clientresp))
     return str(clientresp)
 
 

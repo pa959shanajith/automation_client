@@ -1203,7 +1203,7 @@ class ZipFile(object):
                      zinfo.CRC, compress_size, file_size,
                      len(zinfo.filename), len(extra_data), len(zinfo.comment),
                      0, zinfo.internal_attr, zinfo.external_attr,
-                     header_offset), file=sys.stderr)
+                     header_offset))
                     raise
                 self.fp.write(centdir)
                 self.fp.write(filename)

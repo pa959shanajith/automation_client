@@ -14,6 +14,10 @@ import clickandadd
 import highlight
 import time
 import logging
+import logger
+
+log = logging.getLogger('scrapper.py')
+
 class Scrapper():
     def executor(data):
         if data == 'IE'  or  data == 'CH' or  data == 'FX':
@@ -47,27 +51,4 @@ class Scrapper():
             logger.print_on_console('Returned data from def highlight:',res)
             if res == 'SUCCESS':
                 logger.print_on_console('HIGHLIGHT: ******Element highlighted successfully.******')
-
-    if __name__ == '__main__':
-        logger.print_on_console('==================OBJECT IDENTIFICATION UTILITY STARTED============================')
-        logger.print_on_console('---------------------------------------------------------------------------------------')
-        logging.basicConfig(filename='python-scrappy.log', level=logging.DEBUG, format='%(asctime)s--Line No:%(lineno)d--%(message)s')
-        logging.debug('==================OBJECT IDENTIFICATION UTILITY STARTED============================')
-        logging.debug('---------------------------------------------------------------------------------------')
-        browser=input("""Enter the browser name to  open : IE - Internet Explorer, CH - Google Chrome, FX - Mozilla Firefox""")
-        if browser == 'IE' or browser == 'CH' or browser == 'FX':
-            executor(browser)
-        else:
-            logger.print_on_console('Please select the valid browser name')
-        while True:
-            start=input("""enter START to perform start click and add :  """)
-            if start=='START':
-                executor('CLICKANDADD')
-            stop=input("""Enter STOP to stop click and add """)
-            if stop=='STOP':
-                executor('STOPCLICKANDADD')
-        logger.print_on_console('==================OBJECT IDENTIFICATION UTILITY STOPPED============================')
-        logger.print_on_console('---------------------------------------------------------------------------------------')
-        logging.debug('==================OBJECT IDENTIFICATION UTILITY STOPPED============================')
-        logging.debug('---------------------------------------------------------------------------------------')
 
