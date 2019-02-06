@@ -29,6 +29,7 @@ import numpy as np
 from PIL import Image
 import urllib
 import os
+from functools import reduce
 #from skimage.measure import compare_ssim as ssim
 
 

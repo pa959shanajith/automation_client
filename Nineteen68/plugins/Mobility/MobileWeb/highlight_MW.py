@@ -194,7 +194,7 @@ class Highlight():
 ##                            new_properties=element_properties[0];
 ##                            print 'New Properties: ',new_properties
                             highlight1(webElement[0])
-                            if cmp(element,new_properties)!=0:
+                            if (element>new_properties)-(element<new_properties)!=0:
                                 log.info('object properties changed')
                                 changedobject.append(new_properties)
                             else:
@@ -261,7 +261,7 @@ class Highlight():
                             log.info('Actual element Properties: ',new_properties)
 
                             highlight1(webElement[0])
-                            if cmp(element,new_properties)!=0:
+                            if (element>new_properties)-(element<new_properties)!=0:
                                 log.info('object properties changed')
                                 changedobject.append(new_properties)
 
