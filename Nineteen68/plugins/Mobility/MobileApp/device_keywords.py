@@ -72,7 +72,7 @@ class Device_Keywords():
                     for i in serial:
                         if ':' in i :
                             output=subprocess.check_output([cmd, 'connect',i])
-                            if 'connected' in output :
+                            if 'connected' in str(output) :
                                 logger.print_on_console('Already connected to the network')
                                 return i
                             else:

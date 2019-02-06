@@ -23,6 +23,8 @@ import platform
 from constants import SYSTEM_OS
 import domconstants_MW
 import logger
+import logging
+log = logging.getLogger('browserops_MW.py')
 import Exceptions_MW
 import mobile_server_utilities
 import webconstants_MW
@@ -61,6 +63,7 @@ class BrowserOperations():
             time.sleep(15)
             logger.print_on_console('Server started')
         except Exception as e:
+            log.error(e,exc_info=True)
             logger.print_on_console('Exception in starting server')
 
     def get_device_list(self,input_val,*args):
@@ -71,14 +74,12 @@ class BrowserOperations():
         try:
             android_home=os.environ['ANDROID_HOME']
             cmd=android_home+'\\platform-tools\\'
-
             os.chdir(cmd)
             cmd=cmd +'adb.exe'
             if android_home!=None:
                 with open(os.devnull, 'wb') as devnull:
                     subprocess.check_call([cmd, 'start-server'], stdout=devnull,
                               stderr=devnull)
-##                print subprocess.check_output([cmd, 'devices'])
                 proc = subprocess.Popen([cmd, 'devices'], stdout=subprocess.PIPE)
                 for line in proc.stdout.readlines():
                     line = str(line)[2:-1]
@@ -95,7 +96,7 @@ class BrowserOperations():
                 os.chdir(maindir)
 
         except Exception as e:
-            logger.log(e)
+            log.error(e,exc_info=True)
 ##            logger.print_on_console(e)
         return devices
 
@@ -111,7 +112,7 @@ class BrowserOperations():
                     for i in serial:
                         if ':' in i :
                             output=subprocess.check_output([cmd, 'connect',i])
-                            if 'connected' in output :
+                            if 'connected' in str(output) :
                                 logger.print_on_console('Already connected to the network')
                                 return i
                             else:
@@ -119,7 +120,6 @@ class BrowserOperations():
                                 return ''
                     cm=cmd + ' tcpip 5555'
                     abc=str(subprocess.check_output(cm))
-                    import time
                     time.sleep(5)
                     cmmmm=cmd + ' shell ip -f inet addr show wlan0'
                     out1 = str(subprocess.check_output(cmmmm))
@@ -139,7 +139,7 @@ class BrowserOperations():
                     logger.print_on_console('No devices found please connect the device via usb to configure adb through WiFi')
                     return ''
         except Exception as e:
-            logger.error(e)
+            log.error(e,exc_info=True)
 ##            logger.print_on_console(e)
 
 
@@ -158,6 +158,7 @@ class BrowserOperations():
                 import os
                 os.system("killall -9 node")
         except Exception as e:
+            log.error(e,exc_info=True)
             logger.print_on_console('Exception in stopping server')
 
     def closeandroidBrowser(self  , *args):
@@ -177,6 +178,7 @@ class BrowserOperations():
             else:
                 mobile_key_objects.custom_msg.append("ERR_WEB_DRIVER_EXCEPTION")
          except Exception as e:
+            log.error(e,exc_info=True)
             mobile_key_objects.custom_msg.append("ERR_WEB_DRIVER")
 
          mobile_key_objects.keyword_output.append(str(status))
@@ -211,26 +213,34 @@ class BrowserOperations():
                    'FILE: browserops_MW.py , DEF: openSafariBrowser() , MSG:  Safari browser opened successfully')
                status = domconstants_MW.STATUS_SUCCESS
            else:
+                import psutil
+                import os
+                processes = psutil.net_connections()
+                for line in processes:
+                    p = line.laddr
+                    if p[1] == 4723:
+                        status = domconstants_MW.STATUS_SUCCESS
+                        return status
                 input_list = inputs.split(';')
-                if input_list[1] == 'wifi':
-                    self.wifi_connect()
-                else :
+                device_name = input_list[0]
+                if device_name == 'wifi':
+                    device_name=self.wifi_connect()
+                if device_name != '':
                     self.start_server()
                     time.sleep(5)
                     desired_caps = {}
                     desired_caps['platformName'] = 'Android'
                     desired_caps['platformVersion'] =input_list[1]
-                    desired_caps['deviceName'] = input_list[0]
-                    desired_caps['udid'] = input_list[0]
+                    desired_caps['deviceName'] = device_name
+                    desired_caps['udid'] = device_name
                     desired_caps['browserName'] = 'Chrome'
-                    ##desired_caps['appium-version'] = '1.4.0'
                     desired_caps['clearSystemFiles']=True
                     desired_caps['newCommandTimeout'] = '36000'
-                    device_version= subprocess.check_output(["adb", "shell", "getprop ro.build.version.release"])
+                    device_version= subprocess.check_output(["adb","-s",device_name, "shell", "getprop ro.build.version.release"])
                     device_version=str(device_version)[2:-1]
-                    device_version_data =device_version.split('\r')
+                    device_version_data =device_version.split('\\r')
                     version = device_version_data[-2]
-                    if (version[0] == '\n'):
+                    if (version[0] == '\\n'):
                         version = version[1:]
                     if str(input_list[1]) == str(version):
                         driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
@@ -243,6 +253,8 @@ class BrowserOperations():
                         mobile_key_objects.custom_msg.append("Invalid Input")
                         status = domconstants_MW.STATUS_FAIL
                         logger.print_on_console("Invalid Input")
+                else:
+                    status = domconstants_MW.STATUS_FAIL
 
 
         except Exception as e:
@@ -254,5 +266,6 @@ class BrowserOperations():
                 if not os.path.exists(path_node_modules):
                     logger.print_on_console("node_modules Directory not Found in /Nineteen68/plugins/Mobility/")
             logger.print_on_console("ERROR OCURRED WHILE OPENING BROWSER")
+            log.error(e,exc_info=True)
             ##Exceptions_MW.error(e)
         return status
