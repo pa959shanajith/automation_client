@@ -35,6 +35,7 @@ class Date_Keywords():
         obj=[]
         input_date=input[0].split('/')
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        years=[]
         try:
             if webelement is not None:
                 visibility=webelement.is_displayed()
