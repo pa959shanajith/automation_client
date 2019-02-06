@@ -51,7 +51,7 @@ class Action_Key_App():
             send_values={
             'enter':' shell input keyevent 66',
             'keydown':' shell input keyevent 20',
-            'keyup': 'shell input keyevent 19',
+            'keyup': ' shell input keyevent 19',
             'tab' :' shell input keyevent 61',
             'a':' shell input keyevent 29',
             'b':' shell input keyevent 30',

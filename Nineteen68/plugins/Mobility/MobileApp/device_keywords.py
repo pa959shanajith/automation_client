@@ -21,7 +21,6 @@ log = logging.getLogger('device_keywords.py')
 
 class Device_Keywords():
 
-
     def get_device_list(self,input_val,*args):
 
         status=TEST_RESULT_FAIL
@@ -34,38 +33,35 @@ class Device_Keywords():
         try:
             android_home=os.environ['ANDROID_HOME']
             cmd=android_home+'\\platform-tools\\'
-
             os.chdir(cmd)
             cmd=cmd +'adb.exe'
             if android_home!=None:
                 with open(os.devnull, 'wb') as devnull:
                     subprocess.check_call([cmd, 'start-server'], stdout=devnull,
                               stderr=devnull)
-##                print subprocess.check_output([cmd, 'devices'])
-                out = self.split_lines(subprocess.check_output([cmd, 'devices']))
-                # The first line of `adb devices` just says "List of attached devices", so
-                # skip that.
-                devices = []
-                for line in out[1:]:
+                proc = subprocess.Popen([cmd, 'devices'], stdout=subprocess.PIPE)
+                for line in proc.stdout.readlines():
+                    line = str(line)[2:-1]
+                    line = line.rstrip('\\n\\r')
+                    if "List" in line:
+                        continue
+                    if "offline" in line:
+                        continue
                     if not line.strip():
                         continue
-                    if 'offline' in line:
-                        continue
-                    serial, _ = re.split(r'\s+', line, maxsplit=1)
-                    devices.append(serial)
+                    serial = line.split('\\t')
+                    devices.append(serial[0])
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
                 os.chdir(maindir)
-
         except Exception as e:
-            log.error(e)
+            log.error(e,exc_info=True)
             logger.print_on_console(err_msg)
         return status,methodoutput,devices,err_msg
 
     def wifi_connect(self,*args):
         try:
             err_msg=None
-            device_name=[]
             android_home=os.environ['ANDROID_HOME']
             cmd=android_home+'\\platform-tools\\'
             os.chdir(cmd)
@@ -73,45 +69,40 @@ class Device_Keywords():
             if android_home!=None:
                 a,b,serial,d=self.get_device_list(None)
                 if len(serial)!=0:
-                    if ':' in serial :
-                             output=subprocess.check_output([cmd, 'connect',serial])
-                             if 'connected' in output :
-                                    logger.print_on_console('Already connected to the network')
-                                    a1,b1,device_name,d1 = self.get_device_list(None)
-                             else:
-                                    logger.print_on_console('Connection lost please retry')
-                    else :
-                            cm=cmd + ' tcpip 5555'
-                            abc=subprocess.check_output(cm)
-                            import time
-                            time.sleep(5)
-                            cmmmm=cmd + ' shell ip -f inet addr show wlan0'
-                            out1 = subprocess.check_output(cmmmm)
-                            b=out1[out1.find('inet'):]
-                            b=b.strip('inet')
-                            c=b.split('/')
-                            ser=c[0] + ':5555'
-                            c= cmd + ' connect ' +ser
-                            o=subprocess.check_output(c)
-                            if 'connected' in o :
-                                logger.print_on_console('Both devices are connected over wifi unplug the cable')
+                    for i in serial:
+                        if ':' in i :
+                            output=subprocess.check_output([cmd, 'connect',i])
+                            if 'connected' in output :
+                                logger.print_on_console('Already connected to the network')
+                                return i
                             else:
-                                logger.print_on_console('Error connecting the device through wifi')
-                            a1,b1,device_name,d1 = self.get_device_list(None)
+                                logger.print_on_console('Connection lost please retry')
+                                return ''
+                    cm=cmd + ' tcpip 5555'
+                    abc=str(subprocess.check_output(cm))
+                    import time
+                    time.sleep(5)
+                    cmmmm=cmd + ' shell ip -f inet addr show wlan0'
+                    out1 = str(subprocess.check_output(cmmmm))
+                    b=out1[out1.find('inet'):]
+                    b=b.strip('inet')
+                    c=b.split('/')
+                    ser=c[0] + ':5555'
+                    c= cmd + ' connect ' +ser
+                    o=str(subprocess.check_output(c))
+                    if 'connected' in o :
+                        logger.print_on_console('Both devices are connected over wifi unplug the cable')
+                        return ser[1:]
+                    else:
+                        logger.print_on_console('Error connecting the device through wifi')
+                        return ''
                 else:
                     logger.print_on_console('No devices found please connect the device via usb to configure adb through WiFi')
-
-                    # The first line of `adb devices` just says "List of attached devices", so
-                    # skip that.
-
-
+                    return ''
         except Exception as e:
-            log.error(e)
+            log.error(e,exc_info=True)
             logger.print_on_console(err_msg)
-        for i in device_name:
-            if ':' in i:
-                return i
-        return ''
+
 
 
     def invoke_device(self,input_val,*args):
@@ -135,39 +126,63 @@ class Device_Keywords():
                 with open(os.devnull, 'wb') as devnull:
                     subprocess.check_call([cmd, 'start-server'], stdout=devnull,
                               stderr=devnull)
-##                print subprocess.check_output([cmd, 'devices'])
-                out = self.split_lines(subprocess.check_output([cmd, 'devices']))
-                # The first line of `adb devices` just says "List of attached devices", so
-                # skip that.
-                devices = []
-                for line in out[1:]:
+                proc = subprocess.Popen([cmd, 'devices'], stdout=subprocess.PIPE)
+                for line in proc.stdout.readlines():
+                    line = str(line)[2:-1]
+                    line = line.rstrip('\\n\\r')
+                    if "List" in line:
+                        continue
+                    if "offline" in line:
+                        continue
                     if not line.strip():
                         continue
-                    if 'offline' in line:
-                        continue
-                    serial, _ = re.split(r'\s+', line, maxsplit=1)
-                    devices.append(serial)
+                    serial = line.split('\\t')
+                    devices.append(serial[0])
                 if device is not None and device[0] in devices:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 os.chdir(maindir)
         except Exception as e:
-            log.error(e)
+            log.error(e,exc_info=True)
             logger.print_on_console(err_msg)
         return status,methodoutput,OUTPUT_CONSTANT,err_msg
 
-    def split_lines(self,s):
-        """Splits lines in a way that works even on Windows and old devices.
-        Windows will see \r\n instead of \n, old devices do the same, old devices
-        on Windows will see \r\r\n."""
-        # rstrip is used here to workaround a difference between splineslines and
-        # re.split:
-        # >>> 'foo\n'.splitlines()
-        # ['foo']
-        # >>> re.split(r'\n', 'foo\n')
-        # ['foo', '']
-        return re.split(r'[\r\n]+', s.rstrip())
+    def package_name(self,apk):
+        packageName = None
+        maindir=os.getcwd()
+        try:
+            aapt_home=os.environ['AAPT_HOME']
+            cmd=aapt_home
+            os.chdir(cmd)
+            cmd = cmd + 'aapt.exe'
+            out = subprocess.Popen([cmd, 'dump','badging',apk],stdout= subprocess.PIPE)
+            for line in out.stdout.readlines():
+                curr_line = str(line)[2:-1]
+                if 'package:' in curr_line:
+                    curr_line = curr_line.strip().split()
+                    packageName = curr_line[1][6:-1]
+            os.chdir(maindir)
+        except Exception as e:
+            log.error(e,exc_info=True)
+            logger.print_on_console(e)
+        return packageName
 
-
-
-
+    def activity_name(self,apk):
+        activityName = None
+        maindir=os.getcwd()
+        try:
+            aapt_home=os.environ['AAPT_HOME']
+            cmd=aapt_home
+            os.chdir(cmd)
+            cmd = cmd + 'aapt.exe'
+            out = subprocess.Popen([cmd, 'dump', 'badging', apk],stdout= subprocess.PIPE)
+            for line in out.stdout.readlines():
+                curr_line = str(line)[2:-1]
+                if 'launchable' in curr_line:
+                    curr_line = curr_line.strip().split()
+                    activityName = curr_line[1][6:-1]
+            os.chdir(maindir)
+        except Exception as e:
+            log.error(e,exc_info=True)
+            logger.print_on_console(e)
+        return activityName

@@ -18,7 +18,7 @@ import logger
 import time
 driver_obj = None
 
-log = logging.getLogger('button_link_keywords_mobility.py')
+log = logging.getLogger('spinner_keywords.py')
 
 class Spinner_Keywords():
 
@@ -244,7 +244,6 @@ class Spinner_Keywords():
 
 
     def select_value_by_text(self,webelement,input,*args):
-        global flag
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -253,6 +252,7 @@ class Spinner_Keywords():
         input=input[0]
         text=[]
         obj=[]
+        global flag
         flag=False
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
@@ -296,6 +296,8 @@ class Spinner_Keywords():
                                     err_msg='invalid input'
                                     log.error('invalid input')
                                     logger.print_on_console(err_msg)
+                            if status == TEST_RESULT_PASS :
+                                break
                             length1=len(text)
                             scrollele11=obj[0]
                             scrollele21=obj[(length1)-1]
@@ -320,6 +322,8 @@ class Spinner_Keywords():
                                 else :
                                     err_msg='invalid input'
                                     log.error('invalid input')
+                            if status == TEST_RESULT_PASS :
+                                break
                             length3=len(text)
                             driver.scroll(scrollele11,scrollele21)
                             if flag == False:
@@ -358,9 +362,9 @@ class Spinner_Keywords():
                                 break
 
 
-                            if className != 'RadioButton':
+                            if className == 'CheckedTextView' :
                                 driver.back()
-                            break
+                                break
 
                     else:
                         err_msg='element is disabled'
@@ -376,7 +380,6 @@ class Spinner_Keywords():
         return status,result,output,err_msg
 
     def verify_selected_value(self,webelement,input,*args):
-        global flag
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -386,6 +389,7 @@ class Spinner_Keywords():
         className=''
         text=[]
         obj=[]
+        global flag
         flag=False
 
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -408,6 +412,7 @@ class Spinner_Keywords():
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                count = len(element)
                                 if count == 0 :
                                     element=driver.find_elements_by_class_name('android.widget.TextView')
                                     className='TextView'
@@ -425,37 +430,44 @@ class Spinner_Keywords():
                                             if input == j.text :
                                                 status=TEST_RESULT_PASS
                                                 result=TEST_RESULT_TRUE
-                                                if status == TEST_RESULT_PASS :
-                                                    driver.back()
-                                                    var='true'
+                                                #if status == TEST_RESULT_PASS :
+                                                driver.back()
+                                                var='true'
                                                 flag=True
+                                                break
                                             else:
                                                 if var=='' :
                                                     driver.back()
                                                     var='true'
+                                                    break
                                     else :
                                         driver.back()
+                                        var = 'true'
                                         err_msg='invalid input'
                                         log.error('invalid input')
                                         logger.print_on_console(err_msg)
                             else:
                                 for j in obj:
                                     if input is not None:
-                                        selected=j.get_attribute("text")
-                                        if selected.strip() != '':
+                                        selected=j.get_attribute("selected")
+                                        logger.print_on_console(str(selected))
+                                        if str(selected) == 'true':
                                             if input == j.text :
                                                 flag=True
                                                 driver.back()
+                                                var = 'true'
                                                 status=TEST_RESULT_PASS
                                                 result=TEST_RESULT_TRUE
                                                 break
                                             else :
                                                 driver.back()
+                                                var='true'
                                                 err_msg='invalid input'
                                                 log.error('invalid input')
                                                 logger.print_on_console(err_msg)
                                                 break
-
+                            if status == TEST_RESULT_PASS :
+                                break
                             if className !='TextView':
                                 length1=len(text)
                                 if length1 >4 :
@@ -481,10 +493,12 @@ class Spinner_Keywords():
                                                             driver.back()
                                                             var='true'
                                                         flag=True
+                                                        break
                                                     else :
                                                         if var=='' :
                                                             driver.back()
                                                             var='true'
+                                                        break
 
                                             else :
                                                 err_msg='invalid input'
@@ -529,7 +543,6 @@ class Spinner_Keywords():
 
 
     def select_value_by_index(self,webelement,input,*args):
-        global flag
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -538,6 +551,7 @@ class Spinner_Keywords():
         className=''
         input=int(input[0])
         obj=[]
+        global flag
         flag=False
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
@@ -558,6 +572,7 @@ class Spinner_Keywords():
 
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
+                                count=len(element)
                                 className='RadioButton'
                                 if count == 0 :
                                     element=driver.find_elements_by_class_name('android.widget.TextView')
@@ -581,6 +596,8 @@ class Spinner_Keywords():
                                 err_msg='invalid input'
                                 log.error('invalid input')
                                 logger.print_on_console(err_msg)
+                            if status == TEST_RESULT_PASS :
+                                break
                             length1=len(text)
                             scrollele11=obj[0]
                             scrollele21=obj[(length1)-1]
@@ -604,6 +621,8 @@ class Spinner_Keywords():
                                 err_msg='invalid input'
                                 log.error('invalid input')
                                 logger.print_on_console(err_msg)
+                            if status == TEST_RESULT_PASS :
+                                break
                             length3=len(text)
                             driver.scroll(scrollele11,scrollele21)
 
@@ -641,10 +660,11 @@ class Spinner_Keywords():
                                     logger.print_on_console(err_msg)
                                     if className == 'CheckedTextView' :
                                         driver.back()
+                                        var = 'true'
                                 break
-                            if className != 'RadioButton' :
+                        if className == 'CheckedTextView' :
+                            if var == '':
                                 driver.back()
-
 
                     else:
                         err_msg='element is disabled'
@@ -662,7 +682,6 @@ class Spinner_Keywords():
 
 
     def select_multiple_value_by_index(self,webelement,input,*args):
-        global flag
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -670,6 +689,7 @@ class Spinner_Keywords():
         text=[]
         obj=[]
         className=''
+        global flag
         flag=False
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
@@ -740,7 +760,6 @@ class Spinner_Keywords():
 
 
     def select_multiple_value_by_text(self,webelement,input,*args):
-        global flag
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -748,6 +767,7 @@ class Spinner_Keywords():
         text=[]
         className=''
         obj=[]
+        global flag
         flag=False
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
@@ -828,7 +848,6 @@ class Spinner_Keywords():
         obj=[]
 ##        input=int(input)
         count=0
-        flag=False
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
@@ -948,7 +967,6 @@ class Spinner_Keywords():
 
 
     def get_selected_value(self,webelement,input,*args):
-        global flag
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=None
@@ -957,6 +975,7 @@ class Spinner_Keywords():
         text=[]
         obj=[]
 ##        input=int(input[0])
+        global flag
         flag=False
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
@@ -978,6 +997,7 @@ class Spinner_Keywords():
                             if count == 0 :
                                 element=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 className='RadioButton'
+                                count = len(element)
                                 if count == 0 :
                                     element=driver.find_elements_by_class_name('android.widget.TextView')
                                     className='TextView'
@@ -1063,7 +1083,6 @@ class Spinner_Keywords():
         obj=[]
 ##        input=int(input)
         count=0
-        flag=False
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:

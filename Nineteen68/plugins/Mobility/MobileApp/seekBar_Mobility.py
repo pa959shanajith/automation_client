@@ -16,7 +16,7 @@ import logging
 import logger
 import time
 
-log = logging.getLogger('button_link_keywords_mobility.py')
+log = logging.getLogger('seekBar_Mobility.py')
 
 class Seek_Bar_Keywords():
 

@@ -16,7 +16,7 @@ import install_and_launch
 import logging
 import logger
 
-log = logging.getLogger('radio_button_keywords_mobility.py')
+log = logging.getLogger('picker_wheel_ios.py')
 
 class Picker_Wheel_Keywords():
     # def __init__(self):

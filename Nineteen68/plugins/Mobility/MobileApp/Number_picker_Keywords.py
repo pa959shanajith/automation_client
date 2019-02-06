@@ -18,7 +18,7 @@ import logger
 import time
 
 
-log = logging.getLogger('button_link_keywords_mobility.py')
+log = logging.getLogger('Number_picker_keywords.py')
 
 class Number_Picker():
 

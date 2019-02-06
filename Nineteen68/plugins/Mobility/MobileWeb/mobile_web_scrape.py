@@ -13,7 +13,7 @@ import core_utils
 import platform
 import logger
 
-browserobj = browserops_MW.BrowserOperations()
+#browserobj = browserops_MW.BrowserOperations()
 clickandadd_MWoj = clickandadd_MW.clickandadd_MW()
 fullscrape_MWobj = fullscrape_MW.fullscrape_MW()
 

@@ -131,8 +131,12 @@ class BrowserKeywords():
                     ##            desired_caps['appium-version'] = '1.4.0'
                     desired_caps['newCommandTimeout'] = '36000'
                     device_version= subprocess.check_output(["adb", "shell", "getprop ro.build.version.release"])
+                    device_version=str(device_version)[2:-1]
                     device_version_data =device_version.split('\r')
-                    if str(input_list[1]) == str(device_version_data[0]):
+                    version = device_version_data[-2]
+                    if (version[0] == '\n'):
+                        version = version[1:]
+                    if str(input_list[1]) == str(version):
                         driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
                         logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
                         driver.get(domconstants_MW.BLANK_PAGE)
