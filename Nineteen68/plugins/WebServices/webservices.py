@@ -348,16 +348,17 @@ class WSkeywords:
             #added status code
             self.baseResHeader['StatusCode']=response.status_code
             log.info(ws_constants.RESPONSE_HEADER+'\n'+str(self.baseResHeader))
-            self.baseResBody=str(response.content).replace("&gt;",">").replace("&lt;","<")
-            log.info(ws_constants.RESPONSE_BODY+'\n'+str(self.baseResBody))
+            resp_content = response.content.decode("utf-8") if (type(response.content)==bytes) else response.content
+            self.baseResBody=resp_content.replace("&gt;",">").replace("&lt;","<")
+            log.info(ws_constants.RESPONSE_BODY+'\n'+self.baseResBody)
             log.debug(STATUS_METHODOUTPUT_UPDATE)
             status = ws_constants.TEST_RESULT_PASS
             methodoutput = ws_constants.TEST_RESULT_TRUE
-            output=(self.baseResHeader,str(self.baseResBody).replace("&gt;",">").replace("&lt;","<"))
+            output=(self.baseResHeader,self.baseResBody)
         except Exception as e:
-            log.error(e)
-            log.info(e)
             err_msg=ws_constants.METHOD_INVALID_INPUT
+            log.error(err_msg)
+            log.error(e,exc_info=True)
             logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,output
@@ -568,7 +569,7 @@ class WSkeywords:
                 res = result[2]
                 if type(res) == tuple:
                     for key in res[0]:
-                        headerresp = headerresp +str(key) + ":" + str (res[0][key]) + "##"
+                        headerresp = headerresp +str(key) + ":" + str(res[0][key]) + "##"
                     datasize = sys.getsizeof(res[1])
                     kilobytes = datasize/1024
                     megabytes = kilobytes/1024
@@ -582,14 +583,14 @@ class WSkeywords:
                     for key in res:
                         headerresp = headerresp +str(key) + ":" + str (res[key]) + "##"
                     response=headerresp+'rEsPONseBOdY: '
-            response = str(response)
+            response = response.decode('utf-8') if (type(response)==bytes) else str(response)
             if response == '':
                 response = 'fail'
             if testcasename == '':
-                response = unicode(response, "utf-8")
                 socketIO.emit('result_debugTestCaseWS',response)
         except Exception as e:
             logger.print_on_console(e)
+            log.error(e,exc_info=True)
         return result
 
      def getHeader(self,*args):
@@ -668,8 +669,8 @@ class WSkeywords:
                             methodoutput = ws_constants.TEST_RESULT_TRUE
                             if 'soap:Envelope' in self.baseResBody:
                                 from lxml import etree as et
-                                root = et.fromstring(self.baseResBody)
-                                respBody = et.tostring(root,pretty_print=True)
+                                root = et.fromstring(bytes(self.baseResBody,'utf-8'))
+                                respBody = str(et.tostring(root,pretty_print=True))
                                 if respBody.find(args[0])==-1:
                                     status = ws_constants.TEST_RESULT_FAIL
                                     methodoutput = ws_constants.TEST_RESULT_FALSE
@@ -680,7 +681,7 @@ class WSkeywords:
                         if not flag:
                             output= self.baseResBody
                     except Exception as e:
-                        log.error(e)
+                        log.error(e,exc_info=True)
                         output= self.baseResBody
             elif len(args) == 2:
                 key=args[0]
@@ -816,7 +817,6 @@ class WSkeywords:
                 else:
                     self.client_key_path = "RSAPRIVATEKEY.pem"
                 self.server_cert_path = "TRUSTSTORECERT.pem"
-
         except Exception as e:
             log.error(e)
             logger.print_on_console(str(e))
@@ -857,51 +857,34 @@ class WSkeywords:
                     # if server side certificates are available
                     if (not (self.server_cert_path == '' or self.server_cert_path == None)):
                         log.debug('TWO WAY HANDSHAKE with basic authentication')
-                        response = requests.post(self.baseEndPointURL,
-                                                    data = self.baseReqBody,
-                                                    headers=self.baseReqHeader,
-                                                    cert=cert,
-                                                    verify=self.server_cert_path,
-                                                    auth=(self.auth_uname,self.auth_pass))
+                        response = requests.post(self.baseEndPointURL, data = self.baseReqBody,
+                            headers=self.baseReqHeader, cert=cert, verify=self.server_cert_path,
+                            auth=(self.auth_uname,self.auth_pass))
                     else:
                         log.debug('ONE WAY HANDSHAKE with basic authentication')
-                        response = requests.post(self.baseEndPointURL,
-                                                        data = self.baseReqBody,
-                                                        headers=self.baseReqHeader,
-                                                        cert=cert,
-                                                        verify=False,
-                                                        auth=(self.auth_uname,self.auth_pass))
+                        response = requests.post(self.baseEndPointURL, data = self.baseReqBody,
+                            headers=self.baseReqHeader, cert=cert, verify=False,
+                            auth=(self.auth_uname,self.auth_pass))
                 else:
                     if (not (self.server_cert_path == '' or self.server_cert_path == None)):
                         log.debug('TWO WAY HANDSHAKE without basic authentication')
-                        response = requests.post(self.baseEndPointURL,
-                                                    data = self.baseReqBody,
-                                                    headers=self.baseReqHeader,
-                                                    cert=cert,
-                                                    verify=self.server_cert_path
-                                                    #auth=(self.auth_uname,self.auth_pass)
-                                                    )
+                        response = requests.post(self.baseEndPointURL, data = self.baseReqBody,
+                            headers=self.baseReqHeader, cert=cert,
+                            verify=self.server_cert_path)
                     else:
                         log.debug('ONE WAY HANDSHAKE without basic authentication')
-                        response = requests.post(self.baseEndPointURL,
-                                                        data = self.baseReqBody,
-                                                        headers=self.baseReqHeader,
-                                                        cert=cert,
-                                                        verify=False
-                                                        #auth=(self.auth_uname,self.auth_pass)
-                                                        )
+                        response = requests.post(self.baseEndPointURL, data = self.baseReqBody,
+                            headers=self.baseReqHeader, cert=cert, verify=False)
             else:
                 response = requests.post(self.baseEndPointURL,data=self.baseReqBody,headers=self.baseReqHeader)
         except Exception as e:
             log.error(e)
             if '[SSL: CERTIFICATE_VERIFY_FAILED]' in str(e):
                 err_msg = 'Certificate Mismatched.'
-                logger.print_on_console('Certificate Mismatched.')
             else:
-                log.error(str(e))
-                log.info(str(e))
                 err_msg=ws_constants.METHOD_INVALID_INPUT
-                logger.print_on_console(err_msg)
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         return response,err_msg
 
      def parse_xml(self,input_xml,path,value,attribute_name,flag):
