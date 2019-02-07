@@ -80,9 +80,24 @@ class Highlight():
                             time.sleep(sec)
                     log.info('Before getting the original style .....')
                     original_style = element.get_attribute('style')
+                    original_style_background = None
+                    original_style_border = None
+                    original_style_outline = None
+                    try:
+                        original_style_background = webElement.value_of_css_property('background')
+                    except AttributeError:
+                        log.info('Attribute error: property not found')
+                    try:
+                        original_style_border = webElement.value_of_css_property('border')
+                    except AttributeError:
+                        log.info('Attribute error: property not found')
+                    try:
+                        original_style_outline = webElement.value_of_css_property('outline')
+                    except AttributeError:
+                        log.info('Attribute error: property not found')
                     log.info('Original style obtained.....')
                     log.info('Before highlighting .....')
-                    apply_style(str(original_style) + "background: #fff300; border: 2px solid #cc3300;outline: 2px solid #fff300;", 3)
+                    apply_style(str(original_style) + "background: #fff300 !important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;", 3)
                     log.info('Element highlighted .....')
 ##                    if (driver.capabilities['version'] != unicode(8)):
 ##                        log.info('FILE: highlight.py , DEF: highlight1() , MSG: Before removing the style for ie8 .....')
@@ -90,9 +105,16 @@ class Highlight():
 ##                            apply_style(original_style, 0)
 ##                            log.info('Removed the style for ie8 .....')
 ##                    else:
+                    extra_style = ""
+                    if original_style_background is None:
+                        extra_style = extra_style + "background: 0; "
+                    if original_style_border is None:
+                        extra_style = extra_style + "border: 0px none; "
+                    if original_style_outline is None:
+                        extra_style = extra_style + "outline: none"
                     log.info('Before removing the style for other browsers .....')
                     if(action!='OBJECTMAPPER'):
-                        apply_style(str(original_style) + "background: 0; border: 0px none 0; outline: none", 0)
+                        apply_style(str(original_style) + extra_style, 0)
                         log.info('Removed the style for other browsers .....')
 
             def is_int(url):
@@ -172,7 +194,7 @@ class Highlight():
 ##                            new_properties=element_properties[0];
 ##                            print 'New Properties: ',new_properties
                             highlight1(webElement[0])
-                            if cmp(element,new_properties)!=0:
+                            if (element>new_properties)-(element<new_properties)!=0:
                                 log.info('object properties changed')
                                 changedobject.append(new_properties)
                             else:
@@ -239,7 +261,7 @@ class Highlight():
                             log.info('Actual element Properties: ',new_properties)
 
                             highlight1(webElement[0])
-                            if cmp(element,new_properties)!=0:
+                            if (element>new_properties)-(element<new_properties)!=0:
                                 log.info('object properties changed')
                                 changedobject.append(new_properties)
 
@@ -262,6 +284,7 @@ class Highlight():
 
             status = domconstants_MW.STATUS_SUCCESS
         except Exception as e:
+            log.error(e,exc_info=True)
             Exceptions_MW.error(e)
             status= domconstants_MW.STATUS_FAIL
         log.info('Highlight method execution done ')

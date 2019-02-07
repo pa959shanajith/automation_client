@@ -18,7 +18,7 @@ import logger
 import time
 
 
-log = logging.getLogger('button_link_keywords_mobility.py')
+log = logging.getLogger('Timepicker_Keywords_Mobility.py')
 
 class Time_Keywords():
 
@@ -34,8 +34,8 @@ class Time_Keywords():
         Tflag1 =False
         Tflag2 =False
         input_date=input[0].split(':')
-        
-        
+
+
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
@@ -52,7 +52,7 @@ class Time_Keywords():
                         count= len(Date_picker)
                         Date_picker2=driver.find_elements_by_class_name('android.widget.RadialTimePickerView$RadialPickerTouchHelper')
                         count2= len(Date_picker2)
-                        
+
                         if count2 == 12 :
                             if input_date[0] !='':
                                 inphr = int(input_date[0]) - 1
@@ -89,8 +89,8 @@ class Time_Keywords():
                                 err_msg='Invalid input'
                                 log.error('Invalid input')
                                 logger.print_on_console(err_msg)
-                        
-                        
+
+
                         elif count == 1:
                             if input_date[0] !='':
                                 element=driver.find_elements_by_class_name('android.widget.EditText')

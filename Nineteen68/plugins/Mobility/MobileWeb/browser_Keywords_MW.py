@@ -30,6 +30,7 @@ if SYSTEM_OS!='Darwin':
     import win32gui
     import win32api
 import readconfig
+import browserops_MW
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
 class TestThread(threading.Thread):
     """Test Worker Thread Class."""
@@ -75,6 +76,7 @@ class BrowserKeywords():
             time.sleep(15)
             logger.print_on_console('Server started')
         except Exception as e:
+            log.error(e,exc_info=True)
             logger.print_on_console('Exception in starting server')
 
     def openBrowser(self, webelement, inputs, *args):
@@ -114,37 +116,42 @@ class BrowserKeywords():
                     result = webconstants_MW.TEST_RESULT_TRUE
                     status = webconstants_MW.TEST_RESULT_PASS
                 else:
-                    self.start_server()
-                    obj = Singleton_DriverUtil()
-                    # Logic to make sure that logic of usage of existing driver is not applicable to execution
-
+                    browserops_object = browserops_MW.BrowserOperations()
                     input_list = inputs
                     device_id = input_list[0]
-                    time.sleep(5)
-                    desired_caps = {}
-                    desired_caps['platformName'] = 'Android'
-                    desired_caps['platformVersion'] =input_list[1]
-
-                    desired_caps['deviceName'] = input_list[0]
-                    desired_caps['udid'] = input_list[0]
-                    desired_caps['browserName'] = 'Chrome'
-                    ##            desired_caps['appium-version'] = '1.4.0'
-                    desired_caps['newCommandTimeout'] = '36000'
-                    device_version= subprocess.check_output(["adb", "shell", "getprop ro.build.version.release"])
-                    device_version_data =device_version.split('\r')
-                    if str(input_list[1]) == str(device_version_data[0]):
-                        driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
-                        logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
-                        driver.get(domconstants_MW.BLANK_PAGE)
-                        driver_obj = driver
-                        logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
-                        result = webconstants_MW.TEST_RESULT_TRUE
-                        status = webconstants_MW.TEST_RESULT_PASS
-                    else:
-                        logger.log('Invalid Input')
-                        mobile_key_objects.custom_msg.append("Invalid Input")
-                        status = webconstants_MW.TEST_RESULT_FAIL
-                        logger.print_on_console("Invalid Input")
+                    if device_id == 'wifi':
+                        device_id=browserops_object.wifi_connect()
+                    if device_id != '':
+                        self.start_server()
+                        obj = Singleton_DriverUtil()
+                        # Logic to make sure that logic of usage of existing driver is not applicable to execution
+                        time.sleep(5)
+                        desired_caps = {}
+                        desired_caps['platformName'] = 'Android'
+                        desired_caps['platformVersion'] =input_list[1]
+                        desired_caps['deviceName'] = device_id
+                        desired_caps['udid'] = device_id
+                        desired_caps['browserName'] = 'Chrome'
+                        desired_caps['newCommandTimeout'] = '36000'
+                        device_version= subprocess.check_output(["adb","-s",device_id, "shell", "getprop ro.build.version.release"])
+                        device_version=str(device_version)[2:-1]
+                        device_version_data =device_version.split('\\r')
+                        version = device_version_data[-2]
+                        if (version[0] == '\\n'):
+                            version = version[1:]
+                        if str(input_list[1]) == str(version):
+                            driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
+                            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
+                            driver.get(domconstants_MW.BLANK_PAGE)
+                            driver_obj = driver
+                            logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
+                            result = webconstants_MW.TEST_RESULT_TRUE
+                            status = webconstants_MW.TEST_RESULT_PASS
+                        else:
+                            logger.log('Invalid Input')
+                            mobile_key_objects.custom_msg.append("Invalid Input")
+                            status = webconstants_MW.TEST_RESULT_FAIL
+                            logger.print_on_console("Invalid Input")
             except Exception as e:
                 err_msg = 'ERROR OCURRED WHILE OPENING BROWSER'
                 if SYSTEM_OS == 'Darwin':
@@ -154,6 +161,7 @@ class BrowserKeywords():
                         logger.print_on_console(
                             "node_modules Directory not Found in /Nineteen68/plugins/Mobility/")
                 logger.print_on_console("ERROR OCURRED WHILE OPENING BROWSER")
+                log.error(e,exc_info=True)
             return status, result, output, err_msg
 
     def openNewBrowser(self,*args):
@@ -172,6 +180,7 @@ class BrowserKeywords():
             status=webconstants_MW.TEST_RESULT_PASS
             result=webconstants_MW.TEST_RESULT_TRUE
         except Exception as e:
+            log.error(e,exc_info=True)
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
@@ -188,6 +197,7 @@ class BrowserKeywords():
                 status=webconstants_MW.TEST_RESULT_PASS
                 result=webconstants_MW.TEST_RESULT_TRUE
         except Exception as e:
+            log.error(e,exc_info=True)
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
@@ -209,6 +219,7 @@ class BrowserKeywords():
             else:
                 logger.print_on_console(webconstants_MW.INVALID_INPUT)
         except Exception as e:
+            log.error(e,exc_info=True)
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
@@ -225,6 +236,7 @@ class BrowserKeywords():
             obj.execute_key('tab',1)
             obj.execute_key('enter',1)
         except Exception as e:
+            log.error(e,exc_info=True)
             err_msg=self.__web_driver_exception(e)
         return
 
@@ -261,6 +273,7 @@ class BrowserKeywords():
                 log.error(webconstants_MW.INVALID_INPUT)
                 err_msg = webconstants_MW.INVALID_INPUT
         except Exception as e:
+            log.error(e,exc_info=True)
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
@@ -286,6 +299,7 @@ class BrowserKeywords():
                 log.error('Driver object is null')
                 err_msg = 'Driver object is null'
         except Exception as e:
+            log.error(e,exc_info=True)
             err_msg=self.__web_driver_exception(e)
         return status,result,page_title,err_msg
 
@@ -318,6 +332,7 @@ class BrowserKeywords():
                 logger.print_on_console('Driver object is null')
                 err_msg = 'Driver object is null'
         except Exception as e:
+            log.error(e,exc_info=True)
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
@@ -340,6 +355,7 @@ class BrowserKeywords():
                 log.error('Driver object is null')
                 err_msg = 'Driver object is null'
         except Exception as e:
+            log.error(e,exc_info=True)
             err_msg=self.__web_driver_exception(e)
         return status,result,url,err_msg
 
@@ -372,25 +388,27 @@ class BrowserKeywords():
                 logger.print_on_console(webconstants_MW.INVALID_INPUT)
                 err_msg = webconstants_MW.INVALID_INPUT
         except Exception as e:
+            log.error(e,exc_info=True)
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
     def stop_server(self):
-            try:
-                if SYSTEM_OS!= 'Darwin':
-                    import psutil
-                    import os
-                    processes = psutil.net_connections()
-                    for line in processes:
-                        p =  line.laddr
-                        if p[1] == 4723:
-                            os.system("TASKKILL /F /PID " + str(line.pid))
-    ##                        logger.print_on_console('Server stopped')
-                else:
-                    import os
-                    os.system("killall -9 node")
-            except Exception as e:
-                logger.print_on_console('Exception in stopping server')
+        try:
+            if SYSTEM_OS!= 'Darwin':
+                import psutil
+                import os
+                processes = psutil.net_connections()
+                for line in processes:
+                    p =  line.laddr
+                    if p[1] == 4723:
+                        os.system("TASKKILL /F /PID " + str(line.pid))
+##                        logger.print_on_console('Server stopped')
+            else:
+                import os
+                os.system("killall -9 node")
+        except Exception as e:
+            log.error(e,exc_info=True)
+            logger.print_on_console('Exception in stopping server')
 
     def closeBrowser(self,*args):
         status=webconstants_MW.TEST_RESULT_FAIL
@@ -418,19 +436,17 @@ class BrowserKeywords():
 ##                if(len(winHandles) == 1):
 ##                    webdriver_list.pop(len(webdriver_list)-1)
 ##                    print 'Kill driver logic'
-          if SYSTEM_OS== 'Darwin':
-            driver_obj.quit()
-          else:
-            driver_obj.close()
-          self.stop_server()
-          status=webconstants_MW.TEST_RESULT_PASS
-          result=webconstants_MW.TEST_RESULT_TRUE
+            if SYSTEM_OS== 'Darwin':
+                driver_obj.quit()
+            else:
+                driver_obj.close()
+                self.stop_server()
+                status=webconstants_MW.TEST_RESULT_PASS
+                result=webconstants_MW.TEST_RESULT_TRUE
 
         except Exception as e:
-                err_msg=self.__web_driver_exception(e)
-##        else:
-##            logger.print_on_console('For this close browser open browser or open new browser is not present')
-##            log.error('For this close browser open browser or open new browser is not present')
+            log.error(e,exc_info=True)
+            err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
 
@@ -451,6 +467,7 @@ class BrowserKeywords():
                 log.error('Driver object is null')
                 err_msg = 'Driver object is null'
         except Exception as e:
+            log.error(e,exc_info=True)
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
@@ -484,6 +501,7 @@ class BrowserKeywords():
                 log.info('No sub windows to close')
 
         except Exception as e:
+            log.error(e,exc_info=True)
             err_msg=self.__web_driver_exception(e)
             driver_obj.switch_to.window(parent_handle)
         return status,result,output,err_msg
@@ -518,6 +536,7 @@ class BrowserKeywords():
                 log.error("This feature is available only for Internet Explorer.")
                 err_msg = "This feature is available only for Internet Explorer."
         except Exception as e:
+            log.error(e,exc_info=True)
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
@@ -679,6 +698,7 @@ class Singleton_DriverUtil():
                     log.info('geckodriver started')
 
             except Exception as e:
+                log.error(e,exc_info=True)
                 logger.print_on_console(e)
 
         elif(browser_num == '3'):

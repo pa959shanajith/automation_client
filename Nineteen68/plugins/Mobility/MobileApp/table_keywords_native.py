@@ -5,7 +5,7 @@ import install_and_launch
 import logging
 import logger
 
-log = logging.getLogger('table_keywords.py')
+log = logging.getLogger('table_keywords_native.py')
 
 class Table_Keywords():
     # def __init__(self):
