@@ -15,7 +15,7 @@ from socketIO_client import SocketIO,BaseNamespace
 ##desktop_scraping_obj = desktop_scraping.Scrape()
 import os
 import logger
-obj=None
+obj=android_scrapping.InstallAndLaunch()
 import core_utils
 
 class ScrapeWindow(wx.Frame):
@@ -28,7 +28,7 @@ class ScrapeWindow(wx.Frame):
         self.core_utilsobject = core_utils.CoreUtils()
         self.parent = parent
         global obj
-        obj = android_scrapping.InstallAndLaunch()
+        #obj = android_scrapping.InstallAndLaunch()
 
         self.socketIO = socketIO
         apk_path=filePath.split(';')[0]
