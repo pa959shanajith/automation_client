@@ -95,7 +95,7 @@ class InstallAndLaunch():
             log.error(e)
 
     def installApplication(self, apk_path, platform_version, device_name, udid, *args):
-        self.driver=None
+        global driver
         from appium import webdriver
         try:
             if SYSTEM_OS == 'Darwin' :
@@ -181,6 +181,14 @@ class InstallAndLaunch():
                     return self.driver
                 return self.driver
             else:
+                import psutil
+                import os
+                processes = psutil.net_connections()
+                for line in processes:
+                    p = line.laddr
+                    if p[1] == 4723:
+                        return driver
+                self.driver = None
                 device_keywords_object = device_keywords.Device_Keywords()
                 activityName = device_keywords_object.activity_name(apk_path)
                 packageName = device_keywords_object.package_name(apk_path)
@@ -205,6 +213,7 @@ class InstallAndLaunch():
                     self.desired_caps['appPackage'] = packageName
                     self.desired_caps['appActivity'] = activityName
                     self.driver = webdriver.Remote('http://localhost:4723/wd/hub', self.desired_caps)
+                    driver = self.driver
         except Exception as e:
             err = "Not able to install or launch application"
             logger.print_on_console(e)

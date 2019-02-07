@@ -28,24 +28,14 @@ def print_on_console(message,*args):
         caller = getframeinfo(stack()[1][0])
         filename=os.path.basename(caller.filename)[0:-3]
 
-        isunicode = False
-        #for loop to check if the arguments is containing unicode value
-        # isunicode is updated if the arguments contain a unicode
+        resultant=''
+        if isinstance(message,bytes): message=message.decode('utf-8')
+        elif not isinstance(message,str): message=str(message)
         for values in args:
-            if isinstance(values, str):
-                isunicode = True
-        if not isinstance(message,str) and not isunicode:
-            print(sttime + ':  CONSOLE: ' +filename+':'+str(caller.lineno) +' ' +str(message),''.join(str(i) if (type(i)==str or type(i)==str) else  repr(i) for i in args))
-        else:
-            # code checks if the value has a unicode and appends accordingly
-            resultant=''
-            for values in args:
-                if not isinstance(values,str):
-                    values=str(values)
-                if not isinstance(message,str):
-                    message=str(message)
-                resultant=resultant+values
-            print(sttime + ':  CONSOLE: ' +filename+':'+str(caller.lineno) +' ' + message + resultant)
+            if isinstance(values,bytes): values=values.decode('utf-8')
+            elif not isinstance(values,str): values=str(values)
+            resultant+=values
+        print(sttime + ':  CONSOLE: ' +filename + ':'+str(caller.lineno) +' ' + message + resultant)
     except Exception as e:
         import traceback
         print(traceback.format_exc())
@@ -53,7 +43,3 @@ def print_on_console(message,*args):
 
 def log(message):
     print(message)
-
-
-
-

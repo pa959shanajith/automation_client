@@ -116,64 +116,19 @@ class Controller():
                 self.get_all_the_imports('Generic')
                 import generic_dispatcher
                 self.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
-                try:
-                    self.__load_mobile_web()
-                except Exception as e:
-                    print (e)
-
-                try:
-                    self.__load_system()
-                except Exception as e:
-                    print (e)
-
-                try:
-                    self.__load_mainframe()
-                except Exception as e:
-                    print (e)
-
-                try:
-                    self.__load_sap()
-                except Exception as e:
-                    print (e)
-
-                try:
-                    self.__load_desktop()
-                except Exception as e:
-                    print (e)
-
-                try:
-                    self.__load_web()
-                except Exception as e:
-                    print (e)
-
-                try:
-                    self.__load_oebs()
-                except Exception as e:
-                    print (e)
-
-                try:
-                    self.__load_webservice()
-                except Exception as e:
-                    print (e)
-
-                try:
-                    self.__load_mobile_app()
-                except Exception as e:
-                    print (e)
-
-
-
-
-
-
-
-
-
+                # Load all plugins
+                self.__load_mobile_web()
+                self.__load_system()
+                self.__load_mainframe()
+                self.__load_sap()
+                self.__load_desktop()
+                self.__load_web()
+                self.__load_oebs()
+                self.__load_webservice()
+                self.__load_mobile_app()
         except Exception as e:
             logger.print_on_console('Error loading Generic plugin')
-            import traceback
-            traceback.print_exc()
-            log.error(e)
+            log.error(e,exc_info=True)
 
     def __load_mobile_web(self):
         try:
@@ -562,7 +517,7 @@ class Controller():
                 if self.core_utilsobject.getdatasize(display_keyword_response[1],'mb') < 10:
                     if 'soap:Envelope' in display_keyword_response[1]:
                         from lxml import etree
-                        root = etree.fromstring(display_keyword_response[1])
+                        root = etree.fromstring(bytes(display_keyword_response[1],'utf-8'))
                         respBody = etree.tostring(root,pretty_print=True)
                         logger.print_on_console('Response Body: \n',respBody,'\n')
                     else:

@@ -89,7 +89,6 @@ class GetParam():
                     log.debug('Retrieved file name and sheetname ')
                     if os.access(filepath, os.R_OK):
 ##                        log.info('File is accesible')
-##                        print '\n'
 ##                        logger.print_on_console('File is accesible')
                         wb = open_workbook(filepath)
                         log.info('Work Book object is created')
