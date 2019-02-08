@@ -13,18 +13,11 @@ from xml.sax.handler import ContentHandler
 import xml.sax
 import xml.parsers.expat
 import configparser
-import uuid,json
-import os
-import subprocess
-import time
+import uuid, json, os, psutil, subprocess, time, re
+from collections import OrderedDict
 from constants import *
 from mobile_app_constants import *
-import logger
-import subprocess
-import socket
-import base64
-import platform
-import logging
+import logger, subprocess, socket, base64, platform, logging
 import device_keywords
 log = logging.getLogger('android_scrapping.py')
 
@@ -79,7 +72,6 @@ class InstallAndLaunch():
     def stop_server(self):
         try:
             if SYSTEM_OS != 'Darwin':
-                import psutil
                 processes = psutil.net_connections()
                 for line in processes:
                     p = line.laddr
@@ -109,16 +101,12 @@ class InstallAndLaunch():
                 self.desired_caps['fullReset'] = False
                 self.desired_caps['newCommandTimeout'] = 3600
                 self.desired_caps['launchTimeout'] = 180000
-
                 self.driver = "pass"
-
-                current_dir = (os.getcwd())
                 dir_path = os.path.dirname(os.path.realpath(__file__))
                 # set IP
 
                 if (subprocess.getoutput('pgrep xcodebuild') == ''):
                     try:
-
                         with open(dir_path + "/Nineteen68UITests/data.txt",'wb') as f:
                             f.write(self.desired_caps['Ip_Address'])  # send IP
                     except Exception as e:
@@ -181,8 +169,6 @@ class InstallAndLaunch():
                     return self.driver
                 return self.driver
             else:
-                import psutil
-                import os
                 processes = psutil.net_connections()
                 for line in processes:
                     p = line.laddr
@@ -216,7 +202,7 @@ class InstallAndLaunch():
                     driver = self.driver
         except Exception as e:
             err = "Not able to install or launch application"
-            logger.print_on_console(e)
+            logger.print_on_console(err)
             log.error(e,exc_info=True)
         return self.driver
 
@@ -245,12 +231,8 @@ class InstallAndLaunch():
             image_data = fragments.split("!@#$%^&*()")[1]
             height_data = fragments.split("!@#$%^&*()")[2]
             width_data = fragments.split("!@#$%^&*()")[3]
-
-
             data = json.loads(data)
-            from collections import OrderedDict
             jsonArray = OrderedDict()
-
             jsonArray['view'] = data
             jsonArray['mirror'] = image_data
             jsonArray['mirrorwidth'] = width_data
@@ -258,11 +240,7 @@ class InstallAndLaunch():
             with open("savefile.json", 'w') as outfile:
                 logger.print_on_console('Writing scrape data to domelements.json file')
                 json.dump(jsonArray, outfile, indent=4, sort_keys=False)
-            outfile.close()
-
-
             return jsonArray
-
 
         if self.driver != None:
             page_source=self.driver.page_source
@@ -295,7 +273,6 @@ class InstallAndLaunch():
 class BuildJson:
 
     def xmltojson(self,driver):
-        import re
         global ScrapeList
         global XpathList
         global label
@@ -371,9 +348,7 @@ class BuildJson:
 
 
     def save_json(self,scrape_data,driver):
-        from collections import OrderedDict
         jsonArray=OrderedDict()
-
         jsonArray['view']= scrape_data
 ##        jsonArray['mirror']='IMAGEEEEE'
         jsonArray['mirror']=driver.get_screenshot_as_base64()
@@ -507,4 +482,3 @@ class Exact(xml.sax.handler.ContentHandler):
 
     def characters(self, data):
         self.buffer += data
-
