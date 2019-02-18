@@ -500,9 +500,9 @@ class DropdownKeywords():
                     log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                     select = Select(webelement)
                     index = select.all_selected_options
-                    log.info('Index value')
-                    log.info(index)
-                    if (len(index) == '1'):
+                    log.debug('Index value')
+                    log.debug(index)
+                    if (len(index) == 1):
                         output = select.all_selected_options[i].text
                         str(output)
                         logger.print_on_console(output)
