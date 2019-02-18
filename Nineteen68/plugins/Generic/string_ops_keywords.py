@@ -224,32 +224,17 @@ class StringOperation:
             if not (input is None or input is ''):
                 coreutilsobj=core_utils.CoreUtils()
                 input=coreutilsobj.get_UTF_8(input)
-                input_len = len(input)
-                if (input_len % 2 == 0):
-                    even_inp = input_len/2
-                    output = input[even_inp]
-                    output=coreutilsobj.get_UTF_8(output)
-##                    logger.print_on_console('Result : ',output)
-                    log.info('Result : ')
-                    log.info(output)
-                    status=generic_constants.TEST_RESULT_PASS
-                    result=generic_constants.TEST_RESULT_TRUE
-                else:
-                    odd_inp = input_len/2
-                    output = input[odd_inp]
-##                    logger.print_on_console('Result : ',output)
-                    output=coreutilsobj.get_UTF_8(output)
-                    log.info('Result : ')
-                    log.info(output)
-                    status=TEST_RESULT_PASS
-                    result=TEST_RESULT_TRUE
+                output = coreutilsobj.get_UTF_8(input[int(len(input)/2)])
+                #logger.print_on_console('Result: '+str(output))
+                log.info('Result:')
+                log.info(output)
+                status=generic_constants.TEST_RESULT_PASS
+                result=generic_constants.TEST_RESULT_TRUE
             else:
-                #log.error(INVALID_INPUT)
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                #logger.print_on_console(INVALID_INPUT)
         except Exception as e:
+            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             log.error(e)
-            logger.print_on_console(e)
         if err_msg!=None:
             logger.print_on_console(err_msg)
         return status,result,output,err_msg
