@@ -16,6 +16,7 @@ from pywinauto.win32functions import SetForegroundWindow
 import os
 import time
 import controller
+import readconfig
 
 class Cropandadd():
     def startcropandadd(self,wx_window):
@@ -62,7 +63,7 @@ class Cropandadd():
                     RGB_img_crop = image_orig[iy:y,ix:x]
                     cv2.imwrite("cropped.png", RGB_img_crop)
                     with open("cropped.png", "rb") as imageFile:
-                        RGB_img_crop_im = base64.b64encode(imageFile.read())
+                        RGB_img_crop_im = str(base64.b64encode(imageFile.read()))
                     if(ix!=x and iy!=y):
                         if(constant_image):
                             custname = 'const_img_object_'+str(ix)+'_'+str(iy)+'_'+str(x)+'_'+str(y)
@@ -70,7 +71,7 @@ class Cropandadd():
                         else:
                             custname = 'img_object_'+str(ix)+'_'+str(iy)+'_'+str(x)+'_'+str(y)
                             tag = 'relative'
-                        self.data['view'].append({'custname': custname,'cord':RGB_img_crop_im,'tag':tag,'width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix,'xpath':'iris'})
+                        self.data['view'].append({'custname': custname,'cord':RGB_img_crop_im,'tag':tag,'width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix,'xpath':'iris','objectType':''})
                     if(constant_image):
                         cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,0,255),1)
                     else:
@@ -105,15 +106,27 @@ class Cropandadd():
             logger.print_on_console("Error occured in capturing iris object")
 
     def stopcropandadd(self):
-        im = PIL.ImageGrab.grab()
-        im.save('out.png')
-        with open("out.png", "rb") as imageFile:
-            self.data['mirror'] = base64.b64encode(imageFile.read())
-        os.remove('out.png')
-        with open('domelements.json', 'w') as outfile:
-            log.info('Opening domelements.json file to write scraped objects')
-            json.dump(self.data, outfile, indent=4, sort_keys=False)
-            log.info('crop and add is dumped into domelements.json file')
-        outfile.close()
-        self.stopflag = True
-        return self.data
+        try:
+            im = PIL.ImageGrab.grab()
+            im.save('out.png')
+            with open("out.png", "rb") as imageFile:
+                self.data['mirror'] = str(base64.b64encode(imageFile.read()))
+            os.remove('out.png')
+            with open('domelements.json', 'w') as outfile:
+                log.info('Opening domelements.json file to write scraped objects')
+                json.dump(self.data, outfile, indent=4, sort_keys=False)
+                log.info('crop and add is dumped into domelements.json file')
+            outfile.close()
+            self.stopflag = True
+            configvalues = readconfig.readConfig().readJson()
+            if(configvalues['prediction_for_iris_objects'].lower()=='yes'):
+                logger.print_on_console("Starting prediction...")
+                import label_image
+                label = label_image.LabelImage()
+                res = label.start(self.data['view'])
+                for i in range(0,len(self.data['view'])):
+                    self.data['view'][i]['objectType'] = res[self.data['view'][i]['custname']]
+            return self.data
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console("Error occured in stop IRIS")
