@@ -72,52 +72,57 @@ def load_labels(label_file):
 
 class LabelImage():
     def start(self,view):
-        model_file = os.environ['NINETEEN68_HOME'] + '/Lib/site-packages/prediction/retrained_graph.pb'
-        label_file = os.environ['NINETEEN68_HOME'] + '/Lib/site-packages/prediction/retrained_labels.txt'
-        input_height = 299
-        input_width = 299
-        input_mean = 0
-        input_std = 255
-        #input_layer = "input"
-        #output_layer = "InceptionV3/Predictions/Reshape_1"
-        input_layer = "Placeholder"
-        output_layer = "final_result"
-        graph = load_graph(model_file)
-        input_name = "import/" + input_layer
-        output_name = "import/" + output_layer
-        input_operation = graph.get_operation_by_name(input_name)
-        output_operation = graph.get_operation_by_name(output_name)
-        prediction_results = {}
+        try:
+            model_file = os.environ['NINETEEN68_HOME'] + '/Lib/site-packages/prediction/retrained_graph.pb'
+            label_file = os.environ['NINETEEN68_HOME'] + '/Lib/site-packages/prediction/retrained_labels.txt'
+            input_height = 299
+            input_width = 299
+            input_mean = 0
+            input_std = 255
+            #input_layer = "input"
+            #output_layer = "InceptionV3/Predictions/Reshape_1"
+            input_layer = "Placeholder"
+            output_layer = "final_result"
+            graph = load_graph(model_file)
+            input_name = "import/" + input_layer
+            output_name = "import/" + output_layer
+            input_operation = graph.get_operation_by_name(input_name)
+            output_operation = graph.get_operation_by_name(output_name)
+            prediction_results = {}
 
-        for obj in view:
-            byte_mirror = base64.b64encode(obj['cord'].encode('utf-8'))
-            b64 = base64.b64decode(byte_mirror)
-            mirror = b64[2:len(b64)-1]
-            with open('test.png','wb') as f:
-                f.write(base64.b64decode(mirror))
+            labels = load_labels(label_file)
             file_name = os.environ['NINETEEN68_HOME'] + '/test.png'
 
-            t = read_tensor_from_image_file(
-              file_name,
-              input_height=input_height,
-              input_width=input_width,
-              input_mean=input_mean,
-              input_std=input_std)
-
             with tf.Session(graph=graph) as sess:
-                results = sess.run(output_operation.outputs[0], {
-                    input_operation.outputs[0]: t
-                })
-            results = np.squeeze(results)
+                for obj in view:
+                    byte_mirror = base64.b64encode(obj['cord'].encode('utf-8'))
+                    b64 = base64.b64decode(byte_mirror)
+                    mirror = b64[2:len(b64)-1]
+                    with open('test.png','wb') as f:
+                        f.write(base64.b64decode(mirror))
+                    t = read_tensor_from_image_file(
+                      file_name,
+                      input_height=input_height,
+                      input_width=input_width,
+                      input_mean=input_mean,
+                      input_std=input_std)
+                    results = sess.run(output_operation.outputs[0], {
+                        input_operation.outputs[0]: t
+                    })
+                    results = np.squeeze(results)
 
-            top_k = results.argsort()[-5:][::-1]
-            labels = load_labels(label_file)
-            result = {}
-            for i in top_k:
-                result[results[i]] = labels[i]
-            if(float(max(result.keys()))>0.75):
-                prediction_results[obj['custname']] = result[max(result.keys())]
-            else:
-                prediction_results[obj['custname']] = ''
-        os.remove(os.environ['NINETEEN68_HOME'] + '/test.png')
+                    top_k = results.argsort()[-5:][::-1]
+
+                    result = {}
+                    for i in top_k:
+                        result[results[i]] = labels[i]
+                    if(float(max(result.keys()))>0.75):
+                        prediction_results[obj['custname']] = result[max(result.keys())]
+                        prediction_results[obj['custname']] = prediction_results[obj['custname']][0].upper() + prediction_results[obj['custname']][1:]
+                    else:
+                        prediction_results[obj['custname']] = 'Unable to recognize object type'
+            os.remove(os.environ['NINETEEN68_HOME'] + '/test.png')
+        except Exception as e:
+            logger.print_on_console('Error occured while labeling iris object type')
+            log.error(e)
         return prediction_results
