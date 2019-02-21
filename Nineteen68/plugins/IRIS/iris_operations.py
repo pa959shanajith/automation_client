@@ -11,8 +11,11 @@ from constants import *
 log = logging.getLogger('iris_operations.py')
 import os
 from pytesseract import pytesseract
-import base64
+import base64,json
 from pyrobot import Robot
+import imutils
+import sys,math
+from uuid import uuid4
 vertical = []
 horizontal = []
 verifyexists = []
@@ -94,8 +97,11 @@ def data_in_cells(image,row,column):
         logger.print_on_console("Invalid Input for row and column number")
     return text
 
-def gotoobject(elem, number):
-    img_rgb = elem.decode('base64')
+def gotoobject(elem):
+    byte_mirror = base64.b64encode(elem['cord'].encode('utf-8'))
+    b64 = base64.b64decode(byte_mirror)
+    mirror = b64[2:len(b64)-1]
+    img_rgb = base64.b64decode(mirror)
     fh = open("sample.png", "wb")
     fh.write(img_rgb)
     fh.close()
@@ -112,28 +118,38 @@ def gotoobject(elem, number):
     loc = np.where( res >= threshold)
     ind = np.unravel_index(np.argmax(res, axis=None), res.shape)
     pt = []
-    #points = []
+    total_points = []
     for pt in zip(*loc[::-1]):
-        #points.append(pt)
+        total_points.append(pt)
         cv2.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0,0,255), 2)
-    #cv2.imwrite('res.png',img_rgb)
-
-##    if(number != None):
-##        if(number>=0 and number<len(points)):
-##            pt = points[number]
-##        else:
-##            logger.print_on_console("Input number exceeds the number of relevant images found.")
-##    else:
-##        pt = (ind[1],ind[0])
-##        print "pt updated",pt
+    #cv2.imwrite('res1.png',img_rgb)
     if(len(pt) > 0):
-        pt = (ind[1],ind[0])
-        pyautogui.moveTo(pt[0]+ int(w/2),pt[1] + int(h/2))
+        if(len(total_points)>1):
+            """If multiple matches are found, choose the one which is closest to the captured coordinates."""
+            point = ()
+            min_dist = sys.maxsize
+            for p in total_points:
+                dist = math.sqrt( (int(elem['coordinates'][0]) - p[0])**2 + (int(elem['coordinates'][1]) - p[1])**2 )
+                if(dist<min_dist):
+                    min_dist = dist
+                    point = p
+        else:
+            point = (ind[1],ind[0])
+        pyautogui.moveTo(point[0]+ int(w/2),point[1] + int(h/2))
+    else:
+        """If no matches are found, try scaling down the image. If still no match, try scaling up."""
+        point,w,h = scaleUpOrDown(0.2,elem,template,img_rgb)
+        if(len(point)>0):
+            pyautogui.moveTo(point[0]+ int(w/2),point[1] + int(h/2))
+        else:
+            point,w,h = scaleUpOrDown(2.0,elem,template,img_rgb)
+            if(len(point)>0):
+                pyautogui.moveTo(point[0]+ int(w/2),point[1] + int(h/2))
     if(os.path.isfile('sample.png')):
         os.remove('sample.png')
     if(os.path.isfile('test.png')):
         os.remove('test.png')
-    return pt
+    return point
 
 def find_relative_image(elements,const_new_coordinates):
     try:
@@ -174,6 +190,99 @@ def find_relative_image(elements,const_new_coordinates):
         logger.print_on_console("Error occured in finding relative image.")
     return rel_image,coordinates
 
+def check_duplicates(scrapedata, socketIO):
+    try:
+        duplicates = []
+        mirror = scrapedata['mirror']
+        byte_mirror = base64.b64encode(mirror.encode('utf-8'))
+        b64 = base64.b64decode(byte_mirror)
+        mirror = b64[2:len(b64)-1]
+        with open('screen.png','wb') as f:
+            f.write(base64.b64decode(mirror))
+        img_rgb = cv2.imread('screen.png')
+        img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
+        for elem in scrapedata['view']:
+            byte_mirror = base64.b64encode(elem['cord'].encode('utf-8'))
+            b64 = base64.b64decode(byte_mirror)
+            mirror = b64[2:len(b64)-1]
+            img = base64.b64decode(mirror)
+            fh = open("sample.png", "wb")
+            fh.write(img)
+            fh.close()
+            template = cv2.imread('sample.png',0)
+            w, h = template.shape[::-1]
+            res = cv2.matchTemplate(img_gray,template,cv2.TM_CCOEFF_NORMED)
+            threshold = 0.9
+            loc = np.where( res >= threshold)
+            ind = np.unravel_index(np.argmax(res, axis=None), res.shape)
+            p = [0,0]
+            points = []
+            for pt in zip(*loc[::-1]):
+                if(not ((pt[0] in range(p[0]-2,p[0]+3)) and (pt[1] in range(p[1]-2,p[1]+3)))):
+                    points.append(pt)
+                cv2.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0,0,255), 2)
+                p = list(pt)
+            #cv2.imwrite('res.png',img_rgb)
+            if(len(points)>1):
+                duplicates.append(elem['custname'])
+        socketIO.emit('iris_operations_result',str(json.dumps(duplicates)))
+        if(os.path.isfile('sample.png')):
+            os.remove('sample.png')
+        if(os.path.isfile('screen.png')):
+            os.remove('screen.png')
+    except Exception as e:
+        log.error(e)
+        logger.print_on_console("Error while checking for duplicate objects.")
+
+def scaleUpOrDown(arg,elem,template,img_rgb):
+    try:
+        point = ()
+        img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
+        w, h = template.shape[::-1]
+        for scale in np.linspace(arg, 1.0, 20)[::-1]:
+            resized = imutils.resize(template, width = int(template.shape[1] * scale))
+            resized_width = resized.shape[1]
+            resized_height = resized.shape[0]
+            res = cv2.matchTemplate(img_gray,resized,cv2.TM_CCOEFF_NORMED)
+            threshold = 0.8
+            loc = np.where( res >= threshold)
+            ind = np.unravel_index(np.argmax(res, axis=None), res.shape)
+            pt = []
+            total_points = []
+            for pt in zip(*loc[::-1]):
+                total_points.append(pt)
+                cv2.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0,0,255), 2)
+            if(len(pt) > 0):
+                if(len(total_points)>1):
+                    point = ()
+                    min_dist = sys.maxsize
+                    for p in total_points:
+                        dist = math.sqrt( (int(elem['coordinates'][0]) - p[0])**2 + (int(elem['coordinates'][1]) - p[1])**2 )
+                        if(dist<min_dist):
+                            min_dist = dist
+                            point = p
+                else:
+                    point = (ind[1],ind[0])
+                break
+    except Exception as e:
+        log.error(e)
+        logger.print_on_console("Error while scaling image.")
+    return point,resized_width,resized_height
+
+def update_dataset(image_data):
+    try:
+        mirror = image_data['cord']
+        byte_mirror = base64.b64encode(mirror.encode('utf-8'))
+        b64 = base64.b64decode(byte_mirror)
+        mirror = b64[2:len(b64)-1]
+        filename = os.environ['NINETEEN68_HOME'] + '/Lib/site-packages/prediction/Dataset/' + str(image_data['type']) + '/' + str(uuid4()).replace("-","")+".png"
+        with open(filename,'wb') as f:
+            f.write(base64.b64decode(mirror))
+        return True
+    except Exception as e:
+        log.error(e)
+        return False
+
 class IRISKeywords():
     def clickiris(self,element,*args):
         status = TEST_RESULT_FAIL
@@ -194,12 +303,7 @@ class IRISKeywords():
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
             else:
-                img = element['cord']
-                res = None
-                if(len(args[0])==1 and args[0][0].isdigit()):
-                    res = gotoobject(img,int(args[0][0])-1)
-                else:
-                    res = gotoobject(img,None)
+                res = gotoobject(element)
             if(len(res)>0):
                 pyautogui.click()
                 status= TEST_RESULT_PASS
@@ -230,12 +334,7 @@ class IRISKeywords():
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
             else:
-                img = element['cord']
-                res = None
-                if(len(args[0]) == 2 and args[0][1].isdigit()):
-                    res = gotoobject(img,int(args[0][1])-1)
-                else:
-                    res = gotoobject(img,None)
+                res = gotoobject(element)
             if(len(res)>0):
                 pyautogui.click()
                 robot = Robot()
@@ -272,9 +371,11 @@ class IRISKeywords():
                             (elem_coordinates[2], elem_coordinates[3])]
                     img,res = find_relative_image(elements, verifyexists)
                 else:
-                    img = element['cord']
+                    byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
+                    b64 = base64.b64decode(byte_mirror)
+                    img = b64[2:len(b64)-1]
                 with open("cropped.png", "wb") as f:
-                    f.write(img.decode('base64'))
+                    f.write(base64.b64decode(img))
                 image = cv2.imread("cropped.png")
                 text = ''
                 if(len(args[0])==1 and args[0][0].lower().strip() == 'select'):
@@ -356,9 +457,11 @@ class IRISKeywords():
                         (elem_coordinates[2], elem_coordinates[3])]
                 img,res = find_relative_image(elements, verifyexists)
             else:
-                img = element['cord']
+                byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
+                b64 = base64.b64decode(byte_mirror)
+                img = b64[2:len(b64)-1]
             with open("cropped.png", "wb") as f:
-                f.write(img.decode('base64'))
+                f.write(base64.b64decode(img))
             img = cv2.imread("cropped.png")
             hough_transform_p(img,1)
             # rotated = imutils.rotate_bound(img, 270)
@@ -394,9 +497,11 @@ class IRISKeywords():
                         (elem_coordinates[2], elem_coordinates[3])]
                 img,res = find_relative_image(elements, verifyexists)
             else:
-                img = element['cord']
+                byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
+                b64 = base64.b64decode(byte_mirror)
+                img = b64[2:len(b64)-1]
             with open("cropped.png", "wb") as f:
-                f.write(img.decode('base64'))
+                f.write(base64.b64decode(img))
             img = cv2.imread("cropped.png")
             hough_transform_p(img,1)
             # rotated = imutils.rotate_bound(img, 270)
@@ -438,9 +543,11 @@ class IRISKeywords():
                             (elem_coordinates[2], elem_coordinates[3])]
                     img,res = find_relative_image(elements, verifyexists)
                 else:
-                    img = element['cord']
+                    byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
+                    b64 = base64.b64decode(byte_mirror)
+                    img = b64[2:len(b64)-1]
                 with open("cropped.png", "wb") as f:
-                    f.write(img.decode('base64'))
+                    f.write(base64.b64decode(img))
                 img = cv2.imread("cropped.png")
                 text = data_in_cells(img,row,col)
                 if(text != None):
@@ -462,11 +569,19 @@ class IRISKeywords():
         value = OUTPUT_CONSTANT
         try:
             global verifyexists
-            res = None
-            if(len(args[0])==1 and args[0][0].isdigit()):
-                res = gotoobject(element['cord'],int(args[0][0])-1)
+            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+                elem_coordinates = element['coordinates']
+                const_coordintes = args[2]['coordinates']
+                elements = [(const_coordintes[0],const_coordintes[1]),
+                        (const_coordintes[2],const_coordintes[3]),
+                        (elem_coordinates[0], elem_coordinates[1]),
+                        (elem_coordinates[2], elem_coordinates[3])]
+                img,res = find_relative_image(elements, verifyexists)
+                width = res[2] - res[0]
+                height = res[3] - res[1]
+                pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
             else:
-                res = gotoobject(element['cord'],None)
+                res = gotoobject(element)
             if(len(res)>0):
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
@@ -500,9 +615,11 @@ class IRISKeywords():
                             (elem_coordinates[2], elem_coordinates[3])]
                     img,res = find_relative_image(elements, verifyexists)
                 else:
-                    img = element['cord']
+                    byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
+                    b64 = base64.b64decode(byte_mirror)
+                    img = b64[2:len(b64)-1]
                 with open("cropped.png", "wb") as f:
-                    f.write(img.decode('base64'))
+                    f.write(base64.b64decode(img))
                 image = cv2.imread("cropped.png")
                 text = get_ocr(image)
                 if(isinstance(text,str)):

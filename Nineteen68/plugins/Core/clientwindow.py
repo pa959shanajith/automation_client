@@ -512,6 +512,20 @@ class MainNamespace(BaseNamespace):
         wxObject.schedule.Disable()
         wxObject.connectbutton.Enable()
 
+    def on_irisOperations(self, *args):
+        try:
+            global socketIO
+            con = controller.Controller()
+            con.get_all_the_imports('IRIS')
+            import iris_operations
+            if(args[1]=='updateDataset'):
+                check = iris_operations.update_dataset(args[0])
+                socketIO.emit('iris_operations_result',check)
+            elif(args[1]=='checkDuplicate'):
+                check = iris_operations.check_duplicates(args[0],socketIO)
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console('Error occured in iris operations')
 
 class SocketThread(threading.Thread):
     """Test Worker Thread Class."""
@@ -1252,7 +1266,7 @@ class Config_window(wx.Frame):
         #------------------------------------Different co-ordinates for Windows and Mac
         if SYSTEM_OS=='Windows':
             config_fields= {
-            "Frame":[(300, 150),(470,480)],
+            "Frame":[(300, 150),(470,560)],
             "S_address":[(12,8 ),(90, 28),(100,8 ),(140,-1)],
             "S_port": [(270,8 ),(70, 28),(340,8 ), (105,-1)],
             "Chrm_path":[(12,38),(80, 28),(100,38), (310,-1),(415,38),(30, -1)],
@@ -1274,12 +1288,13 @@ class Config_window(wx.Frame):
             "En_secu_check":[(308,278)],
             "Brow_ch":[(115,338)],
             "High_ch":[ (225,338)],
-            "Save":[(100,418), (100, 28)],
-            "Close":[(250,418), (100, 28)]
+            "Iris_prediction":[(12,398)],
+            "Save":[(100,488), (100, 28)],
+            "Close":[(250,488), (100, 28)]
         }
         else:
             config_fields={
-            "Frame":[(300, 150),(555,490)],
+            "Frame":[(300, 150),(555,570)],
             "S_address":[(12,8),(90,28),(116,8 ),(140,-1)],
             "S_port": [(352,8),(70,28),(430,8 ),(105,-1)],
             "Chrm_path":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
@@ -1301,8 +1316,9 @@ class Config_window(wx.Frame):
             "En_secu_check":[(358,278)],
             "Brow_ch":[(130,338)],
             "High_ch":[(260,338)],
-            "Save":[(135,418),(100, 28)],
-            "Close":[(285,418),(100, 28)]
+            "Iris_prediction":[(12,398)],
+            "Save":[(135,488),(100, 28)],
+            "Close":[(285,488),(100, 28)]
         }
         wx.Frame.__init__(self, parent, title=title,
                    pos=config_fields["Frame"][0], size=config_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
@@ -1470,7 +1486,14 @@ class Config_window(wx.Frame):
         else:
             self.rbox10.SetSelection(1)
 
-        self.error_msg=wx.StaticText(self.panel, label="", pos=(85,390),size=(350, 28), style=0, name="")
+        self.rbox11 = wx.RadioBox(self.panel, label = 'Prediction for IRIS Objects', pos = config_fields["Iris_prediction"][0], choices = lblList,
+         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson!=False and isConfigJson['prediction_for_iris_objects'].title()==lblList[0]:
+            self.rbox11.SetSelection(0)
+        else:
+            self.rbox11.SetSelection(1)
+
+        self.error_msg=wx.StaticText(self.panel, label="", pos=(85,458),size=(350, 28), style=0, name="")
         self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])
         self.save_btn.Bind(wx.EVT_BUTTON, self.config_check)
         self.close_btn=wx.Button(self.panel, label="Close",pos=config_fields["Close"][0], size=config_fields["Close"][1])
@@ -1516,6 +1539,7 @@ class Config_window(wx.Frame):
         browser_check=self.rbox8.GetStringSelection()
         disable_server_cert=self.rbox9.GetStringSelection()
         highlight_check=self.rbox10.GetStringSelection()
+        iris_prediction = self.rbox11.GetStringSelection()
         #----------------creating data dictionary
         data['server_ip'] = server_add.strip()
         data['server_port'] = server_port.strip()
@@ -1538,6 +1562,7 @@ class Config_window(wx.Frame):
         data['browser_check']=browser_check.strip()
         data['disable_server_cert'] = disable_server_cert.strip()
         data['highlight_check'] = highlight_check.strip()
+        data['prediction_for_iris_objects'] = iris_prediction.strip()
         config_data=data
         if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='' and data['firefox_path']!='':
             #---------------------------------------resetting the static texts
