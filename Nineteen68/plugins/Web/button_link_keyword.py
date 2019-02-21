@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-
+import os
 import logger
 import webconstants
 import time
@@ -22,14 +22,9 @@ import logging
 from constants import *
 import core_utils
 
-
-##driver = browser_Keywords.driver_obj
-##driver = None
 log = logging.getLogger('button_link_keyword.py')
 text_javascript = """function stext_content(f) {     var sfirstText = '';     var stextdisplay = '';     for (var z = 0; z < f.childNodes.length; z++) {         var scurNode = f.childNodes[z];         swhitespace = /^\s*$/;         if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {             sfirstText = scurNode.nodeValue;             stextdisplay = stextdisplay + sfirstText;         }     }     return (stextdisplay); }; return stext_content(arguments[0])"""
 class ButtonLinkKeyword():
-##    def __init__(self):
-##        driver = webdriver.Ie(executable_path = 'D:\Drivers\iedriverserver64')
 
     def click(self,webelement,*args):
         log.debug('Got the driver object from browser keyword class')
@@ -341,19 +336,15 @@ class ButtonLinkKeyword():
                         err_msg='There is no link text for the given element'
                         logger.print_on_console(err_msg)
                         log.info(err_msg)
-
                 else:
-                    log.error(INVALID_INPUT)
                     err_msg=INVALID_INPUT
-                    logger.print_on_console(INVALID_INPUT)
-
+                    log.error(err_msg)
+                    logger.print_on_console(err_msg)
         except Exception as e:
             log.error(e)
-
-            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-
-        #return status and methodoutput
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -380,15 +371,13 @@ class ButtonLinkKeyword():
                     status = webconstants.TEST_RESULT_PASS
                     methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
-                    log.info(WEB_ELEMENT_DISABLED)
                     err_msg = WEB_ELEMENT_DISABLED
-                    logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
             log.error(e)
-
-            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-        #return status and methodoutput
+        if err_msg:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -411,16 +400,13 @@ class ButtonLinkKeyword():
                     status = webconstants.TEST_RESULT_PASS
                     methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
-                    log.info(WEB_ELEMENT_DISABLED)
                     err_msg = WEB_ELEMENT_DISABLED
-                    logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
-            import traceback
-            traceback.print_exc()
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-        #return status and methodoutput
+        if err_msg:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -443,15 +429,13 @@ class ButtonLinkKeyword():
                     status = webconstants.TEST_RESULT_PASS
                     methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
-                    log.info(WEB_ELEMENT_DISABLED)
                     err_msg = WEB_ELEMENT_DISABLED
-                    logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
             log.error(e)
-
-            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-        #return status and methodoutput
+        if err_msg:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -463,47 +447,37 @@ class ButtonLinkKeyword():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         #upload_file keyword implementation
         try:
-##            driver = browser_Keywords.driver_obj
             filepath = inputs[0]
             filename = inputs[1]
-            inputfile = filepath + '\\' + filename
+            inputfile = filepath + os.sep + filename
             if webelement != None:
                 log.info('Recieved web element from the web dispatcher')
                 log.debug(webelement)
                 log.debug('Check for the element enable')
                 if webelement.is_enabled():
-                    if SYSTEM_OS != 'Darwin':
-                        if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
-                            log.debug('Mozilla Firefox Instance')
-                            clickinfo = browser_Keywords.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
-                            log.info('upload_file click info')
-                            log.info(clickinfo)
-                            filestatus = self.__upload_operation(inputfile)
-                            log.info(STATUS_METHODOUTPUT_UPDATE)
-                            status = webconstants.TEST_RESULT_PASS
-                            methodoutput = webconstants.TEST_RESULT_TRUE
-                        else:
-                            if  self.__click_for_file_upload(browser_Keywords.driver_obj,webelement):
-                                filestatus =self.__upload_operation(inputfile)
-                                log.info(STATUS_METHODOUTPUT_UPDATE)
-                                status = webconstants.TEST_RESULT_PASS
-                                methodoutput = webconstants.TEST_RESULT_TRUE
-                    elif SYSTEM_OS == 'Darwin':
-                        if  self.__click_for_file_upload(browser_Keywords.driver_obj,webelement):
+                    if SYSTEM_OS != 'Darwin' and isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
+                        log.debug('Mozilla Firefox Instance')
+                        clickinfo = browser_Keywords.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
+                        log.info('upload_file click info')
+                        log.info(clickinfo)
+                        filestatus = self.__upload_operation(inputfile)
+                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                        status = webconstants.TEST_RESULT_PASS
+                        methodoutput = webconstants.TEST_RESULT_TRUE
+                    else:
+                        if self.__click_for_file_upload(browser_Keywords.driver_obj,webelement):
                             filestatus =self.__upload_operation(inputfile)
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
-                    log.info(WEB_ELEMENT_DISABLED)
                     err_msg = WEB_ELEMENT_DISABLED
-                    logger.print_on_console(WEB_ELEMENT_DISABLED)
         except Exception as e:
             log.error(e)
-
-            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-        #return status and methodoutput
+        if err_msg:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -540,7 +514,7 @@ class ButtonLinkKeyword():
         try:
             robot = Robot()
             log.debug('Copying input file path to the clipboard')
-            robot.add_to_clipboard(str(inputfile))
+            robot.add_to_clipboard(inputfile)
             log.debug(' input file path Copied to  clipboard')
             status = True
         except Exception as e:
@@ -569,71 +543,4 @@ class ButtonLinkKeyword():
             log.error(EXCEPTION_OCCURED)
             log.error(e)
         return status
-
-
-##if __name__ == '__main__':
-####    driver = webdriver.Chrome(executable_path = 'D:\Drivers\chromedriver')
-##    driver = webdriver.Ie(executable_path = 'D:\Drivers\iedriverserver64')
-##    driver.get('https://converge/ManageUsers.aspx')
-##    driver.get('https://www.google.co.in/?gfe_rd=cr&ei=y3ghWLqjAs-L8QfMjYGwDA&gws_rd=ssl')
-##    driver.get('https://www.irctc.co.in/eticketing/loginHome.jsf')
-##
-##    print 'Browser opened and navigaed to url'
-##
-####    element = driver.find_element_by_id('ctl00_MainContent_btnSearch')
-##    element = driver.find_element_by_id('loginbutton')
-##
-##    print 'element obtained'
-##
-##
-####    element = driver.find_element_by_name('btnI')
-##    obj = ButtonLinkKeyword()
-##    logger.print_on_console('ButtonLinkKeyword object created')
-##
-##    obj.click(element)
-##    print ' ***click exected ***\n\n'
-##    time.sleep(5)
-##
-##    obj.verify_button_name('Login',element)
-##
-##    print ' ***verify_button_name exected ***\n\n'
-##
-##    linkelement = driver.find_element_by_xpath('//*[@id="loginFormId"]/div[1]/div[4]/div/ul/li[1]/a')
-##
-##    status,methodoutput,linktext = obj.get_link_text(linkelement)
-##    print 'Status: ',status
-##    print 'Method Result: ',methodoutput
-##    print 'Link text: ',linktext
-##
-##    print ' ***get_link_text exected ***\n\n'
-##
-##    status,methodoutput = obj.verify_link_text('Forgot Password',linkelement)
-##
-##    print 'Status: ',status
-##    print 'Method Result: ',methodoutput
-##
-##    print ' ***verify_link_text exected ***\n\n'
-##
-####    obj.double_click(element)
-####    print ' ***double_click exected ***\n\n'
-##
-##    driver.get('http://cgi-lib.berkeley.edu/ex/fup.html')
-##
-##    upele = driver.find_element_by_name('upfile')
-##
-##    folder = 'D:\M'
-##    filename = 'test.txt'
-##    obj.upload_file(upele,folder,filename)
-##    print ' ***upload_file exected ***\n\n'
-##
-##
-##    clele = driver.find_element_by_xpath('/html/body/form/input[3]')
-####    obj.click(clele)
-##
-
-
-
-
-
-
 

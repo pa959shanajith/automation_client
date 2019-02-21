@@ -38,8 +38,8 @@ class FolderOperations:
         try:
             logger.print_on_console(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
             if not (inputpath is None and inputpath is '') and self.validateFolderName(inputpath,'path') and self.validateFolderName(folder_name):
-                if not os.path.exists(inputpath+'/'+folder_name):
-                    os.makedirs(inputpath+'/'+folder_name)
+                if not os.path.exists(inputpath+os.sep+folder_name):
+                    os.makedirs(inputpath+os.sep+folder_name)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
@@ -57,7 +57,6 @@ class FolderOperations:
         return status,methodoutput,output,err_msg
 
 
-
     def verify_folder_exists(self,inputpath,folder_name):
         """
         def : verify_folder_exists
@@ -73,7 +72,7 @@ class FolderOperations:
         try:
             logger.print_on_console(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
             if not (inputpath is None and inputpath is ''):
-                if os.path.exists(inputpath+'/'+folder_name):
+                if os.path.exists(inputpath+os.sep+folder_name):
                     logger.print_on_console(generic_constants.FOLDER_EXISTS)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
@@ -107,8 +106,8 @@ class FolderOperations:
         try:
             logger.print_on_console(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name+' new folder name '+rename_folder)
             if not (inputpath is None and inputpath is ''):
-                old_path=inputpath+'/'+folder_name
-                rename_path=inputpath+'/'+rename_folder
+                old_path=inputpath+os.sep+folder_name
+                rename_path=inputpath+os.sep+rename_folder
                 if os.path.exists(old_path):
                     os.renames(old_path,rename_path)
                     status=TEST_RESULT_PASS
@@ -133,7 +132,7 @@ class FolderOperations:
         def : delete_folder
         purpose : deletes / force deletes the given folder based on the argument
                   optional argument '1' which indicates 'force_delete'
-       param : inputpath,folder_name
+        param : inputpath,folder_name
         return : bool
 
         """
@@ -145,18 +144,18 @@ class FolderOperations:
             logger.print_on_console(generic_constants.INPUT_IS+inputpath+' folder name '+folder_name)
             if not (inputpath is None and inputpath is ''):
                 try:
-
-                    if os.path.exists(inputpath+'/'+folder_name):
+                    if os.path.exists(inputpath+os.sep+folder_name):
                         if len(args)==1 and int(args[0]) == 1:
                             import shutil
-                            shutil.rmtree(inputpath+'/'+folder_name)
+                            shutil.rmtree(inputpath+os.sep+folder_name)
                         else:
-                            os.rmdir(inputpath+'/'+folder_name)
+                            os.rmdir(inputpath+os.sep+folder_name)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg=generic_constants.FOLDER_NOT_EXISTS
                 except (ValueError,WindowsError) as e:
+                    log.error(e)
                     err_msg=ERROR_CODE_DICT['ERR_FOLDER_NOT_ACESSIBLE']
             else:
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']

@@ -70,7 +70,7 @@ class Object_Mapper():
                 webElement = self.webscrapeutilsobj.locate_webelement(self.driver, identifiers)
                 if webElement is not None:
                     new_properties = self.driver.execute_script(self.webscrapeutilsobj.javascript_get_object_properties,webElement[0],decryptedelementurl)[0]
-                    if cmp(new_properties['xpath'],decryptedxpath) != 0:
+                    if new_properties['xpath'] != decryptedxpath:
                         # print "new: ",new_properties['xpath']
                         # log.debug("changed object found")
                         # Xpath Encryption logic implemented

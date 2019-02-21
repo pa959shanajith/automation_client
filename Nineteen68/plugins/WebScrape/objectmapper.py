@@ -86,7 +86,7 @@ class Highlight():
                             element_properties = []
                             element_properties = driver.execute_script(properties_script,webElement[0],self.url)
                             new_properties=element_properties[0];
-                            if (element>new_properties)-(element<new_properties)!=0:
+                            if element != new_properties:
                                 log.info('object is changed')
                                 return new_properties
                         try:
@@ -136,7 +136,7 @@ class Highlight():
                             element_properties = []
                             element_properties = driver.execute_script(properties_script,webElement[0],self.url)
                             new_properties=element_properties[0];
-                            if (element>new_properties)-(element<new_properties)!=0:
+                            if element != new_properties:
                                 log.info('object is changed')
                                 return new_properties
                             else:
