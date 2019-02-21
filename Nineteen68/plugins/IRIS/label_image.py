@@ -20,6 +20,9 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 import os,base64
+import logger
+import logging
+log = logging.getLogger('label_image.py')
 
 def load_graph(model_file):
   graph = tf.Graph()
