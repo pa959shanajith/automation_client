@@ -35,9 +35,9 @@ class AESCipher:
             if (raw is None or raw is ''):
                 err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
             else:
-                cipher = AES.new(key.encode('utf-8'), AES.MODE_ECB)
+                cipher = AES.new(self.key, AES.MODE_ECB)
                 raw = cipher.encrypt(pad(raw.encode('utf-8')))
-                return codecs.encode(raw, 'hex')
+                return base64.b64encode(raw)
         except Exception as e:
             err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
             log.error(e)
@@ -47,12 +47,12 @@ class AESCipher:
 
     def decrypt(self, enc):
         try:
-            if (raw is None or raw is ''):
+            if (enc is None or enc is ''):
                 err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
             else:
-                enc = codecs.decode(enc, 'hex')
-                cipher = AES.new(key.encode('utf-8'), AES.MODE_ECB)
-                return unpad(cipher.decrypt(data).decode('utf-8'))
+                enc = base64.b64decode(enc)
+                cipher = AES.new(self.key, AES.MODE_ECB)
+                return unpad(cipher.decrypt(enc).decode('utf-8'))
         except Exception as e:
             err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
             log.error(e)
