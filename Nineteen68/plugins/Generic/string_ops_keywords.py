@@ -497,7 +497,7 @@ class StringOperation:
                     if(data_length_int > 0):
                         data_type=data_type.lower()
                         if (data_type == 'char'):
-                            output = ''.join(random.choice(string.lowercase + string.uppercase) for i in range(data_length_int))
+                            output = ''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase) for i in range(data_length_int))
 ##                            logger.print_on_console('Result : ',output)
                             log.info('Result : ')
                             log.info(output)

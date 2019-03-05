@@ -160,7 +160,8 @@ class Dispatcher:
                                     log.info(WEB_ELEMENT_FOUND)
                                     logger.print_on_console(WEB_ELEMENT_FOUND)
                 except Exception as e:
-                    print_error('ERR_CUSTOM_ELE_NOTFOUND')
+                    log.error(e,exc_info=True)
+                    print_error('Web element not found')
 
             elif teststepproperty.cord != None and teststepproperty.cord != "":
                 obj_props = teststepproperty.objectname.split(';')
@@ -308,7 +309,7 @@ class Dispatcher:
                 dict['getcellvalueiris'] = iris_object.getcellvalueiris
                 dict['verifyexistsiris'] = iris_object.verifyexistsiris
                 dict['verifytextiris'] = iris_object.verifytextiris
-                
+
             if browser_Keywords.driver_obj is not None:
                 browser_info=browser_Keywords.driver_obj.capabilities
                 reporting_obj.browser_type=browser_info.get('browserName')
@@ -421,16 +422,19 @@ class Dispatcher:
             log.info('checking for the url error')
             try:
                 urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', browser_Keywords.driver_obj.current_url)
-                response=requests.get(urls[0],verify=False)
-                status_code=response.status_code
-                log.info(status_code)
-                if status_code in STATUS_CODE_DICT:
-                    value=STATUS_CODE_DICT[status_code]
-                    logger.print_on_console('Error code ',status_code,' : ',value)
-                    log.error('Error code and value ')
-                    log.error(status_code)
-                    log.error(value)
-                    status=True
+                if urls != []:
+                    response=requests.get(urls[0],verify=False)
+                    status_code=response.status_code
+                    log.info(status_code)
+                    if status_code in STATUS_CODE_DICT:
+                        value=STATUS_CODE_DICT[status_code]
+                        logger.print_on_console('Error code ',status_code,' : ',value)
+                        log.error('Error code and value ')
+                        log.error(status_code)
+                        log.error(value)
+                        status=True
+                else:
+                    log.info('Url is empty')
             except Exception as e:
                 status_code=111
                 if status_code in STATUS_CODE_DICT:
