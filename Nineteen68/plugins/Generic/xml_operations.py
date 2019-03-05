@@ -111,7 +111,8 @@ class XMLOperations():
                             items.append(tag)
                 else:
     ##                items = root.getiterator(str(input_tag))
-                    items = root.getiterator(input_tag)
+                    items = list(root.getiterator(input_tag))
+                    log.debug(items)
     ##            items = root.getiterator(str(input_tag))
                 log.debug('Getting children node from the root')
                 if len(items) > 0:
@@ -177,8 +178,8 @@ class XMLOperations():
                         items.append(elem)
             else:
 ##                items = root.getiterator(str(input_tag))
-                items = root.getiterator(input_tag)
-            log.info(items)
+                items = list(root.getiterator(input_tag))
+            log.debug(items)
             log.debug('Getting children node from the root')
             if len(items) > 0:
                 log.debug('There are children in the root node, get the total number of children')
@@ -318,8 +319,9 @@ class XMLOperations():
                         if tag == input_tag:
                             blocks.append(elem)
                 else:
-                    blocks = root.getiterator(input_tag)
+                    blocks = list(root.getiterator(input_tag))
                 log.debug('Getting children node from the root')
+                log.debug(blocks)
                 if len(blocks) > 0:
                     log.debug('There are children in the root node, get the total number of children')
                     block_count = len(blocks)
