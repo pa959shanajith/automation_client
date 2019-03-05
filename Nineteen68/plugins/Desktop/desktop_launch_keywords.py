@@ -245,9 +245,9 @@ class Launch_Keywords():
         try:
             app = Application()
             app.connect(handle=window_handle)
-            app_dialog = app.top_window_()
-            app_dialog.Minimize()
-            app_dialog.Restore()
+            app_dialog = app.top_window()
+            app_dialog.minimize()
+            app_dialog.restore()
             pid = self.get_window_pid(window_name)
             rect = self.getParentRectangle(pid,window_name)
 ##            aut_handle=window_handle

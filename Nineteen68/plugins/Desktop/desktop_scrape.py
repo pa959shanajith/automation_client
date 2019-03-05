@@ -137,7 +137,7 @@ class ScrapeWindow(wx.Frame):
                         log.error(msg)
                         log.error(e)
                         logger.print_on_console(msg)
-                data['mirror'] =encoded_string.encode('UTF-8').strip()
+                data['mirror'] =encoded_string.decode('UTF-8').strip()
                 #10 is the limit of MB set as per Nineteen68 standards
                 if self.core_utilsobject.getdatasize(str(data),'mb') < 10:
                     self.socketIO.emit('scrape',data)
@@ -182,7 +182,7 @@ class ScrapeWindow(wx.Frame):
                     log.error(msg)
                     log.error(e)
                     logger.print_on_console(msg)
-            data['mirror'] =encoded_string.encode('UTF-8').strip()
+            data['mirror'] =encoded_string.decode('UTF-8').strip()
             if self.core_utilsobject.getdatasize(str(data),'mb') < 10:
                 self.socketIO.emit('scrape',data)
             else:
