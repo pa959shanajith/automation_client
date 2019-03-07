@@ -412,7 +412,7 @@ class MainNamespace(BaseNamespace):
                     encoded_string = ''
                     with open(path, "rb") as image_file:
                         encoded_string = base64.b64encode(image_file.read())
-                    base64_data=encoded_string.encode('UTF-8').strip()
+                    base64_data=encoded_string.decode('UTF-8').strip()
                     data_URIs.append(base64_data)
             socketIO.emit('render_screenshot',data_URIs)
         except Exception as e:
