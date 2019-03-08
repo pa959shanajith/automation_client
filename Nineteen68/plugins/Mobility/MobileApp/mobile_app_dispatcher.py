@@ -13,6 +13,7 @@
 import button_link_keyword_mobility
 import radio_button_keywords_mobility
 import install_and_launch
+import android_scrapping
 import textbox_keywords_mobility
 import slider_util_keywords
 import Number_picker_Keywords
@@ -34,7 +35,6 @@ import TimePicker_Keywords_Mobility
 import picker_wheel_ios
 import table_keywords_native
 import socket
-import subprocess
 import os
 import subprocess
 import platform
@@ -107,7 +107,7 @@ class MobileDispatcher:
                     'getbuttonname' : self.button_link_object.get_button_name,
                     'verifybuttonname' : self.button_link_object.verify_button_name,
                     'installapplication' : self.install_and_launch_object.installApplication,
-                    'launchapplication' : self.install_and_launch_object.installApplication,
+                    'launchapplication' : self.install_and_launch_object.launchApp,
                     'uninstallapplication' : self.install_and_launch_object.uninstallApplication,
                     'closeapplication' : self.install_and_launch_object.closeApplication,
                     'swipeleft' : self.swipe_keywords_object.swipe_left,
@@ -393,7 +393,7 @@ class MobileDispatcher:
 
 
                 else:
-                    driver = install_and_launch.driver
+                    driver = android_scrapping.driver
                     if keyword==WAIT_FOR_ELEMENT_EXISTS:
                         result=dict[keyword](objectname,input)
                     else:

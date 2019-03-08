@@ -124,8 +124,7 @@ class Device_Keywords():
             cmd=cmd +'adb.exe'
             if android_home!=None:
                 with open(os.devnull, 'wb') as devnull:
-                    subprocess.check_call([cmd, 'start-server'], stdout=devnull,
-                              stderr=devnull)
+                    subprocess.check_call([cmd, 'start-server'], stdout=devnull, stderr=devnull)
                 proc = subprocess.Popen([cmd, 'devices'], stdout=subprocess.PIPE)
                 for line in proc.stdout.readlines():
                     line = str(line)[2:-1]
@@ -167,7 +166,7 @@ class Device_Keywords():
             logger.print_on_console(e)
         return packageName
 
-    def activity_name(self,apk):
+    def activity_name(self, apk):
         activityName = None
         maindir=os.getcwd()
         try:
@@ -186,3 +185,25 @@ class Device_Keywords():
             log.error(e,exc_info=True)
             logger.print_on_console(e)
         return activityName
+
+    def uninstall_app(self, pkg):
+        maindir = os.getcwd()
+        flag = False
+        try:
+            android_home = os.environ['ANDROID_HOME']
+            cmd = android_home + '\\platform-tools\\'
+            os.chdir(cmd)
+            cmd = cmd + 'adb.exe'
+            if android_home is not None:
+                out = subprocess.Popen([cmd, 'uninstall', pkg], stdout=subprocess.PIPE)
+                for line in out.stdout.readlines():
+                    line = str(line)[2:-1]
+                    if 'Success' in line:
+                        flag = True
+                        break
+                os.chdir(maindir)
+                if flag is False:
+                    raise Exception('Error Uninstalling App using adb')
+        except Exception as e:
+            log.error(e, exc_info=True)
+            logger.print_on_console(e)

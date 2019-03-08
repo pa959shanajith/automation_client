@@ -11,8 +11,9 @@
 
 from constants import *
 from mobile_app_constants import *
-from appium.webdriver.common.touch_action import TouchAction
-import install_and_launch
+#from appium.webdriver.common.touch_action import TouchAction
+#import install_and_launch
+import android_scrapping
 import logging
 import logger
 import  platform
@@ -22,7 +23,7 @@ import time
 class SliderKeywords():
 
     def find_coordinates_horizontal(self):
-        size=install_and_launch.driver.get_window_size()
+        size=android_scrapping.driver.get_window_size()
         log.debug('Window size is '+str(size))
         startx=(size['width']*0.70)
         endx=(size['width']*0.30)
@@ -31,10 +32,10 @@ class SliderKeywords():
         return startx,starty,endx
 
     def find_coordinates_vertical(self):
-        size=install_and_launch.driver.get_window_size()
+        size=android_scrapping.driver.get_window_size()
         log.debug('Window size is '+str(size))
-        min_y=(size['height']/4)
-        max_y=(size['height']/1.2)
+        min_y=(size['height']/5)
+        max_y=(size['height']*0.8)
         x_Value=(size['width']*0.50)
         log.debug(x_Value,max_y,min_y)
         return x_Value,max_y,min_y
@@ -50,12 +51,12 @@ class SliderKeywords():
         try:
             startx,starty,endx=self.find_coordinates_horizontal()
             #Swipe from Right to Left
-            install_and_launch.driver.swipe(startx, starty, endx, starty, 3000)
-            time.sleep(3)
+            android_scrapping.driver.swipe(startx, starty, endx, starty, 3000)
+            time.sleep(2)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            err_msg='Error thrown be android driver'
+            err_msg='Error thrown by android driver'
             log.error(e)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
@@ -70,12 +71,12 @@ class SliderKeywords():
         try:
             startx,starty,endx=self.find_coordinates_horizontal()
             #Swipe from left to Right
-            install_and_launch.driver.swipe(endx, starty, startx, starty, 3000);
-            time.sleep(3)
+            android_scrapping.driver.swipe(endx, starty, startx, starty, 3000)
+            time.sleep(2)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            err_msg='Error thrown be android driver'
+            err_msg='Error thrown by android driver'
             log.error(e)
             logger.print_on_console(err_msg)
 
@@ -92,16 +93,16 @@ class SliderKeywords():
             x_Value,max_y,min_y=self.find_coordinates_vertical()
             #Swipe from down to up
             if SYSTEM_OS == 'Darwin':
-                install_and_launch.driver.execute_script('mobile: scroll', {'direction': 'down'})
+                android_scrapping.driver.execute_script('mobile: scroll', {'direction': 'down'})
             else:
-                install_and_launch.driver.swipe(x_Value, max_y, x_Value, min_y, 3000)
-            time.sleep(3)
+                android_scrapping.driver.swipe(x_Value, max_y, x_Value, min_y, 3000)
+            time.sleep(2)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             import traceback
             traceback.print_exc()
-            err_msg='Error thrown be android driver'
+            err_msg='Error thrown by android driver'
             log.error(e)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
@@ -116,12 +117,12 @@ class SliderKeywords():
         try:
             x_Value,max_y,min_y=self.find_coordinates_vertical()
             #Swipe from up to bottom
-            install_and_launch.driver.swipe(x_Value, min_y, x_Value, max_y, 3000)
-            time.sleep(3)
+            android_scrapping.driver.swipe(x_Value, min_y, x_Value, max_y, 3000)
+            time.sleep(2)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            err_msg='Error thrown be android driver'
+            err_msg='Error thrown by android driver'
             log.error(e)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
@@ -135,12 +136,13 @@ class SliderKeywords():
         try:
             startx,starty,endx=self.find_coordinates_vertical()
             #Swipe from up to bottom
-            install_and_launch.driver.hide_keyboard(inputval[0])
-            time.sleep(3)
+            if android_scrapping.driver.is_keyboard_shown():
+                android_scrapping.driver.hide_keyboard()
+            time.sleep(1)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            err_msg='Error thrown be android driver'
+            err_msg='Error thrown by android driver'
             log.error(e)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
@@ -154,16 +156,12 @@ class SliderKeywords():
         try:
 ##            startx,starty,endx=self.find_coordinates_vertical()
             #Swipe from up to bottom
-            import platform
-            if SYSTEM_OS == 'Darwin':
-                install_and_launch.driver.back()
-            else:
-                install_and_launch.driver.keyevent(4)
-            time.sleep(3)
+            android_scrapping.driver.keyevent(4)
+            time.sleep(2)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            err_msg='Error thrown be android driver'
+            err_msg='Error thrown by android driver'
             log.error(e)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
