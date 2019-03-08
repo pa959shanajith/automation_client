@@ -39,6 +39,8 @@ name=[]
 ScrapeList=[]
 counter=0
 driver=None
+device_id = None
+
 
 class InstallAndLaunch():
     def __init__(self):
@@ -60,7 +62,6 @@ class InstallAndLaunch():
                 path = curdir + '/Nineteen68/plugins/Mobility/node_modules/appium/build/lib/main.js'
                 proc = subprocess.Popen(path, shell=False, stdin=None, stdout=None, stderr=None,
                                         close_fds=True)
-
                 time.sleep(15)
                 logger.print_on_console('Server started')
         except Exception as e:
@@ -87,7 +88,8 @@ class InstallAndLaunch():
             log.error(e)
 
     def installApplication(self, apk_path, platform_version, device_name, udid, *args):
-        global driver
+        global driver, device_id
+        #import appium
         from appium import webdriver
         try:
             if SYSTEM_OS == 'Darwin' :
@@ -102,16 +104,15 @@ class InstallAndLaunch():
                 self.desired_caps['newCommandTimeout'] = 3600
                 self.desired_caps['launchTimeout'] = 180000
                 self.driver = "pass"
+                current_dir = (os.getcwd())
                 dir_path = os.path.dirname(os.path.realpath(__file__))
                 # set IP
-
                 if (subprocess.getoutput('pgrep xcodebuild') == ''):
                     try:
                         with open(dir_path + "/Nineteen68UITests/data.txt",'wb') as f:
                             f.write(self.desired_caps['Ip_Address'])  # send IP
                     except Exception as e:
                         log.error(e)
-
                     # set run command
                     self.desired_caps["deviceName"] = self.desired_caps["deviceName"].split(" ")
                     self.desired_caps["deviceName"] = "\ ".join(self.desired_caps["deviceName"])
@@ -129,14 +130,11 @@ class InstallAndLaunch():
                                 name + " OS=" + self.desired_caps["platformVersion"] +" >/dev/null "+ " test")
                     except Exception as e:
                         log.error(e)
-
                     # subprocess.call("chmod a+x run.command")
-
                     try:
                         subprocess.Popen(dir_path + "/run.command", shell=True)
                     except:
                         log.error(ERROR_CODE_DICT["ERR_XCODE_DOWN"])
-
                     timer = 0
                     while True:
                         try:
@@ -185,8 +183,11 @@ class InstallAndLaunch():
                     device_name = device_keywords_object.wifi_connect()
                 if device_name != '':
                     logger.print_on_console("Connected device name:",device_name)
+                    device_id = device_name
                     self.start_server()
                     self.desired_caps = {}
+                    if platform_version is not None:
+                        self.desired_caps['platformVersion'] = platform_version
                     self.desired_caps['platformName'] = 'Android'
                     self.desired_caps['deviceName'] = device_name
                     self.desired_caps['udid'] = device_name
@@ -204,7 +205,7 @@ class InstallAndLaunch():
             err = "Not able to install or launch application"
             logger.print_on_console(err)
             log.error(e,exc_info=True)
-        return self.driver
+        return driver
 
     def scrape(self):
         finalJson=''
@@ -218,7 +219,6 @@ class InstallAndLaunch():
             clientsocket.send(XCODE_SCRAPE)
             clientsocket.send(str(length))
             clientsocket.send(bundle_id)
-
             while True:
                 chunck = clientsocket.recv(10000)
                 if chunck.endswith(EOF):
@@ -226,7 +226,6 @@ class InstallAndLaunch():
                     fragments += chunck[:idx]
                     break
                 fragments += chunck
-
             data = fragments.split("!@#$%^&*()")[0]
             image_data = fragments.split("!@#$%^&*()")[1]
             height_data = fragments.split("!@#$%^&*()")[2]
@@ -241,7 +240,6 @@ class InstallAndLaunch():
                 logger.print_on_console('Writing scrape data to domelements.json file')
                 json.dump(jsonArray, outfile, indent=4, sort_keys=False)
             return jsonArray
-
         if self.driver != None:
             page_source=self.driver.page_source
             parser = xml.sax.make_parser()
@@ -254,7 +252,6 @@ class InstallAndLaunch():
                 with open(file_path_xml,'wb') as new_file:
                     new_file.write(page_source)
                     new_file.close()
-
                 parser.parse(file_path_xml)
                 obj2=BuildJson()
                 finalJson=obj2.xmltojson(self.driver)
@@ -273,6 +270,7 @@ class InstallAndLaunch():
 class BuildJson:
 
     def xmltojson(self,driver):
+        import re
         global ScrapeList
         global XpathList
         global label
@@ -286,7 +284,6 @@ class BuildJson:
         global y_coordinate
         global width
         global height
-
         ScrapeList=[]
         custnamelist=[]
         global counter
@@ -297,7 +294,6 @@ class BuildJson:
                 text=label[i]
             elif SYSTEM_OS!='Darwin' and content_desc[i]  != '':
                 text=content_desc[i]
-
             if text=='' or text==None:
                  text=class_name[i]
             if text not in custnamelist:
@@ -306,7 +302,6 @@ class BuildJson:
                 text=text+str(counter)
                 custnamelist.append(text)
                 counter=counter+1
-
             if SYSTEM_OS!='Darwin':
                 xpath = resource_id[i] + ';' + XpathList[i]
                 ele_bounds=re.findall('\d+',rectangle[i])
@@ -316,7 +311,6 @@ class BuildJson:
     ##            'width':ele_bounds[2]}
                 width=int(ele_bounds[2])-int(ele_bounds[0])
                 height=int(ele_bounds[3])-int(ele_bounds[1])
-
                 ScrapeList.append({'xpath': xpath, 'tag': class_name[i],
                     'text': text,
                     'id': resource_id[i], 'custname': text,
@@ -482,3 +476,4 @@ class Exact(xml.sax.handler.ContentHandler):
 
     def characters(self, data):
         self.buffer += data
+

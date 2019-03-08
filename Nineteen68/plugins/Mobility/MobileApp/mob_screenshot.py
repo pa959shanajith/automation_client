@@ -18,7 +18,7 @@ import logger
 import os
 import uuid
 from constants import *
-import install_and_launch
+import android_scrapping
 
 import logging
 
@@ -87,12 +87,12 @@ class Screenshot():
                 else:
 
                     log.debug('screenshot captured')
-                    if install_and_launch.driver==None:
+                    if android_scrapping.driver==None:
                         img=ImageGrab.grab()
                         img.save(filePath+'.png')
     ##                    logger.print_on_console('screenshot captured')
                     else:
-                        img=install_and_launch.driver.save_screenshot(filePath+'.png')
+                        img=android_scrapping.driver.save_screenshot(filePath+'.png')
     ##                    logger.print_on_console('screenshot captured')
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE

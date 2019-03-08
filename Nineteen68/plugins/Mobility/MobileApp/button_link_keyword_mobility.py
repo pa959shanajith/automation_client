@@ -12,7 +12,8 @@
 from constants import *
 from mobile_app_constants import *
 from appium.webdriver.common.touch_action import TouchAction
-import install_and_launch
+#import install_and_launch
+import android_scrapping
 import logging
 import logger
 
@@ -36,7 +37,7 @@ class Button_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
                         action = TouchAction(driver)
                         action.tap(element).perform()
                         status=TEST_RESULT_PASS
@@ -64,6 +65,7 @@ class Button_Keywords():
         output=OUTPUT_CONSTANT
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        input = input_val[0]
         try:
             if element is not None:
                 visibility=element.is_displayed()
@@ -73,9 +75,12 @@ class Button_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
                         action = TouchAction(driver)
-                        action.long_press(element).perform()
+                        if input is not None:
+                            action.long_press(element).wait(int(input)*1000).release().perform()
+                        else:
+                            action.long_press(element).wait(3000).release().perform()
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:

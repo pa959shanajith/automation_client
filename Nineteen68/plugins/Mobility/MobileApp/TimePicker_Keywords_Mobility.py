@@ -12,7 +12,8 @@
 from constants import *
 from mobile_app_constants import *
 from appium.webdriver.common.touch_action import TouchAction
-import install_and_launch
+#import install_and_launch
+import android_scrapping
 import logging
 import logger
 import time
@@ -46,7 +47,7 @@ class Time_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
                         action = TouchAction(driver)
                         Date_picker=driver.find_elements_by_class_name('android.widget.TimePicker')
                         count= len(Date_picker)
@@ -137,6 +138,8 @@ class Time_Keywords():
                                     value2=element[2].text
 
                                 if value0 == input_date[0] and value1== input_date[1] and value2==input_date[2]:
+                                    if driver.is_keyboard_shown():
+                                        driver.hide_keyboard()
                                     status=TEST_RESULT_PASS
                                     result=TEST_RESULT_TRUE
                         else:
@@ -179,7 +182,7 @@ class Time_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver1=install_and_launch.driver
+                        driver1=android_scrapping.driver
                         Date_picker=driver1.find_elements_by_class_name('android.widget.TimePicker')
                         count= len(Date_picker)
                         Date_picker2=driver1.find_elements_by_class_name('android.widget.RadialTimePickerView$RadialPickerTouchHelper')
