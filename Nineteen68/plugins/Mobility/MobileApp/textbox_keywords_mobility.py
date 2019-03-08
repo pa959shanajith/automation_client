@@ -14,7 +14,10 @@ from encryption_utility import AESCipher
 from mobile_app_constants import *
 import logging
 import logger
-
+import android_scrapping
+from appium.webdriver.common.touch_action import TouchAction
+import time
+import action_keyowrds_app
 log = logging.getLogger('textbox_keywords_mobility.py')
 
 class Textbox_keywords():
@@ -41,19 +44,15 @@ class Textbox_keywords():
                     if enable:
 
                         log.debug('Setting the text')
-                        import platform
-                        if SYSTEM_OS == 'Darwin':
+                        if len(element.text)>0:
+                            log.debug('clearing  the existing text')
                             element.clear()
-                            element.set_value(text)
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
-                        else:
-                            if len(element.text)>0:
-                             log.debug('clearing  the existing text')
-                             element.clear()
-                            element.set_text(text)
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
+                        element.set_text(text)
+                        if android_scrapping.driver.is_keyboard_shown():
+                            android_scrapping.driver.hide_keyboard()
+                        time.sleep(1)
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
                     else:
 
                         err_msg='element is disabled'
@@ -88,20 +87,14 @@ class Textbox_keywords():
                     enable=element.is_enabled()
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
-                        import platform
-                        if SYSTEM_OS == 'Darwin':
+                        if len(element.text)>0:
+                            log.debug('clearing  the existing text')
                             element.clear()
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:
-                            if len(element.text)>0:
-                                log.debug('clearing  the existing text')
-                                element.clear()
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
-                            else:
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
 
                     else:
                         err_msg='element is disabled'
@@ -128,8 +121,8 @@ class Textbox_keywords():
         output=OUTPUT_CONSTANT
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        if webelement is not None:
-            try:
+        try:
+            if webelement is not None:
                 if webelement.is_enabled():
                     log.debug(WEB_ELEMENT_ENABLED)
                     is_visble=webelement.is_displayed()
@@ -140,37 +133,28 @@ class Textbox_keywords():
 ##                    log.info(INPUT_IS)
                     log.info(input)
                     if input is not None:
-                        import platform
-                        if SYSTEM_OS == 'Darwin':
+                        if len(webelement.text)>0:
+                            log.debug('clearing  the existing text')
                             webelement.clear()
-                            encryption_obj = AESCipher()
-                            input_val = encryption_obj.decrypt(input)
+                        encryption_obj = AESCipher()
+                        input_val = encryption_obj.decrypt(input)
 ##                            user_input=self.validate_input(webelement,input_val)
 ##                            if user_input is not None:
 ##                                input_val=user_input
-                            webelement.set_value(input_val)
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
-                        else:
-                            if len(webelement.text)>0:
-                                log.debug('clearing  the existing text')
-                                webelement.clear()
-                            encryption_obj = AESCipher()
-                            input_val = encryption_obj.decrypt(input)
-##                            user_input=self.validate_input(webelement,input_val)
-##                            if user_input is not None:
-##                                input_val=user_input
-                            webelement.set_text(input_val)
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
+                        webelement.set_text(input_val)
+                        if android_scrapping.driver.is_keyboard_shown():
+                            android_scrapping.driver.hide_keyboard()
+                        time.sleep(3)
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
 
                 else:
                     err_msg='element is disabled'
 
-            except Exception as e:
-                err_msg='exception occured'
-                log.error(e)
-                logger.print_on_console(err_msg)
+        except Exception as e:
+            err_msg='exception occured'
+            log.error(e)
+            logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
 
@@ -192,21 +176,21 @@ class Textbox_keywords():
                     enable=element.is_enabled()
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
-
                         log.debug('Sending the keys')
-                        import platform
-                        if SYSTEM_OS == 'Darwin':
+                        if len(element.text)>0:
+                            log.debug('clearing  the existing text')
                             element.clear()
-                            element.set_value(text)
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
-                        else:
-                            if len(element.text)>0:
-                                log.debug('clearing  the existing text')
-                                element.clear()
-                                element.send_keys(text)
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
+                        action = TouchAction(android_scrapping.driver)
+                        action.tap(element).perform()
+                        text1 = []
+                        text1.append(text)
+                        obj = action_keyowrds_app.Action_Key_App()
+                        status,methodoutput,output,err_msg = obj.action_key(element,text1)
+                        if android_scrapping.driver.is_keyboard_shown():
+                            android_scrapping.driver.hide_keyboard()
+                        time.sleep(1)
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
@@ -219,7 +203,6 @@ class Textbox_keywords():
         except Exception as e:
             log.error(e)
             logger.print_on_console(err_msg)
-
         return status,methodoutput,output,err_msg
 
     def get_text(self,webelement,input,*args):
@@ -232,16 +215,19 @@ class Textbox_keywords():
             if type(webelement) is list:
                    webelement=webelement[0]
             if webelement is not None:
-                    if webelement.is_enabled():
-                        log.debug(WEB_ELEMENT_ENABLED)
-                        output=webelement.text
-                        status=TEST_RESULT_PASS
-                        result=TEST_RESULT_TRUE
-                    else:
-                        err_msg='ERR_DISABLED_OBJECT'
+                if webelement.is_enabled():
+                    log.debug(WEB_ELEMENT_ENABLED)
+                    output=webelement.text
+                    status=TEST_RESULT_PASS
+                    result=TEST_RESULT_TRUE
+                else:
+                    err_msg='ERR_DISABLED_OBJECT'
+                    output=webelement.text
+                    status=TEST_RESULT_PASS
+                    result=TEST_RESULT_TRUE
         except Exception as e:
-                log.error(e)
-                logger.print_on_console(err_msg)
+            log.error(e)
+            logger.print_on_console(err_msg)
         return status,result,output,err_msg
 
 
@@ -256,20 +242,28 @@ class Textbox_keywords():
         try:
             input_val=input[0]
             if len(input_val)>0 :
-                if type(webelement) is list:
-                       webelement=webelement[0]
+                #if type(webelement) is list:
+                #       webelement=webelement[0]
                 if webelement is not None:
-                        if webelement.is_enabled():
-                            log.debug(WEB_ELEMENT_ENABLED)
-                            if webelement.text==input_val:
-                                log.debug('text matched')
-                                status=TEST_RESULT_PASS
-                                result=TEST_RESULT_TRUE
+                    if webelement.is_enabled():
+                        log.debug(WEB_ELEMENT_ENABLED)
+                        if webelement.text==input_val:
+                            log.debug('text matched')
+                            status=TEST_RESULT_PASS
+                            result=TEST_RESULT_TRUE
                         else:
-                            err_msg='ERR_DISABLED_OBJECT'
-                            logger.print_on_console(err_msg)
+                            logger.print_on_console("Element text:"+webelement.text)
+                    else:
+                        err_msg='ERR_DISABLED_OBJECT'
+                        logger.print_on_console(err_msg)
+                        if webelement.text==input_val:
+                            log.debug('text matched')
+                            status=TEST_RESULT_PASS
+                            result=TEST_RESULT_TRUE
+                        else:
+                            logger.print_on_console("Element text:"+webelement.text)
         except Exception as e:
-                log.error(e)
+                log.error(e,exc_info=True)
                 logger.print_on_console(err_msg)
         return status,result,output,err_msg
 
@@ -280,23 +274,24 @@ class Textbox_keywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-                if type(webelement) is list:
-                       webelement=webelement[0]
-                if webelement is not None:
-                        if webelement.is_enabled():
-                            log.debug(WEB_ELEMENT_ENABLED)
-                            output=webelement.get_attribute('maxLength')
-                            status=TEST_RESULT_PASS
-                            result=TEST_RESULT_TRUE
-                        else:
-                            err_msg='ERR_DISABLED_OBJECT'
-                            logger.print_on_console(err_msg)
+            if type(webelement) is list:
+                   webelement=webelement[0]
+            if webelement is not None:
+                if webelement.is_enabled():
+                    log.debug(WEB_ELEMENT_ENABLED)
+                    output=webelement.get_attribute('maxLength')
+                    status=TEST_RESULT_PASS
+                    result=TEST_RESULT_TRUE
+                else:
+                    err_msg='ERR_DISABLED_OBJECT'
+                    logger.print_on_console(err_msg)
+                    output=webelement.get_attribute('maxLength')
+                    status=TEST_RESULT_PASS
+                    result=TEST_RESULT_TRUE
 
         except Exception as e:
                 err_msg='This element does not have the length property'
-                import traceback
-                traceback.print_exc()
-                log.error(e)
+                log.error(e,exc_info=True)
                 logger.print_on_console(err_msg)
         return status,result,output,err_msg
 
@@ -313,21 +308,32 @@ class Textbox_keywords():
                 if type(webelement) is list:
                        webelement=webelement[0]
                 if webelement is not None:
-                        if webelement.is_enabled():
-                            log.debug(WEB_ELEMENT_ENABLED)
-                            if webelement.get_attribute('maxLength')==int(input_val):
-                                log.debug('text matched')
-                                status=TEST_RESULT_PASS
-                                result=TEST_RESULT_TRUE
+                    if webelement.is_enabled():
+                        log.debug(WEB_ELEMENT_ENABLED)
+                        Len = webelement.get_attribute('maxLength')
+                        if Len == int(input_val):
+                            log.debug('text matched')
+                            status=TEST_RESULT_PASS
+                            result=TEST_RESULT_TRUE
                         else:
-                            err_msg='ERR_DISABLED_OBJECT'
-                            logger.print_on_console(err_msg)
+                            logger.print_on_console(str(Len))
+                            
+                    else:
+                        err_msg='ERR_DISABLED_OBJECT'
+                        logger.print_on_console(err_msg)
+                        Len = webelement.get_attribute('maxLength')
+                        if Len == int(input_val):
+                            log.debug('text matched')
+                            status=TEST_RESULT_PASS
+                            result=TEST_RESULT_TRUE
+                        else:
+                            logger.print_on_console(str(Len))
             else:
                 log.error('Invalid input')
                 err_msg='Invalid input'
         except Exception as e:
                 err_msg='This element does not have the length property'
-                log.error(e)
+                log.error(e,exc_info=True)
                 logger.print_on_console(err_msg)
         return status,result,output,err_msg
 

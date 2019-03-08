@@ -11,12 +11,9 @@
 
 from constants import *
 from mobile_app_constants import *
-from appium.webdriver.common.touch_action import TouchAction
-import install_and_launch
+import android_scrapping
 import logging
 import logger
-import time
-
 
 log = logging.getLogger('Number_picker_keywords.py')
 
@@ -28,8 +25,6 @@ class Number_Picker():
         output=OUTPUT_CONSTANT
         className=''
         err_msg=None
-        text=[]
-        obj=[]
         input_date=input[0]
 
         try:
@@ -50,6 +45,8 @@ class Number_Picker():
                             inp=int(input_date)
 
                             webelement.set_text(inp)
+                            if android_scrapping.driver.is_keyboard_shown():
+                                android_scrapping.driver.hide_keyboard()
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                         except Exception as e:

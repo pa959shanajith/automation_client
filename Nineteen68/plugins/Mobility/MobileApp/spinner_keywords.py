@@ -13,6 +13,7 @@ from constants import *
 from mobile_app_constants import *
 from appium.webdriver.common.touch_action import TouchAction
 import install_and_launch
+import android_scrapping
 import logging
 import logger
 import time
@@ -40,7 +41,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -65,8 +66,7 @@ class Spinner_Keywords():
                             length1=len(text)
                             scrollele11=obj[0]
                             scrollele21=obj[(length1)-1]
-                            import time
-                            time.sleep(3)
+                            time.sleep(2)
                             top_val=element[0].text
                             driver.scroll(scrollele11,scrollele21)
                             for i in element:
@@ -80,8 +80,7 @@ class Spinner_Keywords():
                             if length1 >4 :
                                 scrollele1=obj[length3-1]
                                 scrollele2=obj[length3-2]
-                                import time
-                                time.sleep(3)
+                                time.sleep(2)
                                 driver.scroll(scrollele2,scrollele1)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                             count= len(element)
@@ -100,8 +99,7 @@ class Spinner_Keywords():
                                     text.append(i.text)
                                     obj.append(i)
                             length2=len(text)
-                            import time
-                            time.sleep(3)
+                            time.sleep(2)
                             driver.scroll(scrollele2,scrollele1)
 
                             if (length1==length2):
@@ -111,7 +109,7 @@ class Spinner_Keywords():
                                 break
 
                         if className != 'RadioButton' :
-                            driver.back()
+                            driver.keyevent(4)
 
                     else:
                         err_msg='element is disabled'
@@ -147,7 +145,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -172,8 +170,7 @@ class Spinner_Keywords():
                             length1=len(text)
                             scrollele11=obj[0]
                             scrollele21=obj[(length1)-1]
-                            import time
-                            time.sleep(3)
+                            time.sleep(2)
                             top_val=element[0].text
                             driver.scroll(scrollele11,scrollele21)
                             for i in element:
@@ -187,8 +184,7 @@ class Spinner_Keywords():
                             if length1 >4 :
                                 scrollele1=obj[length3-1]
                                 scrollele2=obj[length3-2]
-                                import time
-                                time.sleep(3)
+                                time.sleep(2)
                                 driver.scroll(scrollele2,scrollele1)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                             count= len(element)
@@ -207,8 +203,7 @@ class Spinner_Keywords():
                                     text.append(i.text)
                                     obj.append(i)
                             length2=len(text)
-                            import time
-                            time.sleep(3)
+                            time.sleep(2)
                             driver.scroll(scrollele2,scrollele1)
 
                             if (length1==length2):
@@ -218,7 +213,7 @@ class Spinner_Keywords():
                                 break
 
                         if className != 'RadioButton' :
-                            driver.back()
+                            driver.keyevent(4)
                         if (input==len(text)):
                                 log.debug('count matched')
                                 status=TEST_RESULT_PASS
@@ -264,7 +259,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -301,8 +296,7 @@ class Spinner_Keywords():
                             length1=len(text)
                             scrollele11=obj[0]
                             scrollele21=obj[(length1)-1]
-                            import time
-                            time.sleep(3)
+                            time.sleep(2)
                             top_val=element[0].text
                             driver.scroll(scrollele11,scrollele21)
                             for i in element:
@@ -330,8 +324,7 @@ class Spinner_Keywords():
                                 if length1 >4 :
                                     scrollele1=obj[0]
                                     scrollele2=obj[(length1)-1]
-                                    import time
-                                    time.sleep(3)
+                                    time.sleep(2)
                                     driver.scroll(scrollele2,scrollele1)
                                     for i in element:
                                         if i.text not in text:
@@ -350,8 +343,7 @@ class Spinner_Keywords():
                                             log.error('invalid input')
                                             logger.print_on_console(err_msg)
                             length2=len(text)
-                            import time
-                            time.sleep(3)
+                            time.sleep(2)
                             driver.scroll(scrollele2,scrollele1)
 
                             if (length1==length2):
@@ -363,7 +355,7 @@ class Spinner_Keywords():
 
 
                             if className == 'CheckedTextView' :
-                                driver.back()
+                                driver.keyevent(4)
                                 break
 
                     else:
@@ -402,7 +394,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -431,17 +423,17 @@ class Spinner_Keywords():
                                                 status=TEST_RESULT_PASS
                                                 result=TEST_RESULT_TRUE
                                                 #if status == TEST_RESULT_PASS :
-                                                driver.back()
+                                                driver.keyevent(4)
                                                 var='true'
                                                 flag=True
                                                 break
                                             else:
                                                 if var=='' :
-                                                    driver.back()
+                                                    driver.keyevent(4)
                                                     var='true'
                                                     break
                                     else :
-                                        driver.back()
+                                        driver.keyevent(4)
                                         var = 'true'
                                         err_msg='invalid input'
                                         log.error('invalid input')
@@ -454,13 +446,13 @@ class Spinner_Keywords():
                                         if str(selected) == 'true':
                                             if input == j.text :
                                                 flag=True
-                                                driver.back()
+                                                driver.keyevent(4)
                                                 var = 'true'
                                                 status=TEST_RESULT_PASS
                                                 result=TEST_RESULT_TRUE
                                                 break
                                             else :
-                                                driver.back()
+                                                driver.keyevent(4)
                                                 var='true'
                                                 err_msg='invalid input'
                                                 log.error('invalid input')
@@ -473,8 +465,7 @@ class Spinner_Keywords():
                                 if length1 >4 :
                                     scrollele1=obj[length1-1]
                                     scrollele2=obj[length1-2]
-                                    import time
-                                    time.sleep(3)
+                                    time.sleep(2)
                                     driver.scroll(scrollele2,scrollele1)
 
                                 for i in element:
@@ -490,13 +481,13 @@ class Spinner_Keywords():
                                                         status=TEST_RESULT_PASS
                                                         result=TEST_RESULT_TRUE
                                                         if var=='' :
-                                                            driver.back()
+                                                            driver.keyevent(4)
                                                             var='true'
                                                         flag=True
                                                         break
                                                     else :
                                                         if var=='' :
-                                                            driver.back()
+                                                            driver.keyevent(4)
                                                             var='true'
                                                         break
 
@@ -506,8 +497,7 @@ class Spinner_Keywords():
                                                 logger.print_on_console(err_msg)
 
                             length2=len(text)
-                            import time
-                            time.sleep(3)
+                            time.sleep(2)
                             ##driver.scroll(scrollele2,scrollele1)
 
                             if (length1==length2):
@@ -516,17 +506,17 @@ class Spinner_Keywords():
                                     log.error('invalid input')
                                     logger.print_on_console(err_msg)
                                     if var=='':
-                                        driver.back()
+                                        driver.keyevent(4)
                                         var='true'
 
                                 break
 
 ##                        if className == 'CheckedTextView' :
 ##                            print '2222222'
-##                            driver.back()
+##                            driver.keyevent(4)
 
                         if var=='' :
-                            driver.back()
+                            driver.keyevent(4)
                             var='true'
                     else:
                         err_msg='element is disabled'
@@ -563,7 +553,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -601,8 +591,7 @@ class Spinner_Keywords():
                             length1=len(text)
                             scrollele11=obj[0]
                             scrollele21=obj[(length1)-1]
-                            import time
-                            time.sleep(3)
+                            time.sleep(2)
                             top_val=element[0].text
                             driver.scroll(scrollele11,scrollele21)
                             for i in element:
@@ -629,8 +618,7 @@ class Spinner_Keywords():
                             if length1 >4 :
                                 scrollele1=obj[0]
                                 scrollele2=obj[length1-2]
-                                import time
-                                time.sleep(3)
+                                time.sleep(2)
                                 driver.scroll(scrollele2,scrollele1)
 
                             for i in element:
@@ -649,8 +637,7 @@ class Spinner_Keywords():
                                     log.error('invalid input')
                                     logger.print_on_console(err_msg)
                             length2=len(text)
-                            import time
-                            time.sleep(3)
+                            time.sleep(2)
                             driver.scroll(scrollele2,scrollele1)
 
                             if (length1==length2):
@@ -659,12 +646,12 @@ class Spinner_Keywords():
                                     log.error('invalid input')
                                     logger.print_on_console(err_msg)
                                     if className == 'CheckedTextView' :
-                                        driver.back()
+                                        driver.keyevent(4)
                                         var = 'true'
                                 break
                         if className == 'CheckedTextView' :
                             if var == '':
-                                driver.back()
+                                driver.keyevent(4)
 
                     else:
                         err_msg='element is disabled'
@@ -701,7 +688,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -742,7 +729,7 @@ class Spinner_Keywords():
                                     scrollele2=obj[length1-2]
                                     driver.scroll(scrollele1,scrollele2)
                         if className == 'CheckedTextView' :
-                            driver.back()
+                            driver.keyevent(4)
 
                     else:
                         err_msg='element is disabled'
@@ -779,7 +766,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -820,7 +807,7 @@ class Spinner_Keywords():
                                     scrollele2=obj[length1-2]
                                     driver.scroll(scrollele2,scrollele1)
                         if className != 'RadioButton' :
-                            driver.back()
+                            driver.keyevent(4)
 
                     else:
                         err_msg='element is disabled'
@@ -858,7 +845,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -887,8 +874,7 @@ class Spinner_Keywords():
                             length1=len(text)
                             scrollele11=obj[0]
                             scrollele21=obj[(length1)-1]
-                            import time
-                            time.sleep(3)
+                            time.sleep(2)
                             top_val=element[0].text
                             driver.scroll(scrollele11,scrollele21)
                             for i in element:
@@ -906,8 +892,7 @@ class Spinner_Keywords():
                             if length1 >4 :
                                 scrollele1=obj[length1-1]
                                 scrollele2=obj[length1-2]
-                                import time
-                                time.sleep(3)
+                                time.sleep(2)
                                 driver.scroll(scrollele2,scrollele1)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                             count= len(element)
@@ -931,8 +916,7 @@ class Spinner_Keywords():
                                     ##temp.append(text[k])
                                     ##count=count+1
                             length2=len(text)
-                            import time
-                            time.sleep(3)
+                            time.sleep(2)
                             driver.scroll(scrollele2,scrollele1)
                             ##if (length1==length2):
                                 ##if len(input) == len(temp):
@@ -949,7 +933,7 @@ class Spinner_Keywords():
                                     logger.print_on_console(err_msg)
                                     break
                         if className != 'RadioButton' :
-                            driver.back()
+                            driver.keyevent(4)
 
 
                     else:
@@ -987,7 +971,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -1012,8 +996,7 @@ class Spinner_Keywords():
                             length1=len(text)
                             scrollele11=obj[0]
                             scrollele21=obj[(length1)-1]
-                            import time
-                            time.sleep(3)
+                            time.sleep(2)
                             top_val=element[0].text
                             driver.scroll(scrollele11,scrollele21)
                             for i in element:
@@ -1054,7 +1037,7 @@ class Spinner_Keywords():
                                         break
                                 break
                         if className != 'RadioButton' :
-                            driver.back()
+                            driver.keyevent(4)
 
                     else:
                         err_msg='element is disabled'
@@ -1093,7 +1076,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -1123,8 +1106,7 @@ class Spinner_Keywords():
                             if length1 >4 :
                                 scrollele1=obj[length1-1]
                                 scrollele2=obj[length1-2]
-                                import time
-                                time.sleep(3)
+                                time.sleep(2)
                                 driver.scroll(scrollele1,scrollele2)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                             count= len(element)
@@ -1148,8 +1130,7 @@ class Spinner_Keywords():
                                         temp.append(text[k])
                                         count=count+1
                             length2=len(text)
-                            import time
-                            time.sleep(3)
+                            time.sleep(2)
 ##                            driver.scroll(scrollele1,scrollele2)
 
                             if (length1==length2):
@@ -1171,7 +1152,7 @@ class Spinner_Keywords():
 
 
                         if className != 'RadioButton' :
-                            driver.back()
+                            driver.keyevent(4)
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
@@ -1209,7 +1190,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -1232,8 +1213,7 @@ class Spinner_Keywords():
                             length1=len(text)
                             scrollele11=obj[0]
                             scrollele21=obj[(length1)-1]
-                            import time
-                            time.sleep(3)
+                            time.sleep(2)
                             top_val=element[0].text
                             driver.scroll(scrollele11,scrollele21)
                             for i in element:
@@ -1243,15 +1223,13 @@ class Spinner_Keywords():
                                 if i.text ==top_val:
                                     break
                             length3=len(text)
-                            import time
-                            time.sleep(3)
+                            time.sleep(2)
                             driver.scroll(scrollele11,scrollele21)
 
                             if length1 >4 :
                                 scrollele1=obj[0]
                                 scrollele2=obj[length1-2]
-                                import time
-                                time.sleep(3)
+                                time.sleep(2)
                                 driver.scroll(scrollele2,scrollele1)
                                 element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                                 count= len(element)
@@ -1284,7 +1262,7 @@ class Spinner_Keywords():
                                 break
 
                         if className != 'RadioButton' :
-                            driver.back()
+                            driver.keyevent(4)
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
@@ -1319,7 +1297,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -1341,8 +1319,7 @@ class Spinner_Keywords():
                             length1=len(text)
                             scrollele11=obj[0]
                             scrollele21=obj[(length1)-1]
-                            import time
-                            time.sleep(3)
+                            time.sleep(2)
                             top_val=element[0].text
                             driver.scroll(scrollele11,scrollele21)
                             for i in element:
@@ -1356,8 +1333,7 @@ class Spinner_Keywords():
                             if length1 >4 :
                                 scrollele1=obj[0]
                                 scrollele2=obj[length1-2]
-                                import time
-                                time.sleep(3)
+                                time.sleep(2)
                                 driver.scroll(scrollele2,scrollele1)
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                             count1= len(element)
@@ -1375,8 +1351,7 @@ class Spinner_Keywords():
                                     text.append(i.text)
                                     obj.append(i)
                             length2=len(text)
-                            import time
-                            time.sleep(3)
+                            time.sleep(2)
 ##                            driver.scroll(scrollele1,scrollele2)
                             if (length1==length2):
                                 if len(input) == len(text):
@@ -1405,7 +1380,7 @@ class Spinner_Keywords():
 
 
                         if className != 'RadioButton' :
-                            driver.back()
+                            driver.keyevent(4)
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')

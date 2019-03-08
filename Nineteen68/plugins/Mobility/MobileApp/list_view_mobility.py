@@ -12,7 +12,7 @@
 from constants import *
 from mobile_app_constants import *
 from appium.webdriver.common.touch_action import TouchAction
-import install_and_launch
+import android_scrapping
 import logging
 import logger
 import time
@@ -46,7 +46,7 @@ class List_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
 
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
@@ -143,7 +143,7 @@ class List_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
 
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
@@ -237,7 +237,7 @@ class List_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
 
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
@@ -323,7 +323,7 @@ class List_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
 
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
@@ -390,7 +390,7 @@ class List_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
 
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
@@ -454,7 +454,7 @@ class List_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
 
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
@@ -527,7 +527,7 @@ class List_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
 
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
@@ -617,7 +617,7 @@ class List_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
 
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
@@ -705,7 +705,7 @@ class List_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
 
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
@@ -798,7 +798,7 @@ class List_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
 
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
@@ -886,7 +886,7 @@ class List_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
 
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
@@ -948,7 +948,7 @@ class List_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
 
                         while(True):
                             element=driver.find_elements_by_class_name('android.widget.CheckedTextView')

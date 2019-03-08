@@ -12,6 +12,7 @@ from constants import *
 from mobile_app_constants import *
 from appium.webdriver.common.touch_action import TouchAction
 import install_and_launch
+import android_scrapping
 import logging
 import logger
 import time
@@ -41,7 +42,7 @@ class Seek_Bar_Keywords():
                         start_y=location['y'] + (size['height']/2)
                         end_x=location['x']
                         end_y=location['y'] + (size['height']/2)
-                        driver=install_and_launch.driver
+                        driver=android_scrapping.driver
                         driver.swipe(start_x,start_y,end_x,end_y,3000)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -109,7 +110,7 @@ class Seek_Bar_Keywords():
                        start_y=location['y'] + (size['height']/2)
                        end_x=location['x'] + (size['width'])
                        end_y=start_y
-                       driver=install_and_launch.driver
+                       driver=android_scrapping.driver
                        driver.swipe(start_x,start_y,end_x,end_y,3000)
                        status=TEST_RESULT_PASS
                        methodoutput=TEST_RESULT_TRUE

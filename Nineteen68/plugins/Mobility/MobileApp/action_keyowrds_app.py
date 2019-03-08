@@ -13,13 +13,11 @@
 from constants import *
 from mobile_app_constants import *
 from appium.webdriver.common.touch_action import TouchAction
-
-
 import logging
 import logger
 import platform
 if SYSTEM_OS!='Darwin':
-    import install_and_launch
+    import android_scrapping
 import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -28,12 +26,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 import os
 import subprocess
 
-
-
 class Action_Key_App():
-
-
-
 
     def action_key(self,webelement,inputs,*args):
         status=TEST_RESULT_FAIL
@@ -42,7 +35,7 @@ class Action_Key_App():
         output=OUTPUT_CONSTANT
         err_msg=None
         status=None
-        device=install_and_launch.device_id
+        device=android_scrapping.device_id
 
 ##        print '123456789'
 ##        print 'device is',device
@@ -51,7 +44,7 @@ class Action_Key_App():
             send_values={
             'enter':' shell input keyevent 66',
             'keydown':' shell input keyevent 20',
-            'keyup': ' shell input keyevent 19',
+            'keyup':' shell input keyevent 19',
             'tab' :' shell input keyevent 61',
             'a':' shell input keyevent 29',
             'b':' shell input keyevent 30',
@@ -88,23 +81,54 @@ class Action_Key_App():
             '3':' shell input keyevent 10',
             '4':' shell input keyevent 11',
             '5':' shell input keyevent 12',
-            '6':' shell input keyevent 12',
+            '6':' shell input keyevent 13',
             '7':' shell input keyevent 14',
             '8':' shell input keyevent 15',
             '9':' shell input keyevent 16',
             'comma':' shell input keyevent 55',
             'space':' shell input keyevent 62',
             'volume_up':' shell input keyevent 24',
-            'volume_down':' shell input keyevent 25'
+            'volume_down':' shell input keyevent 25',
+            'back':' shell input keyevent 4',
+            '.':' shell input keyevent 56',
+            'del':' shell input keyevent 67',
+            '`':' shell input keyevent 68',
+            '-':' shell input keyevent 69',
+            '=':' shell input keyevent 70',
+            '(':' shell input keyevent 71',
+            ')':' shell input keyevent 72',
+            '\\':' shell input keyevent 73',
+            ';':' shell input keyevent 74',
+            "'":' shell input keyevent 75',
+            '/':' shell input keyevent 76',
+            '@':' shell input keyevent 77',
+            '+':' shell input keyevent 81',
+            'pageup':' shell input keyevent 92',
+            'pagedown':' shell input keyevent 93',
+            'movehome':' shell input keyevent 122',
+            'moveend':' shell input keyevent 123'
             }
             adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
-            if(len(inputs)==2):
+            if (len(inputs)==1):
+                inp_val = inputs[0]
+                if device is not None:
+                    cmd = adb + ' -s '+ device+' shell input text '+inp_val
+                else:
+                    cmd = adb +' shell input text '+inp_val
+                s = subprocess.check_output(cmd.split())
+                time.sleep(1)
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+            elif(len(inputs)==2):
                 inp_val= inputs[0].lower()
                 if inp_val in list(send_values.keys()):
                     input=int(inputs[1])
                     if input > 0 :
                         while True:
-                            cmd = adb + ' -s '+ device+send_values[inp_val]
+                            if device is not None:
+                                cmd = adb + ' -s '+ device+send_values[inp_val]
+                            else:
+                                cmd = adb +send_values[inp_val]
                             s = subprocess.check_output(cmd.split())
                             time.sleep(1)
                             status=TEST_RESULT_PASS

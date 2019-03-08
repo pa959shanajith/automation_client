@@ -13,6 +13,7 @@ from constants import *
 from mobile_app_constants import *
 from appium.webdriver.common.touch_action import TouchAction
 import install_and_launch
+import android_scrapping
 import logging
 import logger
 
@@ -39,7 +40,7 @@ class Radio_Button_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        action = TouchAction(install_and_launch.driver)
+                        action = TouchAction(android_scrapping.driver)
                         action.tap(element).perform()
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -78,20 +79,10 @@ class Radio_Button_Keywords():
                     if enable:
 
                         log.debug('performing the action')
-                        import platform
-                        if SYSTEM_OS == 'Darwin':
-                           classname= webelement.get_attribute("type")
-                        else:
-                           classname= webelement.get_attribute("className")
+                        classname= webelement.get_attribute("className")
                         if 'Switch' in classname:
                             output=webelement.text
                             output=str(output).upper()
-                            import platform
-                            if SYSTEM_OS == 'Darwin':
-                                if output == 'TRUE':
-                                    output = 'On'
-                                else:
-                                    output = "Off"
                         elif 'Radio' in classname:
                             output=webelement.get_attribute("checked")
                             if output=='true':
@@ -143,10 +134,15 @@ class Radio_Button_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        action = TouchAction(install_and_launch.driver)
-                        action.tap(element).perform()
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                        action = TouchAction(android_scrapping.driver)
+                        if element.get_attribute('checked') == 'false':
+                            action.tap(element).perform()
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                        elif element.get_attribute('checked') == 'true':
+                            log.debug('Element already selected')
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
@@ -178,10 +174,15 @@ class Radio_Button_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        action = TouchAction(install_and_launch.driver)
-                        action.tap(element).perform()
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                        action = TouchAction(android_scrapping.driver)
+                        if element.get_attribute('checked') == 'true':
+                            action.tap(element).perform()
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                        elif element.get_attribute('checked') == 'false':
+                            log.debug('Element already unselected')
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')

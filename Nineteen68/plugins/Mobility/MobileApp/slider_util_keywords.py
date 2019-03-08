@@ -13,6 +13,7 @@ from constants import *
 from mobile_app_constants import *
 from appium.webdriver.common.touch_action import TouchAction
 import install_and_launch
+import android_scrapping
 import logging
 import logger
 import time
@@ -275,7 +276,7 @@ class SliderKeywords():
             if timeout!=None:
                 start_time = time.time()
                 while True:
-                    element=dispatcher.getMobileElement(install_and_launch.driver,object_name)
+                    element=dispatcher.getMobileElement(android_scrapping.driver,object_name)
                     later=time.time()
                     if int(later-start_time)>=int(timeout):
                         logger.print_on_console('Delay timeout')
