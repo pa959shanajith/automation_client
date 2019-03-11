@@ -1769,10 +1769,11 @@ class Config_window(wx.Frame):
     def close(self,event):
         self.Close()
         self.Destroy()
-        global configvalues, browsercheckFlag
+        global configvalues, browsercheckFlag, chromeFlag, firefoxFlag
         configvalues = readconfig.readConfig().readJson() # Re-reading config values
         if configvalues['browser_check'].lower()=='no':
             browsercheckFlag=True
+            chromeFlag=firefoxFlag=False
         else:
             browsercheckFlag=False
         try:

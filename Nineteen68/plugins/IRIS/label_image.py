@@ -124,7 +124,8 @@ class LabelImage():
                         prediction_results[obj['custname']] = prediction_results[obj['custname']][0].upper() + prediction_results[obj['custname']][1:]
                     else:
                         prediction_results[obj['custname']] = 'Unable to recognize object type'
-            os.remove(os.environ['NINETEEN68_HOME'] + '/test.png')
+            if(os.path.isfile(file_name)):
+                os.remove(file_name)
         except Exception as e:
             logger.print_on_console('Error occured while labeling iris object type')
             log.error(e)
