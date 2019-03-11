@@ -428,10 +428,7 @@ class IRISKeywords():
                     text = get_ocr(image)
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
-                if(isinstance(text,str)):
-                    value = text.encode('utf-8')
-                else:
-                    value = text
+                value = text
                 os.remove('cropped.png')
             else:
                 log.error("Tesseract module not found.")

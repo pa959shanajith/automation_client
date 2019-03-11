@@ -116,16 +116,6 @@ class Controller():
                 self.get_all_the_imports('Generic')
                 import generic_dispatcher
                 self.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
-                # Load all plugins
-                self.__load_mobile_web()
-                self.__load_system()
-                self.__load_mainframe()
-                self.__load_sap()
-                self.__load_desktop()
-                self.__load_web()
-                self.__load_oebs()
-                self.__load_webservice()
-                self.__load_mobile_app()
         except Exception as e:
             logger.print_on_console('Error loading Generic plugin')
             log.error(e,exc_info=True)

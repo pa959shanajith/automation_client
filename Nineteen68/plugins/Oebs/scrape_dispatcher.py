@@ -106,7 +106,7 @@ class ScrapeDispatcher(wx.Frame):
                           encoded_string = base64.b64encode(image_file.read())
 
                 d = json.loads(d);
-                d['mirror'] =encoded_string.encode('UTF-8').strip()
+                d['mirror'] =encoded_string.decode('UTF-8').strip()
             except Exception as e:
                 logger.print_on_console('Error occured while capturing Screenshot',e)
 
@@ -144,7 +144,7 @@ class ScrapeDispatcher(wx.Frame):
                       encoded_string = base64.b64encode(image_file.read())
             d = json.loads(d);
 
-            d['mirror'] =encoded_string.encode('UTF-8').strip()
+            d['mirror'] =encoded_string.decode('UTF-8').strip()
         except Exception as e:
             logger.print_on_console('Error occured while capturing Screenshot ',e)
 
