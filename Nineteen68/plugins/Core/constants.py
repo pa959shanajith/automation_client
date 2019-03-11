@@ -118,6 +118,8 @@ ERROR_CODE_DICT ={
                     'ERR_HIDDEN_OBJECT':'The element is Hidden.',
                     'ERR_DISABLED_OBJECT':'The Element is Disabled.',
                     'ERR_EXCEPTION':'Exception occurred:',
+                    'ERR_REMEMBERED_CREDENTIALS_PRESENT':'Remembered Credentials Present',
+                    'ERR_WIN32':'Error occured when entering credentials',
                     'ERR_CODE_ERROR':'Code Error.',
                     'MSG_RESULT_IS':'Result obtained is:',
                     'ERR_OBJECTSELECTED':'Checkbox already Selected',

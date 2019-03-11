@@ -56,9 +56,11 @@ class TestThread(threading.Thread):
 class BrowserKeywords():
     def __init__(self):
         self.browser_num=''
+        self.windows=[]
+        self.params=[]
 
     def __web_driver_exception(self,e):
-        log.error(e)
+        log.error(e,exc_info=True)
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         logger.print_on_console(err_msg)
         return err_msg
@@ -268,7 +270,11 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return
 
-    def navigate_with_authenticate(self, webelement, url, *args):
+    def princon(self,hwnd, lparam):
+        if win32gui.GetClassName(hwnd)=="Edit":
+            self.params.append(hwnd)
+
+    def navigate_with_authenticate(self,webelement, url, *args):
         """
         def : navigate_with_authenticate
         purpose : To open a URL which throws a popup and automatically fill
@@ -283,65 +289,104 @@ class BrowserKeywords():
         err_msg=None
 
         try:
-            if (url[0] is not None and url[0] != '')\
-             and (url[1] is not None and url[1] != '')\
-              and (url[2] is not None and url[2] != ''):
+            inputURL = url[0]
+            if (inputURL is not None or inputURL != '') and (url[1] is not None or url[1] != '') and (url[2] is not None or url[2] != ''):
                 from encryption_utility import AESCipher
                 encryption_obj = AESCipher()
                 input_val = encryption_obj.decrypt(url[2])
                 url[2]=input_val
-                inputURL = url[0]
-                if not (inputURL is None and inputURL.strip() is ''):
-                    inputURL = inputURL.strip()
-                    if inputURL[0:7].lower()!='http://' and inputURL[0:8].lower()!='https://' and inputURL[0:5].lower()!='file:':
-                        inputURL='http://'+inputURL
-                t=TestThread(inputURL)
-                t.start()
+                inputURL = inputURL.strip()
+                if len(inputURL)<7 or (inputURL[0:7].lower()!='http://' and inputURL[0:8].lower()!='https://' and inputURL[0:7].lower()!='file://'):
+                    inputURL='http://'+inputURL
                 if len(url)>3:
-                    try:
-                        url[3]=int(url[3])
-                    except:
-                        url[3]=6
-                    time.sleep(int(url[3]))
+                    timeout=int(url[3])
+                    time.sleep(timeout)
                 else:
                     time.sleep(6)
 
                 # defect #193 added functionality for authentication automation in browser popup (Himanshu)
                 if(isinstance(driver_obj,webdriver.Ie)):
-                    obj=SF()
-                    username=url[1].strip()
-                    password=url[2]
-                    obj.type(username)
-                    obj.execute_key('tab',1)
-                    obj.type(password)
-                    obj.execute_key('tab',1)
-                    obj.execute_key('spacebar',1)
-                    obj.execute_key('tab',1)
-                    obj.execute_key('enter',1)
+                    driver_obj.get(inputURL)
+                    time.sleep(6)
+                    driver_pid=driver_obj.iedriver.process.pid
+                    auth_window_pid=psutil.Process(psutil.Process(driver_pid).children()[0].pid).children()[0].pid
+                    win32gui.EnumWindows(self.enum_window_callback, auth_window_pid)
+                    try:
+                        for i in self.windows:
+                            if win32gui.GetWindowText(i)=="Windows Security":
+                                win32gui.EnumChildWindows(i, self.princon, "extra")
+                    except Exception as e:
+                        err_msg = ERROR_CODE_DICT['ERR_EXCEPTION']
+                        logger.error(e)
+                    if len(self.params)>1:
+                        win32gui.SendMessage(self.params[0], win32con.WM_SETTEXT,0,url[1].encode('utf-8'))
+                        time.sleep(0.5)
+                        win32gui.SendMessage(self.params[1], win32con.WM_SETTEXT,0,url[2].encode('utf-8'))
+                        time.sleep(0.5)
+                        app=Application().connect(process=auth_window_pid)
+                        win=app.top_window()
+                        children_win=win.children()
+                        for c in children_win:
+                            if str(c.friendly_class_name())=="Button":
+                                win_text=c.Texts()
+                                if str(win_text[0]) =='OK':
+                                    c.Click()
+                                    status=webconstants.TEST_RESULT_PASS
+                                    result=webconstants.TEST_RESULT_TRUE
+                        if status!=webconstants.TEST_RESULT_PASS:
+                            err_msg=ERR_DICT['ERR_WIN32']
+                    elif len(self.params)==1:
+                        app=Application().connect(process=auth_window_pid)
+                        win=app.top_window()
+                        children_win=win.children()
+                        for c in children_win:
+                            if str(c.friendly_class_name())=="Button":
+                                win_text=c.Texts()
+                                if str(win_text[0]) =='Cancel':
+                                    c.Click()
+                        err_msg = ERROR_CODE_DICT['ERR_REMEMBERED_CREDENTIALS_PRESENT']
+                        #condition when password is saved  by windows credential manager
+                        #return with Failed flag
+                    else:
+                        from pywinauto.application import Application as appl
+                        app = appl().Connect(title=u'Windows Security')
+                        credentialdialogxamlhost = app['Windows Security']
+                        time.sleep(0.5)
+                        credentialdialogxamlhost.ClickInput()
+                        credentialdialogxamlhost.TypeKeys(url[1])
+                        time.sleep(0.5)
+                        credentialdialogxamlhost.TypeKeys("{TAB}")
+                        credentialdialogxamlhost.TypeKeys(url[2])
+                        time.sleep(0.5)
+                        credentialdialogxamlhost.TypeKeys("{ENTER}")
+                        status=webconstants.TEST_RESULT_PASS
+                        result=webconstants.TEST_RESULT_TRUE
+                    self.params = []
+                    self.windows = []
                 else:
-                    obj=SF()
-                    username=url[1].strip()
-                    password=url[2]
-                    obj.type(username)
-                    obj.execute_key('tab',1)
-                    obj.type(password)
-                    obj.execute_key('tab',1)
-                    obj.execute_key('enter',1)
-                t.join()
+                    auth_url=None
+                    if inputURL[0:5]=="https":
+                        auth_url=inputURL[0:8]+url[1]+":"+url[2]+"@"+inputURL[8:]
+                    else:
+                        auth_url=inputURL[0:7]+url[1]+":"+url[2]+"@"+inputURL[7:]
+                    #chrome supports basic auth!
+                    driver_obj.get(auth_url)
                 try:
                     ignore_certificate = readconfig.configvalues['ignore_certificate']
                     if ((ignore_certificate.lower() == 'yes') and ((driver_obj.title !=None) and ('Certificate' in driver_obj.title))):
                         driver_obj.execute_script("""document.getElementById('overridelink').click();""")
                 except Exception as k:
-                    logger.print_on_console('Exception while ignoring the certificate')
+                    log.error(k)
+                    err_msg='Exception while ignoring the certificate'
                 logger.print_on_console('Navigated to URL')
                 log.info('Navigated to URL')
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             else:
-                logger.print_on_console(webconstants.INVALID_INPUT)
-                log.error(webconstants.INVALID_INPUT)
                 err_msg = webconstants.INVALID_INPUT
+            if err_msg:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
