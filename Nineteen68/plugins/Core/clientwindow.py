@@ -44,6 +44,7 @@ mobileWebScrapeFlag=False
 debugFlag = False
 oebsScrapeFlag = False
 irisFlag = False
+executionOnly=False
 socketIO = None
 allow_connect = False
 icesession = None
@@ -79,6 +80,10 @@ class MainNamespace(BaseNamespace):
                 wxObject.rbox.Enable()
                 if browsercheckFlag == False:
                     browsercheckFlag = check_browser()
+                if executionOnly:
+                    msg='Execution only Mode enabled'
+                    logger.print_on_console(msg)
+                    log.info(msg)
                 log.info('Normal Mode: Connection to the Nineteen68 Server established')
             else:
                 threading.Timer(1,wxObject.killSocket).start()
@@ -187,6 +192,7 @@ class MainNamespace(BaseNamespace):
             log.error(e)
 
     def on_debugTestCase(self, *args):
+        if check_execution_lic("result_debugTestCase"): return None
         global wxObject
         args=list(args)
         wxObject.mythread = TestThread(wxObject,DEBUG,args[0],wxObject.debug_mode)
@@ -202,6 +208,7 @@ class MainNamespace(BaseNamespace):
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_webscrape(self,*args):
+        if check_execution_lic("scrape"): return None
         global action,wxObject,browsername,desktopScrapeFlag,data
         args = list(args)
         d = args[0]
@@ -229,6 +236,7 @@ class MainNamespace(BaseNamespace):
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_LAUNCH_DESKTOP(self, *args):
+        if check_execution_lic("scrape"): return None
         con = controller.Controller()
         global browsername
         browsername = args
@@ -241,6 +249,7 @@ class MainNamespace(BaseNamespace):
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_LAUNCH_SAP(self, *args):
+        if check_execution_lic("scrape"): return None
         try:
             con = controller.Controller()
             global browsername
@@ -257,6 +266,7 @@ class MainNamespace(BaseNamespace):
             log.error(e)
 
     def on_LAUNCH_MOBILE(self, *args):
+        if check_execution_lic("scrape"): return None
         con = controller.Controller()
         global browsername
         con = controller.Controller()
@@ -283,6 +293,7 @@ class MainNamespace(BaseNamespace):
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_LAUNCH_MOBILE_WEB(self, *args):
+        if check_execution_lic("scrape"): return None
         global mobileWebScrapeObj,mobileWebScrapeFlag
         con = controller.Controller()
         global browsername
@@ -298,6 +309,7 @@ class MainNamespace(BaseNamespace):
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_LAUNCH_OEBS(self, *args):
+        if check_execution_lic("scrape"): return None
         global oebsScrapeObj,oebsScrapeFlag
         con = controller.Controller()
         global browsername
@@ -310,6 +322,7 @@ class MainNamespace(BaseNamespace):
         wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
 
     def on_wsdl_listOfOperation(self, *args):
+        if check_execution_lic("result_wsdl_listOfOperation"): return None
         global socketIO
         contrlr = controller.Controller()
         contrlr.get_all_the_imports('WebServices')
@@ -774,7 +787,7 @@ class ClientWindow(wx.Frame):
         self.iconpath = IMAGES_PATH +"slk.ico"
         self.connect_img=wx.Image(IMAGES_PATH +"connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.disconnect_img=wx.Image(IMAGES_PATH +"disconnect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        self.enabledStatus = [False,False,False,False,False,False,False]
+        self.enabledStatus = [False,False,False,False,False,False,False,False]
 
         """
         Creating Root Logger using logger file config and setting logfile path,which is in config.json
@@ -1202,7 +1215,9 @@ class ClientWindow(wx.Frame):
         system_mac = core_utils_obj.getMacAddress()
         mac_verification_key = "".join(['N','1','i','1','N','2','e','3','T','5','e','8','E','1','3','n','2','1','S','i','X','t','Y','3','4','e','I','g','H','t','5','5'])
         irisMAC = []
+        execMAC=[]
         global irisFlag
+        global executionOnly
         try:
             with open(CERTIFICATE_PATH+'/license.key', mode='r') as f:
                 key = "".join(f.readlines()[1:-1]).replace("\n","").replace("\r","")
@@ -1211,16 +1226,27 @@ class ClientWindow(wx.Frame):
                 mac_addr = (mac_addr.replace('-',':').replace(' ','')).lower().split(",")
                 index = 0
                 for mac in mac_addr:
-                    if(str(mac).startswith("iris")):
-                        mac_addr[index] = mac[4:]
-                        irisMAC.append(mac[4:])
+                    iris_index=-1
+                    if "iris" in mac:
+                        iris_index=mac.index("iris")+4
+                        mac_addr[index] = mac[iris_index:]
+                        irisMAC.append(mac[iris_index:])
+                    if "exec_only" in mac:
+                        exec_index=mac.index("exec_only")+9
+                        if iris_index > -1:
+                            exec_index=iris_index
+                        mac_addr[index] = mac[exec_index:]
+                        execMAC.append(mac[exec_index:])
                     index = index + 1
                 if(system_mac in mac_addr):
                     flag = True
+                    if system_mac in execMAC:
+                        executionOnly=True
                     if ((system_mac in irisMAC) and os.path.isdir(os.environ["NINETEEN68_HOME"]+'/Nineteen68/plugins/IRIS')):
                         irisFlag = True
                         controller.iris_flag = True
-        except:
+        except Exception as e:
+            log.error(e,exc_info=True)
             pass
         if not flag:
             msg = "Unauthorized: Access denied, system is not registered with Nineteen68"
@@ -1916,3 +1942,11 @@ def check_browser():
         log.debug("Error while checking browser compatibility")
         log.debug(e)
     return False
+
+def check_execution_lic(event):
+    if executionOnly:
+        msg='Execution only allowed'
+        log.info(msg)
+        logger.print_on_console(msg)
+        socketIO.emit(event,'ExecutionOnlyAllowed')
+    return executionOnly
