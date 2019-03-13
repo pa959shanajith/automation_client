@@ -550,7 +550,7 @@ class Launch_Keywords():
         input_val = ''
         try:
             win = app_uia.top_window()
-            win.Maximize()
+            win.maximize()
             log.info(STATUS_METHODOUTPUT_UPDATE)
             status = desktop_constants.TEST_RESULT_PASS
             result = desktop_constants.TEST_RESULT_TRUE
@@ -572,7 +572,7 @@ class Launch_Keywords():
         input_val = ''
         try:
             win = app_uia.top_window()
-            win.Minimize()
+            win.minimize()
             log.info(STATUS_METHODOUTPUT_UPDATE)
             status = desktop_constants.TEST_RESULT_PASS
             result = desktop_constants.TEST_RESULT_TRUE
