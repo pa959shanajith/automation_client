@@ -340,9 +340,9 @@ class IRISKeywords():
                 pyautogui.click()
                 robot = Robot()
                 robot.ctrl_press('a')
-                time.sleep(0.5)
+                time.sleep(1)
                 robot.key_press('backspace')
-                time.sleep(0.5)
+                time.sleep(1)
                 pyautogui.typewrite(args[0][0], interval=0.2)
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
