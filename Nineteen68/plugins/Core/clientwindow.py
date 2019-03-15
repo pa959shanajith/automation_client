@@ -1010,7 +1010,6 @@ class ClientWindow(wx.Frame):
     def OnClose(self, event):
         controller.terminate_flag=True
         controller.disconnect_flag=True
-        global socketIO
         logger.print_on_console('Disconnected from Nineteen68 server')
         stat = self.killChildWindow(True,True,True,True)
         if stat[1]: socketIO.emit('scrape','Terminate')
@@ -1053,8 +1052,6 @@ class ClientWindow(wx.Frame):
         print('********************************************************************************************************')
 
     def OnNodeConnect(self,event):
-        con =controller.Controller()
-
         try:
             global socketIO
             name = self.connectbutton.GetName()

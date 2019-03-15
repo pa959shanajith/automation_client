@@ -94,7 +94,6 @@ class PdfFile:
              if pagenumber<reader.getNumPages():
                 page=reader.getPage(pagenumber)
                 content=page.extractText()
-                content=content.encode('utf-8')
                 if len(args)>1 and args[1]=='_internal_verify_content':
                     return content
                 if len(args) >= 2 and not (args[0] is None and args[1] is None):
@@ -109,7 +108,6 @@ class PdfFile:
                         endIndex=content.find(end)
                     content=content[startIndex:endIndex]
                     log.info('Content between Start and End string is ')
-##                    logger.print_on_console('Content between Start and End string is ')
                 elif len(args)==1:
                     with open(args[0],'w') as file:
                         file.write(content)
@@ -119,12 +117,13 @@ class PdfFile:
              else:
                 err_msg=generic_constants.INVALID_INPUT
                 log.error(err_msg)
-##                logger.print_on_console(err_msg)
 
         except ValueError as e:
             err_msg=generic_constants.INVALID_INPUT
-        except IOError:
+            log.error(e)
+        except IOError as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
+            log.error(e)
         except Exception as e:
             err_msg=generic_constants.ERR_MSG1+'Fetching PDF content'+generic_constants.ERR_MSG2
             log.error(e)
@@ -245,16 +244,17 @@ class TextFile:
         try:
             with open(input_path) as myFile:
                 content = myFile.read()
-                if int(linenumber) >= 0:
+                linenumber = int(linenumber)
+                split_content = content.splitlines()
+                if linenumber > 0:
                     linenumber = int(linenumber) - 1
-                if (int(linenumber) <= len(content.splitlines())) and (int(linenumber) >= 0):
-                    content = content.splitlines()[int(linenumber)]
+                if (linenumber <= len(split_content)) and (linenumber >= 0):
+                    content = split_content[int(linenumber)]
                     log.info('Content is '+str(content))
                     status=True
                 else:
                     content = ''
                     err_msg=constants.ERROR_CODE_DICT['ERR_INVALID_INPUT']
-
         except IOError:
             err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
@@ -276,7 +276,7 @@ class TextFile:
         status=False
         line_numbers=[]
         err_msg=None
-        log.debug('Get the line number of Text file '+str(input_path)+' containing the ontent '+str(content))
+        log.debug('Get the line number of Text file '+str(input_path)+' containing the content '+str(content))
         try:
             with open(input_path) as myFile:
                 for num, line in enumerate(myFile, 1):
@@ -296,8 +296,6 @@ class TextFile:
         if err_msg!=None:
             logger.print_on_console(err_msg)
         return status,line_numbers,err_msg
-
-
 
     def replace_content(self,input_path,existing_content,replace_content):
         """
@@ -329,8 +327,6 @@ class TextFile:
         if err_msg!=None:
             logger.print_on_console(err_msg)
         return status,err_msg
-
-
 
     def write_to_file(self,input_path,content,*args):
         """
