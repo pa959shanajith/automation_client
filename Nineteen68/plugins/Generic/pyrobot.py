@@ -113,14 +113,19 @@ class MOUSEINPUT(ctypes.Structure):
 
 
 class KEYBDINPUT(ctypes.Structure):
-  _fields_ = [
-    ('wVk', WORD),
-    ('wScan', WORD),
-    ('dwFlags', DWORD),
-    ('time', DWORD),
-    ('dwExtraInfo', POINTER(ULONG)),
-  ]
+    _fields_ = (("wVk",         wintypes.WORD),
+                ("wScan",       wintypes.WORD),
+                ("dwFlags",     wintypes.DWORD),
+                ("time",        wintypes.DWORD),
+                ("dwExtraInfo", wintypes.WPARAM))
 
+    def __init__(self, *args, **kwds):
+        super(KEYBDINPUT, self).__init__(*args, **kwds)
+        KEYEVENTF_UNICODE = 0x0004
+        # some programs use the scan code even if KEYEVENTF_SCANCODE
+        # isn't set in dwFflags, so attempt to map the correct code.
+        if not self.dwFlags & KEYEVENTF_UNICODE:
+            self.wScan = user32.MapVirtualKeyExW(self.wVk, 0, 0)
 
 class HARDWAREINPUT(ctypes.Structure):
   _fields_ = [
@@ -637,19 +642,11 @@ class Robot(object):
     self._key_control(key=vk_code, action=KEY_RELEASE)
 
   def _key_control(self, key, action):
-    ip = INPUT()
-
     INPUT_KEYBOARD = 0x00000001
-    ip.type = INPUT_KEYBOARD
-    ip.ki.wScan = 0
-    ip.ki.time = 0
-    a = user32.GetMessageExtraInfo()
-    b = cast(a, POINTER(c_ulong))
-    # ip.ki.dwExtraInfo
-
-    ip.ki.wVk = key
-    ip.ki.dwFlags = action
-    user32.SendInput(1, byref(ip), sizeof(INPUT))
+    x = INPUT(type=INPUT_KEYBOARD,
+              ki=KEYBDINPUT(wVk=key))
+    x.ki.dwFlags = action
+    user32.SendInput(1, ctypes.byref(x), ctypes.sizeof(x))
 
   def _vk_from_char(self, key_char):
     try:

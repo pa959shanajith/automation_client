@@ -343,7 +343,7 @@ class IRISKeywords():
                 time.sleep(1)
                 robot.key_press('backspace')
                 time.sleep(1)
-                pyautogui.typewrite(args[0][0], interval=0.2)
+                robot.type_string(args[0][0], delay=0.2)
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
             else:
