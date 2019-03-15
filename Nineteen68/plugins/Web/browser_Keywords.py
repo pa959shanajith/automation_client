@@ -29,8 +29,12 @@ if SYSTEM_OS != 'Darwin':
     import win32gui
     import win32api
     import utils_web
+    import win32process
+    import win32con
 import psutil
 import readconfig
+from pywinauto import Application
+
 
 import core_utils
 import time
@@ -270,6 +274,14 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return
 
+    #helper functions for navigate_with_authenticate
+    def enum_window_callback(self,hwnd, pid):
+        tid, current_pid = win32process.GetWindowThreadProcessId(hwnd)
+        if pid == current_pid and win32gui.IsWindowVisible(hwnd):
+            self.windows.append(hwnd)
+
+
+
     def princon(self,hwnd, lparam):
         if win32gui.GetClassName(hwnd)=="Edit":
             self.params.append(hwnd)
@@ -319,12 +331,12 @@ class BrowserKeywords():
                         err_msg = ERROR_CODE_DICT['ERR_EXCEPTION']
                         logger.error(e)
                     if len(self.params)>1:
-                        win32gui.SendMessage(self.params[0], win32con.WM_SETTEXT,0,url[1].encode('utf-8'))
+                        win32gui.SendMessage(self.params[0], win32con.WM_SETTEXT,0,url[1])
                         time.sleep(0.5)
-                        win32gui.SendMessage(self.params[1], win32con.WM_SETTEXT,0,url[2].encode('utf-8'))
+                        win32gui.SendMessage(self.params[1], win32con.WM_SETTEXT,0,url[2])
                         time.sleep(0.5)
                         app=Application().connect(process=auth_window_pid)
-                        win=app.top_window()
+                        win=app['Windows Security']
                         children_win=win.children()
                         for c in children_win:
                             if str(c.friendly_class_name())=="Button":
@@ -334,10 +346,10 @@ class BrowserKeywords():
                                     status=webconstants.TEST_RESULT_PASS
                                     result=webconstants.TEST_RESULT_TRUE
                         if status!=webconstants.TEST_RESULT_PASS:
-                            err_msg=ERR_DICT['ERR_WIN32']
+                            err_msg=ERROR_CODE_DICT['ERR_WIN32']
                     elif len(self.params)==1:
                         app=Application().connect(process=auth_window_pid)
-                        win=app.top_window()
+                        win=app['Windows Security']
                         children_win=win.children()
                         for c in children_win:
                             if str(c.friendly_class_name())=="Button":
@@ -1053,20 +1065,4 @@ class Singleton_DriverUtil():
         return flag1
 
 
-##driver = Singleton_DriverUtil()
-##driver.driver('1','D:\Browser\chromedriver.exe')
-##driver.driver('2')
-##obj = BrowserKeywords()
-##obj.openBrowser('1','D:\Browser\chromedriver.exe')
-##obj.navigateToURL('https://cvg53.ngahrhosting.com/Main/careerportal/JobAgent.cfm')
-##import dropdown_listbox
-##obj1 = DropdownKeywords()
-##obj1.selectValueByIndex('cboRadius','4')
-##obj.openBrowser('2')
-##obj.navigateToURL('https://cvg53.ngahrhosting.com/Main/careerportal/JobAgent.cfm')
-##import dropdown_listbox
-##obj1 = DropdownKeywords()
-##obj1.selectValueByIndex('cboRadius','4')
-##obj.getPageTitle()
-##obj.getCurrentURL()
-##obj.verifyCurrentURL('http://10.41.31.131/users/sign_in')
+
