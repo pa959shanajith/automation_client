@@ -107,11 +107,15 @@ class ScrapeWindow(wx.Frame):
         logger.print_on_console('Performing full scrape')
         d = obj.scrape()
         # 10 is the limit of MB set as per Nineteen68 standards
-        if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
-            self.socketIO.emit('scrape',d)
+        if d is not None:
+            if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
+                self.socketIO.emit('scrape',d)
+            else:
+                logger.print_on_console('Scraped data exceeds max. Limit.')
+                self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
         else:
-            logger.print_on_console('Scraped data exceeds max. Limit.')
-            self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
+            logger.print_on_console('Error in scraping')
+            self.socketIO.emit('scrape','Error in scraping')
         self.parent.schedule.Enable()
         self.Close()
         logger.print_on_console('Full scrape  completed')

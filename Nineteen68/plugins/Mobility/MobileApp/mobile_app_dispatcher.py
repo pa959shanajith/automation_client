@@ -172,11 +172,12 @@ class MobileDispatcher:
                     'settime' : self.time_keywords_object.Set_Time,
                     'gettime' : self.time_keywords_object.Get_Time,
                     'setnumber':self.number_picker_object.Select_Number,
+                    'getnumber':self.number_picker_object.Get_Selected_Number,
+                    'verifynumber':self.number_picker_object.Verify_Selected_Number,
                     'setminvalue':self.seekBar_object.Set_Min_Value,
                     'setmidvalue':self.seekBar_object.Set_Mid_Value,
-                    'setmaxvalue':self.seekBar_object.Set_Max_Value
-
-
+                    'setmaxvalue':self.seekBar_object.Set_Max_Value,
+                    'setvalue':self.seekBar_object.Set_Mid_Value
                 }
             ELEMENT_FOUND=True
             if keyword in list(dict.keys()):
@@ -396,6 +397,10 @@ class MobileDispatcher:
                     driver = android_scrapping.driver
                     if keyword==WAIT_FOR_ELEMENT_EXISTS:
                         result=dict[keyword](objectname,input)
+                    elif keyword == 'getnumber' or keyword == 'verifynumber':
+                        objectname = objectname+"/android.widget.EditText[1]"
+                        webelement=self.getMobileElement(driver,objectname)
+                        result=dict[keyword](webelement,input)
                     else:
                         webelement=self.getMobileElement(driver,objectname)
                         result=dict[keyword](webelement,input)
@@ -423,8 +428,7 @@ class MobileDispatcher:
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
         except Exception as e:
-            import traceback
-            log.error(e)
+            log.error(e,exc_info=True)
             #logger.print_on_console('Exception at dispatcher')
         return result
 
@@ -454,7 +458,7 @@ class MobileDispatcher:
                 except Exception as Ex:
                     log.debug('Webelement not found')
                     err_msg=str(Ex)
-##                    logger.print_on_console(err_msg)
+    ##                    logger.print_on_console(err_msg)
                     log.error(err_msg)
         if mobileElement==None:
             ELEMENT_FOUND=False

@@ -18,44 +18,32 @@ import logger
 log = logging.getLogger('Number_picker_keywords.py')
 
 class Number_Picker():
-
     def Select_Number(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
-        className=''
         err_msg=None
-        input_date=input[0]
-
+        input_date=str(input[0])
         try:
-
             if webelement is not None:
                 visibility=webelement.is_displayed()
                 log.debug('element is visible')
                 if visibility:
-
                     enable=webelement.is_enabled()
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
-
                         log.debug('performing the action')
-
                         try:
-
-                            inp=int(input_date)
-
-                            webelement.set_text(inp)
+                            #input_date=int(input_date)
+                            webelement.set_text(input_date)
                             if android_scrapping.driver.is_keyboard_shown():
                                 android_scrapping.driver.hide_keyboard()
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                         except Exception as e:
-
-
                             err_msg='Invalid input'
-                            log.error('Invalid input')
+                            log.error(e,exc_info=True)
                             logger.print_on_console(err_msg)
-
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
@@ -65,7 +53,67 @@ class Number_Picker():
                     log.error('element is not visible')
                     logger.print_on_console(err_msg)
         except Exception as e:
-
             log.error(e)
+        return status,result,output,err_msg
 
+    def Get_Selected_Number(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        result=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            if webelement is not None:
+                visibility=webelement.is_displayed()
+                log.debug('element is visible')
+                if visibility:
+                    enable=webelement.is_enabled()
+                    log.debug(WEB_ELEMENT_ENABLED)
+                    if enable:
+                        output = webelement.text
+                        status=TEST_RESULT_PASS
+                        result=TEST_RESULT_TRUE
+                    else:
+                        err_msg='element is disabled'
+                        log.error('element is disabled')
+                        logger.print_on_console(err_msg)
+                else:
+                    err_msg='element is not visible'
+                    log.error('element is not visible')
+                    logger.print_on_console(err_msg)
+        except Exception as e:
+            log.error(e,exc_info=True)
+        return status,result,output,err_msg
+
+    def Verify_Selected_Number(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        result=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            input_val=input[0]
+            if len(input_val)>0 :
+                #if type(webelement) is list:
+                #       webelement=webelement[0]
+                if webelement is not None:
+                    if webelement.is_enabled():
+                        log.debug(WEB_ELEMENT_ENABLED)
+                        if webelement.text==input_val:
+                            log.debug('text matched')
+                            status=TEST_RESULT_PASS
+                            result=TEST_RESULT_TRUE
+                        else:
+                            logger.print_on_console("Element text:"+webelement.text)
+                    else:
+                        err_msg='ERR_DISABLED_OBJECT'
+                        logger.print_on_console(err_msg)
+                        if webelement.text==input_val:
+                            log.debug('text matched')
+                            status=TEST_RESULT_PASS
+                            result=TEST_RESULT_TRUE
+                        else:
+                            logger.print_on_console("Element text:"+webelement.text)
+        except Exception as e:
+                log.error(e,exc_info=True)
+                logger.print_on_console(err_msg)
         return status,result,output,err_msg

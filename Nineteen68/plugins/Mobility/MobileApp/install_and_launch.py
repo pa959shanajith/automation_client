@@ -133,10 +133,10 @@ class LaunchAndInstall():
             processes = psutil.net_connections()
             for line in processes:
                 p = line.laddr
-                if p[1] == 4723:
+                if p[1] == 4723 and driver is not None:
                     driver.remove_app(package_name)
             else:
-                device_keywords_object.uninstall_app(package_name)
+                device_keywords_object.uninstall_app(package_name, android_scrapping.device_id)
             #self.stop_server()
             status = mobile_app_constants.TEST_RESULT_PASS
             result = mobile_app_constants.TEST_RESULT_TRUE
@@ -150,11 +150,18 @@ class LaunchAndInstall():
         result=mobile_app_constants.TEST_RESULT_FALSE
         err_msg=None
         output=OUTPUT_CONSTANT
+        global driver, device_keywords_object
         try:
-            driver.close_app()
-            #self.stop_server()
-            status=mobile_app_constants.TEST_RESULT_PASS
-            result=mobile_app_constants.TEST_RESULT_TRUE
+            processes = psutil.net_connections()
+            for line in processes:
+                p = line.laddr
+                if p[1] == 4723 and driver is not None:
+                    logger.print_on_console("Package name to be terminated:"+android_scrapping.packageName)
+                    device_keywords_object.close_app(android_scrapping.packageName, android_scrapping.device_id)
+                    #driver.close_app()
+                    #self.stop_server()
+                    status=mobile_app_constants.TEST_RESULT_PASS
+                    result=mobile_app_constants.TEST_RESULT_TRUE
         except Exception as e:
             log.error(e,exc_info=True)
             logger.print_on_console(e)
@@ -175,12 +182,16 @@ class LaunchAndInstall():
             processes = psutil.net_connections()
             for line in processes:
                 p = line.laddr
-                if p[1] == 4723:
-                    if driver.is_app_installed(package_name):
+                if p[1] == 4723 and driver is not None:
+                    if driver.is_app_installed(android_scrapping.packageName) and android_scrapping.packageName == package_name:
                         driver.launch_app()
-                    else:
+                    elif android_scrapping.packageName == package_name:
                         driver.install_app(apk_path)
                         driver.launch_app()
+                    else:
+                        android_scrapping.packageName = package_name
+                        activity_name = device_keywords_object.activity_name(apk_path)
+                        driver.start_activity(package_name,activity_name)
                     status = mobile_app_constants.TEST_RESULT_PASS
                     result = mobile_app_constants.TEST_RESULT_TRUE
                     driver_flag = True

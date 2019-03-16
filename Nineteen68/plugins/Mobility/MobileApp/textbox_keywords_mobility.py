@@ -132,7 +132,7 @@ class Textbox_keywords():
 ##                    logger.print_on_console(INPUT_IS+str(input))
 ##                    log.info(INPUT_IS)
                     log.info(input)
-                    if input is not None:
+                    if input != '':
                         if len(webelement.text)>0:
                             log.debug('clearing  the existing text')
                             webelement.clear()
