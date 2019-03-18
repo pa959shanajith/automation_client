@@ -30,7 +30,7 @@ import logger
 from webscrape_utils import WebScrape_Utils
 
 class Fullscrape():
-    def fullscrape(self,scrape_option,window_handle_number):
+    def fullscrape(self,scrape_option,window_handle_number,visiblity_status):
         global currenthandle
         start_time = time.clock()
         data = {}
@@ -75,7 +75,10 @@ class Fullscrape():
                     scrape_option[1] = reference_element
                 else:
                     raise ValueError('invalid xpath')
-            tempreturn = driver.execute_script(webscrape_utils_obj.javascript_fullscrape, driver.current_url,scrape_option)
+            if visiblity_status == True:
+                tempreturn = driver.execute_script(webscrape_utils_obj.javascript_fullscrape_Visiblity, driver.current_url,scrape_option)
+            else:
+                tempreturn = driver.execute_script(webscrape_utils_obj.javascript_fullscrape, driver.current_url,scrape_option)
             log.info('full scrape operation on default/outer page is done and data is obtained')
             tempne.extend(tempreturn)
 
@@ -85,7 +88,10 @@ class Fullscrape():
                     path = myipath + str(iframes) + 'i' + '/'
                     if webscrape_utils_obj.switchtoframe_webscrape(driver,currenthandle,path):
                         log.debug('switched to iframe/frame %s', path)
-                        temp = driver.execute_script(webscrape_utils_obj.javascript_fullscrape, path,scrape_option)
+                        if visiblity_status ==True:
+                            temp = driver.execute_script(webscrape_utils_obj.javascript_fullscrape_Visiblity, path,scrape_option)
+                        else:
+                            temp = driver.execute_script(webscrape_utils_obj.javascript_fullscrape, path,scrape_option)
                         if temp is not None:
                             log.debug('full scrape operation on iframe %s is done and data is obtained',path)
                             tempne.extend(temp)
@@ -100,7 +106,10 @@ class Fullscrape():
                     path = myipath + str(frames) + 'f' +  '/'
                     if webscrape_utils_obj.switchtoframe_webscrape(driver,currenthandle,path):
                         log.debug('switched to iframe/frame %s', path)
-                        temp = driver.execute_script(webscrape_utils_obj.javascript_fullscrape, path,scrape_option)
+                        if visiblity_status ==True:
+                            temp = driver.execute_script(webscrape_utils_obj.javascript_fullscrape_Visiblity, path,scrape_option)
+                        else:
+                            temp = driver.execute_script(webscrape_utils_obj.javascript_fullscrape, path,scrape_option)
                         if temp is not None:
                             log.debug('full scrape operation on frame %s is done and data is obtained',path)
                             tempne.extend(temp)
