@@ -65,6 +65,7 @@ class Seek_Bar_Keywords():
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
+            inp=input[0]
             if webelement is not None:
                 visibility=webelement.is_displayed()
                 log.debug('element is visible')
