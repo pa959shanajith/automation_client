@@ -32,6 +32,7 @@ import time
 import ctypes
 import multiprocessing
 from ctypes import *
+from ctypes import wintypes
 from ctypes.wintypes import *
 
 

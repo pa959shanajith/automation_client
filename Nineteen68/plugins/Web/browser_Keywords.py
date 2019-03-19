@@ -186,6 +186,7 @@ class BrowserKeywords():
         try:
             global driver_obj
             global webdriver_list
+            global parent_handle
             driver = Singleton_DriverUtil()
             # ref: <gitlabpath>/nineteen68v2.0/Nineteen68/issues/1556
             # Logic for config file status on `enableSecurityCheck`
