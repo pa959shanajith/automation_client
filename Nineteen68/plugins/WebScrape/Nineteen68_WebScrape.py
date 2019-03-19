@@ -23,7 +23,7 @@ class ScrapeWindow(wx.Frame):
 
     def __init__(self, parent,id, title,browser,socketIO,action,data,irisFlag):
         wx.Frame.__init__(self, parent, title=title,
-                   pos=(300, 150),  size=(200, 180) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
+                   pos=(300, 150),  size=(210, 180) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
         self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
