@@ -22,7 +22,6 @@ log = logging.getLogger('device_keywords.py')
 class Device_Keywords():
 
     def get_device_list(self,input_val,*args):
-
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=None
@@ -80,21 +79,28 @@ class Device_Keywords():
                                 return ''
                     cm=cmd + ' tcpip 5555'
                     abc=str(subprocess.check_output(cm))
-                    import time
-                    time.sleep(5)
-                    cmmmm=cmd + ' shell ip -f inet addr show wlan0'
-                    out1 = str(subprocess.check_output(cmmmm))
-                    b=out1[out1.find('inet'):]
-                    b=b.strip('inet')
-                    c=b.split('/')
-                    ser=c[0] + ':5555'
-                    c= cmd + ' connect ' +ser
-                    o=str(subprocess.check_output(c))
-                    if 'connected' in o :
-                        logger.print_on_console('Both devices are connected over wifi unplug the cable')
-                        return ser[1:]
+                    if 'TCP' in abc:
+                        import time
+                        time.sleep(3)
+                        cmmmm=cmd + ' shell ip -f inet addr show wlan0'
+                        out1 = str(subprocess.check_output(cmmmm))
+                        if 'error' in out1:
+                            logger.print_on_console('Error connecting the device through wifi! Please restart USB debugging')
+                            return ''
+                        b=out1[out1.find('inet'):]
+                        b=b.strip('inet')
+                        c=b.split('/')
+                        ser=c[0] + ':5555'
+                        c= cmd + ' connect ' +ser
+                        o=str(subprocess.check_output(c))
+                        if 'connected' in o :
+                            logger.print_on_console('Both devices are connected over wifi unplug the cable')
+                            return ser[1:]
+                        else:
+                            logger.print_on_console('Error connecting the device through wifi! Please restart USB debugging')
+                            return ''
                     else:
-                        logger.print_on_console('Error connecting the device through wifi')
+                        logger.print_on_console('Error connecting the device through wifi! Please restart USB debugging')
                         return ''
                 else:
                     logger.print_on_console('No devices found please connect the device via usb to configure adb through WiFi')
@@ -104,9 +110,7 @@ class Device_Keywords():
             logger.print_on_console(err_msg)
 
 
-
     def invoke_device(self,input_val,*args):
-
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -115,7 +119,6 @@ class Device_Keywords():
         device=None
         maindir=os.getcwd()
         try:
-
             device=args[0]
             log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
             android_home=os.environ['ANDROID_HOME']
@@ -186,7 +189,7 @@ class Device_Keywords():
             logger.print_on_console(e)
         return activityName
 
-    def uninstall_app(self, pkg):
+    def uninstall_app(self, pkg, device):
         maindir = os.getcwd()
         flag = False
         try:
@@ -195,7 +198,7 @@ class Device_Keywords():
             os.chdir(cmd)
             cmd = cmd + 'adb.exe'
             if android_home is not None:
-                out = subprocess.Popen([cmd, 'uninstall', pkg], stdout=subprocess.PIPE)
+                out = subprocess.Popen([cmd, '-s', device, 'uninstall', pkg], stdout=subprocess.PIPE)
                 for line in out.stdout.readlines():
                     line = str(line)[2:-1]
                     if 'Success' in line:
@@ -207,3 +210,21 @@ class Device_Keywords():
         except Exception as e:
             log.error(e, exc_info=True)
             logger.print_on_console(e)
+
+    def close_app(self, pkg, device):
+        maindir = os.getcwd()
+        flag = False
+        try:
+            android_home = os.environ['ANDROID_HOME']
+            cmd = android_home + '\\platform-tools\\'
+            os.chdir(cmd)
+            cmd = cmd + 'adb.exe'
+            if android_home is not None:
+                #out = subprocess.Popen([cmd, '-s', device, 'shell', 'am', 'force-stop', pkg], stdout=subprocess.PIPE)
+                cmd1=cmd + ' -s ' + device + ' shell am force-stop ' + pkg
+                out = subprocess.check_output(cmd1)
+                os.chdir(maindir)
+        except Exception as e:
+            log.error(e,exc_info=True)
+            logger.print_on_console(e)
+

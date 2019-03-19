@@ -73,7 +73,18 @@ class Seek_Bar_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        webelement.click()
+                        if inp != '':
+                            inp = int(inp)
+                            location=webelement.location
+                            size=webelement.size
+                            start_x=location['x']
+                            start_y=location['y'] + (size['height']/2)
+                            end_x=location['x'] + (size['width'] * (inp/100))
+                            end_y=start_y
+                            driver=android_scrapping.driver
+                            driver.swipe(start_x,start_y,end_x,end_y,3000)
+                        else:
+                            webelement.click()
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:

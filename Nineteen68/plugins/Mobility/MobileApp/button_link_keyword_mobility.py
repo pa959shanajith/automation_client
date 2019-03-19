@@ -77,7 +77,7 @@ class Button_Keywords():
                         log.debug('performing the action')
                         driver=android_scrapping.driver
                         action = TouchAction(driver)
-                        if input is not None:
+                        if input is not None and input != '' :
                             action.long_press(element).wait(int(input)*1000).release().perform()
                         else:
                             action.long_press(element).wait(3000).release().perform()

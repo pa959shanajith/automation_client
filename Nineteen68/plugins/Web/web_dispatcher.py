@@ -32,6 +32,7 @@ import re
 import readconfig
 import logging
 import json
+from selenium import webdriver
 
 log = logging.getLogger('web_dispatcher.py')
 
@@ -86,7 +87,7 @@ class Dispatcher:
                     'sendsecurevalue':['textbox','password']
 
                     }
-        custom_dict_element={'element':['clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists', 'verifyhidden','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys',
+        custom_dict_element={'element':['getobjectcount','getobject','clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists', 'verifyhidden','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys',
                                         'tab','waitforelementvisible','mousehover','savefile','press','verifyenabled','verifydisabled','verifyreadonly']}
 
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
@@ -98,6 +99,7 @@ class Dispatcher:
 
         def send_webelement_to_keyword(driver,objectname,url):
             webelement=None
+            getObjectFlag=False
             if driver != None:
                 log.debug('In send_webelement_to_keyword method')
                 #check if the element is in iframe or frame
@@ -111,7 +113,13 @@ class Dispatcher:
                         log.info('Custom flag is ')
                         log.info(teststepproperty.custom_flag)
                         if teststepproperty.custom_flag:
-                            reference_element=self.getwebelement(driver,teststepproperty.parent_xpath)
+                            if len(input)>3 and isinstance(input[-1],webdriver.remote.webelement.WebElement):
+                                reference_element=input[-1]
+                                getObjectFlag=True
+                                log.info("getObjectFlag is True. Reference element is taken from getObject")
+                                logger.print_on_console("getObjectFlag is True. Reference element is taken from getObject")
+                            else:
+                                reference_element=self.getwebelement(driver,teststepproperty.parent_xpath)
                             log.debug('Reference_element ')
                             log.debug(reference_element)
                             if reference_element != None:
@@ -125,10 +133,9 @@ class Dispatcher:
                                     if (keyword in custom_dict and input[0].lower() in custom_dict[keyword]) or keyword in list(custom_dict_element.values())[0]:
                                         webelement=self.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url)
                                         log.debug(MSG_CUSTOM_FOUND)
-                                        input.reverse()
-                                        for x in range(0,3):
+                                        if getObjectFlag:
                                             input.pop()
-                                        input.reverse()
+                                        del input[:3]
                                     else:
                                         print_error('ERR_CUSTOM_MISMATCH')
                                 else:
@@ -167,7 +174,6 @@ class Dispatcher:
                 obj_props = teststepproperty.objectname.split(';')
                 coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
                 webelement = {'cord': teststepproperty.cord, 'coordinates':coord}
-
             return webelement
 
 
@@ -187,7 +193,9 @@ class Dispatcher:
 
         try:
             window_ops_list=['click','press','doubleclick','rightclick','uploadfile','acceptpopup','dismisspopup','selectradiobutton','selectcheckbox','unselectcheckbox','cellclick','clickelement','drag','drop','settext','sendvalue','cleartext','setsecuretext','sendsecurevalue','selectvaluebyindex','selectvaluebytext','selectallvalues','selectmultiplevaluesbyindexes','selectmultiplevaluesbytext','verifyvaluesexists','deselectall','setfocus','mousehover','tab','sendfunctionkeys','rightclick','mouseclick','openbrowser','navigatetourl','opennewbrowser','refresh','closebrowser','closesubwindows','switchtowindow','clearcache','navigatewithauthenticate']
-            dict={'getobjectcount':self.custom_object.get_object_count,
+            web_dict={
+                  'getobjectcount':self.custom_object.get_object_count,
+                  'getobject':self.custom_object.get_object,
                   'click': self.button_link_object.click,
                   'verifybuttonname' : self.button_link_object.verify_button_name,
                   'getbuttonname': self.button_link_object.get_button_name,
@@ -301,14 +309,14 @@ class Dispatcher:
             if(iris_flag):
                 import iris_operations
                 iris_object = iris_operations.IRISKeywords()
-                dict['clickiris'] = iris_object.clickiris
-                dict['settextiris'] = iris_object.settextiris
-                dict['gettextiris'] = iris_object.gettextiris
-                dict['getrowcountiris'] = iris_object.getrowcountiris
-                dict['getcolcountiris'] = iris_object.getcolcountiris
-                dict['getcellvalueiris'] = iris_object.getcellvalueiris
-                dict['verifyexistsiris'] = iris_object.verifyexistsiris
-                dict['verifytextiris'] = iris_object.verifytextiris
+                web_dict['clickiris'] = iris_object.clickiris
+                web_dict['settextiris'] = iris_object.settextiris
+                web_dict['gettextiris'] = iris_object.gettextiris
+                web_dict['getrowcountiris'] = iris_object.getrowcountiris
+                web_dict['getcolcountiris'] = iris_object.getcolcountiris
+                web_dict['getcellvalueiris'] = iris_object.getcellvalueiris
+                web_dict['verifyexistsiris'] = iris_object.verifyexistsiris
+                web_dict['verifytextiris'] = iris_object.verifytextiris
 
             if browser_Keywords.driver_obj is not None:
                 browser_info=browser_Keywords.driver_obj.capabilities
@@ -316,7 +324,7 @@ class Dispatcher:
                 reporting_obj.browser_version=browser_info.get('version')
                 if(reporting_obj.browser_version == '' or reporting_obj.browser_version == None):
                     reporting_obj.browser_version= browser_info['browserVersion']
-            if keyword in list(dict.keys()):
+            if keyword in list(web_dict.keys()):
                 flag=False
                 #Finding the webelement for NON_WEBELEMENT_KEYWORDS
                 if keyword not in NON_WEBELEMENT_KEYWORDS:
@@ -349,14 +357,14 @@ class Dispatcher:
                     if objectname=="@Object":
                         ##webelement = input[0]
                         input =input[1:]
-                        result= dict[keyword](webelement,input)
+                        result= web_dict[keyword](webelement,input)
                     elif teststepproperty.cord!='' and teststepproperty.cord!=None:
                         if teststepproperty.custom_flag:
-                            result = dict[keyword](webelement,input,output,teststepproperty.parent_xpath)
+                            result = web_dict[keyword](webelement,input,output,teststepproperty.parent_xpath)
                         else:
-                            result = dict[keyword](webelement,input,output)
+                            result = web_dict[keyword](webelement,input,output)
                     else:
-                        result= dict[keyword](webelement,input)
+                        result= web_dict[keyword](webelement,input)
                     ## To terminate debug/execution if requested browser is not available in the system (Defect #846)
                     if(result[1] == TERMINATE):
                         result = TERMINATE

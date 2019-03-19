@@ -48,6 +48,8 @@ class ElementKeywords:
         text=''
         try:
             text = webelement.get_attribute('title')
+            if text =='':
+                text = webelement.get_attribute('data-original-title')
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)

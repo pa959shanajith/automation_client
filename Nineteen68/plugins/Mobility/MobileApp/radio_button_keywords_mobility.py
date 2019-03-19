@@ -81,8 +81,10 @@ class Radio_Button_Keywords():
                         log.debug('performing the action')
                         classname= webelement.get_attribute("className")
                         if 'Switch' in classname:
-                            output=webelement.text
-                            output=str(output).upper()
+                            if res.upper() == 'OFF' or element.get_attribute('checked') == 'false':
+                                output = 'OFF'
+                            else:
+                                output = 'ON'
                         elif 'Radio' in classname:
                             output=webelement.get_attribute("checked")
                             if output=='true':

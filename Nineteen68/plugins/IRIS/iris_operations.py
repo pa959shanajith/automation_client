@@ -271,13 +271,14 @@ def scaleUpOrDown(arg,elem,template,img_rgb):
 
 def update_dataset(image_data):
     try:
-        mirror = image_data['cord']
-        byte_mirror = base64.b64encode(mirror.encode('utf-8'))
-        b64 = base64.b64decode(byte_mirror)
-        mirror = b64[2:len(b64)-1]
-        filename = os.environ['NINETEEN68_HOME'] + '/Lib/site-packages/prediction/Dataset/' + str(image_data['type']) + '/' + str(uuid4()).replace("-","")+".png"
-        with open(filename,'wb') as f:
-            f.write(base64.b64decode(mirror))
+        if(image_data['type'] != 'others'):
+            mirror = image_data['cord']
+            byte_mirror = base64.b64encode(mirror.encode('utf-8'))
+            b64 = base64.b64decode(byte_mirror)
+            mirror = b64[2:len(b64)-1]
+            filename = os.environ['NINETEEN68_HOME'] + '/Lib/site-packages/prediction/Dataset/' + str(image_data['type']) + '/' + str(uuid4()).replace("-","")+".png"
+            with open(filename,'wb') as f:
+                f.write(base64.b64decode(mirror))
         return True
     except Exception as e:
         log.error(e)
@@ -339,10 +340,10 @@ class IRISKeywords():
                 pyautogui.click()
                 robot = Robot()
                 robot.ctrl_press('a')
-                time.sleep(0.5)
+                time.sleep(1)
                 robot.key_press('backspace')
-                time.sleep(0.5)
-                pyautogui.typewrite(args[0][0], interval=0.2)
+                time.sleep(1)
+                robot.type_string(args[0][0], delay=0.2)
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
             else:

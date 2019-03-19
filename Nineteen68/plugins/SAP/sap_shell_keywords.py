@@ -367,6 +367,7 @@ class Shell_Keywords():
         elem = ses.FindById(id)
         elem.UnselectAll()
         node = ''
+        in_flag=False
         try:
             if(id != None):
                 if(elem.type == 'GuiShell' and elem.SubType == 'Tree'):
@@ -374,10 +375,16 @@ class Shell_Keywords():
                     if(node):
                         # SomeNodes with GetItemType = 2 does not work for Double Click But With SelectedNode
                         # Selection and Double Click Both Operation so as to Select and DoubleClick in cases where Double Click Works and where selected Work
-                        elem.SelectedNode = node
-                        elem.DoubleClickNode(node)
-                        status = sap_constants.TEST_RESULT_PASS
-                        result = sap_constants.TEST_RESULT_TRUE
+                        try:
+                            elem.SelectedNode = node
+                            elem.DoubleClickNode(node)
+                            in_flag=True
+                        except:
+                            elem.DoubleClickNode(node)
+                            in_flag=True
+                        if in_flag==True:
+                            status = sap_constants.TEST_RESULT_PASS
+                            result = sap_constants.TEST_RESULT_TRUE
                     else:
                         logger.print_on_console('Invalid input')
                         err_msg = sap_constants.ERROR_MSG

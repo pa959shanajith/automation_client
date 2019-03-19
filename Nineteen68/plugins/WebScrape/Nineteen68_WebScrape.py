@@ -17,12 +17,13 @@ browserobj = browserops.BrowserOperations()
 clickandaddoj = clickandadd.Clickandadd()
 fullscrapeobj = fullscrape.Fullscrape()
 log = logging.getLogger(__name__)
+visiblity_status=False
 
 class ScrapeWindow(wx.Frame):
 
     def __init__(self, parent,id, title,browser,socketIO,action,data,irisFlag):
         wx.Frame.__init__(self, parent, title=title,
-                   pos=(300, 150),  size=(200, 150) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
+                   pos=(300, 150),  size=(210, 180) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
         self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
@@ -66,6 +67,9 @@ class ScrapeWindow(wx.Frame):
                     self.fullscrapebutton = wx.Button(self.panel, label="Scrape",pos=(101,48 ), size=(86, 25))
                     self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)
 
+                    self.visibilityCheck = wx.CheckBox(self.panel, label="Visibility",pos=(12,78), size=(175, 25))
+                    self.visibilityCheck.Bind(wx.EVT_CHECKBOX, self.visibility)
+
                     self.prevbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(os.environ["IMAGES_PATH"] +"stepBack.png", wx.BITMAP_TYPE_ANY), (35, 48), (35, 28))
                     self.prevbutton.Bind(wx.EVT_LEFT_DOWN, self.on_prev)
                     self.prevbutton.SetToolTip(wx.ToolTip("Select previous window/tab"))
@@ -85,7 +89,7 @@ class ScrapeWindow(wx.Frame):
                         import cropandadd
                         global cropandaddobj
                         cropandaddobj = cropandadd.Cropandadd()
-                        self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,78 ), size=(175, 25))
+                        self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,108 ), size=(175, 25))
                         self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
 
                 elif(self.action == 'compare'):
@@ -203,6 +207,12 @@ class ScrapeWindow(wx.Frame):
             else:
                 self.perform_fullscrape()
 
+    def visibility(self,event):
+        global visiblity_status
+        visiblity_state = event.GetEventObject()
+        log.info(visiblity_state.GetLabel(),' is clicked',visiblity_state.GetValue())
+        visiblity_status= visiblity_state.GetValue()
+
     def perform_fullscrape(self):
 
         '''if any of the last two options are selected then
@@ -213,7 +223,7 @@ class ScrapeWindow(wx.Frame):
             self.scrape_selected_option.append(self.fullscrapedropdown.GetValue().lower())
         if len(self.scrape_selected_option) > 1:
             logger.print_on_console("value is: ",self.scrape_selected_option[1])
-        d = fullscrapeobj.fullscrape(self.scrape_selected_option,self.window_handle_number)
+        d = fullscrapeobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status)
 
         '''Check the limit of data size as per Nineteen68 standards'''
         if self.core_utilsobject.getdatasize(str(d),'mb') < self.webscrape_utils_obj.SCRAPE_DATA_LIMIT:

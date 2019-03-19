@@ -494,7 +494,7 @@ class Robot(object):
     # This is more or less ripped right for MSDN.
     GHND = 0x0042
     # Allocate at
-    hGlobalMemory = kernel32.GlobalAlloc(GHND, len(bytes(string))+1)
+    hGlobalMemory = kernel32.GlobalAlloc(GHND, len(bytes(string,encoding='utf8'))+1)
     # Lock it
     lpGlobalMemory = kernel32.GlobalLock(hGlobalMemory)
     # copy it

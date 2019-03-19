@@ -216,6 +216,22 @@ class CustomKeyword:
 
         return status,methodoutput,count,err_msg
 
+
+    def get_object(self,reference_ele,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output= None
+        if reference_ele:
+            log.info("Cutom object found")
+            status=TEST_RESULT_PASS
+            methodoutput=TEST_RESULT_TRUE
+            output=reference_ele
+        else:
+            log.info("Custom object not found")
+
+        return status,methodoutput,reference_ele,err_msg
+
     def get_count(self,counter,ele_type,index):
         result=browser_Keywords.driver_obj.execute_script(GET_OBJECT_COUNT_JS,counter,ele_type,index,self.list_flag)
         counter=result[0]
@@ -228,8 +244,6 @@ class CustomKeyword:
             counter=self.get_count_iframe(result[1],counter,ele_type);
         else:
             return counter
-
-
         return self.get_count(counter,ele_type,index)
 
 
