@@ -31,9 +31,9 @@ if SYSTEM_OS != 'Darwin':
     import utils_web
     import win32process
     import win32con
+    from pywinauto import Application
 import psutil
 import readconfig
-from pywinauto import Application
 
 
 import core_utils

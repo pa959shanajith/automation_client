@@ -116,6 +116,8 @@ class Dispatcher:
                             if len(input)>3 and isinstance(input[-1],webdriver.remote.webelement.WebElement):
                                 reference_element=input[-1]
                                 getObjectFlag=True
+                                log.info("getObjectFlag is True. Reference element is taken from getObject")
+                                logger.print_on_console("getObjectFlag is True. Reference element is taken from getObject")
                             else:
                                 reference_element=self.getwebelement(driver,teststepproperty.parent_xpath)
                             log.debug('Reference_element ')
@@ -132,8 +134,8 @@ class Dispatcher:
                                         webelement=self.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url)
                                         log.debug(MSG_CUSTOM_FOUND)
                                         if getObjectFlag:
-                                            input=input[0:-1]
-                                        input=input[3:]
+                                            input.pop()
+                                        del input[:3]
                                     else:
                                         print_error('ERR_CUSTOM_MISMATCH')
                                 else:
