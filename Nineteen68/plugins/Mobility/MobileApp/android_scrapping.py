@@ -175,9 +175,6 @@ class InstallAndLaunch():
                 for line in processes:
                     p = line.laddr
                     if p[1] == 4723 and driver is not None:
-                        state = driver.query_app_state(packageName)
-                        if state != '4':
-                            driver.activate_app(packageName)
                         return driver
                 self.driver = None
                 if device_name == 'wifi':
