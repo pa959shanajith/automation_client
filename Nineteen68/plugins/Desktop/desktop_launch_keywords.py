@@ -528,7 +528,10 @@ class Launch_Keywords():
                         input_val = input_val + '->' + i
                     else:
                         input_val = i
-                win = app_uia.top_window()
+                try:
+                    win = app_uia.top_window()
+                except:
+                    win = app_win32.top_window()
                 win.menu_select(input_val)
                 log.info(STATUS_METHODOUTPUT_UPDATE)
                 status = desktop_constants.TEST_RESULT_PASS
@@ -549,7 +552,10 @@ class Launch_Keywords():
         err_msg = None
         input_val = ''
         try:
-            win = app_uia.top_window()
+            try:
+                win = app_uia.top_window()
+            except:
+                win = app_win32.top_window()
             win.maximize()
             log.info(STATUS_METHODOUTPUT_UPDATE)
             status = desktop_constants.TEST_RESULT_PASS
@@ -571,7 +577,10 @@ class Launch_Keywords():
         err_msg = None
         input_val = ''
         try:
-            win = app_uia.top_window()
+            try:
+                win = app_uia.top_window()
+            except:
+                win = app_win32.top_window()
             win.minimize()
             log.info(STATUS_METHODOUTPUT_UPDATE)
             status = desktop_constants.TEST_RESULT_PASS
