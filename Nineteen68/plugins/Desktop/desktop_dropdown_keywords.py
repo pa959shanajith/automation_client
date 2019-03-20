@@ -17,6 +17,7 @@ import desktop_editable_text
 import time
 from constants import *
 import logging
+import traceback
 log = logging.getLogger('dropdown_keywords.py')
 class Dropdown_Keywords():
         def selectValueByIndex(self,element,parent,input_val, *args):
@@ -117,9 +118,10 @@ class Dropdown_Keywords():
                             err_msg='Element not present on the page where operation is trying to be performed'
                             logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                log.error(exception)
-                logger.print_on_console(exception)
+                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
+                log.error(err_msg)
+                log.error(exception)
             return status,result,verb,err_msg
 
         def getValueByIndex(self,element,parent,input_val, *args):
@@ -210,16 +212,15 @@ class Dropdown_Keywords():
                             else:
                                 logger.print_on_console('Index value index starts with 1')
                         #========================================================================
-
-
                else:
                    log.info('Element not present on the page where operation is trying to be performed')
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'
             except Exception as exception:
-                log.error(exception)
-                logger.print_on_console(exception)
+                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
+                log.error(err_msg)
+                log.error(exception)
             return status,result,verb,err_msg
 
         def getCount(self,element,parent, *args):
@@ -260,9 +261,10 @@ class Dropdown_Keywords():
                       err_msg='Element not present on the page where operation is trying to be performed'
                       logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                log.error(exception)
-                logger.print_on_console(exception)
+                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
+                log.error(err_msg)
+                log.error(exception)
             return status,result,verb,err_msg
 
         def verifyCount(self,element,parent,input_val, *args):
@@ -305,10 +307,10 @@ class Dropdown_Keywords():
                       err_msg='Element not present on the page where operation is trying to be performed'
                       logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                log.error(exception)
-                import traceback
                 traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
+                log.error(err_msg)
+                log.error(exception)
             return status,result,verb,err_msg
 
 
@@ -383,10 +385,10 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                import traceback
                 traceback.print_exc()
-                log.error(exception)
                 err_msg=desktop_constants.ERROR_MSG
+                log.error(err_msg)
+                log.error(exception)
             return status,result,verb,err_msg
 
         def verifySelected(self,element,parent,input_val, *args):
@@ -473,11 +475,10 @@ class Dropdown_Keywords():
                        err_msg='Element not present on the page where operation is trying to be performed'
                        logger.print_on_console('Element not present on the page where operation is trying to be performed')
                 except Exception as exception:
-                    import traceback
                     traceback.print_exc()
-                    log.error(exception)
-                    logger.print_on_console(exception)
                     err_msg=desktop_constants.ERROR_MSG
+                    log.error(err_msg)
+                    log.error(exception)
                 return status,result,verb,err_msg
 
         def selectValueByText(self,element,parent,input_val, *args):
@@ -584,9 +585,10 @@ class Dropdown_Keywords():
                             err_msg='Element not present on the page where operation is trying to be performed'
                             logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                log.error(exception)
-                logger.print_on_console(exception)
+                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
+                log.error(err_msg)
+                log.error(exception)
             return status,result,verb,err_msg
 
 
@@ -653,11 +655,10 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                import traceback
                 traceback.print_exc()
-                log.error(exception)
-                logger.print_on_console(exception)
                 err_msg=desktop_constants.ERROR_MSG
+                log.error(err_msg)
+                log.error(exception)
             return status,result,verb,err_msg
 
 
@@ -726,11 +727,10 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                import traceback
                 traceback.print_exc()
-                log.error(exception)
-                logger.print_on_console(exception)
                 err_msg=desktop_constants.ERROR_MSG
+                log.error(err_msg)
+                log.error(exception)
             return status,result,verb,err_msg
 
         def selectAllValues(self,element,parent,*args):
@@ -788,11 +788,10 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                import traceback
                 traceback.print_exc()
-                log.error(exception)
-                logger.print_on_console(exception)
                 err_msg=desktop_constants.ERROR_MSG
+                log.error(err_msg)
+                log.error(exception)
             return status,result,verb,err_msg
 
         def deSelectAll(self,element,parent,*args):
@@ -846,11 +845,10 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                import traceback
                 traceback.print_exc()
-                log.error(exception)
-                logger.print_on_console(exception)
                 err_msg=desktop_constants.ERROR_MSG
+                log.error(err_msg)
+                log.error(exception)
             return status,result,verb,err_msg
 
 
@@ -955,11 +953,10 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                import traceback
                 traceback.print_exc()
-                log.error(exception)
-                logger.print_on_console(exception)
                 err_msg=desktop_constants.ERROR_MSG
+                log.error(err_msg)
+                log.error(exception)
             return status,result,verb,err_msg
 
 
@@ -1020,7 +1017,7 @@ class Dropdown_Keywords():
                                          if not item.is_selected():
                                             if element.is_active() == False:
                                                 element.click()
-                                            if item_index <=0:
+                                            if int(item_index[i]) <=0:
                                                 log.info('List item index starts with 1')
                                                 logger.print_on_console('List item index starts with 1')
                                             else:
@@ -1050,9 +1047,10 @@ class Dropdown_Keywords():
                         err_msg='Element not present on the page where operation is trying to be performed'
                         logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                log.error(exception)
-                logger.print_on_console(exception)
+                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
+                log.error(err_msg)
+                log.error(exception)
             return status,result,verb,err_msg
 
 
@@ -1061,6 +1059,7 @@ class Dropdown_Keywords():
             result=desktop_constants.TEST_RESULT_FALSE
             verb = OUTPUT_CONSTANT
             err_msg=None
+            pass_flag=True
             try:
                 if desktop_launch_keywords.window_name!=None:
                     log.info('Recieved element from the desktop dispatcher')
@@ -1077,7 +1076,8 @@ class Dropdown_Keywords():
                                 elelist=element.texts()
                                 new_elelist=[]
                                 for i in range(0,len(elelist)):
-                                    new_elelist.append(elelist[i].encode("utf-8"))
+                                    new_elelist.append(elelist[i].encode("utf-8")) #to remove special characters
+                                new_elelist = [bytearray(x).decode('ascii') for x in new_elelist]
                         #=======================================================================================================
                             if checkName == 'ListView' or 'ListBox':
                                 if checkName == 'ListBox':
@@ -1112,32 +1112,39 @@ class Dropdown_Keywords():
                                                 if element.is_active() == False:
                                                     element.click()
                                                 itemtext.select()
-                                                logger.print_on_console('List item selected')
-                                                status = desktop_constants.TEST_RESULT_PASS
-                                                result = desktop_constants.TEST_RESULT_TRUE
                                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                                              else:
                                                 log.info('List item is already selected')
-                                                logger.print_on_console('List item is already selected')
-                                                err_msg = 'List item is already selected'
+                                                log.debug('List item is already selected')
+                                        else:
+                                            pass_flag=False
+                                    if pass_flag==True:
+                                        status = desktop_constants.TEST_RESULT_PASS
+                                        result = desktop_constants.TEST_RESULT_TRUE
+                                    else:
+                                        for i in range(0,len(items)):
+                                            items[i].deselect()
+                                        err_msg = 'Element/Elements not present on the page where operation is trying to be performed'
+                                        log.error(err_msg)
                             #=======================================================================================================
 
                         else:
                             log.info('Element state does not allow to perform the operation')
-                            logger.print_on_console('Element state does not allow to perform the operation')
                             err_msg = 'Element state does not allow to perform the operation'
+                            log.error(err_msg)
                     else:
                         log.info('Element not present on the page where operation is trying to be performed')
                         err_msg='Element not present on the page where operation is trying to be performed'
-                        logger.print_on_console('Element not present on the page where operation is trying to be performed')
+                        log.error(err_msg)
             except Exception as exception:
-                log.error(exception)
-                logger.print_on_console(exception)
+                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
+                log.error(err_msg)
+                log.error(exception)
             return status,result,verb,err_msg
 
         def multiListGetter(self,cols,elelist,input_val):
-            rows=len(elelist)/cols
+            rows=int(len(elelist)/cols)
             #-------------------------------------------------creating a 2D list
             #print"creating a 2D list"
             Matrix = [[0 for x in range(cols)] for y in range(rows)]
@@ -1182,9 +1189,7 @@ class Dropdown_Keywords():
                         NewMatrix[r][c]=Matrix[rowindex][c]
                     r=r+1
             except Exception as e:
-                import traceback
                 traceback.print_exc()
-                logger.print_on_console("Error occoured in populating the new matrix")
                 log.error(e)
             #-------------------------------------------------poulating the new martix
             #-------------------------------------------------printing the new 2D list
