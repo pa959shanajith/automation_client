@@ -160,7 +160,7 @@ class MobileDispatcher:
                     'verifyselectedviews':self.list_view_keywords_object.verify_selected_views,
                     'selectmultipleviewsbyindexes':self.list_view_keywords_object.select_multiple_views_by_indexes,
                     'selectmultipleviewsbytext':self.list_view_keywords_object.select_multiple_views_by_text,
-                    'setvalue': self.picker_wheel_keywords_object.set_value,
+                    'setvalue': self.seekBar_object.Set_Mid_Value,
                     'getvalue': self.picker_wheel_keywords_object.get_value,
                     'getrowcount':self.table_keywords_object.get_row_count,
                     'verifyrowcount':self.table_keywords_object.verify_row_count,
@@ -176,8 +176,7 @@ class MobileDispatcher:
                     'verifynumber':self.number_picker_object.Verify_Selected_Number,
                     'setminvalue':self.seekBar_object.Set_Min_Value,
                     'setmidvalue':self.seekBar_object.Set_Mid_Value,
-                    'setmaxvalue':self.seekBar_object.Set_Max_Value,
-                    'setvalue':self.seekBar_object.Set_Mid_Value
+                    'setmaxvalue':self.seekBar_object.Set_Max_Value
                 }
             ELEMENT_FOUND=True
             if keyword in list(dict.keys()):

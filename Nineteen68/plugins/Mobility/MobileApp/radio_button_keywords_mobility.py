@@ -77,10 +77,10 @@ class Radio_Button_Keywords():
                     enable=webelement.is_enabled()
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
-
                         log.debug('performing the action')
                         classname= webelement.get_attribute("className")
                         if 'Switch' in classname:
+                            res = element.text
                             if res.upper() == 'OFF' or element.get_attribute('checked') == 'false':
                                 output = 'OFF'
                             else:
@@ -116,7 +116,7 @@ class Radio_Button_Keywords():
 
 
         except Exception as e:
-                err_msg='error occured'
+            log.error(e,exc_info = True)
 
         return status,methodoutput,output,err_msg
 
