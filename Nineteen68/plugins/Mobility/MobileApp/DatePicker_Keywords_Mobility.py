@@ -268,3 +268,31 @@ class Date_Keywords():
 
         return status,methodoutput,output,err_msg
 
+
+    def verify_date(self,webelement,input,*args):
+        status,result,output,err_msg = self.Get_Date(webelement,None)
+        try:
+            input_date = input[0].split('/')
+            output_date = output.split('/')
+            if len(input_date) == 3:
+                for i in range(3):
+                    if input_date[i] != output_date[i]:
+                        output=OUTPUT_CONSTANT
+                        status=TEST_RESULT_FAIL
+                        result=TEST_RESULT_FALSE
+                        err_msg = 'Verifying date Failed'
+                        break
+                if output != OUTPUT_CONSTANT:
+                    output=OUTPUT_CONSTANT
+                    status=TEST_RESULT_PASS
+                    result=TEST_RESULT_TRUE
+                    err_msg=None
+            else:
+                output=OUTPUT_CONSTANT
+                status=TEST_RESULT_FAIL
+                result=TEST_RESULT_FALSE
+                err_msg = 'Invalid input'
+        except Exception as e:
+            logger.print_on_console(err_msg)
+            log.error(e,exc_info = True)
+        return status,result,output,err_msg

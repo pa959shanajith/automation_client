@@ -176,29 +176,30 @@ class InstallAndLaunch():
                     p = line.laddr
                     if p[1] == 4723 and driver is not None:
                         return driver
-                self.driver = None
-                if device_name == 'wifi':
-                    device_name = device_keywords_object.wifi_connect()
-                if device_name != '':
-                    logger.print_on_console("Connected device name:",device_name)
-                    device_id = device_name
-                    self.start_server()
-                    self.desired_caps = {}
-                    if platform_version is not None:
-                        self.desired_caps['platformVersion'] = platform_version
-                    self.desired_caps['platformName'] = 'Android'
-                    self.desired_caps['deviceName'] = device_name
-                    self.desired_caps['udid'] = device_name
-                    self.desired_caps['noReset'] = True
-                    self.desired_caps['newCommandTimeout'] = 0
-                    self.desired_caps['app'] = apk_path
-                    self.desired_caps['sessionOverride'] = True
-                    self.desired_caps['fullReset'] = False
-                    self.desired_caps['log_level'] = False
-                    self.desired_caps['appPackage'] = packageName
-                    self.desired_caps['appActivity'] = activityName
-                    self.driver = webdriver.Remote('http://localhost:4723/wd/hub', self.desired_caps)
-                    driver = self.driver
+                try:
+                    if device_name == 'wifi':
+                        device_name = device_keywords_object.wifi_connect()
+                    if device_name != '':
+                        logger.print_on_console("Connected device name:",device_name)
+                        device_id = device_name
+                        self.start_server()
+                        self.desired_caps = {}
+                        if platform_version is not None:
+                            self.desired_caps['platformVersion'] = platform_version
+                        self.desired_caps['platformName'] = 'Android'
+                        self.desired_caps['deviceName'] = device_name
+                        self.desired_caps['udid'] = device_name
+                        self.desired_caps['noReset'] = True
+                        self.desired_caps['newCommandTimeout'] = 0
+                        self.desired_caps['app'] = apk_path
+                        self.desired_caps['sessionOverride'] = True
+                        self.desired_caps['fullReset'] = False
+                        self.desired_caps['log_level'] = False
+                        self.desired_caps['appPackage'] = packageName
+                        self.desired_caps['appActivity'] = activityName
+                        driver = webdriver.Remote('http://localhost:4723/wd/hub', self.desired_caps)
+                except:
+                    driver = None
         except Exception as e:
             err = "Not able to install or launch application"
             logger.print_on_console(err)
@@ -239,8 +240,8 @@ class InstallAndLaunch():
                 logger.print_on_console('Writing scrape data to domelements.json file')
                 json.dump(jsonArray, outfile, indent=4, sort_keys=False)
             return jsonArray
-        elif self.driver is not None:
-            page_source=self.driver.page_source
+        elif driver is not None:
+            page_source=driver.page_source
             parser = xml.sax.make_parser()
             handler = Exact('/',parser,'')
             parser.setContentHandler(handler)
@@ -253,7 +254,7 @@ class InstallAndLaunch():
                     new_file.close()
                 parser.parse(file_path_xml)
                 obj2=BuildJson()
-                finalJson=obj2.xmltojson(self.driver)
+                finalJson=obj2.xmltojson(driver)
                 with open(file_path_xml,'w') as new_file:
                     new_file.write('')
                     new_file.close()

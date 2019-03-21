@@ -96,7 +96,6 @@ class MobileDispatcher:
                     'sendvalue' : self.textbox_keywords_object.send_value,
                     'gettext' : self.textbox_keywords_object.get_text,
                     'verifytext' : self.textbox_keywords_object.verify_text,
-                    'gettextboxlength': self.textbox_keywords_object.get_textBoxLength,
                     'verifytextboxlength' : self.textbox_keywords_object.verify_textBoxLength,
                     'selectradiobutton' : self.radio_button_object.select_radio_button,
                     'getstatus' : self.radio_button_object.get_status,
@@ -176,7 +175,9 @@ class MobileDispatcher:
                     'verifynumber':self.number_picker_object.Verify_Selected_Number,
                     'setminvalue':self.seekBar_object.Set_Min_Value,
                     'setmidvalue':self.seekBar_object.Set_Mid_Value,
-                    'setmaxvalue':self.seekBar_object.Set_Max_Value
+                    'setmaxvalue':self.seekBar_object.Set_Max_Value,
+                    'verifytime':self.time_keywords_object.verify_time,
+                    'verifydate':self.date_keywords_object.verify_date
                 }
             ELEMENT_FOUND=True
             if keyword in list(dict.keys()):
