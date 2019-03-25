@@ -38,9 +38,9 @@ class Seek_Bar_Keywords():
                         ##webelement.send_keys('0')
                         location=webelement.location
                         size=webelement.size
-                        start_x=location['x']
+                        start_x=location['x'] + (size['width']/2)
                         start_y=location['y'] + (size['height']/2)
-                        end_x=location['x']
+                        end_x=location['x'] + 1
                         end_y=location['y'] + (size['height']/2)
                         driver=android_scrapping.driver
                         driver.swipe(start_x,start_y,end_x,end_y,3000)
@@ -78,9 +78,14 @@ class Seek_Bar_Keywords():
                             inp = int(inp)
                             location=webelement.location
                             size=webelement.size
-                            start_x=location['x']
+                            start_x=location['x'] + (size['width']/2)
                             start_y=location['y'] + (size['height']/2)
-                            end_x=location['x'] + (size['width'] * (inp/100))
+                            if inp <= 0:
+                                end_x=location['x'] + 1
+                            elif inp >= 100:
+                                end_x=location['x'] + (size['width'] - 1)
+                            else:
+                                end_x=location['x'] + (size['width'] * (inp/100))
                             end_y=start_y
                             driver=android_scrapping.driver
                             driver.swipe(start_x,start_y,end_x,end_y,3000)
@@ -115,17 +120,17 @@ class Seek_Bar_Keywords():
                     enable=webelement.is_enabled()
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
-                       log.debug('performing the action')
-                       location=webelement.location
-                       size=webelement.size
-                       start_x=location['x']
-                       start_y=location['y'] + (size['height']/2)
-                       end_x=location['x'] + (size['width'])
-                       end_y=start_y
-                       driver=android_scrapping.driver
-                       driver.swipe(start_x,start_y,end_x,end_y,3000)
-                       status=TEST_RESULT_PASS
-                       methodoutput=TEST_RESULT_TRUE
+                        log.debug('performing the action')
+                        location=webelement.location
+                        size=webelement.size
+                        start_x=location['x'] + (size['width']/2)
+                        start_y=location['y'] + (size['height']/2)
+                        end_x=location['x'] + (size['width'] - 1)
+                        end_y=start_y
+                        driver=android_scrapping.driver
+                        driver.swipe(start_x,start_y,end_x,end_y,3000)
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
