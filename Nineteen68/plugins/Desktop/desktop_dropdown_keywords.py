@@ -17,7 +17,6 @@ import desktop_editable_text
 import time
 from constants import *
 import logging
-import traceback
 log = logging.getLogger('dropdown_keywords.py')
 class Dropdown_Keywords():
         def selectValueByIndex(self,element,parent,input_val, *args):
@@ -118,7 +117,6 @@ class Dropdown_Keywords():
                             err_msg='Element not present on the page where operation is trying to be performed'
                             logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -217,7 +215,6 @@ class Dropdown_Keywords():
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -261,7 +258,6 @@ class Dropdown_Keywords():
                       err_msg='Element not present on the page where operation is trying to be performed'
                       logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -307,7 +303,6 @@ class Dropdown_Keywords():
                       err_msg='Element not present on the page where operation is trying to be performed'
                       logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -337,8 +332,6 @@ class Dropdown_Keywords():
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                             except Exception as e :
-                                import traceback
-                                traceback.print_exc()
                                 err_msg=desktop_constants.ERROR_MSG
                                 log.error(e)
                         elif checkName == 'ListView' or 'ListBox':
@@ -385,7 +378,6 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -475,7 +467,6 @@ class Dropdown_Keywords():
                        err_msg='Element not present on the page where operation is trying to be performed'
                        logger.print_on_console('Element not present on the page where operation is trying to be performed')
                 except Exception as exception:
-                    traceback.print_exc()
                     err_msg=desktop_constants.ERROR_MSG
                     log.error(err_msg)
                     log.error(exception)
@@ -546,8 +537,7 @@ class Dropdown_Keywords():
                                                     result = desktop_constants.TEST_RESULT_TRUE
                                                     log.info(STATUS_METHODOUTPUT_UPDATE)
                                                 except Exception as e:
-                                                    import traceback
-                                                    traceback.print_exc()
+                                                    log.error(e)
                                                     logger.print_on_console('There is no item in List with the given text',e)
 
                                 elif checkName == 'ListView':
@@ -585,7 +575,6 @@ class Dropdown_Keywords():
                             err_msg='Element not present on the page where operation is trying to be performed'
                             logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -655,7 +644,6 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -727,7 +715,6 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -788,7 +775,6 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -845,7 +831,6 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -953,7 +938,6 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -1047,7 +1031,6 @@ class Dropdown_Keywords():
                         err_msg='Element not present on the page where operation is trying to be performed'
                         logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -1137,7 +1120,6 @@ class Dropdown_Keywords():
                         err_msg='Element not present on the page where operation is trying to be performed'
                         log.error(err_msg)
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -1158,10 +1140,9 @@ class Dropdown_Keywords():
                         Matrix[j][k]=elelist[index_i].encode("utf-8")
                         index_i=index_i+1
                     except Exception as e:
-                        import traceback
-                        traceback.print_exc()
                         logger.print_on_console("Error occoured in populating the 2D matrix")
-                        og.error(e)
+                        log.error("Error occoured in populating the 2D matrix")
+                        log.error(e)
             #-------------------------------------------------populating the 2D list
             #-------------------------------------------------printing the 2D list
 ##                                print"printing the 2D list"
@@ -1189,7 +1170,6 @@ class Dropdown_Keywords():
                         NewMatrix[r][c]=Matrix[rowindex][c]
                     r=r+1
             except Exception as e:
-                traceback.print_exc()
                 log.error(e)
             #-------------------------------------------------poulating the new martix
             #-------------------------------------------------printing the new 2D list
