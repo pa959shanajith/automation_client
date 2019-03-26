@@ -80,8 +80,8 @@ class Radio_Button_Keywords():
                         log.debug('performing the action')
                         classname= webelement.get_attribute("className")
                         if 'Switch' in classname:
-                            res = element.text
-                            if res.upper() == 'OFF' or element.get_attribute('checked') == 'false':
+                            res = webelement.text
+                            if res.upper() == 'OFF' or webelement.get_attribute('checked') == 'false':
                                 output = 'OFF'
                             else:
                                 output = 'ON'
@@ -142,7 +142,7 @@ class Radio_Button_Keywords():
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         elif element.get_attribute('checked') == 'true':
-                            log.debug('Element already selected')
+                            logger.print_on_console('Element already selected')
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                     else:
@@ -182,7 +182,7 @@ class Radio_Button_Keywords():
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         elif element.get_attribute('checked') == 'false':
-                            log.debug('Element already unselected')
+                            logger.print_on_console('Element already unselected')
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                     else:
