@@ -52,7 +52,10 @@ def addNodes(shape, text, parent, child):
 		classname = "import"
 	else:
 		classname = PresentClassName
-	text = str(text, errors='replace')
+	try:
+		text = str(text)
+	except:
+		text = str(text, errors='replace')
 	if parent is None:
 		return {"shape": shape, "text": text, "parent": parent, "child": child, "class": classname, "method": PresentMethodName}
 	else:
