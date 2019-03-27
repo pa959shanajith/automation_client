@@ -163,6 +163,7 @@ class Device_Keywords():
                 if 'package:' in curr_line:
                     curr_line = curr_line.strip().split()
                     packageName = curr_line[1][6:-1]
+                    break
             os.chdir(maindir)
         except Exception as e:
             log.error(e,exc_info=True)
@@ -183,6 +184,7 @@ class Device_Keywords():
                 if 'launchable' in curr_line:
                     curr_line = curr_line.strip().split()
                     activityName = curr_line[1][6:-1]
+                    break
             os.chdir(maindir)
         except Exception as e:
             log.error(e,exc_info=True)
@@ -227,4 +229,37 @@ class Device_Keywords():
         except Exception as e:
             log.error(e,exc_info=True)
             logger.print_on_console(e)
+
+    def launch_app(self, package, activity, device):
+        maindir = os.getcwd()
+        try:
+            result = 'Error in Starting App'
+            connected = 'Connection error;'
+            android_home = os.environ['ANDROID_HOME']
+            cmd = android_home + '\\platform-tools\\'
+            os.chdir(cmd)
+            cmd = cmd + 'adb.exe'
+            cmp = package+'/'+activity
+            o1, o2, o3, o4 = self.get_device_list(None)
+            for i in o3:
+                if device == i:
+                    connected = 'Connected;'
+                    break
+            if android_home is not None:
+                out = subprocess.Popen([cmd, '-s', device, 'shell', 'am', 'start', '-a', 'android.intent.action.MAIN', '-n', cmp], stdout=subprocess.PIPE)
+                for line in out.stdout.readlines():
+                    curr_line = str(line)[2:-1]
+                    if 'Starting' in curr_line:
+                        os.chdir(maindir)
+                        result = 'Starting App'
+                        break
+                    if 'Warning' in curr_line:
+                        result = 'App was already started; Its current task has been brought to the front'
+                        break
+            os.chdir(maindir)
+        except Exception as e:
+            log.error(e, exc_info=True)
+            logger.print_on_console(e)
+            logger.print_on_console('Error in Starting App')
+        return connected+result
 

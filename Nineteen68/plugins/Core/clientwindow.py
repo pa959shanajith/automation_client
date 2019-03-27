@@ -506,6 +506,20 @@ class MainNamespace(BaseNamespace):
             log.error(e)
             logger.print_on_console('Exception in APG Open File In Editor')
 
+    def on_runDeadcodeIdentifier(self, *args):
+        try:
+            global socketIO
+            con = controller.Controller()
+            con.get_all_the_imports('AutomatedPathGenerator')
+            from generateAST import DeadcodeIdentifier
+            dci = DeadcodeIdentifier()
+            result = dci.start(str(args[0]),str(args[1]))
+            socketIO.emit('deadcode_identifier',result)
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console('Error occured while running deadcode identifier')
+            socketIO.emit('deadcode_identifier',False)
+
     def on_killSession(self,*args):
         global wxObject
         try:

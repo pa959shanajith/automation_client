@@ -220,3 +220,31 @@ class Time_Keywords():
                 log.error(e)
 
         return status,result,output,err_msg
+
+    def verify_time(self,webelement,input,*args):
+        status,result,output,err_msg = self.Get_Time(webelement,None)
+        try:
+            input_time = input[0].split(':')
+            output_time = output.split(':')
+            if len(input_time) == 3:
+                for i in range(3):
+                    if input_time[i] != output_time[i]:
+                        output=OUTPUT_CONSTANT
+                        status=TEST_RESULT_FAIL
+                        result=TEST_RESULT_FALSE
+                        err_msg='Verifying time Failed'
+                        break
+                if output != OUTPUT_CONSTANT:
+                    output=OUTPUT_CONSTANT
+                    status=TEST_RESULT_PASS
+                    result=TEST_RESULT_TRUE
+                    err_msg=None
+            else:
+                output=OUTPUT_CONSTANT
+                status=TEST_RESULT_FAIL
+                result=TEST_RESULT_FALSE
+                err_msg = 'Invalid input'
+        except Exception as e:
+            logger.print_on_console(err_msg)
+            log.error(e,exc_info = True)
+        return status,result,output,err_msg

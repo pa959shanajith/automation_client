@@ -106,7 +106,8 @@ class Action_Key_App():
             'pageup':' shell input keyevent 92',
             'pagedown':' shell input keyevent 93',
             'movehome':' shell input keyevent 122',
-            'moveend':' shell input keyevent 123'
+            'moveend':' shell input keyevent 123',
+            'recents':' shell input keyevent KEYCODE_APP_SWITCH'
             }
             adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
             if (len(inputs)==1):

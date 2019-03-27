@@ -96,7 +96,6 @@ class MobileDispatcher:
                     'sendvalue' : self.textbox_keywords_object.send_value,
                     'gettext' : self.textbox_keywords_object.get_text,
                     'verifytext' : self.textbox_keywords_object.verify_text,
-                    'gettextboxlength': self.textbox_keywords_object.get_textBoxLength,
                     'verifytextboxlength' : self.textbox_keywords_object.verify_textBoxLength,
                     'selectradiobutton' : self.radio_button_object.select_radio_button,
                     'getstatus' : self.radio_button_object.get_status,
@@ -160,7 +159,7 @@ class MobileDispatcher:
                     'verifyselectedviews':self.list_view_keywords_object.verify_selected_views,
                     'selectmultipleviewsbyindexes':self.list_view_keywords_object.select_multiple_views_by_indexes,
                     'selectmultipleviewsbytext':self.list_view_keywords_object.select_multiple_views_by_text,
-                    'setvalue': self.picker_wheel_keywords_object.set_value,
+                    'setvalue': self.seekBar_object.Set_Mid_Value,
                     'getvalue': self.picker_wheel_keywords_object.get_value,
                     'getrowcount':self.table_keywords_object.get_row_count,
                     'verifyrowcount':self.table_keywords_object.verify_row_count,
@@ -177,7 +176,8 @@ class MobileDispatcher:
                     'setminvalue':self.seekBar_object.Set_Min_Value,
                     'setmidvalue':self.seekBar_object.Set_Mid_Value,
                     'setmaxvalue':self.seekBar_object.Set_Max_Value,
-                    'setvalue':self.seekBar_object.Set_Mid_Value
+                    'verifytime':self.time_keywords_object.verify_time,
+                    'verifydate':self.date_keywords_object.verify_date
                 }
             ELEMENT_FOUND=True
             if keyword in list(dict.keys()):
