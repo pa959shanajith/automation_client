@@ -250,17 +250,23 @@ class CustomObjectHandler():
             logger.print_on_console(e)
         return allobjects
 
-    def getobjectforcustom(self, parent_xpath, eleType, eleIndex,backendType):
+    def getobjectforcustom(self, parent_xpath, eleType, eleIndex):
         """Method to retreve Custom elements, returns xpath of the element , after searching for in the list of data recieved from function(for_custom_scrape)"""
         """Note: parent_xpath is the xpath of the element from where custom keyword performs its operation."""
         x_var=parent_xpath.split(';')
         parent_xpath=x_var[0]
         data = []
         newdata=[]
+        backendType = x_var[4]
         xpath = None
         try:
             #app_uia = desktop_launch_keywords.app_uia
-            data = self.for_custom_scrape(backendType)
+            try:
+                data = self.for_custom_scrape(backendType)
+            except:
+                backendType='A'
+                data = self.for_custom_scrape(backendType)
+
             for index, item in enumerate(data):
                 i_var=item['xpath'].split(';')
                 item_xpath=i_var[0]
@@ -277,8 +283,7 @@ class CustomObjectHandler():
 ##                    except:
 ##                        logger.print_on_console( e)
         except Exception as e:
-            import traceback
-            traceback.print_exc()
+            logger.print_on_console( e)
         if xpath==None:
             logger.print_on_console('Warning!:AUT Structure has changed, unable to verify the parent element.')
         return xpath

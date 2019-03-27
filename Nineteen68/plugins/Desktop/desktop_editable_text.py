@@ -22,7 +22,7 @@ log = logging.getLogger('desktop_editable_text.py')
 class Text_Box:
     def set_text(self , element , parent , input_val ,*args):
         if(len(input_val)>1):
-            text = input_val[2]
+            text = input_val[3]
         else:
             text=input_val[0]
         status=desktop_constants.TEST_RESULT_FAIL
