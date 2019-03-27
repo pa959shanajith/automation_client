@@ -761,6 +761,8 @@ class UtilWebKeywords:
                                 log.debug('Setting the mouse position')
                                 robot.mouse_down('left')
                                 log.debug('Mouse click performed')
+                                robot.mouse_up('left')
+                                log.debug('Mouse release performed')
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
 
@@ -778,6 +780,7 @@ class UtilWebKeywords:
                                 logger.print_on_console('after loc')
                                 robot.mouse_down('left')
                                 logger.print_on_console('button press')
+                                robot.mouse_up('left')
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
 
