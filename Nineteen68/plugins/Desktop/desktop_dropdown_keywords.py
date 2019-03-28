@@ -156,7 +156,7 @@ class Dropdown_Keywords():
                             index=int(input_val[0])-1
                             if index>=0:
                                 if checkName=='ListBox':
-                                    items=element.ItemTexts()
+                                    items=element.item_texts()
                                     verb =items[index]
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
@@ -191,7 +191,6 @@ class Dropdown_Keywords():
                                          val=item_list[i]
                                          res=elelist[int(val)]
                                         else:
-
                                          val=item_list[i]
                                          res1=elelist[int(val)]
                                          res2=elelist[int(val) + 1]
@@ -239,15 +238,12 @@ class Dropdown_Keywords():
                         if element.friendly_class_name() == 'ListView' or 'ListBox':
                             if element.is_active() == False:
                                element.click()
-                            val=element.texts()
-                            verb1 = element.item_count()
-                            verb=int(verb1)
+                            verb=int(element.item_count())
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                         elif element.friendly_class_name() == 'ComboBox':
-                            verb1 = element.item_count()
-                            verb=int(verb1)
+                            verb=int(element.item_count())
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -604,38 +600,36 @@ class Dropdown_Keywords():
                             newlist=[]
                             items_list=input_val
                             for i in range(0,len(items)):
-                                    newlist.append(items[i].encode("utf-8"))
-                                    if items_list==newlist:
-                                        status = desktop_constants.TEST_RESULT_PASS
-                                        result = desktop_constants.TEST_RESULT_TRUE
-                                    else:
-                                        status = desktop_constants.TEST_RESULT_FAIL
-                                        result = desktop_constants.TEST_RESULT_FALSE
+                                    newlist.append(items[i])
+                            if items_list==newlist:
+                                status = desktop_constants.TEST_RESULT_PASS
+                                result = desktop_constants.TEST_RESULT_TRUE
+                            else:
+                                status = desktop_constants.TEST_RESULT_FAIL
+                                result = desktop_constants.TEST_RESULT_FALSE
                         #==================================================================
                         elif checkName == 'ListView' or 'ListBox':
                              if checkName == 'ListBox':
                                 items=element.ItemTexts()
                                 newlist=[]
-                                newlist=[item.encode("utf-8") for item in items]#removing unicode
+                                newlist=[item for item in items]#removing unicode
                                 items_list=input_val
                                 if newlist==items_list:
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
-
                              elif checkName == 'ListView':
-                                 items=list(element.items())
-                                 items.pop(0)
-                                 newlist=[]
-                                 items_list=input_val
-                                 for i in range(0,len(items)):
-                                        #newitems=[item.encode("utf-8") for item in items]
-                                        newlist.append(items[i].encode("utf-8"))
-                                        if items_list==newlist:
-                                            status = desktop_constants.TEST_RESULT_PASS
-                                            result = desktop_constants.TEST_RESULT_TRUE
-                                        else:
-                                            status = desktop_constants.TEST_RESULT_FAIL
-                                            result = desktop_constants.TEST_RESULT_FALSE
+                                items=list(element.items())
+                                items.pop(0)
+                                newlist=[]
+                                items_list=input_val
+                                for i in range(0,len(items)):
+                                    newlist.append(items[i])
+                                if items_list==newlist:
+                                    status = desktop_constants.TEST_RESULT_PASS
+                                    result = desktop_constants.TEST_RESULT_TRUE
+                                else:
+                                    status = desktop_constants.TEST_RESULT_FAIL
+                                    result = desktop_constants.TEST_RESULT_FALSE
                         #==================================================================
                else:
                    log.info('Element not present on the page where operation is trying to be performed')
@@ -646,8 +640,6 @@ class Dropdown_Keywords():
                 log.error(err_msg)
                 log.error(exception)
             return status,result,verb,err_msg
-
-
 
 
         def verifyValuesExists(self,element,parent,input_val, *args):
@@ -683,7 +675,7 @@ class Dropdown_Keywords():
                                 fail_flag=False #will set to true if item is not apart of original list,if set to true result is set to fail
                                 items=element.ItemTexts()
                                 newlist=[]
-                                newlist=[item.encode("utf-8") for item in items] #removing unicode
+                                newlist=[item for item in items] #removing unicode
                                 items_list=input_val
                                 for i in range(0,len(items_list)):
                                     if items_list[i] not in newlist:
@@ -699,7 +691,7 @@ class Dropdown_Keywords():
                                  newlist=[]
                                  items_list=input_val
                                  for i in range(0,len(items)):
-                                        newlist.append(elelist[i].encode("utf-8"))
+                                        newlist.append(elelist[i])
                                         for i in range(0,len(items_list)):
                                             if items_list[i] in newlist:
                                                 status = desktop_constants.TEST_RESULT_PASS
