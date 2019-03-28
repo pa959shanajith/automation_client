@@ -8,12 +8,10 @@
 # Copyright:   (c) kavyasree.l 2017
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-
 import desktop_launch_keywords
 import logger
 from desktop_editable_text import Text_Box
 import desktop_constants
-import desktop_editable_text
 import time
 from constants import *
 import logging
@@ -21,7 +19,7 @@ log = logging.getLogger('dropdown_keywords.py')
 class Dropdown_Keywords():
         def selectValueByIndex(self,element,parent,input_val, *args):
             if(len(input_val)>1):
-                text = input_val[2]
+                text = input_val[3]
             else:
                 text=input_val[0]
             status=desktop_constants.TEST_RESULT_FAIL
@@ -474,7 +472,7 @@ class Dropdown_Keywords():
 
         def selectValueByText(self,element,parent,input_val, *args):
             if(len(input_val)>1):
-                text = input_val[2]
+                text = input_val[3]
             else:
                 text=input_val[0]
             status=desktop_constants.TEST_RESULT_FAIL
@@ -584,7 +582,7 @@ class Dropdown_Keywords():
         def verifyAllValues(self,element,parent,input_val, *args):
             try:
                 if input_val[0]=='dropdown' and int(input_val[1])==True:         #to check is object is custom dropdown
-                    input_val = input_val[2:]                                #if custom then populate list from 3rd element
+                    input_val = input_val[3:]                                #if custom then populate list from 4th element
             except :
                 pass
             status=desktop_constants.TEST_RESULT_FAIL

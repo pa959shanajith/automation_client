@@ -9,14 +9,13 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import desktop_constants
-from desktop_editable_text import Text_Box
+from desktop_editable_text import Text_Box,CursorPositionCorrection
 import desktop_launch_keywords
-from desktop_launch_keywords import Launch_Keywords
 import pywinauto
+import pythoncom
 import logging
 from constants import *
 import logger
-import win32api
 log = logging.getLogger('desktop_element_keywords.py')
 
 class ElementKeywords():
@@ -116,9 +115,10 @@ class ElementKeywords():
                 if (check):
                     log.info('Parent matched')
                     if(element.is_enabled()):
-                        cursor_x,cursor_y = win32api.GetCursorPos()#handling cursor move
+                        cursor_obj=CursorPositionCorrection()
+                        cursor_obj.getOriginalPosition()
                         element.set_focus()
-                        win32api.SetCursorPos((cursor_x,cursor_y))#handling cursor move
+                        cursor_obj.setOriginalPosition()
                         element.click()
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
@@ -139,7 +139,6 @@ class ElementKeywords():
         return status,result,verb,err_msg
 
     def get_element_text(self, element , parent , *args):
-        import pythoncom
         pythoncom.CoInitialize()
         status=desktop_constants.TEST_RESULT_FAIL
         result=desktop_constants.TEST_RESULT_FALSE
@@ -177,10 +176,9 @@ class ElementKeywords():
         return status,result,output,err_msg
 
     def verify_element_text(self, element , parent ,input_value, *args):
-        import pythoncom
         pythoncom.CoInitialize()
         if(len(input_value)>1):
-            text_verify = input_value[2]
+            text_verify = input_value[3]
         else:
             text_verify=input_value[0]
         status=desktop_constants.TEST_RESULT_FAIL
@@ -234,7 +232,10 @@ class ElementKeywords():
         Rect=''
         try:
             #----------get the element coordinates
-            Rect=str(element.Rectangle())
+            try:
+                Rect=str(element.rectangle())
+            except:
+                pass
             Rect=Rect[1:len(Rect)-1]
             Rect=Rect.split(",")
             Left=Rect[0].strip()#left
@@ -267,8 +268,6 @@ class ElementKeywords():
             status = desktop_constants.TEST_RESULT_PASS
             result = desktop_constants.TEST_RESULT_TRUE
         except Exception as exception:
-            import traceback
-            traceback.print_exc()
             log.error(exception)
             logger.print_on_console(exception)
             err_msg="Unable to perform Mouse Hover"
