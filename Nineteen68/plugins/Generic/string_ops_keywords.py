@@ -283,6 +283,7 @@ class StringOperation:
                 if not (to_find is None or to_find is ''):
                     coreutilsobj=core_utils.CoreUtils()
                     actual_string=coreutilsobj.get_UTF_8(actual_string)
+                    actual_string=unidecode(actual_string)
                     to_find=coreutilsobj.get_UTF_8(to_find)
                     output_val = actual_string.find(to_find)
                     if(output_val == -1):
@@ -320,6 +321,7 @@ class StringOperation:
                     if not (value is None):
                         coreutilsobj=core_utils.CoreUtils()
                         actual_string=coreutilsobj.get_UTF_8(actual_string)
+                        actual_string=unidecode(actual_string)
                         to_be_replaced=coreutilsobj.get_UTF_8(to_be_replaced)
                         value=coreutilsobj.get_UTF_8(value)
                         if (actual_string not in to_be_replaced):
@@ -367,6 +369,7 @@ class StringOperation:
                 if not (character is None):
                     coreutilsobj=core_utils.CoreUtils()
                     input=coreutilsobj.get_UTF_8(input)
+                    input=unidecode(input)
                     character=coreutilsobj.get_UTF_8(character)
                     output = input.split(character)
 ##                    logger.print_on_console('Result : ',output)
@@ -409,6 +412,7 @@ class StringOperation:
                 coreutilsobj=core_utils.CoreUtils()
                 for eachvalue in input_vals:
                     eachvalue=coreutilsobj.get_UTF_8(eachvalue)
+                    eachvalue=unidecode(eachvalue)
                     output=output+eachvalue
                 logger.print_on_console('Result : ',output)
                 log.info('Output is')
@@ -441,6 +445,7 @@ class StringOperation:
             if not (actual_string is None or actual_string is ''):
                 coreutilsobj=core_utils.CoreUtils()
                 actual_string=coreutilsobj.get_UTF_8(actual_string)
+                actual_string=unidecode(actual_string)
                 if not (index is None or index is ''):
                     ran = '-'
                     if(ran in index):
