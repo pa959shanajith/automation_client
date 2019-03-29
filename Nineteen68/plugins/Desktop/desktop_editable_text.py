@@ -45,7 +45,7 @@ class Text_Box:
                     log.info('Parent matched')
                     if(element.is_enabled()):
                         try:
-                            element.SetEditText(text, pos_start=None, pos_end=None)
+                            element.set_edit_text(text, pos_start=None, pos_end=None)
                         except:
                             self.clear_text(element,parent)
                             cursor_obj=CursorPositionCorrection()
@@ -73,7 +73,7 @@ class Text_Box:
 
     def set_secure_text(self, element , parent , input_val , *args):
         if(len(input_val)>1):
-            text = input_val[2]
+            text = input_val[3]
         else:
             text=input_val[0]
         status=desktop_constants.TEST_RESULT_FAIL
@@ -101,7 +101,7 @@ class Text_Box:
                         input_val_temp = encryption_obj.decrypt(text)
                         if input_val_temp is not None:
                             try:
-                                element.SetEditText(input_val_temp, pos_start=None, pos_end=None)
+                                element.set_edit_text(input_val_temp, pos_start=None, pos_end=None)
                             except:
                                 self.clear_text(element,parent)
                                 cursor_obj=CursorPositionCorrection()
@@ -145,7 +145,10 @@ class Text_Box:
                 log.debug(check)
                 if (check):
                     log.info('Parent matched')
-                    output = element.text_block()
+                    if element.backend.name == 'uia':
+                        output = element.get_value()
+                    elif element.backend.name=='win32':
+                        output = element.text_block()
                     status = desktop_constants.TEST_RESULT_PASS
                     result = desktop_constants.TEST_RESULT_TRUE
                     log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -185,7 +188,7 @@ class Text_Box:
                         for i in range(0,len(element.text_block())):
                             element.type_keys('^a{BACKSPACE}')
                         cursor_obj.setOriginalPosition()
-                        element.SetText("", pos_start=None, pos_end=None)
+                        element.set_text("", pos_start=None, pos_end=None)
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -211,6 +214,7 @@ class Text_Box:
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         verb = OUTPUT_CONSTANT
         err_msg=None
+        text=None
         try:
             if desktop_launch_keywords.window_name!=None:
                 log.info('Recieved element from the desktop dispatcher')
@@ -224,10 +228,11 @@ class Text_Box:
                 log.debug(check)
                 if (check):
                     log.debug('Parent matched')
-                    text = element.text_block()
-                    logger.print_on_console('Text : ' , text)
+                    if element.backend.name == 'uia':
+                        text = str(element.get_value())
+                    elif element.backend.name=='win32':
+                        text = str(element.text_block())
                     log.info('Text obtained')
-                    text = str(text)
                     log.info(text)
                     if(text == input_val):
                         log.info(STATUS_METHODOUTPUT_UPDATE)

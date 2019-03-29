@@ -36,7 +36,7 @@ def remove_duplicates(lines):
                 del lines[index]
     return lines
 
-def sort_line_list(lines,pos):
+def sort_line_list(lines):
     # sort lines into horizontal and vertical
     vertical = []
     for line in lines:
@@ -72,21 +72,22 @@ def hough_transform_p(img,pos):
     # probabilistic hough transform
     lines = cv2.HoughLinesP(edges,rho=1, theta=np.pi, threshold=int(0.8*edges.shape[0]), minLineLength=int(0.6*edges.shape[0]), maxLineGap=int(0.02*edges.shape[0]))
     lines_t = []
-    for line in lines:
-        lines_t.append(line[0].tolist())
-    # remove duplicates
-    lines = remove_duplicates(lines_t)
+    if(isinstance(lines,np.ndarray)):
+        for line in lines:
+            lines_t.append(line[0].tolist())
+        # remove duplicates
+        lines = remove_duplicates(lines_t)
 
-    # draw image
-    for i in range(len(lines)):
-        if(lines[i]!=[0,0,0,0]):
-            cv2.line(img_copy,(lines[i][0], lines[i][1]),(lines[i][2],lines[i][3]), (0, 0, 255), 1)
+        # draw image
+        for i in range(len(lines)):
+            if(lines[i]!=[0,0,0,0]):
+                cv2.line(img_copy,(lines[i][0], lines[i][1]),(lines[i][2],lines[i][3]), (0, 0, 255), 1)
 
-    # sort lines into vertical & horizontal lists
-    if(pos==1):
-        vertical = sort_line_list(lines,1)
-    else:
-        horizontal = sort_line_list(lines,2)
+        # sort lines into vertical & horizontal lists
+        if(pos==1):
+            vertical = sort_line_list(lines)
+        else:
+            horizontal = sort_line_list(lines)
 
 def data_in_cells(image,row,column):
     text = None
@@ -470,7 +471,11 @@ class IRISKeywords():
             hough_transform_p(img,2)
             status  = TEST_RESULT_PASS
             result = TEST_RESULT_TRUE
-            value = len(horizontal)-1
+            if(len(horizontal)>0):
+                value = len(horizontal)-1
+            else:
+                value = 0
+                logger.print_on_console('Unable to detect rows')
             os.remove('cropped.png')
             os.remove('rotated.png')
         except Exception as e:
@@ -510,7 +515,11 @@ class IRISKeywords():
             hough_transform_p(img,2)
             status  = TEST_RESULT_PASS
             result = TEST_RESULT_TRUE
-            value = len(vertical)-1
+            if(len(vertical)>0):
+                value = len(vertical)-1
+            else:
+                value = 0
+                logger.print_on_console('Unable to detect columns')
             os.remove('cropped.png')
             os.remove('rotated.png')
         except Exception as e:
