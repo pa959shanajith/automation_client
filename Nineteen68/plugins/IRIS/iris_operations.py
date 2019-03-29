@@ -629,8 +629,6 @@ class IRISKeywords():
                     f.write(base64.b64decode(img))
                 image = cv2.imread("cropped.png")
                 text = get_ocr(image)
-                if(isinstance(text,str)):
-                    text = text.encode('utf-8')
                 if(verifytext == text):
                     status= TEST_RESULT_PASS
                     result = TEST_RESULT_TRUE
