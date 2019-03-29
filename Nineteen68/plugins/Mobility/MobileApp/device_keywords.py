@@ -16,6 +16,7 @@ import os
 import re
 import logging
 import logger
+import android_scrapping
 
 log = logging.getLogger('device_keywords.py')
 
@@ -230,10 +231,11 @@ class Device_Keywords():
             log.error(e,exc_info=True)
             logger.print_on_console(e)
 
-    def launch_app(self, package, activity, device):
+    def launch_app(self, apk_path, package, activity, device):
         maindir = os.getcwd()
         try:
             result = 'Error in Starting App'
+            result1 = ' App already installed; '
             connected = 'Connection error;'
             android_home = os.environ['ANDROID_HOME']
             cmd = android_home + '\\platform-tools\\'
@@ -246,20 +248,28 @@ class Device_Keywords():
                     connected = 'Connected;'
                     break
             if android_home is not None:
+                if not(android_scrapping.driver.is_app_installed(package)):
+                    install = subprocess.Popen([cmd, '-s', device, 'install', apk_path], stdout=subprocess.PIPE)
+                    for line in install.stdout.readlines():
+                        curr_line = str(line)[2:-1]
+                        if 'Success' in curr_line:
+                            result1 = ' App installed; '
+                            break
                 out = subprocess.Popen([cmd, '-s', device, 'shell', 'am', 'start', '-a', 'android.intent.action.MAIN', '-n', cmp], stdout=subprocess.PIPE)
                 for line in out.stdout.readlines():
                     curr_line = str(line)[2:-1]
                     if 'Starting' in curr_line:
-                        os.chdir(maindir)
                         result = 'Starting App'
-                        break
                     if 'Warning' in curr_line:
                         result = 'App was already started; Its current task has been brought to the front'
+                        break
+                    if 'Error' in curr_line:
+                        result = 'Error in Starting App'
                         break
             os.chdir(maindir)
         except Exception as e:
             log.error(e, exc_info=True)
             logger.print_on_console(e)
             logger.print_on_console('Error in Starting App')
-        return connected+result
+        return connected+result1+result
 

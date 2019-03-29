@@ -92,7 +92,7 @@ class LaunchAndInstall():
             logger.print_on_console('Exception in starting server')
             logger.print_on_console(e)
 
-    def stop_server(self):
+    def stop_server(self,input_val,*args):
         status = mobile_app_constants.TEST_RESULT_FAIL
         result = mobile_app_constants.TEST_RESULT_FALSE
         err_msg = None
@@ -191,12 +191,14 @@ class LaunchAndInstall():
                 android_scrapping.packageName = package_name
                 activity_name = device_keywords_object.activity_name(apk_path)
                 #driver.start_activity(package_name,activity_name)
-                msg = device_keywords_object.launch_app(package_name,activity_name,android_scrapping.device_id)
+                msg = device_keywords_object.launch_app(apk_path,package_name,activity_name,android_scrapping.device_id)
                 if 'Error' in msg:
+                    log.error(msg)
                     status = mobile_app_constants.TEST_RESULT_FAIL
                     result = mobile_app_constants.TEST_RESULT_FALSE
                     err_msg = msg
                 else:
+                    console.log(msg)
                     status = mobile_app_constants.TEST_RESULT_PASS
                     result = mobile_app_constants.TEST_RESULT_TRUE
             else:

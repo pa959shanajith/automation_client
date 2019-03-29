@@ -46,68 +46,32 @@ class Action_Key_App():
             'keydown':' shell input keyevent 20',
             'keyup':' shell input keyevent 19',
             'tab' :' shell input keyevent 61',
-            'a':' shell input keyevent 29',
-            'b':' shell input keyevent 30',
-            'c':' shell input keyevent 31',
-            'd':' shell input keyevent 32',
-            'e':' shell input keyevent 33',
-            'f':' shell input keyevent 34',
-            'g':' shell input keyevent 35',
-            'h':' shell input keyevent 36',
-            'i':' shell input keyevent 37',
-            'j':' shell input keyevent 38',
-            'k':' shell input keyevent 39',
-            'l':' shell input keyevent 40',
-            'm':' shell input keyevent 41',
-            'n':' shell input keyevent 42',
-            'o':' shell input keyevent 43',
-            'p':' shell input keyevent 44',
-            'q':' shell input keyevent 45',
-            'r':' shell input keyevent 46',
-            's':' shell input keyevent 47',
-            't':' shell input keyevent 48',
-            'u':' shell input keyevent 49',
-            'v':' shell input keyevent 50',
-            'w':' shell input keyevent 51',
-            'x':' shell input keyevent 52',
-            'y':' shell input keyevent 53',
-            'z':' shell input keyevent 54',
             'contacts':' shell input keyevent 207',
             'menu':' shell input keyevent 82',
             'home':' shell input keyevent 3',
-            '0':' shell input keyevent 7',
-            '1':' shell input keyevent 8',
-            '2':' shell input keyevent 9',
-            '3':' shell input keyevent 10',
-            '4':' shell input keyevent 11',
-            '5':' shell input keyevent 12',
-            '6':' shell input keyevent 13',
-            '7':' shell input keyevent 14',
-            '8':' shell input keyevent 15',
-            '9':' shell input keyevent 16',
-            'comma':' shell input keyevent 55',
-            'space':' shell input keyevent 62',
             'volume_up':' shell input keyevent 24',
             'volume_down':' shell input keyevent 25',
             'back':' shell input keyevent 4',
-            '.':' shell input keyevent 56',
             'del':' shell input keyevent 67',
+            'pageup':' shell input keyevent 92',
+            'pagedown':' shell input keyevent 93',
+            'movehome':' shell input keyevent 122',
+            'moveend':' shell input keyevent 123',
+            'recents':' shell input keyevent 187',
+            'comma':' shell input keyevent 55',
+            'space':' shell input keyevent 62',
+            '.':' shell input keyevent 56',
             '`':' shell input keyevent 68',
             '-':' shell input keyevent 69',
             '=':' shell input keyevent 70',
             '(':' shell input keyevent 71',
             ')':' shell input keyevent 72',
             '\\':' shell input keyevent 73',
-            ';':' shell input keyevent 74',
+            'semicolon':' shell input keyevent 74',
             "'":' shell input keyevent 75',
             '/':' shell input keyevent 76',
             '@':' shell input keyevent 77',
-            '+':' shell input keyevent 81',
-            'pageup':' shell input keyevent 92',
-            'pagedown':' shell input keyevent 93',
-            'movehome':' shell input keyevent 122',
-            'moveend':' shell input keyevent 123',
-            'recents':' shell input keyevent KEYCODE_APP_SWITCH'
+            '+':' shell input keyevent 81'
             }
             adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
             if (len(inputs)==1):
@@ -138,15 +102,15 @@ class Action_Key_App():
                             if input < 1 :
                                 break
                     else :
-                        logger.print_on_console('Invalid Input')
+                        logger.print_on_console('Invalid Input; Value 2 cannot be zero or less')
                         status=TEST_RESULT_FAIL
                         methodoutput=TEST_RESULT_FALSE
                 else :
-                    logger.print_on_console('Invalid Input')
+                    logger.print_on_console('Invalid Input; not supported')
                     status=TEST_RESULT_FAIL
                     methodoutput=TEST_RESULT_FALSE
             else :
-                    logger.print_on_console('Invalid Input')
+                    logger.print_on_console('Invalid Input; Maximum two inputs Accepted')
                     status=TEST_RESULT_FAIL
                     methodoutput=TEST_RESULT_FALSE
 

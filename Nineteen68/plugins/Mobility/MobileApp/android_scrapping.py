@@ -165,22 +165,20 @@ class InstallAndLaunch():
                     return self.driver
                 return self.driver
             else:
-                device_keywords_object = device_keywords.Device_Keywords()
-                activityName = device_keywords_object.activity_name(apk_path)
-                packageName = device_keywords_object.package_name(apk_path)
-                #logger.print_on_console("Apk path:",apk_path)
-                logger.print_on_console("App package name:",packageName)
-                #logger.print_on_console("Activity name:",activityName)
                 processes = psutil.net_connections()
                 for line in processes:
                     p = line.laddr
                     if p[1] == 4723 and driver is not None:
                         return driver
                 try:
+                    device_keywords_object = device_keywords.Device_Keywords()
                     if device_name == 'wifi':
                         device_name = device_keywords_object.wifi_connect()
                     if device_name != '':
+                        activityName = device_keywords_object.activity_name(apk_path)
+                        packageName = device_keywords_object.package_name(apk_path)
                         logger.print_on_console("Connected device name:",device_name)
+                        logger.print_on_console("App package name:",packageName)
                         device_id = device_name
                         self.start_server()
                         self.desired_caps = {}
