@@ -15,7 +15,6 @@ import desktop_constants
 import time
 from constants import *
 import logging
-import traceback
 log = logging.getLogger('dropdown_keywords.py')
 class Dropdown_Keywords():
         def selectValueByIndex(self,element,parent,input_val, *args):
@@ -119,7 +118,6 @@ class Dropdown_Keywords():
                             err_msg='Element not present on the page where operation is trying to be performed'
                             logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -217,7 +215,6 @@ class Dropdown_Keywords():
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
                    err_msg='Element not present on the page where operation is trying to be performed'
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -258,7 +255,6 @@ class Dropdown_Keywords():
                       err_msg='Element not present on the page where operation is trying to be performed'
                       logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -304,7 +300,6 @@ class Dropdown_Keywords():
                       err_msg='Element not present on the page where operation is trying to be performed'
                       logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -389,7 +384,6 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -487,7 +481,6 @@ class Dropdown_Keywords():
                        err_msg='Element not present on the page where operation is trying to be performed'
                        logger.print_on_console('Element not present on the page where operation is trying to be performed')
                 except Exception as exception:
-                    traceback.print_exc()
                     err_msg=desktop_constants.ERROR_MSG
                     log.error(err_msg)
                     log.error(exception)
@@ -602,7 +595,6 @@ class Dropdown_Keywords():
                             err_msg='Element not present on the page where operation is trying to be performed'
                             logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -669,7 +661,6 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -739,7 +730,6 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -800,7 +790,6 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -857,7 +846,6 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -965,7 +953,6 @@ class Dropdown_Keywords():
                    err_msg='Element not present on the page where operation is trying to be performed'
                    logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -1059,7 +1046,6 @@ class Dropdown_Keywords():
                         err_msg='Element not present on the page where operation is trying to be performed'
                         logger.print_on_console('Element not present on the page where operation is trying to be performed')
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
@@ -1149,7 +1135,6 @@ class Dropdown_Keywords():
                         err_msg='Element not present on the page where operation is trying to be performed'
                         log.error(err_msg)
             except Exception as exception:
-                traceback.print_exc()
                 err_msg=desktop_constants.ERROR_MSG
                 log.error(err_msg)
                 log.error(exception)
