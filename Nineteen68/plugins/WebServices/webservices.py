@@ -93,8 +93,6 @@ class WSkeywords:
         except Exception as fileremovalexc:
             log.error(fileremovalexc)
             if self.client_cert_path != '' and self.client_cert_path != None:
-                log.error(fileremovalexc)
-                log.info(fileremovalexc)
                 logger.print_on_console('Cannot find the Certificate' )
 
      def setEndPointURL(self,url):
@@ -348,16 +346,16 @@ class WSkeywords:
             #added status code
             self.baseResHeader['StatusCode']=response.status_code
             log.info(ws_constants.RESPONSE_HEADER+'\n'+str(self.baseResHeader))
-            resp_content = response.content.decode("utf-8") if (type(response.content)==bytes) else response.content
-            self.baseResBody=resp_content.replace("&gt;",">").replace("&lt;","<")
-            log.info(ws_constants.RESPONSE_BODY+'\n'+self.baseResBody)
+            #resp_content = response.content.decode("utf-8") if (type(response.content)==bytes) else response.content
+            self.baseResBody=str(response.content).replace("&gt;",">").replace("&lt;","<")
+            log.info(ws_constants.RESPONSE_BODY+'\n'+str(self.baseResBody))
             log.debug(STATUS_METHODOUTPUT_UPDATE)
             status = ws_constants.TEST_RESULT_PASS
             methodoutput = ws_constants.TEST_RESULT_TRUE
-            output=(self.baseResHeader,self.baseResBody)
+            output=(self.baseResHeader,str(self.baseResBody).replace("&gt;",">").replace("&lt;","<"))
         except Exception as e:
             err_msg=ws_constants.METHOD_INVALID_INPUT
-            log.error(err_msg)
+            log.error(e)
             log.error(e,exc_info=True)
             logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
@@ -583,10 +581,12 @@ class WSkeywords:
                     for key in res:
                         headerresp = headerresp +str(key) + ":" + str (res[key]) + "##"
                     response=headerresp+'rEsPONseBOdY: '
-            response = response.decode('utf-8') if (type(response)==bytes) else str(response)
+            #response = response.decode('utf-8') if (type(response)==bytes) else str(response)
+            response= str(response)
             if response == '':
                 response = 'fail'
             if testcasename == '':
+                response = unicode(response, "utf-8")
                 socketIO.emit('result_debugTestCaseWS',response)
         except Exception as e:
             logger.print_on_console(e)
@@ -669,7 +669,8 @@ class WSkeywords:
                             methodoutput = ws_constants.TEST_RESULT_TRUE
                             if 'soap:Envelope' in self.baseResBody:
                                 from lxml import etree as et
-                                root = et.fromstring(bytes(self.baseResBody,'utf-8'))
+                                root = et.fromstring(self.baseResBody)
+                                #root = et.fromstring(bytes(self.baseResBody,'utf-8'))
                                 respBody = str(et.tostring(root,pretty_print=True))
                                 if respBody.find(args[0])==-1:
                                     status = ws_constants.TEST_RESULT_FAIL
@@ -681,7 +682,7 @@ class WSkeywords:
                         if not flag:
                             output= self.baseResBody
                     except Exception as e:
-                        log.error(e,exc_info=True)
+                        log.error(e)
                         output= self.baseResBody
             elif len(args) == 2:
                 key=args[0]
@@ -857,24 +858,35 @@ class WSkeywords:
                     # if server side certificates are available
                     if (not (self.server_cert_path == '' or self.server_cert_path == None)):
                         log.debug('TWO WAY HANDSHAKE with basic authentication')
-                        response = requests.post(self.baseEndPointURL, data = self.baseReqBody,
-                            headers=self.baseReqHeader, cert=cert, verify=self.server_cert_path,
-                            auth=(self.auth_uname,self.auth_pass))
+                        response = requests.post(self.baseEndPointURL,
+                                                data = self.baseReqBody,
+                                                headers=self.baseReqHeader,
+                                                cert=cert,
+                                                verify=self.server_cert_path,
+                                                auth=(self.auth_uname,self.auth_pass))
                     else:
                         log.debug('ONE WAY HANDSHAKE with basic authentication')
-                        response = requests.post(self.baseEndPointURL, data = self.baseReqBody,
-                            headers=self.baseReqHeader, cert=cert, verify=False,
-                            auth=(self.auth_uname,self.auth_pass))
+                        response = requests.post(self.baseEndPointURL,
+                                                data = self.baseReqBody,
+                                                headers=self.baseReqHeader,
+                                                cert=cert,
+                                                verify=False,
+                                                auth=(self.auth_uname,self.auth_pass))
                 else:
                     if (not (self.server_cert_path == '' or self.server_cert_path == None)):
                         log.debug('TWO WAY HANDSHAKE without basic authentication')
-                        response = requests.post(self.baseEndPointURL, data = self.baseReqBody,
-                            headers=self.baseReqHeader, cert=cert,
-                            verify=self.server_cert_path)
+                        response = requests.post(self.baseEndPointURL,
+                                                data = self.baseReqBody,
+                                                headers=self.baseReqHeader,
+                                                cert=cert,
+                                                verify=self.server_cert_path)
                     else:
                         log.debug('ONE WAY HANDSHAKE without basic authentication')
-                        response = requests.post(self.baseEndPointURL, data = self.baseReqBody,
-                            headers=self.baseReqHeader, cert=cert, verify=False)
+                        response = requests.post(self.baseEndPointURL,
+                                                data = self.baseReqBody,
+                                                headers=self.baseReqHeader,
+                                                cert=cert,
+                                                verify=False)
             else:
                 response = requests.post(self.baseEndPointURL,data=self.baseReqBody,headers=self.baseReqHeader)
         except Exception as e:
@@ -883,7 +895,7 @@ class WSkeywords:
                 err_msg = 'Certificate Mismatched.'
             else:
                 err_msg=ws_constants.METHOD_INVALID_INPUT
-            log.error(err_msg)
+            log.error(e)
             logger.print_on_console(err_msg)
         return response,err_msg
 

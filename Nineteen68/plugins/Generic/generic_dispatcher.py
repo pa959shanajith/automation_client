@@ -46,6 +46,7 @@ class GenericKeywordDispatcher:
     generic_delay=delay_operations.Delay_keywords()
     generic_sendkeys=sendfunction_keys.SendFunctionKeys()
     xml_oper = xml_operations.XMLOperations()
+    json_oper = xml_operations.JSONOperations()
     util_operation_obj=util_operations.UtilOperations()
     dyn_var_obj=dynamic_variable.DynamicVariables()
 
@@ -155,8 +156,8 @@ class GenericKeywordDispatcher:
                   'getalltablesfromdoc': self.generic_word.getAllTablesFromDoc,
                   'readjson': self.generic_word.readjson,
                   'readxml': self.generic_word.readxml,
-                  'readpdf': self.generic_word.readPdf
-
+                  'readpdf': self.generic_word.readPdf,
+                  'getkeyvalue': self.json_oper.get_key_value
 
                 }
             if keyword in list(dict.keys()):

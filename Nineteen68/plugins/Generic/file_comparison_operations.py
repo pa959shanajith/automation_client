@@ -87,13 +87,15 @@ class PdfFile:
         content=None
         err_msg=None
         from PyPDF2 import PdfFileReader, PdfFileWriter
+        import fitz
         try:
              log.debug('Get the content of pdf file: '+str(input_path)+','+str(pagenumber))
-             reader=PdfFileReader(open(input_path,'rb'))
+             doc=fitz.open(input_path)
              pagenumber=int(pagenumber)-1
-             if pagenumber<reader.getNumPages():
-                page=reader.getPage(pagenumber)
-                content=page.extractText()
+             if pagenumber<doc.pageCount:
+                page = doc[pagenumber]
+                content=page.getText()
+                content=content.encode('utf-8')
                 if len(args)>1 and args[1]=='_internal_verify_content':
                     return content
                 if len(args) >= 2 and not (args[0] is None and args[1] is None):
@@ -108,12 +110,40 @@ class PdfFile:
                         endIndex=content.find(end)
                     content=content[startIndex:endIndex]
                     log.info('Content between Start and End string is ')
+##                    logger.print_on_console('Content between Start and End string is ')
                 elif len(args)==1:
                     with open(args[0],'w') as file:
                         file.write(content)
                         file.close()
                 log.info(content)
                 status=True
+##        try:
+##             log.debug('Get the content of pdf file: '+str(input_path)+','+str(pagenumber))
+##             reader=PdfFileReader(open(input_path,'rb'))
+##             pagenumber=int(pagenumber)-1
+##             if pagenumber<reader.getNumPages():
+##                page=reader.getPage(pagenumber)
+##                content=page.extractText()
+##                if len(args)>1 and args[1]=='_internal_verify_content':
+##                    return content
+##                if len(args) >= 2 and not (args[0] is None and args[1] is None):
+##                    start=args[0].strip()
+##                    end=args[1].strip()
+##                    startIndex=0
+##                    endIndex=len(content)
+##                    log.info('Start string: '+str(start)+' End string: '+str(end))
+##                    if not start is '':
+##                        startIndex=content.find(start)+len(start)
+##                    if not end is '':
+##                        endIndex=content.find(end)
+##                    content=content[startIndex:endIndex]
+##                    log.info('Content between Start and End string is ')
+##                elif len(args)==1:
+##                    with open(args[0],'w') as file:
+##                        file.write(content)
+##                        file.close()
+##                log.info(content)
+##                status=True
              else:
                 err_msg=generic_constants.INVALID_INPUT
                 log.error(err_msg)

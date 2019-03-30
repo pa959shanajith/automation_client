@@ -1,8 +1,8 @@
 #-------------------------------------------------------------------------------
 # Name:        button_link_keywords_desktop.py
-# Purpose:
+# Purpose:      To handle button and link objects
 #
-# Author:      wasimakram.sutar
+# Author:      wasimakram.sutar,anas.ahmed
 #
 # Created:     29/05/2017
 # Copyright:   (c) wasimakram.sutar 2017
@@ -42,7 +42,11 @@ class ButtonLinkKeyword():
                 if (check):
                     log.info('Parent matched')
                     if(element.is_enabled()):
-                        element.ClickInput(button='left', double=True, wheel_dist=0, pressed='')
+                        if element.backend.name =='win32':
+                            element.click(button='left', double=True,coords=(0, 0),absolute=False,  pressed='')
+                        elif element.backend.name =='uia':
+                            for i in range(0,2):
+                                element.click()
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -190,7 +194,6 @@ class ButtonLinkKeyword():
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
-
                 else:
                     log.info('Element not present on the page where operation is trying to be performed')
                     err_msg = 'Element not present on the page where operation is trying to be performed'

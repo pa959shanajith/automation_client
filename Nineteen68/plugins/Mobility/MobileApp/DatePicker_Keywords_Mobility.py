@@ -215,11 +215,11 @@ class Date_Keywords():
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
-        className=''
+        # className=''
         err_msg=None
-        text=[]
-        obj=[]
-        input_date=input[0].split('/')
+        # text=[]
+        # obj=[]
+        # input_date=input[0].split('/')
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:

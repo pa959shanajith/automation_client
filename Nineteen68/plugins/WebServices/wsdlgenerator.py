@@ -24,11 +24,16 @@ imp.filter.add('http://tempuri.org/')
 from lxml import etree
 import logger
 import logging
+import os
+import requests
+from requests.auth import HTTPBasicAuth
+
 try:
     from wsdllib_override import zeep
 except ImportError:
     import zeep
-
+global server_certs
+auth_set= False
 log = logging.getLogger('wsdlgenerator.py')
 
 ## This class will have the methods to generate request header and body of WSDL
@@ -65,6 +70,8 @@ class WebservicesWSDL():
             ##    for methodindex in range(0,len(obt_list_method1)):
             ##       allmethodslist.append(str('SOAP1.2-'+obt_list_method[methodindex]))
             ##    log.info(allmethodslist)
+            log.info("List Of Operations:",allmethodslist)
+            logger.print_on_console('List Of Operations:::::',allmethodslist)
             return allmethodslist
         except Exception as e:
             logger.print_on_console('Invalid end point URl')
@@ -80,12 +87,14 @@ class BodyGenarator():
     3. soap_type i.e to which soap version request body and header needs to be generated(SOAP11 or SOAP12)
     It also creates object of client
     """
-    def __init__(self, wsdl , operation_name , soap_type):
+    def __init__(self, wsdl , operation_name , soap_type,serverCertificate,serverCerificate_pass,auth_uname,auth_pass):
         self.wsdl = str(wsdl)
         self.operation_name=str(operation_name)
         self.soap_type = int(soap_type)
         self.client_obj = zeep.Client(self.wsdl)
         self.client_obj.soaptype = None
+        if not(serverCertificate=='' or serverCertificate==None or serverCerificate_pass=='' or serverCerificate_pass==None ) and  not(auth_uname=='' or auth_uname==None or auth_pass=='' or auth_pass==None):
+            server_certs = self.server_certs(wsdl,operation_name,soap_type,serverCertificate,serverCerificate_pass,auth_uname,auth_pass)
 
     def get_string(self ,count):
         str=[]
@@ -100,34 +109,45 @@ class BodyGenarator():
     """
     def requestHeader(self):
         try:
-            if self.soap_type == 0:
-                self.client_obj.soaptype = 0
-                log.info('soap type is 0 i.e is soap 11')
-                request_header_soap11 = self.client_obj.service._binding.create_message_header(self.operation_name)
-                ##request_header_soap11 = str(request_header_soap11)
-                log.info('request header of soap11')
-                log.info(request_header_soap11)
-                return request_header_soap11
-            elif self.soap_type == 1:
-                self.client_obj.soaptype = 1
-                log.info('soap type is 1 i.e is soap 12')
-                request_header_soap12 = self.client_obj.service._binding.create_message_header(self.operation_name)
-                ##request_header_soap12 = str(request_header_soap12)
-                log.info('request header of soap12')
-                log.info(request_header_soap12)
-                return request_header_soap12
-            elif self.soap_type == 2:
-                self.client_obj.soaptype = 0
-                request_header_soap11 = self.client_obj.service._binding.create_message_header(self.operation_name)
-                request_header_soap11 = str(request_header_soap11)
-                log.info('request header of soap11')
-                log.info(request_header_soap11)
-                self.client_obj.soaptype = 1
-                request_header_soap12 = self.client_obj.service._binding.create_message_header(self.operation_name)
-                ##request_header_soap12 = str(request_header_soap12)
-                log.info('request header of soap12')
-                log.info(request_header_soap12)
-                return request_header_soap11,request_header_soap12
+            if auth_set==False:
+                if self.soap_type == 0:
+                    self.client_obj.soaptype = 0
+                    log.info('soap type is 0 i.e is soap 11')
+                    request_header_soap11 = self.client_obj.service._binding.create_message_header(self.operation_name)
+                    ##request_header_soap11 = str(request_header_soap11)
+                    log.info('request header of soap11')
+                    log.info(request_header_soap11)
+                    return request_header_soap11
+                elif self.soap_type == 1:
+                    self.client_obj.soaptype = 1
+                    log.info('soap type is 1 i.e is soap 12')
+                    request_header_soap12 = self.client_obj.service._binding.create_message_header(self.operation_name)
+                    ##request_header_soap12 = str(request_header_soap12)
+                    log.info('request header of soap12')
+                    log.info(request_header_soap12)
+                    return request_header_soap12
+                elif self.soap_type == 2:
+                    self.client_obj.soaptype = 0
+                    request_header_soap11 = self.client_obj.service._binding.create_message_header(self.operation_name)
+                    request_header_soap11 = str(request_header_soap11)
+                    log.info('request header of soap11')
+                    log.info(request_header_soap11)
+                    self.client_obj.soaptype = 1
+                    request_header_soap12 = self.client_obj.service._binding.create_message_header(self.operation_name)
+                    ##request_header_soap12 = str(request_header_soap12)
+                    log.info('request header of soap12')
+                    log.info(request_header_soap12)
+                    return request_header_soap11,request_header_soap12
+            elif auth_set==True:
+                test= self.client_obj.service._binding.create_message_header(self.operation_name)
+                if type(server_certs) == tuple:
+                    response=server_certs[0]
+                response =server_certs
+                logger.print_on_console('Status code: ',response.status_code)
+                log.info('Status code: ')
+                log.info(response.status_code)
+                request_header_soap_auth_header=response.headers
+                return request_header_soap_auth_header
         except Exception as e:
             logger.print_on_console('Invalid end point url')
             log.error(e)
@@ -141,67 +161,110 @@ class BodyGenarator():
     """
     def requestBody(self):
         try:
-            if self.soap_type == 0:
-                self.client_obj.soaptype = 0
-                log.info('soap type is 0 i.e is soap 11')
-                obt_body_base = self.client_obj.service._binding.create_message(self.operation_name)
-                obt_body_base = etree.tostring(obt_body_base,pretty_print=True)
-                inp_count = zeep.xsd.indicators.inputParameterCount
-                args=self.get_string(inp_count)
-                try:
-                    obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
-                    obt_request_body_soap11 = etree.tostring(obt_body,pretty_print=True)
-                except:
-                    logger.print_on_console('No Request data to Enter')
-                    obt_request_body_soap11 = obt_body_base
-                log.info('request body of soap11')
-                log.info(obt_request_body_soap11)
-                return obt_request_body_soap11
+            if auth_set ==False:
+                if self.soap_type == 0:
+                    self.client_obj.soaptype = 0
+                    log.info('soap type is 0 i.e is soap 11')
+                    obt_body_base = self.client_obj.service._binding.create_message(self.operation_name)
+                    obt_body_base = etree.tostring(obt_body_base,pretty_print=True)
+                    inp_count = zeep.xsd.indicators.inputParameterCount
+                    args=self.get_string(inp_count)
+                    try:
+                        obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
+                        obt_request_body_soap11 = etree.tostring(obt_body,pretty_print=True)
+                    except:
+                        logger.print_on_console('No Request data to Enter')
+                        obt_request_body_soap11 = obt_body_base
+                    log.info('request body of soap11')
+                    log.info(obt_request_body_soap11)
+                    return obt_request_body_soap11
 
-            elif self.soap_type == 1:
-                self.client_obj.soaptype = 1
-                log.info('soap type is 1 i.e is soap 12')
-                obt_body_base = self.client_obj.service._binding.create_message(self.operation_name)
-                obt_body_base = etree.tostring(obt_body_base,pretty_print=True)
-                inp_count = zeep.xsd.indicators.inputParameterCount
-                args=self.get_string(inp_count)
-                try:
-                    obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
-                    obt_request_body_soap12 = etree.tostring(obt_body,pretty_print=True)
-                except:
-                    logger.print_on_console('No Request data to Enter')
-                    obt_request_body_soap12 = obt_body_base
-                log.info('request body of soap12')
-                log.info(obt_request_body_soap12)
-                return obt_request_body_soap12
+                elif self.soap_type == 1:
+                    self.client_obj.soaptype = 1
+                    log.info('soap type is 1 i.e is soap 12')
+                    obt_body_base = self.client_obj.service._binding.create_message(self.operation_name)
+                    obt_body_base = etree.tostring(obt_body_base,pretty_print=True)
+                    inp_count = zeep.xsd.indicators.inputParameterCount
+                    args=self.get_string(inp_count)
+                    try:
+                        obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
+                        obt_request_body_soap12 = etree.tostring(obt_body,pretty_print=True)
+                    except:
+                        logger.print_on_console('No Request data to Enter')
+                        obt_request_body_soap12 = obt_body_base
+                    log.info('request body of soap12')
+                    log.info(obt_request_body_soap12)
+                    return obt_request_body_soap12
 
-            elif self.soap_type == 2:
-                self.client_obj.soaptype = 0
-                obt_body_base1 = self.client_obj.service._binding.create_message(self.operation_name)
-                obt_body_base1 = etree.tostring(obt_body_base1,pretty_print=True)
-                inp_count = zeep.xsd.indicators.inputParameterCount
-                args=self.get_string(inp_count)
-                obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
-                try:
+                elif self.soap_type == 2:
+                    self.client_obj.soaptype = 0
+                    obt_body_base1 = self.client_obj.service._binding.create_message(self.operation_name)
+                    obt_body_base1 = etree.tostring(obt_body_base1,pretty_print=True)
+                    inp_count = zeep.xsd.indicators.inputParameterCount
+                    args=self.get_string(inp_count)
                     obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
-                    obt_request_body_soap11 = etree.tostring(obt_body,pretty_print=True)
-                except:
-                    logger.print_on_console('No Request data to Enter')
-                    obt_request_body_soap11 = obt_body_base1
-                log.info('request body of soap11')
-                log.info(obt_request_body_soap11)
+                    try:
+                        obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
+                        obt_request_body_soap11 = etree.tostring(obt_body,pretty_print=True)
+                    except:
+                        logger.print_on_console('No Request data to Enter')
+                        obt_request_body_soap11 = obt_body_base1
+                    log.info('request body of soap11')
+                    log.info(obt_request_body_soap11)
 
-                self.client_obj.soaptype = 1
-                obt_body_base2 = self.client_obj.service._binding.create_message(self.operation_name)
-                try:
-                    obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
-                    obt_request_body_soap12 = etree.tostring(obt_body,pretty_print=True)
-                except:
-                    logger.print_on_console('No Request data to Enter')
-                    obt_request_body_soap12 = obt_body_base2
-                log.info('request body of soap12')
-                log.info(obt_request_body_soap12)
-                return obt_request_body_soap11,obt_request_body_soap12
+                    self.client_obj.soaptype = 1
+                    obt_body_base2 = self.client_obj.service._binding.create_message(self.operation_name)
+                    try:
+                        obt_body = self.client_obj.service._binding.create_message(self.operation_name,*args)
+                        obt_request_body_soap12 = etree.tostring(obt_body,pretty_print=True)
+                    except:
+                        logger.print_on_console('No Request data to Enter')
+                        obt_request_body_soap12 = obt_body_base2
+                    log.info('request body of soap12')
+                    log.info(obt_request_body_soap12)
+                    return obt_request_body_soap11,obt_request_body_soap12
+            elif (server_certs!='' or server_certs!=None):
+                import xml.etree.ElementTree as ET
+                if type(server_certs) == tuple:
+                    response=server_certs[0]
+                response =server_certs
+                logger.print_on_console('Status code: ',response.status_code)
+                log.info('Status code: ')
+                log.info(response.status_code)
+                rep_content= str(response.content).replace("&gt;",">").replace("&lt;","<")
+                res_status_code=response.status_code
+                request_header_soap_auth_body=(str(res_status_code),rep_content.replace("&gt;",">").replace("&lt;","<"))
+                return request_header_soap_auth_body
         except Exception as e:
             logger.print_on_console('Invalid end point url')
             log.error(e)
+
+    def server_certs(self,wsdl , operation_name, soap_type, serverCertificate,serverCerificate_pass,auth_uname,auth_pass):
+        trust_cert_path=None
+        import webservices as w
+        obj=w.WSkeywords()
+        if (not(auth_uname == '' or auth_uname == None) and not(auth_pass == '' or auth_pass == None)):
+            auth_pass = obj.aes_decript(auth_pass)
+            if (not(serverCertificate== '' or serverCertificate==None) and not(serverCerificate_pass=='' or serverCerificate_pass==None)):
+                serverCerificate_pass =obj.aes_decript(serverCerificate_pass)
+                trust_cert= obj.extract_jks(serverCertificate,serverCerificate_pass.encode('utf-8'))
+                if trust_cert:
+                    trust_cert_path = os.environ["NINETEEN68_HOME"]+'\\TRUSTSTORECERT.pem'
+                    resp = requests.get(wsdl, auth=HTTPBasicAuth(auth_uname, auth_pass),verify=trust_cert_path)
+                    status_code = resp.status_code
+            else:
+                resp = requests.get(wsdl, verify=False,auth=HTTPBasicAuth(auth_uname, auth_pass))
+                status_code = resp.status_code
+        else:
+            if (not(serverCertificate== '' or serverCertificate==None) and not(serverCerificate_pass=='' or serverCerificate_pass==None)):
+                serverCerificate_pass =obj.aes_decript(serverCerificate_pass)
+                trust_cert= obj.extract_jks(serverCertificate,serverCerificate_pass.encode('utf-8'))
+                if trust_cert:
+                    trust_cert_path = os.environ["NINETEEN68_HOME"]+'\\TRUSTSTORECERT.pem'
+                    resp = requests.get(wsdl, verify=trust_cert_path)
+                    status_code = resp.status_code
+            else:
+                resp = requests.get(wsdl, verify=False)
+                status_code = resp.status_code
+        auth_set= True
+        return resp

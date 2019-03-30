@@ -191,7 +191,7 @@ class XMLOperations():
                 log.info(block_number)
                 if len(block)==0:
                     block=[items[0]]
-
+                list_tag=[]
                 for child in block:
                     log.info('Iterating child in the block')
                     # added condition in 'or' for SOAP types
@@ -222,7 +222,7 @@ class XMLOperations():
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = TEST_RESULT_PASS
                             methodoutput = TEST_RESULT_TRUE
-                        break
+                        list_tag.append(tagvalue)
                     else:
                         invalidinput = True
                 if status == TEST_RESULT_FAIL:
@@ -239,6 +239,10 @@ class XMLOperations():
             log.error(err_msg)
             logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
+        if len(list_tag) <=1:
+            tagvalue=list_tag[0]
+        else:
+            tagvalue=list_tag
         return status,methodoutput,tagvalue,err_msg
 
     def get_block_value(self,input_string,block_number,input_tag):
@@ -426,4 +430,62 @@ class XMLOperations():
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
+class JSONOperations():
 
+    def get_key_value(self,input_string,block_key_name,block_count,key_name,*args):
+        """
+        def : get_key_value
+        purpose : get_key_value is used to get the key Value of the specified key in the given json
+        param  : inputs : 1. json 2. block_key_name 3. block_count 4. key_name
+        return : pass,true / fail,false, keyvalue
+
+        """
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        key_value=''
+        exception_json=None
+        err_msg=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            encoded_inp_string=input_string
+            if isinstance(input_string,str):
+                encoded_inp_string=input_string.encode('utf-8')
+            input_json=json.loads(encoded_inp_string)
+            blocks=block_key_name.split('.')
+            nested=input_json
+            for k in blocks:
+                if k in nested:
+                    nested=nested[k]
+            if type(nested)==list and block_count != None and block_count!='':
+                block_count=int(block_count)
+                if block_count-1 <= len(nested) :
+                    if key_name in nested[block_count-1]:
+                        key_value = nested[block_count-1][key_name];
+                        logger.print_on_console('Key : ',key_name, ' Value : ',key_value)
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                    else:
+                        err_msg= 'Invalid key given'
+                else:
+                    err_msg= 'Index out of range'
+            elif type(nested)==dict:
+                if key_name in nested:
+                    key_value = nested[key_name]
+                    logger.print_on_console('Key : ',key_name, ' Value : ',key_value)
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
+                else:
+                    err_msg= 'Invalid key given'
+            else:
+                try:
+                    key_value = nested[0][key_name];
+                    logger.print_on_console('Key : ',key_name, ' Value : ',key_value)
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
+                except Exception as e:
+                    log.error(e)
+        except Exception as e:
+            err_msg=EXCEPTION_OCCURED
+            log.error(e)
+        key_value=key_value.encode('utf-8')
+        return status,methodoutput,key_value,err_msg
