@@ -286,8 +286,8 @@ class DesktopDispatcher:
             log.error(e)
             #logger.print_on_console('Exception at dispatcher')
         if err_msg!=None:
-            import traceback
-            traceback.print_exc()
+            #import traceback
+            #traceback.print_exc()
             log.error(err_msg)
             logger.print_on_console(err_msg)
 
@@ -367,10 +367,10 @@ class DesktopDispatcher:
                     if prev_flag==False:#checking if previous test case flag is True or not.
                         ele=''  #If false then new test case and AUT structure has changed, so setting the ele to ''
                 #---------------------------------------------------
-            except :
-                #logger.print_on_console("Unable to get desktop elements because :")
-                import traceback
-                traceback.print_exc()
+            except Exception as e:
+                log.error("Unable to get desktop elements because : ",e)
+                #import traceback
+                #traceback.print_exc()
             if ele=='':
                 #logger.print_on_console("Warning! AUT Structure has changed")
                 try:
@@ -382,8 +382,8 @@ class DesktopDispatcher:
                     ele = ch[int(index)]
                 except Exception as e:
                     log.error(e)
-                    import traceback
-                    traceback.print_exc()
+                    #import traceback
+                    #traceback.print_exc()
                     logger.print_on_console("Unable to get desktop element because :")
                     logger.print_on_console(e)
         elif backend =='B':
@@ -408,8 +408,8 @@ class DesktopDispatcher:
                     ele = ch[int(index)]
             except Exception as e:
                 log.error(e)
-                import traceback
-                traceback.print_exc()
+                #import traceback
+                #traceback.print_exc()
                 logger.print_on_console("Unable to get desktop element because :")
                 logger.print_on_console(e)
         return ele
@@ -430,12 +430,14 @@ class DesktopDispatcher:
                     if xclass==className:
                         if xconID==conID:
                             ele=ch1[i]
-                except:
-                    import traceback
-                    traceback.print_exc()
-        except :
-            import traceback
-            traceback.print_exc()
+                except Exception as e:
+                    log.error(e)
+                    #import traceback
+                    #traceback.print_exc()
+        except Exception as e:
+            log.error(e)
+            #import traceback
+            #traceback.print_exc()
         return ele
     def get_element_if_empty(self,xclass,xname,app):
         """This method was added as a check, The name of the element is passed as an argument,it
@@ -475,10 +477,12 @@ class DesktopDispatcher:
                         if xname==comp_text:
                             ele=ch2[i]
                             break
-                except:
-                    import traceback
-                    traceback.print_exc()
-        except :
-            import traceback
-            traceback.print_exc()
+                except Exception as e:
+                    log.error(e)
+                    #import traceback
+                    #traceback.print_exc()
+        except Exception as e:
+            log.error(e)
+            #import traceback
+            #traceback.print_exc()
         return ele
