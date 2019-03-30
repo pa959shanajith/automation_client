@@ -336,6 +336,10 @@ class MainNamespace(BaseNamespace):
 
     def on_wsdl_ServiceGenerator(self, *args):
         global socketIO
+        serverCertificate=None
+        serverCerificate_pass=None
+        auth_uname=None
+        auth_pass=None
         contrlr = controller.Controller()
         contrlr.get_all_the_imports('WebServices')
         import wsdlgenerator
@@ -345,9 +349,20 @@ class MainNamespace(BaseNamespace):
         wsdlurl = wsdlurl.strip()
         operations = wsgen_inputs['operations']
         soapVersion = wsgen_inputs['soapVersion']
-        wsdl_object = wsdlgenerator.BodyGenarator(wsdlurl,operations,soapVersion)
+        if len(wsgen_inputs['serverCertificate'])!=0:
+            Server_data= wsgen_inputs['serverCertificate']['certsDetails']
+            Server_data =Server_data.split(';')
+            serverCertificate = Server_data[0]
+            serverCerificate_pass = Server_data[2]
+            auth_Details= wsgen_inputs['serverCertificate']['authDetails']
+            auth_Details= auth_Details.split(';')
+            auth_uname= auth_Details[0]
+            auth_pass= auth_Details[1]
+        wsdl_object = wsdlgenerator.BodyGenarator(wsdlurl,operations,soapVersion,serverCertificate,serverCerificate_pass,auth_uname,auth_pass)
         responseHeader = wsdl_object.requestHeader()
         responseBody = wsdl_object.requestBody()
+        from bs4 import BeautifulSoup
+        responseBody = BeautifulSoup(responseBody, "xml").prettify()
         stringHeader=''
         if(responseHeader != None):
             for key in responseHeader:
