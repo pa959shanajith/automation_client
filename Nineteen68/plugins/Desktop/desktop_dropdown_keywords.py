@@ -647,8 +647,6 @@ class Dropdown_Keywords():
                                 #newlist=[]
                                 #newlist=[item for item in items]#removing unicode
                                 #items_list=input_val
-                                #print(items)
-                                #print(input_val)
                                 if items==input_val:
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
@@ -659,8 +657,6 @@ class Dropdown_Keywords():
                                 #items_list=input_val
                                 #for i in range(0,len(items)):
                                 #    newlist.append(items[i])
-                                #print(items)
-                                #print(input_val)
                                 if input_val==items:
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
