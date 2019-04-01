@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        desktop_dropdown_keywords.py
-# Purpose:
+# Purpose:     to handle dropdown,listbox and listview
 #
 # Author:      kavyasree.l,anas.ahmed
 #
@@ -197,8 +197,8 @@ class Dropdown_Keywords():
                                          val=item_list[i]
                                          res1=elelist[int(val)]
                                          res2=elelist[int(val) + 1]
-                                         newlist.append(res1.encode("utf-8"))
-                                         newlist.append(res2.encode("utf-8"))
+                                         newlist.append(res1)
+                                         newlist.append(res2)
                                     if cols==1:
                                         verb=newlist
                                     else:
@@ -398,7 +398,7 @@ class Dropdown_Keywords():
                                     newlist=[]
                                     for i in range(0,len(items)):
                                          if (items[i].is_selected()):
-                                           newlist.append(elelist[i].encode("utf-8"))
+                                           newlist.append(elelist[i])
                                 verb=newlist
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
@@ -490,11 +490,10 @@ class Dropdown_Keywords():
                                     for i in range(0,len(items)):
                                          if (items[i].is_selected()):
                                            selected=element.item(i, subitem_index=0)
-                                           newlist.append(elelist[i].encode("utf-8"))
-                                    verb=newlist
+                                           newlist.append(elelist[i])
                                     item_list=input_val
                                     for item in item_list:
-                                     if item in verb:
+                                     if item in newlist:
                                        status=desktop_constants.TEST_RESULT_PASS
                                        result=desktop_constants.TEST_RESULT_TRUE
                                      else:
@@ -900,7 +899,7 @@ class Dropdown_Keywords():
                                 for x in range(0,len(input_list)):
                                     ilist.append(int(input_list[x])-1)
                                 items=element.item_texts()
-                                newlist=[item.encode("utf-8") for item in items]#removing unicode
+                                newlist=[item for item in items]#removing unicode
                                 for i in range(len(ilist)):
                                     index=None
                                     index=int(ilist[i])
@@ -909,7 +908,7 @@ class Dropdown_Keywords():
                                         false_flag=True
                                     else:
                                         verbList.append(items[index])
-                                verb =[nitem.encode("utf-8") for nitem in verbList]
+                                verb =[nitem for nitem in verbList]
                                 if false_flag==False:
                                     err_msg="Entered indexs are out of bound"
                                     status = desktop_constants.TEST_RESULT_PASS
@@ -948,8 +947,8 @@ class Dropdown_Keywords():
                                      val=item_list[i]
                                      res1=elelist[int(val)]
                                      res2=elelist[int(val) + 1]
-                                     newlist.append(res1.encode("utf-8"))
-                                     newlist.append(res2.encode("utf-8"))
+                                     newlist.append(res1)
+                                     newlist.append(res2)
                                 if cols==1:
                                     verb=newlist
                                 else:
@@ -1104,7 +1103,7 @@ class Dropdown_Keywords():
 ##                                           element.click()
                                         newlist=[]
                                         items=element.item_texts()
-                                        newlist=[item.encode("utf-8") for item in items]#removing unicode
+                                        newlist=[item for item in items]#removing unicode
                                         for i in range(len(item_text)):
                                             if(item_text[i] not in newlist):
                                                 fail_flag=True
@@ -1171,7 +1170,7 @@ class Dropdown_Keywords():
             for j in range(0,rows):
                 for k in range (0,cols):
                     try:
-                        Matrix[j][k]=elelist[index_i].encode("utf-8")
+                        Matrix[j][k]=elelist[index_i]
                         index_i=index_i+1
                     except Exception as e:
                         logger.print_on_console("Error occoured in populating the 2D matrix")
