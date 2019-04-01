@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        desktop_dropdown_keywords.py
-# Purpose:     to handle dropdown,listbox and listview
+# Purpose:     to handle dropdown , listbox and listview
 #
 # Author:      kavyasree.l,anas.ahmed
 #
