@@ -586,7 +586,7 @@ class WSkeywords:
             if response == '':
                 response = 'fail'
             if testcasename == '':
-                response = unicode(response, "utf-8")
+                response = response.replace("##", ' ')
                 socketIO.emit('result_debugTestCaseWS',response)
         except Exception as e:
             logger.print_on_console(e)
