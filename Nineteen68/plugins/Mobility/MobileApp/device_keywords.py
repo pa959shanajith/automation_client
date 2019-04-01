@@ -195,41 +195,50 @@ class Device_Keywords():
     def uninstall_app(self, pkg, device):
         maindir = os.getcwd()
         flag = False
+        err_msg = None
         try:
             android_home = os.environ['ANDROID_HOME']
             cmd = android_home + '\\platform-tools\\'
             os.chdir(cmd)
             cmd = cmd + 'adb.exe'
             if android_home is not None:
-                out = subprocess.Popen([cmd, '-s', device, 'uninstall', pkg], stdout=subprocess.PIPE)
-                for line in out.stdout.readlines():
-                    line = str(line)[2:-1]
-                    if 'Success' in line:
-                        flag = True
-                        break
+                if device is not None:
+                    c = cmd+ ' -s '+ device+ ' uninstall '+ pkg
+                else:
+                    c = cmd+ ' uninstall '+ pkg
+                out = str(subprocess.check_output(c))
+                if 'Success' in out:
+                    flag = True
                 os.chdir(maindir)
                 if flag is False:
-                    raise Exception('Error Uninstalling App using adb')
+                    raise Exception('Error Uninstalling App using adb; App not installed')
         except Exception as e:
             log.error(e, exc_info=True)
-            logger.print_on_console(e)
+            logger.print_on_console('Error Uninstalling App using adb; App not installed')
+            err_msg = e
+        return err_msg
 
     def close_app(self, pkg, device):
         maindir = os.getcwd()
         flag = False
+        err_msg = None
         try:
             android_home = os.environ['ANDROID_HOME']
             cmd = android_home + '\\platform-tools\\'
             os.chdir(cmd)
             cmd = cmd + 'adb.exe'
             if android_home is not None:
-                #out = subprocess.Popen([cmd, '-s', device, 'shell', 'am', 'force-stop', pkg], stdout=subprocess.PIPE)
-                cmd1=cmd + ' -s ' + device + ' shell am force-stop ' + pkg
-                out = subprocess.check_output(cmd1)
+                if pkg is not None and device is not None:
+                    cmd1=cmd + ' -s ' + device + ' shell am force-stop ' + pkg
+                    out = subprocess.check_output(cmd1)
+                else:
+                    raise Exception('Driver not running; App not launched')
                 os.chdir(maindir)
         except Exception as e:
             log.error(e,exc_info=True)
-            logger.print_on_console(e)
+            logger.print_on_console('Driver not running; App not launched')
+            err_msg = e
+        return err_msg
 
     def launch_app(self, apk_path, package, activity, device):
         maindir = os.getcwd()
