@@ -1209,7 +1209,8 @@ class StepDescription:
         def navigateforward():
             return 'Navigate forward in the browser'
         def navigatewithauthenticate():
-            return ' Open url ' +"'"+input[0]+"'"+' with '+"'"+input[1]+"' and '"+input[2] +"' in the browser."
+            vals = str(input).split(',')
+            return ' Open url ' +"'"+vals[0]+"'"+' with authentication of '+"'"+vals[1]+"' in the browser."
         def navigateback():
             return 'Navigate back in the browser'
         def verifytextexists():
