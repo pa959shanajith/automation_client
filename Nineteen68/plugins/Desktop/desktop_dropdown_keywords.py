@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        desktop_dropdown_keywords.py
-# Purpose:     to handle dropdown , listbox and listview
+# Purpose:     to handle dropdown,listbox and listview
 #
 # Author:      kavyasree.l,anas.ahmed
 #
@@ -90,7 +90,7 @@ class Dropdown_Keywords():
                                     #----------------------------------------------------ListBox
                                     #----------------------------------------------------ListView
                                     elif checkName == 'ListView':
-                                        item = element.GetItem(item_index-1)
+                                        item = element.get_item(item_index-1)
                                         if not item.is_selected():
                                             if element.is_active() == False:
                                                 element.click()
@@ -391,14 +391,14 @@ class Dropdown_Keywords():
                                 if element.is_active() == False:
                                     if element.backend.name == 'win32':
                                         element.click()
-                                    items=list(element.items())
-                                    elelist=element.texts()
-                                    elelist.pop(0)
-                                    itemcount=element.item_count()
-                                    newlist=[]
-                                    for i in range(0,len(items)):
-                                         if (items[i].is_selected()):
-                                           newlist.append(elelist[i])
+                                items=list(element.items())
+                                elelist=element.texts()
+                                elelist.pop(0)
+                                itemcount=element.item_count()
+                                newlist=[]
+                                for i in range(0,len(items)):
+                                     if (items[i].is_selected()):
+                                       newlist.append(elelist[i])
                                 verb=newlist
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
