@@ -232,7 +232,7 @@ class CustomKeyword:
 
         return status,methodoutput,reference_ele,err_msg
 
-    def get_count(self,counter,ele_type,index):
+    def get_count(self,counter,ele_type,index,*args):
         result=browser_Keywords.driver_obj.execute_script(GET_OBJECT_COUNT_JS,counter,ele_type,index,self.list_flag)
         counter=result[0]
         index=result[2]
