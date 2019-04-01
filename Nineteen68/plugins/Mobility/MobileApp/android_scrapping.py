@@ -68,23 +68,6 @@ class InstallAndLaunch():
             log.error(err)
             log.error(e)
 
-    def stop_server(self):
-        try:
-            if SYSTEM_OS != 'Darwin':
-                processes = psutil.net_connections()
-                for line in processes:
-                    p = line.laddr
-                    if p[1] == 4723:
-                        os.system("TASKKILL /F /PID " + str(line.pid))
-                        ##logger.print_on_console('Server stopped')
-            else:
-                os.system("killall -9 node")
-        except Exception as e:
-            err = 'Error while stopping server'
-            logger.print_on_console(err)
-            log.error(err)
-            log.error(e)
-
     def installApplication(self, apk_path, platform_version, device_name, udid, *args):
         global driver, device_id, packageName
         #import appium
@@ -264,7 +247,6 @@ class InstallAndLaunch():
                 logger.print_on_console(err)
                 log.error(err)
                 log.error(e,exc_info=True)
-            #self.stop_server()
             return finalJson
         else:
             return None

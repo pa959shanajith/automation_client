@@ -17,6 +17,7 @@ import re
 import logging
 import logger
 import android_scrapping
+import time
 
 log = logging.getLogger('device_keywords.py')
 
@@ -81,7 +82,6 @@ class Device_Keywords():
                     cm=cmd + ' tcpip 5555'
                     abc=str(subprocess.check_output(cm))
                     if 'TCP' in abc:
-                        import time
                         time.sleep(3)
                         cmmmm=cmd + ' shell ip -f inet addr show wlan0'
                         out1 = str(subprocess.check_output(cmmmm))
@@ -255,6 +255,7 @@ class Device_Keywords():
                         if 'Success' in curr_line:
                             result1 = ' App installed; '
                             break
+                time.sleep(3)
                 out = subprocess.Popen([cmd, '-s', device, 'shell', 'am', 'start', '-a', 'android.intent.action.MAIN', '-n', cmp], stdout=subprocess.PIPE)
                 for line in out.stdout.readlines():
                     curr_line = str(line)[2:-1]

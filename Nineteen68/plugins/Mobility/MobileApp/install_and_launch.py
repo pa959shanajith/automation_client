@@ -97,6 +97,7 @@ class LaunchAndInstall():
         result = mobile_app_constants.TEST_RESULT_FALSE
         err_msg = None
         output = OUTPUT_CONSTANT
+        global driver
         try:
             if SYSTEM_OS != 'Darwin':
                 processes = psutil.net_connections()
@@ -106,6 +107,7 @@ class LaunchAndInstall():
                         log.info( 'Pid Found' )
                         log.info(line.pid)
                         os.system("TASKKILL /F /PID " + str(line.pid))
+                        driver = None
                         status = mobile_app_constants.TEST_RESULT_PASS
                         result = mobile_app_constants.TEST_RESULT_TRUE
             else:
@@ -198,7 +200,7 @@ class LaunchAndInstall():
                     result = mobile_app_constants.TEST_RESULT_FALSE
                     err_msg = msg
                 else:
-                    console.log(msg)
+                    log.info(msg)
                     status = mobile_app_constants.TEST_RESULT_PASS
                     result = mobile_app_constants.TEST_RESULT_TRUE
             else:
