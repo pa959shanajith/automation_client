@@ -95,7 +95,7 @@ class PdfFile:
              if pagenumber<doc.pageCount:
                 page = doc[pagenumber]
                 content=page.getText()
-                content=content.encode('utf-8')
+##                content=content.encode('utf-8')
                 if len(args)>1 and args[1]=='_internal_verify_content':
                     return content
                 if len(args) >= 2 and not (args[0] is None and args[1] is None):
