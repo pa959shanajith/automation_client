@@ -661,12 +661,11 @@ class Dropdown_Keywords():
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
                              elif checkName == 'ListView':
-                                items=list(element.items())
+                                items=element.texts()
                                 items.pop(0)
-                                #newlist=[]
-                                #items_list=input_val
-                                #for i in range(0,len(items)):
-                                #    newlist.append(items[i])
+                                #----------------------------remove characters from input
+                                input_val=[i.replace('\\\\','\\') for i in input_val]
+                                #----------------------------remove characters from input
                                 if input_val==items:
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE

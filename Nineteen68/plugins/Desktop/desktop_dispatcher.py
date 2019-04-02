@@ -406,6 +406,11 @@ class DesktopDispatcher:
                     index = child[child.index('[') + 1 : child.index(']')]
                     ch = ele.children()
                     ele = ch[int(index)]
+                #warning message
+                if ele.friendly_class_name() == 'ListView' or 'ListBox':
+                    log.info('List keywords return inconsistant values for elements scraped via method B')
+                    log.error('List keywords return inconsistant values for elements scraped via method B')
+                    logger.print_on_console('List keywords return inconsistant values for elements scraped via method B')
             except Exception as e:
                 log.error(e)
                 #import traceback
