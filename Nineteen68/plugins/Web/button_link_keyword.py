@@ -514,7 +514,7 @@ class ButtonLinkKeyword():
         try:
             robot = Robot()
             log.debug('Copying input file path to the clipboard')
-            robot.add_to_clipboard(inputfile,encoding='utf8')
+            robot.add_to_clipboard(inputfile.encode(encoding='utf8'))
             log.debug(' input file path Copied to  clipboard')
             status = True
         except Exception as e:

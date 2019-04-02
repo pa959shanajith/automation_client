@@ -67,8 +67,9 @@ class LaunchAndInstall():
                 #     self.driver_obj = driver
                 driver = install_obj.installApplication(input_val[0], input_val[1], input_val[2], None)
                 #self.driver_obj = driver
-                status = mobile_app_constants.TEST_RESULT_PASS
-                result = mobile_app_constants.TEST_RESULT_TRUE
+                if driver is not None:
+                    status = mobile_app_constants.TEST_RESULT_PASS
+                    result = mobile_app_constants.TEST_RESULT_TRUE
         except Exception as e:
             log.error(e,exc_info=True)
             logger.print_on_console(e)
@@ -97,6 +98,7 @@ class LaunchAndInstall():
         result = mobile_app_constants.TEST_RESULT_FALSE
         err_msg = None
         output = OUTPUT_CONSTANT
+        global driver
         try:
             if SYSTEM_OS != 'Darwin':
                 processes = psutil.net_connections()
@@ -106,6 +108,7 @@ class LaunchAndInstall():
                         log.info( 'Pid Found' )
                         log.info(line.pid)
                         os.system("TASKKILL /F /PID " + str(line.pid))
+                        driver = None
                         status = mobile_app_constants.TEST_RESULT_PASS
                         result = mobile_app_constants.TEST_RESULT_TRUE
             else:
@@ -123,6 +126,7 @@ class LaunchAndInstall():
         status=mobile_app_constants.TEST_RESULT_FAIL
         result=mobile_app_constants.TEST_RESULT_FALSE
         err_msg=None
+        driver_flag = False
         output=OUTPUT_CONSTANT
         global driver,device_keywords_object
         try:
@@ -137,10 +141,13 @@ class LaunchAndInstall():
                     break
             if driver_flag is True:
                 driver.remove_app(package_name)
+                status = mobile_app_constants.TEST_RESULT_PASS
+                result = mobile_app_constants.TEST_RESULT_TRUE
             else:
-                device_keywords_object.uninstall_app(package_name, android_scrapping.device_id)
-            status = mobile_app_constants.TEST_RESULT_PASS
-            result = mobile_app_constants.TEST_RESULT_TRUE
+                err_msg = device_keywords_object.uninstall_app(package_name, android_scrapping.device_id)
+                if err_msg is None:
+                    status = mobile_app_constants.TEST_RESULT_PASS
+                    result = mobile_app_constants.TEST_RESULT_TRUE
         except Exception as e:
             log.error(e,exc_info=True)
             logger.print_on_console(e)
@@ -160,10 +167,11 @@ class LaunchAndInstall():
             #         driver_flag = True
             #         break
             # if driver_flag is True:
-            logger.print_on_console("Package name to be terminated:"+android_scrapping.packageName)
-            device_keywords_object.close_app(android_scrapping.packageName, android_scrapping.device_id)
-            status=mobile_app_constants.TEST_RESULT_PASS
-            result=mobile_app_constants.TEST_RESULT_TRUE
+            logger.print_on_console("Package name to be terminated:",android_scrapping.packageName)
+            err_msg = device_keywords_object.close_app(android_scrapping.packageName, android_scrapping.device_id)
+            if err_msg is None:
+                status=mobile_app_constants.TEST_RESULT_PASS
+                result=mobile_app_constants.TEST_RESULT_TRUE
         except Exception as e:
             log.error(e,exc_info=True)
             logger.print_on_console(e)
@@ -198,7 +206,7 @@ class LaunchAndInstall():
                     result = mobile_app_constants.TEST_RESULT_FALSE
                     err_msg = msg
                 else:
-                    console.log(msg)
+                    log.info(msg)
                     status = mobile_app_constants.TEST_RESULT_PASS
                     result = mobile_app_constants.TEST_RESULT_TRUE
             else:

@@ -586,7 +586,7 @@ class WSkeywords:
             if response == '':
                 response = 'fail'
             if testcasename == '':
-                response = unicode(response, "utf-8")
+                response = response.replace("##", ' ')
                 socketIO.emit('result_debugTestCaseWS',response)
         except Exception as e:
             logger.print_on_console(e)
@@ -817,7 +817,11 @@ class WSkeywords:
                     self.client_key_path = "PRIVATEKEY.pem"
                 else:
                     self.client_key_path = "RSAPRIVATEKEY.pem"
-                self.server_cert_path = "TRUSTSTORECERT.pem"
+                try:
+                    self.server_cert_path = "TRUSTSTORECERT.pem"
+                except Exception as e:
+                    log.error(e)
+                    self.server_cert_path =''
         except Exception as e:
             log.error(e)
             logger.print_on_console(str(e))
@@ -853,8 +857,7 @@ class WSkeywords:
             cert = (self.client_cert_path, self.client_key_path)
             if (cert != (None, None)):
             # if basic auth details are available
-                if (not(self.auth_uname == '' and self.auth_uname == None)
-                    and not (self.auth_pass == '' and self.auth_pass == None)):
+                if not((self.auth_uname == '' or self.auth_uname == None) and (self.auth_pass == '' or self.auth_pass == None)):
                     # if server side certificates are available
                     if (not (self.server_cert_path == '' or self.server_cert_path == None)):
                         log.debug('TWO WAY HANDSHAKE with basic authentication')

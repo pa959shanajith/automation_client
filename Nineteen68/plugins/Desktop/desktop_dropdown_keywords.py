@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        desktop_dropdown_keywords.py
-# Purpose:
+# Purpose:     to handle dropdown,listbox and listview
 #
 # Author:      kavyasree.l,anas.ahmed
 #
@@ -90,7 +90,7 @@ class Dropdown_Keywords():
                                     #----------------------------------------------------ListBox
                                     #----------------------------------------------------ListView
                                     elif checkName == 'ListView':
-                                        item = element.GetItem(item_index-1)
+                                        item = element.get_item(item_index-1)
                                         if not item.is_selected():
                                             if element.is_active() == False:
                                                 element.click()
@@ -197,8 +197,8 @@ class Dropdown_Keywords():
                                          val=item_list[i]
                                          res1=elelist[int(val)]
                                          res2=elelist[int(val) + 1]
-                                         newlist.append(res1.encode("utf-8"))
-                                         newlist.append(res2.encode("utf-8"))
+                                         newlist.append(res1)
+                                         newlist.append(res2)
                                     if cols==1:
                                         verb=newlist
                                     else:
@@ -240,8 +240,14 @@ class Dropdown_Keywords():
                         log.info('Parent matched')
                         if element.friendly_class_name() == 'ListView' or 'ListBox':
                             if element.is_active() == False:
-                               element.click()
-                            verb=int(element.item_count())
+                                if element.backend.name=='win32':
+                                    element.click()
+                                elif element.backend.name=='uia':
+                                    pass
+                            if element.backend.name=='uia' and element.friendly_class_name()=='ListBox':
+                                verb=len(element.get_items())
+                            else:
+                                verb=int(element.item_count())
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -260,7 +266,7 @@ class Dropdown_Keywords():
                 log.error(exception)
             return status,result,verb,err_msg
 
-        def verifyCount(self,element,parent,input_val, *args):
+        def verifyCount(self,element,parent,input_val,*args):
             status=desktop_constants.TEST_RESULT_FAIL
             result=desktop_constants.TEST_RESULT_FALSE
             verb = OUTPUT_CONSTANT
@@ -270,7 +276,6 @@ class Dropdown_Keywords():
                 if desktop_launch_keywords.window_name!=None:
                     log.info('Recieved element from the desktop dispatcher')
                     dektop_element = element
-                    input_val[0]=int(input_val[0])
                     verify_obj = Text_Box()
                     check = verify_obj.verify_parent(element,parent)
                     log.debug('Parent of element while scraping')
@@ -281,20 +286,24 @@ class Dropdown_Keywords():
                         log.info('Parent matched')
                         if element.friendly_class_name() == 'ListView' or 'ListBox':
                             if element.is_active() == False:
-                               element.click()
-                            val=element.texts()
-                            count = element.item_count()
-                            if(count == input_val[0]):
+                               if element.backend.name=='win32':
+                                    element.click()
+                               elif element.backend.name=='uia':
+                                    pass
+                            if element.backend.name=='uia' and element.friendly_class_name()=='ListBox':
+                                count=len(element.get_items())
+                            else:
+                                count=element.item_count()
+                            if(count == int(input_val[0])):
                              status = desktop_constants.TEST_RESULT_PASS
                              result = desktop_constants.TEST_RESULT_TRUE
                              log.info(STATUS_METHODOUTPUT_UPDATE)
                         elif element.friendly_class_name() == 'ComboBox':
                             count = element.item_count()
-                            if(count == input_val[0]):
+                            if(count == int(input_val[0])):
                              status = desktop_constants.TEST_RESULT_PASS
                              result = desktop_constants.TEST_RESULT_TRUE
                              log.info(STATUS_METHODOUTPUT_UPDATE)
-
                     else:
                       log.info('Element not present on the page where operation is trying to be performed')
                       err_msg='Element not present on the page where operation is trying to be performed'
@@ -304,7 +313,6 @@ class Dropdown_Keywords():
                 log.error(err_msg)
                 log.error(exception)
             return status,result,verb,err_msg
-
 
         def getSelected(self,element,parent,input_val, *args):
             status=desktop_constants.TEST_RESULT_FAIL
@@ -343,37 +351,54 @@ class Dropdown_Keywords():
                         elif checkName == 'ListView' or 'ListBox':
                             if checkName =='ListBox':
                                 if element.is_active() == False:
-                                  element.click()
-                                items=element.item_texts()
-                                elelist=element.texts()
-                                elelist.pop(0)
-                                oldlist=len(items)
-                                itemcount=element.item_count()
+                                    if element.backend.name == 'win32':
+                                        element.click()
+                                if element.backend.name == 'uia':
+                                        item=element.get_items()
+                                        items=[]
+                                        for i in item:
+                                            if type(i.texts())==list:
+                                                items.append(i.texts()[0])
+                                            else:
+                                                items.append(i.texts())
+                                elif element.backend.name == 'win32':
+                                    items=element.item_texts()
                                 newlist=[]
-                                if(element.is_single_selection()==True):
-                                    logger.print_on_console('List is a single selection type.')
-                                n=element.selected_indices()
-                                for i in range(0,len(n)):
-                                    idindex=None
-                                    idindex=int(n[i])
-                                    newlist=items[idindex]
-                                #newitems=[item.encode("utf-8") for item in items]
-                                verb=newlist
-                                status = desktop_constants.TEST_RESULT_PASS
-                                result = desktop_constants.TEST_RESULT_TRUE
-                                log.info(STATUS_METHODOUTPUT_UPDATE)
+                                if element.backend.name == 'win32':
+                                    if(element.is_single_selection()==True):
+                                        logger.print_on_console('List is a single selection type.')
+                                    n=element.selected_indices()
+                                    for i in range(0,len(n)):
+                                        idindex=None
+                                        idindex=int(n[i])
+                                        newlist=items[idindex]
+                                    flag=True
+                                elif element.backend.name == 'uia':
+                                    try:
+                                        for i in range(0,len(item)):
+                                            if item[i].is_checked()==True:
+                                                newlist.append(items[i])
+                                        flag=True
+                                    except Exception as e:
+                                        logger.print_on_console('GetSelected returns inconsistent outputs for method B elements.')
+                                        log.error(e)
+                                if flag == True:
+                                    verb=newlist
+                                    status = desktop_constants.TEST_RESULT_PASS
+                                    result = desktop_constants.TEST_RESULT_TRUE
+                                    log.info(STATUS_METHODOUTPUT_UPDATE)
                             elif checkName =='ListView':
                                 if element.is_active() == False:
-                                  element.click()
+                                    if element.backend.name == 'win32':
+                                        element.click()
                                 items=list(element.items())
                                 elelist=element.texts()
                                 elelist.pop(0)
-                                oldlist=len(items)
                                 itemcount=element.item_count()
                                 newlist=[]
                                 for i in range(0,len(items)):
                                      if (items[i].is_selected()):
-                                       newlist.append(elelist[i].encode("utf-8"))
+                                       newlist.append(elelist[i])
                                 verb=newlist
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
@@ -433,7 +458,7 @@ class Dropdown_Keywords():
                                 if checkName == 'ListBox':
                                     if element.is_active() == False:
                                       element.click()
-                                    items=element.ItemTexts()
+                                    items=element.item_texts()
                                     elelist=element.texts()
                                     elelist.pop(0)
                                     oldlist=len(items)
@@ -465,11 +490,10 @@ class Dropdown_Keywords():
                                     for i in range(0,len(items)):
                                          if (items[i].is_selected()):
                                            selected=element.item(i, subitem_index=0)
-                                           newlist.append(elelist[i].encode("utf-8"))
-                                    verb=newlist
+                                           newlist.append(elelist[i])
                                     item_list=input_val
                                     for item in item_list:
-                                     if item in verb:
+                                     if item in newlist:
                                        status=desktop_constants.TEST_RESULT_PASS
                                        result=desktop_constants.TEST_RESULT_TRUE
                                      else:
@@ -548,7 +572,7 @@ class Dropdown_Keywords():
                             elif checkName == 'ListView' or 'ListBox':
                                 if checkName == 'ListBox':
                                     if item_text != '' or item_text != None:
-                                        items=element.ItemTexts()
+                                        items=element.item_texts()
                                         for i in range(0,len(items)):
                                             if(item_text==str(items[i])):
                                                 try:
@@ -623,9 +647,6 @@ class Dropdown_Keywords():
                         if checkName == 'ComboBox':
                             items=element.texts()
                             items.pop(0)
-                            #newlist=[]
-                            #for i in range(0,len(items)):
-                            #        newlist.append(items[i])
                             if input_val==items:
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
@@ -635,10 +656,7 @@ class Dropdown_Keywords():
                         #==================================================================
                         elif checkName == 'ListView' or 'ListBox':
                              if checkName == 'ListBox':
-                                items=element.ItemTexts()
-                                #newlist=[]
-                                #newlist=[item for item in items]#removing unicode
-                                #items_list=input_val
+                                items=element.item_texts()
                                 if items==input_val:
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
@@ -698,7 +716,7 @@ class Dropdown_Keywords():
                         elif checkName == 'ListView' or 'ListBox':
                             if checkName == 'ListBox':
                                 fail_flag=False #will set to true if item is not apart of original list,if set to true result is set to fail
-                                items=element.ItemTexts()
+                                items=element.item_texts()
                                 newlist=[]
                                 newlist=[item for item in items] #removing unicode
                                 #items_list=input_val
@@ -758,7 +776,7 @@ class Dropdown_Keywords():
                                     if(element.is_single_selection()!=True):
                                         if element.is_active() == False:
                                            element.click()
-                                        items=element.ItemTexts()
+                                        items=element.item_texts()
                                         for item in range(0,len(items)):
                                             try:
                                                 element.select(item)
@@ -814,7 +832,7 @@ class Dropdown_Keywords():
                             #===============================================================
                             if element.friendly_class_name() == 'ListView' or 'ListBox':
                                 if element.friendly_class_name() == 'ListBox':
-                                    items=element.ItemTexts()
+                                    items=element.item_texts()
                                     fail_flag=False
                                     if(element.is_single_selection()!=True):#to check if the ListBox is a singleSelection type
                                         for item in range(0,len(items)):
@@ -880,8 +898,8 @@ class Dropdown_Keywords():
                                 verbList=[]
                                 for x in range(0,len(input_list)):
                                     ilist.append(int(input_list[x])-1)
-                                items=element.ItemTexts()
-                                newlist=[item.encode("utf-8") for item in items]#removing unicode
+                                items=element.item_texts()
+                                newlist=[item for item in items]#removing unicode
                                 for i in range(len(ilist)):
                                     index=None
                                     index=int(ilist[i])
@@ -890,7 +908,7 @@ class Dropdown_Keywords():
                                         false_flag=True
                                     else:
                                         verbList.append(items[index])
-                                verb =[nitem.encode("utf-8") for nitem in verbList]
+                                verb =[nitem for nitem in verbList]
                                 if false_flag==False:
                                     err_msg="Entered indexs are out of bound"
                                     status = desktop_constants.TEST_RESULT_PASS
@@ -929,8 +947,8 @@ class Dropdown_Keywords():
                                      val=item_list[i]
                                      res1=elelist[int(val)]
                                      res2=elelist[int(val) + 1]
-                                     newlist.append(res1.encode("utf-8"))
-                                     newlist.append(res2.encode("utf-8"))
+                                     newlist.append(res1)
+                                     newlist.append(res2)
                                 if cols==1:
                                     verb=newlist
                                 else:
@@ -986,7 +1004,7 @@ class Dropdown_Keywords():
                                         if element.is_active() == False:
                                            element.click()
                                         ilist=[]
-                                        items=element.ItemTexts()
+                                        items=element.item_texts()
 
                                         for x in range(0,len(item_index)):
                                             ilist.append(int(item_index[x])-1)
@@ -1084,8 +1102,8 @@ class Dropdown_Keywords():
 ##                                        if element.is_active() == False:
 ##                                           element.click()
                                         newlist=[]
-                                        items=element.ItemTexts()
-                                        newlist=[item.encode("utf-8") for item in items]#removing unicode
+                                        items=element.item_texts()
+                                        newlist=[item for item in items]#removing unicode
                                         for i in range(len(item_text)):
                                             if(item_text[i] not in newlist):
                                                 fail_flag=True
@@ -1152,7 +1170,7 @@ class Dropdown_Keywords():
             for j in range(0,rows):
                 for k in range (0,cols):
                     try:
-                        Matrix[j][k]=elelist[index_i].encode("utf-8")
+                        Matrix[j][k]=elelist[index_i]
                         index_i=index_i+1
                     except Exception as e:
                         logger.print_on_console("Error occoured in populating the 2D matrix")

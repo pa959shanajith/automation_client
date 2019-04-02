@@ -494,7 +494,8 @@ class FileOperations:
         content=coreutilsobj.get_UTF_8(content)
 
         try:
-
+            if SYSTEM_OS != 'Darwin':
+                import win32com.client
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             err_msg=None

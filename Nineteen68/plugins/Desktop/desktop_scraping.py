@@ -436,7 +436,10 @@ class Scrape:
                             #----------------------------------------------------
                             new_path=''
                             className=ch[i].friendly_class_name()
-                            if text_initial!='':
+                            #handling for UIA listbox
+                            if ch[i].backend.name == 'uia' and ch[i].friendly_class_name() =='ListBox':
+                                new_text=text_old
+                            elif text_initial!='':
                                 if type(text_initial)==list:
                                     try:
                                         new_text=', '.join([x.encode('utf-8') for x in text_initial])

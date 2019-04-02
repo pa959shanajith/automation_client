@@ -505,14 +505,14 @@ class Controller():
                 logger.print_on_console('Response Header: \n',display_keyword_response[0])
                 #data size check
                 if self.core_utilsobject.getdatasize(display_keyword_response[1],'mb') < 10:
+                    from bs4 import BeautifulSoup
                     if 'soap:Envelope' in display_keyword_response[1]:
-                        from lxml import etree
-                        root = etree.fromstring(bytes(display_keyword_response[1],'utf-8'))
-                        respBody = etree.tostring(root,pretty_print=True)
+                        root = BeautifulSoup(display_keyword_response[1][2:-1], "xml").prettify()
+                        respBody = root.replace("\n",' ')
                         logger.print_on_console('Response Body: \n',respBody,'\n')
                     else:
                         logger.print_on_console('NON SOAP XML')
-                        logger.print_on_console('Response Body: \n',display_keyword_response[1],'\n')
+                        logger.print_on_console('Response Body: \n',display_keyword_response[1][2:-1],'\n')
                 else:
                     logger.print_on_console('Response Body exceeds max. Limit, please use writeToFile keyword.')
                     log.info('Result obtained is: ')
@@ -957,6 +957,9 @@ class Controller():
                                     break
                                 print('\n')
                                 if (True in testcase_empty_flag):
+                                    if(condition_check_value==1):
+                                        condition_check_flag = True
+                                        logger.print_on_console('Condition Check: Terminated by program ')
                                     info_msg=str("Scenario cannot be executed, since the following testcases are empty: "+','.join(empty_testcase_names))
                                     logger.print_on_console(info_msg)
                                     log.info(info_msg)

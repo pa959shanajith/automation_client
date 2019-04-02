@@ -98,6 +98,8 @@ class Delay_keywords:
                         logger.print_on_console("Static variable doesn't exist")
 
                     if not isinstance(y,str):
+                        if str(type(y))=="<class 'selenium.webdriver.remote.webelement.WebElement'>":
+                            y = "WebElement"
                         y=str(y)
 ##                    display_input+=x+' = '+(y if type(y)==str else repr(y))+'\n'
 
