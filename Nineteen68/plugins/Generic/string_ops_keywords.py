@@ -15,6 +15,7 @@ import generic_constants
 import core_utils
 from constants import SYSTEM_OS
 import subprocess
+import unidecode
 if SYSTEM_OS == "Windows":
     import win32clipboard
 
