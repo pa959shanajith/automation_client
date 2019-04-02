@@ -957,6 +957,9 @@ class Controller():
                                     break
                                 print('\n')
                                 if (True in testcase_empty_flag):
+                                    if(condition_check_value==1):
+                                        condition_check_flag = True
+                                        logger.print_on_console('Condition Check: Terminated by program ')
                                     info_msg=str("Scenario cannot be executed, since the following testcases are empty: "+','.join(empty_testcase_names))
                                     logger.print_on_console(info_msg)
                                     log.info(info_msg)
