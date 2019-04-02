@@ -217,6 +217,7 @@ class ScrapeWindow(wx.Frame):
 
         '''if any of the last two options are selected then
         scrape_selected_option must be having one more entry as the value of tagname/xpath'''
+        global visiblity_status
         if self.scrape_selected_option[0]  == self.scrapeoptions[-1]:
             self.scrape_selected_option.append(self.fullscrapedropdown.GetValue())
         elif self.scrape_selected_option[0] == self.scrapeoptions[-2]:
@@ -238,6 +239,7 @@ class ScrapeWindow(wx.Frame):
             self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
         self.parent.schedule.Enable()
         self.Close()
+        visiblity_status =False
 
     def cropandadd(self,event):
         state = event.GetEventObject().GetValue()
