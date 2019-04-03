@@ -420,8 +420,12 @@ class Tree_View_Keywords():
                     if (check):
                         log.info('Parent matched')
                         if(element.is_enabled()):
-                                tree_elm=element.Item(input_val, exact=True)
-                                tree_elm.ClickInput(button='left', double=False, wheel_dist=0, where='text', pressed='')
+                                if element.backend.name=='win32':
+                                    tree_elm=element.item(input_val, exact=True)
+                                    tree_elm.click_input(button='left', double=False, wheel_dist=0, where='text', pressed='')
+                                elif element.backend.name=='uia':
+                                    tree_elm=element.get_item(input_val, exact=True)
+                                    tree_elm.click_input(button='left', double=False, wheel_dist=0, pressed='')
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                         else:
@@ -440,7 +444,7 @@ class Tree_View_Keywords():
             Rect=''
             try:
                 #----------get the element coordinates
-                Rect=str(element.Rectangle())
+                Rect=str(element.rectangle())
                 Rect=Rect[1:len(Rect)-1]
                 Rect=Rect.split(",")
                 Left=Rect[0].strip()#left
@@ -473,8 +477,6 @@ class Tree_View_Keywords():
                 status = desktop_constants.TEST_RESULT_PASS
                 result = desktop_constants.TEST_RESULT_TRUE
             except Exception as exception:
-                import traceback
-                traceback.print_exc()
                 log.error(exception)
                 logger.print_on_console(exception)
                 err_msg="Unable to perform Mouse Hover"
@@ -574,6 +576,7 @@ class Tree_View_Keywords():
         result=desktop_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
         err_msg=None
+        flag=False
         try:
             if desktop_launch_keywords.window_name!=None:
                 verify_obj = Text_Box()
@@ -587,29 +590,47 @@ class Tree_View_Keywords():
                     log.info('Parent matched')
                     if(element.is_enabled()):
                         try:
-                            roots=element.Roots()
+                            roots=element.roots()
                             root_elem=roots[int(input_val[0])-1]
                             if len(input_val)>1:
                                 input_val=input_val[1:]
-                                new_elem=root_elem
-                                def recur(elem,index):
-                                    children=elem.Children()
-                                    return children[index]
-                                for i in input_val:
-                                    index=int(i)-1
-                                    new_elem=recur(new_elem,index)
-                                verb=new_elem.Text()
-                                status = desktop_constants.TEST_RESULT_PASS
-                                result = desktop_constants.TEST_RESULT_TRUE
+                                #------------------------win32
+                                if element.backend.name=='win32':
+                                    new_elem=root_elem
+                                    def recur(elem,index):
+                                        children=elem.children()
+                                        return children[index]
+                                    for i in input_val:
+                                        index=int(i)-1
+                                        new_elem=recur(new_elem,index)
+                                    verb=new_elem.text()
+                                    flag=True
+                                #------------------------uia
+                                elif element.backend.name=='uia':
+                                    new_elem=root_elem
+                                    def recur(elem,index):
+                                        if elem.is_expanded()==False:
+                                            elem.expand()
+                                        children=elem.children()
+                                        return children[index]
+                                    for i in input_val:
+                                        index=int(i)-1
+                                        new_elem=recur(new_elem,index)
+                                    verb=new_elem.texts()[0]
+                                    flag=True
+                                if flag==True:
+                                    status = desktop_constants.TEST_RESULT_PASS
+                                    result = desktop_constants.TEST_RESULT_TRUE
                             else:
-                                verb=root_elem.Text()
+                                if element.backend.name=='win32':
+                                    verb=root_elem.text()
+                                elif element.backend.name=='uia':
+                                    verb=root_elem.texts()[0]
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                         except Exception as e:
-                            import traceback
-                            traceback.print_exc()
-                            #logger.print_on_console(e)
                             log.info(e)
+                            log.error(e)
                     else:
                       log.info('Element state does not allow to perform the operation')
                       logger.print_on_console('Element state does not allow to perform the operation')
@@ -623,4 +644,3 @@ class Tree_View_Keywords():
             logger.print_on_console(exception)
             err_msg="Unable to perform action on this element."
         return status,result,verb,err_msg
-

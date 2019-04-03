@@ -191,7 +191,7 @@ class Tab_Control_Keywords():
             result=desktop_constants.TEST_RESULT_FALSE
             verb = OUTPUT_CONSTANT
             err_msg=None
-            text_flag = False
+            flag = False
             #---------------------------------------------checker(32 or 64)
             import platform
             info_32=platform.architecture()
@@ -229,18 +229,22 @@ class Tab_Control_Keywords():
                                         try:
                                             if element.backend.name=='win32':
                                                 element.select(item_text)
+                                                flag=True
                                             elif element.backend.name=='uia':
                                                 try:
+                                                    logger.print_on_console('SelectTabByText returns inconsistent outputs for method B elements')
                                                     element.select(item_text)
+                                                    flag=True
                                                 except Exception as e:
                                                     log.error('Tab error via method B')
                                                     log.info('Tab error via method B')
                                                     log.error(e)
-                                            log.info('Tab control with given text selected')
-                                            logger.print_on_console('Tab control with given text selected')
-                                            status = desktop_constants.TEST_RESULT_PASS
-                                            result = desktop_constants.TEST_RESULT_TRUE
-                                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                                            if flag==True:
+                                                log.info('Tab control with given text selected')
+                                                logger.print_on_console('Tab control with given text selected')
+                                                status = desktop_constants.TEST_RESULT_PASS
+                                                result = desktop_constants.TEST_RESULT_TRUE
+                                                log.info(STATUS_METHODOUTPUT_UPDATE)
                                         except Exception as e:
                                             log.info('There is no tab in Tab control with the given text')
                                             logger.print_on_console('There is no tab in Tab control with the given text')
