@@ -21,76 +21,107 @@ import constants
 import logger
 import logging
 from core_utils import CoreUtils
+import threading
+local_handler = threading.local()
 
 
 
 """List to store the test steps"""
-tspList=[]
+##tspList=[]
 
 """global index used in parse_condition method"""
-tspIndex=-1
+##tspIndex=-1
 
 """global index used in create_list method"""
-tspIndex2=-1
+##tspIndex2=-1
 
 """Dict to store the for,endfor keywords"""
-copy_for_keywords=OrderedDict()
-for_keywords=OrderedDict()
+##copy_for_keywords=OrderedDict()
+##for_keywords=OrderedDict()
 
 """Dict to store the if,elseIf,else,endIf keywords"""
-copy_condition_keywords=OrderedDict()
-condition_keywords=OrderedDict()
+##copy_condition_keywords=OrderedDict()
+##condition_keywords=OrderedDict()
 
 """Dict to store the getparam,startloop,endloop keywords"""
-copy_getparam_keywords=OrderedDict()
-getparam_keywords=OrderedDict()
+##copy_getparam_keywords=OrderedDict()
+##getparam_keywords=OrderedDict()
 
 """List containing for,endfor constants"""
-for_array=[constants.FOR,constants.ENDFOR]
+##for_array=[constants.FOR,constants.ENDFOR]
 
 """List containing if,endif constants"""
-if_endIf=[constants.IF,constants.ENDIF]
+##if_endIf=[constants.IF,constants.ENDIF]
 
 """List containing if,elseif,else,endif constants"""
-if_array=[constants.IF,constants.ELSE_IF,constants.ELSE,constants.ENDIF]
+##if_array=[constants.IF,constants.ELSE_IF,constants.ELSE,constants.ENDIF]
 
 """List containing getparam,startloop,endloop constants"""
-get_param=[constants.GETPARAM,constants.STARTLOOP,constants.ENDLOOP]
+##get_param=[constants.GETPARAM,constants.STARTLOOP,constants.ENDLOOP]
 
 """List to store the object of nested if info"""
-cond_nest_info=[]
+##cond_nest_info=[]
 
 """Dict to store the start-end of for info"""
-for_info=OrderedDict()
+##for_info=OrderedDict()
 
 """Dict to store the start-end of if info"""
 
-if_info=OrderedDict()
+##if_info=OrderedDict()
 """Dict to store the start-end of getparam info"""
-get_param_info=OrderedDict()
+##get_param_info=OrderedDict()
 
 """Dict to store information about the possible start of each conditional keyword"""
-start_end_dict={constants.ENDFOR:[constants.FOR],
-                constants.FOR:[constants.ENDFOR],
+##start_end_dict={constants.ENDFOR:[constants.FOR],
+##                constants.FOR:[constants.ENDFOR],
 ##                constants.IF:[constants.ENDIF,constants.ELSE_IF,constants.ELSE],
-                constants.ENDIF:[constants.IF,constants.ELSE_IF,constants.ELSE],
-                constants.ELSE_IF:[constants.IF,constants.ELSE_IF],
-                constants.ELSE:[constants.IF,constants.ELSE_IF],
-                constants.GETPARAM:[constants.STARTLOOP],
-                constants.STARTLOOP:[constants.ENDLOOP]}
+##                constants.ENDIF:[constants.IF,constants.ELSE_IF,constants.ELSE],
+##                constants.ELSE_IF:[constants.IF,constants.ELSE_IF],
+##                constants.ELSE:[constants.IF,constants.ELSE_IF],
+##                constants.GETPARAM:[constants.STARTLOOP],
+##                constants.STARTLOOP:[constants.ENDLOOP]}
 
-ws_template=''
-ws_templates_dict={}
-testcasename = ''
+##ws_template=''
+##ws_templates_dict={}
+##testcasename = ''
 
 ##dynamic_variable_map=OrderedDict()
-log = logging.getLogger('handler.py')
+##log = logging.getLogger('handler.py')
 
 
 class Handler():
 
     def __init__(self):
+        global local_handler
         self.utils_obj=CoreUtils()
+        local_handler.log = logging.getLogger('handler.py')
+        local_handler.testcasename = ''
+        local_handler.ws_templates_dict = {}
+        local_handler.ws_template = ''
+        local_handler.start_end_dict = {constants.ENDFOR:[constants.FOR],
+                                      constants.FOR:[constants.ENDFOR],
+                                      constants.ENDIF:[constants.IF,constants.ELSE_IF,constants.ELSE],
+                                      constants.ELSE_IF:[constants.IF,constants.ELSE_IF],
+                                      constants.ELSE:[constants.IF,constants.ELSE_IF],
+                                      constants.GETPARAM:[constants.STARTLOOP],
+                                      constants.STARTLOOP:[constants.ENDLOOP]}
+        local_handler.get_param_info = OrderedDict()
+        local_handler.if_info = OrderedDict()
+        local_handler.for_info = OrderedDict()
+        local_handler.cond_nest_info = []
+        local_handler.get_param = [constants.GETPARAM,constants.STARTLOOP,constants.ENDLOOP]
+        local_handler.if_array = [constants.IF,constants.ELSE_IF,constants.ELSE,constants.ENDIF]
+        local_handler.if_endIf = [constants.IF,constants.ENDIF]
+        local_handler.for_array = [constants.FOR,constants.ENDFOR]
+        local_handler.getparam_keywords = OrderedDict()
+        local_handler.copy_getparam_keywords = OrderedDict()
+        local_handler.condition_keywords = OrderedDict()
+        local_handler.copy_condition_keywords = OrderedDict()
+        local_handler.for_keywords = OrderedDict()
+        local_handler.copy_for_keywords = OrderedDict()
+        local_handler.tspIndex2 = -1
+        local_handler.tspIndex = -1
+        local_handler.tspList = []
 
     def parse_json(self,test_data,data_param_path=None):
         """
@@ -101,12 +132,10 @@ class Handler():
 
         """
 ##        import  ftfy
-        global ws_template
-        global ws_templates_dict
-        log.debug('Parsing')
-        log.debug('-------------------------')
-        log.debug('TSP list')
-        log.debug('-------------------------')
+        local_handler.log.debug('Parsing')
+        local_handler.log.debug('-------------------------')
+        local_handler.log.debug('TSP list')
+        local_handler.log.debug('-------------------------')
         json_string = json.dumps(test_data)
         new_obj = json.loads(json_string)
         script=[]
@@ -128,13 +157,13 @@ class Handler():
                 #Empty testcase scenerio not terminating fix Bug #246 (Himanshu)
                     if (len(testcase)==0 or testcase=='[]' or testcase=='' or testcase=='null'):
                         logger.print_on_console('Testcase is empty')
-                        log.info('Testcase is empty')
+                        local_handler.log.info('Testcase is empty')
                         testcase_empty_flag.append(True)
                         if 'testcasename' in json_data:
                             empty_testcase_names.append(json_data['testcasename'])
                         continue
                 except Exception as e:
-                    log.error(e)
+                    local_handler.log.error(e)
 
                 #passing test case value to ftfy module to handle special charcter
 ##                if(type(testcase) == 'unicode'):
@@ -150,17 +179,16 @@ class Handler():
             if 'testscript_name' in json_data:
                 testscript_name=json_data['testscript_name']
                 if 'template' in json_data:
-                    ws_templates_dict[testscript_name]=json_data['template']
+                    local_handler.ws_templates_dict[testscript_name]=json_data['template']
                 else:
-                    ws_templates_dict[testscript_name]=""
+                    local_handler.ws_templates_dict[testscript_name]=""
             elif 'testcasename' in json_data:
                 testscript_name=json_data['testcasename']
                 if 'template' in json_data:
-                    ws_templates_dict[testscript_name]=json_data['template']
+                    local_handler.ws_templates_dict[testscript_name]=json_data['template']
                 else:
-                    ws_templates_dict[testscript_name]=""
-            global testcasename
-            testcasename =testscript_name
+                    local_handler.ws_templates_dict[testscript_name]=""
+            local_handler.testcasename =testscript_name
             testcasename_list.append(testscript_name)
             if 'browsertype' in json_data:
                 browser_type=json_data['browsertype']
@@ -192,6 +220,7 @@ class Handler():
         suiteId_list=[]
         suite_details=[]
         execution_id=[]
+        exec_mode = None
         #Iterating through json array
 
         try:
@@ -200,6 +229,7 @@ class Handler():
             #Getting suite_ids
             suiteId_list=new_obj['testsuiteIds']
             execution_id=new_obj['executionId']
+            exec_mode=new_obj['exec_mode']
             for json_data,suite_id in zip(suite_details,suiteId_list):
                 if type(suite_id)==str:
                     suite_id=str(suite_id)
@@ -218,7 +248,7 @@ class Handler():
                     dataparam_path[suite_id]=json_data['dataparampath']
         except Exception as e:
             print(e)
-        return suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path
+        return suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path,exec_mode
 
     def validate(self,start,end):
         """
@@ -228,7 +258,7 @@ class Handler():
         return : bool
 
         """
-        return end in start_end_dict[start]
+        return end in local_handler.start_end_dict[start]
 
     def insert_into_fordict(self,keyword_index,keyword,start_index):
         """
@@ -239,11 +269,11 @@ class Handler():
 
         """
         if start_index is not None:
-            for_info[start_index]=[{keyword_index:keyword}]
-            for_info[(keyword_index,keyword)]=[{start_index[0]:start_index[1]}]
-            for_keywords.popitem()
+            local_handler.for_info[start_index]=[{keyword_index:keyword}]
+            local_handler.for_info[(keyword_index,keyword)]=[{start_index[0]:start_index[1]}]
+            local_handler.for_keywords.popitem()
         else:
-            for_info[(keyword_index,keyword)]=None
+            local_handler.for_info[(keyword_index,keyword)]=None
 
     def insert_into_getParamdict(self,keyword_index,keyword,start_index):
         """
@@ -255,12 +285,12 @@ class Handler():
         """
         if start_index is not None:
             if not(start_index[1] == constants.ENDLOOP and keyword==constants.ENDLOOP):
-                if start_index in get_param_info and get_param_info[start_index] is not None and (start_index != {keyword_index:keyword}):
-                    get_param_info[start_index].append({keyword_index:keyword})
+                if start_index in local_handler.get_param_info and local_handler.get_param_info[start_index] is not None and (start_index != {keyword_index:keyword}):
+                    local_handler.get_param_info[start_index].append({keyword_index:keyword})
                 else:
-                    get_param_info[start_index]=[{keyword_index:keyword}]
+                    local_handler.get_param_info[start_index]=[{keyword_index:keyword}]
         else:
-            get_param_info[(keyword_index,keyword)]=None
+            local_handler.get_param_info[(keyword_index,keyword)]=None
 
     def insert_into_ifdict(self,keyword_index,keyword,start_index):
         """
@@ -272,12 +302,12 @@ class Handler():
         """
         if start_index is not None:
             if not(start_index[1] == constants.ENDIF and keyword==constants.ENDIF):
-                if start_index in if_info and if_info[start_index] is not None and (start_index != {keyword_index:keyword}):
-                    if_info[start_index].append({keyword_index:keyword})
+                if start_index in local_handler.if_info and local_handler.if_info[start_index] is not None and (start_index != {keyword_index:keyword}):
+                    local_handler.if_info[start_index].append({keyword_index:keyword})
                 else:
-                    if_info[start_index]=[{keyword_index:keyword}]
+                    local_handler.if_info[start_index]=[{keyword_index:keyword}]
         else:
-            if_info[(keyword_index,keyword)]=None
+            local_handler.if_info[(keyword_index,keyword)]=None
 
 
     def for_index(self,keyword,keyword_index):
@@ -290,13 +320,13 @@ class Handler():
         """
         flag=True
 
-        if len(for_keywords) != 0:
-            start_index=list(for_keywords.items())[-1]
+        if len(local_handler.for_keywords) != 0:
+            start_index=list(local_handler.for_keywords.items())[-1]
 ##            if keyword == constants.ENDFOR and self.validate(keyword,start_index[1]):
             if keyword == constants.ENDFOR:
                 self.insert_into_fordict(keyword_index,keyword,start_index)
             elif keyword== constants.ENDFOR:
-                log.error('For is missing: Invalid testcase ')
+                local_handler.log.error('For is missing: Invalid testcase ')
                 logger.print_on_console('For is missing: Invalid testcase ')
                 flag=False
             elif keyword==constants.FOR:
@@ -317,9 +347,9 @@ class Handler():
 
         """
         flag=True
-        if len(condition_keywords)>0:
-            start_index=list(condition_keywords.items())[-1]
-            if not (keyword in if_endIf) and self.validate(keyword,start_index[1]):
+        if len(local_handler.condition_keywords)>0:
+            start_index=list(local_handler.condition_keywords.items())[-1]
+            if not (keyword in local_handler.if_endIf) and self.validate(keyword,start_index[1]):
                 self.insert_into_ifdict(keyword_index,keyword,start_index)
                 #New change to insert even the satrt of the keyword
                 self.insert_into_ifdict(start_index[0],start_index[1],(keyword_index,keyword))
@@ -334,22 +364,22 @@ class Handler():
                 #mapping 'endIf' to it's respective steps while backtracking
                 while(start_index[1]!=constants.IF):
                     whileflag=True
-                    if (len(condition_keywords)>0):
-                        start_index=list(condition_keywords.items())[-1]
+                    if (len(local_handler.condition_keywords)>0):
+                        start_index=list(local_handler.condition_keywords.items())[-1]
                         self.insert_into_ifdict(keyword_index,keyword,start_index)
                         self.insert_into_ifdict(start_index[0],start_index[1],(keyword_index,keyword))
-                        condition_keywords.popitem()
+                        local_handler.condition_keywords.popitem()
                         flag=constants.ENDIF
                     else:
-                        log.error('IF is missing: Invalid Testcase ')
+                        local_handler.log.error('IF is missing: Invalid Testcase ')
                         logger.print_on_console('IF is missing: Invalid script ')
                         flag=False
                         break
                 #To fix issue with nested if blocks (without containing elseif/else blocks)
                 if(start_index[1]==constants.IF and not(whileflag)):
-                    condition_keywords.popitem()
+                    local_handler.condition_keywords.popitem()
                     flag=constants.ENDIF
-                    
+
             elif keyword==constants.IF:
 ##                self.insert_into_ifdict(keyword_index,keyword,None)
                   #New change to Map 'if' to 'if'
@@ -369,8 +399,8 @@ class Handler():
 
         """
         flag=True
-        if len(getparam_keywords)>0:
-            start_index=list(getparam_keywords.items())[-1]
+        if len(local_handler.getparam_keywords)>0:
+            start_index=list(local_handler.getparam_keywords.items())[-1]
             if keyword==constants.ENDLOOP:
                 #insert 'endLoop' key to dict
                 self.insert_into_getParamdict(keyword_index,keyword,None)
@@ -380,13 +410,13 @@ class Handler():
                     self.insert_into_getParamdict(start_index[0],start_index[1],(keyword_index,keyword))
                 #mapping 'endloop' to it's respective steps while backtracking
                 while(start_index[1]!=constants.GETPARAM):
-                    if (len(getparam_keywords)>0):
-                        start_index=list(getparam_keywords.items())[-1]
+                    if (len(local_handler.getparam_keywords)>0):
+                        start_index=list(local_handler.getparam_keywords.items())[-1]
                         self.insert_into_getParamdict(keyword_index,keyword,start_index)
                         self.insert_into_getParamdict(start_index[0],start_index[1],(keyword_index,keyword))
-                        getparam_keywords.popitem()
+                        local_handler.getparam_keywords.popitem()
                     else:
-                        log.error('Getparam is missing: Invalid testcase ')
+                        local_handler.log.error('Getparam is missing: Invalid testcase ')
                         logger.print_on_console('Getparam is missing: Invalid testcase ')
                         flag=False
                         break
@@ -429,37 +459,36 @@ class Handler():
             outputArray=outputval.split(';')
             if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
                 logger.print_on_console('keyword: '+keyword)
-                log.info('keyword: '+keyword)
-                log.debug(str(x)+'keyword: '+keyword)
+                local_handler.log.info('keyword: '+keyword)
+                local_handler.log.debug(str(x)+'keyword: '+keyword)
                 keyword=keyword.lower()
-                global tspIndex
-                tspIndex+=1
+                local_handler.tspIndex+=1
 
                 #getting 'for' info
-                if keyword in for_array:
-                    flag=self.find_start_index(keyword,tspIndex,1)
+                if keyword in local_handler.for_array:
+                    flag=self.find_start_index(keyword,local_handler.tspIndex,1)
                     if flag==False:
                         return flag
                     if keyword==constants.FOR:
-                        for_keywords[tspIndex]=keyword
-                    copy_for_keywords[tspIndex]=keyword
+                        local_handler.for_keywords[local_handler.tspIndex]=keyword
+                    local_handler.copy_for_keywords[local_handler.tspIndex]=keyword
 
                 #getting 'if' info
-                elif keyword in if_array:
-                    flag=self.find_start_index(keyword,tspIndex,2)
+                elif keyword in local_handler.if_array:
+                    flag=self.find_start_index(keyword,local_handler.tspIndex,2)
                     if flag==False:
                         return flag
                     if flag!=constants.ENDIF:
-                        condition_keywords[tspIndex]=keyword
-                    copy_condition_keywords[tspIndex]=keyword
+                        local_handler.condition_keywords[local_handler.tspIndex]=keyword
+                    local_handler.copy_condition_keywords[local_handler.tspIndex]=keyword
 
                 #getting 'getParam' info
-                elif keyword in get_param:
-                    flag=self.find_start_index(keyword,tspIndex,3)
+                elif keyword in local_handler.get_param:
+                    flag=self.find_start_index(keyword,local_handler.tspIndex,3)
                     if flag==False:
                         return flag
-                    getparam_keywords[tspIndex]=keyword
-                    copy_getparam_keywords[tspIndex]=keyword
+                    local_handler.getparam_keywords[local_handler.tspIndex]=keyword
+                    local_handler.copy_getparam_keywords[local_handler.tspIndex]=keyword
             else:
                 logger.print_on_console('Commented step '+str(step['stepNo']))
         return flag
@@ -480,33 +509,33 @@ class Handler():
         tsp_step=None
         try:
             #block which creates the step of instances of (for,endFor)
-            if key_lower in for_array:
-                if not(key in for_info):
+            if key_lower in local_handler.for_array:
+                if not(key in local_handler.for_info):
                     self.insert_into_fordict(index,key_lower,None)
-                    log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
+                    local_handler.log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
 ##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
-                tsp_step=for_step.For(index,keyword,inputval,outputval,stepnum,testscript_name,for_info[key],False,apptype,additionalinfo,i,remark,testcase_details)
+                tsp_step=for_step.For(index,keyword,inputval,outputval,stepnum,testscript_name,local_handler.for_info[key],False,apptype,additionalinfo,i,remark,testcase_details)
 
             #block which creates the step of instances (if,elseIf,else,endIf)
-            elif key_lower in if_array:
-                if not(key in if_info):
+            elif key_lower in local_handler.if_array:
+                if not(key in local_handler.if_info):
                     self.insert_into_ifdict(index,key_lower,None)
-                    log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
+                    local_handler.log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
 ##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
 
-                tsp_step=if_step.If(index,keyword,inputval,outputval,stepnum,testscript_name,if_info[key],False,apptype,additionalinfo,i,remark,testcase_details)
+                tsp_step=if_step.If(index,keyword,inputval,outputval,stepnum,testscript_name,local_handler.if_info[key],False,apptype,additionalinfo,i,remark,testcase_details)
 
             #block which creates the step of instances of (getparam,startloop,endloop)
-            elif key_lower in get_param:
-                if not(key in get_param_info):
+            elif key_lower in local_handler.get_param:
+                if not(key in local_handler.get_param_info):
                     self.insert_into_getParamdict(index,key_lower,None)
-                    log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
+                    local_handler.log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
 ##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
 
                 if(extract_path==None):
-                    tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i,remark,testcase_details)
+                    tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,local_handler.get_param_info[key],False,apptype,additionalinfo,i,remark,testcase_details)
                 else:
-                    tsp_step=getparam.GetParam(index,keyword,extract_path,outputval,stepnum,testscript_name,get_param_info[key],False,apptype,additionalinfo,i,remark,testcase_details)
+                    tsp_step=getparam.GetParam(index,keyword,extract_path,outputval,stepnum,testscript_name,local_handler.get_param_info[key],False,apptype,additionalinfo,i,remark,testcase_details)
 
             #block which creates the step of instances of (jumpBy)
             elif key_lower == constants.JUMP_BY:
@@ -530,11 +559,11 @@ class Handler():
                             right_part=self.utils_obj.scrape_unwrap(xpath_string[2])
                             objectname = left_part+';'+xpath_string[1]+';'+right_part
                     except Exception as e:
-                        log.error(e)
+                        local_handler.log.error(e)
                 tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord)
         except Exception as e:
             logger.print_on_console(e)
-            log.error(e)
+            local_handler.log.error(e)
         return tsp_step
 
     def extract_field(self,step,index,testscript_name,i,extract_path = None):
@@ -553,7 +582,7 @@ class Handler():
         stepnum=step['stepNo']
         url=step['url']
         custname=step['custname']
-        if('cord' in step): 
+        if('cord' in step):
             cord=step['cord']
         else:
             cord=None
@@ -568,9 +597,8 @@ class Handler():
         outputArray=outputval.split(';')
         #check if the step is commented before adding to the tsplist
         if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
-            global tspIndex2
-            tspIndex2+=1
-            return self.create_step(tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,extract_path)
+            local_handler.tspIndex2+=1
+            return self.create_step(local_handler.tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,extract_path)
         return None
 
 
@@ -603,11 +631,11 @@ class Handler():
         for i in range(len(testcase_copy)):
             for x in testcase_copy[i]:
                 if extract_path == None:
-                    step=self.extract_field(x,tspIndex2,testscript_name[i],i+1)
+                    step=self.extract_field(x,local_handler.tspIndex2,testscript_name[i],i+1)
                 else:
-                    step=self.extract_field(x,tspIndex2,testscript_name[i],i+1,extract_path)
+                    step=self.extract_field(x,local_handler.tspIndex2,testscript_name[i],i+1,extract_path)
                 if step is not None and step != False:
-                    tspList.append(step)
+                    local_handler.tspList.append(step)
                 elif step == False:
                     return step
         return True
@@ -624,14 +652,14 @@ class Handler():
         return :
 
         """
-        log.info('Printing each step in TSP')
-        log.info('-------------------------')
-        log.info('TSP list')
-        log.info('-------------------------')
-        for x in tspList:
+        local_handler.log.info('Printing each step in TSP')
+        local_handler.log.info('-------------------------')
+        local_handler.log.info('TSP list')
+        local_handler.log.info('-------------------------')
+        for x in local_handler.tspList:
             x.print_step()
 ##            logger.print_on_console('\n')
-        return tspList
+        return local_handler.tspList
 
     def print_dict(self,d):
         """
@@ -654,24 +682,23 @@ class Handler():
         return :
 
         """
+        global local_handler
         import dynamic_variable_handler
-        del tspList[:]
-        del cond_nest_info[:]
-        global tspIndex,tspIndex2,copy_for_keywords,for_keywords,copy_condition_keywords,condition_keywords,copy_getparam_keywords                        ,getparam_keywords,for_info,if_info,get_param_info
-        tspIndex=-1
-        tspIndex2=-1
-        copy_for_keywords.clear()
-        for_keywords.clear()
-        copy_condition_keywords.clear()
-        condition_keywords.clear()
-        copy_getparam_keywords.clear()
-        getparam_keywords.clear()
-        for_info.clear()
-        if_info.clear()
-        get_param_info.clear()
-        ws_template=''
-        global ws_templates_dict
-        ws_templates_dict.clear();
+        del local_handler.tspList[:]
+        del local_handler.cond_nest_info[:]
+        local_handler.tspIndex=-1
+        local_handler.tspIndex2=-1
+        local_handler.copy_for_keywords.clear()
+        local_handler.for_keywords.clear()
+        local_handler.copy_condition_keywords.clear()
+        local_handler.condition_keywords.clear()
+        local_handler.copy_getparam_keywords.clear()
+        local_handler.getparam_keywords.clear()
+        local_handler.for_info.clear()
+        local_handler.if_info.clear()
+        local_handler.get_param_info.clear()
+        local_handler.ws_template=''
+        local_handler.ws_templates_dict.clear();
         #dynamic_variable_handler.dynamic_variable_map.clear()
         if con.oebs_dispatcher_obj != None:
             con.oebs_dispatcher_obj.clear_oebs_window_name()

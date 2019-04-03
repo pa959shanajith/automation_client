@@ -49,7 +49,7 @@ class  JumpTo():
         output=OUTPUT_CONSTANT
         try:
             log.debug('Get the tsp list')
-            tspList=handler.tspList
+            tspList=handler.local_handler.tspList
             flag=False
             i=-1
             log.debug('Searching for Test script name in tsp list')
@@ -64,7 +64,7 @@ class  JumpTo():
                     log.info('Jump to Testcase:' +tsp.testscript_name)
                     return_value=i
                     self.status=True
-                    no_Of_Test_steps=self.getNoOfStepsInTestScript(i,tsp.testscript_name,handler.tspList)
+                    no_Of_Test_steps=self.getNoOfStepsInTestScript(i,tsp.testscript_name,handler.local_handler.tspList)
                     break
             if(flag==False):
                 logger.print_on_console('Test script name not found')

@@ -10,11 +10,11 @@
 #-------------------------------------------------------------------------------
 import logger
 import constants
-iteration_count={}
-
+##iteration_count={}
 import logging
-
 log = logging.getLogger('for_step.py')
+import threading
+local_for = threading.local()
 
 class For():
 
@@ -37,6 +37,7 @@ class For():
         self.testcase_num=testcase_num
         self.remarks=remark
         self.testcase_details=testcase_details
+        local_for.iteration_count={}
 
 
     def print_step(self):
@@ -81,17 +82,17 @@ class For():
 
 
     def invokeFor(self,input,reporting_obj):
-        global iteration_count
+        global local_for
 
         #block to execute endFor
         if self.name.lower() == constants.ENDFOR:
             logger.print_on_console('\nEncountered :'+self.name+'\n')
             self.executed=True
             index=self.getEndfor()
-            logger.print_on_console('***For: Iteration '+str(iteration_count[index])+' completed***\n\n')
-            log.info('***For: Iteration '+str(iteration_count[index])+' completed***\n\n')
+            logger.print_on_console('***For: Iteration '+str(local_for.iteration_count[index])+' completed***\n\n')
+            log.info('***For: Iteration '+str(local_for.iteration_count[index])+' completed***\n\n')
             #Reporting part
-            self.add_report_step(reporting_obj,'Iteration: '+str(iteration_count[index])+' executed')
+            self.add_report_step(reporting_obj,'Iteration: '+str(local_for.iteration_count[index])+' executed')
             #Reporting part ends
 
             return index
@@ -105,14 +106,14 @@ class For():
             try:
                 if(int(input[0]) <= 0):
                     forIndex=self.invalid_for_input(endForNum,inputval,reporting_obj)
-                    iteration_count[self.index]=0
+                    local_for.iteration_count[self.index]=0
                     return forIndex
                 else:
                    inputval = int(input[0])
-                   iteration_count[self.index]=0
+                   local_for.iteration_count[self.index]=0
             except ValueError:
                 forIndex=self.invalid_for_input(endForNum,inputval,reporting_obj)
-                iteration_count[self.index]=0
+                local_for.iteration_count[self.index]=0
                 return forIndex
 
 
@@ -121,7 +122,7 @@ class For():
                 self.count=self.count+1
 
                 if not(self.count<= inputval):
-                    iteration_count[self.index]=0
+                    local_for.iteration_count[self.index]=0
                     self.count=0
                     self.executed=False
                     forIndex=endForNum+1
@@ -139,16 +140,16 @@ class For():
                         self.add_report_step_for(reporting_obj,'Execute the steps in the loop for the given count '+str(inputval))
                         #Reporting part ends
                     self.executed=True
-                    iteration_count[self.index]=self.count
+                    local_for.iteration_count[self.index]=self.count
                     logger.print_on_console('***For: Iteration '+str(self.count)+ ' started***')
                     log.info('***For: Iteration '+str(self.count)+ ' started***')
 
                     #Reporting part
-                    self.add_report_step_iteration(reporting_obj,'Iteration '+str(iteration_count[self.index])+' started')
+                    self.add_report_step_iteration(reporting_obj,'Iteration '+str(local_for.iteration_count[self.index])+' started')
                     #Reporting part ends
             else:
                 forIndex=self.invalid_for_input(endForNum,inputval,reporting_obj)
-                iteration_count[self.index]=0
+                local_for.iteration_count[self.index]=0
 
             return forIndex
 

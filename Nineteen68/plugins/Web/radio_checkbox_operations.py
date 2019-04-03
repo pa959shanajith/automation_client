@@ -18,8 +18,8 @@ import webconstants
 from constants import *
 import logging
 import readconfig
-
-log = logging.getLogger('radio_checkbox_operations.py')
+import threading
+local_rco = threading.local()
 
 class RadioCheckboxKeywords():
 
@@ -27,15 +27,16 @@ class RadioCheckboxKeywords():
         self.utilobj=UtilWebKeywords()
         self.status={'radio':'Selected',
                     'checkbox':'Checked'}
+        local_rco.log = logging.getLogger('radio_checkbox_operations.py')
 
     def __element_disabled(self):
         err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
         logger.print_on_console(err_msg)
-        log.error(err_msg)
+        local_rco.log.error(err_msg)
         return err_msg
 
     def __web_driver_exception(self,e):
-        log.error(e)
+        local_rco.log.error(e)
         logger.print_on_console(e)
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         return err_msg
@@ -43,7 +44,7 @@ class RadioCheckboxKeywords():
     def __element_not_displayed(self):
         err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
         logger.print_on_console(err_msg)
-        log.error(err_msg)
+        local_rco.log.error(err_msg)
         return err_msg
 
     def __check_visibility_from_config(self):
@@ -54,21 +55,21 @@ class RadioCheckboxKeywords():
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_rco.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
                 if webelement.is_enabled():
-                    log.debug(WEB_ELEMENT_ENABLED)
+                    local_rco.log.debug(WEB_ELEMENT_ENABLED)
                     if not (self.utilobj.is_visible(webelement)) and self.__check_visibility_from_config():
                         # performing js code
-                        log.debug('element is invisible, performing js code')
-                        browser_Keywords.driver_obj.execute_script(webconstants.CLICK_RADIO_CHECKBOX,webelement)
+                        local_rco.log.debug('element is invisible, performing js code')
+                        browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_RADIO_CHECKBOX,webelement)
                         status = TEST_RESULT_PASS
                         methodoutput = TEST_RESULT_TRUE
                     else:
                         if self.utilobj.is_visible(webelement):
                             # performing selenium code
-                            log.debug('element is visible, performing selenium code')
+                            local_rco.log.debug('element is visible, performing selenium code')
                             webelement.click()
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
@@ -86,22 +87,22 @@ class RadioCheckboxKeywords():
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_rco.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
                 if webelement.is_enabled():
-                    log.debug(WEB_ELEMENT_ENABLED)
+                    local_rco.log.debug(WEB_ELEMENT_ENABLED)
                     if not(webelement.is_selected()):
                         if not (self.utilobj.is_visible(webelement)) and self.__check_visibility_from_config():
                             # performing js code
-                            log.debug('element is invisible, performing js code')
-                            browser_Keywords.driver_obj.execute_script(webconstants.CLICK_RADIO_CHECKBOX,webelement)
+                            local_rco.log.debug('element is invisible, performing js code')
+                            browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_RADIO_CHECKBOX,webelement)
                             status = TEST_RESULT_PASS
                             methodoutput = TEST_RESULT_TRUE
                         else:
                             if self.utilobj.is_visible(webelement):
                                 # performing selenium code
-                                log.debug('element is visible, performing selenium code')
+                                local_rco.log.debug('element is visible, performing selenium code')
                                 webelement.click()
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
@@ -110,7 +111,7 @@ class RadioCheckboxKeywords():
                     else:
                         err_msg=ERROR_CODE_DICT['ERR_OBJECTSELECTED']
                         logger.print_on_console(err_msg)
-                        log.error(err_msg)
+                        local_rco.log.error(err_msg)
                 else:
                     err_msg=self.__element_disabled()
             except Exception as e:
@@ -123,22 +124,22 @@ class RadioCheckboxKeywords():
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_rco.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
                 if webelement.is_enabled():
-                    log.debug(WEB_ELEMENT_ENABLED)
+                    local_rco.log.debug(WEB_ELEMENT_ENABLED)
                     if webelement.is_selected():
                         if not (self.utilobj.is_visible(webelement)) and self.__check_visibility_from_config():
                             # performing js code
-                            log.debug('element is invisible, performing js code')
-                            browser_Keywords.driver_obj.execute_script(webconstants.CLICK_RADIO_CHECKBOX,webelement)
+                            local_rco.log.debug('element is invisible, performing js code')
+                            browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_RADIO_CHECKBOX,webelement)
                             status = TEST_RESULT_PASS
                             methodoutput = TEST_RESULT_TRUE
                         else:
                             if self.utilobj.is_visible(webelement):
                                 # performing selenium code
-                                log.debug('element is visible, performing selenium code')
+                                local_rco.log.debug('element is visible, performing selenium code')
                                 webelement.click()
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
@@ -147,7 +148,7 @@ class RadioCheckboxKeywords():
                     else:
                         err_msg=ERROR_CODE_DICT['ERR_OBJECTUNSELECTED']
                         logger.print_on_console(err_msg)
-                        log.error(err_msg)
+                        local_rco.log.error(err_msg)
                 else:
                     err_msg=self.__element_disabled()
             except Exception as e:
@@ -160,7 +161,7 @@ class RadioCheckboxKeywords():
         output=OUTPUT_CONSTANT
         err_msg=None
         status=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_rco.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
                 if webelement.tag_name=='table':
@@ -182,7 +183,7 @@ class RadioCheckboxKeywords():
     def __fetch_status(self,webelement,*args):
         try:
             input_type=webelement.get_attribute('type').lower();
-            log.debug('Type is '+input_type)
+            local_rco.log.debug('Type is '+input_type)
             if webelement.is_selected():
                 if input_type in ['submit','button','reset']:
                     status=webelement.is_selected()
@@ -200,7 +201,7 @@ class RadioCheckboxKeywords():
     def __fetch_status_array(self,webelement,input):
         status_list=[]
         try:
-            driver=browser_Keywords.driver_obj
+            driver=browser_Keywords.local_bk.driver_obj
             row_num=input[0]
             col_num=input[1]
             row_num=int(row_num)
@@ -209,7 +210,7 @@ class RadioCheckboxKeywords():
             cell=driver.execute_script(webconstants.GET_CELL_JS,webelement,row_num-1,col_num-1)
             element_list=cell.find_elements_by_xpath('.//*')
             if tag_name=='radio' or tag_name=='checkbox' or tag_name in ['submit','button','reset'] :
-                log.debug('Tagname is',tag_name)
+                local_rco.log.debug('Tagname is',tag_name)
                 for element in element_list:
                     element_xpath=driver.execute_script(webconstants.GET_XPATH_JS,element)
                     child=driver.find_element_by_xpath(element_xpath)
@@ -225,7 +226,7 @@ class RadioCheckboxKeywords():
 
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
-        log.debug(status_list)
+        local_rco.log.debug(status_list)
         return status_list
 
     def getActualElement(self,element,input):
@@ -244,8 +245,8 @@ class RadioCheckboxKeywords():
             element_list=cell.find_elements_by_xpath('.//*')
             for member in element_list:
                   js1='function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();'
-                  xpath=browser_Keywords.driver_obj.execute_script(js1,member)
-                  cellChild = browser_Keywords.driver_obj.find_element_by_xpath(xpath)
+                  xpath=browser_Keywords.local_bk.driver_obj.execute_script(js1,member)
+                  cellChild = browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
                   tagName = cellChild.tag_name
                   tagType = cellChild.get_attribute('type')
                   xpath_elements=xpath.split('/')

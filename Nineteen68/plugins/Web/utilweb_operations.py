@@ -32,7 +32,8 @@ from constants import *
 import readconfig
 from  selenium.webdriver.common import action_chains
 from selenium.webdriver.common.action_chains import ActionChains
-log = logging.getLogger('utilweb_operations.py')
+import threading
+local_uo = threading.local()
 
 class UtilWebKeywords:
     def __create_keyinfo_dict(self):
@@ -93,6 +94,7 @@ class UtilWebKeywords:
 
 
     def __init__(self):
+        local_uo.log = logging.getLogger('utilweb_operations.py')
         self.verify_image_obj=None
         self.keys_info={}
         self.__create_keyinfo_dict()
@@ -104,28 +106,28 @@ class UtilWebKeywords:
             from verify_file_images import VerifyFileImages
             self.verify_image_obj=VerifyFileImages()
         except Exception as e:
-            log.error(e)
+            local_uo.log.error(e)
 
     def __web_driver_exception(self,e):
-        log.error(e)
+        local_uo.log.error(e)
         logger.print_on_console(e)
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         return err_msg
 
     def is_visible(self,webelement):
         flag=False
-        log.debug('Checking the visibility of element')
+        local_uo.log.debug('Checking the visibility of element')
         try:
             script="""var isVisible = (function() {     function inside(schild, sparent) {         while (schild) {             if (schild === sparent) return true;             schild = schild.parentNode;         }         return false;     };     return function(selem) {         if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0) return false;         var srect = selem.getBoundingClientRect();         if (window.getComputedStyle || selem.currentStyle) {             var sel = selem,                 scomp = null;             while (sel) {                 if (sel === document) {                     break;                 } else if (!sel.parentNode) return false;                 scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;                 if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && !(scomp.opacity > 0)))) return false;                 sel = sel.parentNode;             }         }         return true;     } })(); var s = arguments[0]; return isVisible(s);"""
-            flag= browser_Keywords.driver_obj.execute_script(script,webelement)
+            flag= browser_Keywords.local_bk.driver_obj.execute_script(script,webelement)
         except Exception as e:
             self.__web_driver_exception(e)
-        log.debug('Visibility is '+str(flag))
+        local_uo.log.debug('Visibility is '+str(flag))
         return flag
 
 
     def is_enabled(self,webelement):
-        log.debug('Checking the enability of element')
+        local_uo.log.debug('Checking the enability of element')
         return webelement.is_enabled()
 
     def verify_visible(self,webelement,*args):
@@ -133,23 +135,23 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
                 #call to highlight the webelement
                 self.highlight(webelement)
                 res=self.is_visible(webelement)
-                log.info('The visible status is '+str(res))
+                local_uo.log.info('The visible status is '+str(res))
                 logger.print_on_console('The visible status is '+str(res))
                 if res:
                     logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_VISIBLE'])
-                    log.info(ERROR_CODE_DICT['ERR_OBJECT_VISIBLE'])
+                    local_uo.log.info(ERROR_CODE_DICT['ERR_OBJECT_VISIBLE'])
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
                     logger.print_on_console(err_msg)
-                    log.error(err_msg)
+                    local_uo.log.error(err_msg)
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
@@ -160,14 +162,14 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None and webelement != '':
                 #call to highlight the webelement
                 if readconfig.configvalues['highlight_check'].strip().lower()=="yes":
                     self.highlight(webelement)
                 logger.print_on_console(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
-                log.info(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
+                local_uo.log.info(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
@@ -179,10 +181,10 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is None or webelement == '':
             logger.print_on_console(ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS'])
-            log.info(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
+            local_uo.log.info(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output,err_msg
@@ -193,7 +195,7 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
                 #call to highlight the webelement
@@ -205,17 +207,17 @@ class UtilWebKeywords:
                 if webelement.is_enabled() and not(res):
                     info_msg=ERROR_CODE_DICT['The object is Hidden']
                     logger.print_on_console(err_msg)
-                    log.info(info_msg)
+                    local_uo.log.info(info_msg)
                 elif webelement.is_enabled() and res:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                     info_msg=ERROR_CODE_DICT['MSG_OBJECT_ENABLED']
                     logger.print_on_console(err_msg)
-                    log.info(info_msg)
+                    local_uo.log.info(info_msg)
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
                     logger.print_on_console(err_msg)
-                    log.error(err_msg)
+                    local_uo.log.error(err_msg)
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
@@ -225,27 +227,27 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
                 #call to highlight the webelement
                 self.highlight(webelement)
                 flag=False
                 unselectable_val=webelement.get_attribute('unselectable')
-                log.info('unselectable_val ',unselectable_val)
+                local_uo.log.info('unselectable_val ',unselectable_val)
                 if (unselectable_val!=None and unselectable_val.lower()=='on'):
                     flag=True
-                log.info('Disabled flag value ',flag)
+                local_uo.log.info('Disabled flag value ',str(flag))
                 if not(webelement.is_enabled()) or flag:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                     info_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
                     logger.print_on_console(info_msg)
-                    log.info(info_msg)
+                    local_uo.log.info(info_msg)
                 else:
                     err_msg=ERROR_CODE_DICT['MSG_OBJECT_ENABLED']
                     logger.print_on_console(err_msg)
-                    log.error(err_msg)
+                    local_uo.log.error(err_msg)
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
@@ -256,20 +258,20 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
                 res=self.is_visible(webelement)
                 if not(res):
                     info_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
                     logger.print_on_console(info_msg)
-                    log.info(info_msg)
+                    local_uo.log.info(info_msg)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_OBJECT_VISIBLE']
                     logger.print_on_console(err_msg)
-                    log.error(err_msg)
+                    local_uo.log.error(err_msg)
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
@@ -279,7 +281,7 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
                 #call to highlight the webelement
@@ -288,13 +290,13 @@ class UtilWebKeywords:
                 if readonly_value is not None and readonly_value.lower() =='true' or readonly_value is '':
                     info_msg=ERROR_CODE_DICT['ERR_ELEMENT_IS_READONLY']
                     logger.print_on_console(info_msg)
-                    log.info(info_msg)
+                    local_uo.log.info(info_msg)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_ELEMENT_IS_NOT_READONLY']
                     logger.print_on_console(err_msg)
-                    log.error(err_msg)
+                    local_uo.log.error(err_msg)
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
@@ -302,19 +304,19 @@ class UtilWebKeywords:
 
     def highlight(self,webelement):
         try:
-            if browser_Keywords.driver_obj is not None:
-                browser_info=browser_Keywords.driver_obj.capabilities
+            if browser_Keywords.local_bk.driver_obj is not None:
+                browser_info=browser_Keywords.local_bk.driver_obj.capabilities
                 browser_name=browser_info.get('browserName')
                 browser_version=browser_info.get('version')
-                ##log.info('Browser is:'+browser_name+'Version is:'+browser_version)
+                ##local_uo.log.info('Browser is:'+browser_name+'Version is:'+browser_version)
                 #get the original style of the element
                 original_style = webelement.get_attribute('style')
                 #Apply css to the element
                 #check if driver instance is IE
-                if isinstance(browser_Keywords.driver_obj,webdriver.Ie):
-                    browser_Keywords.driver_obj.execute_script(HIGHLIGHT_SCRIPT_IE,webelement,original_style+APPLY_CSS)
+                if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Ie):
+                    browser_Keywords.local_bk.driver_obj.execute_script(HIGHLIGHT_SCRIPT_IE,webelement,original_style+APPLY_CSS)
                 else:
-                    browser_Keywords.driver_obj.execute_script(HIGHLIGHT_SCRIPT,webelement,str(original_style)+APPLY_CSS)
+                    browser_Keywords.local_bk.driver_obj.execute_script(HIGHLIGHT_SCRIPT,webelement,str(original_style)+APPLY_CSS)
 
                 #highlight remains for 3 secs on the element
                 import time
@@ -322,21 +324,21 @@ class UtilWebKeywords:
 
                 #Remove css from the element  and applying the original style back to the element
                 #check if driver instance is IE
-                if isinstance(browser_Keywords.driver_obj,webdriver.Ie):
+                if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Ie):
                     if '8' in browser_version:
-                        browser_Keywords.driver_obj.execute_script(HIGHLIGHT_SCRIPT_IE,webelement,original_style+REMOVE_CSS_IE8)
+                        browser_Keywords.local_bk.driver_obj.execute_script(HIGHLIGHT_SCRIPT_IE,webelement,original_style+REMOVE_CSS_IE8)
                     else:
-                        browser_Keywords.driver_obj.execute_script(HIGHLIGHT_SCRIPT_IE,webelement,original_style)
+                        browser_Keywords.local_bk.driver_obj.execute_script(HIGHLIGHT_SCRIPT_IE,webelement,original_style)
                 else:
-                    browser_Keywords.driver_obj.execute_script(HIGHLIGHT_SCRIPT,webelement,original_style)
+                    browser_Keywords.local_bk.driver_obj.execute_script(HIGHLIGHT_SCRIPT,webelement,original_style)
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
 
 
     def __setfocus(self,webelement):
         status=TEST_RESULT_FAIL
-        if browser_Keywords.driver_obj is not None:
-            browser_Keywords.driver_obj.execute_script(FOUCS_ELE,webelement)
+        if browser_Keywords.local_bk.driver_obj is not None:
+            browser_Keywords.local_bk.driver_obj.execute_script(FOUCS_ELE,webelement)
             status=TEST_RESULT_PASS
         return status
 
@@ -345,13 +347,13 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
                 status=self.__setfocus(webelement)
                 if status==TEST_RESULT_PASS:
                     info_msg='Element is focused'
-                    log.info(info_msg)
+                    local_uo.log.info(info_msg)
                     logger.print_on_console(info_msg)
                     methodoutput=TEST_RESULT_TRUE
         except Exception as e:
@@ -365,7 +367,7 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if(len(args[0]) == 2):
                 row = int(args[0][0])-1
@@ -376,7 +378,7 @@ class UtilWebKeywords:
                 element_list=cell.find_elements_by_xpath('.//*')
                 if len(list(element_list))>0:
                     xpath=tableops.getElemntXpath(element_list[0])
-                    cell=browser_Keywords.driver_obj.find_element_by_xpath(xpath)
+                    cell=browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
                 if(cell!=None):
                     webelement=cell
 
@@ -393,8 +395,8 @@ class UtilWebKeywords:
                 element_list=cell.find_elements_by_xpath('.//*')
                 for member in element_list:
                     js1='function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();'
-                    xpath=browser_Keywords.driver_obj.execute_script(js1,member)
-                    cellChild = browser_Keywords.driver_obj.find_element_by_xpath(xpath)
+                    xpath=browser_Keywords.local_bk.driver_obj.execute_script(js1,member)
+                    cellChild = browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
                     tagName = cellChild.tag_name
                     tagType = cellChild.get_attribute('type')
                     xpath_elements=xpath.split('/')
@@ -488,14 +490,14 @@ class UtilWebKeywords:
             if webelement is not None:
                 location=webelement.location
                 if SYSTEM_OS != 'Darwin':
-                    if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
+                    if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                         javascript = "return window.mozInnerScreenY"
-                        value=browser_Keywords.driver_obj.execute_script(javascript)
+                        value=browser_Keywords.local_bk.driver_obj.execute_script(javascript)
                         logger.print_on_console(value)
                         offset=int(value)
                         robot=pyrobot.Robot()
                         robot.set_mouse_pos(int(location.get('x')+18),int(location.get('y')+offset+18))
-                        log.debug('hover performed')
+                        local_uo.log.debug('hover performed')
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
@@ -505,22 +507,22 @@ class UtilWebKeywords:
                         rect=obj.rect
                         robot=pyrobot.Robot()
                         obj.mouse_move(int(location.get('x'))+9,int(location.get('y')+rect[1]+6))
-                        log.debug('hover performed')
+                        local_uo.log.debug('hover performed')
                 if SYSTEM_OS == 'Darwin':
                     try:
-                        ##clickinfo = browser_Keywords.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
-                        hover = webdriver.ActionChains(browser_Keywords.driver_obj).move_to_element(webelement)
+                        ##clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
+                        hover = webdriver.ActionChains(browser_Keywords.local_bk.driver_obj).move_to_element(webelement)
                         hover.perform()
-                        log.info('Hover operation performed')
+                        local_uo.log.info('Hover operation performed')
                         status = TEST_RESULT_PASS
                         methodoutput = TEST_RESULT_TRUE
                     except Exception as e:
-                        log.error(e)
+                        local_uo.log.error(e)
                         logger.print_on_console("Cannot perform mouseHover operation.")
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            log.error(e)
+            local_uo.log.error(e)
             err_msg=self.__web_driver_exception(e)
             logger.print_on_console("Cannot perform mouseHover operation.")
         return status,methodoutput,output,err_msg
@@ -533,14 +535,14 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
                 webelement.send_keys(Keys.TAB)
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except WebDriverException as e:
-            if isinstance(browser_Keywords.driver_obj,webdriver.Chrome):
+            if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Chrome):
                 self.__setfocus(webelement)
                 robot=Robot()
                 robot.key_press('tab')
@@ -560,28 +562,28 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
                 #input=input[0]
                 input1=input[0]
                 info_msg='Focus the given webelement '+webelement.tag_name+' before sending keys'
-                log.info(info_msg)
+                local_uo.log.info(info_msg)
                 logger.print_on_console(info_msg)
                 self.__setfocus(webelement)
                 if len(args)==0 and input1 in list(self.keys_info.keys()):
                     if webelement.get_attribute('type')!='text':
                         webelement.send_keys(self.keys_info[input1.lower()])
-                        log.debug('It is not a textbox')
+                        local_uo.log.debug('It is not a textbox')
                     else:
-                        log.debug('It is a textbox')
+                        local_uo.log.debug('It is a textbox')
                         #self.generic_sendfucntion_keys(input1.lower(),*args)
                         if(len(input)>1):
                             self.generic_sendfucntion_keys(input[0].lower(),input[1])
                         else:
                             self.generic_sendfucntion_keys(input[0].lower(),*args)
                 else:
-                    log.debug('Calling Generic sendfunction keys')
+                    local_uo.log.debug('Calling Generic sendfunction keys')
                     #self.generic_sendfucntion_keys(input.lower(),*args)
                     if(len(input)>1):
                         self.generic_sendfucntion_keys(input[0].lower(),input[1])
@@ -598,32 +600,32 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
                 if webelement.is_enabled():
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
+                    local_uo.log.debug(WEB_ELEMENT_ENABLED)
+                    if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                         info_msg='Firefox browser'
-                        log.info(info_msg)
+                        local_uo.log.info(info_msg)
                         logger.print_on_console(info_msg)
                         javascript = "return window.mozInnerScreenY"
-                        value=browser_Keywords.driver_obj.execute_script(javascript)
+                        value=browser_Keywords.local_bk.driver_obj.execute_script(javascript)
                         logger.print_on_console(value)
                         offset=int(value)
                         location = webelement.location
                         robot=pyrobot.Robot()
                         robot.set_mouse_pos(int(location.get('x')+9),int(location.get('y')+offset))
-                        log.debug('Setting the mouse position')
+                        local_uo.log.debug('Setting the mouse position')
                         robot.click_mouse('right')
-                        log.debug('Performed Right click')
+                        local_uo.log.debug('Performed Right click')
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
                         from selenium.webdriver.common.action_chains import ActionChains
-                        action_obj=ActionChains(browser_Keywords.driver_obj)
+                        action_obj=ActionChains(browser_Keywords.local_bk.driver_obj)
                         action_obj.context_click(webelement).perform()
-                        log.debug('Performed Right click')
+                        local_uo.log.debug('Performed Right click')
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
         except Exception as e:
@@ -635,8 +637,10 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        driver = browser_Keywords.local_bk.driver_obj
         bk_obj=browser_Keywords.BrowserKeywords()
+        browser_Keywords.local_bk.driver_obj = driver
         try:
             input=input[0]
             try:
@@ -645,28 +649,28 @@ class UtilWebKeywords:
                 to_window = -1
             if not(input is None or input is '' or to_window <0):
                 logger.print_on_console(INPUT_IS+input)
-                log.info('Switching to the window ')
-                log.info(to_window)
+                local_uo.log.info('Switching to the window ')
+                local_uo.log.info(to_window)
                 bk_obj.update_window_handles()
                 window_handles=self.__get_window_handles()
                 ## Issue #190 Driver control won't switch back to parent window
                 if to_window>len(window_handles):
                     err_msg='Window '+input+' not found'
                     logger.print_on_console(err_msg)
-                    log.error(err_msg)
+                    local_uo.log.error(err_msg)
                 else:
-                    log.info('The available window handles are ')
-                    log.info(window_handles)
-                    cur_handle=browser_Keywords.driver_obj.current_window_handle
+                    local_uo.log.info('The available window handles are ')
+                    local_uo.log.info(window_handles)
+                    cur_handle=browser_Keywords.local_bk.driver_obj.current_window_handle
                     from_window=-1
                     if cur_handle in window_handles:
                         from_window=window_handles.index(cur_handle)+1
-                        log.info('Switching from the window')
-                        log.info(from_window)
+                        local_uo.log.info('Switching from the window')
+                        local_uo.log.info(from_window)
                     if from_window>-1:
-                        browser_Keywords.driver_obj.switch_to.window(window_handles[to_window-1])
+                        browser_Keywords.local_bk.driver_obj.switch_to.window(window_handles[to_window-1])
                         bk_obj.update_recent_handle(window_handles[to_window-1])
-                        logger.print_on_console('Switched to window handle'+browser_Keywords.driver_obj.current_window_handle)
+                        logger.print_on_console('Switched to window handle'+str(browser_Keywords.local_bk.driver_obj.current_window_handle))
                         logger.print_on_console('Control switched from window ' + str(from_window)
     							+ " to window " + str(to_window))
                         status=TEST_RESULT_PASS
@@ -674,15 +678,15 @@ class UtilWebKeywords:
                     else:
                         err_msg='Current window handle not found'
                         logger.print_on_console(err_msg)
-                        log.error(err_msg)
+                        local_uo.log.error(err_msg)
             elif (input is None or input is ''):
                 window_handles=self.__get_window_handles()
-                log.info('Current window handles are ')
-                log.info(window_handles)
-                log.debug(len(window_handles))
+                local_uo.log.info('Current window handles are ')
+                local_uo.log.info(window_handles)
+                local_uo.log.debug(len(window_handles))
                 if len(window_handles)>0:
                     total_handles=len(window_handles)
-                    browser_Keywords.driver_obj.switch_to.window(window_handles[total_handles-1])
+                    browser_Keywords.local_bk.driver_obj.switch_to.window(window_handles[total_handles-1])
                     ## Issue #190 Driver control won't switch back to parent window
                     bk_obj.update_recent_handle(window_handles[total_handles-1])
                     logger.print_on_console('Control switched to latest window')
@@ -691,20 +695,20 @@ class UtilWebKeywords:
             else:
                 logger.print_on_console(INVALID_INPUT)
                 err_msg=INVALID_INPUT
-                log.error(INVALID_INPUT)
+                local_uo.log.error(INVALID_INPUT)
         except Exception as e:
             etype=type(e)
             err_msg=self.__web_driver_exception(e)
-            log.info('Inside Exception block')
+            local_uo.log.info('Inside Exception block')
             try:
                 if isinstance(etype,NoSuchWindowException):
                     window_handles=self.__get_window_handles()
-                    log.info('Current window handles are ')
-                    log.info(window_handles)
-                    log.debug(len(window_handles))
+                    local_uo.log.info('Current window handles are ')
+                    local_uo.log.info(window_handles)
+                    local_uo.log.debug(len(window_handles))
                     if len(window_handles)>0:
                         total_handles=len(window_handles)
-                        browser_Keywords.driver_obj.switch_to.window(window_handles[total_handles-1])
+                        browser_Keywords.local_bk.driver_obj.switch_to.window(window_handles[total_handles-1])
                         ## Issue #190 Driver control won't switch back to parent window
                         bk_obj.update_recent_handle(window_handles[total_handles-1])
                         status=TEST_RESULT_PASS
@@ -712,7 +716,7 @@ class UtilWebKeywords:
                     else:
                         err_msg='No handles found'
                         logger.print_on_console(err_msg)
-                        log.error(err_msg)
+                        local_uo.log.error(err_msg)
             except Exception as e:
                 etype=type(e)
                 err_msg=self.__web_driver_exception(e)
@@ -723,11 +727,11 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement !=None:
-                log.info(INPUT_IS)
-                log.info(input)
+                local_uo.log.info(INPUT_IS)
+                local_uo.log.info(input)
                 if not(input is None):
                     row_num=int(input[0])-1
                     col_num=int(input[1])-1
@@ -737,32 +741,32 @@ class UtilWebKeywords:
                     element_list=cell.find_elements_by_xpath('.//*')
                     if len(list(element_list))>0:
                         xpath=tableops.getElemntXpath(element_list[0])
-                        cell=browser_Keywords.driver_obj.find_element_by_xpath(xpath)
+                        cell=browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
 
                     if(cell!=None):
-                        log.debug('checking for element enabled')
+                        local_uo.log.debug('checking for element enabled')
                         webelement=cell
                         if cell.is_enabled():
                             ele_coordinates=cell.location
                             logger.print_on_console(ele_coordinates)
                             hwnd=win32gui.GetForegroundWindow()
-                            log.debug('Handle found ')
-                            log.debug(hwnd)
-                            if isinstance(browser_Keywords.driver_obj,webdriver.Firefox):
+                            local_uo.log.debug('Handle found ')
+                            local_uo.log.debug(hwnd)
+                            if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                                 info_msg='Firefox browser'
-                                log.info(info_msg)
+                                local_uo.log.info(info_msg)
                                 logger.print_on_console(info_msg)
                                 javascript = "return window.mozInnerScreenY"
-                                value=browser_Keywords.driver_obj.execute_script(javascript)
+                                value=browser_Keywords.local_bk.driver_obj.execute_script(javascript)
                                 logger.print_on_console(value)
                                 offset=int(value)
                                 robot=pyrobot.Robot()
                                 robot.set_mouse_pos(int(ele_coordinates.get('x')+9),int(ele_coordinates.get('y')+offset-5))
-                                log.debug('Setting the mouse position')
+                                local_uo.log.debug('Setting the mouse position')
                                 robot.mouse_down('left')
-                                log.debug('Mouse click performed')
+                                local_uo.log.debug('Mouse click performed')
                                 robot.mouse_up('left')
-                                log.debug('Mouse release performed')
+                                local_uo.log.debug('Mouse release performed')
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
 
@@ -772,7 +776,7 @@ class UtilWebKeywords:
                                 logger.print_on_console("UTIL WIND")
                                 rect=utils.rect
                                 robot=pyrobot.Robot()
-                                log.debug('Setting the mouse position')
+                                local_uo.log.debug('Setting the mouse position')
                                 logger.print_on_console('before loc')
                                 location=utils.get_element_location(webelement)
                                 logger.print_on_console(location)
@@ -795,21 +799,21 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             from PIL import Image
             if webelement!=None and webelement !='':
                 img_src = webelement.get_attribute("src")
                 file1 = io.StringIO(urllib.request.urlopen(img_src).read())
                 file2=input[0]
-                log.info(INPUT_IS)
-                log.info(file2)
+                local_uo.log.info(INPUT_IS)
+                local_uo.log.info(file2)
                 if file1 != None and file2 != None and  file2 != '' and os.path.exists(file2) :
-                    log.debug('comparing the images')
+                    local_uo.log.debug('comparing the images')
                     if self.verify_image_obj != None: #Meaning user has advanced image processing plugin
                         if self.verify_image_obj.imagecomparison(file1,file2):
                             info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
-                            log.info(info_msg)
+                            local_uo.log.info(info_msg)
                             logger.print_on_console(info_msg)
                             methodoutput=TEST_RESULT_TRUE
                             status=TEST_RESULT_PASS
@@ -829,7 +833,7 @@ class UtilWebKeywords:
                             err /= float(imageA.shape[0] * imageA.shape[1])
                             if(err<1000):
                                 info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
-                                log.info(info_msg)
+                                local_uo.log.info(info_msg)
                                 logger.print_on_console(info_msg)
                                 methodoutput=TEST_RESULT_TRUE
                                 status=TEST_RESULT_PASS
@@ -841,7 +845,7 @@ class UtilWebKeywords:
                 err_msg='Web element not found'
             if err_msg != None:
                 logger.print_on_console(err_msg)
-                log.error(err_msg)
+                local_uo.log.error(err_msg)
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
@@ -851,21 +855,21 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             from PIL import Image
             if webelement!=None and webelement !='':
                 img_src = webelement.get_attribute("src")
                 file1 = io.StringIO(urllib.request.urlopen(img_src).read())
                 file2=input[0]
-                log.info(INPUT_IS)
-                log.info(file2)
+                local_uo.log.info(INPUT_IS)
+                local_uo.log.info(file2)
                 if file1 != None and file2 != None and  file2 != '' and os.path.exists(file2) :
-                    log.debug('comparing the images')
+                    local_uo.log.debug('comparing the images')
                     if self.verify_image_obj != None: #Meaning user has advanced image processing plugin
                         if self.verify_image_obj.imagecomparison(file1,file2):
                             info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
-                            log.info(info_msg)
+                            local_uo.log.info(info_msg)
                             logger.print_on_console(info_msg)
                             methodoutput=TEST_RESULT_TRUE
                             status=TEST_RESULT_PASS
@@ -890,15 +894,15 @@ class UtilWebKeywords:
                             logger.print_on_console("Image similarity percentage is: "+str((1-err)*100)+"%")
                             methodoutput=TEST_RESULT_TRUE
                             status=TEST_RESULT_PASS
-                            log.info('Result is ',output)
+                            local_uo.log.info('Result is ',output)
                             logger.print_on_console('Result is ',output)
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
                 if err_msg != None:
                     logger.print_on_console(err_msg)
-                    log.error(err_msg)
+                    local_uo.log.error(err_msg)
         except Exception as e:
-            log.error(e)
+            local_uo.log.error(e)
             logger.print_on_console(e)
             err_msg=INPUT_ERROR
         return status,methodoutput,output,err_msg
@@ -908,28 +912,28 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output=OUTPUT_CONSTANT
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
                 if webelement.is_enabled():
-                    log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
+                    local_uo.log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
                     output = str(webelement.tag_name)
-                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                    local_uo.log.info(STATUS_METHODOUTPUT_UPDATE)
                     logger.print_on_console('Result: ',output)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    log.error(ERR_DISABLED_OBJECT)
+                    local_uo.log.error(ERR_DISABLED_OBJECT)
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
                     logger.print_on_console(ERR_DISABLED_OBJECT)
             except Exception as e:
                  err_msg=self.__web_driver_exception(e)
-        log.info(RETURN_RESULT)
+        local_uo.log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
     def __get_window_handles(self):
     	## Issue #190 Driver control won't switch back to parent window
-        window_handles=browser_Keywords.all_handles
+        window_handles=browser_Keywords.local_bk.all_handles
         logger.print_on_console('Window handles size '+str(len(window_handles)))
         return window_handles
 

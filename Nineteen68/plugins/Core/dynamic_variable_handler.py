@@ -15,20 +15,24 @@ from collections import OrderedDict
 from constants import *
 import re
 import core_utils
-dynamic_variable_map=OrderedDict()
+##dynamic_variable_map=OrderedDict()
 import logging
 log = logging.getLogger('dynamic_variable_handler.py')
 import ast
+import threading
+local_dynamic = threading.local()
 
 class DynamicVariables:
+    def __init__(self):
+        local_dynamic.dynamic_variable_map=OrderedDict()
 
 	#TO ftech the value form Data base
     def getDBdata(self,inp_value,con_obj):
         res=False
         dyn_value=None
         variable=re.findall("\{(.*?)\[",inp_value)
-        if len(variable)>0 and variable[0] != '' and DB_VAR in dynamic_variable_map:
-            dbvalue=dynamic_variable_map[DB_VAR]
+        if len(variable)>0 and variable[0] != '' and DB_VAR in local_dynamic.dynamic_variable_map:
+            dbvalue=local_dynamic.dynamic_variable_map[DB_VAR]
             temp_dbvalue=re.findall("\{(.*?)\[",dbvalue[-1])
             #To Fix issue with displaying/Fetching of Databse values
             if len(temp_dbvalue)==0:
@@ -87,8 +91,8 @@ class DynamicVariables:
         if len(value)>0 and not(isinstance(value[0],list)):
             variable=variable[0:len(variable)-1]
             for i in range(len(value)):
-                dynamic_variable_map[variable+'['+str(i)+']}']=value[i]
-            dynamic_variable_map[variable+'}'] = value
+                local_dynamic.dynamic_variable_map[variable+'['+str(i)+']}']=value[i]
+            local_dynamic.dynamic_variable_map[variable+'}'] = value
 
         else:
             variable=variable[0:len(variable)-1]
@@ -96,8 +100,8 @@ class DynamicVariables:
                 p=i+1
                 for j in range(len(value[i])):
                     q=j+1
-                    dynamic_variable_map[variable+'['+str(p)+']['+str(q)+']}']=value[i][j]
-            dynamic_variable_map[variable+'}'] = value
+                    local_dynamic.dynamic_variable_map[variable+'['+str(p)+']['+str(q)+']}']=value[i][j]
+            local_dynamic.dynamic_variable_map[variable+'}'] = value
 
 
      #To Store the output from keyword as an array if it is single value
@@ -108,9 +112,9 @@ class DynamicVariables:
                     self.store_as_array(output_var,output_value)
                 else:
                     output_value.append(output_var)
-                    dynamic_variable_map[DB_VAR]=output_value
+                    local_dynamic.dynamic_variable_map[DB_VAR]=output_value
             else:
-                dynamic_variable_map[output_var]=output_value
+                local_dynamic.dynamic_variable_map[output_var]=output_value
 
 
 
@@ -148,8 +152,8 @@ class DynamicVariables:
         #returns the value of the dynamic variable if it exists otherwise returns None
 
         value=None
-        if variable in dynamic_variable_map:
-            value=dynamic_variable_map.get(variable)
+        if variable in local_dynamic.dynamic_variable_map:
+            value=local_dynamic.dynamic_variable_map.get(variable)
         return value
 
      #To Check if the given pattern of the variable matches '{a[{b}]}'
@@ -175,8 +179,8 @@ class DynamicVariables:
                 #Check if the nested variable is again a dynamic variable or actual value
                 replacestring=nested_variable[i]
                 if self.check_for_dynamicvariables(nested_variable[i])==TEST_RESULT_TRUE:
-                    if nested_variable[i] in dynamic_variable_map:
-                        replacestring = dynamic_variable_map.get(nested_variable[i])
+                    if nested_variable[i] in local_dynamic.dynamic_variable_map:
+                        replacestring = local_dynamic.dynamic_variable_map.get(nested_variable[i])
                 if not isinstance(replacestring,str):
                     replacestring = str(replacestring)
                 inputvar = inputvar.replace(nested_variable[i],replacestring)

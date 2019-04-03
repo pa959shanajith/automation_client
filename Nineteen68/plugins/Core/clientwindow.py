@@ -180,7 +180,7 @@ class MainNamespace(BaseNamespace):
                 wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode)
             else:
                 obj = handler.Handler()
-                suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path=obj.parse_json_execute(args[0])
+                suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path,exec_mode=obj.parse_json_execute(args[0])
                 data = {'scenario_ids':scenarioIds,'execution_id':execution_id,'time':str(datetime.now())}
                 emsg='Execution already in progress. Skipping current request.'
                 log.warn(emsg)
@@ -757,7 +757,7 @@ class TestThread(threading.Thread):
             self.wxObject.breakpoint.Enable()
             self.wxObject.cancelbutton.Enable()
             self.wxObject.terminatebutton.Disable()
-            testcasename = handler.testcasename
+            testcasename = handler.local_handler.testcasename
             if self.action==DEBUG:
                 self.wxObject.killChildWindow(debug=True)
                 if (len(testcasename) > 0 or apptype.lower() not in plugins_list):

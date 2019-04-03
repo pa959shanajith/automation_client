@@ -29,6 +29,8 @@ import word_operations
 import dynamic_variable
 import constants
 import logging
+import threading
+local_generic = threading.local()
 log = logging.getLogger("generic_dispatcher.py")
 
 class GenericKeywordDispatcher:
@@ -48,11 +50,12 @@ class GenericKeywordDispatcher:
     xml_oper = xml_operations.XMLOperations()
     json_oper = xml_operations.JSONOperations()
     util_operation_obj=util_operations.UtilOperations()
-    dyn_var_obj=dynamic_variable.DynamicVariables()
+##    dyn_var_obj=dynamic_variable.DynamicVariables()
 
 
     def __init__(self):
         self.action=None
+        local_generic.dyn_var_obj=dynamic_variable.DynamicVariables()
 	#Call to fetch data in database keywords
     def fetch_data(self,input):
         output=None
@@ -143,10 +146,10 @@ class GenericKeywordDispatcher:
                   'verifyfileimages':self.util_operation_obj.verify_file_images,
                   'imagesimilaritypercentage':self.util_operation_obj.image_similarity_percentage,
                   'stop':self.util_operation_obj.stop,
-                  'createdynvariable':self.dyn_var_obj.create_dynamic_variable,
-                  'copyvalue':self.dyn_var_obj.copy_value,
-                  'modifyvalue':self.dyn_var_obj.modify_value,
-                  'deletedynvariable':self.dyn_var_obj.delete_dyn_value,
+                  'createdynvariable':local_generic.dyn_var_obj.create_dynamic_variable,
+                  'copyvalue':local_generic.dyn_var_obj.copy_value,
+                  'modifyvalue':local_generic.dyn_var_obj.modify_value,
+                  'deletedynvariable':local_generic.dyn_var_obj.delete_dyn_value,
                   'displayvariablevalue':self.generic_delay.display_variable_value,
                   'verifyvalues':self.util_operation_obj.verify_values,
                   'getindexcount':self.util_operation_obj.getIndexCount,

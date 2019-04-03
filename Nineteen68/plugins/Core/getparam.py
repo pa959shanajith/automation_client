@@ -417,7 +417,7 @@ class GetParam():
 
         if data is None:
             return None
-        teststepproperty =handler.tspList[paramindex]
+        teststepproperty =handler.local_handler.tspList[paramindex]
         inputval = teststepproperty.inputval
         inputlistwithval = (list)( inputval)
         global statCnt
@@ -447,7 +447,7 @@ class GetParam():
                                     inputresult= int(inputresult)
                             temp=STATIC_DV_NAME[:9]+str(statCnt)+STATIC_DV_NAME[9:]
                             statCnt+=1
-                            dynamic_variable_handler.dynamic_variable_map[temp]=inputresult
+                            dynamic_variable_handler.local_dynamic.dynamic_variable_map[temp]=inputresult
                         resultinput = resultinput.replace(var,temp)
                     inputlistwithval.insert(i,resultinput)
                 else:
@@ -478,7 +478,7 @@ class GetParam():
                                             inputresult = int(inputresult)
                                     temp=STATIC_DV_NAME[:9]+str(statCnt)+STATIC_DV_NAME[9:]
                                     statCnt+=1
-                                    dynamic_variable_handler.dynamic_variable_map[temp]=inputresult
+                                    dynamic_variable_handler.local_dynamic.dynamic_variable_map[temp]=inputresult
                                 resultinput = resultinput.replace(variable,temp)
                                 inputlistwithval.insert(i,resultinput)
         except Exception as e:
@@ -666,8 +666,8 @@ class GetParam():
                             if self.name.lower()==GETPARAM:
                                 inputval = self.inputval[0]
                                 paramindex = self.index+2
-                                if handler.tspList[self.index+1].name.lower()==STARTLOOP:
-                                    handler.tspList[self.index+1].executed=True
+                                if handler.local_handler.tspList[self.index+1].name.lower()==STARTLOOP:
+                                    handler.local_handler.tspList[self.index+1].executed=True
                                 if (inputval != None):
                                     log.info(  '***Data Param: Iteration '+ str(k) +  ' started***')
                                     logger.print_on_console(  '***Data Param: Iteration ',k, ' started***')
@@ -715,8 +715,8 @@ class GetParam():
                         if self.name.lower()==GETPARAM:
                             inputval = self.inputval[0]
                             paramindex = self.index+2
-                            if handler.tspList[self.index+1].name.lower()==STARTLOOP:
-                                handler.tspList[self.index+1].executed=True
+                            if handler.local_handler.tspList[self.index+1].name.lower()==STARTLOOP:
+                                handler.local_handler.tspList[self.index+1].executed=True
                             if (inputval != None):
                                 log.info( '***Data Param: Iteration '+str(k)+ ' started***')
                                 logger.print_on_console( '***Data Param: Iteration ',k, ' started***')
@@ -765,8 +765,8 @@ class GetParam():
                         if self.name.lower()==GETPARAM:
                             inputval = self.inputval[0]
                             paramindex = self.index+2
-                            if handler.tspList[self.index+1].name.lower()==STARTLOOP:
-                                handler.tspList[self.index+1].executed=True
+                            if handler.local_handler.tspList[self.index+1].name.lower()==STARTLOOP:
+                                handler.local_handler.tspList[self.index+1].executed=True
                             if (inputval != None):
                                 log.info( '***Data Param: Iteration '+str(k)+ ' started***')
                                 logger.print_on_console( '***Data Param: Iteration ',k, ' started***')
