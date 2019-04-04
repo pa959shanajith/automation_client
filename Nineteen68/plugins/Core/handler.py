@@ -705,4 +705,4 @@ class Handler():
             	##        dynamic_variable_handler.dynamic_variable_map.clear()
     def clear_dyn_variables(self):
         import dynamic_variable_handler
-        dynamic_variable_handler.dynamic_variable_map.clear()
+        dynamic_variable_handler.local_dynamic.dynamic_variable_map.clear()
