@@ -206,7 +206,7 @@ class DesktopDispatcher:
                     'selectrow':self.table_keywords_obj.select_row,
                     'clickcell':self.table_keywords_obj.click_cell,
                     'doubleclickcell':self.table_keywords_obj.double_click_cell,
-                    'vaerifycellvalue':self.table_keywords_obj.verify_cell_value
+                    'verifycellvalue':self.table_keywords_obj.verify_cell_value
                 }
             if(iris_flag):
                 import iris_operations

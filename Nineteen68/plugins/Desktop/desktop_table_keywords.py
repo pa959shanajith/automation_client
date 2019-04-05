@@ -32,7 +32,7 @@ class Table_Keywords():
                 indexi=int(input_val[0])
                 indexj=int(input_val[1])
                 const=0
-                if(element.friendly_class_name()=='Table' and element.texts()[0].encode('utf-8')=='DataGridView'):
+                if(element.friendly_class_name()=='Table' and element.texts()[0]=='DataGridView'):
                     log.info('Valid row and col number')
                     c=element.children()
                     for i in range(0,len(c)):
@@ -44,7 +44,7 @@ class Table_Keywords():
                         dicttab={}
                         for j in range(len(a)):
                             key=j+1
-                            value=a[j].legacy_properties()['Value'].encode('utf-8')
+                            value=a[j].legacy_properties()['Value']
                             dicttab[key]=value
                         dictq[i-const]=dicttab
                     status = desktop_constants.TEST_RESULT_PASS
@@ -88,7 +88,7 @@ class Table_Keywords():
         verb = OUTPUT_CONSTANT
         err_msg=None
         try:
-            if(element.friendly_class_name()=='Table' and element.texts()[0].encode('utf-8')=='DataGridView'):
+            if(element.friendly_class_name()=='Table' and element.texts()[0]=='DataGridView'):
                 c=element.children()
                 const=0
                 for i in range(0,len(c)):
@@ -114,7 +114,7 @@ class Table_Keywords():
         verb = OUTPUT_CONSTANT
         err_msg=None
         try:
-            if(element.friendly_class_name()=='Table' and element.texts()[0].encode('utf-8')=='DataGridView'):
+            if(element.friendly_class_name()=='Table' and element.texts()[0]=='DataGridView'):
                 c=element.children()
                 log.info('Number of rows is',len(c[1].children()))
                 status = desktop_constants.TEST_RESULT_PASS
@@ -138,7 +138,7 @@ class Table_Keywords():
         try:
             if(len(input_val)>=1):
                 index=int(input_val[0])
-                if(element.friendly_class_name()=='Table' and element.texts()[0].encode('utf-8')=='DataGridView'):
+                if(element.friendly_class_name()=='Table' and element.texts()[0]=='DataGridView'):
                     log.info('Valid row number')
                     c=element.children()
                     const=0
@@ -170,7 +170,7 @@ class Table_Keywords():
                 valuei=str(input_val[0])
                 const=0
                 flag=0
-                if(element.friendly_class_name()=='Table' and element.texts()[0].encode('utf-8')=='DataGridView'):
+                if(element.friendly_class_name()=='Table' and element.texts()[0]=='DataGridView'):
                     log.info('Valid row number')
                     c=element.children()
                     for i in range(0,len(c)):
@@ -182,22 +182,25 @@ class Table_Keywords():
                         dicttab={}
                         for j in range(len(a)):
                             key=j+1
-                            value=a[j].legacy_properties()['Value'].encode('utf-8')
+                            value=a[j].legacy_properties()['Value']
                             dicttab[key]=value
                         dictq[i-const]=dicttab
+                    newkey=[]
                     for key1 in list(dictq.keys()):
                         for k,v in list(dictq[key1].items()):
                             if v==valuei:
-                                key=key1
+                                newkey.append(key1)
                                 flag+=1
                     if flag==1:
-                        verb=key
+                        verb=newkey[0]
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
-                        log.info('Value is found in row number',key)
-                    else:
-                        logger.print_on_console('Multiple rows or columns have same text')
-                        log.info('Multiple rows or columns have same text')
+                        log.info('Value is found in row number',verb)
+                    elif flag>1:
+                        verb=newkey
+                        status = desktop_constants.TEST_RESULT_PASS
+                        result = desktop_constants.TEST_RESULT_TRUE
+                        log.info('Values are found in row numbers : ',verb)
             else:
                 log.info('Unable to select row')
                 err_msg='Unable to select row'
@@ -205,7 +208,6 @@ class Table_Keywords():
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-
         return status,result,verb,err_msg
 
     def get_col_num_by_text(self,element,parent,input_val,*args):
@@ -219,7 +221,7 @@ class Table_Keywords():
                 valuei=str(input_val[0])
                 const=0
                 flag=0
-                if(element.friendly_class_name()=='Table' and element.texts()[0].encode('utf-8')=='DataGridView'):
+                if(element.friendly_class_name()=='Table' and element.texts()[0]=='DataGridView'):
                     log.info('Valid row number')
                     c=element.children()
                     for i in range(0,len(c)):
@@ -231,22 +233,25 @@ class Table_Keywords():
                         dicttab={}
                         for j in range(len(a)):
                             key=j+1
-                            value=a[j].legacy_properties()['Value'].encode('utf-8')
+                            value=a[j].legacy_properties()['Value']
                             dicttab[key]=value
                         dictq[i-const]=dicttab
+                    newkey=[]
                     for key1 in list(dictq.keys()):
                         for k,v in list(dictq[key1].items()):
                             if v==valuei:
-                                key=k
+                                newkey.append(k)
                                 flag+=1
                     if flag==1:
-                        verb=key
+                        verb=newkey[0]
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
-                        log.info('Value is found in row number',key)
-                    else:
-                        logger.print_on_console('Multiple rows or columns have same text')
-                        log.info('Multiple rows or columns have same text')
+                        log.info('Value is found in column number',key)
+                    elif flag>1:
+                        verb=newkey
+                        status = desktop_constants.TEST_RESULT_PASS
+                        result = desktop_constants.TEST_RESULT_TRUE
+                        log.info('Values are found in column numbers : ',verb)
             else:
                 log.info('Unable to select col')
                 err_msg='Unable to select col'
@@ -269,7 +274,7 @@ class Table_Keywords():
                 indexj=int(input_val[1])
                 valuei=str(input_val[2])
                 const=0
-                if(element.friendly_class_name()=='Table' and element.texts()[0].encode('utf-8')=='DataGridView'):
+                if(element.friendly_class_name()=='Table' and element.texts()[0]=='DataGridView'):
                     log.info('Valid row number')
                     c=element.children()
                     for i in range(0,len(c)):
@@ -281,10 +286,10 @@ class Table_Keywords():
                         dicttab={}
                         for j in range(len(a)):
                             key=j+1
-                            value=a[j].legacy_properties()['Value'].encode('utf-8')
+                            value=a[j].legacy_properties()['Value']
                             dicttab[key]=value
                         dictq[i-const]=dicttab
-                    if dictq[indexi][indexj]==valuei:
+                    if (dictq[indexi][indexj]==valuei):
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                         log.info('Returning value in row ',indexi,' col ',indexj,' value ',valuei)
@@ -328,7 +333,7 @@ class Table_Keywords():
             if(len(input_val)>=2):
                 indexi=int(input_val[0])
                 indexj=int(input_val[1])
-                if(element.friendly_class_name()=='Table' and element.texts()[0].encode('utf-8')=='DataGridView'):
+                if(element.friendly_class_name()=='Table' and element.texts()[0]=='DataGridView'):
                     log.info('Valid row number')
                     c=element.children()
                     const=0
@@ -347,7 +352,6 @@ class Table_Keywords():
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-
         return status,result,verb,err_msg
 
     def double_click_cell(self,element,parent,input_val,*args):
@@ -359,7 +363,7 @@ class Table_Keywords():
             if(len(input_val)>=2):
                 indexi=int(input_val[0])
                 indexj=int(input_val[1])
-                if(element.friendly_class_name()=='Table' and element.texts()[0].encode('utf-8')=='DataGridView'):
+                if(element.friendly_class_name()=='Table' and element.texts()[0]=='DataGridView'):
                     log.info('Valid row number')
                     c=element.children()
                     const=0
@@ -378,5 +382,4 @@ class Table_Keywords():
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-
         return status,result,verb,err_msg
