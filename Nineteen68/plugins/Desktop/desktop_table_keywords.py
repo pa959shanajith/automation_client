@@ -31,26 +31,30 @@ class Table_Keywords():
             if(len(input_val)>=2):
                 indexi=int(input_val[0])
                 indexj=int(input_val[1])
-                const=0
-                if(element.friendly_class_name()=='Table' and element.texts()[0]=='DataGridView'):
-                    log.info('Valid row and col number')
-                    c=element.children()
-                    for i in range(0,len(c)):
-                        if c[i].friendly_class_name().lower() == "scrollbar":
-                            const+=1
-                    b=c[1].children()
-                    for i in range(const+1,len(c)):
-                        a=c[i].children()
-                        dicttab={}
-                        for j in range(len(a)):
-                            key=j+1
-                            value=a[j].legacy_properties()['Value']
-                            dicttab[key]=value
-                        dictq[i-const]=dicttab
-                    status = desktop_constants.TEST_RESULT_PASS
-                    result = desktop_constants.TEST_RESULT_TRUE
-                    verb=dictq[indexi][indexj]
-                    log.info('Returning value in row ',indexi,' col ',indexj)
+                #get row and col count
+                col=self.get_col_count(element,'','','')
+                row=self.get_row_count(element,'','','')
+                if (row[2]>=indexi>0  and col[2]>=indexj>0):
+                    const=0
+                    if(element.friendly_class_name()=='Table' and element.texts()[0]=='DataGridView'):
+                        log.info('Valid row and col number')
+                        c=element.children()
+                        for i in range(0,len(c)):
+                            if c[i].friendly_class_name().lower() == "scrollbar":
+                                const+=1
+                        b=c[1].children()
+                        for i in range(const+1,len(c)):
+                            a=c[i].children()
+                            dicttab={}
+                            for j in range(len(a)):
+                                key=j+1
+                                value=a[j].legacy_properties()['Value']
+                                dicttab[key]=value
+                            dictq[i-const]=dicttab
+                        verb=dictq[indexi][indexj]
+                        status = desktop_constants.TEST_RESULT_PASS
+                        result = desktop_constants.TEST_RESULT_TRUE
+                        log.info('Returning value in row ',indexi,' col ',indexj)
                 else:
                     log.info('Invalid row or col number')
                     err_msg='Invalid row or col number'
@@ -79,7 +83,7 @@ class Table_Keywords():
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-
+            err_msg=desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
     def get_row_count(self,element,parent,input_val,*args):
@@ -105,7 +109,7 @@ class Table_Keywords():
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-
+            err_msg=desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
     def get_col_count(self,element,parent,input_val,*args):
@@ -127,7 +131,7 @@ class Table_Keywords():
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-
+            err_msg=desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
     def select_row(self,element,parent,input_val,*args):
@@ -156,7 +160,7 @@ class Table_Keywords():
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-
+            err_msg=desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
     def get_row_num_by_text(self,element,parent,input_val,*args):
@@ -208,6 +212,7 @@ class Table_Keywords():
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
+            err_msg=desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
     def get_col_num_by_text(self,element,parent,input_val,*args):
@@ -259,7 +264,7 @@ class Table_Keywords():
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-
+            err_msg=desktop_constants.ERROR_MSG
         return status,result,verb,err_msg
 
     def verify_cell_value(self, element, parent, input_val, *args):
@@ -319,6 +324,7 @@ class Table_Keywords():
                 err_msg='Invalid row or col number'
                 logger.print_on_console('Invalid row or col number')
         except Exception as e:
+            err_msg=desktop_constants.ERROR_MSG
             log.error(e)
             logger.print_on_console(e)
 
@@ -350,6 +356,7 @@ class Table_Keywords():
                 err_msg='Unable to select row'
                 logger.print_on_console('Unable to select row')
         except Exception as e:
+            err_msg=desktop_constants.ERROR_MSG
             log.error(e)
             logger.print_on_console(e)
         return status,result,verb,err_msg
@@ -380,6 +387,7 @@ class Table_Keywords():
                 err_msg='Unable to select row'
                 logger.print_on_console('Unable to select row')
         except Exception as e:
+            err_msg=desktop_constants.ERROR_MSG
             log.error(e)
             logger.print_on_console(e)
         return status,result,verb,err_msg
