@@ -7,6 +7,7 @@ from Var import VarInfo
 import Check
 import logging
 log = logging.getLogger('ObjectExtraction.py')
+sys.setrecursionlimit(15000)
 
 def main(root,data,filePath):
 	try:
@@ -100,7 +101,7 @@ def castExpressionExtraction(root):
 	return
 
 def catchStatementExtraction(root):
-	for i in xrange(0,root.total_child()):
+	for i in range(0,root.total_child()):
 		line = (root.child[i]).get_value()[0]
 		if re.match("FormalParameter",line):
 			formalParameterExtraction(root.child[i])
@@ -784,7 +785,7 @@ def typeArgumentExtraction(root):
 		line = root.child[i].get_value()[0]
 		if re.match("ReferenceType",line):
 			value = referenceTypeExtraction(root.child[i])
-			value = value.keys()[0]
+			value = list(value.keys())[0]
 	return value
 
 def typeArgumentsExtraction(root):
@@ -834,7 +835,7 @@ def typeVariableExtraction(root):
 			return {(root.child[i].get_value())[1]:""}
 
 def unaryExpressionNotPlusMinusExtraction(root):
-	for i in xrange(0,root.total_child()):
+	for i in range(0,root.total_child()):
 		line = root.child[i].get_value()[0]
 		if re.match("PrimaryExpression",line):
 			primaryExpressionExtraction(root.child[i])

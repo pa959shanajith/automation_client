@@ -14,6 +14,7 @@ import controller
 import logging
 from datetime import datetime
 log = logging.getLogger('apg.py')
+from constants import *
 Cylomatic_Compelxity={}
 prev_classes = []
 varstorage = None
@@ -31,7 +32,7 @@ class AutomatedPathGenerator:
 
     '''function to open zip file'''
     def open_zip(self, zip_file, java_version):
-        fstart = zip_file.rfind("\\")
+        fstart = zip_file.rfind("/")
         fend = zip_file.rfind(".")
         fname = zip_file[fstart:fend]
         try:
@@ -79,7 +80,7 @@ class AutomatedPathGenerator:
         try:
             lst = os.listdir(folder)
             for filename in lst:
-                filename = folder + "\\" + filename
+                filename = folder + "/" + filename
                 if os.path.isdir(filename):
                     error_flag = self.open_folder(filename, java_version)
                 elif (os.path.isfile(filename) and filename.endswith('.java')):
@@ -92,24 +93,22 @@ class AutomatedPathGenerator:
 
     '''This call will generate the AST Using PMD Parser and store it in ASTTree.txt'''
     def pmdCall(self, version, pathToFile, filename):
-        os.chdir(r'./Lib/site-packages')
-        subprocess.call(['java',
-                         '-classpath',
-                         r'.\flowgraph_lib\*;.',
-                         r'PMD.DD',
-                         str(version),
-                         pathToFile,
-                         filename
-                         ],
-                        shell="false")
+        if SYSTEM_OS=='Darwin':
+            os.chdir(os.environ['NINETEEN68_HOME'] + '/lib/python2.7/site-packages')
+            subprocess.call(['java','-classpath','./flowgraph_lib/*:.','PMD.DD',str(version),pathToFile,filename],shell=False)
+        else:
+            os.chdir(r'./Lib/site-packages')
+            subprocess.call(['java','-classpath',r'.\flowgraph_lib\*;.',r'PMD.DD',str(version),pathToFile,filename],shell="false")
 
     '''function to open file'''
     def open_file(self, filename, java_version):
         flag = True
         try:
             global prev_classes, varstorage
-            filename = filename.replace("/", "\\")
-            name = filename.split('\\')[-1][:-5]
+            if ('/' in filename):
+                name = filename.split('/')[-1][:-5]
+            else:
+                name = filename[filename.rindex('\\')+1:]
             if filename not in self.filenames:
                 if filename.find(".java", len(filename) - 5,
                                  len(filename)) > 0:
@@ -119,7 +118,7 @@ class AutomatedPathGenerator:
                     self.pmdCall(java_version, filename, name)
                 # ASTTree 1st node(CompilationUnit) captured in root if no error is present
                 root = dataStruct.start(name)
-                os.remove(r'./ASTTree' + name + '.txt')
+                os.remove('./ASTTree' + name + '.txt')
                 os.chdir(os.environ["NINETEEN68_HOME"])
                 if root:
                     # ObjectExtract.main will generate the FlowChart Nodes, give the Classes and all Possible Methods
@@ -286,7 +285,7 @@ class AutomatedPathGenerator:
                         i = i + 1
                         f = False
                         while(i <len(self.FlowChart) and self.FlowChart[i]['shape'] == 'Square' and self.FlowChart[i-1]['child'] == [self.FlowChart[i]['id']]
-                        and self.FlowChart[i]['child'] == [self.FlowChart[i]['id']+1]):
+                        and (self.FlowChart[i]['id']+1 in self.FlowChart[i]['child'])):
                             id = self.FlowChart[i]['id']
                             parent = id
                             for fc in self.FlowChart:
@@ -332,8 +331,6 @@ class AutomatedPathGenerator:
             err_msg="Graph generation failed"
             logger.print_on_console(err_msg)
             log.error(e)
-            log.error(log.error(e))
-            logger.print_on_console("Error occured while generate graph.")
 
     def extract_Complexity(self,line):
         name=""
@@ -353,9 +350,14 @@ class AutomatedPathGenerator:
              cdata={'class':'', 'methods':[],'line_no':''}
              if not filepath in Cylomatic_Compelxity:
                  complexity_data={}
-                 subprocess.call(['java','-classpath',r'./Lib/site-packages/flowgraph_lib/Cyclomatic/*','net.sourceforge.pmd.PMD','-d',
+                 if SYSTEM_OS=='Darwin':
+                    file = open('./Output.txt', 'w+')
+                    subprocess.call(['java','-classpath',os.environ['NINETEEN68_HOME']+'/lib/python2.7/site-packages/flowgraph_lib/Cyclomatic/*','net.sourceforge.pmd.PMD','-d',
+                                    str(filepath),'-R','category/java/design.xml/CyclomaticComplexity','-f','text'],shell=False,stdout=file)
+                    file.close()
+                 else:
+                    subprocess.call(['java','-classpath',r'./Lib/site-packages/flowgraph_lib/Cyclomatic/*','net.sourceforge.pmd.PMD','-d',
                                     str(filepath),'-R','category/java/design.xml/CyclomaticComplexity','-f','text','>','Output.txt'],shell="false")
-
                  file= open('./Output.txt','r+')
                  flag_name=''
                  for i in file:
@@ -388,10 +390,14 @@ class AutomatedPathGenerator:
                     cdata['methods']=Cylomatic_Compelxity[filepath][cname+'_methods'] if cname+'_methods' in Cylomatic_Compelxity[filepath] else []
                 else:
                     cdata="Undefined"
-             return cdata
+             sum = 1
+             for s in cdata['methods']:
+                sum = sum + int(s['complexity'])
+             cdata['class'] = str(sum)
         except Exception as e:
             logger.print_on_console("Error occured while calculating complexity")
             log.error(e)
+        return cdata
 
     def open_file_in_editor(self, editor, filepath, linenumber):
         try:

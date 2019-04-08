@@ -1,10 +1,10 @@
 from time import ctime
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
-from reportlab.lib.units import inch,cm
+from reportlab.lib.units import inch
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle,Paragraph, Spacer
-from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER
+from reportlab.lib.enums import TA_LEFT, TA_CENTER
 from cgi import escape
 
 class Report:
