@@ -13,6 +13,7 @@ import random
 import logger
 import generic_constants
 import core_utils
+from unidecode import unidecode
 from constants import SYSTEM_OS
 import subprocess
 if SYSTEM_OS == "Windows":
