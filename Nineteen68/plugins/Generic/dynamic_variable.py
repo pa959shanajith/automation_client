@@ -51,7 +51,7 @@ class DynamicVariables:
                         log.info(variable)
                         log.info('Value : ')
                         log.info(value)
-                        logger.print_on_console('Variable created is ',variable,' = ',value)
+                        logger.print_on_console('Variable created is ',str(variable),' = ',str(value))
 ##                        logger.print_on_console('Variable created is '+str(variable)+'='+str(value))
                     else:
                         err_msg=ERROR_CODE_DICT['ERR_DYNVAR_ALREADY_EXISTS']
@@ -98,8 +98,8 @@ class DynamicVariables:
                         dynamic_variable_handler.local_dynamic.dynamic_variable_map[variable]=value
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
-                        log.debug('Variable modified: Old value ',variable,' = ',oldvalue,' New value ',variable,' = ',value)
-                        logger.print_on_console('Variable modified: Old value ',variable,' = ',oldvalue,' New value ',variable,' = ',value)
+                        log.debug('Variable modified: Old value ',str(variable),' = ',str(oldvalue),' New value ',str(variable),' = ',str(value))
+                        logger.print_on_console('Variable modified: Old value ',str(variable),' = ',str(oldvalue),' New value ',str(variable),' = ',str(value))
 ##                        log.debug('Variable modified: Old value '+str(variable)+'='+str(oldvalue)+'New value '+str(variable)+'='+str(value))
 ##                        logger.print_on_console('Variable modified: Old value '+str(variable)+'='+str(oldvalue)+'New value '+str(variable)+'='+str(value))
                     else:
@@ -135,8 +135,8 @@ class DynamicVariables:
                     dynamic_variable_handler.local_dynamic.dynamic_variable_map[variable]=value
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
-                    log.debug('Variable copied is ',variable,' = ',value)
-                    logger.print_on_console('Variable copied is ',variable,' = ',value)
+                    log.debug('Variable copied is ',str(variable),' = ',str(value))
+                    logger.print_on_console('Variable copied is ',str(variable),' = ',str(value))
 
                     #Fixing issue #123(ALM) check for the variable if it already exists is removed
 ##                    #Check if the variable already exists
@@ -196,8 +196,8 @@ class DynamicVariables:
                         value=dynamic_variable_handler.local_dynamic.dynamic_variable_map.pop(variable)
 ##                        log.debug('Variable deleted is '+str(variable)+'='+str(value))
 ##                        logger.print_on_console('Variable deleted is '+str(variable)+'='+str(value))
-                        log.debug('Variable deleted is ',variable,' = ',value)
-                        logger.print_on_console('Variable deleted is ',variable,' = ',value)
+                        log.debug('Variable deleted is ',str(variable),' = ',str(value))
+                        logger.print_on_console('Variable deleted is ',str(variable),' = ',str(value))
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:

@@ -261,9 +261,9 @@ class UtilOperations:
                         output = str((1-err)*100)
                         logger.print_on_console("Image similarity percentage is: "+str((1-err)*100)+"%")
                         methodoutput=TEST_RESULT_TRUE
-                        status=TEST_RESULT_PASS       
+                        status=TEST_RESULT_PASS
                         log.info('Result is ',output)
-                        logger.print_on_console('Result is ',output)                                         
+                        logger.print_on_console('Result is ',output)
             else:
                 err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
             if err_msg != None:
@@ -313,7 +313,7 @@ class UtilOperations:
         logger.print_on_console('Execution Stopped')
         log.debug('Execution Stopped')
         import handler
-        output=len(handler.tspList)
+        output=len(handler.local_handler.tspList)
         return status,methodoutput,output,err_msg
 
     def getIndexCount(self,variable):

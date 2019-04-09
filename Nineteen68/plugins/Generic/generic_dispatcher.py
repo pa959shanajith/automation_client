@@ -34,33 +34,30 @@ local_generic = threading.local()
 log = logging.getLogger("generic_dispatcher.py")
 
 class GenericKeywordDispatcher:
-    generic_date = date_ops_keywords.DateOperation()
-    generic_string =string_ops_keywords.StringOperation()
-    generic_file=file_operations.FileOperations()
-    genric_folder=folder_operations.FolderOperations()
-    generic_excel=excel_operations.ExcelFile()
-    generic_word=word_operations.WordFile()
-    generic_database =database_keywords.DatabaseOperation()
-    generic_batch=batch_operation_keyword.BatchOperationKeyword()
-    generic_math=math_operation_keywords.NumericStringParser()
-    generic_screenshot=screenshot_keywords.Screenshot()
-    generic_logical=logical_operation_keywords.logical_eval()
-    generic_delay=delay_operations.Delay_keywords()
-    generic_sendkeys=sendfunction_keys.SendFunctionKeys()
-    xml_oper = xml_operations.XMLOperations()
-    json_oper = xml_operations.JSONOperations()
-    util_operation_obj=util_operations.UtilOperations()
-##    dyn_var_obj=dynamic_variable.DynamicVariables()
-
-
     def __init__(self):
         self.action=None
+        local_generic.generic_date = date_ops_keywords.DateOperation()
+        local_generic.generic_string =string_ops_keywords.StringOperation()
+        local_generic.generic_file=file_operations.FileOperations()
+        local_generic.genric_folder=folder_operations.FolderOperations()
+        local_generic.generic_excel=excel_operations.ExcelFile()
+        local_generic.generic_word=word_operations.WordFile()
+        local_generic.generic_database =database_keywords.DatabaseOperation()
+        local_generic.generic_batch=batch_operation_keyword.BatchOperationKeyword()
+        local_generic.generic_math=math_operation_keywords.NumericStringParser()
+        local_generic.generic_screenshot=screenshot_keywords.Screenshot()
+        local_generic.generic_logical=logical_operation_keywords.logical_eval()
+        local_generic.generic_delay=delay_operations.Delay_keywords()
+        local_generic.generic_sendkeys=sendfunction_keys.SendFunctionKeys()
+        local_generic.xml_oper = xml_operations.XMLOperations()
+        local_generic.json_oper = xml_operations.JSONOperations()
+        local_generic.util_operation_obj=util_operations.UtilOperations()
         local_generic.dyn_var_obj=dynamic_variable.DynamicVariables()
 	#Call to fetch data in database keywords
     def fetch_data(self,input):
         output=None
         try:
-            output=self.generic_database.fetchData(input)
+            output=local_generic.generic_database.fetchData(input)
         except Exception as e:
             log.error(e)
         return output
@@ -72,95 +69,95 @@ class GenericKeywordDispatcher:
          err_msg=None
          result=[constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
          try:
-            dict={'tolowercase': self.generic_string.toLowerCase,
-                  'touppercase' : self.generic_string.toUpperCase,
-                  'trim'    : self.generic_string.trim,
-                  'left'     : self.generic_string.left,
-                  'right'  : self.generic_string.right,
-                  'mid' : self.generic_string.mid,
-                  'getstringlength'      : self.generic_string.getStringLength,
-                  'find'      : self.generic_string.find,
-                  'replace':self.generic_string.replace,
-                  'split' : self.generic_string.split,
-                  'concatenate' : self.generic_string.concatenate,
-                  'getsubstring':self.generic_string.getSubString,
-                  'stringgeneration':self.generic_string.stringGeneration,
-                  'savetoclipboard':self.generic_string.save_to_clip_board,
-                  'getfromclipboard':self.generic_string.get_from_clip_board,
-                  'getcurrentdate' : self.generic_date.getCurrentDate,
-                  'getcurrenttime' : self.generic_date.getCurrentTime,
-                  'getcurrentdateandtime': self.generic_date.getCurrentDateAndTime,
-                  'getcurrentday' : self.generic_date.getCurrentDay,
-                  'getcurrentdaydateandtime' : self.generic_date.getCurrentDayDateAndTime,
-                  'datedifference' : self.generic_date.dateDifference,
-                  'dateaddition'    : self.generic_date.dateAddition,
-                  'monthaddition'  :self.generic_date.monthAddition,
-                  'yearaddition' : self.generic_date.yearAddition,
-                  'changedateformat'     : self.generic_date.changeDateFormat,
-                  'datecompare'  : self.generic_date.dateCompare,
-                  'savefile':self.generic_file.save_file,
-                  'createfile':self.generic_file.create_file,
-                  'renamefile':self.generic_file.rename_file,
-                  'deletefile':self.generic_file.delete_file,
-                  'verifyfileexists':self.generic_file.verify_file_exists,
-                  'createfolder':self.genric_folder.create_folder,
-                  'renamefolder':self.genric_folder.rename_folder,
-                  'deletefolder':self.genric_folder.delete_folder,
-                  'verifyfolderexists':self.genric_folder.verify_folder_exists,
-                  'comparecontent':self.generic_file.compare_content,
-                  'replacecontent':self.generic_file.replace_content,
-                  'verifycontent':self.generic_file.verify_content,
-                  'clearfilecontent':self.generic_file.clear_content,
-                  'getlinenumber':self.generic_file.get_line_number,
-                  'getcontent':self.generic_file.get_content,
-                  'writetofile':self.generic_file.write_to_file,
-                  'writetocell':self.generic_excel.write_cell,
-                  'readcell':self.generic_excel.read_cell,
-                  'clearcell':self.generic_excel.clear_cell,
-                  'setexcelpath':self.generic_excel.set_excel_path,
-                  'storeexcelpath':self.generic_excel.set_excel_path,
-                  'clearexcelpath':self.generic_excel.clear_excel_path,
-                  'deleterow':self.generic_excel.delete_row,
-                  'getrowcount':self.generic_excel.get_rowcount,
-                  'getcolumncount':self.generic_excel.get_colcount,
-                  'runquery':self.generic_database.runQuery,
-                  'securerunquery': self.generic_database.secureRunQuery,
-                  'getdata':self.generic_database.getData,
-                  'securegetdata': self.generic_database.secureGetData,
-                  'exportdata':self.generic_database.exportData,
-                  'secureverifydata': self.generic_database.secureVerifyData,
-                  'verifydata':self.generic_database.verifyData,
-                  'secureexportdata': self.generic_database.secureExportData,
-                  'evallogicalexpression':self.generic_logical.eval_expression,
-                  'capturescreenshot':self.generic_screenshot.captureScreenshot,
-                  'executefile':self.generic_batch.executeFile,
-                  'evaluate':self.generic_math.eval,
-                  'wait':self.generic_delay.wait,
-                  'pause':self.generic_delay.pause,
-                  'sendfunctionkeys':self.generic_sendkeys.sendfunction_keys,
-                  'getblockcount' : self.xml_oper.get_block_count,
-                  'gettagvalue' : self.xml_oper.get_tag_value,
-                  'getblockvalue' : self.xml_oper.get_block_value,
-                  'verifyobjects': self.xml_oper.verifyObjects,
-                  'typecast':self.util_operation_obj.type_cast,
-                  'verifyfileimages':self.util_operation_obj.verify_file_images,
-                  'imagesimilaritypercentage':self.util_operation_obj.image_similarity_percentage,
-                  'stop':self.util_operation_obj.stop,
+            dict={'tolowercase': local_generic.generic_string.toLowerCase,
+                  'touppercase' : local_generic.generic_string.toUpperCase,
+                  'trim'    : local_generic.generic_string.trim,
+                  'left'     : local_generic.generic_string.left,
+                  'right'  : local_generic.generic_string.right,
+                  'mid' : local_generic.generic_string.mid,
+                  'getstringlength'      : local_generic.generic_string.getStringLength,
+                  'find'      : local_generic.generic_string.find,
+                  'replace':local_generic.generic_string.replace,
+                  'split' : local_generic.generic_string.split,
+                  'concatenate' : local_generic.generic_string.concatenate,
+                  'getsubstring':local_generic.generic_string.getSubString,
+                  'stringgeneration':local_generic.generic_string.stringGeneration,
+                  'savetoclipboard':local_generic.generic_string.save_to_clip_board,
+                  'getfromclipboard':local_generic.generic_string.get_from_clip_board,
+                  'getcurrentdate' : local_generic.generic_date.getCurrentDate,
+                  'getcurrenttime' : local_generic.generic_date.getCurrentTime,
+                  'getcurrentdateandtime': local_generic.generic_date.getCurrentDateAndTime,
+                  'getcurrentday' : local_generic.generic_date.getCurrentDay,
+                  'getcurrentdaydateandtime' : local_generic.generic_date.getCurrentDayDateAndTime,
+                  'datedifference' : local_generic.generic_date.dateDifference,
+                  'dateaddition'    : local_generic.generic_date.dateAddition,
+                  'monthaddition'  :local_generic.generic_date.monthAddition,
+                  'yearaddition' : local_generic.generic_date.yearAddition,
+                  'changedateformat'     : local_generic.generic_date.changeDateFormat,
+                  'datecompare'  : local_generic.generic_date.dateCompare,
+                  'savefile':local_generic.generic_file.save_file,
+                  'createfile':local_generic.generic_file.create_file,
+                  'renamefile':local_generic.generic_file.rename_file,
+                  'deletefile':local_generic.generic_file.delete_file,
+                  'verifyfileexists':local_generic.generic_file.verify_file_exists,
+                  'createfolder':local_generic.genric_folder.create_folder,
+                  'renamefolder':local_generic.genric_folder.rename_folder,
+                  'deletefolder':local_generic.genric_folder.delete_folder,
+                  'verifyfolderexists':local_generic.genric_folder.verify_folder_exists,
+                  'comparecontent':local_generic.generic_file.compare_content,
+                  'replacecontent':local_generic.generic_file.replace_content,
+                  'verifycontent':local_generic.generic_file.verify_content,
+                  'clearfilecontent':local_generic.generic_file.clear_content,
+                  'getlinenumber':local_generic.generic_file.get_line_number,
+                  'getcontent':local_generic.generic_file.get_content,
+                  'writetofile':local_generic.generic_file.write_to_file,
+                  'writetocell':local_generic.generic_excel.write_cell,
+                  'readcell':local_generic.generic_excel.read_cell,
+                  'clearcell':local_generic.generic_excel.clear_cell,
+                  'setexcelpath':local_generic.generic_excel.set_excel_path,
+                  'storeexcelpath':local_generic.generic_excel.set_excel_path,
+                  'clearexcelpath':local_generic.generic_excel.clear_excel_path,
+                  'deleterow':local_generic.generic_excel.delete_row,
+                  'getrowcount':local_generic.generic_excel.get_rowcount,
+                  'getcolumncount':local_generic.generic_excel.get_colcount,
+                  'runquery':local_generic.generic_database.runQuery,
+                  'securerunquery': local_generic.generic_database.secureRunQuery,
+                  'getdata':local_generic.generic_database.getData,
+                  'securegetdata': local_generic.generic_database.secureGetData,
+                  'exportdata':local_generic.generic_database.exportData,
+                  'secureverifydata': local_generic.generic_database.secureVerifyData,
+                  'verifydata':local_generic.generic_database.verifyData,
+                  'secureexportdata': local_generic.generic_database.secureExportData,
+                  'evallogicalexpression':local_generic.generic_logical.eval_expression,
+                  'capturescreenshot':local_generic.generic_screenshot.captureScreenshot,
+                  'executefile':local_generic.generic_batch.executeFile,
+                  'evaluate':local_generic.generic_math.eval,
+                  'wait':local_generic.generic_delay.wait,
+                  'pause':local_generic.generic_delay.pause,
+                  'sendfunctionkeys':local_generic.generic_sendkeys.sendfunction_keys,
+                  'getblockcount' : local_generic.xml_oper.get_block_count,
+                  'gettagvalue' : local_generic.xml_oper.get_tag_value,
+                  'getblockvalue' : local_generic.xml_oper.get_block_value,
+                  'verifyobjects': local_generic.xml_oper.verifyObjects,
+                  'typecast':local_generic.util_operation_obj.type_cast,
+                  'verifyfileimages':local_generic.util_operation_obj.verify_file_images,
+                  'imagesimilaritypercentage':local_generic.util_operation_obj.image_similarity_percentage,
+                  'stop':local_generic.util_operation_obj.stop,
                   'createdynvariable':local_generic.dyn_var_obj.create_dynamic_variable,
                   'copyvalue':local_generic.dyn_var_obj.copy_value,
                   'modifyvalue':local_generic.dyn_var_obj.modify_value,
                   'deletedynvariable':local_generic.dyn_var_obj.delete_dyn_value,
-                  'displayvariablevalue':self.generic_delay.display_variable_value,
-                  'verifyvalues':self.util_operation_obj.verify_values,
-                  'getindexcount':self.util_operation_obj.getIndexCount,
-                  'writewordfile': self.generic_word.writeWordFile,
-                  'readworddoc': self.generic_word.readWorddoc,
-                  'readallcheckbox': self.generic_word.readallcheckbox,
-                  'getalltablesfromdoc': self.generic_word.getAllTablesFromDoc,
-                  'readjson': self.generic_word.readjson,
-                  'readxml': self.generic_word.readxml,
-                  'readpdf': self.generic_word.readPdf,
-                  'getkeyvalue': self.json_oper.get_key_value
+                  'displayvariablevalue':local_generic.generic_delay.display_variable_value,
+                  'verifyvalues':local_generic.util_operation_obj.verify_values,
+                  'getindexcount':local_generic.util_operation_obj.getIndexCount,
+                  'writewordfile': local_generic.generic_word.writeWordFile,
+                  'readworddoc': local_generic.generic_word.readWorddoc,
+                  'readallcheckbox': local_generic.generic_word.readallcheckbox,
+                  'getalltablesfromdoc': local_generic.generic_word.getAllTablesFromDoc,
+                  'readjson': local_generic.generic_word.readjson,
+                  'readxml': local_generic.generic_word.readxml,
+                  'readpdf': local_generic.generic_word.readPdf,
+                  'getkeyvalue': local_generic.json_oper.get_key_value
 
                 }
             if keyword in list(dict.keys()):
@@ -192,7 +189,7 @@ class GenericKeywordDispatcher:
                             import handler
                             import controller
                             con = controller.Controller()
-                            for test in handler.tspList:
+                            for test in handler.local_handler.tspList:
                                 if((test.name).lower() == "getparam"):
                                     teststep = test
                                     break

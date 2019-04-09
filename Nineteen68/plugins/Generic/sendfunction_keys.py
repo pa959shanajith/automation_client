@@ -36,7 +36,7 @@ class SendFunctionKeys:
             import browser_Keywords
             import selenium
             import win32gui,win32api,win32process
-            pids = browser_Keywords.pid_set
+            pids = browser_Keywords.local_bk.pid_set
             if(len(pids)>0):
                 pid = pids.pop()
                 toplist, winlist = [], []
