@@ -81,9 +81,10 @@ class Table_Keywords():
                 err_msg='Row and Col number not specified'
                 logger.print_on_console('Row and Col number not specified')
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
             err_msg=desktop_constants.ERROR_MSG
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
+            log.error(e)
         return status,result,verb,err_msg
 
     def get_row_count(self,element,parent,input_val,*args):
@@ -107,9 +108,10 @@ class Table_Keywords():
                 err_msg='Unable to get row count'
                 logger.print_on_console('Unable to get row count')
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
             err_msg=desktop_constants.ERROR_MSG
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
+            log.error(e)
         return status,result,verb,err_msg
 
     def get_col_count(self,element,parent,input_val,*args):
@@ -129,9 +131,10 @@ class Table_Keywords():
                 err_msg='Unable to get col count'
                 logger.print_on_console('Unable to get col count')
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
             err_msg=desktop_constants.ERROR_MSG
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
+            log.error(e)
         return status,result,verb,err_msg
 
     def select_row(self,element,parent,input_val,*args):
@@ -158,9 +161,10 @@ class Table_Keywords():
                 err_msg='Unable to select row'
                 logger.print_on_console('Unable to select row')
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
             err_msg=desktop_constants.ERROR_MSG
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
+            log.error(e)
         return status,result,verb,err_msg
 
     def get_row_num_by_text(self,element,parent,input_val,*args):
@@ -210,9 +214,10 @@ class Table_Keywords():
                 err_msg='Unable to select row'
                 logger.print_on_console('Unable to select row')
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
             err_msg=desktop_constants.ERROR_MSG
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
+            log.error(e)
         return status,result,verb,err_msg
 
     def get_col_num_by_text(self,element,parent,input_val,*args):
@@ -262,9 +267,10 @@ class Table_Keywords():
                 err_msg='Unable to select col'
                 logger.print_on_console('Unable to select col')
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
             err_msg=desktop_constants.ERROR_MSG
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
+            log.error(e)
         return status,result,verb,err_msg
 
     def verify_cell_value(self, element, parent, input_val, *args):
@@ -325,9 +331,9 @@ class Table_Keywords():
                 logger.print_on_console('Invalid row or col number')
         except Exception as e:
             err_msg=desktop_constants.ERROR_MSG
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.error(e)
-            logger.print_on_console(e)
-
         return status,result,verb,err_msg
 
     def click_cell(self,element,parent,input_val,*args):
@@ -357,8 +363,9 @@ class Table_Keywords():
                 logger.print_on_console('Unable to select row')
         except Exception as e:
             err_msg=desktop_constants.ERROR_MSG
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.error(e)
-            logger.print_on_console(e)
         return status,result,verb,err_msg
 
     def double_click_cell(self,element,parent,input_val,*args):
@@ -388,6 +395,7 @@ class Table_Keywords():
                 logger.print_on_console('Unable to select row')
         except Exception as e:
             err_msg=desktop_constants.ERROR_MSG
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.error(e)
-            logger.print_on_console(e)
         return status,result,verb,err_msg
