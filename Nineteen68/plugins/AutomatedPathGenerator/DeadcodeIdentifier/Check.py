@@ -1,6 +1,3 @@
-from Object import Object
-from Var import VarInfo
-from Method import Method
 import re
 
 def DuplicateImports(imports,impDic):

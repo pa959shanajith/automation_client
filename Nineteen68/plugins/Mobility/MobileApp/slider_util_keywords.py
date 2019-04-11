@@ -25,7 +25,6 @@ log = logging.getLogger('slider_util_keywords.py')
 class SliderKeywords():
 
     def set_slide_value(self, element,input_val,*args):
-        logger.print_on_console('in slider')
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -40,12 +39,7 @@ class SliderKeywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        logger.print_on_console('set value pass')
-                        logger.print_on_console(input_val)
-                        # for set value
                         element.set_value(input_val[0])
-
-                        # print element.text
                         methodoutput=TEST_RESULT_TRUE
                         status = TEST_RESULT_PASS
                     else:
@@ -58,8 +52,6 @@ class SliderKeywords():
                     logger.print_on_console(err_msg)
 
         except Exception as e:
-            import  traceback
-            traceback.print_exc()
             log.error(e)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
@@ -80,9 +72,7 @@ class SliderKeywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        # for set value
                         output= x=str(float(element.get_attribute('value').replace('%',''))/100)[:3]
-                        # print element.text
                         methodoutput=TEST_RESULT_TRUE
                         status = TEST_RESULT_PASS
 
@@ -125,10 +115,14 @@ class SliderKeywords():
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
                     log.error(err_msg)
                     logger.print_on_console(err_msg)
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
 
         except Exception as e:
             err_msg=ANDROID_ERROR
-            log.error(e)
+            log.error(e,exc_info = True)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
@@ -158,10 +152,14 @@ class SliderKeywords():
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
                     log.error(err_msg)
                     logger.print_on_console(err_msg)
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
 
         except Exception as e:
             err_msg=ANDROID_ERROR
-            log.error(e)
+            log.error(e,exc_info = True)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
@@ -183,10 +181,14 @@ class SliderKeywords():
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
                     log.error(err_msg)
                     logger.print_on_console(err_msg)
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
 
         except Exception as e:
             err_msg=ANDROID_ERROR
-            log.error(e)
+            log.error(e,exc_info = True)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
@@ -199,18 +201,22 @@ class SliderKeywords():
         try:
             if element is not None:
                 visibility=element.is_displayed()
-                if not(visibility):
-                    log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
-                else:
+                if visibility:
                     err_msg=ERROR_CODE_DICT['ERR_OBJECT_VISIBLE']
                     log.error(err_msg)
                     logger.print_on_console(err_msg)
+                else:
+                    log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+            else:
+                log.info(ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS'])
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
 
         except Exception as e:
             err_msg=ANDROID_ERROR
-            log.error(e)
+            log.error(e,exc_info = True)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
@@ -225,7 +231,6 @@ class SliderKeywords():
                 log.info(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
-
             else:
                 err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
                 log.error(err_msg)
@@ -233,7 +238,7 @@ class SliderKeywords():
 
         except Exception as e:
             err_msg=ANDROID_ERROR
-            log.error(e)
+            log.error(e,exc_info = True)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
@@ -248,19 +253,16 @@ class SliderKeywords():
                 err_msg=ERROR_CODE_DICT['ERR_ELEMENT_EXISTS']
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
-
             else:
                 log.info(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
 
-
         except Exception as e:
             err_msg=ANDROID_ERROR
-            log.error(e)
+            log.error(e,exc_info = True)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
-
 
     def waitforelement_exists(self, object_name,input_val,*args):
         status=TEST_RESULT_FAIL
@@ -281,7 +283,7 @@ class SliderKeywords():
                     if int(later-start_time)>=int(timeout):
                         logger.print_on_console('Delay timeout')
                         break
-                    if element!=None:
+                    if element is not None:
                         logger.print_on_console('Element Exists')
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -289,10 +291,8 @@ class SliderKeywords():
             else:
                 err_msg='Invalid Input'
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             err_msg='error occured'
-            log.error(e)
+            log.error(e,exc_info = True)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 

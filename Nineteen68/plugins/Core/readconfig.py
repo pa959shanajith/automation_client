@@ -29,7 +29,7 @@ class readConfig():
         "queryTimeOut":"", "timeOut":"", "stepExecutionWait":"", "displayVariableTimeOut":"",
         "retrieveURL":"", "delay":"", "ignoreVisibilityCheck":"", "exception_flag":"",
         "server_cert":"", "enableSecurityCheck":"","browser_check":"","disable_server_cert":"","highlight_check":"","firefox_path":"",
-        "prediction_for_iris_objects":""}
+        "prediction_for_iris_objects":"","connection_timeout":""}
         if os.path.isfile(self.config_path)==True:
             try:
                 params = json.load(open(self.config_path))
@@ -55,6 +55,7 @@ class readConfig():
                 configvalues['disable_server_cert'] = params['disable_server_cert']
                 configvalues['highlight_check'] = params['highlight_check']
                 configvalues['prediction_for_iris_objects'] = params['prediction_for_iris_objects']
+                configvalues['connection_timeout'] = params['connection_timeout']
             except Exception as e:
                 configvalues['errorflag']=e
         else:

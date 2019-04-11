@@ -775,6 +775,7 @@ class TestThread(threading.Thread):
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
                     socketIO.emit('result_executeTestSuite',status)
+        threading.Timer(300, wxObject.closeConnection).start()
         self.wxObject.mythread = None
         execution_flag = False
         self.wxObject.schedule.Enable()
@@ -1014,6 +1015,10 @@ class ClientWindow(wx.Frame):
 
     def onChecked_Schedule(self, e):
         mode=self.schedule.GetValue()
+        if mode:
+            conn_time= int(configvalues['connection_timeout'])
+            if ((conn_time !='') and (conn_time not in range(0,8))):
+                threading.Timer(conn_time*60*60, wxObject.closeConnection).start()
         global socketIO
         socketIO.emit('toggle_schedule',mode)
 
@@ -1127,6 +1132,20 @@ class ClientWindow(wx.Frame):
                 wxObject.socketthread.join()
         except Exception as e:
             log.error("Error while disconnecting from server")
+            log.error(e)
+
+    def closeConnection(self):
+        try:
+            if execution_flag:
+                err_msg="Delaying closing Connection due to active execution."
+                logger.print_on_console(err_msg)
+                log.info(err_msg)
+            else:
+                self.killSocket()
+        except Exception as e:
+            err_msg="Error while closing connection"
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.error(e)
 
     def killChildWindow(self, debug=False, scrape=False, display=False, pdf=False):
@@ -1318,7 +1337,7 @@ class Config_window(wx.Frame):
         #------------------------------------Different co-ordinates for Windows and Mac
         if SYSTEM_OS=='Windows':
             config_fields= {
-            "Frame":[(300, 150),(470,560)],
+            "Frame":[(300, 150),(470,620)],
             "S_address":[(12,8 ),(90, 28),(100,8 ),(140,-1)],
             "S_port": [(270,8 ),(70, 28),(340,8 ), (105,-1)],
             "Chrm_path":[(12,38),(80, 28),(100,38), (310,-1),(415,38),(30, -1)],
@@ -1330,23 +1349,24 @@ class Config_window(wx.Frame):
             "Step_exec":[(12,158),(120, 28),(130,158),(80,-1)],
             "Disp_var":[(225,158),(140, 28),(360,158), (85,-1)],
             "S_cert":[(12,188),(85, 28),(100,188),(310,-1),(415,188),(30, -1)],
-            "Ignore_cert":[(12,218)],
-            "IE_arch":[(150,218)],
-            "Dis_s_cert":[(290,218)],
-            "Ex_flag":[(12,278)],
-            "Ignore_v_check":[(150,278)],
-            "S_flag":[(340,338)],
-            "Ret_url":[(12,338)],
-            "En_secu_check":[(308,278)],
-            "Brow_ch":[(115,338)],
-            "High_ch":[ (225,338)],
-            "Iris_prediction":[(12,398)],
-            "Save":[(100,488), (100, 28)],
-            "Close":[(250,488), (100, 28)]
+            "C_Timeout" :[(12,218),(120, 28),(130,218), (80,-1)],
+            "Ignore_cert":[(12,248)],
+            "IE_arch":[(150,248)],
+            "Dis_s_cert":[(290,248)],
+            "Ex_flag":[(12,308)],
+            "Ignore_v_check":[(150,308)],
+            "S_flag":[(340,368)],
+            "Ret_url":[(12,368)],
+            "En_secu_check":[(308,308)],
+            "Brow_ch":[(115,368)],
+            "High_ch":[ (225,368)],
+            "Iris_prediction":[(12,428)],
+            "Save":[(100,518), (100, 28)],
+            "Close":[(250,518), (100, 28)]
         }
         else:
             config_fields={
-            "Frame":[(300, 150),(555,570)],
+            "Frame":[(300, 150),(555,540)],
             "S_address":[(12,8),(90,28),(116,8 ),(140,-1)],
             "S_port": [(352,8),(70,28),(430,8 ),(105,-1)],
             "Chrm_path":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
@@ -1358,19 +1378,20 @@ class Config_window(wx.Frame):
             "Step_exec":[(12,158),(120, 28),(142,158),(80,-1)],
             "Disp_var":[(288,158),(140, 28),(448,158),(85,-1)],
             "S_cert":[(12,188),(85, 28),(116,188),(382,-1),(504,188),(30, -1)],
-            "Ignore_cert":[(12,278)],
-            "IE_arch":[(158,218)],
-            "Dis_s_cert":[(335,218)],
-            "Ex_flag":[(12,218)],
-            "Ignore_v_check":[(170,278)],
-            "S_flag":[(396,338)],
-            "Ret_url":[(12,338)],
-            "En_secu_check":[(358,278)],
-            "Brow_ch":[(130,338)],
-            "High_ch":[(260,338)],
+            "Ignore_cert":[(12,318)],
+            "IE_arch":[(158,258)],
+            "Dis_s_cert":[(335,258)],
+            "Ex_flag":[(12,258)],
+            "Ignore_v_check":[(170,318)],
+            "S_flag":[(396,378)],
+            "Ret_url":[(12,378)],
+            "En_secu_check":[(358,318)],
+            "Brow_ch":[(130,378)],
+            "High_ch":[(260,378)],
+            "Save":[(135,458),(100, 28)],
+            "C_Timeout" :[(12,218),(120, 28),(180,218), (80,-1)],
             "Iris_prediction":[(12,398)],
-            "Save":[(135,488),(100, 28)],
-            "Close":[(285,488),(100, 28)]
+            "Close":[(285,458),(100, 28)]
         }
         wx.Frame.__init__(self, parent, title=title,
                    pos=config_fields["Frame"][0], size=config_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
@@ -1464,6 +1485,14 @@ class Config_window(wx.Frame):
         else:
             self.server_cert.SetValue(isConfigJson['server_cert'])
 
+        self.connection_timeout=wx.StaticText(self.panel, label="Connection Timeout", pos=config_fields["C_Timeout"][0],size=config_fields["C_Timeout"][1], style=0, name="")
+        self.conn_timeout=wx.TextCtrl(self.panel, pos=config_fields["C_Timeout"][2], size=config_fields["C_Timeout"][3])
+
+        if isConfigJson!=False and int(isConfigJson['connection_timeout'])>=8:
+            self.conn_timeout.SetValue(isConfigJson['connection_timeout'])
+        else:
+            self.conn_timeout.SetValue("0")
+
         lblList = ['Yes', 'No']
         lblList2 = ['64-bit', '32-bit']
         lblList3 = ['All', 'Fail']
@@ -1545,7 +1574,7 @@ class Config_window(wx.Frame):
         else:
             self.rbox11.SetSelection(1)
 
-        self.error_msg=wx.StaticText(self.panel, label="", pos=(85,458),size=(350, 28), style=0, name="")
+        self.error_msg=wx.StaticText(self.panel, label="", pos=(85,488),size=(350, 28), style=0, name="")
         self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])
         self.save_btn.Bind(wx.EVT_BUTTON, self.config_check)
         self.close_btn=wx.Button(self.panel, label="Close",pos=config_fields["Close"][0], size=config_fields["Close"][1])
@@ -1592,6 +1621,7 @@ class Config_window(wx.Frame):
         disable_server_cert=self.rbox9.GetStringSelection()
         highlight_check=self.rbox10.GetStringSelection()
         iris_prediction = self.rbox11.GetStringSelection()
+        conn_timeout = self.conn_timeout.GetValue()
         #----------------creating data dictionary
         data['server_ip'] = server_add.strip()
         data['server_port'] = server_port.strip()
@@ -1615,8 +1645,9 @@ class Config_window(wx.Frame):
         data['disable_server_cert'] = disable_server_cert.strip()
         data['highlight_check'] = highlight_check.strip()
         data['prediction_for_iris_objects'] = iris_prediction.strip()
+        data['connection_timeout']= conn_timeout.strip()
         config_data=data
-        if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='' and data['firefox_path']!='':
+        if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='' and data['firefox_path']!='' and  data['connection_timeout']>='':
             #---------------------------------------resetting the static texts
             self.error_msg.SetLabel("")
             self.sev_add.SetLabel('Server Address')
@@ -1641,6 +1672,8 @@ class Config_window(wx.Frame):
             self.stepExecWait.SetForegroundColour((0,0,0))
             self.dispVarTimeOut.SetLabel('Display Variable Timeout')
             self.dispVarTimeOut.SetForegroundColour((0,0,0))
+            self.connection_timeout.SetLabel('Connection Timeout')
+            self.connection_timeout.SetForegroundColour((0,0,0))
 
             #---------------------------------------creating the file in specified path
             try:
@@ -1655,6 +1688,10 @@ class Config_window(wx.Frame):
 
             #---------------------------------------resetting the static texts
             if (os.path.isfile(data['chrome_path'])==True or str(data['chrome_path']).strip()=='default') and os.path.isfile(data['server_cert'])==True and os.path.isfile(data['logFile_Path'])==True and (os.path.isfile(data['firefox_path'])==True or str(data['firefox_path']).strip()=='default'):
+                if int(data['connection_timeout'])in range(1, 8):
+                    self.error_msg.SetLabel("Connection Timeout must be greater than or equal to 8")
+                    self.error_msg.SetForegroundColour((255,0,0))
+                    self.connection_timeout.SetForegroundColour((255,0,0))
                 self.jsonCreater(config_data)
             else:
                 self.error_msg.SetLabel("Marked fields '^' contain invalid path, Data not saved")
@@ -1755,6 +1792,12 @@ class Config_window(wx.Frame):
             else:
                 self.dispVarTimeOut.SetLabel('Display Variable Timeout')
                 self.dispVarTimeOut.SetForegroundColour((0,0,0))
+            if data['connection_timeout']=='':
+                self.connection_timeout.SetLabel('Connection Timeout*')
+                self.connection_timeout.SetForegroundColour((255,0,0))
+            else:
+                self.connection_timeout.SetLabel('Connection Timeout')
+                self.connection_timeout.SetForegroundColour((0,0,0))
 
 
     """jsonCreater saves the data in json form, location of file to be saved must be defined. This method will overwrite the existing .json file"""

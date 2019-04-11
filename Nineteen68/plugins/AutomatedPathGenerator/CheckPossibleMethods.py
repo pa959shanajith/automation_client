@@ -113,11 +113,16 @@ def main(PossibleMethods, Classes, VarStorage):
                                         PossibleMethods[i]["ParentNodeNo"] = j["NodeNo"]'''
                                     PossibleMethods[i]["ParentNodeNo"] = j["NodeNo"]
                         else:
+                            count = 0
+                            key = None
                             for keys in VarStorage:
-                                if (str(keys) in PosMethodName and VarStorage[keys] in classnames):
-                                    PossibleMethods[i]["Class"] = VarStorage[keys]
-                                    PossibleMethods[i]["MethodOrClassCall"] = "Variable"
-                                    break
+                                if (str(keys) in PosMethodName):
+                                    count = count + 1
+                                    if VarStorage[keys] in classnames:
+                                        key = VarStorage[keys]
+                            if (count == 1 and key != None):
+                                PossibleMethods[i]["Class"] = key
+                                PossibleMethods[i]["MethodOrClassCall"] = "Variable"
                             if(PossibleMethods[i]["MethodOrClassCall"] != "Variable"):
                                 for cls in classnames:
                                     if (str(cls) in PosMethodName):

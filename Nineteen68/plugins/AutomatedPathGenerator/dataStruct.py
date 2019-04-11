@@ -1,7 +1,3 @@
-import sys
-import re
-import os
-
 ASTNode = []
 
 def next_line(line):
@@ -23,7 +19,7 @@ def start(name):
     global ASTNode
     ASTNode = []
     try:
-        with open(r'./ASTTree' + name + '.txt', 'rt') as f:
+        with open('./ASTTree' + name + '.txt', 'rt') as f:
             line = f.readline()
             level, value = next_line(line)
             if value.find(":") != -1:
