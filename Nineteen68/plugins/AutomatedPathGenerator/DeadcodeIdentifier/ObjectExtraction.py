@@ -22,6 +22,7 @@ def main(root,data,filePath):
 		objectExtract(root)
 	except Exception as e:
 		log.error(e)
+	sys.setrecursionlimit(1000)
 	return main.showData
 
 def additiveExpressionExtraction(root):
