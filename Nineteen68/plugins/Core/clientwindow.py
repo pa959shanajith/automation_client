@@ -1015,7 +1015,6 @@ class ClientWindow(wx.Frame):
 
     def onChecked_Schedule(self, e):
         mode=self.schedule.GetValue()
-        configvalues = readconfig.readConfig().readJson()
         if mode:
             conn_time= int(configvalues['connection_timeout'])
             if ((conn_time !='') and (conn_time not in range(0,8))):
