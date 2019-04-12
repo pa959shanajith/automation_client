@@ -14,6 +14,7 @@ import logging
 log = logging.getLogger('word_operations.py')
 import logger
 import platform
+import fitz
 
 class WordFile():
     def writeWordFile(self, filename, filetext, operation, file_encoding = None, *args):
@@ -22,20 +23,25 @@ class WordFile():
         output = OUTPUT_CONSTANT
         err_msg = None
         try:
-            if not os.path.exists(os.path.normpath(filename)):
-                log.debug("Write File => File Not Found. Creating a new File with name : "+filename)
-            if file_encoding:
-                filetext = filetext.encode(file_encoding)
-            if operation.lower() == "overwrite":
-                file = open(filename,"w")
-                file.write(filetext)
-                file.close()
-            elif operation.lower()=="append":
-                file = open(filename,'a+')
-                file.write(filetext)
-                file.close()
-            status = TEST_RESULT_PASS
-            result = TEST_RESULT_TRUE
+            fileName,file_ext=os.path.splitext(filename)
+            if file_ext.lower() ==".docx":
+                if not os.path.exists(os.path.normpath(filename)):
+                    log.debug("Write File- File Not Found. Creating a new File with name : "+filename)
+                if file_encoding:
+                    filetext = filetext.encode(file_encoding)
+                if operation.lower() == "overwrite":
+                    file = open(filename,"w")
+                    file.write(filetext)
+                    file.close()
+                elif operation.lower()=="append":
+                    file = open(filename,'a+')
+                    file.write(filetext)
+                    file.close()
+                status = TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+            else:
+                err_msg=generic_constants.INVALID_INPUT
+                log.debug('Invalid File Extension')
         except Exception as e:
             err_msg = generic_constants.INVALID_INPUT
         if err_msg != None:
@@ -290,24 +296,23 @@ class WordFile():
         err_msg = None
         try:
             if os.path.exists(os.path.normpath(filename)):
-                pdfFileObj = open(filename, 'rb')
-                pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
-                no_of_pages = pdfReader.numPages
-                if pageno != None:
-                    pagenum=int(pageno)
-                    if pagenum <= no_of_pages:
-                        pageObj = pdfReader.getPage(pagenum-1)
+                fileName,file_ext=os.path.splitext(filename)
+                if file_ext.lower() ==".pdf":
+                    pdfData=fitz.open(filename)
+                    pagenumber=int(pageno)-1
+                    if pagenumber<pdfData.pageCount:
+                        page = pdfData[pagenumber]
                     else:
-                        logger.print_on_console("Invalid page number")
+                        page = pdfData[0]
+                    output=page.getText()
+                    output=output.replace("\n"," ").replace('\r',' ')
+                    status = TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
                 else:
-                    pageObj = pdfReader.getPage(0)
-                output=pageObj.extractText()
-                output=output.replace("\n"," ").replace('\r',' ')
-                status = TEST_RESULT_PASS
-                result = TEST_RESULT_TRUE
-                pdfFileObj.close()
+                    err_msg = 'Invalid Input'
+                    logger.print_on_console('Invalid Input')
             else:
-                logger.print_on_console("Read PDF => Error : File not Found")
+                logger.print_on_console("Read PDF: Error : File not Found")
         except Exception as e:
             if isinstance(e, ValueError):
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
