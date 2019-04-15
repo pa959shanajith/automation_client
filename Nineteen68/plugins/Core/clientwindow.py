@@ -51,6 +51,7 @@ icesession = None
 plugins_list = []
 configvalues = None
 execution_flag = False
+closeActiveConnection = False
 ICE_CONST= os.environ["NINETEEN68_HOME"] + '/Lib/ice_const.json'
 CONFIG_PATH= os.environ["NINETEEN68_HOME"] + '/Lib/config.json'
 IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images/"
@@ -707,7 +708,7 @@ class TestThread(threading.Thread):
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
-        global socketIO,execution_flag
+        global socketIO, execution_flag, closeActiveConnection
         try:
             self.wxObject.cancelbutton.Disable()
             self.wxObject.terminatebutton.Enable()
@@ -775,7 +776,9 @@ class TestThread(threading.Thread):
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
                     socketIO.emit('result_executeTestSuite',status)
-        threading.Timer(300, wxObject.closeConnection).start()
+        if closeActiveConnection:
+            threading.Timer(300, wxObject.closeConnection).start()
+            closeActiveConnection = False
         self.wxObject.mythread = None
         execution_flag = False
         self.wxObject.schedule.Enable()
@@ -1135,13 +1138,16 @@ class ClientWindow(wx.Frame):
             log.error(e)
 
     def closeConnection(self):
+        global closeActiveConnection
         try:
             if execution_flag:
                 err_msg="Delaying closing Connection due to active execution."
-                logger.print_on_console(err_msg)
-                log.info(err_msg)
+                closeActiveConnection = True
             else:
                 self.killSocket()
+                err_msg="Closing active connection due to timeout."
+            logger.print_on_console(err_msg)
+            log.info(err_msg)
         except Exception as e:
             err_msg="Error while closing connection"
             logger.print_on_console(err_msg)
