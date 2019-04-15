@@ -43,6 +43,7 @@ class WordFile():
                 err_msg=generic_constants.INVALID_INPUT
                 log.debug('Invalid File Extension')
         except Exception as e:
+            log.error(e)
             err_msg = generic_constants.INVALID_INPUT
         if err_msg != None:
             log.error(err_msg)
@@ -70,7 +71,7 @@ class WordFile():
                     output = "\n".join(paras)
                 else:
                     output = paras[num-1]
-                log.debug('Read Paragraphs => Total Number of Paragraphs :'+str(len(paras)))
+                log.debug('Total Number of Paragraphs :'+str(len(paras)))
                 status = TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
             else:
@@ -173,43 +174,38 @@ class WordFile():
             if SYSTEM_OS == "Windows":
                 import pythoncom
                 import win32com.client as win32
-                if os.path.exists(os.path.normpath(filename)):
-                    pythoncom.CoInitialize()
-                    word = win32.Dispatch("Word.Application")
-                    word.Documents.Open(filename)
-                    doc = word.ActiveDocument
-                    tables = []
-                    log.debug("Read All Tables => FileName:"+filename+", Total Number of Tables : "+str(doc.Tables.Count))
-                    for t in range(doc.Tables.Count):
-                        table = []
-                        comTable =  doc.Tables(t+1)
-                        for r in range(comTable.Rows.Count):
-                            row = []
-                            for c in range(comTable.Rows(r+1).Range.Columns.Count):
-                                try:
-                                    row.insert(c, comTable.Cell(Row=r+1, Column=c+1).Range.Text.encode('utf-8').replace('\r\x07','').replace('\r','\n').strip() )
-                                    log.debug("table = "+str(t+1)+" row = "+str(r+1)+" column = "+str(c+1)+" :    Value =="+comTable.Cell(Row=r+1, Column=c+1).Range.Text)
-                                except Exception as e:
-                                    pass
-                            table.insert(r, row)
-                        tables.insert(t, table)
-                    output = tables
-                    status = TEST_RESULT_PASS
-                    result = TEST_RESULT_TRUE
+                fileName,file_ext=os.path.splitext(filename)
+                if file_ext.lower() ==".docx":
+                    if os.path.exists(os.path.normpath(filename)):
+                        pythoncom.CoInitialize()
+                        doc=docx.Document(filename)
+                        for t in range(len(doc.tables)):
+                            table = doc.tables[t]
+                            data = []
+                            keys = None
+                            for i, row in enumerate(table.rows):
+                                text = (cell.text for cell in row.cells)
+                                if i == 0:
+                                    keys = tuple(text)
+                                    continue
+                                row_data = dict(zip(keys, text))
+                                data.append(row_data)
+                        output = data
+                        status = TEST_RESULT_PASS
+                        result = TEST_RESULT_TRUE
+                    else:
+                        err_msg = ERROR_CODE_DICT['ERR_FILE_NOT_FOUND_EXCEPTION']
+                        logger.print_on_console("Error : File not Found")
+                        log.error(err_msg)
                 else:
-                    err_msg = ERROR_CODE_DICT['ERR_FILE_NOT_FOUND_EXCEPTION']
-                    logger.print_on_console("getAllTablesFromDoc => Error : File not Found")
-                    log.error(err_msg)
+                    err_msg=generic_constants.INVALID_INPUT
+                    log.debug('Invalid File Extension')
         except Exception as e:
             err_msg = ERROR_CODE_DICT['ERR_EXCEPTION']
-            ##err_json = {"ERR_CODE": err_code, "ERR_MSG": ERROR_CODE_DICT['ERR_EXCEPTION'], "STACK_TRACE": str(e)}
+            log.error(e)
+        if err_msg != None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
-            log.error(e) #@Delete
-        finally:
-            if doc: doc.Close()
-            if word: word.Quit()
-        log.info("Read All Tables => " + ERROR_CODE_DICT['MSG_STATUS'] + status)
         return status, result, output, err_msg
 
     def readjson(self, filename, jsonpara, *args):
@@ -218,24 +214,30 @@ class WordFile():
         output = OUTPUT_CONSTANT
         err_msg = None
         try:
-            if os.path.exists(os.path.normpath(filename)):
-                log.debug("Read JSON => Filename : " + filename)
-                divlist = [e if e.isdigit() else e for e in jsonpara.split(';')]
-                #numofelem = len(divlist)
-                with open(filename) as data_file:
-                    data = json.load(data_file)
-                for e in divlist:
-                    if(e.isdigit()):
-                        data = data[int(e)-1]
-                    else:
-                        data = data[''+e]
-                output = data
-                status = TEST_RESULT_PASS
-                result = TEST_RESULT_TRUE
+            fileName,file_ext=os.path.splitext(filename)
+            if file_ext.lower() ==".json":
+                if os.path.exists(os.path.normpath(filename)):
+                    log.debug("Filename : " + filename)
+                    vals= list(args)
+                    jsonparameters= vals.insert(0,jsonpara)
+                    divlist = [e if e.isdigit() else e for e in vals]
+                    with open(filename) as data_file:
+                        data = json.load(data_file)
+                    for e in divlist:
+                        if(e.isdigit()):
+                            data = data[int(e)-1]
+                        else:
+                            data = data[''+e]
+                    output = data
+                    status = TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
+                else:
+                    err_msg = ERROR_CODE_DICT['ERR_FILE_NOT_FOUND_EXCEPTION']
+                    log.error(err_msg)
+                    logger.print_on_console("Error : File not Found")
             else:
-                err_msg = ERROR_CODE_DICT['ERR_FILE_NOT_FOUND_EXCEPTION']
-                log.error(err_msg)
-                logger.print_on_console("Read JSON => Error : File not Found")
+                err_msg=generic_constants.INVALID_INPUT
+                log.debug('Invalid File Extension')
         except Exception as e:
             if isinstance(e, ValueError):
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -246,7 +248,7 @@ class WordFile():
             log.error(err_msg)
             log.error(e) #@delete
             logger.print_on_console(err_msg)
-        log.info("Read JSON => " + ERROR_CODE_DICT['MSG_STATUS'] + status)
+        log.info(ERROR_CODE_DICT['MSG_STATUS'] + status)
         return status, result, output, err_msg
 
     def readxml(self,filename,xmlpara,*args):
@@ -255,36 +257,39 @@ class WordFile():
         output = OUTPUT_CONSTANT
         err_msg = None
         try:
-            if os.path.exists(os.path.normpath(filename)):
-                divlist = [e if e.isdigit() else e for e in xmlpara.split(';')]
-                contents = open(filename).read()
-                #Since this is being parsed in JSON, the order of xml is lost
-                para1 = xmltodict.parse(contents)
-                para2 = json.dumps(para1)
-                data = json.loads(para2)
-                for e in divlist:
-                    if e.isdigit():
-                        data = data[int(e)-1]
-                    else:
-                        data = data[''+e]
-                output = data
-                status = TEST_RESULT_PASS
-                result = TEST_RESULT_TRUE
+            fileName,file_ext=os.path.splitext(filename)
+            if file_ext.lower() ==".xml":
+                if os.path.exists(os.path.normpath(filename)):
+                    vals= list(args)
+                    xmlparameters= vals.insert(0,xmlpara)
+                    divlist = [e if e.isdigit() else e for e in vals]
+                    contents = open(filename).read()
+                    #Since this is being parsed in JSON, the order of xml is lost
+                    para1 = xmltodict.parse(contents)
+                    para2 = json.dumps(para1)
+                    data = json.loads(para2)
+                    for e in divlist:
+                        if e.isdigit():
+                            data = data[int(e)-1]
+                        else:
+                            data = data[''+e]
+                    output = data
+                    status = TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
+                else:
+                    err_msg = ERROR_CODE_DICT['ERR_FILE_NOT_FOUND_EXCEPTION']
+                    log.error(err_msg)
+                    logger.print_on_console("Error: File not Found")
             else:
-                err_msg = ERROR_CODE_DICT['ERR_FILE_NOT_FOUND_EXCEPTION']
-                ##err_json = {"ERR_CODE": err_code, "ERR_MSG": ERROR_CODE_DICT['ERR_FILE_NOT_FOUND']}
-                log.error(err_msg)
-                logger.print_on_console("Read XML => Error : File not Found")
+                err_msg=generic_constants.INVALID_INPUT
+                log.debug('Invalid File Extension')
         except Exception as e:
             if isinstance(e, ValueError):
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                ##err_json = {"ERR_CODE": err_code, "ERR_MSG": ERROR_CODE_DICT['ERR_INVALID_INPUT']}
             elif isinstance(e, KeyError):
                 err_msg = ERROR_CODE_DICT['ERR_OBJECT_NOT_EXISTS']
-                ##err_json = {"ERR_CODE": err_code, "ERR_MSG": ERROR_CODE_DICT['ERR_OBJECT_NOT_EXISTS']}
             else:
                 err_msg = ERROR_CODE_DICT['ERR_EXCEPTION']
-                ##err_json = {"ERR_CODE": err_code, "ERR_MSG": ERROR_CODE_DICT['ERR_EXCEPTION'], "STACK_TRACE": str(e)}
             log.error(e)
             logger.print_on_console(err_msg)
         return status, result, output, err_msg
