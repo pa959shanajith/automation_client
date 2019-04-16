@@ -26,7 +26,7 @@ class custom():
             log.error(e,exc_info=True)
             logger.print_on_console("Incorrect input!!")
             return False
-        if len(input) >= 3 and input[0] != "" and isinstance(input[0], int) and isinstance(input[1], str):
+        if len(input) >= 3 and input[0] != "" and isinstance(input[2], int) and isinstance(input[1], str):
             class_name = input[0]
             custom_dict = {
                 'button': ["getbuttonname", "longpress", "press", "verifybuttonname", "verifydisabled", "verifyenabled", "verifyexists",
@@ -77,7 +77,7 @@ class custom():
         driver_flag = False
         object_name = input[0]
         visible_text = input[1]
-        print(input)
+        logger.print_on_console(input)
         driver = android_scrapping.driver
         classes = {
             'textbox': ['android.widget.EditText'],
@@ -93,7 +93,7 @@ class custom():
             'listview': ['android.widget.ListView'],
             'text': ['android.widget.TextView'],
             'image': ['android.widget.ImageView'],
-            'layout': ['android.widget.LinearLayout','android.widget.RelativeLayout']
+            'layout': ['android.widget.LinearLayout','android.widget.RelativeLayout'],
             'element': ['android.widget.ScrollView','android.view.View','android.view.ViewGroup','android.widget.FrameLayout']
         }
         elements = []
@@ -107,22 +107,14 @@ class custom():
                     driver_flag = True
                     break
             if driver_flag is True:
-                for item in classes[object_name]:
-                    new_elem = driver.find_elements_by_class_name(item)
-                    if isinstance(new_elem, list):
-                        elements = elements + new_elem
-                    else:
-                        elements.append(new_elem)
                 elem_count = 0
                 if len(visible_text) > 0:
-                    for item in elements:
-                        if item.get_attribute('text') == visible_text:
-                            element_list.append(item)
-                            if index == elem_count:
-                                break
-                            elem_count = elem_count + 1
+                    for item in classes[object_name]:
+                        xpath_str = '//'+item+'[@text="'+visible_text+'"]'
+                        element_list = element_list + driver.find_elements_by_xpath(xpath_str)
                 else:
-                    element_list = elements
+                    for item in classes[object_name]:
+                        element_list = element_list + driver.find_elements_by_class_name(item)
                 if index < len(element_list):
                     element = element_list[index]
                 else:
