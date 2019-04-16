@@ -431,7 +431,6 @@ class MainNamespace(BaseNamespace):
             global socketIO
             filepath = args[0]
             data_URIs=[]
-            logger.print_on_console("Request recieved for processing screenshots for report")
             num_path = len(filepath)
             #for path in filepath:
             for i in range(num_path):
