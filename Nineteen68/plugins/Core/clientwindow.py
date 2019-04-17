@@ -509,7 +509,10 @@ class MainNamespace(BaseNamespace):
             global socketIO
             filepath = args[0]
             data_URIs=[]
-            for path in filepath:
+            log.info("Request recieved for processing screenshots for report")
+            num_path = len(filepath)
+            for i in range(num_path):
+                path = filepath[i]
                 if not (os.path.exists(path)):
                     data_URIs.append(None)
                     logger.print_on_console("Error while rendering Screenshot: File \""+path+"\" not found!")
@@ -520,7 +523,11 @@ class MainNamespace(BaseNamespace):
                         encoded_string = base64.b64encode(image_file.read())
                     base64_data=encoded_string.decode('UTF-8').strip()
                     data_URIs.append(base64_data)
-            socketIO.emit('render_screenshot',data_URIs)
+                if i%25==0 or i==(num_path-1):
+                    socketIO.emit('render_screenshot',data_URIs)
+                    data_URIs=[]
+            socketIO.emit('render_screenshot',"finished")
+            log.info("Request for processing screenshots completed successfully")
         except Exception as e:
             err_msg='Error while sending screenshot data'
             log.error(err_msg)
