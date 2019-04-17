@@ -151,21 +151,21 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console('Highlight result: '+str(res))
         if appType==APPTYPE_DESKTOP_JAVA.lower():
             if(not args[0].startswith('iris')):
-                con =controller.Controller()
-                con.get_all_the_imports('Oebs')
+                #con =controller.Controller()
+                core_utils.get_all_the_imports('Oebs')
                 import utils
                 light =utils.Utils()
                 res = light.highlight(args[0],args[1])
                 logger.print_on_console('Highlight result: '+str(res))
         elif appType==APPTYPE_DESKTOP.lower():
-            con =controller.Controller()
-            con.get_all_the_imports('Desktop')
+            #con =controller.Controller()
+            core_utils.get_all_the_imports('Desktop')
             import desktop_highlight
             highlightObj=desktop_highlight.highLight()
             highlightObj.highLiht_element(args[0],args[1])
         elif appType==APPTYPE_SAP.lower():
-            con =controller.Controller()
-            con.get_all_the_imports('SAP')
+            #con =controller.Controller()
+            core_utils.get_all_the_imports('SAP')
             import sap_highlight
             highlightObj=sap_highlight.highLight()
 ##            i = args[0].rfind(",")
@@ -238,10 +238,10 @@ class MainNamespace(BaseNamespace):
 
     def on_LAUNCH_DESKTOP(self, *args):
         if check_execution_lic("scrape"): return None
-        con = controller.Controller()
+        #con = controller.Controller()
         global browsername
         browsername = args
-        con.get_all_the_imports('Desktop')
+        core_utils.get_all_the_imports('Desktop')
         import desktop_scrape
         global desktopScrapeObj
         desktopScrapeObj=desktop_scrape
@@ -252,10 +252,10 @@ class MainNamespace(BaseNamespace):
     def on_LAUNCH_SAP(self, *args):
         if check_execution_lic("scrape"): return None
         try:
-            con = controller.Controller()
+            #con = controller.Controller()
             global browsername
             browsername = args[0]
-            con.get_all_the_imports('SAP')
+            core_utils.get_all_the_imports('SAP')
             import sap_scrape
             global sapScrapeObj
             sapScrapeObj=sap_scrape
@@ -268,9 +268,8 @@ class MainNamespace(BaseNamespace):
 
     def on_LAUNCH_MOBILE(self, *args):
         if check_execution_lic("scrape"): return None
-        con = controller.Controller()
         global browsername
-        con = controller.Controller()
+        #con = controller.Controller()
         if str(args[0]).endswith('apk'):
             browsername = args[0]+";"+args[1]
         elif str(args[4])=='ios':
@@ -281,11 +280,11 @@ class MainNamespace(BaseNamespace):
         elif str(args[0]).endswith('ipa'):
             browsername = args[0] + ";" + args[2] + ";" + args[3]+";" + args[4]
         """
-        con =controller.Controller()
+        #con =controller.Controller()
         if SYSTEM_OS=='Darwin':
-            con.get_all_the_imports('Mobility/MobileApp')
+            core_utils.get_all_the_imports('Mobility/MobileApp')
         else:
-            con.get_all_the_imports('Mobility')
+            core_utils.get_all_the_imports('Mobility')
         import mobile_app_scrape
         global mobileScrapeObj
         mobileScrapeObj=mobile_app_scrape
@@ -296,14 +295,14 @@ class MainNamespace(BaseNamespace):
     def on_LAUNCH_MOBILE_WEB(self, *args):
         if check_execution_lic("scrape"): return None
         global mobileWebScrapeObj,mobileWebScrapeFlag
-        con = controller.Controller()
+        #con = controller.Controller()
         global browsername
         browsername = args[0]+";"+args[1]
         con =controller.Controller()
         if SYSTEM_OS=='Darwin':
-            con.get_all_the_imports('Mobility/MobileWeb')
+            core_utils.get_all_the_imports('Mobility/MobileWeb')
         else:
-            con.get_all_the_imports('Mobility')
+            core_utils.get_all_the_imports('Mobility')
         import mobile_web_scrape
         mobileWebScrapeObj=mobile_web_scrape
         mobileWebScrapeFlag=True
@@ -312,11 +311,11 @@ class MainNamespace(BaseNamespace):
     def on_LAUNCH_OEBS(self, *args):
         if check_execution_lic("scrape"): return None
         global oebsScrapeObj,oebsScrapeFlag
-        con = controller.Controller()
+        #con = controller.Controller()
         global browsername
         browsername = args[0]
-        con =controller.Controller()
-        con.get_all_the_imports('Oebs')
+        #con =controller.Controller()
+        core_utils.get_all_the_imports('Oebs')
         import scrape_dispatcher
         oebsScrapeObj=scrape_dispatcher
         oebsScrapeFlag=True
@@ -325,8 +324,8 @@ class MainNamespace(BaseNamespace):
     def on_wsdl_listOfOperation(self, *args):
         if check_execution_lic("result_wsdl_listOfOperation"): return None
         global socketIO
-        contrlr = controller.Controller()
-        contrlr.get_all_the_imports('WebServices')
+        #contrlr = controller.Controller()
+        core_utils.get_all_the_imports('WebServices')
         import wsdlgenerator
         wsdlurl = str(args[0])
         wsdl_object = wsdlgenerator.WebservicesWSDL()
@@ -341,8 +340,8 @@ class MainNamespace(BaseNamespace):
         serverCerificate_pass=None
         auth_uname=None
         auth_pass=None
-        contrlr = controller.Controller()
-        contrlr.get_all_the_imports('WebServices')
+        #contrlr = controller.Controller()
+        core_utils.get_all_the_imports('WebServices')
         import wsdlgenerator
         wsgen_inputs=eval(str(args[0]))
         wsdlurl = wsgen_inputs['wsdlurl']
@@ -451,8 +450,8 @@ class MainNamespace(BaseNamespace):
 
     def on_webCrawlerGo(self,*args):
         try:
-            con = controller.Controller()
-            con.get_all_the_imports('WebOcular')
+            #con = controller.Controller()
+            core_utils.get_all_the_imports('WebOcular')
             import webocular
             wobj = webocular.Webocular()
             args=list(args)
@@ -465,8 +464,8 @@ class MainNamespace(BaseNamespace):
 
     def on_jiralogin(self,*args):
         try:
-            con = controller.Controller()
-            con.get_all_the_imports('Jira')
+            #con = controller.Controller()
+            core_utils.get_all_the_imports('Jira')
             import jiracontroller
             obj = jiracontroller.JiraWindow()
             global socketIO
@@ -497,8 +496,8 @@ class MainNamespace(BaseNamespace):
     def on_generateFlowGraph(self,*args):
         try:
             global socketIO
-            con = controller.Controller()
-            con.get_all_the_imports('AutomatedPathGenerator')
+            #con = controller.Controller()
+            core_utils.get_all_the_imports('AutomatedPathGenerator')
             import apg
             fg = apg.AutomatedPathGenerator(socketIO)
             args=list(args)
@@ -511,8 +510,8 @@ class MainNamespace(BaseNamespace):
     def on_apgOpenFileInEditor(self, *args):
         try:
             global socketIO
-            con = controller.Controller()
-            con.get_all_the_imports('AutomatedPathGenerator')
+            #con = controller.Controller()
+            core_utils.get_all_the_imports('AutomatedPathGenerator')
             import apg
             fg = apg.AutomatedPathGenerator(socketIO)
             args = list(args)
@@ -525,8 +524,8 @@ class MainNamespace(BaseNamespace):
     def on_runDeadcodeIdentifier(self, *args):
         try:
             global socketIO
-            con = controller.Controller()
-            con.get_all_the_imports('AutomatedPathGenerator')
+            #con = controller.Controller()
+            core_utils.get_all_the_imports('AutomatedPathGenerator')
             from generateAST import DeadcodeIdentifier
             dci = DeadcodeIdentifier()
             result = dci.start(str(args[0]),str(args[1]))
@@ -558,8 +557,8 @@ class MainNamespace(BaseNamespace):
     def on_irisOperations(self, *args):
         try:
             global socketIO
-            con = controller.Controller()
-            con.get_all_the_imports('IRIS')
+            #con = controller.Controller()
+            core_utils.get_all_the_imports('IRIS')
             import iris_operations
             if(args[1]=='updateDataset'):
                 check = iris_operations.update_dataset(args[0])
@@ -1213,10 +1212,10 @@ class ClientWindow(wx.Frame):
         global mobileScrapeFlag,qcConFlag,mobileWebScrapeFlag,desktopScrapeFlag
         global sapScrapeFlag,debugFlag,browsername,action,oebsScrapeFlag
         global socketIO,data
-        con = controller.Controller()
+        #con = controller.Controller()
         self.schedule.Disable()
         if(irisFlag == True):
-            con.get_all_the_imports('IRIS')
+            core_utils.get_all_the_imports('IRIS')
         if mobileScrapeFlag==True:
             self.scrapewindow = mobileScrapeObj.ScrapeWindow(parent = self,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
             mobileScrapeFlag=False
@@ -1244,8 +1243,8 @@ class ClientWindow(wx.Frame):
             if browsername in browsernumbers:
                 logger.print_on_console('Browser name : '+str(browsername))
                 #con = controller.Controller()
-                con.get_all_the_imports('Web')
-                con.get_all_the_imports('WebScrape')
+                core_utils.get_all_the_imports('Web')
+                core_utils.get_all_the_imports('WebScrape')
                 import Nineteen68_WebScrape
                 self.scrapewindow = Nineteen68_WebScrape.ScrapeWindow(parent = self,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data,irisFlag = irisFlag)
                 browsername = ''
