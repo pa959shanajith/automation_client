@@ -50,6 +50,109 @@ class DesktopDispatcher:
     table_keywords_obj=desktop_table_keywords.Table_Keywords()
 ##    outook_obj=outlook.OutlookKeywords()
 
+    desktop_dict={ 'click': button_link_keywords_obj.click,
+        'press':button_link_keywords_obj.press,
+        'doubleclick' : button_link_keywords_obj.double_click,
+        'verifybuttonname' : button_link_keywords_obj.verify_button_name,
+        'getbuttonname' : button_link_keywords_obj.get_button_name,
+        'rightclick' : button_link_keywords_obj.right_click,
+        'getlinktext' : button_link_keywords_obj.get_link_text,
+        'verifylinktext' : button_link_keywords_obj.verify_link_text,
+        'settext' : editable_text_obj.set_text,
+        'setsecuretext' : editable_text_obj.set_secure_text,
+        'gettext' : editable_text_obj.get_text,
+        'cleartext' : editable_text_obj.clear_text,
+        'verifytext' :  editable_text_obj.verify_text,
+        'verifyelementexists' : element_keywords_obj.verify_element_exists,
+        'verifyelementdoesnotexists' : element_keywords_obj.verify_element_doesNot_exists,
+        'clickelement' : element_keywords_obj.click_element,
+        'getelementtext' : element_keywords_obj.get_element_text,
+        'verifyelementtext' : element_keywords_obj.verify_element_text,
+        'mousehover':element_keywords_obj.mouseHover,
+        'launchapplication' : launch_keywords_obj.launch_application,
+        'findwindowandattach' : launch_keywords_obj.find_window_and_attach,
+        'selectmenu': launch_keywords_obj.select_menu,
+        'maximizewindow' : launch_keywords_obj.maximize_window,
+        'minimizewindow' : launch_keywords_obj.minimize_window,
+        'getpagetitle' : launch_keywords_obj.getPageTitle,
+        'closeapplication' : launch_keywords_obj.closeApplication,
+        'verifyenabled' : util_keywords_obj.verifyEnabled,
+        'verifydisabled' : util_keywords_obj.verifyDisabled,
+        'verifyvisible' : util_keywords_obj.verifyVisible,
+        'verifyexists' : util_keywords_obj.verifyExists,
+        'verifyhidden' : util_keywords_obj.verifyHidden,
+        'verifyreadonly' : util_keywords_obj.verifyReadOnly,
+        'setfocus' : util_keywords_obj.setFocus,
+        'selectvaluebyindex': dropdown_keywords_obj.selectValueByIndex,
+        'selectvaluebytext': dropdown_keywords_obj.selectValueByText,
+        'getselected': dropdown_keywords_obj.getSelected,
+        'verifyselectedvalue': dropdown_keywords_obj.verifySelected,
+        'getcount': dropdown_keywords_obj.getCount,
+        'verifycount': dropdown_keywords_obj.verifyCount,
+        'verifyvaluesexists': dropdown_keywords_obj.verifyValuesExists,
+        'verifyallvalues': dropdown_keywords_obj.verifyAllValues,
+        'getvaluebyindex': dropdown_keywords_obj.getValueByIndex,
+        'getmultiplevaluesbyindexes': dropdown_keywords_obj.getMultpleValuesByIndexs,
+        'selectallvalues': dropdown_keywords_obj.selectAllValues,
+        'deselectall': dropdown_keywords_obj.deSelectAll,
+        'selectmultiplevaluesbyindexes': dropdown_keywords_obj.selectMultpleValuesByIndexs,
+        'selectmultiplevaluesbytext': dropdown_keywords_obj.selectMultpleValuesByText,
+        'selectradiobutton' : radio_checkbox_keywords_obj.select_radiobutton,
+        'selectcheckbox' : radio_checkbox_keywords_obj.select_checkbox,
+        'unselectcheckbox' : radio_checkbox_keywords_obj.unselect_checkbox,
+        'getstatus' : radio_checkbox_keywords_obj.get_status,
+        'selecttabbyindex': tab_control_keywords_obj.selectTabByIndex,
+        'selecttabbytext' : tab_control_keywords_obj.selectTabByText,
+        'getselectedtab' : tab_control_keywords_obj.getSelectedTab,
+        'verifyselectedtab' : tab_control_keywords_obj.verifySelectedTab,
+        'getdate' : date_control_keywords_obj.getDate,
+        'setdate' : date_control_keywords_obj.setDate,
+        'getemail': outook_obj.GetEmail,
+        'getfrommailid' : outook_obj.GetFromMailId,
+        'getattachmentstatus'    : outook_obj.GetAttachmentStatus,
+        'getsubject'     : outook_obj.GetSubject,
+        'gettomailid'  : outook_obj.GetToMailID,
+        'getbody' : outook_obj.GetBody,
+        'verifyemail' : outook_obj.VerifyEmail,
+        'switchtofolder':outook_obj.switchToFolder,
+        'settomailid':outook_obj.send_to_mail,
+        'setcc':outook_obj.send_CC,
+        'setbcc':outook_obj.send_BCC,
+        'setsubject':outook_obj.send_subject,
+        'setbody':outook_obj.send_body,
+        'setattachments':outook_obj.send_attachments,
+        'sendemail':outook_obj.send_mail,
+        'selecttreenode':tree_keywords_obj.click_tree_element,
+        'getnodenamebyindex':tree_keywords_obj.getElementTextByIndex,
+        'getcellvalue':table_keywords_obj.get_cell_value,
+        'getcolcount':table_keywords_obj.get_col_count,
+        'getcolnumbytext':table_keywords_obj.get_col_num_by_text,
+        'getrowcount':table_keywords_obj.get_row_count,
+        'getrownumbytext':table_keywords_obj.get_row_num_by_text,
+        'selectrow':table_keywords_obj.select_row,
+        'clickcell':table_keywords_obj.click_cell,
+        'doubleclickcell':table_keywords_obj.double_click_cell,
+        'verifycellvalue':table_keywords_obj.verify_cell_value
+    }
+
+
+    email_dict={'getemail': 1,
+          'getfrommailid' : 2,
+          'getattachmentstatus'    : 3,
+          'getsubject'     : 4,
+          'gettomailid'  : 5,
+          'getbody' : 6,
+          'verifyemail' : 7,
+          'switchtofolder':8,
+          'settomailid' : 9,
+          'setcc'    : 10,
+          'setbcc'     :11,
+          'setsubject'  : 12,
+          'setbody' : 13,
+          'setattachments' : 14,
+          'sendemail':15
+    }
+
     def __init__(self):
         self.exception_flag=''
         self.action = None
@@ -98,6 +201,18 @@ class DesktopDispatcher:
         result=[desktop_constants.TEST_RESULT_FAIL,desktop_constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
 ##        if objectname != '@Browser' or objectname != '@BrowserPopUp' or objectname != '@Custom':
 #-----------------------------------------------------------------for custom objects
+
+        if(iris_flag):
+            import iris_operations
+            iris_object = iris_operations.IRISKeywords()
+            self.desktop_dict['clickiris'] = iris_object.clickiris
+            self.desktop_dict['settextiris'] = iris_object.settextiris
+            self.desktop_dict['gettextiris'] = iris_object.gettextiris
+            self.desktop_dict['getrowcountiris'] = iris_object.getrowcountiris
+            self.desktop_dict['getcolcountiris'] = iris_object.getcolcountiris
+            self.desktop_dict['getcellvalueiris'] = iris_object.getcellvalueiris
+            self.desktop_dict['verifyexistsiris'] = iris_object.verifyexistsiris
+            self.desktop_dict['verifytextiris'] = iris_object.verifytextiris
         try:
             if objectname==desktop_constants.CUSTOM and teststepproperty.custom_flag:
                 ele_type=input[0].lower()
@@ -115,132 +230,12 @@ class DesktopDispatcher:
 #-----------------------------------------------------------------for custom objects
 
         try:
-            dict={ 'click': self.button_link_keywords_obj.click,
-                    'press':self.button_link_keywords_obj.press,
-                    'doubleclick' : self.button_link_keywords_obj.double_click,
-                    'verifybuttonname' : self.button_link_keywords_obj.verify_button_name,
-                    'getbuttonname' : self.button_link_keywords_obj.get_button_name,
-                    'rightclick' : self.button_link_keywords_obj.right_click,
-                    'getlinktext' : self.button_link_keywords_obj.get_link_text,
-                    'verifylinktext' : self.button_link_keywords_obj.verify_link_text,
-                    'settext' : self.editable_text_obj.set_text,
-                    'setsecuretext' : self.editable_text_obj.set_secure_text,
-                    'gettext' : self.editable_text_obj.get_text,
-                    'cleartext' : self.editable_text_obj.clear_text,
-                    'verifytext' :  self.editable_text_obj.verify_text,
-                    'verifyelementexists' : self.element_keywords_obj.verify_element_exists,
-                    'verifyelementdoesnotexists' : self.element_keywords_obj.verify_element_doesNot_exists,
-                    'clickelement' : self.element_keywords_obj.click_element,
-                    'getelementtext' : self.element_keywords_obj.get_element_text,
-                    'verifyelementtext' : self.element_keywords_obj.verify_element_text,
-                    'mousehover':self.element_keywords_obj.mouseHover,
-                    'launchapplication' : self.launch_keywords_obj.launch_application,
-                    'findwindowandattach' : self.launch_keywords_obj.find_window_and_attach,
-                    'selectmenu': self.launch_keywords_obj.select_menu,
-                    'maximizewindow' : self.launch_keywords_obj.maximize_window,
-                    'minimizewindow' : self.launch_keywords_obj.minimize_window,
-                    'getpagetitle' : self.launch_keywords_obj.getPageTitle,
-                    'closeapplication' : self.launch_keywords_obj.closeApplication,
-                    'verifyenabled' : self.util_keywords_obj.verifyEnabled,
-                    'verifydisabled' : self.util_keywords_obj.verifyDisabled,
-                    'verifyvisible' : self.util_keywords_obj.verifyVisible,
-                    'verifyexists' : self.util_keywords_obj.verifyExists,
-                    'verifyhidden' : self.util_keywords_obj.verifyHidden,
-                    'verifyreadonly' : self.util_keywords_obj.verifyReadOnly,
-                    'setfocus' : self.util_keywords_obj.setFocus,
-                    'selectvaluebyindex': self.dropdown_keywords_obj.selectValueByIndex,
-                    'selectvaluebytext': self.dropdown_keywords_obj.selectValueByText,
-                    'getselected': self.dropdown_keywords_obj.getSelected,
-                    'verifyselectedvalue': self.dropdown_keywords_obj.verifySelected,
-                    'getcount': self.dropdown_keywords_obj.getCount,
-                    'verifycount': self.dropdown_keywords_obj.verifyCount,
-                    'verifyvaluesexists': self.dropdown_keywords_obj.verifyValuesExists,
-                    'verifyallvalues': self.dropdown_keywords_obj.verifyAllValues,
-                    'getvaluebyindex': self.dropdown_keywords_obj.getValueByIndex,
-                    'getmultiplevaluesbyindexes': self.dropdown_keywords_obj.getMultpleValuesByIndexs,
-                    'selectallvalues': self.dropdown_keywords_obj.selectAllValues,
-                    'deselectall': self.dropdown_keywords_obj.deSelectAll,
-                    'selectmultiplevaluesbyindexes': self.dropdown_keywords_obj.selectMultpleValuesByIndexs,
-                    'selectmultiplevaluesbytext': self.dropdown_keywords_obj.selectMultpleValuesByText,
-                    'selectradiobutton' : self.radio_checkbox_keywords_obj.select_radiobutton,
-                    'selectcheckbox' : self.radio_checkbox_keywords_obj.select_checkbox,
-                    'unselectcheckbox' : self.radio_checkbox_keywords_obj.unselect_checkbox,
-                    'getstatus' : self.radio_checkbox_keywords_obj.get_status,
-                    'selecttabbyindex': self.tab_control_keywords_obj.selectTabByIndex,
-                    'selecttabbytext' : self.tab_control_keywords_obj.selectTabByText,
-                    'getselectedtab' : self.tab_control_keywords_obj.getSelectedTab,
-                    'verifyselectedtab' : self.tab_control_keywords_obj.verifySelectedTab,
-                    'getdate' : self.date_control_keywords_obj.getDate,
-                    'setdate' : self.date_control_keywords_obj.setDate,
-                    'getemail': self.outook_obj.GetEmail,
-                    'getfrommailid' : self.outook_obj.GetFromMailId,
-                    'getattachmentstatus'    : self.outook_obj.GetAttachmentStatus,
-                    'getsubject'     : self.outook_obj.GetSubject,
-                    'gettomailid'  : self.outook_obj.GetToMailID,
-                    'getbody' : self.outook_obj.GetBody,
-                    'verifyemail' : self.outook_obj.VerifyEmail,
-                    'switchtofolder':self.outook_obj.switchToFolder,
-                    'settomailid':self.outook_obj.send_to_mail,
-                    'setcc':self.outook_obj.send_CC,
-                    'setbcc':self.outook_obj.send_BCC,
-                    'setsubject':self.outook_obj.send_subject,
-                    'setbody':self.outook_obj.send_body,
-                    'setattachments':self.outook_obj.send_attachments,
-                    'sendemail':self.outook_obj.send_mail,
-##                    'getnodecount':self.tree_keywords_obj.get_item_count,
-##                    'verifynodecount':self.tree_keywords_obj.verify_item_count,
-##                    'expandall':self.tree_keywords_obj.expand_all,
-##                    'collapseall':self.tree_keywords_obj.collapse_all,
-##                    'getchildren':self.tree_keywords_obj.get_children,
-##                    'verifychildren':self.tree_keywords_obj.verify_children,
-##                    'getrootnodes':self.tree_keywords_obj.get_root_elements,
-##                    'selecttreeelement':self.tree_keywords_obj.select_element,
-                    'selecttreenode':self.tree_keywords_obj.click_tree_element,
-##                    'doubleclicktreenode':self.tree_keywords_obj.double_click_tree_element,
-                    'getnodenamebyindex':self.tree_keywords_obj.getElementTextByIndex,
-                    'getcellvalue':self.table_keywords_obj.get_cell_value,
-                    'getcolcount':self.table_keywords_obj.get_col_count,
-                    'getcolnumbytext':self.table_keywords_obj.get_col_num_by_text,
-                    'getrowcount':self.table_keywords_obj.get_row_count,
-                    'getrownumbytext':self.table_keywords_obj.get_row_num_by_text,
-                    'selectrow':self.table_keywords_obj.select_row,
-                    'clickcell':self.table_keywords_obj.click_cell,
-                    'doubleclickcell':self.table_keywords_obj.double_click_cell,
-                    'verifycellvalue':self.table_keywords_obj.verify_cell_value
-                }
-            if(iris_flag):
-                import iris_operations
-                iris_object = iris_operations.IRISKeywords()
-                dict['clickiris'] = iris_object.clickiris
-                dict['settextiris'] = iris_object.settextiris
-                dict['gettextiris'] = iris_object.gettextiris
-                dict['getrowcountiris'] = iris_object.getrowcountiris
-                dict['getcolcountiris'] = iris_object.getcolcountiris
-                dict['getcellvalueiris'] = iris_object.getcellvalueiris
-                dict['verifyexistsiris'] = iris_object.verifyexistsiris
-                dict['verifytextiris'] = iris_object.verifytextiris
 
-            email_dict={'getemail': 1,
-                  'getfrommailid' : 2,
-                  'getattachmentstatus'    : 3,
-                  'getsubject'     : 4,
-                  'gettomailid'  : 5,
-                  'getbody' : 6,
-                  'verifyemail' : 7,
-                  'switchtofolder':8,
-                  'settomailid' : 9,
-                  'setcc'    : 10,
-                  'setbcc'     :11,
-                  'setsubject'  : 12,
-                  'setbody' : 13,
-                  'setattachments' : 14,
-                  'sendemail':15
-                }
             keyword=keyword.lower()
             ele = None
-            if keyword in list(dict.keys()):
-                if keyword=='launchapplication' or keyword=='findwindowandattach' or keyword=='selectmenu' or keyword in list(email_dict.keys()) :
-                    result= dict[keyword](input,output)
+            if keyword in list(self.desktop_dict.keys()):
+                if keyword=='launchapplication' or keyword=='findwindowandattach' or keyword=='selectmenu' or keyword in list(self.email_dict.keys()) :
+                    result= self.desktop_dict[keyword](input,output)
                 else:
                     self.launch_keywords_obj.verifyWindowTitle()
                     if objectname != '' and teststepproperty.cord != None and teststepproperty.cord != '':
@@ -250,13 +245,13 @@ class DesktopDispatcher:
                         coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
                         ele = {'cord': teststepproperty.cord, 'coordinates': coord}
                         if(teststepproperty.custom_flag):
-                            result = dict[keyword](ele,input,output,teststepproperty.parent_xpath)
+                            result = self.desktop_dict[keyword](ele,input,output,teststepproperty.parent_xpath)
                         else:
-                            result= dict[keyword](ele,input,output)
+                            result= self.desktop_dict[keyword](ele,input,output)
                     else:
                         if objectname != '':
                             ele = self.get_desktop_element(objectname,url)
-                        result= dict[keyword](ele,url,input,output)
+                        result= self.desktop_dict[keyword](ele,url,input,output)
 
                 if not(desktop_constants.ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE

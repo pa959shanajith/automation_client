@@ -84,7 +84,7 @@ class Controller():
     system_dispatcher_obj = None
     def __init__(self):
         self.action=None
-        self.get_all_the_imports(CORE)
+        core_utils.get_all_the_imports(CORE)
 
         self.cur_dir= os.getcwd()
         self.previous_step=''
@@ -161,7 +161,7 @@ class Controller():
 
     def __load_oebs(self):
         try:
-            self.get_all_the_imports('Oebs')
+            core_utils.get_all_the_imports('Oebs')
             if iris_flag:
                 core_utils.get_all_the_imports('IRIS')
             import oebs_dispatcher
@@ -174,7 +174,7 @@ class Controller():
 
     def __load_web(self):
         try:
-##            self.get_all_the_imports('ImageProcessing')
+##            core_utils.get_all_the_imports('ImageProcessing')
             core_utils.get_all_the_imports('WebScrape')
             core_utils.get_all_the_imports('Web')
             if iris_flag:
@@ -1239,7 +1239,7 @@ def kill_process():
                 os.system("TASKKILL /F /PID " + str(pid))
             browser_Keywords.pid_set.clear()
         except Exception as e:
-            log.error(e)
+            log.error(e,exc_info=True)
         try:
             time.sleep(3)
             try:

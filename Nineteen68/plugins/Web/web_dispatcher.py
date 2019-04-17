@@ -163,17 +163,7 @@ class Dispatcher:
       'navigatewithauthenticate':browser_object.navigate_with_authenticate
     }
 
-    if(iris_flag):
-        import iris_operations
-        iris_object = iris_operations.IRISKeywords()
-        web_dict['clickiris'] = iris_object.clickiris
-        web_dict['settextiris'] = iris_object.settextiris
-        web_dict['gettextiris'] = iris_object.gettextiris
-        web_dict['getrowcountiris'] = iris_object.getrowcountiris
-        web_dict['getcolcountiris'] = iris_object.getcolcountiris
-        web_dict['getcellvalueiris'] = iris_object.getcellvalueiris
-        web_dict['verifyexistsiris'] = iris_object.verifyexistsiris
-        web_dict['verifytextiris'] = iris_object.verifytextiris
+
 
     def __init__(self):
         self.exception_flag=''
@@ -215,6 +205,18 @@ class Dispatcher:
                                         'tab','waitforelementvisible','mousehover','savefile','press','verifyenabled','verifydisabled','verifyreadonly']}
 
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
+
+        if(iris_flag):
+            import iris_operations
+            iris_object = iris_operations.IRISKeywords()
+            self.web_dict['clickiris'] = iris_object.clickiris
+            self.web_dict['settextiris'] = iris_object.settextiris
+            self.web_dict['gettextiris'] = iris_object.gettextiris
+            self.web_dict['getrowcountiris'] = iris_object.getrowcountiris
+            self.web_dict['getcolcountiris'] = iris_object.getcolcountiris
+            self.web_dict['getcellvalueiris'] = iris_object.getcellvalueiris
+            self.web_dict['verifyexistsiris'] = iris_object.verifyexistsiris
+            self.web_dict['verifytextiris'] = iris_object.verifytextiris
 
         def print_error(err_msg):
 ##            err_msg=ERROR_CODE_DICT['ERR_CUSTOM_MISMATCH']
