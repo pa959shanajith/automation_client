@@ -52,6 +52,7 @@ plugins_list = []
 configvalues = None
 execution_flag = False
 closeActiveConnection = False
+connection_Timer=None
 ICE_CONST= os.environ["NINETEEN68_HOME"] + '/Lib/ice_const.json'
 CONFIG_PATH= os.environ["NINETEEN68_HOME"] + '/Lib/config.json'
 IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images/"
@@ -69,72 +70,77 @@ if SYSTEM_OS=='Darwin':
 
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
-        global action,wxObject,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag
+        global action,wxObject,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag,connection_Timer
         try:
             if(str(args[0]) == 'connected'):
-                if(allow_connect):
-                    logger.print_on_console('Normal Mode: Connection to the Nineteen68 Server established')
-                    wxObject.schedule.Enable()
-                    wxObject.cancelbutton.Enable()
-                    wxObject.terminatebutton.Enable()
-                    wxObject.clearbutton.Enable()
-                    wxObject.rbox.Enable()
-                    if browsercheckFlag == False:
-                        browsercheckFlag = check_browser()
-                    if executionOnly:
-                        msg='Execution only Mode enabled'
-                        logger.print_on_console(msg)
-                        log.info(msg)
-                    log.info('Normal Mode: Connection to the Nineteen68 Server established')
+            if(allow_connect):
+                logger.print_on_console('Normal Mode: Connection to the Nineteen68 Server established')
+                wxObject.schedule.Enable()
+                wxObject.cancelbutton.Enable()
+                wxObject.terminatebutton.Enable()
+                wxObject.clearbutton.Enable()
+                wxObject.rbox.Enable()
+                if browsercheckFlag == False:
+                    browsercheckFlag = check_browser()
+                if executionOnly:
+                    msg='Execution only Mode enabled'
+                    logger.print_on_console(msg)
+                    log.info(msg)
+                log.info('Normal Mode: Connection to the Nineteen68 Server established')
+                conn_time= int(configvalues['connection_timeout'])
+                if ((conn_time !='') and (conn_time*60*60 not in range(0,8))):
+                    connection_Timer = threading.Timer(conn_time, wxObject.closeConnection)
+                    connection_Timer.start()
+            else:
+                threading.Timer(1,wxObject.killSocket).start()
+
+        elif(str(args[0]) == 'schedulingEnabled'):
+            logger.print_on_console('Schedule Mode Enabled')
+            log.info('Schedule Mode Enabled')
+
+        elif(str(args[0]) == 'schedulingDisabled'):
+            logger.print_on_console('Schedule Mode Disabled')
+            log.info('Schedule Mode Disabled')
+
+        elif(str(args[0]) == 'checkConnection'):
+            try:
+                global icesession,plugins_list
+                ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+                    'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
+                core_utils_obj = core_utils.CoreUtils()
+                response = json.loads(core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
+                plugins_list = response['plugins']
+                err_res = None
+                if(response['id'] != icesession['ice_id'] and response['connect_time'] != icesession['connect_time']):
+                    err_res="Invalid response received"
+                if(response['res'] != 'success'):
+                    if('err_msg' in response):
+                        err_res=response['err_msg']
+                if(err_res is not None):
+                    logger.print_on_console(err_res)
+                    log.info(err_res)
                 else:
-                    threading.Timer(1,wxObject.killSocket).start()
+                    allow_connect = True
+                    wxObject.connectbutton.SetBitmapLabel(wxObject.disconnect_img)
+                    wxObject.connectbutton.SetName("disconnect")
+                    wxObject.connectbutton.SetToolTip(wx.ToolTip("Disconnect from Nineteen68 Server"))
+                    controller.disconnect_flag=False
+                wxObject.connectbutton.Enable()
+            except Exception as e:
+                logger.print_on_console('Error while checking connection request')
+                log.info('Error while checking connection request')
+                log.error(e)
 
-            elif(str(args[0]) == 'schedulingEnabled'):
-                logger.print_on_console('Schedule Mode Enabled')
-                log.info('Schedule Mode Enabled')
+        elif(str(args[0]) == 'fail'):
+            fail_msg = "Fail"
+            if len(args) > 1 and args[1]=="conn":
+                fail_msg+="ed to connect to Nineteen68 Server"
+            if len(args) > 1 and args[1]=="disconn":
+                fail_msg+="ed to disconnect from Nineteen68 Server"
+            logger.print_on_console(fail_msg)
+            log.info(fail_msg)
+            threading.Timer(0.1,wxObject.killSocket).start()
 
-            elif(str(args[0]) == 'schedulingDisabled'):
-                logger.print_on_console('Schedule Mode Disabled')
-                log.info('Schedule Mode Disabled')
-
-            elif(str(args[0]) == 'checkConnection'):
-                try:
-                    global icesession,plugins_list
-                    ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
-                        'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-                    core_utils_obj = core_utils.CoreUtils()
-                    response = json.loads(core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
-                    plugins_list = response['plugins']
-                    err_res = None
-                    if(response['id'] != icesession['ice_id'] and response['connect_time'] != icesession['connect_time']):
-                        err_res="Invalid response received"
-                    if(response['res'] != 'success'):
-                        if('err_msg' in response):
-                            err_res=response['err_msg']
-                    if(err_res is not None):
-                        logger.print_on_console(err_res)
-                        log.info(err_res)
-                    else:
-                        allow_connect = True
-                        wxObject.connectbutton.SetBitmapLabel(wxObject.disconnect_img)
-                        wxObject.connectbutton.SetName("disconnect")
-                        wxObject.connectbutton.SetToolTip(wx.ToolTip("Disconnect from Nineteen68 Server"))
-                        controller.disconnect_flag=False
-                    wxObject.connectbutton.Enable()
-                except Exception as e:
-                    logger.print_on_console('Error while checking connection request')
-                    log.info('Error while checking connection request')
-                    log.error(e)
-
-            elif(str(args[0]) == 'fail'):
-                fail_msg = "Fail"
-                if len(args) > 1 and args[1]=="conn":
-                    fail_msg+="ed to connect to Nineteen68 Server"
-                if len(args) > 1 and args[1]=="disconn":
-                    fail_msg+="ed to disconnect from Nineteen68 Server"
-                logger.print_on_console(fail_msg)
-                log.info(fail_msg)
-                threading.Timer(0.1,wxObject.killSocket).start()
         except Exception as e:
             err_msg='Error while Connecting to Server'
             log.error(err_msg)
@@ -795,7 +801,7 @@ class TestThread(threading.Thread):
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
-        global socketIO, execution_flag, closeActiveConnection
+        global socketIO, execution_flag, closeActiveConnection,connection_Timer
         try:
             self.wxObject.cancelbutton.Disable()
             self.wxObject.terminatebutton.Enable()
@@ -864,8 +870,10 @@ class TestThread(threading.Thread):
                 elif self.action==EXECUTE:
                     socketIO.emit('result_executeTestSuite',status)
         if closeActiveConnection:
-            threading.Timer(300, wxObject.closeConnection).start()
+            connection_Timer =threading.Timer(300, wxObject.closeConnection)
+            connection_Timer.start()
             closeActiveConnection = False
+            connection_Timer = None
         self.wxObject.mythread = None
         execution_flag = False
         self.wxObject.schedule.Enable()
@@ -1104,13 +1112,17 @@ class ClientWindow(wx.Frame):
                 log.error(e)
 
     def onChecked_Schedule(self, e):
+        global connection_Timer,socketIO
+        conn_time= int(configvalues['connection_timeout'])
+        if ((conn_time !='') and (conn_time not in range(0,8))):
+            if (connection_Timer != None and connection_Timer.isAlive()):
+                connection_Timer.cancel()
+                log.info("Timer Restarted")
+                connection_Timer =threading.Timer(conn_time*60*60, wxObject.closeConnection)
+                connection_Timer.start()
         mode=self.schedule.GetValue()
-        if mode:
-            conn_time= int(configvalues['connection_timeout'])
-            if ((conn_time !='') and (conn_time not in range(0,8))):
-                threading.Timer(conn_time*60*60, wxObject.closeConnection).start()
-        global socketIO
         socketIO.emit('toggle_schedule',mode)
+
 
     def onRadioBox(self,e):
         self.choice=self.rbox.GetStringSelection()
@@ -1132,9 +1144,14 @@ class ClientWindow(wx.Frame):
                 self.breakpoint.Disable()
 
     def OnClose(self, event):
+        global connection_Timer
         controller.terminate_flag=True
         controller.disconnect_flag=True
         logger.print_on_console('Disconnected from Nineteen68 server')
+        if (connection_Timer != None and connection_Timer.isAlive()):
+            log.info("Timer Stopped Connection Timeout")
+            connection_Timer.cancel()
+            connection_Timer=None
         stat = self.killChildWindow(True,True,True,True)
         if stat[1]: socketIO.emit('scrape','Terminate')
         self.killSocket(True)
