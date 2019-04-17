@@ -52,6 +52,7 @@ plugins_list = []
 configvalues = None
 execution_flag = False
 closeActiveConnection = False
+connection_Timer=None
 ICE_CONST= os.environ["NINETEEN68_HOME"] + '/Lib/ice_const.json'
 CONFIG_PATH= os.environ["NINETEEN68_HOME"] + '/Lib/config.json'
 IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images/"
@@ -69,7 +70,7 @@ if SYSTEM_OS=='Darwin':
 
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
-        global action,wxObject,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag
+        global action,wxObject,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag,connection_Timer
 
         if(str(args[0]) == 'connected'):
             if(allow_connect):
@@ -86,6 +87,10 @@ class MainNamespace(BaseNamespace):
                     logger.print_on_console(msg)
                     log.info(msg)
                 log.info('Normal Mode: Connection to the Nineteen68 Server established')
+                conn_time= int(configvalues['connection_timeout'])
+                if ((conn_time !='') and (conn_time*60*60 not in range(0,8))):
+                    connection_Timer = threading.Timer(conn_time, wxObject.closeConnection)
+                    connection_Timer.start()
             else:
                 threading.Timer(1,wxObject.killSocket).start()
 
@@ -707,7 +712,7 @@ class TestThread(threading.Thread):
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
-        global socketIO, execution_flag, closeActiveConnection
+        global socketIO, execution_flag, closeActiveConnection,connection_Timer
         try:
             self.wxObject.cancelbutton.Disable()
             self.wxObject.terminatebutton.Enable()
@@ -776,8 +781,10 @@ class TestThread(threading.Thread):
                 elif self.action==EXECUTE:
                     socketIO.emit('result_executeTestSuite',status)
         if closeActiveConnection:
-            threading.Timer(300, wxObject.closeConnection).start()
+            connection_Timer =threading.Timer(300, wxObject.closeConnection)
+            connection_Timer.start()
             closeActiveConnection = False
+            connection_Timer = None
         self.wxObject.mythread = None
         execution_flag = False
         self.wxObject.schedule.Enable()
@@ -1016,12 +1023,15 @@ class ClientWindow(wx.Frame):
                 log.error(e)
 
     def onChecked_Schedule(self, e):
+        global connection_Timer,socketIO
+        conn_time= int(configvalues['connection_timeout'])
+        if ((conn_time !='') and (conn_time not in range(0,8))):
+            if (connection_Timer != None and connection_Timer.isAlive()):
+                connection_Timer.cancel()
+                log.info("Timer Restarted")
+                connection_Timer =threading.Timer(conn_time*60*60, wxObject.closeConnection)
+                connection_Timer.start()
         mode=self.schedule.GetValue()
-        if mode:
-            conn_time= int(configvalues['connection_timeout'])
-            if ((conn_time !='') and (conn_time not in range(0,8))):
-                threading.Timer(conn_time*60*60, wxObject.closeConnection).start()
-        global socketIO
         socketIO.emit('toggle_schedule',mode)
 
     def onRadioBox(self,e):
@@ -1044,9 +1054,14 @@ class ClientWindow(wx.Frame):
                 self.breakpoint.Disable()
 
     def OnClose(self, event):
+        global connection_Timer
         controller.terminate_flag=True
         controller.disconnect_flag=True
         logger.print_on_console('Disconnected from Nineteen68 server')
+        if (connection_Timer != None and connection_Timer.isAlive()):
+            log.info("Timer Stopped Connection Timeout")
+            connection_Timer.cancel()
+            connection_Timer=None
         stat = self.killChildWindow(True,True,True,True)
         if stat[1]: socketIO.emit('scrape','Terminate')
         self.killSocket(True)
