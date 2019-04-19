@@ -87,8 +87,8 @@ class MainNamespace(BaseNamespace):
                         log.info(msg)
                     log.info('Normal Mode: Connection to the Nineteen68 Server established')
                     conn_time= int(configvalues['connection_timeout'])
-                    if ((conn_time !='') and (conn_time*60*60 not in range(0,8))):
-                        connection_Timer = threading.Timer(conn_time, wxObject.closeConnection)
+                    if ((conn_time !='') and (conn_time not in range(0,8))):
+                        connection_Timer = threading.Timer(conn_time*60*60, wxObject.closeConnection)
                         connection_Timer.start()
                 else:
                     threading.Timer(1,wxObject.killSocket).start()
