@@ -107,21 +107,6 @@ class DesktopDispatcher:
         'verifyselectedtab' : tab_control_keywords_obj.verifySelectedTab,
         'getdate' : date_control_keywords_obj.getDate,
         'setdate' : date_control_keywords_obj.setDate,
-        'getemail': outook_obj.GetEmail,
-        'getfrommailid' : outook_obj.GetFromMailId,
-        'getattachmentstatus'    : outook_obj.GetAttachmentStatus,
-        'getsubject'     : outook_obj.GetSubject,
-        'gettomailid'  : outook_obj.GetToMailID,
-        'getbody' : outook_obj.GetBody,
-        'verifyemail' : outook_obj.VerifyEmail,
-        'switchtofolder':outook_obj.switchToFolder,
-        'settomailid':outook_obj.send_to_mail,
-        'setcc':outook_obj.send_CC,
-        'setbcc':outook_obj.send_BCC,
-        'setsubject':outook_obj.send_subject,
-        'setbody':outook_obj.send_body,
-        'setattachments':outook_obj.send_attachments,
-        'sendemail':outook_obj.send_mail,
         'selecttreenode':tree_keywords_obj.click_tree_element,
         'getnodenamebyindex':tree_keywords_obj.getElementTextByIndex,
         'getcellvalue':table_keywords_obj.get_cell_value,
@@ -153,13 +138,53 @@ class DesktopDispatcher:
           'sendemail':15
     }
 
+    # For custom objects
+    custom_dict = {
+        "clickelement":['radiobutton','checkbox','input','button','select'],
+        "doubleclick":['radiobutton','checkbox','input','button','select'],
+        "getelementtext":['radiobutton','checkbox','input','button','select'],
+        "getstatus":['radiobutton','checkbox'],
+        "gettext":['input'],
+        "rightclick":['button'],
+        "selectcheckbox":['checkbox'],
+        "selectradiobutton":['radiobutton'],
+        "setfocus" :['radiobutton','checkbox','input','button','select'],
+        "setsecuretext":['input'],
+        "selectvaluebyindex":['select'],
+        "selectvaluebytext":['select'],
+        "settext":['input'],
+        "unselectcheckbox":['checkbox'],
+        'verifyhidden' :['radiobutton','checkbox','input','button','select'],
+        'verifyvisible':['radiobutton','checkbox','input','button','select'],
+        "verifyelementtext":['radiobutton','checkbox','input','button','select'],
+        "verifyexists":['radiobutton','checkbox','input','button','select'],
+        "mousehover":['radiobutton','checkbox','input','button'],
+        "verifyallvalues":['select']
+    }
+
+    get_ele_type={
+        'radio': 'radiobutton',
+        'checkbox':'checkbox',
+        'dropdown':'select',
+        'textbox':'input',
+        'button':'button',
+    }
+
+
     def __init__(self):
         self.exception_flag=''
         self.action = None
         self.outook_obj=outlook.OutlookKeywords()
 
-#-----------------------------------------------------------------for custom objects
-
+    def dispatcher(self,teststepproperty,input,iris_flag):
+        objectname = teststepproperty.objectname
+        output = teststepproperty.outputval
+        objectname = objectname.strip()
+        keyword = teststepproperty.name.lower()
+        url = teststepproperty.url
+        err_msg=None
+        result=[desktop_constants.TEST_RESULT_FAIL,desktop_constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
+##        if objectname != '@Browser' or objectname != '@BrowserPopUp' or objectname != '@Custom':
 
         self.desktop_dict['getemail']= self.outook_obj.GetEmail
         self.desktop_dict['getfrommailid']=self.outook_obj.GetFromMailId
@@ -177,48 +202,6 @@ class DesktopDispatcher:
         self.desktop_dict['setattachments']=self.outook_obj.send_attachments
         self.desktop_dict['sendemail']=self.outook_obj.send_mail
 
-    custom_dict = {
-                    "clickelement":['radiobutton','checkbox','input','button','select'],
-                    "doubleclick":['radiobutton','checkbox','input','button','select'],
-                    "getelementtext":['radiobutton','checkbox','input','button','select'],
-                    "getstatus":['radiobutton','checkbox'],
-                    "gettext":['input'],
-                    "rightclick":['button'],
-                    "selectcheckbox":['checkbox'],
-                    "selectradiobutton":['radiobutton'],
-                    "setfocus" :['radiobutton','checkbox','input','button','select'],
-                    "setsecuretext":['input'],
-                    "selectvaluebyindex":['select'],
-                    "selectvaluebytext":['select'],
-                    "settext":['input'],
-                    "unselectcheckbox":['checkbox'],
-                    'verifyhidden' :['radiobutton','checkbox','input','button','select'],
-                    'verifyvisible':['radiobutton','checkbox','input','button','select'],
-                    "verifyelementtext":['radiobutton','checkbox','input','button','select'],
-                    "verifyexists":['radiobutton','checkbox','input','button','select'],
-                    "mousehover":['radiobutton','checkbox','input','button'],
-                    "verifyallvalues":['select']
-                  }
-
-    get_ele_type={
-                'radio': 'radiobutton',
-                'checkbox':'checkbox',
-                'dropdown':'select',
-                'textbox':'input',
-                'button':'button',
-                }
-#-----------------------------------------------------------------for custom objects
-
-    def dispatcher(self,teststepproperty,input,iris_flag):
-        objectname = teststepproperty.objectname
-        output = teststepproperty.outputval
-        objectname = objectname.strip()
-        keyword = teststepproperty.name.lower()
-        url = teststepproperty.url
-        err_msg=None
-        result=[desktop_constants.TEST_RESULT_FAIL,desktop_constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
-##        if objectname != '@Browser' or objectname != '@BrowserPopUp' or objectname != '@Custom':
-#-----------------------------------------------------------------for custom objects
 
         if(iris_flag):
             import iris_operations
