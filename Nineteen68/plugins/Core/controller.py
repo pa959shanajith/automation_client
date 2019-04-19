@@ -8,6 +8,12 @@
 # Copyright:   (c) wasimakram.sutar 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
+from concurrent.futures import ThreadPoolExecutor
+import threading
+from datetime import datetime
+import logging
+import time
+import platform
 import if_step
 import for_step
 import getparam
@@ -23,12 +29,6 @@ import pause_execution
 import dynamic_variable_handler
 import reporting
 import core_utils
-from concurrent.futures import ThreadPoolExecutor
-import threading
-from datetime import datetime
-import logging
-import time
-import platform
 #index for iterating the teststepproperty for executor
 i = 0
 #Terminate Flag
@@ -84,7 +84,7 @@ class Controller():
     system_dispatcher_obj = None
     def __init__(self):
         self.action=None
-        self.get_all_the_imports(CORE)
+        core_utils.get_all_the_imports(CORE)
 
         self.cur_dir= os.getcwd()
         self.previous_step=''
@@ -112,8 +112,8 @@ class Controller():
     def __load_generic(self):
         try:
             if self.generic_dispatcher_obj==None:
-                self.get_all_the_imports('ImageProcessing')
-                self.get_all_the_imports('Generic')
+                core_utils.get_all_the_imports('ImageProcessing')
+                core_utils.get_all_the_imports('Generic')
                 import generic_dispatcher
                 self.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
         except Exception as e:
@@ -123,11 +123,10 @@ class Controller():
     def __load_mobile_web(self):
         try:
             if self.mobile_web_dispatcher_obj==None:
-                import platform
                 if SYSTEM_OS == 'Darwin':
-                    self.get_all_the_imports('Mobility/MobileWeb')
+                    core_utils.get_all_the_imports('Mobility/MobileWeb')
                 else:
-                    self.get_all_the_imports('Mobility')
+                    core_utils.get_all_the_imports('Mobility')
                 import web_dispatcher_MW
                 self.mobile_web_dispatcher_obj = web_dispatcher_MW.Dispatcher()
                 self.mobile_web_dispatcher_obj.action=self.action
@@ -138,11 +137,10 @@ class Controller():
     def __load_mobile_app(self):
         try:
             if self.mobile_app_dispatcher_obj==None:
-                import platform
                 if SYSTEM_OS=='Darwin':
-                    self.get_all_the_imports('Mobility/MobileApp')
+                    core_utils.get_all_the_imports('Mobility/MobileApp')
                 else:
-                    self.get_all_the_imports('Mobility')
+                    core_utils.get_all_the_imports('Mobility')
                 import mobile_app_dispatcher
                 self.mobile_app_dispatcher_obj = mobile_app_dispatcher.MobileDispatcher()
                 self.mobile_app_dispatcher_obj.action=self.action
@@ -152,7 +150,7 @@ class Controller():
 
     def __load_webservice(self):
         try:
-            self.get_all_the_imports('WebServices')
+            core_utils.get_all_the_imports('WebServices')
             import websevice_dispatcher
             self.webservice_dispatcher_obj = websevice_dispatcher.Dispatcher()
         except Exception as e:
@@ -161,9 +159,9 @@ class Controller():
 
     def __load_oebs(self):
         try:
-            self.get_all_the_imports('Oebs')
+            core_utils.get_all_the_imports('Oebs')
             if iris_flag:
-                self.get_all_the_imports('IRIS')
+                core_utils.get_all_the_imports('IRIS')
             import oebs_dispatcher
             self.oebs_dispatcher_obj = oebs_dispatcher.OebsDispatcher()
             self.oebs_dispatcher_obj.exception_flag=self.exception_flag
@@ -174,11 +172,11 @@ class Controller():
 
     def __load_web(self):
         try:
-##            self.get_all_the_imports('ImageProcessing')
-            self.get_all_the_imports('WebScrape')
-            self.get_all_the_imports('Web')
+##            core_utils.get_all_the_imports('ImageProcessing')
+            core_utils.get_all_the_imports('WebScrape')
+            core_utils.get_all_the_imports('Web')
             if iris_flag:
-                self.get_all_the_imports('IRIS')
+                core_utils.get_all_the_imports('IRIS')
             import web_dispatcher
             self.web_dispatcher_obj = web_dispatcher.Dispatcher()
             self.web_dispatcher_obj.exception_flag=self.exception_flag
@@ -189,9 +187,9 @@ class Controller():
 
     def __load_desktop(self):
         try:
-            self.get_all_the_imports('Desktop')
+            core_utils.get_all_the_imports('Desktop')
             if iris_flag:
-                self.get_all_the_imports('IRIS')
+                core_utils.get_all_the_imports('IRIS')
             import desktop_dispatcher
             self.desktop_dispatcher_obj = desktop_dispatcher.DesktopDispatcher()
             self.desktop_dispatcher_obj.exception_flag=self.exception_flag
@@ -202,9 +200,9 @@ class Controller():
 
     def __load_sap(self):
         try:
-            self.get_all_the_imports('SAP')
+            core_utils.get_all_the_imports('SAP')
             if iris_flag:
-                self.get_all_the_imports('IRIS')
+                core_utils.get_all_the_imports('IRIS')
             import sap_dispatcher
             self.sap_dispatcher_obj = sap_dispatcher.SAPDispatcher()
             self.sap_dispatcher_obj.exception_flag=self.exception_flag
@@ -215,7 +213,7 @@ class Controller():
 
     def __load_mainframe(self):
         try:
-            self.get_all_the_imports('Mainframe')
+            core_utils.get_all_the_imports('Mainframe')
             import mainframe_dispatcher
             self.mainframe_dispatcher_obj = mainframe_dispatcher.MainframeDispatcher()
             self.mainframe_dispatcher_obj.exception_flag=self.exception_flag
@@ -226,7 +224,7 @@ class Controller():
 
     def __load_system(self):
         try:
-            self.get_all_the_imports('System')
+            core_utils.get_all_the_imports('System')
             import system_dispatcher
             self.system_dispatcher_obj = system_dispatcher.SystemDispatcher()
             self.system_dispatcher_obj.exception_flag=self.exception_flag
@@ -830,14 +828,6 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
         return res
 
-    def get_all_the_imports(self,plugin_path):
-        path= os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/'+plugin_path
-        sys.path.append(path)
-        for root, dirs, files in os.walk(path):
-            for d in dirs:
-                p = path + '/' + d
-                sys.path.append(p)
-
     def invoke_debug(self,mythread,runfrom_step,json_data):
         status=COMPLETED
         global break_point
@@ -845,10 +835,10 @@ class Controller():
         self.action=DEBUG
         handler.tspList=[]
         scenario=[json_data]
-        print( '=======================================================================================================')
+        print('=======================================================================================================')
         log.info('***DEBUG STARTED***')
         logger.print_on_console('***DEBUG STARTED***')
-        print( '=======================================================================================================')
+        print('=======================================================================================================')
         for d in scenario:
             flag,browser_type,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(d)
             if flag == False:
@@ -868,11 +858,11 @@ class Controller():
                 logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
                 log.info('Invalid step number!! Please provide run from step number')
         else:
-            print('Invalid script')
-        print( '=======================================================================================================')
+            logger.print_on_console('Invalid script')
+        print('=======================================================================================================')
         log.info('***DEBUG COMPLETED***')
         logger.print_on_console('***DEBUG COMPLETED***')
-        print( '=======================================================================================================')
+        print('=======================================================================================================')
         #clearing of dynamic variables
         obj.clearList(self)
         #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
@@ -907,11 +897,11 @@ class Controller():
                 status=TERMINATE
 ##                break
             log.info('---------------------------------------------------------------------')
-            print( '=======================================================================================================')
+            print('=======================================================================================================')
             log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
             logger.print_on_console('***SUITE ', j ,' EXECUTION STARTED***')
             log.info('-----------------------------------------------')
-            print( '=======================================================================================================')
+            print('=======================================================================================================')
             do_not_execute = False
             #Check for the disabled scenario
             if not (do_not_execute) :
@@ -930,9 +920,9 @@ class Controller():
                         if not(condition_check_flag):
                              #check for temrinate flag before printing loggers
                             if not(terminate_flag):
-                                print( '=======================================================================================================')
+                                print('=======================================================================================================')
                                 logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
-                                print( '=======================================================================================================')
+                                print('=======================================================================================================')
                                 log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
                             if(len(scenario)==3 and len(scenario['qcdetails'])==7):
                                 qc_details_creds=scenario['qccredentials']
@@ -982,9 +972,9 @@ class Controller():
                                     con.conthread=mythread
                                     con.tsp_list=tsplist
                                     status = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
-                                    print( '=======================================================================================================')
+                                    print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
-                                    print( '=======================================================================================================')
+                                    print('=======================================================================================================')
                             if execute_flag:
                                 #Saving the report for the scenario
                                 logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
@@ -1066,19 +1056,18 @@ class Controller():
                             #logic for condition check
                             report_json=con.reporting_obj.report_json[OVERALLSTATUS]
             log.info('---------------------------------------------------------------------')
-            print( '=======================================================================================================')
+            print('=======================================================================================================')
             log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
             logger.print_on_console('***SUITE ', j ,' EXECUTION COMPLETED***')
             log.info('-----------------------------------------------')
-            print( '=======================================================================================================')
+            print('=======================================================================================================')
             j=j+1
         if status==TERMINATE:
-            print( '=======================================================================================================')
+            print('=======================================================================================================')
             logger.print_on_console( '***Terminating the Execution***')
-            print( '=======================================================================================================')
-
+            print('=======================================================================================================')
         return status
 
     #Building of Dictionary to send back toserver to save the data
@@ -1239,7 +1228,7 @@ def kill_process():
                 os.system("TASKKILL /F /PID " + str(pid))
             browser_Keywords.pid_set.clear()
         except Exception as e:
-            log.error(e)
+            log.error(e,exc_info=True)
         try:
             time.sleep(3)
             try:

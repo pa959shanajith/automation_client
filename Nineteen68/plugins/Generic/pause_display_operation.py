@@ -71,6 +71,7 @@ class Pause(wx.Frame):
             while cont.paused:
                 cont.pause_cond.wait()
 
+
 class Display(wx.Frame):
     def __init__(self, parent, id,title,input):
         wx.Frame.__init__(self, parent, title="Nineteen68 - DisplayValue",   size=(400, 300),style=wx.STAY_ON_TOP|wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
@@ -81,27 +82,27 @@ class Display(wx.Frame):
         self.SetIcon(self.wicon)
         self.t = wx.TextCtrl(self.panel, wx.ID_ANY,  size=(380, 200),  style = wx.TE_MULTILINE|wx.TE_READONLY)
         self.t.Clear()
-        self.t.AppendText(input)
-
+        try:
+            self.t.AppendText(input)
+        except:
+            self.t.AppendText("Text cannot be displayed!")
         self.okbutton = wx.Button(self.panel, label="OK", pos=(150, 230))
         self.okbutton.Bind(wx.EVT_BUTTON, self.OnOk)
         self.okbutton.SetFocus()
         self.Centre()
         self.Show()
-        configvalues = readconfig.configvalues
-        interval = configvalues['displayVariableTimeOut']
-        if interval == '':
+        interval = readconfig.configvalues['displayVariableTimeOut']
+        try:
+            interval = int(interval)
+        except:
             interval = 3
-        else:
-            try:
-                interval = int(interval)
-            except:
-                interval = 3
-        t = threading.Timer(interval,self.OnOk)
-        t.start()
+        self.done = threading.Timer(interval,self.OnOk)
+        self.done.start()
 
     def OnOk(self, *event):
-        if(self):
+        if self.done is not None and self.done.isAlive():
+            self.done.cancel()
+        if (self != None) and (bool(self) != False):
             self.resume_execution()
             self.Destroy()
 
