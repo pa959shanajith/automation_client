@@ -344,7 +344,6 @@ class MainNamespace(BaseNamespace):
             #con = controller.Controller()
             global browsername
             browsername = args[0]+";"+args[1]
-            con =controller.Controller()
             if SYSTEM_OS=='Darwin':
                 core_utils.get_all_the_imports('Mobility/MobileWeb')
             else:
@@ -366,7 +365,6 @@ class MainNamespace(BaseNamespace):
             #con = controller.Controller()
             global browsername
             browsername = args[0]
-            #con =controller.Controller()
             core_utils.get_all_the_imports('Oebs')
             import scrape_dispatcher
             oebsScrapeObj=scrape_dispatcher

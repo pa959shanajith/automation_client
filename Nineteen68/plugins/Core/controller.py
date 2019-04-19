@@ -123,7 +123,6 @@ class Controller():
     def __load_mobile_web(self):
         try:
             if self.mobile_web_dispatcher_obj==None:
-                import platform
                 if SYSTEM_OS == 'Darwin':
                     core_utils.get_all_the_imports('Mobility/MobileWeb')
                 else:
@@ -138,7 +137,6 @@ class Controller():
     def __load_mobile_app(self):
         try:
             if self.mobile_app_dispatcher_obj==None:
-                import platform
                 if SYSTEM_OS=='Darwin':
                     core_utils.get_all_the_imports('Mobility/MobileApp')
                 else:
@@ -830,14 +828,6 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
         return res
 
-##    def get_all_the_imports(self,plugin_path):
-##        path= os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/'+plugin_path
-##        sys.path.append(path)
-##        for root, dirs, files in os.walk(path):
-##            for d in dirs:
-##                p = path + '/' + d
-##                sys.path.append(p)
-
     def invoke_debug(self,mythread,runfrom_step,json_data):
         status=COMPLETED
         global break_point
@@ -845,10 +835,10 @@ class Controller():
         self.action=DEBUG
         handler.tspList=[]
         scenario=[json_data]
-        print( '=======================================================================================================')
+        print('=======================================================================================================')
         log.info('***DEBUG STARTED***')
         logger.print_on_console('***DEBUG STARTED***')
-        print( '=======================================================================================================')
+        print('=======================================================================================================')
         for d in scenario:
             flag,browser_type,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(d)
             if flag == False:
@@ -868,11 +858,11 @@ class Controller():
                 logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
                 log.info('Invalid step number!! Please provide run from step number')
         else:
-            print('Invalid script')
-        print( '=======================================================================================================')
+            logger.print_on_console('Invalid script')
+        print('=======================================================================================================')
         log.info('***DEBUG COMPLETED***')
         logger.print_on_console('***DEBUG COMPLETED***')
-        print( '=======================================================================================================')
+        print('=======================================================================================================')
         #clearing of dynamic variables
         obj.clearList(self)
         #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
@@ -907,11 +897,11 @@ class Controller():
                 status=TERMINATE
 ##                break
             log.info('---------------------------------------------------------------------')
-            print( '=======================================================================================================')
+            print('=======================================================================================================')
             log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
             logger.print_on_console('***SUITE ', j ,' EXECUTION STARTED***')
             log.info('-----------------------------------------------')
-            print( '=======================================================================================================')
+            print('=======================================================================================================')
             do_not_execute = False
             #Check for the disabled scenario
             if not (do_not_execute) :
@@ -930,9 +920,9 @@ class Controller():
                         if not(condition_check_flag):
                              #check for temrinate flag before printing loggers
                             if not(terminate_flag):
-                                print( '=======================================================================================================')
+                                print('=======================================================================================================')
                                 logger.print_on_console( '***Scenario ' ,(i  + 1 ) ,' execution started***')
-                                print( '=======================================================================================================')
+                                print('=======================================================================================================')
                                 log.info('***Scenario '  + str((i  + 1 ) ) + ' execution started***')
                             if(len(scenario)==3 and len(scenario['qcdetails'])==7):
                                 qc_details_creds=scenario['qccredentials']
@@ -982,9 +972,9 @@ class Controller():
                                     con.conthread=mythread
                                     con.tsp_list=tsplist
                                     status = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
-                                    print( '=======================================================================================================')
+                                    print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,(i  + 1 ) ,' execution completed***')
-                                    print( '=======================================================================================================')
+                                    print('=======================================================================================================')
                             if execute_flag:
                                 #Saving the report for the scenario
                                 logger.print_on_console( '***Saving report of Scenario' ,(i  + 1 ),'***')
@@ -1066,19 +1056,18 @@ class Controller():
                             #logic for condition check
                             report_json=con.reporting_obj.report_json[OVERALLSTATUS]
             log.info('---------------------------------------------------------------------')
-            print( '=======================================================================================================')
+            print('=======================================================================================================')
             log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
             logger.print_on_console('***SUITE ', j ,' EXECUTION COMPLETED***')
             log.info('-----------------------------------------------')
-            print( '=======================================================================================================')
+            print('=======================================================================================================')
             j=j+1
         if status==TERMINATE:
-            print( '=======================================================================================================')
+            print('=======================================================================================================')
             logger.print_on_console( '***Terminating the Execution***')
-            print( '=======================================================================================================')
-
+            print('=======================================================================================================')
         return status
 
     #Building of Dictionary to send back toserver to save the data
