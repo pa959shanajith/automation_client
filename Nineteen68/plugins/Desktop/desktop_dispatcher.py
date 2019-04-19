@@ -159,6 +159,24 @@ class DesktopDispatcher:
         self.outook_obj=outlook.OutlookKeywords()
 
 #-----------------------------------------------------------------for custom objects
+
+
+        self.desktop_dict['getemail']= self.outook_obj.GetEmail
+        self.desktop_dict['getfrommailid']=self.outook_obj.GetFromMailId
+        self.desktop_dict['getattachmentstatus']= self.outook_obj.GetAttachmentStatus
+        self.desktop_dict['getsubject']= self.outook_obj.GetSubject
+        self.desktop_dict['gettomailid']= self.outook_obj.GetToMailID
+        self.desktop_dict['getbody']= self.outook_obj.GetBody
+        self.desktop_dict['verifyemail']= self.outook_obj.VerifyEmail
+        self.desktop_dict['switchtofolder']=self.outook_obj.switchToFolder
+        self.desktop_dict['settomailid']=self.outook_obj.send_to_mail
+        self.desktop_dict['setcc']=self.outook_obj.send_CC
+        self.desktop_dict['setbcc']=self.outook_obj.send_BCC
+        self.desktop_dict['setsubject']=self.outook_obj.send_subject
+        self.desktop_dict['setbody']=self.outook_obj.send_body
+        self.desktop_dict['setattachments']=self.outook_obj.send_attachments
+        self.desktop_dict['sendemail']=self.outook_obj.send_mail
+
     custom_dict = {
                     "clickelement":['radiobutton','checkbox','input','button','select'],
                     "doubleclick":['radiobutton','checkbox','input','button','select'],
