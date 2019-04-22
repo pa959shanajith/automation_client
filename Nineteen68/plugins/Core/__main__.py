@@ -55,7 +55,7 @@ if __name__ == "__main__":
         log.info(err)
         log.error(configvalues['errorflag'])
     elif cw.logfilename_error_flag:
-        err = "[Error]: Please provide a valid logfile path in config.json file and restart "+appName+"."
+        err = "[Error]:"+str(configvalues['errorflag'])+ " config field is missing Please provide a valid logfile path in config.json file and restart "+appName+"."
         logger.print_on_console(err)
         log.info(err)
         cw.logfilename_error_flag = False

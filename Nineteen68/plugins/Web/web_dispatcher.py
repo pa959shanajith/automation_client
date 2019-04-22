@@ -50,6 +50,120 @@ class Dispatcher:
     statict_text_object = static_text_keywords.StaticTextKeywords()
     custom_object=custom_keyword.CustomKeyword()
     webelement_map=OrderedDict()
+    web_dict={
+      'getobjectcount':custom_object.get_object_count,
+      'getobject':custom_object.get_object,
+      'click': button_link_object.click,
+      'verifybuttonname' : button_link_object.verify_button_name,
+      'getbuttonname': button_link_object.get_button_name,
+      'getlinktext'    : button_link_object.get_link_text,
+      'verifylinktext' : button_link_object.verify_link_text,
+      'press'  : button_link_object.press,
+      'doubleclick' : button_link_object.double_click,
+      'rightclick' : button_link_object.right_click,
+      'uploadfile'  : button_link_object.upload_file,
+
+      'acceptpopup' : popup_object.accept_popup,
+      'dismisspopup':popup_object.dismiss_popup,
+      'getpopuptext':popup_object.get_popup_text,
+      'verifypopuptext':popup_object.verify_popup_text,
+
+
+      'getstatus': radio_checkbox_object.get_status,
+      'selectradiobutton': radio_checkbox_object.select_radiobutton,
+      'selectcheckbox': radio_checkbox_object.select_checkbox,
+      'unselectcheckbox': radio_checkbox_object.unselect_checkbox,
+
+      'getrowcount' : table_object.getRowCount,
+      'getcolumncount' : table_object.getColoumnCount,
+      'getcellvalue' : table_object.getCellValue,
+      'verifycellvalue' : table_object.verifyCellValue,
+      'cellclick' : table_object.cellClick,
+      'getrownumbytext' : table_object.getRowNumByText,
+      'getcolnumbytext' : table_object.getColNumByText,
+      'getinnertable' : table_object.getInnerTable,
+      #author : arpitha.b.v
+      #added mapping of 'getCellToolTip' and 'verifyCellToolTip' to table object
+      'getcelltooltip' : table_object.getCellToolTip,
+      'verifycelltooltip' : table_object.verifyCellToolTip,
+      'getelementtext' : element_object.get_element_text,
+      'verifyelementtext' : element_object.verify_element_text,
+      'clickelement' : element_object.click_element,
+      'gettooltiptext' : element_object.get_tooltip_text,
+      'verifytooltiptext' : element_object.verify_tooltip_text,
+      'drag':element_object.drag,
+      'drop':element_object.drop,
+      'dropfile':element_object.drop_file,
+      'settext':textbox_object.set_text,
+      'sendvalue':textbox_object.send_value,
+      'gettext':textbox_object.get_text,
+      'verifytext':textbox_object.verify_text,
+      'cleartext':textbox_object.clear_text,
+      'gettextboxlength':textbox_object.gettextbox_length,
+      'verifytextboxlength':textbox_object.verifytextbox_length,
+      'setsecuretext':textbox_object.setsecuretext,
+      'sendsecurevalue':textbox_object.sendSecureValue,
+
+      'selectvaluebyindex':dropdown_list_object.selectValueByIndex,
+      'getcount':dropdown_list_object.getCount,
+      'selectvaluebytext':dropdown_list_object.selectValueByText,
+      'verifyselectedvalues':dropdown_list_object.verifySelectedValues,
+      'verifyselectedvalue':dropdown_list_object.verifySelectedValue,
+      'verifycount':dropdown_list_object.verifyCount,
+      'selectallvalues':dropdown_list_object.selectAllValues,
+      'selectmultiplevaluesbyindexes':dropdown_list_object.selectMultipleValuesByIndexes,
+      'getselected':dropdown_list_object.getSelected,
+      'selectmultiplevaluesbytext':dropdown_list_object.selectMultipleValuesByText,
+      'getmultiplevaluesbyindexes':dropdown_list_object.getMultipleValuesByIndexes,
+      'verifyallvalues':dropdown_list_object.verifyAllValues,
+      'selectbyabsolutevalue':dropdown_list_object.selectByAbsoluteValue,
+
+      #author :arpitha.b.v
+    #Added mapping of "getAllValues" keyword values to dropdown's object
+
+      'getallvalues':dropdown_list_object.getAllValues,
+      'getvaluebyindex':dropdown_list_object.getValueByIndex,
+      'verifyvaluesexists':dropdown_list_object.verifyValuesExists,
+      'deselectall':dropdown_list_object.deselectAll,
+
+
+      'verifyvisible':util_object.verify_visible,
+      'verifyexists':util_object.verify_exists,
+      'verifydoesnotexists':util_object.verify_doesnot_exists,
+      'verifyenabled':util_object.verify_enabled,
+      'verifydisabled':util_object.verify_disabled,
+      'verifyhidden':util_object.verify_hidden,
+      'verifyreadonly':util_object.verify_readonly,
+      'setfocus':util_object.setfocus,
+      'mousehover':util_object.mouse_hover,
+      'tab':util_object.tab,
+      'sendfunctionkeys':util_object.sendfunction_keys,
+      'rightclick':util_object.rightclick,
+      'mouseclick':util_object.mouse_click,
+      'verifywebimages':util_object.verify_web_images,
+      'imagesimilaritypercentage':util_object.image_similarity_percentage,
+      'waitforelementvisible':element_object.waitforelement_visible,
+      'getelementtagvalue': util_object.get_element_tag_value,
+
+
+      'openbrowser':browser_object.openBrowser,
+      'navigatetourl':browser_object.navigateToURL,
+      'opennewbrowser':browser_object.openNewBrowser,
+      'getpagetitle':browser_object.getPageTitle,
+      'getcurrenturl':browser_object.getCurrentURL,
+      'maximizebrowser':browser_object.maximizeBrowser,
+      'refresh':browser_object.refresh,
+      'verifycurrenturl':browser_object.verifyCurrentURL,
+      'closebrowser':browser_object.closeBrowser,
+      'closesubwindows':browser_object.closeSubWindows,
+      'switchtowindow':util_object.switch_to_window,
+      'verifytextexists':statict_text_object.verify_text_exists,
+      'verifypagetitle':browser_object.verify_page_title,
+      'clearcache':browser_object.clear_cache,
+      'navigatewithauthenticate':browser_object.navigate_with_authenticate
+    }
+
+
 
     def __init__(self):
         self.exception_flag=''
@@ -91,6 +205,18 @@ class Dispatcher:
                                         'tab','waitforelementvisible','mousehover','savefile','press','verifyenabled','verifydisabled','verifyreadonly']}
 
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
+
+        if(iris_flag):
+            import iris_operations
+            iris_object = iris_operations.IRISKeywords()
+            self.web_dict['clickiris'] = iris_object.clickiris
+            self.web_dict['settextiris'] = iris_object.settextiris
+            self.web_dict['gettextiris'] = iris_object.gettextiris
+            self.web_dict['getrowcountiris'] = iris_object.getrowcountiris
+            self.web_dict['getcolcountiris'] = iris_object.getcolcountiris
+            self.web_dict['getcellvalueiris'] = iris_object.getcellvalueiris
+            self.web_dict['verifyexistsiris'] = iris_object.verifyexistsiris
+            self.web_dict['verifytextiris'] = iris_object.verifytextiris
 
         def print_error(err_msg):
 ##            err_msg=ERROR_CODE_DICT['ERR_CUSTOM_MISMATCH']
@@ -193,130 +319,6 @@ class Dispatcher:
 
         try:
             window_ops_list=['click','press','doubleclick','rightclick','uploadfile','acceptpopup','dismisspopup','selectradiobutton','selectcheckbox','unselectcheckbox','cellclick','clickelement','drag','drop','settext','sendvalue','cleartext','setsecuretext','sendsecurevalue','selectvaluebyindex','selectvaluebytext','selectallvalues','selectmultiplevaluesbyindexes','selectmultiplevaluesbytext','verifyvaluesexists','deselectall','setfocus','mousehover','tab','sendfunctionkeys','rightclick','mouseclick','openbrowser','navigatetourl','opennewbrowser','refresh','closebrowser','closesubwindows','switchtowindow','clearcache','navigatewithauthenticate']
-            web_dict={
-                  'getobjectcount':self.custom_object.get_object_count,
-                  'getobject':self.custom_object.get_object,
-                  'click': self.button_link_object.click,
-                  'verifybuttonname' : self.button_link_object.verify_button_name,
-                  'getbuttonname': self.button_link_object.get_button_name,
-                  'getlinktext'    : self.button_link_object.get_link_text,
-                  'verifylinktext' : self.button_link_object.verify_link_text,
-                  'press'  : self.button_link_object.press,
-                  'doubleclick' : self.button_link_object.double_click,
-                  'rightclick' : self.button_link_object.right_click,
-                  'uploadfile'  : self.button_link_object.upload_file,
-
-                  'acceptpopup' : self.popup_object.accept_popup,
-                  'dismisspopup':self.popup_object.dismiss_popup,
-                  'getpopuptext':self.popup_object.get_popup_text,
-                  'verifypopuptext':self.popup_object.verify_popup_text,
-
-
-                  'getstatus': self.radio_checkbox_object.get_status,
-                  'selectradiobutton': self.radio_checkbox_object.select_radiobutton,
-                  'selectcheckbox': self.radio_checkbox_object.select_checkbox,
-                  'unselectcheckbox': self.radio_checkbox_object.unselect_checkbox,
-
-                  'getrowcount' : self.table_object.getRowCount,
-                  'getcolumncount' : self.table_object.getColoumnCount,
-                  'getcellvalue' : self.table_object.getCellValue,
-                  'verifycellvalue' : self.table_object.verifyCellValue,
-                  'cellclick' : self.table_object.cellClick,
-                  'getrownumbytext' : self.table_object.getRowNumByText,
-                  'getcolnumbytext' : self.table_object.getColNumByText,
-                  'getinnertable' : self.table_object.getInnerTable,
-                  #author : arpitha.b.v
-                  #added mapping of 'getCellToolTip' and 'verifyCellToolTip' to table object
-                  'getcelltooltip' : self.table_object.getCellToolTip,
-                  'verifycelltooltip' : self.table_object.verifyCellToolTip,
-                  'getelementtext' : self.element_object.get_element_text,
-                  'verifyelementtext' : self.element_object.verify_element_text,
-                  'clickelement' : self.element_object.click_element,
-                  'gettooltiptext' : self.element_object.get_tooltip_text,
-                  'verifytooltiptext' : self.element_object.verify_tooltip_text,
-                  'drag':self.element_object.drag,
-                  'drop':self.element_object.drop,
-                  'dropfile':self.element_object.drop_file,
-                  'settext':self.textbox_object.set_text,
-                  'sendvalue':self.textbox_object.send_value,
-                  'gettext':self.textbox_object.get_text,
-                  'verifytext':self.textbox_object.verify_text,
-                  'cleartext':self.textbox_object.clear_text,
-                  'gettextboxlength':self.textbox_object.gettextbox_length,
-                  'verifytextboxlength':self.textbox_object.verifytextbox_length,
-                  'setsecuretext':self.textbox_object.setsecuretext,
-                  'sendsecurevalue':self.textbox_object.sendSecureValue,
-
-                  'selectvaluebyindex':self.dropdown_list_object.selectValueByIndex,
-                  'getcount':self.dropdown_list_object.getCount,
-                  'selectvaluebytext':self.dropdown_list_object.selectValueByText,
-                  'verifyselectedvalues':self.dropdown_list_object.verifySelectedValues,
-                  'verifyselectedvalue':self.dropdown_list_object.verifySelectedValue,
-                  'verifycount':self.dropdown_list_object.verifyCount,
-                  'selectallvalues':self.dropdown_list_object.selectAllValues,
-                  'selectmultiplevaluesbyindexes':self.dropdown_list_object.selectMultipleValuesByIndexes,
-                  'getselected':self.dropdown_list_object.getSelected,
-                  'selectmultiplevaluesbytext':self.dropdown_list_object.selectMultipleValuesByText,
-                  'getmultiplevaluesbyindexes':self.dropdown_list_object.getMultipleValuesByIndexes,
-                  'verifyallvalues':self.dropdown_list_object.verifyAllValues,
-                  'selectbyabsolutevalue':self.dropdown_list_object.selectByAbsoluteValue,
-
-                  #author :arpitha.b.v
-                #Added mapping of "getAllValues" keyword values to dropdown's object
-
-                  'getallvalues':self.dropdown_list_object.getAllValues,
-                  'getvaluebyindex':self.dropdown_list_object.getValueByIndex,
-                  'verifyvaluesexists':self.dropdown_list_object.verifyValuesExists,
-                  'deselectall':self.dropdown_list_object.deselectAll,
-
-
-                  'verifyvisible':self.util_object.verify_visible,
-                  'verifyexists':self.util_object.verify_exists,
-                  'verifydoesnotexists':self.util_object.verify_doesnot_exists,
-                  'verifyenabled':self.util_object.verify_enabled,
-                  'verifydisabled':self.util_object.verify_disabled,
-                  'verifyhidden':self.util_object.verify_hidden,
-                  'verifyreadonly':self.util_object.verify_readonly,
-                  'setfocus':self.util_object.setfocus,
-                  'mousehover':self.util_object.mouse_hover,
-                  'tab':self.util_object.tab,
-                  'sendfunctionkeys':self.util_object.sendfunction_keys,
-                  'rightclick':self.util_object.rightclick,
-                  'mouseclick':self.util_object.mouse_click,
-                  'verifywebimages':self.util_object.verify_web_images,
-                  'imagesimilaritypercentage':self.util_object.image_similarity_percentage,
-                  'waitforelementvisible':self.element_object.waitforelement_visible,
-                  'getelementtagvalue': self.util_object.get_element_tag_value,
-
-
-                  'openbrowser':self.browser_object.openBrowser,
-                  'navigatetourl':self.browser_object.navigateToURL,
-                  'opennewbrowser':self.browser_object.openNewBrowser,
-                  'getpagetitle':self.browser_object.getPageTitle,
-                  'getcurrenturl':self.browser_object.getCurrentURL,
-                  'maximizebrowser':self.browser_object.maximizeBrowser,
-                  'refresh':self.browser_object.refresh,
-                  'verifycurrenturl':self.browser_object.verifyCurrentURL,
-                  'closebrowser':self.browser_object.closeBrowser,
-                  'closesubwindows':self.browser_object.closeSubWindows,
-                  'switchtowindow':self.util_object.switch_to_window,
-                  'verifytextexists':self.statict_text_object.verify_text_exists,
-                  'verifypagetitle':self.browser_object.verify_page_title,
-                  'clearcache':self.browser_object.clear_cache,
-                  'navigatewithauthenticate':self.browser_object.navigate_with_authenticate
-                }
-
-            if(iris_flag):
-                import iris_operations
-                iris_object = iris_operations.IRISKeywords()
-                web_dict['clickiris'] = iris_object.clickiris
-                web_dict['settextiris'] = iris_object.settextiris
-                web_dict['gettextiris'] = iris_object.gettextiris
-                web_dict['getrowcountiris'] = iris_object.getrowcountiris
-                web_dict['getcolcountiris'] = iris_object.getcolcountiris
-                web_dict['getcellvalueiris'] = iris_object.getcellvalueiris
-                web_dict['verifyexistsiris'] = iris_object.verifyexistsiris
-                web_dict['verifytextiris'] = iris_object.verifytextiris
 
             if browser_Keywords.driver_obj is not None:
                 browser_info=browser_Keywords.driver_obj.capabilities
@@ -324,7 +326,7 @@ class Dispatcher:
                 reporting_obj.browser_version=browser_info.get('version')
                 if(reporting_obj.browser_version == '' or reporting_obj.browser_version == None):
                     reporting_obj.browser_version= browser_info['browserVersion']
-            if keyword in list(web_dict.keys()):
+            if keyword in list(self.web_dict.keys()):
                 flag=False
                 #Finding the webelement for NON_WEBELEMENT_KEYWORDS
                 if keyword not in NON_WEBELEMENT_KEYWORDS:
@@ -357,14 +359,14 @@ class Dispatcher:
                     if objectname=="@Object":
                         ##webelement = input[0]
                         input =input[1:]
-                        result= web_dict[keyword](webelement,input)
+                        result= self.web_dict[keyword](webelement,input)
                     elif teststepproperty.cord!='' and teststepproperty.cord!=None:
                         if teststepproperty.custom_flag:
-                            result = web_dict[keyword](webelement,input,output,teststepproperty.parent_xpath)
+                            result = self.web_dict[keyword](webelement,input,output,teststepproperty.parent_xpath)
                         else:
-                            result = web_dict[keyword](webelement,input,output)
+                            result = self.web_dict[keyword](webelement,input,output)
                     else:
-                        result= web_dict[keyword](webelement,input)
+                        result= self.web_dict[keyword](webelement,input)
                     ## To terminate debug/execution if requested browser is not available in the system (Defect #846)
                     if(result[1] == TERMINATE):
                         result = TERMINATE

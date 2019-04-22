@@ -20,6 +20,9 @@ from Crypto.Cipher import AES
 
 class CoreUtils():
 
+    def __init__(self):
+        get_all_the_imports('Generic')
+
     #definition to fetch the data size in bytes/kilobytes/megabytes
     # sends data length in bytes if memoryformat not provided
     def getdatasize(self,inputdata,memoryformat):
@@ -112,3 +115,12 @@ class CoreUtils():
                     break
         mac = str(mac).replace('-',':')
         return str(mac).strip()
+
+
+def get_all_the_imports(plugin_path):
+        path= os.environ["NINETEEN68_HOME"] + '/Nineteen68/plugins/'+plugin_path
+        sys.path.append(path)
+        for root, dirs, files in os.walk(path):
+            for d in dirs:
+                p = path + '/' + d
+                sys.path.append(p)
