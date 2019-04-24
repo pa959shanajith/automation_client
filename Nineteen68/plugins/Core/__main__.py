@@ -50,12 +50,12 @@ if __name__ == "__main__":
         logger.print_on_console(err)
         log.info(err)
     elif cw.is_config_invalid:
-        err = "[Error]: Syntax error in config.json file, and please check and restart "+appName+"."
+        err = "[Error]: Syntax error in config file.\n"+str(configvalues['errorflag'])+ " config field is missing. Please check and restart "+appName+"."
         logger.print_on_console(err)
         log.info(err)
         log.error(configvalues['errorflag'])
     elif cw.logfilename_error_flag:
-        err = "[Error]:"+str(configvalues['errorflag'])+ " config field is missing Please provide a valid logfile path in config.json file and restart "+appName+"."
+        err = "[Error]: Please provide a valid logfile path in config file and restart "+appName+"."
         logger.print_on_console(err)
         log.info(err)
         cw.logfilename_error_flag = False
