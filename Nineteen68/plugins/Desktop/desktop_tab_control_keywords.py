@@ -29,7 +29,6 @@ class Tab_Control_Keywords():
             try:
                 if desktop_launch_keywords.window_name!=None:
                     log.info('Recieved element from the desktop dispatcher')
-                    dektop_element = element
                     verify_obj = Text_Box()
                     check = verify_obj.verify_parent(element,parent)
                     log.debug('Parent of element while scraping')
@@ -40,11 +39,10 @@ class Tab_Control_Keywords():
                         log.info('Parent matched')
                         if(element.is_enabled()):
                             item_index=int(input_val[0])
-                            item_count = element.TabCount()
+                            item_count = element.tab_count()
                             if item_index <= item_count:
                                 if element.is_enabled():
-                                    selected_index = element.GetSelectedTab()
-                                    selected_index = int(selected_index)
+                                    selected_index = int(element.get_selected_tab())
                                     if selected_index == item_index -1:
                                         log.info('Tab control with given index is already selected')
                                         logger.print_on_console('Tab control with given index is already selected')
@@ -93,7 +91,6 @@ class Tab_Control_Keywords():
                 logger.print_on_console('Warning:You are using 32bit version of ICE Engine.This keyword is unstable for this version.')
             #---------------------------------------------
             try:
-               dektop_element = element
                verify_obj = Text_Box()
                check = verify_obj.verify_parent(element,parent)
                log.debug('Parent of element while scraping')
@@ -103,10 +100,14 @@ class Tab_Control_Keywords():
                if (check):
                         log.info('Parent matched')
                         if(element.is_enabled()):
-                            selected_tab_index=element.GetSelectedTab()
-                            selected_tab_index = int(selected_tab_index)
-                            selected = element.GetTabText(selected_tab_index)
-                            verb=selected
+                            #-----------------------------------checking if element is uia or win32
+                            selected_tab_index=int(element.get_selected_tab())
+                            if element.backend.name=='win32':
+                                verb = str(element.get_tab_text(selected_tab_index))
+                            elif element.backend.name=='uia':
+                                tab_texts=element.texts()
+                                verb = tab_texts[selected_tab_index]
+                            #-----------------------------------checking if element is uia or win32
                             if verb=="":
                                 handle = element.handle
                                 import pywinauto
@@ -114,7 +115,7 @@ class Tab_Control_Keywords():
                                 pythoncom.CoInitialize()
                                 text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
                                 verb=text
-                            logger.print_on_console('selected tab:',verb)
+                            logger.print_on_console('Selected Tab:',verb)
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -126,8 +127,6 @@ class Tab_Control_Keywords():
                    log.info('Tab control not present on the page where operation is trying to be performed')
                    err_msg='Tab control not present on the page where operation is trying to be performed'
             except Exception as exception:
-                import traceback
-                traceback.print_exc()
                 log.error(exception)
                 logger.print_on_console(exception)
                 err_msg=desktop_constants.ERROR_MSG
@@ -145,7 +144,6 @@ class Tab_Control_Keywords():
                     logger.print_on_console('Warning:You are using 32bit version of ICE Engine.This keyword is unstable for this version.')
                 #---------------------------------------------
                 try:
-                   dektop_element = element
                    verify_obj = Text_Box()
                    check = verify_obj.verify_parent(element,parent)
                    log.debug('Parent of element while scraping')
@@ -155,10 +153,14 @@ class Tab_Control_Keywords():
                    if (check):
                             log.info('Parent matched')
                             if(element.is_enabled()):
-                                selected_tab_index=element.GetSelectedTab()
-                                selected_tab_index = int(selected_tab_index)
-                                selected = element.GetTabText(selected_tab_index)
-                                selected= str(selected)
+                                #-----------------------------------checking if element is uia or win32
+                                selected_tab_index=int(element.get_selected_tab())
+                                if element.backend.name=='win32':
+                                    selected = str(element.get_tab_text(selected_tab_index))
+                                elif element.backend.name=='uia':
+                                    tab_texts=element.texts()
+                                    selected = tab_texts[selected_tab_index]
+                                #-----------------------------------checking if element is uia or win32
                                 if selected=='':
                                     handle = element.handle
                                     import pywinauto
@@ -166,8 +168,7 @@ class Tab_Control_Keywords():
                                     pythoncom.CoInitialize()
                                     text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
                                     selected=text
-                                input_val = input_val[0]
-                                if selected == input_val:
+                                if selected == input_val[0]:
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -180,8 +181,6 @@ class Tab_Control_Keywords():
                        err_msg='Tab control not present on the page where operation is trying to be performed'
                        logger.print_on_console('Tab control not present on the page where operation is trying to be performed')
                 except Exception as exception:
-                    import traceback
-                    traceback.print_exc()
                     log.error(exception)
                     logger.print_on_console(exception)
                     err_msg=desktop_constants.ERROR_MSG
@@ -192,7 +191,7 @@ class Tab_Control_Keywords():
             result=desktop_constants.TEST_RESULT_FALSE
             verb = OUTPUT_CONSTANT
             err_msg=None
-            text_flag = False
+            flag = False
             #---------------------------------------------checker(32 or 64)
             import platform
             info_32=platform.architecture()
@@ -202,7 +201,6 @@ class Tab_Control_Keywords():
             try:
                 if desktop_launch_keywords.window_name!=None:
                     log.info('Recieved element from the desktop dispatcher')
-                    dektop_element = element
                     verify_obj = Text_Box()
                     check = verify_obj.verify_parent(element,parent)
                     log.debug('Parent of element while scraping')
@@ -215,21 +213,38 @@ class Tab_Control_Keywords():
                             item_text=str(input_val[0])
                             if item_text != '' or item_text != None:
                                 if element.is_enabled():
-                                    selected_tab_index=element.GetSelectedTab()
-                                    selected_tab_index = int(selected_tab_index)
-                                    selected = element.GetTabText(selected_tab_index)
+                                    selected_tab_index=int(element.get_selected_tab())
+                                    #-----------------------------------checking if element is uia or win32
+                                    if element.backend.name=='win32':
+                                        selected = str(element.get_tab_text(selected_tab_index))
+                                    elif element.backend.name=='uia':
+                                        tab_texts=element.texts()
+                                        selected = tab_texts[selected_tab_index]
+                                    #-----------------------------------checking if element is uia or win32
                                     if selected == item_text:
                                         log.info('Tab control with given text is already selected')
                                         logger.print_on_console('Tab control with given text is already selected')
                                         err_msg = 'Tab control with given text is already selected'
                                     else:
                                         try:
-                                            element.select(item_text)
-                                            log.info('Tab control with given text selected')
-                                            logger.print_on_console('Tab control with given text selected')
-                                            status = desktop_constants.TEST_RESULT_PASS
-                                            result = desktop_constants.TEST_RESULT_TRUE
-                                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                                            if element.backend.name=='win32':
+                                                element.select(item_text)
+                                                flag=True
+                                            elif element.backend.name=='uia':
+                                                try:
+                                                    logger.print_on_console('SelectTabByText returns inconsistent outputs for method B elements')
+                                                    element.select(item_text)
+                                                    flag=True
+                                                except Exception as e:
+                                                    log.error('Tab error via method B')
+                                                    log.info('Tab error via method B')
+                                                    log.error(e)
+                                            if flag==True:
+                                                log.info('Tab control with given text selected')
+                                                logger.print_on_console('Tab control with given text selected')
+                                                status = desktop_constants.TEST_RESULT_PASS
+                                                result = desktop_constants.TEST_RESULT_TRUE
+                                                log.info(STATUS_METHODOUTPUT_UPDATE)
                                         except Exception as e:
                                             log.info('There is no tab in Tab control with the given text')
                                             logger.print_on_console('There is no tab in Tab control with the given text')

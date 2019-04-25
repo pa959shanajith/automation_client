@@ -1,5 +1,3 @@
-import Method
-import re
 class Object:
 	
 	def __init__(self,name,parent,imports,lineNum):

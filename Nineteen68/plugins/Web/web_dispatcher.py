@@ -54,6 +54,118 @@ class Dispatcher:
         local_Wd.log = logging.getLogger('web_dispatcher.py')
         self.exception_flag=''
         self.action=None
+        self.web_dict={
+              'getobjectcount':local_Wd.custom_object.get_object_count,
+              'getobject':local_Wd.custom_object.get_object,
+              'click': local_Wd.button_link_object.click,
+              'verifybuttonname' : local_Wd.button_link_object.verify_button_name,
+              'getbuttonname': local_Wd.button_link_object.get_button_name,
+              'getlinktext'    : local_Wd.button_link_object.get_link_text,
+              'verifylinktext' : local_Wd.button_link_object.verify_link_text,
+              'press'  : local_Wd.button_link_object.press,
+              'doubleclick' : local_Wd.button_link_object.double_click,
+              'rightclick' : local_Wd.button_link_object.right_click,
+              'uploadfile'  : local_Wd.button_link_object.upload_file,
+
+              'acceptpopup' : local_Wd.popup_object.accept_popup,
+              'dismisspopup':local_Wd.popup_object.dismiss_popup,
+              'getpopuptext':local_Wd.popup_object.get_popup_text,
+              'verifypopuptext':local_Wd.popup_object.verify_popup_text,
+
+
+              'getstatus': local_Wd.radio_checkbox_object.get_status,
+              'selectradiobutton': local_Wd.radio_checkbox_object.select_radiobutton,
+              'selectcheckbox': local_Wd.radio_checkbox_object.select_checkbox,
+              'unselectcheckbox': local_Wd.radio_checkbox_object.unselect_checkbox,
+
+              'getrowcount' : local_Wd.table_object.getRowCount,
+              'getcolumncount' : local_Wd.table_object.getColoumnCount,
+              'getcellvalue' : local_Wd.table_object.getCellValue,
+              'verifycellvalue' : local_Wd.table_object.verifyCellValue,
+              'cellclick' : local_Wd.table_object.cellClick,
+              'getrownumbytext' : local_Wd.table_object.getRowNumByText,
+              'getcolnumbytext' : local_Wd.table_object.getColNumByText,
+              'getinnertable' : local_Wd.table_object.getInnerTable,
+              #author : arpitha.b.v
+              #added mapping of 'getCellToolTip' and 'verifyCellToolTip' to table object
+              'getcelltooltip' : local_Wd.table_object.getCellToolTip,
+              'verifycelltooltip' : local_Wd.table_object.verifyCellToolTip,
+              'getelementtext' : local_Wd.element_object.get_element_text,
+              'verifyelementtext' : local_Wd.element_object.verify_element_text,
+              'clickelement' : local_Wd.element_object.click_element,
+              'gettooltiptext' : local_Wd.element_object.get_tooltip_text,
+              'verifytooltiptext' : local_Wd.element_object.verify_tooltip_text,
+              'drag':local_Wd.element_object.drag,
+              'drop':local_Wd.element_object.drop,
+              'dropfile':local_Wd.element_object.drop_file,
+              'settext':local_Wd.textbox_object.set_text,
+              'sendvalue':local_Wd.textbox_object.send_value,
+              'gettext':local_Wd.textbox_object.get_text,
+              'verifytext':local_Wd.textbox_object.verify_text,
+              'cleartext':local_Wd.textbox_object.clear_text,
+              'gettextboxlength':local_Wd.textbox_object.gettextbox_length,
+              'verifytextboxlength':local_Wd.textbox_object.verifytextbox_length,
+              'setsecuretext':local_Wd.textbox_object.setsecuretext,
+              'sendsecurevalue':local_Wd.textbox_object.sendSecureValue,
+
+              'selectvaluebyindex':local_Wd.dropdown_list_object.selectValueByIndex,
+              'getcount':local_Wd.dropdown_list_object.getCount,
+              'selectvaluebytext':local_Wd.dropdown_list_object.selectValueByText,
+              'verifyselectedvalues':local_Wd.dropdown_list_object.verifySelectedValues,
+              'verifyselectedvalue':local_Wd.dropdown_list_object.verifySelectedValue,
+              'verifycount':local_Wd.dropdown_list_object.verifyCount,
+              'selectallvalues':local_Wd.dropdown_list_object.selectAllValues,
+              'selectmultiplevaluesbyindexes':local_Wd.dropdown_list_object.selectMultipleValuesByIndexes,
+              'getselected':local_Wd.dropdown_list_object.getSelected,
+              'selectmultiplevaluesbytext':local_Wd.dropdown_list_object.selectMultipleValuesByText,
+              'getmultiplevaluesbyindexes':local_Wd.dropdown_list_object.getMultipleValuesByIndexes,
+              'verifyallvalues':local_Wd.dropdown_list_object.verifyAllValues,
+              'selectbyabsolutevalue':local_Wd.dropdown_list_object.selectByAbsoluteValue,
+
+              #author :arpitha.b.v
+            #Added mapping of "getAllValues" keyword values to dropdown's object
+
+              'getallvalues':local_Wd.dropdown_list_object.getAllValues,
+              'getvaluebyindex':local_Wd.dropdown_list_object.getValueByIndex,
+              'verifyvaluesexists':local_Wd.dropdown_list_object.verifyValuesExists,
+              'deselectall':local_Wd.dropdown_list_object.deselectAll,
+
+
+              'verifyvisible':local_Wd.util_object.verify_visible,
+              'verifyexists':local_Wd.util_object.verify_exists,
+              'verifydoesnotexists':local_Wd.util_object.verify_doesnot_exists,
+              'verifyenabled':local_Wd.util_object.verify_enabled,
+              'verifydisabled':local_Wd.util_object.verify_disabled,
+              'verifyhidden':local_Wd.util_object.verify_hidden,
+              'verifyreadonly':local_Wd.util_object.verify_readonly,
+              'setfocus':local_Wd.util_object.setfocus,
+              'mousehover':local_Wd.util_object.mouse_hover,
+              'tab':local_Wd.util_object.tab,
+              'sendfunctionkeys':local_Wd.util_object.sendfunction_keys,
+              'rightclick':local_Wd.util_object.rightclick,
+              'mouseclick':local_Wd.util_object.mouse_click,
+              'verifywebimages':local_Wd.util_object.verify_web_images,
+              'imagesimilaritypercentage':local_Wd.util_object.image_similarity_percentage,
+              'waitforelementvisible':local_Wd.element_object.waitforelement_visible,
+              'getelementtagvalue': local_Wd.util_object.get_element_tag_value,
+
+
+              'openbrowser':local_Wd.browser_object.openBrowser,
+              'navigatetourl':local_Wd.browser_object.navigateToURL,
+              'opennewbrowser':local_Wd.browser_object.openNewBrowser,
+              'getpagetitle':local_Wd.browser_object.getPageTitle,
+              'getcurrenturl':local_Wd.browser_object.getCurrentURL,
+              'maximizebrowser':local_Wd.browser_object.maximizeBrowser,
+              'refresh':local_Wd.browser_object.refresh,
+              'verifycurrenturl':local_Wd.browser_object.verifyCurrentURL,
+              'closebrowser':local_Wd.browser_object.closeBrowser,
+              'closesubwindows':local_Wd.browser_object.closeSubWindows,
+              'switchtowindow':local_Wd.util_object.switch_to_window,
+              'verifytextexists':local_Wd.statict_text_object.verify_text_exists,
+              'verifypagetitle':local_Wd.browser_object.verify_page_title,
+              'clearcache':local_Wd.browser_object.clear_cache,
+              'navigatewithauthenticate':local_Wd.browser_object.navigate_with_authenticate
+            }
 
     def dispatcher(self,teststepproperty,input,reporting_obj,iris_flag):
         objectname = teststepproperty.objectname
@@ -93,6 +205,18 @@ class Dispatcher:
                                         'tab','waitforelementvisible','mousehover','savefile','press','verifyenabled','verifydisabled','verifyreadonly']}
 
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
+
+        if(iris_flag):
+            import iris_operations
+            iris_object = iris_operations.IRISKeywords()
+            self.web_dict['clickiris'] = iris_object.clickiris
+            self.web_dict['settextiris'] = iris_object.settextiris
+            self.web_dict['gettextiris'] = iris_object.gettextiris
+            self.web_dict['getrowcountiris'] = iris_object.getrowcountiris
+            self.web_dict['getcolcountiris'] = iris_object.getcolcountiris
+            self.web_dict['getcellvalueiris'] = iris_object.getcellvalueiris
+            self.web_dict['verifyexistsiris'] = iris_object.verifyexistsiris
+            self.web_dict['verifytextiris'] = iris_object.verifytextiris
 
         def print_error(err_msg):
 ##            err_msg=ERROR_CODE_DICT['ERR_CUSTOM_MISMATCH']
@@ -195,138 +319,13 @@ class Dispatcher:
 
         try:
             window_ops_list=['click','press','doubleclick','rightclick','uploadfile','acceptpopup','dismisspopup','selectradiobutton','selectcheckbox','unselectcheckbox','cellclick','clickelement','drag','drop','settext','sendvalue','cleartext','setsecuretext','sendsecurevalue','selectvaluebyindex','selectvaluebytext','selectallvalues','selectmultiplevaluesbyindexes','selectmultiplevaluesbytext','verifyvaluesexists','deselectall','setfocus','mousehover','tab','sendfunctionkeys','rightclick','mouseclick','openbrowser','navigatetourl','opennewbrowser','refresh','closebrowser','closesubwindows','switchtowindow','clearcache','navigatewithauthenticate']
-            web_dict={
-                  'getobjectcount':local_Wd.custom_object.get_object_count,
-                  'getobject':local_Wd.custom_object.get_object,
-                  'click': local_Wd.button_link_object.click,
-                  'verifybuttonname' : local_Wd.button_link_object.verify_button_name,
-                  'getbuttonname': local_Wd.button_link_object.get_button_name,
-                  'getlinktext'    : local_Wd.button_link_object.get_link_text,
-                  'verifylinktext' : local_Wd.button_link_object.verify_link_text,
-                  'press'  : local_Wd.button_link_object.press,
-                  'doubleclick' : local_Wd.button_link_object.double_click,
-                  'rightclick' : local_Wd.button_link_object.right_click,
-                  'uploadfile'  : local_Wd.button_link_object.upload_file,
-
-                  'acceptpopup' : local_Wd.popup_object.accept_popup,
-                  'dismisspopup':local_Wd.popup_object.dismiss_popup,
-                  'getpopuptext':local_Wd.popup_object.get_popup_text,
-                  'verifypopuptext':local_Wd.popup_object.verify_popup_text,
-
-
-                  'getstatus': local_Wd.radio_checkbox_object.get_status,
-                  'selectradiobutton': local_Wd.radio_checkbox_object.select_radiobutton,
-                  'selectcheckbox': local_Wd.radio_checkbox_object.select_checkbox,
-                  'unselectcheckbox': local_Wd.radio_checkbox_object.unselect_checkbox,
-
-                  'getrowcount' : local_Wd.table_object.getRowCount,
-                  'getcolumncount' : local_Wd.table_object.getColoumnCount,
-                  'getcellvalue' : local_Wd.table_object.getCellValue,
-                  'verifycellvalue' : local_Wd.table_object.verifyCellValue,
-                  'cellclick' : local_Wd.table_object.cellClick,
-                  'getrownumbytext' : local_Wd.table_object.getRowNumByText,
-                  'getcolnumbytext' : local_Wd.table_object.getColNumByText,
-                  'getinnertable' : local_Wd.table_object.getInnerTable,
-                  #author : arpitha.b.v
-                  #added mapping of 'getCellToolTip' and 'verifyCellToolTip' to table object
-                  'getcelltooltip' : local_Wd.table_object.getCellToolTip,
-                  'verifycelltooltip' : local_Wd.table_object.verifyCellToolTip,
-                  'getelementtext' : local_Wd.element_object.get_element_text,
-                  'verifyelementtext' : local_Wd.element_object.verify_element_text,
-                  'clickelement' : local_Wd.element_object.click_element,
-                  'gettooltiptext' : local_Wd.element_object.get_tooltip_text,
-                  'verifytooltiptext' : local_Wd.element_object.verify_tooltip_text,
-                  'drag':local_Wd.element_object.drag,
-                  'drop':local_Wd.element_object.drop,
-                  'dropfile':local_Wd.element_object.drop_file,
-                  'settext':local_Wd.textbox_object.set_text,
-                  'sendvalue':local_Wd.textbox_object.send_value,
-                  'gettext':local_Wd.textbox_object.get_text,
-                  'verifytext':local_Wd.textbox_object.verify_text,
-                  'cleartext':local_Wd.textbox_object.clear_text,
-                  'gettextboxlength':local_Wd.textbox_object.gettextbox_length,
-                  'verifytextboxlength':local_Wd.textbox_object.verifytextbox_length,
-                  'setsecuretext':local_Wd.textbox_object.setsecuretext,
-                  'sendsecurevalue':local_Wd.textbox_object.sendSecureValue,
-
-                  'selectvaluebyindex':local_Wd.dropdown_list_object.selectValueByIndex,
-                  'getcount':local_Wd.dropdown_list_object.getCount,
-                  'selectvaluebytext':local_Wd.dropdown_list_object.selectValueByText,
-                  'verifyselectedvalues':local_Wd.dropdown_list_object.verifySelectedValues,
-                  'verifyselectedvalue':local_Wd.dropdown_list_object.verifySelectedValue,
-                  'verifycount':local_Wd.dropdown_list_object.verifyCount,
-                  'selectallvalues':local_Wd.dropdown_list_object.selectAllValues,
-                  'selectmultiplevaluesbyindexes':local_Wd.dropdown_list_object.selectMultipleValuesByIndexes,
-                  'getselected':local_Wd.dropdown_list_object.getSelected,
-                  'selectmultiplevaluesbytext':local_Wd.dropdown_list_object.selectMultipleValuesByText,
-                  'getmultiplevaluesbyindexes':local_Wd.dropdown_list_object.getMultipleValuesByIndexes,
-                  'verifyallvalues':local_Wd.dropdown_list_object.verifyAllValues,
-                  'selectbyabsolutevalue':local_Wd.dropdown_list_object.selectByAbsoluteValue,
-
-                  #author :arpitha.b.v
-                #Added mapping of "getAllValues" keyword values to dropdown's object
-
-                  'getallvalues':local_Wd.dropdown_list_object.getAllValues,
-                  'getvaluebyindex':local_Wd.dropdown_list_object.getValueByIndex,
-                  'verifyvaluesexists':local_Wd.dropdown_list_object.verifyValuesExists,
-                  'deselectall':local_Wd.dropdown_list_object.deselectAll,
-
-
-                  'verifyvisible':local_Wd.util_object.verify_visible,
-                  'verifyexists':local_Wd.util_object.verify_exists,
-                  'verifydoesnotexists':local_Wd.util_object.verify_doesnot_exists,
-                  'verifyenabled':local_Wd.util_object.verify_enabled,
-                  'verifydisabled':local_Wd.util_object.verify_disabled,
-                  'verifyhidden':local_Wd.util_object.verify_hidden,
-                  'verifyreadonly':local_Wd.util_object.verify_readonly,
-                  'setfocus':local_Wd.util_object.setfocus,
-                  'mousehover':local_Wd.util_object.mouse_hover,
-                  'tab':local_Wd.util_object.tab,
-                  'sendfunctionkeys':local_Wd.util_object.sendfunction_keys,
-                  'rightclick':local_Wd.util_object.rightclick,
-                  'mouseclick':local_Wd.util_object.mouse_click,
-                  'verifywebimages':local_Wd.util_object.verify_web_images,
-                  'imagesimilaritypercentage':local_Wd.util_object.image_similarity_percentage,
-                  'waitforelementvisible':local_Wd.element_object.waitforelement_visible,
-                  'getelementtagvalue': local_Wd.util_object.get_element_tag_value,
-
-
-                  'openbrowser':local_Wd.browser_object.openBrowser,
-                  'navigatetourl':local_Wd.browser_object.navigateToURL,
-                  'opennewbrowser':local_Wd.browser_object.openNewBrowser,
-                  'getpagetitle':local_Wd.browser_object.getPageTitle,
-                  'getcurrenturl':local_Wd.browser_object.getCurrentURL,
-                  'maximizebrowser':local_Wd.browser_object.maximizeBrowser,
-                  'refresh':local_Wd.browser_object.refresh,
-                  'verifycurrenturl':local_Wd.browser_object.verifyCurrentURL,
-                  'closebrowser':local_Wd.browser_object.closeBrowser,
-                  'closesubwindows':local_Wd.browser_object.closeSubWindows,
-                  'switchtowindow':local_Wd.util_object.switch_to_window,
-                  'verifytextexists':local_Wd.statict_text_object.verify_text_exists,
-                  'verifypagetitle':local_Wd.browser_object.verify_page_title,
-                  'clearcache':local_Wd.browser_object.clear_cache,
-                  'navigatewithauthenticate':local_Wd.browser_object.navigate_with_authenticate
-                }
-
-            if(iris_flag):
-                import iris_operations
-                iris_object = iris_operations.IRISKeywords()
-                web_dict['clickiris'] = iris_object.clickiris
-                web_dict['settextiris'] = iris_object.settextiris
-                web_dict['gettextiris'] = iris_object.gettextiris
-                web_dict['getrowcountiris'] = iris_object.getrowcountiris
-                web_dict['getcolcountiris'] = iris_object.getcolcountiris
-                web_dict['getcellvalueiris'] = iris_object.getcellvalueiris
-                web_dict['verifyexistsiris'] = iris_object.verifyexistsiris
-                web_dict['verifytextiris'] = iris_object.verifytextiris
-
             if browser_Keywords.local_bk.driver_obj is not None:
                 browser_info=browser_Keywords.local_bk.driver_obj.capabilities
                 reporting_obj.browser_type=browser_info.get('browserName')
                 reporting_obj.browser_version=browser_info.get('version')
                 if(reporting_obj.browser_version == '' or reporting_obj.browser_version == None):
                     reporting_obj.browser_version= browser_info['browserVersion']
-            if keyword in list(web_dict.keys()):
+            if keyword in list(self.web_dict.keys()):
                 flag=False
                 #Finding the webelement for NON_WEBELEMENT_KEYWORDS
                 if keyword not in NON_WEBELEMENT_KEYWORDS:
@@ -359,14 +358,14 @@ class Dispatcher:
                     if objectname=="@Object":
                         ##webelement = input[0]
                         input =input[1:]
-                        result= web_dict[keyword](webelement,input)
+                        result= self.web_dict[keyword](webelement,input)
                     elif teststepproperty.cord!='' and teststepproperty.cord!=None:
                         if teststepproperty.custom_flag:
-                            result = web_dict[keyword](webelement,input,output,teststepproperty.parent_xpath)
+                            result = self.web_dict[keyword](webelement,input,output,teststepproperty.parent_xpath)
                         else:
-                            result = web_dict[keyword](webelement,input,output)
+                            result = self.web_dict[keyword](webelement,input,output)
                     else:
-                        result= web_dict[keyword](webelement,input)
+                        result= self.web_dict[keyword](webelement,input)
                     ## To terminate debug/execution if requested browser is not available in the system (Defect #846)
                     if(result[1] == TERMINATE):
                         result = TERMINATE

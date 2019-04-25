@@ -1,6 +1,5 @@
 import os
 import subprocess
-import sys
 import zipfile
 import tarfile
 import dataStructDeadCode
@@ -10,6 +9,7 @@ import logging
 import logger
 log = logging.getLogger('generateAST.py')
 from generatePdf import Report
+from constants import *
 
 class DeadcodeIdentifier():
 
@@ -107,6 +107,7 @@ class DeadcodeIdentifier():
 
 	#Function to open zip file
 	def open_zip(self,jar_file,java_version):
+		flag = True
 		zf = zipfile.ZipFile(jar_file, 'r')
 		try:
 			lst = zf.infolist()
@@ -114,72 +115,103 @@ class DeadcodeIdentifier():
 				fn = zi.filename
 				if fn.endswith('.java'):
 					zf.extract(fn)
-					self.open_file(fn,java_version)
+					flag = self.open_file(fn,java_version)
+				if(not flag):
+					break
 		finally:
 			zf.close()
+		return flag
 
 	#function to open Tar File
 	def open_tar(self,tar_file,java_version):
+		flag = True
 		tf = tarfile.TarFile(tar_file, 'r')
 		try:
 			lst = tf.getnames()
 			for zi in lst:
 				tf.extract(zi, path="")
-				self.open_file(zi,java_version)
+				flag = self.open_file(zi,java_version)
+				if(not flag):
+					break
 		finally:
 			tf.close()
+		return flag
 
 	def open_folder(self,folder,java_version):
+		flag = True
 		lst = os.listdir(folder)
 		for filename in lst:
 			filename = folder+"/" + filename
 			if os.path.isdir(filename):
-				self.open_folder(filename,java_version)
+				flag = self.open_folder(filename,java_version)
 			elif os.path.isfile(filename):
-				self.open_file(filename,java_version)
+				flag = self.open_file(filename,java_version)
+			if(not flag):
+				break
+		return flag
 
 	def pmdCall(self,language,pathToFile):
-		os.chdir(r'./Lib/site-packages/PMD/deadcode_identifier')
-		subprocess.call(['java', '-classpath', r'.\lib\*;.' ,r'src.DD' ,str(language) , pathToFile],shell="false")
+		if SYSTEM_OS=='Darwin':
+			os.chdir(os.environ['NINETEEN68_HOME']+'/lib/python2.7/site-packages/PMD/deadcode_identifier')
+			subprocess.call(['java', '-classpath', './lib/*:.' ,'src.DD' ,str(language) , pathToFile],shell=False)
+		else:
+			os.chdir(r'./Lib/site-packages/PMD/deadcode_identifier')
+			subprocess.call(['java', '-classpath', r'.\lib\*;.' ,r'src.DD' ,str(language) , pathToFile],shell="false")
 
 	def open_file(self,filename,java_version):
 		try:
-			filename = filename.replace("/", "\\")
-			name = filename.split('\\')[-1][:-5]
-			if filename.find(".java")>0:
-				self.pmdCall(java_version,filename)
+			flag = True
+			if (not controller.terminate_flag):
+				if filename.find(".java")>0:
+					self.pmdCall(java_version,filename)
+				else:
+					flag = False
+				root = dataStructDeadCode.start()
+				os.remove('./ASTTree.txt')
+				os.chdir(os.environ["NINETEEN68_HOME"])
+				if root:
+					logger.print_on_console(filename)
+					filePath = os.path.abspath(filename)
+					self.showData = ObjectExtraction.main(root,self.showData,filePath)
+					del root
+				else:
+					logger.print_on_console("Java file %s has Errors" %(filename))
+					flag = False
 			else:
-				return
-			root = dataStructDeadCode.start()
-			os.remove(r'./ASTTree.txt')
-			os.chdir(os.environ["NINETEEN68_HOME"])
-			if root:
-				logger.print_on_console(filename)
-				filePath = os.path.abspath(filename)
-				self.showData = ObjectExtraction.main(root,self.showData,filePath)
-				del root
-			else:
-				logger.print_on_console("Java file %s has Errors" %(filename))
+				flag = False
 		except IOError:
 			logger.print_on_console('The filepath that is entered does not exist.')
+		return flag
 
 	def checkformat(self,source,java_version):
+		flag = True
 		if source.find(".tar") > 0:
-			self.open_tar(source,java_version)
+			flag = self.open_tar(source,java_version)
 		elif source.find(".zip") > 0:
-			self.open_zip(source,java_version)
+			flag = self.open_zip(source,java_version)
 		elif source.find(".java") > 0:
-			self.open_file(source,java_version)
+			flag = self.open_file(source,java_version)
 		else:
-			self.open_folder(source,java_version)
-		self.reportCreation(self.showData)
+			flag = self.open_folder(source,java_version)
+		return flag
 
 	def start(self,version,path):
 		try:
 			logger.print_on_console('Starting Deadcode Identifier...')
-			self.checkformat(path,version)
-			os.startfile("Report.pdf")
-			return True
+			flag = self.checkformat(path,version)
+			if flag:
+				self.reportCreation(self.showData)
+				if SYSTEM_OS=='Darwin':
+					subprocess.call(['open','Report.pdf'])
+				else:
+					os.startfile("Report.pdf")
+				logger.print_on_console('Deadcode identification completed')
+				return True
+			else:
+				if controller.terminate_flag:
+					logger.print_on_console("---------Termination Completed-------")
+					controller.terminate_flag = False
+				return False
 		except Exception as e:
 			log.error(e)
 			logger.print_on_console("Error occured in deadcode identifier")
