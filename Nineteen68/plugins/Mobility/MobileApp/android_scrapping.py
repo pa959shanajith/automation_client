@@ -148,8 +148,6 @@ class InstallAndLaunch():
                     return self.driver
                 return self.driver
             else:
-                activityName = device_keywords_object.activity_name(apk_path)
-                packageName = device_keywords_object.package_name(apk_path)
                 processes = psutil.net_connections()
                 for line in processes:
                     p = line.laddr
@@ -159,6 +157,8 @@ class InstallAndLaunch():
                     if device_name == 'wifi':
                         device_name = device_keywords_object.wifi_connect()
                     if device_name != '':
+                        activityName = device_keywords_object.activity_name(apk_path)
+                        packageName = device_keywords_object.package_name(apk_path)
                         logger.print_on_console("Connected device name:",device_name)
                         logger.print_on_console("App package name:",packageName)
                         self.start_server()
