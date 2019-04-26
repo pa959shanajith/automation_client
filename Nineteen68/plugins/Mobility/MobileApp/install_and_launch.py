@@ -200,7 +200,7 @@ class LaunchAndInstall():
                 activity_name = device_keywords_object.activity_name(apk_path)
                 #driver.start_activity(package_name,activity_name)
                 msg = device_keywords_object.launch_app(apk_path,package_name,activity_name,android_scrapping.device_id)
-                if 'Error' in msg:
+                if 'error' in msg.lower():
                     log.error(msg)
                     status = mobile_app_constants.TEST_RESULT_FAIL
                     result = mobile_app_constants.TEST_RESULT_FALSE

@@ -41,7 +41,7 @@ counter=0
 driver=None
 packageName=None
 device_id = None
-
+device_keywords_object = device_keywords.Device_Keywords()
 
 class InstallAndLaunch():
     def __init__(self):
@@ -69,7 +69,7 @@ class InstallAndLaunch():
             log.error(e)
 
     def installApplication(self, apk_path, platform_version, device_name, udid, *args):
-        global driver, device_id, packageName
+        global driver, device_id, packageName, device_keywords_object
         #import appium
         from appium import webdriver
         try:
@@ -148,21 +148,22 @@ class InstallAndLaunch():
                     return self.driver
                 return self.driver
             else:
+                activityName = device_keywords_object.activity_name(apk_path)
+                packageName = device_keywords_object.package_name(apk_path)
                 processes = psutil.net_connections()
                 for line in processes:
                     p = line.laddr
                     if p[1] == 4723 and driver is not None:
-                        return driver
+                        msg = device_keywords_object.launch_app(apk_path,packageName,activityName,device_id)
+                        if 'error' not in msg.lower():
+                            return driver
                 try:
-                    device_keywords_object = device_keywords.Device_Keywords()
                     if device_name == 'wifi':
                         device_name = device_keywords_object.wifi_connect()
                     if device_name != '':
-                        activityName = device_keywords_object.activity_name(apk_path)
-                        packageName = device_keywords_object.package_name(apk_path)
+                        
                         logger.print_on_console("Connected device name:",device_name)
                         logger.print_on_console("App package name:",packageName)
-                        device_id = device_name
                         self.start_server()
                         self.desired_caps = {}
                         if platform_version is not None:
@@ -179,16 +180,19 @@ class InstallAndLaunch():
                         self.desired_caps['appPackage'] = packageName
                         self.desired_caps['appActivity'] = activityName
                         driver = webdriver.Remote('http://localhost:4723/wd/hub', self.desired_caps)
+                        device_id = device_name
                 except Exception as e:
                     err = "Not able to install or launch application"
                     logger.print_on_console(err)
                     log.error(e,exc_info=True)
                     driver = None
+                    device_id = None
         except Exception as e:
             err = "Not able to install or launch application"
             logger.print_on_console(err)
             log.error(e,exc_info=True)
             driver = None
+            device_id = None
         return driver
 
     def scrape(self):
