@@ -154,14 +154,11 @@ class InstallAndLaunch():
                 for line in processes:
                     p = line.laddr
                     if p[1] == 4723 and driver is not None:
-                        msg = device_keywords_object.launch_app(apk_path,packageName,activityName,device_id)
-                        if 'error' not in msg.lower():
-                            return driver
+                        return driver
                 try:
                     if device_name == 'wifi':
                         device_name = device_keywords_object.wifi_connect()
                     if device_name != '':
-                        
                         logger.print_on_console("Connected device name:",device_name)
                         logger.print_on_console("App package name:",packageName)
                         self.start_server()

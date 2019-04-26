@@ -265,7 +265,7 @@ class Device_Keywords():
                             result1 = ' App installed; '
                             break
                 time.sleep(3)
-                out = subprocess.Popen([cmd, '-s', device, 'shell', 'am', 'start', '-n', cmp], stdout=subprocess.PIPE)
+                out = subprocess.Popen([cmd, '-s', device, 'shell', 'am', 'start', '-a', 'android.intent.action.MAIN', '-n', cmp], stdout=subprocess.PIPE)
                 for line in out.stdout.readlines():
                     curr_line = str(line)[2:-1]
                     if 'Starting' in curr_line:
