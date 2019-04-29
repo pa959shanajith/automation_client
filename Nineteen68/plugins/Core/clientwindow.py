@@ -639,12 +639,17 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_disconnect(self, *args):
+        global connection_Timer
         logger.print_on_console('Disconnected from Nineteen68 server')
         wxObject.connectbutton.SetBitmapLabel(wxObject.connect_img)
         wxObject.connectbutton.SetName('connect')
         wxObject.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
         wxObject.schedule.Disable()
         wxObject.connectbutton.Enable()
+        if (connection_Timer != None and connection_Timer.isAlive()):
+            log.info("Timer Stopped Connection Timeout")
+            connection_Timer.cancel()
+            connection_Timer=None
 
     def on_irisOperations(self, *args):
         try:
@@ -1206,7 +1211,7 @@ class ClientWindow(wx.Frame):
             else:
                 self.OnTerminate(event,"term_exec")
                 self.killSocket(True)
-                logger.print_on_console('Disconnected from Nineteen68 server')
+                log.info('Disconnected from Nineteen68 server')
                 self.connectbutton.SetBitmapLabel(self.connect_img)
                 self.connectbutton.SetName('connect')
                 self.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
