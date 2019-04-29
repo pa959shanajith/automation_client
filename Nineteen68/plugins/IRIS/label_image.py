@@ -23,6 +23,7 @@ import os,base64
 import logger
 import logging
 log = logging.getLogger('label_image.py')
+from constants import *
 
 def load_graph(model_file):
   graph = tf.Graph()
@@ -76,8 +77,12 @@ def load_labels(label_file):
 class LabelImage():
     def start(self,view):
         try:
-            model_file = os.environ['NINETEEN68_HOME'] + '/Lib/site-packages/prediction/retrained_graph.pb'
-            label_file = os.environ['NINETEEN68_HOME'] + '/Lib/site-packages/prediction/retrained_labels.txt'
+            if SYSTEM_OS=='Darwin':
+                model_file = os.environ['NINETEEN68_HOME'] + '/lib/python2.7/site-packages/prediction/retrained_graph.pb'
+                label_file = os.environ['NINETEEN68_HOME'] + '/lib/python2.7/site-packages/prediction/retrained_labels.txt'
+            else:
+                model_file = os.environ['NINETEEN68_HOME'] + '/Lib/site-packages/prediction/retrained_graph.pb'
+                label_file = os.environ['NINETEEN68_HOME'] + '/Lib/site-packages/prediction/retrained_labels.txt'
             input_height = 299
             input_width = 299
             input_mean = 0
