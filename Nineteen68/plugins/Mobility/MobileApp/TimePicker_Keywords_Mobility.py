@@ -138,8 +138,6 @@ class Time_Keywords():
                                     value2=element[2].text
 
                                 if value0 == input_date[0] and value1== input_date[1] and value2==input_date[2]:
-                                    if driver.is_keyboard_shown():
-                                        driver.hide_keyboard()
                                     status=TEST_RESULT_PASS
                                     result=TEST_RESULT_TRUE
                         else:
@@ -159,8 +157,13 @@ class Time_Keywords():
                 log.error('webelement is None')
                 logger.print_on_console(err_msg)
         except Exception as e:
-                log.error(e)
-
+            log.error(e)
+        try:
+            if driver.is_keyboard_shown():
+                driver.hide_keyboard()
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console("Error hiding the Soft. keyboard")
         return status,result,output,err_msg
 
     def Get_Time(self,webelement,input,*args):
