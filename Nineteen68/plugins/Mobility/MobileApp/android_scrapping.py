@@ -41,6 +41,7 @@ counter=0
 driver=None
 packageName=None
 device_id = None
+                                                          
 
 
 class InstallAndLaunch():
@@ -162,7 +163,6 @@ class InstallAndLaunch():
                         packageName = device_keywords_object.package_name(apk_path)
                         logger.print_on_console("Connected device name:",device_name)
                         logger.print_on_console("App package name:",packageName)
-                        device_id = device_name
                         self.start_server()
                         self.desired_caps = {}
                         if platform_version is not None:
@@ -179,16 +179,19 @@ class InstallAndLaunch():
                         self.desired_caps['appPackage'] = packageName
                         self.desired_caps['appActivity'] = activityName
                         driver = webdriver.Remote('http://localhost:4723/wd/hub', self.desired_caps)
+                        device_id = device_name
                 except Exception as e:
                     err = "Not able to install or launch application"
                     logger.print_on_console(err)
                     log.error(e,exc_info=True)
                     driver = None
+                    device_id = None
         except Exception as e:
             err = "Not able to install or launch application"
             logger.print_on_console(err)
             log.error(e,exc_info=True)
             driver = None
+            device_id = None
         return driver
 
     def scrape(self):

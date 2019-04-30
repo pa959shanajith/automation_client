@@ -204,127 +204,131 @@ class AutomatedPathGenerator:
             Cylomatic_Compelxity={}
             prev_classes=[]
             varstorage = None
-            logger.print_on_console("Graph generation in progress...")
-            logger.print_on_console("File name:")
-            logger.print_on_console("=============")
-            '''This is to check the input is a zip/tar/java file or a folder.'''
-            if (self.checkformat(int(version), source) ==
-                    True):
-                '''After check format, the flow chart would be made completely. So now, we'll check the possible method linking.'''
-                self.PossibleMethods = CheckPossibleMethods.main(
-                    self.PosMethod, self.Classes, varstorage)
-                #print self.PossibleMethods
-                for i in range(0,len(self.FlowChart)):
-                    self.FlowChart[i]['id']=i
-                    if("'" in self.FlowChart[i]['text']):
-                        self.FlowChart[i]['text'] = (self.FlowChart[i]['text']).replace("'", '"')
-                    if(self.FlowChart[i]['class'] == 'import'):
-                        start = i
-                        while(self.FlowChart[i]['class'] == 'import'):
-                            i = i + 1
-                            end = i
-                        classname = self.FlowChart[i]['class']
-                        for j in range (start, end):
-                            self.FlowChart[j]['class'] = classname
-
-                '''jsonString contains the association links for the class diagram'''
-                jsonString = []
-                c_source=None
-                c_target=None
-                method_calls_count = {}
-                for method in self.PossibleMethods:
-                    if(method["MethodOrClassCall"] == "Variable"):
-                        c_source = method["PresentClass"].split("(")[0]
-                        c_target = method["Class"]
-                        if(c_source != None and c_target != None and c_source != c_target):
-                            jsonString.append({"source":c_source,"target":c_target})
-                    elif(method["ParentNodeNo"] != None):
-                        m = method["PosMethod"].split('(')[0]
-                        for cls in self.Classes:
-                            if (m in list(cls["methods"].keys())):
-                                c_target = cls["name"]
-                                break
-                            elif (m == cls["name"]):
-                                c_target = cls["name"]
-                                break
-                        if("PresentClass" in method):
-                            c_source = method["PresentClass"].split("(")[0]
-                        if(c_source != None and c_target != None):
-                            if(c_source != c_target):
-                                jsonString.append({"source":c_source,"target":c_target})
-                            id = None
-                            for fc in self.FlowChart:
-                                if((fc['class'].split('(')[0] == c_source) and (m in fc['text']) and ('Method Name:' not in fc['text'])):
-                                    for trgt in self.FlowChart:
-                                        if((trgt['class'].split('(')[0] == c_target) and (m in trgt['text']) and ('Method Name:' in trgt['text'])):
-                                            id = trgt['id']
-                                            break
-                                    if(fc['method'] not in method_calls_count):
-                                        method_calls_count.update({fc['method']:{'within':0,'outside':0}})
-                                    if(isinstance(fc['child'],list)):
-                                        fc['child'].append(id)
-                                    else:
-                                        fc['child'] = [id]
-                                    if(c_source == c_target):
-                                        fc['within'] = True
-                                        method_calls_count[fc['method']]['within'] += 1
-                                    else:
-                                        fc['outside'] = True
-                                        method_calls_count[fc['method']]['outside'] += 1
-                                    break
-                jsonString = [dict(t) for t in set([tuple(d.items()) for d in jsonString])]
-
-                '''To compress similar nodes in data-flow into one'''
-                test = []
-                i = 0
-                flag = False
-                while(i < len(self.FlowChart)):
-                    if(self.FlowChart[i]['shape'] == 'Square'):
-                        start = i
-                        parent = self.FlowChart[i]['id']
-                        i = i + 1
-                        f = False
-                        while(i <len(self.FlowChart) and self.FlowChart[i]['shape'] == 'Square' and self.FlowChart[i-1]['child'] == [self.FlowChart[i]['id']]
-                        and (self.FlowChart[i]['id']+1 in self.FlowChart[i]['child'])):
-                            id = self.FlowChart[i]['id']
-                            parent = id
-                            for fc in self.FlowChart:
-                                if(fc['child'] != None and (id in fc['child']) and fc['id'] > id):
-                                    f = True
-                                    break
-                            if(not f):
-                                self.FlowChart[start]['text'] += '\n' + self.FlowChart[i]['text']
-                                self.FlowChart[i]['delete'] = 'true'
+            if os.path.exists(source):
+                logger.print_on_console("Graph generation in progress...")
+                logger.print_on_console("File name:")
+                logger.print_on_console("=============")
+                '''This is to check the input is a zip/tar/java file or a folder.'''
+                if (self.checkformat(int(version), source) ==
+                        True):
+                    '''After check format, the flow chart would be made completely. So now, we'll check the possible method linking.'''
+                    self.PossibleMethods = CheckPossibleMethods.main(
+                        self.PosMethod, self.Classes, varstorage)
+                    for i in range(0,len(self.FlowChart)):
+                        self.FlowChart[i]['id']=i
+                        if("'" in self.FlowChart[i]['text']):
+                            self.FlowChart[i]['text'] = (self.FlowChart[i]['text']).replace("'", '"')
+                        if(self.FlowChart[i]['class'] == 'import'):
+                            start = i
+                            while(self.FlowChart[i]['class'] == 'import'):
+                                i = i + 1
                                 end = i
-                                flag = True
+                            classname = self.FlowChart[i]['class']
+                            for j in range (start, end):
+                                self.FlowChart[j]['class'] = classname
+
+                    '''jsonString contains the association links for the class diagram'''
+                    jsonString = []
+                    c_source=None
+                    c_target=None
+                    method_calls_count = {}
+                    for method in self.PossibleMethods:
+                        if(method["MethodOrClassCall"] == "Variable"):
+                            c_source = method["PresentClass"].split("(")[0]
+                            c_target = method["Class"]
+                            if(c_source != None and c_target != None and c_source != c_target):
+                                jsonString.append({"source":c_source,"target":c_target})
+                        elif(method["ParentNodeNo"] != None):
+                            m = method["PosMethod"].split('(')[0]
+                            for cls in self.Classes:
+                                if (m in list(cls["methods"].keys())):
+                                    c_target = cls["name"]
+                                    break
+                                elif (m == cls["name"]):
+                                    c_target = cls["name"]
+                                    break
+                            if("PresentClass" in method):
+                                c_source = method["PresentClass"].split("(")[0]
+                            if(c_source != None and c_target != None):
+                                if(c_source != c_target):
+                                    jsonString.append({"source":c_source,"target":c_target})
+                                id = None
+                                for fc in self.FlowChart:
+                                    if((fc['class'].split('(')[0] == c_source) and (m in fc['text']) and ('Method Name:' not in fc['text'])):
+                                        for trgt in self.FlowChart:
+                                            if((trgt['class'].split('(')[0] == c_target) and (m in trgt['text']) and ('Method Name:' in trgt['text'])):
+                                                id = trgt['id']
+                                                break
+                                        if(fc['method'] not in method_calls_count):
+                                            method_calls_count.update({fc['method']:{'within':0,'outside':0}})
+                                        if(isinstance(fc['child'],list)):
+                                            fc['child'].append(id)
+                                        else:
+                                            fc['child'] = [id]
+                                        if(c_source == c_target):
+                                            fc['within'] = True
+                                            method_calls_count[fc['method']]['within'] += 1
+                                        else:
+                                            fc['outside'] = True
+                                            method_calls_count[fc['method']]['outside'] += 1
+                                        break
+                    jsonString = [dict(t) for t in set([tuple(d.items()) for d in jsonString])]
+
+                    '''To compress similar nodes in data-flow into one'''
+                    test = []
+                    i = 0
+                    flag = False
+                    while(i < len(self.FlowChart)):
+                        if(self.FlowChart[i]['shape'] == 'Square'):
+                            start = i
+                            parent = self.FlowChart[i]['id']
                             i = i + 1
-                        if (flag):
-                            self.FlowChart[start]['child'] = self.FlowChart[end]['child']
-                            self.FlowChart[end+1]['parent'] = [start]
-                            flag = False
-                    else:
-                        i = i + 1
-                for fc in self.FlowChart:
-                    if not ('delete' in fc):
-                        test.append(fc)
+                            f = False
+                            while(i <len(self.FlowChart) and self.FlowChart[i]['shape'] == 'Square' and self.FlowChart[i-1]['child'] == [self.FlowChart[i]['id']]
+                            and (self.FlowChart[i]['id']+1 in self.FlowChart[i]['child'])):
+                                id = self.FlowChart[i]['id']
+                                parent = id
+                                for fc in self.FlowChart:
+                                    if(fc['child'] != None and (id in fc['child']) and fc['id'] > id):
+                                        f = True
+                                        break
+                                if(not f):
+                                    self.FlowChart[start]['text'] += '\n' + self.FlowChart[i]['text']
+                                    self.FlowChart[i]['delete'] = 'true'
+                                    end = i
+                                    flag = True
+                                i = i + 1
+                            if (flag):
+                                self.FlowChart[start]['child'] = self.FlowChart[end]['child']
+                                self.FlowChart[end+1]['parent'] = [start]
+                                flag = False
+                        else:
+                            i = i + 1
+                    for fc in self.FlowChart:
+                        if not ('delete' in fc):
+                            test.append(fc)
 
-                currentdate = datetime.now()
-                differencedate= currentdate - beginingoftime
-                end_time = int(differencedate.total_seconds() * 1000.0)
+                    currentdate = datetime.now()
+                    differencedate= currentdate - beginingoftime
+                    end_time = int(differencedate.total_seconds() * 1000.0)
 
-                data = {"links":jsonString, "data_flow":test, "result":"success", "starttime":start_time,
-                        "endtime":end_time, "method_calls_count":method_calls_count}
-                self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
-                logger.print_on_console("Graph generation completed")
+                    data = {"links":jsonString, "data_flow":test, "result":"success", "starttime":start_time,
+                            "endtime":end_time, "method_calls_count":method_calls_count}
+                    self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
+                    logger.print_on_console("Graph generation completed")
 
+                else:
+                    if(controller.terminate_flag == True):
+                        logger.print_on_console("---------Termination Completed-------")
+                    data = {"result":"fail"}
+                    self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
+                    logger.print_on_console("Graph generation failed")
+
+                controller.terminate_flag = False
             else:
-                if(controller.terminate_flag == True):
-                    logger.print_on_console("---------Termination Completed-------")
-                data = {"result":"fail"}
+                data = {"result":"invalidPath"}
+                logger.print_on_console("The given path does not exists.")
                 self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
-                logger.print_on_console("Graph generation failed")
-
-            controller.terminate_flag = False
         except Exception as e:
             data = {"result":"fail"}
             self.socketIO.emit("result_flow_graph_finished", json.dumps(data))
