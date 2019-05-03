@@ -112,6 +112,7 @@ class Button_Keywords():
 
                         log.debug(WEB_ELEMENT_ENABLED)
                         output=webelement.text
+                        logger.print_on_console("Button name: "+output)
                         status=TEST_RESULT_PASS
                         result=TEST_RESULT_TRUE
 

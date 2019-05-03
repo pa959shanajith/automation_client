@@ -355,6 +355,7 @@ class List_Keywords():
 
                             if (length1==length2):
                                 output=selected
+                                logger.print_on_console("Output: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
@@ -416,6 +417,7 @@ class List_Keywords():
 
                             if (length1==length2):
                                 output=length1
+                                logger.print_on_console("Count: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
@@ -483,6 +485,7 @@ class List_Keywords():
 
                         if (input==count):
                                 log.debug('count matched')
+                                logger.print_on_console("Count: "+count)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                         else :
@@ -744,6 +747,7 @@ class List_Keywords():
                             if (length1==length2):
                                 if len(input) == count:
                                     output=temp[0]
+                                    logger.print_on_console("Output: "+output)
                                     status=TEST_RESULT_PASS
                                     result=TEST_RESULT_TRUE
                                     break
@@ -837,6 +841,7 @@ class List_Keywords():
                             if (length1==length2):
                                 if len(input) == count:
                                     output=temp
+                                    logger.print_on_console("Output: "+output)
                                     status=TEST_RESULT_PASS
                                     result=TEST_RESULT_TRUE
                                     break
@@ -911,6 +916,7 @@ class List_Keywords():
 
                             if (length1==length2):
                                 output=text
+                                logger.print_on_console("Output: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break

@@ -200,6 +200,7 @@ class Time_Keywords():
                             else:
                                 AMorPM="PM"
                             output=Hour+':'+Min+':'+AMorPM
+                            logger.print_on_console("Time: "+output)
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
 
@@ -209,6 +210,7 @@ class Time_Keywords():
                             Min=element[1].text
                             AMorPM=element[2].text
                             output=Hour+':'+Min+':'+AMorPM
+                            logger.print_on_console("Time: "+output)
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                     else:

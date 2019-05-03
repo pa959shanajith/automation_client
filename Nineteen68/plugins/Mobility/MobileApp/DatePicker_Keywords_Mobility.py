@@ -242,6 +242,7 @@ class Date_Keywords():
                             Month = DateText[5:8]
                             Date = DateText[9:11]
                             output = Month+'/'+Date+'/'+Year
+                            logger.print_on_console("Date: "+output)
                             status = TEST_RESULT_PASS
                             methodoutput = TEST_RESULT_TRUE
                         elif count == 1 :
@@ -250,6 +251,7 @@ class Date_Keywords():
                             Date=element[1].text
                             Year=element[2].text
                             output=Month+'/'+Date+'/'+Year
+                            logger.print_on_console("Date: "+output)
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else :

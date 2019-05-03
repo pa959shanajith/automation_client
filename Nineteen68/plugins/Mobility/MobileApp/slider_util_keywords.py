@@ -73,6 +73,7 @@ class SliderKeywords():
                     if enable:
                         log.debug('performing the action')
                         output= x=str(float(element.get_attribute('value').replace('%',''))/100)[:3]
+                        logger.print_on_console("Slide value: "+element.text)
                         methodoutput=TEST_RESULT_TRUE
                         status = TEST_RESULT_PASS
 

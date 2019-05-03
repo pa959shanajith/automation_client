@@ -218,11 +218,13 @@ class Textbox_keywords():
                 if webelement.is_enabled():
                     log.debug(WEB_ELEMENT_ENABLED)
                     output=webelement.text
+                    logger.print_on_console("Element text: "+output)
                     status=TEST_RESULT_PASS
                     result=TEST_RESULT_TRUE
                 else:
                     err_msg='ERR_DISABLED_OBJECT'
                     output=webelement.text
+                    logger.print_on_console("Element text: "+output)
                     status=TEST_RESULT_PASS
                     result=TEST_RESULT_TRUE
         except Exception as e:
@@ -245,23 +247,26 @@ class Textbox_keywords():
                 #if type(webelement) is list:
                 #       webelement=webelement[0]
                 if webelement is not None:
+                    elem_text = webelement.text
                     if webelement.is_enabled():
                         log.debug(WEB_ELEMENT_ENABLED)
-                        if webelement.text==input_val:
+                        if elem_text==input_val:
+                            logger.print_on_console("Element text: "+elem_text)
                             log.debug('text matched')
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                         else:
-                            logger.print_on_console("Element text:"+webelement.text)
+                            logger.print_on_console("Element text: "+elem_text)
                     else:
                         err_msg='ERR_DISABLED_OBJECT'
                         logger.print_on_console(err_msg)
-                        if webelement.text==input_val:
+                        if elem_text==input_val:
+                            logger.print_on_console("Element text: "+elem_text)
                             log.debug('text matched')
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                         else:
-                            logger.print_on_console("Element text:"+webelement.text)
+                            logger.print_on_console("Element text: "+elem_text)
         except Exception as e:
                 log.error(e,exc_info=True)
                 logger.print_on_console(err_msg)

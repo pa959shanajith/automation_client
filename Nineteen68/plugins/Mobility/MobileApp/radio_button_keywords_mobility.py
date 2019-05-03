@@ -101,6 +101,7 @@ class Radio_Button_Keywords():
                             output=webelement.get_attribute("checked")
 
                         if output!=None:
+                            logger.print_on_console("Status: "+output)
                             log.info(output)
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
