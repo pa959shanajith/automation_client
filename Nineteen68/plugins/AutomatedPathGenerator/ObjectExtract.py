@@ -1,6 +1,5 @@
 import re
 import sys
-sys.setrecursionlimit(15000)
 
 FlowChart = []  # List of Flow Chart Nodes (addNodes)
 Classes = []  # List of all the Classes (addClass)
@@ -2371,6 +2370,7 @@ def localVariableExtraction(root):
 def main(ASTDict, Flow, Class, PosMeth):
 	try:
 		global ASTNode, FlowChart, Classes, PosMethod, PossibleMethods, ClassVariables
+		sys.setrecursionlimit(15000)
 		ASTNode = ASTDict
 		FlowChart = Flow
 		Classes = Class
@@ -2381,6 +2381,7 @@ def main(ASTDict, Flow, Class, PosMeth):
 		objectExtract(0)
 	except Exception as e:
 		log.error(e)
+	sys.setrecursionlimit(1000)
 	return FlowChart, Classes, PossibleMethods, ClassVariables, VarStorage
 
 
@@ -2993,6 +2994,13 @@ def primarySuffixExtraction(root):
 def referenceTypeExtraction(root):
 	line = ASTNode[root]["value"][1]
 	ReferenceType = ""
+	if 'list' in ASTNode[ASTNode[root]["child"][0]]["value"][1].lower():
+		a = ASTNode[ASTNode[root]["child"][0]]
+		a = ASTNode[ASTNode[ASTNode[ASTNode[a["child"][0]]["child"][0]]["child"][0]]["child"][0]]
+		value = a["value"][1]
+		PossibleMethods.append(addPossibleMethod('Variable', value, -1))
+		PossibleMethods[len(PossibleMethods)-1]['Class'] = value
+		PossibleMethods[len(PossibleMethods)-1]['PresentClass'] = PresentClassName
 	if ASTNode[ASTNode[root]["child"][0]]["value"][1] is not None:
 		ReferenceType = ReferenceType + \
 			ASTNode[ASTNode[root]["child"][0]]["value"][1]

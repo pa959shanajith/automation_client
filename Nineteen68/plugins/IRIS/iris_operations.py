@@ -277,10 +277,14 @@ def update_dataset(image_data):
             byte_mirror = base64.b64encode(mirror.encode('utf-8'))
             b64 = base64.b64decode(byte_mirror)
             mirror = b64[2:len(b64)-1]
-            filename = os.environ['NINETEEN68_HOME'] + '/Lib/site-packages/prediction/Dataset/' + str(image_data['type']) + '/' + str(uuid4()).replace("-","")+".png"
-            with open(filename,'wb') as f:
-                f.write(base64.b64decode(mirror))
-        return True
+            filename = SCREENSHOT_PATH + '/Dataset/' + str(image_data['type']) + '/' + str(uuid4()).replace("-","") + ".png"
+            if (os.path.exists(SCREENSHOT_PATH + '/Dataset')):
+                with open(filename,'wb') as f:
+                    f.write(base64.b64decode(mirror))
+                return True
+            else:
+                logger.print_on_console("Dataset folder not found.")
+                return False
     except Exception as e:
         log.error(e)
         return False
