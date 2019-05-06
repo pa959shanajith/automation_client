@@ -38,7 +38,7 @@ class SendFunctionKeys:
             import win32gui,win32api,win32process
             pids = browser_Keywords.pid_set
             if(len(pids)>0):
-                pid = pids.pop()
+                pid = pids[len(pids)-1]
                 toplist, winlist = [], []
                 def enum_cb(hwnd, results):
                     winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
@@ -60,8 +60,6 @@ class SendFunctionKeys:
                 time.sleep(1)
         except Exception as e:
             log.error("Web plugin not loaded")
-            pass
-
         try:
             log.debug('reading the inputs')
             input=str(input)

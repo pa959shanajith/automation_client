@@ -39,7 +39,7 @@ import readconfig
 import core_utils
 import time
 from sendfunction_keys import SendFunctionKeys as SF
-pid_set = set()
+pid_set = []
 
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
 class TestThread(threading.Thread):
@@ -115,36 +115,7 @@ class BrowserKeywords():
             if(driver_obj == None):
                 result = TERMINATE
             else:
-                if SYSTEM_OS!='Darwin':
-                    utilobject = utils_web.Utils()
-                    pid = None
-                    if (self.browser_num == '1'):
-                        #Logic to the pid of chrome window
-                        p = psutil.Process(driver_obj.service.process.pid)
-                        pidchrome = p.children()[0]
-                        pid = pidchrome.pid
-                        pid_set.add(pid)
-                    elif(self.browser_num == '2'):
-                        #logic to get the pid of the firefox window
-                        try:
-                            pid = driver_obj.binary.process.pid
-                        except Exception as e:
-                            p = psutil.Process(driver_obj.service.process.pid)
-                            pidchrome = p.children()[0]
-                            pid = pidchrome.pid
-                            pid_set.add(pid)
-                    elif(self.browser_num == '3'):
-                        # Logic checks if security settings needs to be addressed
-                        # ref: <gitlabpath>/nineteen68v2.0/Nineteen68/issues/1556
-                        if enableSecurityFlag:
-                            driver_obj = obj.set_security_zones(
-                                self.browser_num, driver_obj)
-                        #Logic to get the pid of the ie window
-                        p = psutil.Process(driver_obj.iedriver.process.pid)
-                        pidie = p.children()[0]
-                        pid = pidie.pid
-                        pid_set.add(pid)
-                    hwndg = utilobject.bring_Window_Front(pid)
+                self.update_pid_set()
                 webdriver_list.append(driver_obj)
                 parent_handle =  None
                 try:
@@ -202,6 +173,7 @@ class BrowserKeywords():
                 if enableSecurityFlag:
                     driver_obj = driver.set_security_zones(
                         self.browser_num, driver_obj)
+                self.update_pid_set()
                 webdriver_list.append(driver_obj)
                 parent_handle = driver_obj.current_window_handle
                 self.update_recent_handle(parent_handle)
@@ -534,15 +506,13 @@ class BrowserKeywords():
                 count = count - 2
                 webdriver_list[driver_instance].quit()
                 if SYSTEM_OS == 'Darwin':
-
-                        import os
-                        os.system("killall -9 Safari")
-
-
+                    import os
+                    os.system("killall -9 Safari")
                 logger.print_on_console('browser closed')
                 log.info('browser closed')
                 ## Issue #190 Driver control won't switch back to parent window
-                webdriver_list.pop(len(webdriver_list)-1)
+                del webdriver_list[:]
+                del pid_set[:]
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             except Exception as e:
@@ -707,6 +677,39 @@ class BrowserKeywords():
         global recent_handles
         if len(recent_handles)==0 or recent_handles[-1]!=h:
             recent_handles.append(h)
+
+    def update_pid_set(self):
+        global pid_set,driver_obj
+        if SYSTEM_OS!='Darwin':
+            utilobject = utils_web.Utils()
+            pid = None
+            if (self.browser_num == '1'):
+                #Logic to the pid of chrome window
+                p = psutil.Process(driver_obj.service.process.pid)
+                pidchrome = p.children()[0]
+                pid = pidchrome.pid
+                pid_set.append(pid)
+            elif(self.browser_num == '2'):
+                #logic to get the pid of the firefox window
+                try:
+                    pid = driver_obj.binary.process.pid
+                except Exception as e:
+                    p = psutil.Process(driver_obj.service.process.pid)
+                    pidchrome = p.children()[0]
+                    pid = pidchrome.pid
+                    pid_set.append(pid)
+            elif(self.browser_num == '3'):
+                # Logic checks if security settings needs to be addressed
+                # ref: <gitlabpath>/nineteen68v2.0/Nineteen68/issues/1556
+                if enableSecurityFlag:
+                    driver_obj = obj.set_security_zones(
+                        self.browser_num, driver_obj)
+                #Logic to get the pid of the ie window
+                p = psutil.Process(driver_obj.iedriver.process.pid)
+                pidie = p.children()[0]
+                pid = pidie.pid
+                pid_set.append(pid)
+            hwndg = utilobject.bring_Window_Front(pid)
 
 
 class Singleton_DriverUtil():
