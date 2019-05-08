@@ -314,7 +314,11 @@ class Dispatcher:
                 reporting_obj.browser_type=browser_info.get('browserName')
                 log.info(reporting_obj.browser_version)
                 log.info(reporting_obj.browser_type)
-
+            elif browser_Keywords.driver_obj is None:
+                reporting_obj.browser_type=BROWSER_NAME[int(input[0])]
+                reporting_obj.browser_version= 'NA'
+                log.info(reporting_obj.browser_version)
+                log.info(reporting_obj.browser_type)
 
 
         try:
