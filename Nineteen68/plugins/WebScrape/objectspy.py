@@ -58,6 +58,8 @@ class Object_Mapper():
             for element in elementsdata['view']:
                 # XPath and URL decryption logic implemented
                 xpath_string = element['xpath'].split(';')
+                if not xpath_string[0]:
+                    raise ValueError('xpath of the object is empty')
                 left_part = self.coreutilsobj.scrape_unwrap(xpath_string[0])
                 right_part = self.coreutilsobj.scrape_unwrap(xpath_string[2])
                 decryptedxpath = left_part + ';' + xpath_string[1] + ';' + right_part
@@ -120,6 +122,9 @@ class Object_Mapper():
             with open('domelements.json', 'w') as outfile:
                 json.dump(self.data, outfile, indent=4, sort_keys=False)
             self.status  = domconstants.STATUS_SUCCESS
+        except ValueError as e:
+            logger.print_on_console("Unmaped object found")
+            log.error(e)
         except Exception as e:
             logger.print_on_console("Error while comparing objects")
             log.error(e)
