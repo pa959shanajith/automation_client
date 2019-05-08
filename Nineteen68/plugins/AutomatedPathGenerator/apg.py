@@ -261,10 +261,11 @@ class AutomatedPathGenerator:
                                                 break
                                         if(fc['method'] not in method_calls_count):
                                             method_calls_count.update({fc['method']:{'within':0,'outside':0}})
-                                        if(isinstance(fc['child'],list)):
-                                            fc['child'].append(id)
-                                        else:
-                                            fc['child'] = [id]
+                                        if(id != None):
+                                            if(isinstance(fc['child'],list)):
+                                                fc['child'].append(id)
+                                            else:
+                                                fc['child'] = [id]
                                         if(c_source == c_target):
                                             fc['within'] = True
                                             method_calls_count[fc['method']]['within'] += 1

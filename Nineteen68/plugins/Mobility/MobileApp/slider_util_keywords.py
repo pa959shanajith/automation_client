@@ -73,6 +73,7 @@ class SliderKeywords():
                     if enable:
                         log.debug('performing the action')
                         output= x=str(float(element.get_attribute('value').replace('%',''))/100)[:3]
+                        logger.print_on_console("Slide value: "+element.text)
                         methodoutput=TEST_RESULT_TRUE
                         status = TEST_RESULT_PASS
 
@@ -210,9 +211,9 @@ class SliderKeywords():
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
             else:
-                log.info(ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS'])
-                status=TEST_RESULT_PASS
-                methodoutput=TEST_RESULT_TRUE
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
 
         except Exception as e:
             err_msg=ANDROID_ERROR

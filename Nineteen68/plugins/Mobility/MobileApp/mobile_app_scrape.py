@@ -20,21 +20,24 @@ import core_utils
 
 class ScrapeWindow(wx.Frame):
     def __init__(self, parent,id, title,filePath,socketIO):
-        wx.Frame.__init__(self, parent, title=title,
-                   pos=(300, 150),  size=(200, 150) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
+        wx.Frame.__init__(self, parent, title=title, size=(190, 170), style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER|wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
         self.SetBackgroundColour('#e6e7e8')
         self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.core_utilsobject = core_utils.CoreUtils()
         self.parent = parent
         global obj
-        #obj = android_scrapping.InstallAndLaunch()
-
+        
         self.socketIO = socketIO
         apk_path=filePath.split(';')[0]
         serial=filePath.split(';')[1]
         if str(apk_path).endswith("apk"):
             status = obj.installApplication(apk_path, None, serial, None)
+            if android_scrapping.driver is not None:
+                size=android_scrapping.driver.get_window_size()
+                self.min_y=(size['height']/4)
+                self.max_y=(size['height']*0.75)
+                self.x_Value=(size['width']*0.50)
         elif filePath.split(';')[4]== "ios":
             deviceName = filePath.split(';')[0]
             platform_version = filePath.split(';')[1]
@@ -43,8 +46,12 @@ class ScrapeWindow(wx.Frame):
             status = obj.installApplication(deviceName, platform_version,bundle_id,Ip_Address,"ios")
         if status!=None:
             self.panel = wx.Panel(self)
-            self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,38 ), size=(175, 28))
+            self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12, 28), size=(150, 28))
             self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)   # need to implement OnExtract()
+            self.swipedownbutton = wx.Button(self.panel, label="Swipe Down",pos=(12, 60), size=(150, 28))
+            self.swipedownbutton.Bind(wx.EVT_BUTTON, self.swipedown)
+            self.swipeupbutton = wx.Button(self.panel, label="Swipe Up",pos=(12,92 ), size=(150, 28))
+            self.swipeupbutton.Bind(wx.EVT_BUTTON, self.swipeup)
             self.Centre()
             style = self.GetWindowStyle()
             self.SetWindowStyle( style|wx.STAY_ON_TOP )
@@ -103,6 +110,8 @@ class ScrapeWindow(wx.Frame):
 
 
     #----------------------------------------------------------------------
+
+
     def fullscrape(self,event):
         logger.print_on_console('Performing full scrape')
         d = obj.scrape()
@@ -119,3 +128,25 @@ class ScrapeWindow(wx.Frame):
         self.parent.schedule.Enable()
         self.Close()
         logger.print_on_console('Full scrape  completed')
+
+
+    def swipedown(self,event):
+        try:
+            if android_scrapping.driver is not None:
+                android_scrapping.driver.swipe(self.x_Value, self.min_y, self.x_Value, self.max_y)
+            else:
+                logger.print_on_console("Couldn't Scroll as the appium driver is not running!!")
+                self.Close()
+        except Exception as e:
+            log.error(e, exc_info=True)
+
+
+    def swipeup(self,event):
+        try:
+            if android_scrapping.driver is not None:
+                android_scrapping.driver.swipe(self.x_Value, self.max_y, self.x_Value, self.min_y)
+            else:
+                logger.print_on_console("Couldn't Scroll as the appium driver is not running!!")
+                self.Close()
+        except Exception as e:
+            log.error(e, exc_info=True)

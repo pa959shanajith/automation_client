@@ -25,8 +25,8 @@ class SliderKeywords():
     def find_coordinates_horizontal(self):
         size=android_scrapping.driver.get_window_size()
         log.debug('Window size is '+str(size))
-        startx=(size['width']*0.70)
-        endx=(size['width']*0.30)
+        startx=(size['width']*0.75)
+        endx=(size['width']/4)
         starty=(size['height']/2)
         log.debug(startx,starty,endx)
         return startx,starty,endx
@@ -34,9 +34,9 @@ class SliderKeywords():
     def find_coordinates_vertical(self):
         size=android_scrapping.driver.get_window_size()
         log.debug('Window size is '+str(size))
-        min_y=(size['height']/5)
-        max_y=(size['height']*0.8)
-        x_Value=(size['width']*0.50)
+        min_y=(size['height']/4)
+        max_y=(size['height']*0.75)
+        x_Value=(size['width']/2)
         log.debug(x_Value,max_y,min_y)
         return x_Value,max_y,min_y
 
