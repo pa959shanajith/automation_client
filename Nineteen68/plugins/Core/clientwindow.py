@@ -41,6 +41,7 @@ desktopScrapeFlag=False
 sapScrapeFlag=False
 mobileScrapeFlag=False
 mobileWebScrapeFlag=False
+pdfScrapeFlag = False
 debugFlag = False
 oebsScrapeFlag = False
 irisFlag = False
@@ -354,6 +355,25 @@ class MainNamespace(BaseNamespace):
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
         except Exception as e:
             err_msg='Error while Scraping Mobile application'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e,exc_info=True)
+
+    def on_PDF_SCRAPE(self, *args):
+        try:
+            if check_execution_lic("scrape"): return None
+            logger.print_on_console(" Entering inside PDF scrape")
+            global pdfScrapeObj,pdfScrapeFlag
+            global browsername
+            browsername = args[0]
+#           con =controller.Controller()
+            core_utils.get_all_the_imports('PDF')
+            import pdf_scrape_dispatcher
+            pdfScrapeObj=pdf_scrape_dispatcher
+            pdfScrapeFlag=True
+            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+        except Exception as e:
+            err_msg='Error while Scraping in PDF Window'
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
@@ -1314,7 +1334,7 @@ class ClientWindow(wx.Frame):
 
     def test(self,event):
         try:
-            global mobileScrapeFlag,qcConFlag,mobileWebScrapeFlag,desktopScrapeFlag
+            global mobileScrapeFlag,qcConFlag,mobileWebScrapeFlag,desktopScrapeFlag, pdfScrapeFlag
             global sapScrapeFlag,debugFlag,browsername,action,oebsScrapeFlag
             global socketIO,data
             #con = controller.Controller()
@@ -1340,6 +1360,9 @@ class ClientWindow(wx.Frame):
             elif oebsScrapeFlag==True:
                 self.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = self,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
                 oebsScrapeFlag=False
+            elif pdfScrapeFlag==True:
+                self.scrapewindow = pdfScrapeObj.ScrapeDispatcher(parent = self,id = -1, title="SLK Nineteen68 - PDF Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+                pdfScrapeFlag=False
             elif debugFlag == True:
                 self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
                 debugFlag = False
