@@ -38,6 +38,8 @@ class Radio_Checkbox_keywords():
                         state = self.get_status(element,parent)
                         if ( state[2] == 'Selected' ):
                             err_msg='Radio button already selected'
+                            log.info( err_msg )
+                            logger.print_on_console( err_msg )
                         else:
                             if ( element.backend.name=='win32' ):
                                 element.check_by_click()

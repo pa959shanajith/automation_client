@@ -39,6 +39,7 @@ import os
 import subprocess
 import platform
 import time
+import android_custom
 apptypes = None
 
 log = logging.getLogger('mobile_app_dispatcher.py')
@@ -60,6 +61,7 @@ class MobileDispatcher:
     time_keywords_object=TimePicker_Keywords_Mobility.Time_Keywords()
     number_picker_object=Number_picker_Keywords.Number_Picker()
     seekBar_object=seekBar_Mobility.Seek_Bar_Keywords()
+    custom_object=android_custom.custom()
     def __init__(self):
         self.exception_flag=''
 
@@ -96,7 +98,7 @@ class MobileDispatcher:
                     'sendvalue' : self.textbox_keywords_object.send_value,
                     'gettext' : self.textbox_keywords_object.get_text,
                     'verifytext' : self.textbox_keywords_object.verify_text,
-                    'verifytextboxlength' : self.textbox_keywords_object.verify_textBoxLength,
+                    #'verifytextboxlength' : self.textbox_keywords_object.verify_textBoxLength,
                     'selectradiobutton' : self.radio_button_object.select_radio_button,
                     'getstatus' : self.radio_button_object.get_status,
                     'selectcheckbox' : self.radio_button_object.select_checkbox,
@@ -395,7 +397,14 @@ class MobileDispatcher:
 
                 else:
                     driver = android_scrapping.driver
-                    if keyword==WAIT_FOR_ELEMENT_EXISTS:
+                    if teststepproperty.custname == "@Android_Custom":
+                        if self.custom_object.custom_check(input,keyword) == False:
+                            logger.print_on_console("The object and the keyword do not match")
+                            result=TERMINATE
+                        else:
+                            webelement,input=self.custom_object.custom_element(input)
+                            result=dict[keyword](webelement,input)
+                    elif keyword==WAIT_FOR_ELEMENT_EXISTS:
                         result=dict[keyword](objectname,input)
                     elif keyword == 'getnumber' or keyword == 'verifynumber':
                         objectname = objectname+"/android.widget.EditText[1]"

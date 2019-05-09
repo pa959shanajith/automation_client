@@ -81,6 +81,7 @@ class Picker_Wheel_Keywords():
                         # for set value
                         # element.set_value(input_val[0])
                         output=element.text
+                        logger.print_on_console("Output: "+output)
                         status = TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:

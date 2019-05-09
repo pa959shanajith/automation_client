@@ -571,7 +571,9 @@ class UtilWebKeywords:
                 self.__setfocus(webelement)
                 if len(args)==0 and input1 in list(self.keys_info.keys()):
                     if webelement.get_attribute('type')!='text':
-                        webelement.send_keys(self.keys_info[input1.lower()])
+                        if len(input)==2:
+                            input[1] = 1
+                        webelement.send_keys(self.keys_info[input1.lower()]*int(input[1]))
                         log.debug('It is not a textbox')
                     else:
                         log.debug('It is a textbox')

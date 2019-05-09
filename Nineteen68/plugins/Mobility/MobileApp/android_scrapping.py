@@ -41,8 +41,7 @@ counter=0
 driver=None
 packageName=None
 device_id = None
-                                                          
-
+device_keywords_object = device_keywords.Device_Keywords()
 
 class InstallAndLaunch():
     def __init__(self):
@@ -70,7 +69,7 @@ class InstallAndLaunch():
             log.error(e)
 
     def installApplication(self, apk_path, platform_version, device_name, udid, *args):
-        global driver, device_id, packageName
+        global driver, device_id, packageName, device_keywords_object
         #import appium
         from appium import webdriver
         try:
@@ -155,7 +154,6 @@ class InstallAndLaunch():
                     if p[1] == 4723 and driver is not None:
                         return driver
                 try:
-                    device_keywords_object = device_keywords.Device_Keywords()
                     if device_name == 'wifi':
                         device_name = device_keywords_object.wifi_connect()
                     if device_name != '':

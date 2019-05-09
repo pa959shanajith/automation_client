@@ -54,19 +54,19 @@ configvalues = None
 execution_flag = False
 closeActiveConnection = False
 connection_Timer = None
-ICE_CONST= os.environ["NINETEEN68_HOME"] + '/Lib/ice_const.json'
-CONFIG_PATH= os.environ["NINETEEN68_HOME"] + '/Lib/config.json'
-IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images/"
+NINETEEN68_HOME = os.environ["NINETEEN68_HOME"]
+IMAGES_PATH = NINETEEN68_HOME + "/Nineteen68/plugins/Core/Images/"
 os.environ["IMAGES_PATH"] = IMAGES_PATH
-CERTIFICATE_PATH = os.environ["NINETEEN68_HOME"] + "/Scripts/CA_BUNDLE"
-LOGCONFIG_PATH = os.environ["NINETEEN68_HOME"] + "/logging.conf"
-DRIVERS_PATH = os.environ["NINETEEN68_HOME"] + "/Drivers"
-CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver.exe"
-GECKODRIVER_PATH = DRIVERS_PATH + '/geckodriver.exe'
-if SYSTEM_OS=='Darwin':
-    CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
-    GECKODRIVER_PATH = DRIVERS_PATH + '/geckodriver'
-
+ICE_CONST= NINETEEN68_HOME + "/Lib/ice_const.json"
+CONFIG_PATH= NINETEEN68_HOME + "/Lib/config.json"
+CERTIFICATE_PATH = NINETEEN68_HOME + "/Scripts/CA_BUNDLE"
+LOGCONFIG_PATH = NINETEEN68_HOME + "/logging.conf"
+DRIVERS_PATH = NINETEEN68_HOME + "/Drivers"
+CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
+GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
+if SYSTEM_OS == "Windows":
+    CHROME_DRIVER_PATH += ".exe"
+    GECKODRIVER_PATH += ".exe"
 
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
@@ -88,7 +88,8 @@ class MainNamespace(BaseNamespace):
                         log.info(msg)
                     log.info('Normal Mode: Connection to the Nineteen68 Server established')
                     conn_time= int(configvalues['connection_timeout'])
-                    if ((conn_time !='') and (conn_time not in range(0,8))):
+                    if (not (connection_Timer != None and connection_Timer.isAlive())
+                     and ((conn_time !='') and (conn_time not in range(0,8)))):
                         connection_Timer = threading.Timer(conn_time*60*60, wxObject.closeConnection)
                         connection_Timer.start()
                 else:
@@ -479,7 +480,7 @@ class MainNamespace(BaseNamespace):
                     qcdata = args[0]
                     if soc is None:
                         import subprocess
-                        path = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Qc/QcController.exe"
+                        path = NINETEEN68_HOME + "/Nineteen68/plugins/Qc/QcController.exe"
                         pid = subprocess.Popen(path, shell=True)
                         soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         try:
@@ -539,6 +540,7 @@ class MainNamespace(BaseNamespace):
                     socketIO.emit('render_screenshot',data_URIs)
                     data_URIs=[]
             socketIO.emit('render_screenshot',"finished")
+            logger.print_on_console("Request for processing screenshots completed successfully")
             log.info("Request for processing screenshots completed successfully")
         except Exception as e:
             err_msg='Error while sending screenshot data'
@@ -658,7 +660,8 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_disconnect(self, *args):
-        logger.print_on_console('Disconnected from Nineteen68 server')
+        log.info('Disconnected from Nineteen68 server')
+        if not bool(wxObject): return
         wxObject.connectbutton.SetBitmapLabel(wxObject.connect_img)
         wxObject.connectbutton.SetName('connect')
         wxObject.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
@@ -696,7 +699,8 @@ class SocketThread(threading.Thread):
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
-        global socketIO, icesession
+        global socketIO, icesession, allow_connect
+        allow_connect = False
         server_port = int(configvalues['server_port'])
         server_IP = configvalues['server_ip']
         server_cert = configvalues['server_cert']
@@ -906,6 +910,8 @@ class RedirectText(object):
     def write(self,string):
         wx.CallAfter(self.out.AppendText, string)
 
+    def flush(self):
+        pass
 
 
 class ClientWindow(wx.Frame):
@@ -1137,8 +1143,8 @@ class ClientWindow(wx.Frame):
         if ((conn_time !='') and (conn_time not in range(0,8))):
             if (connection_Timer != None and connection_Timer.isAlive()):
                 connection_Timer.cancel()
-                log.info("Timer Restarted")
-                connection_Timer =threading.Timer(conn_time*60*60, wxObject.closeConnection)
+                log.info("Timer Restarted due to change in connection mode")
+                connection_Timer = threading.Timer(conn_time*60*60, wxObject.closeConnection)
                 connection_Timer.start()
         mode=self.schedule.GetValue()
         socketIO.emit('toggle_schedule',mode)
@@ -1208,12 +1214,12 @@ class ClientWindow(wx.Frame):
     def OnClear(self,event):
         self.log.Clear()
         print('********************************************************************************************************')
-        print(('============================================ '+self.appName+' ============================================'))
+        print('============================================ '+self.appName+' ============================================')
         print('********************************************************************************************************')
 
     def OnNodeConnect(self,event):
         try:
-            global socketIO
+            global socketIO, connection_Timer
             name = self.connectbutton.GetName()
             self.connectbutton.Disable()
             if(name == 'connect'):
@@ -1225,13 +1231,17 @@ class ClientWindow(wx.Frame):
             else:
                 self.OnTerminate(event,"term_exec")
                 self.killSocket(True)
-                logger.print_on_console('Disconnected from Nineteen68 server')
+                log.info('Disconnected from Nineteen68 server')
                 self.connectbutton.SetBitmapLabel(self.connect_img)
                 self.connectbutton.SetName('connect')
                 self.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
                 self.schedule.SetValue(False)
                 self.schedule.Disable()
                 self.connectbutton.Enable()
+                if (connection_Timer != None and connection_Timer.isAlive()):
+                    log.info("Connection Timer Stopped")
+                    connection_Timer.cancel()
+                    connection_Timer=None
         except Exception as e:
             emsg="Forbidden request, Connection refused, please configure server ip and server port in Edit -> Configuration, and re-connect."
             logger.print_on_console(emsg)
@@ -1422,7 +1432,7 @@ class ClientWindow(wx.Frame):
                     flag = True
                     if system_mac in execMAC:
                         executionOnly=True
-                    if ((system_mac in irisMAC) and os.path.isdir(os.environ["NINETEEN68_HOME"]+'/Nineteen68/plugins/IRIS')):
+                    if ((system_mac in irisMAC) and os.path.isdir(NINETEEN68_HOME+'/Nineteen68/plugins/IRIS')):
                         irisFlag = True
                         controller.iris_flag = True
         except Exception as e:
@@ -1536,7 +1546,7 @@ class Config_window(wx.Frame):
         self.updated = False
         self.panel = wx.Panel(self)
 
-        self.currentDirectory = os.environ["NINETEEN68_HOME"]
+        self.currentDirectory = NINETEEN68_HOME
         self.defaultServerCrt = './Scripts/CA_BUNDLE/server.crt'
 
         self.sev_add=wx.StaticText(self.panel, label="Server Address", pos=config_fields["S_address"][0],size=config_fields["S_address"][1], style=0, name="")
