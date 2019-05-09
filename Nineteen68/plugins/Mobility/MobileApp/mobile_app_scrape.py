@@ -15,6 +15,8 @@ from socketIO_client import SocketIO,BaseNamespace
 ##desktop_scraping_obj = desktop_scraping.Scrape()
 import os
 import logger
+import logging
+log = logging.getLogger('mobile_app_scrape.py')
 obj=android_scrapping.InstallAndLaunch()
 import core_utils
 
@@ -114,20 +116,23 @@ class ScrapeWindow(wx.Frame):
 
     def fullscrape(self,event):
         logger.print_on_console('Performing full scrape')
-        d = obj.scrape()
-        # 10 is the limit of MB set as per Nineteen68 standards
-        if d is not None:
-            if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
-                self.socketIO.emit('scrape',d)
+        try:
+            d = obj.scrape()
+            # 10 is the limit of MB set as per Nineteen68 standards
+            if d is not None:
+                if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
+                    self.socketIO.emit('scrape',d)
+                else:
+                    logger.print_on_console('Scraped data exceeds max. Limit.')
+                    self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
             else:
-                logger.print_on_console('Scraped data exceeds max. Limit.')
-                self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
-        else:
-            logger.print_on_console('Error in scraping')
-            self.socketIO.emit('scrape','Error in scraping')
-        self.parent.schedule.Enable()
-        self.Close()
-        logger.print_on_console('Full scrape  completed')
+                logger.print_on_console('Error in scraping')
+                self.socketIO.emit('scrape','Error in scraping')
+            self.parent.schedule.Enable()
+            self.Close()
+            logger.print_on_console('Full scrape  completed')
+        except Exception as e:
+            log.error(e, exc_info=True)
 
 
     def swipedown(self,event):
