@@ -70,6 +70,7 @@ class Number_Picker():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         output = webelement.text
+                        logger.print_on_console("Selected number: "+output)
                         status=TEST_RESULT_PASS
                         result=TEST_RESULT_TRUE
                     else:
@@ -96,23 +97,26 @@ class Number_Picker():
                 #if type(webelement) is list:
                 #       webelement=webelement[0]
                 if webelement is not None:
+                    elem_text = webelement.text
                     if webelement.is_enabled():
                         log.debug(WEB_ELEMENT_ENABLED)
-                        if webelement.text==input_val:
+                        if elem_text==input_val:
                             log.debug('text matched')
+                            logger.print_on_console("Selected number: "+elem_text)
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                         else:
-                            logger.print_on_console("Element text:"+webelement.text)
+                            logger.print_on_console("Selected number: "+elem_text)
                     else:
                         err_msg='ERR_DISABLED_OBJECT'
                         logger.print_on_console(err_msg)
-                        if webelement.text==input_val:
+                        if elem_text==input_val:
                             log.debug('text matched')
+                            logger.print_on_console("Selected number: "+elem_text)
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                         else:
-                            logger.print_on_console("Element text:"+webelement.text)
+                            logger.print_on_console("Selected number: ;"+elem_text)
         except Exception as e:
                 log.error(e,exc_info=True)
                 logger.print_on_console(err_msg)

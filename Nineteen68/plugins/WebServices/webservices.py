@@ -739,23 +739,22 @@ class WSkeywords:
                     # possible types pem and jks
                     else:
                         filename,file_ext=os.path.splitext(client_cert)
-                        if file_ext.lower() == '.jks':
-                            if keystore_pass != '' and keystore_pass != None:
-                                keystore_pass = self.aes_decript(keystore_pass)
+                        if keystore_pass != '' and keystore_pass != None:
+                            keystore_pass = self.aes_decript(keystore_pass)
+                            if file_ext.lower() == '.jks':
                                 extract_status = self.extract_jks(client_cert,keystore_pass)
-                                if extract_status:
-                                    logger.print_on_console('Certificate/s have been enabled.')
-                                    status = ws_constants.TEST_RESULT_PASS
-                                    methodoutput = ws_constants.TEST_RESULT_TRUE
+                            elif file_ext.lower() == '.pem':
+                                extract_status = self.extract_pem(client_cert,keystore_pass)
                             else:
-                                err_msg = ERR_AUTH_COMPONENT_MISSING
-                                logger.print_on_console(ERR_AUTH_COMPONENT_MISSING)
-                        elif file_ext.lower() == '.pem':
-                            err_msg = 'Feature not Supported.'
-                            logger.print_on_console('Feature not Supported.')
+                                err_msg = 'Invalid Input'
+                                logger.print_on_console('Invalid Input')
+                            if extract_status:
+                                logger.print_on_console('Certificate/s have been enabled.')
+                                status = ws_constants.TEST_RESULT_PASS
+                                methodoutput = ws_constants.TEST_RESULT_TRUE
                         else:
-                            err_msg = 'Invalid Input'
-                            logger.print_on_console('Invalid Input')
+                            err_msg = ERR_AUTH_COMPONENT_MISSING
+                            logger.print_on_console(ERR_AUTH_COMPONENT_MISSING)
                 else:
                     err_msg = 'Invalid Input'
                     logger.print_on_console('Invalid Input')
@@ -768,6 +767,48 @@ class WSkeywords:
             logger.print_on_console(str(e))
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
+
+     def extract_pem(self,client_cert,keystore_pass):
+        import pem
+        extract_status = False
+        try:
+            certs = pem.parse_file(client_cert)
+            cert_data = {"<class 'pem._core.RSAPrivateKey'>":"RSA PRIVATE KEY",
+                         "<class 'pem._core.PrivateKey'>":"PRIVATE KEY" ,
+                         "<class 'pem._core.Certificate'>":"PRIVATE CERT"}
+            for i in range(0,len(certs)-1):
+                if str(type(certs[i])) in cert_data.keys():
+                    cer_det =str(certs[i]).replace("\r",'')
+                    val = cert_data[str(type(certs[i]))]
+                    self.certdetails[val] = cer_det
+            if len(certs)==4:
+                try:
+                    log.info("Trust Store Entry")
+                    self.certdetails['TRUSTSTORE CERT'] = str(certs[-1]).replace("\r",'')
+                except Exception as e:
+                    log.error(e)
+                    log.error("No Trust Store Entry found")
+                    logger.print_on_console(str(e))
+            for each in self.certdetails:
+                extract_status = True
+                filecreated = open(each.replace(" ","")+".pem","w")
+                filecreated.write(self.certdetails[each])
+                filecreated.close()
+                self.client_cert_path = "PRIVATECERT.pem"
+                if self.certdetails['RSA PRIVATE KEY'] == "":
+                    self.client_key_path = "PRIVATEKEY.pem"
+                else:
+                    self.client_key_path = "RSAPRIVATEKEY.pem"
+
+                try:
+                    self.server_cert_path = "TRUSTSTORECERT.pem"
+                except Exception as e:
+                    log.error(e)
+                    self.server_cert_path =''
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(str(e))
+        return extract_status
 
      def extract_jks(self,client_cert,keystore_pass):
         extract_status = False

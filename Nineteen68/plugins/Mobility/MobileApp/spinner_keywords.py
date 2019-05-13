@@ -104,6 +104,7 @@ class Spinner_Keywords():
 
                             if (length1==length2):
                                 output=length1
+                                logger.print_on_console("Count: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
@@ -216,6 +217,7 @@ class Spinner_Keywords():
                             driver.keyevent(4)
                         if (input==len(text)):
                                 log.debug('count matched')
+                                logger.print_on_console("Count: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                         else :
@@ -923,6 +925,7 @@ class Spinner_Keywords():
                                     ##output=temp[0]
                             if k<=len(obj):
                                 output= obj[k].text
+                                logger.print_on_console("Output: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
@@ -1032,6 +1035,7 @@ class Spinner_Keywords():
                                     if str(selected) == 'true':
                                         output=j.text
                                         flag=True
+                                        logger.print_on_console("Output: "+output)
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE
                                         break
@@ -1137,6 +1141,7 @@ class Spinner_Keywords():
 
                                 if len(input) ==  len(temp):
                                     output=temp
+                                    logger.print_on_console("Output: "+output)
                                     status=TEST_RESULT_PASS
                                     result=TEST_RESULT_TRUE
                                     break
@@ -1257,6 +1262,7 @@ class Spinner_Keywords():
                                 break
                             else:
                                 output=text
+                                logger.print_on_console("Output: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break

@@ -58,20 +58,7 @@ class Action_Key_App():
             'movehome':' shell input keyevent 122',
             'moveend':' shell input keyevent 123',
             'recents':' shell input keyevent 187',
-            'comma':' shell input keyevent 55',
-            'space':' shell input keyevent 62',
-            '.':' shell input keyevent 56',
-            '`':' shell input keyevent 68',
-            '-':' shell input keyevent 69',
-            '=':' shell input keyevent 70',
-            '(':' shell input keyevent 71',
-            ')':' shell input keyevent 72',
-            '\\':' shell input keyevent 73',
-            'semicolon':' shell input keyevent 74',
-            "'":' shell input keyevent 75',
-            '/':' shell input keyevent 76',
-            '@':' shell input keyevent 77',
-            '+':' shell input keyevent 81'
+            'semicolon':' shell input keyevent 74'
             }
             adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
             if (len(inputs)==1):

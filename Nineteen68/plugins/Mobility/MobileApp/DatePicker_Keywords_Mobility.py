@@ -180,14 +180,10 @@ class Date_Keywords():
                                         value22=element[2].text
 
                                     if value0 == input_date[0] and value1== input_date[1] and value2==input_date[2]:
-                                        if driver.is_keyboard_shown():
-                                            driver.hide_keyboard()
                                         status=TEST_RESULT_PASS
                                         methodoutput=TEST_RESULT_TRUE
 
                                     elif value00 == input_date[0] and value11== input_date[1] and value22==input_date[2]:
-                                        if driver.is_keyboard_shown():
-                                            driver.hide_keyboard()
                                         status=TEST_RESULT_PASS
                                         methodoutput=TEST_RESULT_TRUE
                             else:
@@ -207,8 +203,13 @@ class Date_Keywords():
                     log.error('element is not visible')
                     logger.print_on_console(err_msg)
         except Exception as e:
-                log.error(e)
-
+            log.error(e)
+        try:
+            if driver.is_keyboard_shown():
+                driver.hide_keyboard()
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console("Error hiding the Soft. keyboard")
         return status,methodoutput,output,err_msg
 
     def Get_Date(self,webelement,input,*args):
@@ -241,6 +242,7 @@ class Date_Keywords():
                             Month = DateText[5:8]
                             Date = DateText[9:11]
                             output = Month+'/'+Date+'/'+Year
+                            logger.print_on_console("Date: "+output)
                             status = TEST_RESULT_PASS
                             methodoutput = TEST_RESULT_TRUE
                         elif count == 1 :
@@ -249,6 +251,7 @@ class Date_Keywords():
                             Date=element[1].text
                             Year=element[2].text
                             output=Month+'/'+Date+'/'+Year
+                            logger.print_on_console("Date: "+output)
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else :

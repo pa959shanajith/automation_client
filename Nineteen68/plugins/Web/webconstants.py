@@ -165,3 +165,4 @@ NON_WEBELEMENT_KEYWORDS=['openbrowser','opennewbrowser','navigatetourl','getpage
 
 FOUND='found'
 
+BROWSER_NAME = {1: 'Chrome', 2: 'Firefox', 3: 'Internet Explorer'}
