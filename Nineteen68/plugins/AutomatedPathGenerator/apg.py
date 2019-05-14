@@ -214,6 +214,7 @@ class AutomatedPathGenerator:
                     '''After check format, the flow chart would be made completely. So now, we'll check the possible method linking.'''
                     self.PossibleMethods = CheckPossibleMethods.main(
                         self.PosMethod, self.Classes, varstorage)
+
                     for i in range(0,len(self.FlowChart)):
                         self.FlowChart[i]['id']=i
                         if("'" in self.FlowChart[i]['text']):
@@ -257,8 +258,10 @@ class AutomatedPathGenerator:
                                     if((fc['class'].split('(')[0] == c_source) and (m in fc['text']) and ('Method Name:' not in fc['text'])):
                                         for trgt in self.FlowChart:
                                             if((trgt['class'].split('(')[0] == c_target) and (m in trgt['text']) and ('Method Name:' in trgt['text'])):
-                                                id = trgt['id']
-                                                break
+                                                index = trgt['text'].index('\n')
+                                                if(m == trgt['text'][12:index]):
+                                                    id = trgt['id']
+                                                    break
                                         if(fc['method'] not in method_calls_count):
                                             method_calls_count.update({fc['method']:{'within':0,'outside':0}})
                                         if(id != None):
