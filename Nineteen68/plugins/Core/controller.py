@@ -1108,7 +1108,7 @@ class Controller():
             self.execution_mode=SERIAL
             #Parallel Execution
             ##obj=handler.Handler()
-            ##kill_process()
+            kill_process()
             ##if execution_mode.lower() == PARALLEL:
             ##    status=self.invoke_execution(mythread,json_data)
             if self.execution_mode.lower() == SERIAL:
@@ -1227,6 +1227,7 @@ def kill_process():
                 log.info(pid)
                 os.system("TASKKILL /F /PID " + str(pid))
             browser_Keywords.pid_set.clear()
+            browser_Keywords.driver_obj = None
         except Exception as e:
             log.error(e,exc_info=True)
         try:
