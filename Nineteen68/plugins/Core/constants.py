@@ -66,6 +66,8 @@ APPTYPE_MOBILE='mobileweb'
 
 APPTYPE_MOBILE_APP = 'mobileapp'
 
+APPTYPE_PDF = 'pdf'
+
 IGNORE_THIS_STEP = '<<Ignore.This.Step>>'
 
 SEMICOLON = ';'

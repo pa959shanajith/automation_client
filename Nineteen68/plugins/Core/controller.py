@@ -82,6 +82,7 @@ class Controller():
     mobile_app_dispatcher_obj = None
     mainframe_dispatcher_obj = None
     system_dispatcher_obj = None
+    pdf_dispatcher_obj = None
     def __init__(self):
         self.action=None
         core_utils.get_all_the_imports(CORE)
@@ -118,6 +119,16 @@ class Controller():
                 self.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
         except Exception as e:
             logger.print_on_console('Error loading Generic plugin')
+            log.error(e,exc_info=True)
+
+    def __load_pdf(self):
+        try:
+            if self.pdf_dispatcher_obj==None:
+                core_utils.get_all_the_imports('PDF')
+                import pdf_dispatcher
+                self.pdf_dispatcher_obj = pdf_dispatcher.PDFDispatcher()
+        except Exception as e:
+            logger.print_on_console('Error loading PDF plugin')
             log.error(e,exc_info=True)
 
     def __load_mobile_web(self):
@@ -693,6 +704,11 @@ class Controller():
                         self.__load_mainframe()
                     result = self.invokemainframekeyword(teststepproperty,self.mainframe_dispatcher_obj,inpval)
                 #----------------------------------------------------------------------------------------------Mainframe change
+                elif teststepproperty.apptype.lower() == APPTYPE_PDF:
+                    #pdf apptype module call
+                    if self.pdf_dispatcher_obj == None:
+                        self.__load_pdf()
+                    result = self.invokepdfkeyword(teststepproperty,self.pdf_dispatcher_obj,inpval,iris_flag)
 			#Fixed issue num #389 (Taiga)
             temp_result=result
             if result!=TERMINATE:
@@ -826,6 +842,10 @@ class Controller():
 
     def invokemainframekeyword(self,teststepproperty,dispatcher_obj,inputval):
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
+        return res
+
+    def invokepdfkeyword(self, teststepproperty, dispatcher_obj,inputval,iris_flag):
+        res = dispatcher_obj.dispatcher(teststepproperty, inputval, iris_flag)
         return res
 
     def invoke_debug(self,mythread,runfrom_step,json_data):
