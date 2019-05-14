@@ -1108,13 +1108,11 @@ class Controller():
             self.execution_mode=SERIAL
             #Parallel Execution
             ##obj=handler.Handler()
-            ##kill_process()
+            kill_process()
             ##if execution_mode.lower() == PARALLEL:
             ##    status=self.invoke_execution(mythread,json_data)
             if self.execution_mode.lower() == SERIAL:
                 status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc)
-            import browser_Keywords
-            browser_Keywords.driver_obj = None
         elif action.lower()==DEBUG:
             self.debug_mode=debug_mode
             self.wx_object=wxObject
