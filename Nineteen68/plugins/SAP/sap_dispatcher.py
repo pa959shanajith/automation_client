@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        sap_dispatcher.py
-# Purpose:
+# Purpose:     acts as a central dispatch unit, where inputs are dispatched to their respective keywords.
 #
 # Author:      anas.ahmed1,kavyashree,sakshi.goyal,saloni.goyal
 #
@@ -10,7 +10,6 @@
 #-------------------------------------------------------------------------------
 import logger
 import logging
-import logging.config
 log = logging.getLogger('sap_dispatcher.py')
 #-------------------------------------------------------------importing  keywords
 import sap_launch_keywords
@@ -34,13 +33,13 @@ class SAPDispatcher:
 
     launch_keywords_obj = sap_launch_keywords.Launch_Keywords()
     editable_text_obj = text_keywords_sap.Text_Keywords()
-    button_link_obj =button_link_keywords_sap.ButtonLinkKeyword()
+    button_link_obj = button_link_keywords_sap.ButtonLinkKeyword()
     dropdown_keywords_obj = sap_dropdown_keywords.Dropdown_Keywords()
-    radiocheckbox_keywords_obj= radio_checkbox_keywords_sap.Radio_Checkbox_keywords()
-    element_keywords_obj=sap_element_keywords.ElementKeywords()
-    saputil_keywords_obj=saputil_operations.SapUtilKeywords()
-    table_keywords_obj=sap_table_keywords.Table_keywords()
-    shell_keywords_obj=sap_shell_keywords.Shell_Keywords()
+    radiocheckbox_keywords_obj = radio_checkbox_keywords_sap.Radio_Checkbox_keywords()
+    element_keywords_obj = sap_element_keywords.ElementKeywords()
+    saputil_keywords_obj = saputil_operations.SapUtilKeywords()
+    table_keywords_obj = sap_table_keywords.Table_keywords()
+    shell_keywords_obj = sap_shell_keywords.Shell_Keywords()
 
     def __init__(self):
 
@@ -62,18 +61,18 @@ class SAPDispatcher:
                     "verifyexists":['radiobutton','checkbox','input','button','select','table']
                   }
 
-    get_ele_type={
-                'radio': 'radiobutton',
-                'checkbox':'checkbox',
-                'dropdown':'select',
-                'textbox':'input',
-                'button':'button',
-                'table':'table',
-                }
+    get_ele_type = {
+                    'radio': 'radiobutton',
+                    'checkbox':'checkbox',
+                    'dropdown':'select',
+                    'textbox':'input',
+                    'button':'button',
+                    'table':'table',
+                    }
 #-----------------------------------------------------------------for custom objects
 
 
-    def dispatcher(self,teststepproperty,input,iris_flag):
+    def dispatcher(self, teststepproperty, input, iris_flag):
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
@@ -82,23 +81,23 @@ class SAPDispatcher:
         result=[sap_constants.TEST_RESULT_FAIL,sap_constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
 #-----------------------------------------------------------------for custom objects
         try:
-            if objectname==sap_constants.CUSTOM and teststepproperty.custom_flag:
-                ele_type=input[0].lower()
-                if ele_type in self.get_ele_type:
-                    ele_type=self.get_ele_type[ele_type]
-                parent_xpath=teststepproperty.parent_xpath
-                if (keyword in self.custom_dict and ele_type in self.custom_dict[keyword]):
+            if ( objectname == sap_constants.CUSTOM and teststepproperty.custom_flag ):
+                ele_type = input[0].lower()
+                if ( ele_type in self.get_ele_type ):
+                    ele_type = self.get_ele_type[ele_type]
+                parent_xpath = teststepproperty.parent_xpath
+                if ( keyword in self.custom_dict and ele_type in self.custom_dict[keyword] ):
                     custom_sap_element=self.saputil_keywords_obj.getobjectforcustom(parent_xpath,ele_type,input[1])
-                    if(custom_sap_element != '' or None):
+                    if ( custom_sap_element != '' or None ):
                         objectname = custom_sap_element
         except Exception as e:
-            logger.print_on_console(e)
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in dispatcher" )
 #-----------------------------------------------------------------for custom objects
-
         try:
-
-
-            dict={
+            dict = {
+                  #------------------------------------------------------launch keywords
                   'launchapplication' : self.launch_keywords_obj.launch_application,
                   'closeapplication':self.launch_keywords_obj.closeApplication,
                   'getpagetitle':self.launch_keywords_obj.getPageTitle,
@@ -107,6 +106,7 @@ class SAPDispatcher:
                   'getpopuptext':self.launch_keywords_obj.getPopUpText,
                   'geterrormessage':self.launch_keywords_obj.getErrorMessage,
                   'toolbaraction':self.launch_keywords_obj.toolbar_actions,
+                  #------------------------------------------------------textbox keywords
                   'settext' : self.editable_text_obj.setText,
                   'setsecuretext':self.editable_text_obj.setSecureText,
                   'gettext':self.editable_text_obj.getText,
@@ -114,13 +114,16 @@ class SAPDispatcher:
                   'verifytext':self.editable_text_obj.verifyText,
                   'gettextboxlength':self.editable_text_obj.getTextboxLength,
                   'verifytextboxlength':self.editable_text_obj.verifyTextboxLength,
+                  #------------------------------------------------------radio btn keywords
                   'selectcheckbox':self.radiocheckbox_keywords_obj.select_checkbox,
                   'unselectcheckbox':self.radiocheckbox_keywords_obj.unselect_checkbox,
                   'selectradiobutton':self.radiocheckbox_keywords_obj.select_radiobutton,
                   'getstatus': self.radiocheckbox_keywords_obj.get_status,
+                  #------------------------------------------------------button keywords
                   'getbuttonname':self.button_link_obj.get_button_name,
                   'verifybuttonname':self.button_link_obj.verify_button_name,
                   'uploadfile':self.button_link_obj.button_uploadFile,
+                  #------------------------------------------------------dropdown keywords
                   'getselected':self.dropdown_keywords_obj.getSelected,
                   'getcount':self.dropdown_keywords_obj.getCount,
 ##                  'getvaluebyindex':self.dropdown_keywords_obj.getValueByIndex,
@@ -130,6 +133,7 @@ class SAPDispatcher:
                   'verifyselectedvalue':self.dropdown_keywords_obj.verifySelectedValue,
                   'verifyvaluesexists':self.dropdown_keywords_obj.verifyValuesExists,
                   'verifyallvalues':self.dropdown_keywords_obj.verifyAllValues,
+                  #------------------------------------------------------element keywords
                   'click':self.element_keywords_obj.click,
                   'rightclick':self.element_keywords_obj.rightClick,
                   'doubleclick':self.element_keywords_obj.doubleClick,
@@ -139,6 +143,7 @@ class SAPDispatcher:
                   'gettooltiptext':self.element_keywords_obj.getTooltipText,
                   'verifytooltiptext':self.element_keywords_obj.verifyTooltipText,
                   'geticonname':self.element_keywords_obj.getIconName,
+                  'verifyiconname':self.element_keywords_obj.verifyIconName,
                   'getinputhelp':self.element_keywords_obj.getInputHelp,
                   'setfocus':self.element_keywords_obj.setFocus,
                   'scrollup':self.element_keywords_obj.scrollUp,
@@ -147,11 +152,13 @@ class SAPDispatcher:
                   'scrollright':self.element_keywords_obj.scrollRight,
                   'movetabs':self.element_keywords_obj.moveTabs,
                   'selecttab':self.element_keywords_obj.selectTab,
+                  #------------------------------------------------------sap util keywords
                   'verifyenabled':self.saputil_keywords_obj.verifyEnabled,
                   'verifydisabled':self.saputil_keywords_obj.verifyDisabled,
                   'verifyexists':self.saputil_keywords_obj.verifyExists,
                   'verifyhidden':self.saputil_keywords_obj.verifyHidden,
                   'verifyvisible':self.saputil_keywords_obj.verifyVisible,
+                  #-------------------------------------------------------table keywords
                   'getrowcount':self.table_keywords_obj.getRowCount,
                   'getcolumncount':self.table_keywords_obj.getColumnCount,
                   'getcolnumbytext':self.table_keywords_obj.getColNumByText,
@@ -167,6 +174,8 @@ class SAPDispatcher:
                   'getcellstatus':self.table_keywords_obj.getStatus,
                   'selectrow':self.table_keywords_obj.selectRow,
                   'unselectrow':self.table_keywords_obj.unselectRow,
+                  'setcelltext':self.table_keywords_obj.setCellText,
+                  #-----------------------------------------------------shell keywords
                   'getcountofrows':self.shell_keywords_obj.get_rowCount,
                   'getcountofcolumns':self.shell_keywords_obj.get_colCount,
                   'selectrows':self.shell_keywords_obj.selectRows,
@@ -174,14 +183,27 @@ class SAPDispatcher:
                   'getcelltext': self.shell_keywords_obj.getCellText,
                   'clickcell':self.shell_keywords_obj.clickCell,
                   'doubleclickcell':self.shell_keywords_obj.doubleClickCell,
-                  'selecttreenode':self.shell_keywords_obj.selectTreeNode,
-                  'getnodenamebyindex':self.shell_keywords_obj.getNodeNameByIndex,
                   'setshelltext':self.shell_keywords_obj.setShellText,
                   'getrowcolbytext':self.shell_keywords_obj.getRowColByText,
+                  'toolbaractionkeys':self.shell_keywords_obj.toolBarActionKeys,
+                  'settextincell':self.shell_keywords_obj.setCellText,
+                  'selectallrows':self.shell_keywords_obj.selectAllRows,
+                  'unselectallselections':self.shell_keywords_obj.unselectAllSelections,
+                  'scrolltorownumber':self.shell_keywords_obj.scrollToRowNumber,
+                  'getcellcolor':self.shell_keywords_obj.getCellColor,
+                  #------------------------------------------------------treekeywords
+                  'selecttreeelement':self.shell_keywords_obj.selectTreeElement,
+                  'gettreenodetext':self.shell_keywords_obj.getTreeNodeText,
+                  'gettreenodecount':self.shell_keywords_obj.getTreeNodeCount,
+                  'singleselectparentofselected':self.shell_keywords_obj.singleSelectParentOfSelected,
+                  'collapsetree':self.shell_keywords_obj.collapseTree,
+                  'getcolvaluecorrtoselectednode':self.shell_keywords_obj.getColValueCorrToSelectedNode,
+                  'selecttreenode':self.shell_keywords_obj.selectTreeNode,
+                  'getnodenamebyindex':self.shell_keywords_obj.getNodeNameByIndex,
                   'verifytreepath':self.shell_keywords_obj.verifyTreePath
                    }
 
-            if(iris_flag):
+            if ( iris_flag ):
                 import iris_operations
                 iris_object = iris_operations.IRISKeywords()
                 dict['clickiris'] = iris_object.clickiris
@@ -193,56 +215,60 @@ class SAPDispatcher:
                 dict['verifyexistsiris'] = iris_object.verifyexistsiris
                 dict['verifytextiris'] = iris_object.verifytextiris
 
-            keyword=keyword.lower()
-            if keyword in list(dict.keys()):
-                if keyword=='serverconnect' or keyword=='launchapplication' or keyword=='starttransaction' or keyword=='toolbaraction' :
+            keyword = keyword.lower()
+            if ( keyword in list(dict.keys()) ):
+                if ( keyword == 'serverconnect' or keyword == 'launchapplication' or keyword == 'starttransaction' or keyword == 'toolbaraction' ):
                     result= dict[keyword](input,output)
                 else:
-                    if (teststepproperty.cord != None and teststepproperty.cord != ''):
+                    if ( teststepproperty.cord != None and teststepproperty.cord != '' ):
                         obj_props = teststepproperty.objectname.split(';')
                         coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
                         objectname = {'cord': teststepproperty.cord, 'coordinates':coord}
                         from sap_scraping import Scrape
-                        scrapingObj=Scrape()
+                        scrapingObj = Scrape()
                         sapgui = self.saputil_keywords_obj.getSapObject()
-                        if(sapgui != None):
+                        if ( sapgui ):
                             wnd = scrapingObj.getWindow(sapgui)
                             wnd = wnd.Text + '/'
                             self.launch_keywords_obj.setWindowToForeground(wnd)
-                        if(teststepproperty.custom_flag):
+                        if ( teststepproperty.custom_flag ):
                             result = dict[keyword](objectname,input,output,teststepproperty.parent_xpath)
                         else:
                             result = dict[keyword](objectname,input,output)
                     else:
-                        result= dict[keyword](objectname,input,output)
-                if not(sap_constants.ELEMENT_FOUND) and self.exception_flag:
+                        result = dict[keyword](objectname,input,output)
+                if ( not (sap_constants.ELEMENT_FOUND) and self.exception_flag ):
                     logger.print_on_console('Element not found terminating')
-                    result=constants.TERMINATE
+                    result = constants.TERMINATE
             else:
-                err_msg=sap_constants.INVALID_KEYWORD
+                err_msg = sap_constants.INVALID_KEYWORD
                 logger.print_on_console(err_msg)
-                result[3]=err_msg
+                result[3] = err_msg
             configvalues = readconfig.configvalues
             screen_shot_obj = screenshot_keywords.Screenshot()
-            if self.action == constants.EXECUTE:
-                if result !=constants.TERMINATE:
-                    result=list(result)
-                    if configvalues['screenShot_Flag'].lower() == 'fail':
-                        if result[0].lower() == 'fail':
-                            if keyword not in sap_constants.APPLICATION_KEYWORDS:
+            if ( self.action == constants.EXECUTE ):
+                if ( result != constants.TERMINATE ):
+                    result = list(result)
+                    if ( configvalues['screenShot_Flag'].lower() == 'fail' ):
+                        if ( result[0].lower() == 'fail' ):
+                            if ( keyword not in sap_constants.APPLICATION_KEYWORDS ):
                                 file_path = screen_shot_obj.captureScreenshot()
                                 result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
-                        if keyword not in sap_constants.APPLICATION_KEYWORDS:
+                        if ( keyword not in sap_constants.APPLICATION_KEYWORDS ):
                             file_path = screen_shot_obj.captureScreenshot()
                             result.append(file_path[2])
         except TypeError as e:
-            logger.print_on_console('type error found')
-            err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
-            result[3]=err_msg
+            logger.print_on_console( 'Type error found' )
+            err_msg = constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION'] + ' : ' + str(e)
+            result[3] = err_msg
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in dispatcher" )
         except Exception as e:
-            log.error(e)
-        if err_msg!=None:
-            log.error(err_msg)
-            logger.print_on_console(err_msg)
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in dispatcher" )
+        if ( err_msg ):
+            log.error( err_msg )
+            logger.print_on_console( err_msg )
         return result

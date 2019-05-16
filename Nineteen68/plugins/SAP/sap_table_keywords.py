@@ -20,6 +20,7 @@ log = logging.getLogger('sap_table_keywords.py')
 from sap_launch_keywords import Launch_Keywords
 from sap_dropdown_keywords import Dropdown_Keywords
 from radio_checkbox_keywords_sap import Radio_Checkbox_keywords
+from text_keywords_sap import Text_Keywords
 #-----------------------------------------------------Module Imports
 
 class Table_keywords():
@@ -28,206 +29,255 @@ class Table_keywords():
         self.uk = SapUtilKeywords()
         self.lk = Launch_Keywords()
         self.rk = Radio_Checkbox_keywords()
+        self.tk = Text_Keywords()
 
-    def getXpath(self,sap_id,elem,row,col):
+    def getXpath(self, sap_id, elem, row, col):
         try:
             cell = elem.GetCell(row, col)
             cell_id = cell.id.split('/')
             cell_xpath = sap_id + '/' + cell_id[-1]
         except Exception as e:
-            log.error('Error occured',e)
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error(err_msg)
             logger.print_on_console('Not able to get cell_xpath')
         return cell,cell_xpath
 
 
     def getRowCount(self, sap_id, *args):
-        self.lk.setWindowToForeground(sap_id)
-        id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
-        err_msg=None
+        err_msg = None
         try:
-            elem=ses.FindById(id)
-            value = elem.RowCount
-            status=sap_constants.TEST_RESULT_PASS
-            result=sap_constants.TEST_RESULT_TRUE
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id ):
+                elem = ses.FindById(id)
+                value = elem.RowCount
+                status = sap_constants.TEST_RESULT_PASS
+                result = sap_constants.TEST_RESULT_TRUE
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console("Error occured in getRowCount")
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error(err_msg)
+            logger.print_on_console('Error occured in getRowCount')
         return status,result,value,err_msg
 
 
     def getColumnCount(self, sap_id, *args):
-        self.lk.setWindowToForeground(sap_id)
-        id,ses=self.uk.getSapElement(sap_id)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         result = OUTPUT_CONSTANT
-        err_msg=None
+        err_msg = None
         try:
-            elem=ses.FindById(id)
-            value = elem.Columns.Length
-            status=sap_constants.TEST_RESULT_PASS
-            result=sap_constants.TEST_RESULT_TRUE
-        except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console("Error occured in getColumnCount")
-        return status,result,value,err_msg
-
-
-    def getColNumByText(self, sap_id, input_val,*args):
-        self.lk.setWindowToForeground(sap_id)
-        colText=input_val[0]
-        id,ses=self.uk.getSapElement(sap_id)
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        value = OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            elem=ses.FindById(id)
-            no_of_cols = elem.Columns.Length
-            no_of_rows = elem.RowCount
-            for i in range(-1, no_of_rows):
-                for j in range(-1, no_of_cols):
-                    try:
-                        cell = elem.GetCell(i,j)
-                    except:
-                        break
-                    if(colText in elem.GetCell(i,j).text):
-                        value = j+1
-                        break
-                    else:
-                        value =''
-                if(value != ''):
-                    break
-            if(value == ''):
-                logger.print_on_console('No matching text found in the table')
-            status=sap_constants.TEST_RESULT_PASS
-            result=sap_constants.TEST_RESULT_TRUE
-        except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console("Error occured in getColNumByText")
-        return status,result,value,err_msg
-
-
-
-    def getRowNumByText(self, sap_id, input_val,*args):
-        self.lk.setWindowToForeground(sap_id)
-        rowText=input_val[0]
-        id,ses=self.uk.getSapElement(sap_id)
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        value = OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            elem=ses.FindById(id)
-            no_of_cols = elem.Columns.Length
-            no_of_rows = elem.RowCount
-            for i in range(0, no_of_rows):
-                for j in range(0, no_of_cols):
-                    try:
-                        cell = elem.GetCell(i,j)
-                    except:
-                        break
-                    if(rowText in cell.text):
-                        value = i+1
-                        break
-                    else:
-                        value =''
-                if(value != ''):
-                    break
-            if(value==''):
-                logger.print_on_console('No matching text found in the table')
-            status=sap_constants.TEST_RESULT_PASS
-            result=sap_constants.TEST_RESULT_TRUE
-        except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console("Error occured in getRowNumByText")
-        return status,result,value,err_msg
-
-
-
-    def getCellValue(self, sap_id, input_val,*args):
-        self.lk.setWindowToForeground(sap_id)
-        row=int(input_val[0])-1
-        col=int(input_val[1])-1
-        id,ses=self.uk.getSapElement(sap_id)
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        value = OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            elem=ses.FindById(id)
-            value = elem.GetCell(row, col).text
-            status=sap_constants.TEST_RESULT_PASS
-            result=sap_constants.TEST_RESULT_TRUE
-        except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console("Error occured in getCellValue")
-        return status,result,value,err_msg
-
-
-
-    def verifyCellValue(self, sap_id, input_val,*args):
-        self.lk.setWindowToForeground(sap_id)
-        row=int(input_val[0])-1
-        col=int(input_val[1])-1
-        cell_value=input_val[2]
-
-        id,ses=self.uk.getSapElement(sap_id)
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        value = OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            elem=ses.FindById(id)
-            if(elem.GetCell(row, col).text == cell_value):
-                status=sap_constants.TEST_RESULT_PASS
-                result=sap_constants.TEST_RESULT_TRUE
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id ):
+                elem = ses.FindById(id)
+                value = elem.Columns.Length
+                status = sap_constants.TEST_RESULT_PASS
+                result = sap_constants.TEST_RESULT_TRUE
             else:
-                err_msg = sap_constants.ERROR_MSG
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console("Error occured in verifyCellValue")
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error(err_msg)
+            logger.print_on_console('Error occured in getColumnCount')
+        return status,result,value,err_msg
+
+
+    def getColNumByText(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id ):
+                colText = input_val[0]
+                elem=ses.FindById(id)
+                no_of_cols = elem.Columns.Length
+                no_of_rows = elem.RowCount
+                for i in range(-1, no_of_rows):
+                    for j in range(-1, no_of_cols):
+                        try:
+                            cell = elem.GetCell(i,j)
+                        except:
+                            break
+                        if ( colText in elem.GetCell(i,j).text ):
+                            value = j+1
+                            flag = True
+                            break
+                    if flag:
+                        break
+                if not ( flag ):
+                    value = ''
+                    err_msg = 'No matching text found in the table'
+                status = sap_constants.TEST_RESULT_PASS
+                result = sap_constants.TEST_RESULT_TRUE
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error(err_msg)
+            logger.print_on_console('Error occured in getColNumByText')
         return status,result,value,err_msg
 
 
 
-    def verifyTextExists(self, sap_id, input_val,*args):
-        self.lk.setWindowToForeground(sap_id)
-        text=input_val[0]
-        id,ses=self.uk.getSapElement(sap_id)
+    def getRowNumByText(self, sap_id, input_val, *args):
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
-        err_msg=None
+        err_msg = None
         try:
-            elem=ses.FindById(id)
-            no_of_cols = elem.Columns.Length
-            no_of_rows = elem.RowCount
-            for i in range(0, no_of_rows):
-                for j in range(0, no_of_cols):
-                    try:
-                        cell = elem.GetCell(i,j)
-                    except:
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id ):
+                elem = ses.FindById(id)
+                rowText = input_val[0]
+                no_of_cols = elem.Columns.Length
+                no_of_rows = elem.RowCount
+                for i in range(0, no_of_rows):
+                    for j in range(0, no_of_cols):
+                        try:
+                            cell = elem.GetCell(i,j)
+                        except:
+                            break
+                        if ( rowText in cell.text ):
+                            value = i+1
+                            flag = True
+                            break
+                    if flag:
                         break
-                    if(cell.text == text):
-                        status=sap_constants.TEST_RESULT_PASS
-                        result=sap_constants.TEST_RESULT_TRUE
-                        break
-                if(result != sap_constants.TEST_RESULT_FALSE):
-                    break
+                if not ( flag ):
+                    value = ''
+                    err_msg = 'No matching text found in the table'
+                status = sap_constants.TEST_RESULT_PASS
+                result = sap_constants.TEST_RESULT_TRUE
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console("Error occured in verifyTextExists")
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error(err_msg)
+            logger.print_on_console('Error occured in getRowNumByText')
+        return status,result,value,err_msg
+
+
+
+    def getCellValue(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id ):
+                row = int(input_val[0])-1
+                col = int(input_val[1])-1
+                if ( row < 0 or col < 0 ):
+                    err_msg = 'Index value of row or column is negative'
+                else:
+                    elem = ses.FindById(id)
+                    value = elem.GetCell(row, col).text
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error(err_msg)
+            logger.print_on_console('Error occured in getCellValue')
+        return status,result,value,err_msg
+
+
+
+    def verifyCellValue(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id ):
+                elem = ses.FindById(id)
+                row = int(input_val[0])-1
+                col = int(input_val[1])-1
+                cell_value = input_val[2]
+                if ( row >= 0 and col >= 0 ):
+                    if ( elem.GetCell(row, col).text == cell_value ):
+                        status = sap_constants.TEST_RESULT_PASS
+                        result = sap_constants.TEST_RESULT_TRUE
+                    else:
+                        err_msg = 'Cell value and Input value do not Match'
+                else:
+                    err_msg = 'Index value of row or column is negative'
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error(err_msg)
+            logger.print_on_console('Error occured in verifyCellValue')
+        return status,result,value,err_msg
+
+
+
+    def verifyTextExists(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id ):
+                elem = ses.FindById(id)
+                text = input_val[0]
+                no_of_cols = elem.Columns.Length
+                no_of_rows = elem.RowCount
+                for i in range(0, no_of_rows):
+                    for j in range(0, no_of_cols):
+                        try:
+                            cell = elem.GetCell(i,j)
+                        except:
+                            break
+                        if ( cell.text == text ):
+                            status = sap_constants.TEST_RESULT_PASS
+                            result = sap_constants.TEST_RESULT_TRUE
+                            break
+                    if ( result != sap_constants.TEST_RESULT_FALSE ):
+                        break
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error(err_msg)
+            logger.print_on_console('Error occured in verifyTextExists')
         return status,result,value,err_msg
 
 
@@ -280,143 +330,224 @@ class Table_keywords():
 ##        return status,result,value,err_msg
 
 
-    def selectValueByText(self, sap_id, input_val,*args):
-        self.lk.setWindowToForeground(sap_id)
-        row=int(input_val[0])-1
-        col=int(input_val[1])-1
-        text= input_val[2]
-        id,ses=self.uk.getSapElement(sap_id)
-        dk = Dropdown_Keywords()
+    # def selectValueByIndex(self, sap_id, url, input_val, *args):
+    #     status = sap_constants.TEST_RESULT_FAIL
+    #     result = sap_constants.TEST_RESULT_FALSE
+    #     """Object type is dropdown and lists. For SAP, we only have dropdowns."""
+    #     value = OUTPUT_CONSTANT
+    #     err_msg = None
+    #     try:
+    #         self.lk.setWindowToForeground(sap_id)
+    #         id,ses = self.uk.getSapElement(sap_id)
+    #         if ( id ):
+    #             row = int(input_val[0])-1
+    #             col = int(input_val[1])-1
+    #             object_type_input = ses.FindById(id).type
+    #             elem = ses.FindById(id)
+    #             cell ,cell_xpath = self.getXpath(sap_id,elem,row,col)
+    #             if ( cell.__getattr__("type") == object_type_input ):
+    #                 err_msg = 'Error: Type Mismatch'
+    #             else:
+    #                 dk = Dropdown_Keywords()
+    #                 text = input_val[2]
+    #                 status,result,value,err_msg = dk.selectValueByIndex(cell_xpath, url, text)
+    #         else:
+    #             err_msg = sap_constants.ELELMENT_NOT_FOUND
+    #         if ( err_msg ):
+    #             log.info(err_msg)
+    #             logger.print_on_console(err_msg)
+    #     except Exception as e:
+    #        err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+    #        log.error(err_msg)
+    #        logger.print_on_console('Error occured in selectValueByText')
+    #     return status,result,value,err_msg
+
+
+    def selectValueByText(self, sap_id, input_val, *args):
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         """Object type is dropdown and lists. For SAP, we only have dropdowns."""
         value = OUTPUT_CONSTANT
-        err_msg=None
+        err_msg = None
         try:
-            object_type_input = ses.FindById(id).type
-            elem=ses.FindById(id)
-            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            if(cell.__getattr__("type") == object_type_input):
-                logger.print_on_console("Error: Type Mismatch")
-            else:
-                result = dk.selectValueByText(cell_xpath,text)
-                status=sap_constants.TEST_RESULT_PASS
-                result=sap_constants.TEST_RESULT_TRUE
-        except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console("Error occured in selectValueByText")
-        return status,result,value,err_msg
-
-
-
-    def getSelected(self, sap_id, input_val,*args):
-        self.lk.setWindowToForeground(sap_id)
-        row=int(input_val[0])-1
-        col=int(input_val[1])-1
-        id,ses=self.uk.getSapElement(sap_id)
-        dk = Dropdown_Keywords()
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        """Object type is dropdown and lists. For SAP, we only have dropdowns."""
-        value = OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            object_type_input = ses.FindById(id).type
-            elem=ses.FindById(id)
-            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            if(cell.__getattr__("type") == object_type_input):
-                logger.print_on_console("Error: Type Mismatch")
-            else:
-                status,result,value,err_msg = dk.getSelected(cell_xpath)
-                #status=sap_constants.TEST_RESULT_PASS
-                #result=sap_constants.TEST_RESULT_TRUE
-        except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console("Error occured in getSelected")
-        return status,result,value,err_msg
-
-
-    def getStatus(self, sap_id,input_val,*args):
-        self.lk.setWindowToForeground(sap_id)
-        row=int(input_val[0])-1
-        col=int(input_val[1])-1
-        id,ses=self.uk.getSapElement(sap_id)
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        value = OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            object_type_input = ses.FindById(id).type
-            elem=ses.FindById(id)
-            cell ,cell_xpath =self.getXpath(sap_id,elem,row,col)
-            if(cell.__getattr__("type") == object_type_input):
-                logger.print_on_console("Error: Type Mismatch")
-            else:
-                object_type_input=cell.__getattr__("type")
-                if(object_type_input == "GuiRadioButton" or object_type_input == "GuiCheckBox" ):
-                    status,result,value,err_msg = self.rk.get_status(cell_xpath)
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id ):
+                row = int(input_val[0])-1
+                col = int(input_val[1])-1
+                object_type_input = ses.FindById(id).type
+                elem = ses.FindById(id)
+                cell ,cell_xpath = self.getXpath(sap_id,elem,row,col)
+                if ( cell.__getattr__("type") == object_type_input ):
+                    err_msg = 'Error: Type Mismatch'
                 else:
-                    logger.print_on_console('Element state does not allow to perform the operation')
-                    err_msg = sap_constants.ERROR_MSG
+                    dk = Dropdown_Keywords()
+                    text = input_val[2]
+                    status,result,value,err_msg = dk.selectValueByText(cell_xpath,text)
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console("Error occured in getStatus")
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error(err_msg)
+            logger.print_on_console('Error occured in selectValueByText')
         return status,result,value,err_msg
 
 
-    def selectRow(self, sap_id, input_val,*args):
-        self.lk.setWindowToForeground(sap_id)
-        rowNum=int(input_val[0])-1
-        id,ses=self.uk.getSapElement(sap_id)
+
+    def getSelected(self, sap_id, input_val, *args):
+        
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        """Object type is dropdown and lists. For SAP, we only have dropdowns."""
+        value = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id ):
+                object_type_input = ses.FindById(id).type
+                row = int(input_val[0])-1
+                col = int(input_val[1])-1
+                elem = ses.FindById(id)
+                cell ,cell_xpath = self.getXpath(sap_id,elem,row,col)
+                if ( cell.__getattr__("type") == object_type_input ):
+                    err_msg = 'Error: Type Mismatch'
+                else:
+                    dk = Dropdown_Keywords()
+                    status,result,value,err_msg = dk.getSelected(cell_xpath)
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error(err_msg)
+            logger.print_on_console('Error occured in getSelected')
+        return status,result,value,err_msg
+
+
+    def getStatus(self, sap_id, input_val, *args):
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
-        err_msg=None
+        err_msg = None
         try:
-            elem=ses.FindById(id)
-            rows = elem.Rows
-            row_to_select = rows[rowNum]
-            if(row_to_select.Selectable == True):
-                row_to_select.selected = True
-                status=sap_constants.TEST_RESULT_PASS
-                result=sap_constants.TEST_RESULT_TRUE
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id ):
+                row = int(input_val[0])-1
+                col = int(input_val[1])-1
+                object_type_input = ses.FindById(id).type
+                elem = ses.FindById(id)
+                cell ,cell_xpath = self.getXpath(sap_id,elem,row,col)
+                if ( cell.__getattr__("type") == object_type_input ):
+                    err_msg = 'Error: Type Mismatch'
+                else:
+                    object_type_input = cell.__getattr__("type")
+                    if ( object_type_input == "GuiRadioButton" or object_type_input == "GuiCheckBox" ):
+                        status,result,value,err_msg = self.rk.get_status(cell_xpath)
+                    else:
+                        err_msg = sap_constants.INVALID_ELELMENT_TYPE
             else:
-                logger.print_on_console('Element state does not allow to perform the operation')
-                err_msg = sap_constants.ERROR_MSG
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console("Error occured in selectRow")
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error(err_msg)
+            logger.print_on_console('Error occured in getStatus')
         return status,result,value,err_msg
 
 
-
-    def unselectRow(self, sap_id, input_val,*args):
-        self.lk.setWindowToForeground(sap_id)
-        rowNum=int(input_val[0])-1
-        id,ses=self.uk.getSapElement(sap_id)
+    def selectRow(self, sap_id, input_val, *args):
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
-        err_msg=None
+        err_msg = None
         try:
-            elem=ses.FindById(id)
-            rows = elem.Rows
-            row_to_select = rows[rowNum]
-            if(row_to_select.Selectable == True):
-                row_to_select.selected = False
-                status=sap_constants.TEST_RESULT_PASS
-                result=sap_constants.TEST_RESULT_TRUE
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id ):
+                rowNum = int(input_val[0])-1
+                elem = ses.FindById(id)
+                rows = elem.Rows
+                row_to_select = rows[rowNum]
+                if ( row_to_select.Selectable == True ):
+                    row_to_select.selected = True
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg = sap_constants.INVALID_ELELMENT_TYPE
             else:
-                logger.print_on_console('Element state does not allow to perform the operation')
-                err_msg = sap_constants.ERROR_MSG
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console("Error occured in unselectRow")
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error(err_msg)
+            logger.print_on_console('Error occured in selectRow')
         return status,result,value,err_msg
 
 
+
+    def unselectRow(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id ):
+                rowNum = int(input_val[0])-1
+                elem = ses.FindById(id)
+                rows = elem.Rows
+                row_to_select = rows[rowNum]
+                if ( row_to_select.Selectable == True ):
+                    row_to_select.selected = False
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg = sap_constants.INVALID_ELELMENT_TYPE
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error(err_msg)
+            logger.print_on_console('Error occured in unselectRow')
+        return status,result,value,err_msg
+
+
+    def setCellText(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id ):
+                row = int(input_val[0])-1
+                col = int(input_val[1])-1
+                elem = ses.FindById(id)
+                cell, cell_xpath = self.getXpath(sap_id,elem,row,col)
+                status, result, value, err_code = self.tk.setText(cell_xpath, [input_val[2]])
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error(err_msg)
+            logger.print_on_console('Error occured in setCellText')
+        return status,result,value,err_msg
