@@ -409,7 +409,7 @@ class Scrape:
 
                 global obj_ref
                 obj_ref = StartPump()
-            except Exception as exception:
+            except Exception as e:
                 log.error( 'Error occured : ' + str(e) )
                 logger.print_on_console( 'Error occured in Start click and add' )
                 pass
@@ -418,7 +418,7 @@ class Scrape:
             try:
                 obj_ref.StopPump()
                 return view
-            except Exception as exception:
+            except Exception as e:
                 log.error( 'Error occured : ' + str(e) )
                 logger.print_on_console( 'Error occured in Stop click and add' )
                 pass
