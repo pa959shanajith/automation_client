@@ -115,7 +115,7 @@ class BrowserKeywords():
             if(driver_obj == None):
                 result = TERMINATE
             else:
-                self.update_pid_set()
+                self.update_pid_set(enableSecurityFlag)
                 webdriver_list.append(driver_obj)
                 parent_handle =  None
                 try:
@@ -173,7 +173,7 @@ class BrowserKeywords():
                 if enableSecurityFlag:
                     driver_obj = driver.set_security_zones(
                         self.browser_num, driver_obj)
-                self.update_pid_set()
+                self.update_pid_set(enableSecurityFlag)
                 webdriver_list.append(driver_obj)
                 parent_handle = driver_obj.current_window_handle
                 self.update_recent_handle(parent_handle)
@@ -678,7 +678,7 @@ class BrowserKeywords():
         if len(recent_handles)==0 or recent_handles[-1]!=h:
             recent_handles.append(h)
 
-    def update_pid_set(self):
+    def update_pid_set(self,enableSecurityFlag):
         global pid_set,driver_obj
         if SYSTEM_OS!='Darwin':
             utilobject = utils_web.Utils()
