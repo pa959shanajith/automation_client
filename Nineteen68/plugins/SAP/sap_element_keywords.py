@@ -15,7 +15,7 @@ from constants import *
 import logger
 from saputil_operations import SapUtilKeywords
 from sendfunction_keys import SendFunctionKeys
-import logging.config
+import logging
 log = logging.getLogger('sap_element_keywords.py')
 
 class ElementKeywords():

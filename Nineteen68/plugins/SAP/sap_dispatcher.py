@@ -40,6 +40,112 @@ class SAPDispatcher:
     saputil_keywords_obj = saputil_operations.SapUtilKeywords()
     table_keywords_obj = sap_table_keywords.Table_keywords()
     shell_keywords_obj = sap_shell_keywords.Shell_Keywords()
+    sap_dict = {
+            #------------------------------------------------------launch keywords
+            'launchapplication' : self.launch_keywords_obj.launch_application,
+            'closeapplication':self.launch_keywords_obj.closeApplication,
+            'getpagetitle':self.launch_keywords_obj.getPageTitle,
+            'starttransaction':self.launch_keywords_obj.startTransaction,
+            'serverconnect':self.launch_keywords_obj.serverConnect,
+            'getpopuptext':self.launch_keywords_obj.getPopUpText,
+            'geterrormessage':self.launch_keywords_obj.getErrorMessage,
+            'toolbaraction':self.launch_keywords_obj.toolbar_actions,
+            #------------------------------------------------------textbox keywords
+            'settext' : self.editable_text_obj.setText,
+            'setsecuretext':self.editable_text_obj.setSecureText,
+            'gettext':self.editable_text_obj.getText,
+            'cleartext':self.editable_text_obj.clearText,
+            'verifytext':self.editable_text_obj.verifyText,
+            'gettextboxlength':self.editable_text_obj.getTextboxLength,
+            'verifytextboxlength':self.editable_text_obj.verifyTextboxLength,
+            #------------------------------------------------------radio btn keywords
+            'selectcheckbox':self.radiocheckbox_keywords_obj.select_checkbox,
+            'unselectcheckbox':self.radiocheckbox_keywords_obj.unselect_checkbox,
+            'selectradiobutton':self.radiocheckbox_keywords_obj.select_radiobutton,
+            'getstatus': self.radiocheckbox_keywords_obj.get_status,
+            #------------------------------------------------------button keywords
+            'getbuttonname':self.button_link_obj.get_button_name,
+            'verifybuttonname':self.button_link_obj.verify_button_name,
+            'uploadfile':self.button_link_obj.button_uploadFile,
+            #------------------------------------------------------dropdown keywords
+            'getselected':self.dropdown_keywords_obj.getSelected,
+            'getcount':self.dropdown_keywords_obj.getCount,
+            # 'getvaluebyindex':self.dropdown_keywords_obj.getValueByIndex,
+            # 'selectvaluebyindex':self.dropdown_keywords_obj.selectValueByIndex,
+            'selectvaluebytext':self.dropdown_keywords_obj.selectValueByText,
+            'verifycount':self.dropdown_keywords_obj.verifyCount,
+            'verifyselectedvalue':self.dropdown_keywords_obj.verifySelectedValue,
+            'verifyvaluesexists':self.dropdown_keywords_obj.verifyValuesExists,
+            'verifyallvalues':self.dropdown_keywords_obj.verifyAllValues,
+            #------------------------------------------------------element keywords
+            'click':self.element_keywords_obj.click,
+            'rightclick':self.element_keywords_obj.rightClick,
+            'doubleclick':self.element_keywords_obj.doubleClick,
+            'mousehover':self.element_keywords_obj.mouseHover,
+            'getelementtext':self.element_keywords_obj.get_element_text,
+            'verifyelementtext':self.element_keywords_obj.verify_element_text,
+            'gettooltiptext':self.element_keywords_obj.getTooltipText,
+            'verifytooltiptext':self.element_keywords_obj.verifyTooltipText,
+            'geticonname':self.element_keywords_obj.getIconName,
+            'verifyiconname':self.element_keywords_obj.verifyIconName,
+            'getinputhelp':self.element_keywords_obj.getInputHelp,
+            'setfocus':self.element_keywords_obj.setFocus,
+            'scrollup':self.element_keywords_obj.scrollUp,
+            'scrolldown':self.element_keywords_obj.scrollDown,
+            'scrollleft':self.element_keywords_obj.scrollLeft,
+            'scrollright':self.element_keywords_obj.scrollRight,
+            'movetabs':self.element_keywords_obj.moveTabs,
+            'selecttab':self.element_keywords_obj.selectTab,
+            #------------------------------------------------------sap util keywords
+            'verifyenabled':self.saputil_keywords_obj.verifyEnabled,
+            'verifydisabled':self.saputil_keywords_obj.verifyDisabled,
+            'verifyexists':self.saputil_keywords_obj.verifyExists,
+            'verifyhidden':self.saputil_keywords_obj.verifyHidden,
+            'verifyvisible':self.saputil_keywords_obj.verifyVisible,
+            #-------------------------------------------------------table keywords
+            'getrowcount':self.table_keywords_obj.getRowCount,
+            'getcolumncount':self.table_keywords_obj.getColumnCount,
+            'getcolnumbytext':self.table_keywords_obj.getColNumByText,
+            'getrownumbytext':self.table_keywords_obj.getRowNumByText,
+            'getcellvalue':self.table_keywords_obj.getCellValue,
+            'verifycellvalue':self.table_keywords_obj.verifyCellValue,
+            #commenting dropdown code inside table cell
+            'verifytextexists':self.table_keywords_obj.verifyTextExists,
+            # 'cellclick':self.table_keywords_obj.cellClick,
+            # 'selectvaluebyindex':self.table_keywords_obj.selectValueByIndex,
+            # 'selectvaluebytext':self.table_keywords_obj.selectValueByText,
+            # 'getselected':self.table_keywords_obj.getSelected,
+            'getcellstatus':self.table_keywords_obj.getStatus,
+            'selectrow':self.table_keywords_obj.selectRow,
+            'unselectrow':self.table_keywords_obj.unselectRow,
+            'setcelltext':self.table_keywords_obj.setCellText,
+            #-----------------------------------------------------shell keywords
+            'getcountofrows':self.shell_keywords_obj.get_rowCount,
+            'getcountofcolumns':self.shell_keywords_obj.get_colCount,
+            'selectrows':self.shell_keywords_obj.selectRows,
+            'presstoolbarbutton':self.shell_keywords_obj.pressToolBarButton,
+            'getcelltext': self.shell_keywords_obj.getCellText,
+            'clickcell':self.shell_keywords_obj.clickCell,
+            'doubleclickcell':self.shell_keywords_obj.doubleClickCell,
+            'setshelltext':self.shell_keywords_obj.setShellText,
+            'getrowcolbytext':self.shell_keywords_obj.getRowColByText,
+            'toolbaractionkeys':self.shell_keywords_obj.toolBarActionKeys,
+            'settextincell':self.shell_keywords_obj.setCellText,
+            'selectallrows':self.shell_keywords_obj.selectAllRows,
+            'unselectallselections':self.shell_keywords_obj.unselectAllSelections,
+            'scrolltorownumber':self.shell_keywords_obj.scrollToRowNumber,
+            'getcellcolor':self.shell_keywords_obj.getCellColor,
+            #------------------------------------------------------treekeywords
+            'selecttreeelement':self.shell_keywords_obj.selectTreeElement,
+            'gettreenodetext':self.shell_keywords_obj.getTreeNodeText,
+            'gettreenodecount':self.shell_keywords_obj.getTreeNodeCount,
+            'singleselectparentofselected':self.shell_keywords_obj.singleSelectParentOfSelected,
+            'collapsetree':self.shell_keywords_obj.collapseTree,
+            'getcolvaluecorrtoselectednode':self.shell_keywords_obj.getColValueCorrToSelectedNode,
+            'selecttreenode':self.shell_keywords_obj.selectTreeNode,
+            'getnodenamebyindex':self.shell_keywords_obj.getNodeNameByIndex,
+            'verifytreepath':self.shell_keywords_obj.verifyTreePath
+            }
 
     def __init__(self):
 
@@ -96,129 +202,22 @@ class SAPDispatcher:
             logger.print_on_console( "Error occured in dispatcher" )
 #-----------------------------------------------------------------for custom objects
         try:
-            dict = {
-                  #------------------------------------------------------launch keywords
-                  'launchapplication' : self.launch_keywords_obj.launch_application,
-                  'closeapplication':self.launch_keywords_obj.closeApplication,
-                  'getpagetitle':self.launch_keywords_obj.getPageTitle,
-                  'starttransaction':self.launch_keywords_obj.startTransaction,
-                  'serverconnect':self.launch_keywords_obj.serverConnect,
-                  'getpopuptext':self.launch_keywords_obj.getPopUpText,
-                  'geterrormessage':self.launch_keywords_obj.getErrorMessage,
-                  'toolbaraction':self.launch_keywords_obj.toolbar_actions,
-                  #------------------------------------------------------textbox keywords
-                  'settext' : self.editable_text_obj.setText,
-                  'setsecuretext':self.editable_text_obj.setSecureText,
-                  'gettext':self.editable_text_obj.getText,
-                  'cleartext':self.editable_text_obj.clearText,
-                  'verifytext':self.editable_text_obj.verifyText,
-                  'gettextboxlength':self.editable_text_obj.getTextboxLength,
-                  'verifytextboxlength':self.editable_text_obj.verifyTextboxLength,
-                  #------------------------------------------------------radio btn keywords
-                  'selectcheckbox':self.radiocheckbox_keywords_obj.select_checkbox,
-                  'unselectcheckbox':self.radiocheckbox_keywords_obj.unselect_checkbox,
-                  'selectradiobutton':self.radiocheckbox_keywords_obj.select_radiobutton,
-                  'getstatus': self.radiocheckbox_keywords_obj.get_status,
-                  #------------------------------------------------------button keywords
-                  'getbuttonname':self.button_link_obj.get_button_name,
-                  'verifybuttonname':self.button_link_obj.verify_button_name,
-                  'uploadfile':self.button_link_obj.button_uploadFile,
-                  #------------------------------------------------------dropdown keywords
-                  'getselected':self.dropdown_keywords_obj.getSelected,
-                  'getcount':self.dropdown_keywords_obj.getCount,
-##                  'getvaluebyindex':self.dropdown_keywords_obj.getValueByIndex,
-##                  'selectvaluebyindex':self.dropdown_keywords_obj.selectValueByIndex,
-                  'selectvaluebytext':self.dropdown_keywords_obj.selectValueByText,
-                  'verifycount':self.dropdown_keywords_obj.verifyCount,
-                  'verifyselectedvalue':self.dropdown_keywords_obj.verifySelectedValue,
-                  'verifyvaluesexists':self.dropdown_keywords_obj.verifyValuesExists,
-                  'verifyallvalues':self.dropdown_keywords_obj.verifyAllValues,
-                  #------------------------------------------------------element keywords
-                  'click':self.element_keywords_obj.click,
-                  'rightclick':self.element_keywords_obj.rightClick,
-                  'doubleclick':self.element_keywords_obj.doubleClick,
-                  'mousehover':self.element_keywords_obj.mouseHover,
-                  'getelementtext':self.element_keywords_obj.get_element_text,
-                  'verifyelementtext':self.element_keywords_obj.verify_element_text,
-                  'gettooltiptext':self.element_keywords_obj.getTooltipText,
-                  'verifytooltiptext':self.element_keywords_obj.verifyTooltipText,
-                  'geticonname':self.element_keywords_obj.getIconName,
-                  'verifyiconname':self.element_keywords_obj.verifyIconName,
-                  'getinputhelp':self.element_keywords_obj.getInputHelp,
-                  'setfocus':self.element_keywords_obj.setFocus,
-                  'scrollup':self.element_keywords_obj.scrollUp,
-                  'scrolldown':self.element_keywords_obj.scrollDown,
-                  'scrollleft':self.element_keywords_obj.scrollLeft,
-                  'scrollright':self.element_keywords_obj.scrollRight,
-                  'movetabs':self.element_keywords_obj.moveTabs,
-                  'selecttab':self.element_keywords_obj.selectTab,
-                  #------------------------------------------------------sap util keywords
-                  'verifyenabled':self.saputil_keywords_obj.verifyEnabled,
-                  'verifydisabled':self.saputil_keywords_obj.verifyDisabled,
-                  'verifyexists':self.saputil_keywords_obj.verifyExists,
-                  'verifyhidden':self.saputil_keywords_obj.verifyHidden,
-                  'verifyvisible':self.saputil_keywords_obj.verifyVisible,
-                  #-------------------------------------------------------table keywords
-                  'getrowcount':self.table_keywords_obj.getRowCount,
-                  'getcolumncount':self.table_keywords_obj.getColumnCount,
-                  'getcolnumbytext':self.table_keywords_obj.getColNumByText,
-                  'getrownumbytext':self.table_keywords_obj.getRowNumByText,
-                  'getcellvalue':self.table_keywords_obj.getCellValue,
-                  'verifycellvalue':self.table_keywords_obj.verifyCellValue,
-                  #commenting dropdown code inside table cell
-                  'verifytextexists':self.table_keywords_obj.verifyTextExists,
-##                  'cellclick':self.table_keywords_obj.cellClick,
-##                  'selectvaluebyindex':self.table_keywords_obj.selectValueByIndex,
-##                  'selectvaluebytext':self.table_keywords_obj.selectValueByText,
-##                  'getselected':self.table_keywords_obj.getSelected,
-                  'getcellstatus':self.table_keywords_obj.getStatus,
-                  'selectrow':self.table_keywords_obj.selectRow,
-                  'unselectrow':self.table_keywords_obj.unselectRow,
-                  'setcelltext':self.table_keywords_obj.setCellText,
-                  #-----------------------------------------------------shell keywords
-                  'getcountofrows':self.shell_keywords_obj.get_rowCount,
-                  'getcountofcolumns':self.shell_keywords_obj.get_colCount,
-                  'selectrows':self.shell_keywords_obj.selectRows,
-                  'presstoolbarbutton':self.shell_keywords_obj.pressToolBarButton,
-                  'getcelltext': self.shell_keywords_obj.getCellText,
-                  'clickcell':self.shell_keywords_obj.clickCell,
-                  'doubleclickcell':self.shell_keywords_obj.doubleClickCell,
-                  'setshelltext':self.shell_keywords_obj.setShellText,
-                  'getrowcolbytext':self.shell_keywords_obj.getRowColByText,
-                  'toolbaractionkeys':self.shell_keywords_obj.toolBarActionKeys,
-                  'settextincell':self.shell_keywords_obj.setCellText,
-                  'selectallrows':self.shell_keywords_obj.selectAllRows,
-                  'unselectallselections':self.shell_keywords_obj.unselectAllSelections,
-                  'scrolltorownumber':self.shell_keywords_obj.scrollToRowNumber,
-                  'getcellcolor':self.shell_keywords_obj.getCellColor,
-                  #------------------------------------------------------treekeywords
-                  'selecttreeelement':self.shell_keywords_obj.selectTreeElement,
-                  'gettreenodetext':self.shell_keywords_obj.getTreeNodeText,
-                  'gettreenodecount':self.shell_keywords_obj.getTreeNodeCount,
-                  'singleselectparentofselected':self.shell_keywords_obj.singleSelectParentOfSelected,
-                  'collapsetree':self.shell_keywords_obj.collapseTree,
-                  'getcolvaluecorrtoselectednode':self.shell_keywords_obj.getColValueCorrToSelectedNode,
-                  'selecttreenode':self.shell_keywords_obj.selectTreeNode,
-                  'getnodenamebyindex':self.shell_keywords_obj.getNodeNameByIndex,
-                  'verifytreepath':self.shell_keywords_obj.verifyTreePath
-                   }
-
             if ( iris_flag ):
                 import iris_operations
                 iris_object = iris_operations.IRISKeywords()
-                dict['clickiris'] = iris_object.clickiris
-                dict['settextiris'] = iris_object.settextiris
-                dict['gettextiris'] = iris_object.gettextiris
-                dict['getrowcountiris'] = iris_object.getrowcountiris
-                dict['getcolcountiris'] = iris_object.getcolcountiris
-                dict['getcellvalueiris'] = iris_object.getcellvalueiris
-                dict['verifyexistsiris'] = iris_object.verifyexistsiris
-                dict['verifytextiris'] = iris_object.verifytextiris
+                self.sap_dict['clickiris'] = iris_object.clickiris
+                self.sap_dict['settextiris'] = iris_object.settextiris
+                self.sap_dict['gettextiris'] = iris_object.gettextiris
+                self.sap_dict['getrowcountiris'] = iris_object.getrowcountiris
+                self.sap_dict['getcolcountiris'] = iris_object.getcolcountiris
+                self.sap_dict['getcellvalueiris'] = iris_object.getcellvalueiris
+                self.sap_dict['verifyexistsiris'] = iris_object.verifyexistsiris
+                self.sap_dict['verifytextiris'] = iris_object.verifytextiris
 
             keyword = keyword.lower()
-            if ( keyword in list(dict.keys()) ):
+            if ( keyword in list(self.sap_dict.keys()) ):
                 if ( keyword == 'serverconnect' or keyword == 'launchapplication' or keyword == 'starttransaction' or keyword == 'toolbaraction' ):
-                    result= dict[keyword](input,output)
+                    result= self.sap_dict[keyword](input,output)
                 else:
                     if ( teststepproperty.cord != None and teststepproperty.cord != '' ):
                         obj_props = teststepproperty.objectname.split(';')
@@ -232,11 +231,11 @@ class SAPDispatcher:
                             wnd = wnd.Text + '/'
                             self.launch_keywords_obj.setWindowToForeground(wnd)
                         if ( teststepproperty.custom_flag ):
-                            result = dict[keyword](objectname,input,output,teststepproperty.parent_xpath)
+                            result = self.sap_dict[keyword](objectname,input,output,teststepproperty.parent_xpath)
                         else:
-                            result = dict[keyword](objectname,input,output)
+                            result = self.sap_dict[keyword](objectname,input,output)
                     else:
-                        result = dict[keyword](objectname,input,output)
+                        result = self.sap_dict[keyword](objectname,input,output)
                 if ( not (sap_constants.ELEMENT_FOUND) and self.exception_flag ):
                     logger.print_on_console('Element not found terminating')
                     result = constants.TERMINATE
