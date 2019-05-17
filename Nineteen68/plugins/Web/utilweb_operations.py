@@ -563,7 +563,7 @@ class UtilWebKeywords:
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
-                #input=input[0]
+                digits= 1
                 input1=input[0]
                 info_msg='Focus the given webelement '+webelement.tag_name+' before sending keys'
                 log.info(info_msg)
@@ -571,10 +571,12 @@ class UtilWebKeywords:
                 self.__setfocus(webelement)
                 if len(args)==0 and input1 in list(self.keys_info.keys()):
                     if webelement.get_attribute('type')!='text':
-                        if len(input)==2:
-                            input[1] = 1
-                        webelement.send_keys(self.keys_info[input1.lower()]*int(input[1]))
-                        log.debug('It is not a textbox')
+                        digits = [int(i)for i in input if i.isdigit()]
+                        try:
+                            webelement.send_keys(self.keys_info[input1.lower()]*digits[0])
+                        except Exception as e:
+                            log.debug('Operated using option 2',e)
+                            webelement.send_keys(self.keys_info[input1.lower()])
                     else:
                         log.debug('It is a textbox')
                         #self.generic_sendfucntion_keys(input1.lower(),*args)
