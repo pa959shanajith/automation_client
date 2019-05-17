@@ -446,30 +446,33 @@ class MobileDispatcher:
         objectname = str(objectname)
         mobileElement = None
         global ELEMENT_FOUND
+        xpath = None
         if objectname.strip() != '':
             if SYSTEM_OS=='Darwin':
                 objectname = objectname.replace("/AppiumAUT[1]/", "/")
                 print(objectname)
             identifiers = objectname.split(';')
+            id = identifiers[0]
+            xpath = identifiers[1]
             log.debug('Identifiers are ')
             log.debug(identifiers)
             try:
-                log.debug('trying to find mobileElement by Id')
+                log.debug('trying to find mobileElement by xpath')
                 import platform
                 if SYSTEM_OS=='Darwin':
                     mobileElement = driver.find_element_by_xpath(objectname)
                 else:
-                    mobileElement = driver.find_element_by_xpath(identifiers[1])
+                    mobileElement = driver.find_element_by_xpath(xpath)
             except Exception as Ex:
-                try:
-                    log.debug('Webelement not found by Id')
-                    log.debug('trying to find mobileElement by xpath')
-                    mobileElement = driver.find_element_by_id(identifiers[0])
-                except Exception as Ex:
-                    log.debug('Webelement not found')
-                    err_msg=str(Ex)
-    ##                    logger.print_on_console(err_msg)
-                    log.error(err_msg)
+                log.debug(str(Ex))
+                log.debug('Webelement not found by xpath')
+                if (id):
+                    try:
+                        log.debug('trying to find mobileElement by id')
+                        mobileElement = driver.find_element_by_id(id)
+                    except Exception as Ex:
+                        log.debug('Webelement not found')
+                        log.debug(str(Ex))
         if mobileElement==None:
             ELEMENT_FOUND=False
-        return mobileElement, identifiers[1]
+        return mobileElement, xpath

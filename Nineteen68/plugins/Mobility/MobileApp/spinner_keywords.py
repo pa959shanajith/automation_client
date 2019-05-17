@@ -26,7 +26,7 @@ class Spinner_Keywords():
     def get_count(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
-        output=None
+        output=OUTPUT_CONSTANT
         className=''
         err_msg=None
         text=[]
@@ -106,7 +106,7 @@ class Spinner_Keywords():
                                 driver.scroll(scrollele2,scrollele1)
 
                                 if (length1==length2):
-                                    output=length1
+                                    output=str(length1)
                                     logger.print_on_console("Count: "+output)
                                     status=TEST_RESULT_PASS
                                     result=TEST_RESULT_TRUE
@@ -224,7 +224,7 @@ class Spinner_Keywords():
                             driver.keyevent(4)
                         if (input==len(text)):
                                 log.debug('count matched')
-                                logger.print_on_console("Count: "+input)
+                                logger.print_on_console("Count: "+str(input))
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                         else :
@@ -408,7 +408,7 @@ class Spinner_Keywords():
                         element = driver.find_element_by_xpath(args[0]+'/android.widget.TextView[1]')
                         if (element):
                             if (input==element.text):
-                                logger.print_on_console("Output: "+output)
+                                logger.print_on_console("Output: "+input)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                         else:
@@ -459,7 +459,6 @@ class Spinner_Keywords():
                                     for j in obj:
                                         if input is not None:
                                             selected=j.get_attribute("selected")
-                                            logger.print_on_console(str(selected))
                                             if str(selected) == 'true':
                                                 if input == j.text :
                                                     flag=True
@@ -844,7 +843,7 @@ class Spinner_Keywords():
     def get_value_by_index(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
-        output=None
+        output=OUTPUT_CONSTANT
         temp=[]
         className=''
         err_msg=None
@@ -971,7 +970,7 @@ class Spinner_Keywords():
     def get_selected_value(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
-        output=None
+        output=OUTPUT_CONSTANT
         err_msg=None
         className=''
         text=[]
@@ -1045,6 +1044,7 @@ class Spinner_Keywords():
                                         selected=j.get_attribute("checked")
                                         if str(selected) == 'true':
                                             output=j.text
+                                            logger.print_on_console("Output: "+output)
                                             status=TEST_RESULT_PASS
                                             result=TEST_RESULT_TRUE
                                             flag=True
@@ -1082,7 +1082,7 @@ class Spinner_Keywords():
 
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
-        output=None
+        output=OUTPUT_CONSTANT
         temp=[]
         className=''
         err_msg=None
@@ -1156,7 +1156,7 @@ class Spinner_Keywords():
 
                                 if (length1==length2):
                                     if len(input) ==  len(temp):
-                                        output=temp
+                                        output=str(temp)
                                         logger.print_on_console("Output: "+output)
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE
@@ -1190,7 +1190,7 @@ class Spinner_Keywords():
     def get_all_values(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
-        output=None
+        output=OUTPUT_CONSTANT
         err_msg=None
         text=[]
         obj=[]
@@ -1267,12 +1267,13 @@ class Spinner_Keywords():
                             driver.scroll(scrollele2,scrollele1)
 
                             if (length1==length2):
-                                output=text
+                                output=str(text)
+                                logger.print_on_console("Output: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
                             else:
-                                output=text
+                                output=str(text)
                                 logger.print_on_console("Output: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
