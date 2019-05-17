@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-CUSTOM='@Custom'
+CUSTOM = '@Custom'
 
 #Dictionary used for send function keys special characters
 
@@ -44,11 +44,28 @@ SAP_ERROR_CODES = {'0':'The operating system is out of memory or resources.',
                           '30':'The DDE transaction could not be completed because other DDE transactions were being processed..',
                           '31':'There is no application associated with the given filename extension.',
                           '32':'The specified dynamic-link library was not found.'}
-SAP_SCRAPE_KEYWORDS=['clickandadd','fullscrape']
 
-INVALID_KEYWORD='Invalid keyword'
+SAP_SCRAPE_KEYWORDS = ['clickandadd','fullscrape']
 
-INVALID_INPUT='Input value is Invalid,Please provide a valid input'
+INVALID_KEYWORD = 'Invalid keyword'
+
+INVALID_INPUT = 'Input value is invalid, please provide a valid input'
+
+INVALID_ELELMENT_TYPE = 'Invalid element type, element state does not allow to perform the operation'
+
+ELELMENT_NOT_FOUND = 'Element is not present on the page where the operation is trying to be performed'
+
+ELEMENT_NOT_CHANGEABLE = 'Element is not changeable, element state does not allow to perform the operation'
+
+ELELMENT_NOT_FOUND_HIGHLIGHT = "Element not present on the current window. Please scroll down and try again."
+
+ERROR_HIGHLIGHT = "Error occured while highlighting"
+
+SESSION_ERROR = "Session not found"
+
+SESSION_AND_WINDOW_ERROR = "SAP Session and Window not found"
+
+NO_INSTANCE_OPEN_ERROR = "No instance open of SAP GUI"
 
 TEST_RESULT_PASS = "Pass"
 
@@ -58,7 +75,7 @@ TEST_RESULT_TRUE = "True"
 
 TEST_RESULT_FALSE = "False"
 
-FILE_NOT_EXISTS='File does not exists'
+FILE_NOT_EXISTS ='File does not exists'
 
 ENABLED_CHECK = 'enabled'
 
@@ -72,27 +89,27 @@ SELECTED_CHECK = 'selected'
 
 UNSELECTED_CHECK = 'unselected'
 
-COMBO_BOX='cbo'
+COMBO_BOX = 'cbo'
 
-LIST_BOX='list'
+LIST_BOX = 'list'
 
-LIST_ITEM='list_item'
+LIST_ITEM = 'list_item'
 
-CLASS='class'
+CLASS = 'class'
 
-CHILD='children'
+CHILD = 'children'
 
-LABEL='label'
+LABEL = 'label'
 
-ELEMENT_FOUND=True
+ELEMENT_FOUND = True
 
 ERROR_MSG = 'Error occured'
 
-APPLICATION_KEYWORDS=['serverconnect','launchapplication','starttransaction','closeapplication']
+APPLICATION_KEYWORDS = ['serverconnect','launchapplication','starttransaction','closeapplication']
 
 #refer this to find more icon and the significance
 #https://experience.sap.com/files/guidelines/icons_sap/icons_e1_4.htm
-ICON_BITMAP={'S_OKAY':'CHECKED',
+ICON_BITMAP = {'S_OKAY':'CHECKED',
              'S_NONO':'INCOMPLETE',
              'S_ERRO':'FAILURE',
              'S_POSI':'POSITIVE',
@@ -101,5 +118,4 @@ ICON_BITMAP={'S_OKAY':'CHECKED',
              'S_LOOP':'UNLOCKED',
              'STA_OK':'STATUS_OK',
              'STABST':'STATUS_BEST',
-             'B_SPCE':'SPACE'
-             }
+             'B_SPCE':'SPACE'}

@@ -14,28 +14,27 @@ from constants import *
 from sap_scraping import Scrape
 import logger
 import logging
-import logging.config
 log = logging.getLogger('saputil_operations.py')
 class SapUtilKeywords:
 
 
     def getSapObject(self):
-        self.SapGui=None
+        self.SapGui = None
         try:
             import pythoncom
             pythoncom.CoInitialize()
             self.SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
         except Exception as e:
-            logger.print_on_console( 'Not able to find SAPGUI object')
+            logger.print_on_console( 'Not able to find SAPGUI object' )
             log.error(e)
         return self.SapGui
 
     def getSapElement(self,sap_id,*args):
-        id=''
-        ses=''
+        id = None
+        ses = None
         try:
             SapGui = self.getSapObject()
-            scrapingObj=Scrape()                                   #calling scrape class
+            scrapingObj = Scrape()                                   #calling scrape class
             wnd = scrapingObj.getWindow(SapGui)                      #calling window method
             wndId =  wnd.__getattr__('id')                         # windowid from name
             j = wndId.index('ses')
@@ -57,119 +56,151 @@ class SapUtilKeywords:
 
 
     def verifyEnabled(self, sap_id, *args):
-        id,ses=self.getSapElement(sap_id)
-        status=sap_constants.TEST_RESULT_FAIL
-        result=sap_constants.TEST_RESULT_FALSE
-        err_msg=None
-        value=OUTPUT_CONSTANT
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg  = None
+        value = OUTPUT_CONSTANT
         try:
-            if(id != None):
-                if(ses.FindById(id).type == "GuiLabel" or ses.FindById(id).Changeable == True):
+            id, ses = self.getSapElement(sap_id)
+            if ( id and ses ):
+                if( ses.FindById(id).type == "GuiLabel" or ses.FindById(id).Changeable == True ):
                     status=sap_constants.TEST_RESULT_PASS
                     result=sap_constants.TEST_RESULT_TRUE
                 else:
-                    logger.print_on_console("Element is disabled.")
+                    err_msg = 'Element is disabled'
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-            logger.print_on_console("Error occured in verifyEnabled")
-            log.error(e)
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Verify Enabled" )
         return status,result,value,err_msg
 
     def verifyDisabled(self, sap_id, *args):
-        id,ses=self.getSapElement(sap_id)
-        status=sap_constants.TEST_RESULT_FAIL
-        result=sap_constants.TEST_RESULT_FALSE
-        err_msg=None
-        value=OUTPUT_CONSTANT
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
         try:
-            if(id != None):
-                if(ses.FindById(id).Changeable == False and ses.FindById(id).type != "GuiLabel"):
-                    status=sap_constants.TEST_RESULT_PASS
-                    result=sap_constants.TEST_RESULT_TRUE
+            id, ses = self.getSapElement(sap_id)
+            if ( id and ses ):
+                if ( ses.FindById(id).Changeable == False and ses.FindById(id).type != "GuiLabel" ):
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
                 else:
-                    logger.print_on_console("Element is enabled.")
+                    err_msg = 'Element is enabled.'
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-            logger.print_on_console("Error occured in verifyDisabled")
-            log.error(e)
-        return status,result,value,err_msg
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Verify Disabled" )
+        return status, result, value, err_msg
 
     def verifyExists(self, sap_id, *args):
-        id,ses=self.getSapElement(sap_id)
-        status=sap_constants.TEST_RESULT_FAIL
-        result=sap_constants.TEST_RESULT_FALSE
-        err_msg=None
-        value=OUTPUT_CONSTANT
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
         try:
-            if(id != None):
-                status=sap_constants.TEST_RESULT_PASS
-                result=sap_constants.TEST_RESULT_TRUE
+            id, ses = self.getSapElement(sap_id)
+            if ( id and ses ):
+                status = sap_constants.TEST_RESULT_PASS
+                result = sap_constants.TEST_RESULT_TRUE
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-            logger.print_on_console("Error occured in verifyExists")
-            log.error(e)
-        return status,result,value,err_msg
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Verify Exists" )
+        return status, result, value, err_msg
 
     def verifyHidden(self, sap_id, *args):
-        id,ses=self.getSapElement(sap_id)
-        status=sap_constants.TEST_RESULT_FAIL
-        result=sap_constants.TEST_RESULT_FALSE
-        err_msg=None
-        value=OUTPUT_CONSTANT
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
         try:
-            if(id != None):
+            id, ses = self.getSapElement(sap_id)
+            if ( id and ses ):
                 try:
                     ses.FindById(id)
-                    err_msg="Element is visible"
-                    logger.print_on_console("Element is visible")
+                    err_msg = 'Element is visible'
                 except Exception as e:
-##                    if e[2][2]=='The control could not be found by id.':
-##                        logger.print_on_console("Element is hidden")
-                    logger.print_on_console("Element is hidden")
-                    status=sap_constants.TEST_RESULT_PASS
-                    result=sap_constants.TEST_RESULT_TRUE
+                    logger.print_on_console( "Element is hidden" )
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-            logger.print_on_console("Error occured in verifyHidden")
-            log.error(e)
-        return status,result,value,err_msg
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Verify Hidden" )
+        return status, result, value, err_msg
 
     def verifyVisible(self, sap_id, *args):
-        id,ses=self.getSapElement(sap_id)
-        status=sap_constants.TEST_RESULT_FAIL
-        result=sap_constants.TEST_RESULT_FALSE
-        err_msg=None
-        value=OUTPUT_CONSTANT
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
         try:
-            if(id != None):
+            id, ses = self.getSapElement(sap_id)
+            if ( id and ses ):
                 try:
                     ses.FindById(id)
-                    status=sap_constants.TEST_RESULT_PASS
-                    result=sap_constants.TEST_RESULT_TRUE
-                    logger.print_on_console("Element is visible")
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                    logger.print_on_console( "Element is visible" )
                 except Exception as e:
-                    err_msg="Element is hidden"
-                    if e[2][2]=='The control could not be found by id.':
-                        logger.print_on_console("Element is hidden")
+                    err_msg = "Element is hidden"
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-            logger.print_on_console("Error occured in verifyVisible")
-            log.error(e)
-        return status,result,value,err_msg
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Verify Visible" )
+        return status, result, value, err_msg
 
     def getobjectforcustom(self, sap_id, eleType, eleIndex):
         data = []
         xpath = None
+        err_msg = None
         try:
-            id,ses=self.getSapElement(sap_id)
-            reference_elem = ses.FindById(id)
-            wnd_id = id[:26]
-            wnd = ses.FindById(wnd_id)
-            wnd_title = wnd.__getattr__("Text")
-            scrapingObj=Scrape()
-            data = scrapingObj.full_scrape(reference_elem, wnd_title)
-            for elem in data:
-                if elem['tag'].lower() == eleType.strip().lower():
-                    eleIndex = int(eleIndex) - 1
-                    if(eleIndex == 0):
-                        xpath = elem['xpath']
+            id, ses = self.getSapElement(sap_id)
+            if ( id and ses ):
+                reference_elem = ses.FindById(id)
+                wnd_id = id[:26]
+                wnd = ses.FindById(wnd_id)
+                wnd_title = wnd.__getattr__("Text")
+                scrapingObj = Scrape()
+                data = scrapingObj.full_scrape(reference_elem, wnd_title)
+                for elem in data:
+                    if ( elem['tag'].lower() == eleType.strip().lower() ):
+                        eleIndex = int(eleIndex) - 1
+                        if ( eleIndex == 0 ):
+                            xpath = elem['xpath']
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console (err_msg )
         except Exception as e:
-            logger.print_on_console("Error occured while finding custom object")
-            log.error(e)
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Get Object For Custom" )
         return xpath
-

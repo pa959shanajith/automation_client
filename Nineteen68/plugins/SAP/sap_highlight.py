@@ -17,7 +17,7 @@ import time
 import sap_launch_keywords
 import logger
 import logging
-import logging.config
+import sap_constants
 log = logging.getLogger('sap_highlight.py')
 
 class highLight():
@@ -48,7 +48,7 @@ class highLight():
             try:
                 foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
                 appThread = win32api.GetCurrentThreadId()
-                if( foreThread != appThread ):
+                if ( foreThread != appThread ):
                     win32process.AttachThreadInput(foreThread[0], appThread, True)
                     win32gui.BringWindowToTop(hwnd)
                     win32gui.ShowWindow(hwnd,5)
@@ -57,7 +57,7 @@ class highLight():
                     win32gui.BringWindowToTop(hwnd)
                     win32gui.ShowWindow(hwnd,3)
                 time.sleep(1)
-                if((len(ses.Children) > 1) or (bottom_right_y+60 <= window.Height) or ('sbar' in str(elemId))):
+                if ( (len(ses.Children) > 1) or (bottom_right_y+60 <= window.Height) or ('sbar' in str(elemId)) ):
                     rgn1=win32gui.CreateRectRgnIndirect((top_left_x,top_left_y,bottom_right_x,bottom_right_y))
                     rgn2=win32gui.CreateRectRgnIndirect((top_left_x+4,top_left_y+4,bottom_right_x-4,bottom_right_y-4))
                     hdc=win32gui.CreateDC("DISPLAY", None, None)
@@ -69,22 +69,11 @@ class highLight():
                     win32gui.DeleteObject(rgn2)
                     win32gui.DeleteDC(hdc)
                 else:
-                    logger.print_on_console("Element not present on the current window. Please scroll down and try again.")
+                    log.error( sap_constants.ELELMENT_NOT_FOUND_HIGHLIGHT )
+                    logger.print_on_console( sap_constants.ELELMENT_NOT_FOUND_HIGHLIGHT )
             except:
                 pass
         except Exception as e:
             log.error(e)
-            logger.print_on_console("Error occured while highlighting")
-
-
-
-
-
-
-
-
-
-
-
-
-
+            log.error( sap_constants.ERROR_HIGHLIGHT )
+            logger.print_on_console( sap_constants.ERROR_HIGHLIGHT )

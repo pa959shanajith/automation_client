@@ -14,7 +14,6 @@ from constants import *
 from saputil_operations import SapUtilKeywords
 from sap_launch_keywords import Launch_Keywords
 import logging
-import logging.config
 log = logging.getLogger('sap_dropdown_keywords.py')
 
 class Dropdown_Keywords():
@@ -22,28 +21,32 @@ class Dropdown_Keywords():
         self.uk = SapUtilKeywords()
         self.lk = Launch_Keywords()
 
-    def getSelected(self,sap_id, *args):
-        self.lk.setWindowToForeground(sap_id)
-        id,ses=self.uk.getSapElement(sap_id)
+    def getSelected(self, sap_id, *args):
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
-        err_msg=None
+        err_msg = None
         value = OUTPUT_CONSTANT
         try:
-            if(id != None):
-                if(ses.FindById(id).Changeable == True):
+            self.lk.setWindowToForeground(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                if ( ses.FindById(id).Changeable == True ):
                     value = ses.FindById(id).Text.strip()
-                    status=sap_constants.TEST_RESULT_PASS
-                    result=sap_constants.TEST_RESULT_TRUE
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
                 else:
-                    logger.print_on_console( "Element is not changeable")
-                    err_msg = "Element is not changeable"
-                    log.info(err_msg)
+                    err_msg = sap_constants.ELEMENT_NOT_CHANGEABLE
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            #------------------------logging error messages
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console("Error occured in getSelected")
-        return status,result,value,err_msg
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Get Selected" )
+        return status, result, value ,err_msg
 
 
 
@@ -52,9 +55,9 @@ class Dropdown_Keywords():
 ##        status = sap_constants.TEST_RESULT_FAIL
 ##        result = sap_constants.TEST_RESULT_FALSE
 ##        verb = OUTPUT_CONSTANT
-##        index=int(input_val[0])
-##        #index=index+1
-##        err_msg=None
+##        index = int(input_val[0])
+##        #index = index+1
+##        err_msg = None
 ##        i = 0
 ##        arr = []
 ##        try:
@@ -69,17 +72,21 @@ class Dropdown_Keywords():
 ##                        i = i + 1
 ##                    try:
 ##                        ses.FindById(id).value = arr[index]
-##                        status=sap_constants.TEST_RESULT_PASS
-##                        result=sap_constants.TEST_RESULT_TRUE
+##                        status = sap_constants.TEST_RESULT_PASS
+##                        result = sap_constants.TEST_RESULT_TRUE
 ##                    except Exception as e:
-##                         err_msg=e
-##                         logger.print_on_console( 'index out of bound:',e)
+##                        err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+##                        log.error( err_msg )
+##                        logger.print_on_console( "Error occured : Index out of bound" )
 ##                else:
-##                    logger.print_on_console( "Element is not changeable")
-##                    err_msg = "Element is not changeable"
-##                    log.info(err_msg)
+##                    err_msg = sap_constants.ELEMENT_NOT_CHANGEABLE
+##            if ( err_msg ):
+##                log.info(err_msg)
+##                logger.print_on_console(err_msg)
 ##        except Exception as e:
-##             log.error('Error occured',e)
+##            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+##            log.error( err_msg )
+##            logger.print_on_console( "Error occured in getValueByIndex" )
 ##        return status,result,verb,err_msg
 
 ##    def getValueByIndex(self, sap_id, url,input_val,*args):
@@ -87,10 +94,10 @@ class Dropdown_Keywords():
 ##        status = sap_constants.TEST_RESULT_FAIL
 ##        result = sap_constants.TEST_RESULT_FALSE
 ##        #verb = OUTPUT_CONSTANT
-##        value=OUTPUT_CONSTANT
-##        index=int(input_val[0])
-##        #index=index+1
-##        err_msg=None
+##        value = OUTPUT_CONSTANT
+##        index = int(input_val[0])
+##        #index = index+1
+##        err_msg = None
 ##        i = 0
 ##        arr = []
 ##        try:
@@ -108,207 +115,245 @@ class Dropdown_Keywords():
 ##                        status=sap_constants.TEST_RESULT_PASS
 ##                        result=sap_constants.TEST_RESULT_TRUE
 ##                    except Exception as e:
-##                        err_msg=e
-##                        logger.print_on_console( 'index out of bound:',e)
+##                        err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+##                        log.error( err_msg )
+##                        logger.print_on_console( "Error occured : Index out of bound" )
 ##                else:
-##                    logger.print_on_console( "Element is not changeable")
-##                    err_msg = "Element is not changeable"
-##                    log.info(err_msg)
+##                    err_msg = sap_constants.ELEMENT_NOT_CHANGEABLE
+##            if ( err_msg ):
+##                log.info(err_msg)
+##                logger.print_on_console(err_msg)
 ##        except Exception as e:
-##            err_msg = sap_constants.ERROR_MSG
-##            log.error(err_msg,e)
+##            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+##            log.error( err_msg )
+##            logger.print_on_console( "Error occured in getValueByIndex" )
 ##        return status,result,value,err_msg
 
     def selectValueByText(self,sap_id,input_val, *args):
-        self.lk.setWindowToForeground(sap_id)
-        id,ses=self.uk.getSapElement(sap_id)
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
-        if(len(input_val)>1):
-            text = input_val[2]
-        else:
-            text=input_val[0]
-        value=OUTPUT_CONSTANT
-        err_msg=None
-        i = 0
-        try:
-            if(id != None):
-                if(ses.FindById(id).Changeable == True):
-                    entries = ses.FindById(id).Entries
-                    while True:
-                        try:
-                            if(entries(i).value.strip() == text.strip()):
-                                ses.FindById(id).value = text
-                                status=sap_constants.TEST_RESULT_PASS
-                                result=sap_constants.TEST_RESULT_TRUE
-                        except Exception as e:
-                            break
-                        i = i + 1
-                else:
-                    logger.print_on_console( "Element is not changeable")
-                    err_msg = "Element is not changeable"
-                    log.info(err_msg)
-        except Exception as e:
-              log.error('Error occured',e)
-              logger.print_on_console("Error occured in selectValueByText")
-              err_msg = sap_constants.ERROR_MSG
-        return status,result,value,err_msg
-
-
-    def verifySelectedValue(self,sap_id,input_val ,*args):
-        self.lk.setWindowToForeground(sap_id)
-        id,ses=self.uk.getSapElement(sap_id)
-        val=input_val[0]
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
-        err_msg=None
+        err_msg = None
         try:
-            if(id != None):
-                if(ses.FindById(id).Changeable == True):
-                    if(ses.FindById(id).Text.strip() == val):
-                        status=sap_constants.TEST_RESULT_PASS
-                        result=sap_constants.TEST_RESULT_TRUE
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                if ( len(input_val)>1 ):
+                    text = input_val[2]
+                else:
+                    text = input_val[0]
+                i = 0
+                if ( ses.FindById(id).Changeable == True ):
+                    entries = ses.FindById(id).Entries
+                    while True:
+                        try:
+                            if ( entries(i).value.strip() == text.strip() ):
+                                ses.FindById(id).value = text
+                                status = sap_constants.TEST_RESULT_PASS
+                                result = sap_constants.TEST_RESULT_TRUE
+                        except:
+                            break
+                        i = i + 1
+                else:
+                    err_msg = sap_constants.ELEMENT_NOT_CHANGEABLE
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            #------------------------logging error messages
+            if ( err_msg ):
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Select Value By Text" )
+        return status, result, value, err_msg
+
+
+    def verifySelectedValue(self, sap_id, input_val ,*args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                if ( ses.FindById(id).Changeable == True ):
+                    if ( ses.FindById(id).Text.strip() == input_val[0] ):
+                        status = sap_constants.TEST_RESULT_PASS
+                        result = sap_constants.TEST_RESULT_TRUE
                     else:
-                        err_msg = sap_constants.ERROR_MSG
-                        log.info(err_msg)
+                        err_msg = "Input text and Element text do not match"
                 else:
-                    logger.print_on_console( "Element is not changeable")
-                    err_msg = "Element is not changeable"
-                    log.info(err_msg)
+                    err_msg = sap_constants.ELEMENT_NOT_CHANGEABLE
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            #------------------------logging error messages
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-            log.error('Error occured',e)
-            err_msg = sap_constants.ERROR_MSG
-            logger.print_on_console("Error occured in verifySelectedValue")
-        return status,result,value,err_msg
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Verify Selected Value" )
+        return status, result, value, err_msg
 
 
-    def getCount(self,sap_id, *args):
-        self.lk.setWindowToForeground(sap_id)
-        id,ses=self.uk.getSapElement(sap_id)
+    def getCount(self, sap_id, *args):
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
-        value=OUTPUT_CONSTANT
-        err_msg=None
+        value = OUTPUT_CONSTANT
+        err_msg = None
         count = 0
         try:
-            if(id != None):
-                entries = ses.FindById(id).Entries
-                while True:
-                    try:
-                        value = entries(count).value
-                        count = count + 1
-                        value=count
-                        status=sap_constants.TEST_RESULT_PASS
-                        result=sap_constants.TEST_RESULT_TRUE
-                    except Exception as e:
-                        break
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                if ( ses.FindById(id).type == "GuiComboBox" ):
+                    entries = ses.FindById(id).Entries
+                    value = count
+                    while True:
+                        try:
+                            value = entries(count).value
+                            count = count + 1
+                            value = count
+                        except:
+                            break
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg = sap_constants.INVALID_ELELMENT_TYPE
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            #------------------------logging error messages
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-              log.error('Error occured',e)
-              logger.print_on_console("Error occured in getCount")
-              err_msg = sap_constants.ERROR_MSG
-        return status,result,value,err_msg
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Get Count" )
+        return status, result, value, err_msg
 
-    def verifyCount(self,sap_id,input_val, *args):
-        self.lk.setWindowToForeground(sap_id)
-        id,ses=self.uk.getSapElement(sap_id)
-        length = int(input_val[0])
+    def verifyCount(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
-        value=OUTPUT_CONSTANT
-        err_msg=''
-        status = sap_constants.TEST_RESULT_FAIL
-        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
         count = 0
         try:
-            if(id != None):
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                value = count
                 entries = ses.FindById(id).Entries
                 while True:
                     try:
-                        value = entries(count).value
+                        if ( entries(count).value.isspace() ):
+                            count = count + 1
+                            continue
                         count = count + 1
-                    except Exception as e:
+                        value = value + 1
+                    except:
                         break
-                if(length == count):
-                    status=sap_constants.TEST_RESULT_PASS
-                    result=sap_constants.TEST_RESULT_TRUE
+                if ( int(input_val[0]) == value ):
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
                 else:
-                    err_msg = sap_constants.ERROR_MSG
-                    log.info('Count Verify has failed ')
+                    err_msg ='Count Verify has failed '
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            #------------------------logging error messages
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-              log.error('Error occured',e)
-              err_msg = sap_constants.ERROR_MSG
-              logger.print_on_console("Error occured in verifyCount")
-        return status,result,verb,err_msg
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Verify Count" )
+        return status, result, verb, err_msg
 
-    def verifyValuesExists(self,sap_id,input_val, *args):
-        self.lk.setWindowToForeground(sap_id)
-        id,ses=self.uk.getSapElement(sap_id)
+    def verifyValuesExists(self, sap_id, input_val, *args):
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
-        err_msg=None
+        err_msg = None
         verb = OUTPUT_CONSTANT
         dd_entries = []
         i = 0
-        flag=True
+        flag = True
         try:
-            if(id != None):
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
                 entries = ses.FindById(id).Entries
                 while True:
                     try:
-                        dd_entries.append(str(entries(i).value).lower())
+                        if ( not (entries(i).value.isspace()) ):
+                            dd_entries.append(str(entries(i).value).lower())
                         i = i + 1
                     except Exception as e:
                         break
                 for inp in input_val:
-                    if(inp.lower().strip() not in dd_entries):
+                    if ( inp.lower().strip() not in dd_entries ):
                         flag = False
                         break
-                if flag==True:
-                    status =sap_constants.TEST_RESULT_PASS
-                    result =sap_constants.TEST_RESULT_TRUE
+                if ( flag == True ):
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
                 else:
-                    err_msg = sap_constants.ERROR_MSG
+                    err_msg = "No matching data found"
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            #------------------------logging error messages
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-              log.error('Error occured',e)
-              err_msg = sap_constants.ERROR_MSG
-              logger.print_on_console("Error occured in verifyValuesExists")
-        return status,result,verb,err_msg
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Verify Values Exists" )
+        return status, result, verb, err_msg
 
 
-    def verifyAllValues(self,sap_id,input_val, *args):
-        self.lk.setWindowToForeground(sap_id)
+    def verifyAllValues(self, sap_id, input_val, *args):
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
-        id,ses=self.uk.getSapElement(sap_id)
-        err_msg=None
+        err_msg = None
         value = OUTPUT_CONSTANT
         i = 0
         dd_entries = []
         try:
-            if(id != None):
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
                 entries = ses.FindById(id).Entries
                 while True:
                     try:
-                        dd_entries.append(str(entries(i).value))
+                        if ( not (entries(i).value.isspace()) ):
+                            dd_entries.append(str(entries(i).value))
                         i = i + 1
-                    except Exception as e:
+                    except:
                         break
-                flag=True
-                if len(dd_entries)==len(input_val):
+                flag = True
+                if ( len(dd_entries) == len(input_val) ):
                     for dd in dd_entries:
-                        if dd not in input_val:
-                            flag=False
+                        if ( dd not in input_val ):
+                            flag = False
                 else:
-                    flag=False
-                if flag==True:
-                    status =sap_constants.TEST_RESULT_PASS
-                    result =sap_constants.TEST_RESULT_TRUE
+                    flag = False
+                if ( flag == True ):
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
                 else:
-                  err_msg = sap_constants.ERROR_MSG
+                    err_msg = "No matching data found"
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            #------------------------logging error messages
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-              log.error('Error occured',e)
-              err_msg = sap_constants.ERROR_MSG
-              logger.print_on_console("Error occured in verifyAllValues")
-        return status,result,value,err_msg
-
-
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Verify All Values" )
+        return status, result, value, err_msg
