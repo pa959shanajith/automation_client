@@ -138,7 +138,7 @@ class ScrapeWindow(wx.Frame):
     def swipedown(self,event):
         try:
             if android_scrapping.driver is not None:
-                android_scrapping.driver.swipe(self.x_Value, self.min_y, self.x_Value, self.max_y)
+                android_scrapping.driver.swipe(self.x_Value, self.min_y, self.x_Value, self.max_y, 3000)
             else:
                 logger.print_on_console("Couldn't Scroll as the appium driver is not running!!")
                 self.Close()
@@ -149,7 +149,7 @@ class ScrapeWindow(wx.Frame):
     def swipeup(self,event):
         try:
             if android_scrapping.driver is not None:
-                android_scrapping.driver.swipe(self.x_Value, self.max_y, self.x_Value, self.min_y)
+                android_scrapping.driver.swipe(self.x_Value, self.max_y, self.x_Value, self.min_y, 3000)
             else:
                 logger.print_on_console("Couldn't Scroll as the appium driver is not running!!")
                 self.Close()

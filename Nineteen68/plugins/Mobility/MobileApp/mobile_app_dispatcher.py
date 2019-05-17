@@ -65,6 +65,96 @@ class MobileDispatcher:
     def __init__(self):
         self.exception_flag=''
 
+    mob_dict={
+        'settext':textbox_keywords_object.set_text,
+        'cleartext' : textbox_keywords_object.clear_text,
+        'setsecuretext' : textbox_keywords_object.setsecuretext,
+        'sendvalue' : textbox_keywords_object.send_value,
+        'gettext' : textbox_keywords_object.get_text,
+        'verifytext' : textbox_keywords_object.verify_text,
+        #'verifytextboxlength' : textbox_keywords_object.verify_textBoxLength,
+        'selectradiobutton' : radio_button_object.select_radio_button,
+        'getstatus' : radio_button_object.get_status,
+        'selectcheckbox' : radio_button_object.select_checkbox,
+        'unselectcheckbox' : radio_button_object.unselect_checkbox,
+        'press' : button_link_object.press,
+        'longpress' : button_link_object.long_press,
+        'getbuttonname' : button_link_object.get_button_name,
+        'verifybuttonname' : button_link_object.verify_button_name,
+        'installapplication' : install_and_launch_object.installApplication,
+        'launchapplication' : install_and_launch_object.launchApp,
+        'uninstallapplication' : install_and_launch_object.uninstallApplication,
+        'closeapplication' : install_and_launch_object.closeApplication,
+        'swipeleft' : swipe_keywords_object.swipe_left,
+        'swiperight': swipe_keywords_object.swipe_right,
+        'swipeup': swipe_keywords_object.swipe_up,
+        'swipedown': swipe_keywords_object.swipe_down,
+        'toggleon' : toggle_keywords_object.toggle_on,
+        'toggleoff':toggle_keywords_object.toggle_off,
+        'verifyenabled' : slider_util_keywords_object.verify_enabled,
+        'verifydisabled' : slider_util_keywords_object.verify_disabled,
+        'verifyvisible' : slider_util_keywords_object.verify_visible,
+        'verifyhidden' : slider_util_keywords_object.verify_hidden,
+        'verifyexists' : slider_util_keywords_object.verify_exists,
+        'getdevices' : device_keywords_object.get_device_list,
+        'invokedevice' : device_keywords_object.invoke_device,
+        'stopserver':install_and_launch_object.stop_server,
+        'hidesoftkeyboard':swipe_keywords_object.hide_soft_keyboard,
+        'backpress':swipe_keywords_object.backPress,
+        'presselement':button_link_object.press,
+        'longpresselement':button_link_object.long_press,
+        'getelementtext':textbox_keywords_object.get_text,
+        'setslidevalue': slider_util_keywords_object.set_slide_value,
+        'getslidevalue': slider_util_keywords_object.get_slide_value,
+        'verifyelementexists':slider_util_keywords_object.verify_exists,
+        'verifyelementdisabled':slider_util_keywords_object.verify_disabled,
+        'verifyelementdoesnotexists':slider_util_keywords_object.verify_does_not_exists,
+        'verifyelementenabled':slider_util_keywords_object.verify_exists,
+        'verifyelementtext':textbox_keywords_object.verify_text,
+        'actionkey':action_keyowrds_object.action_key,
+        'waitforelementexists':slider_util_keywords_object.waitforelement_exists,
+        'getcount':spinner_keywords_object.get_count,
+        'verifycount':spinner_keywords_object.verify_count,
+        'selectvaluebyindex':spinner_keywords_object.select_value_by_index,
+        'selectvaluebytext':spinner_keywords_object.select_value_by_text,
+        'getmultiplevaluesbyindexes':spinner_keywords_object.get_multiple_values_by_indexes,
+        'getvaluebyindex':spinner_keywords_object.get_value_by_index,
+        'getallvalues':spinner_keywords_object.get_all_values,
+        'verifyallvalues':spinner_keywords_object.verify_all_values,
+        'getselectedvalue':spinner_keywords_object.get_selected_value,
+        'verifyselectedvalue':spinner_keywords_object.verify_selected_value,
+        'getlistcount':list_view_keywords_object.get_list_count,
+        'verifylistcount':list_view_keywords_object.verify_list_count,
+        'selectviewbyindex':list_view_keywords_object.select_view_by_index,
+        'selectviewbytext':list_view_keywords_object.select_view_by_text,
+        'getmultipleviewsbyindexes':list_view_keywords_object.get_multiple_views_by_indexs,
+        'getviewbyindex':list_view_keywords_object.get_list_view_by_index,
+        'getallviews':list_view_keywords_object.get_all_views,
+        'verifyallviews':list_view_keywords_object.verify_all_views,
+        'getselectedviews':list_view_keywords_object.get_selected_views,
+        'verifyselectedviews':list_view_keywords_object.verify_selected_views,
+        'selectmultipleviewsbyindexes':list_view_keywords_object.select_multiple_views_by_indexes,
+        'selectmultipleviewsbytext':list_view_keywords_object.select_multiple_views_by_text,
+        'setvalue': seekBar_object.Set_Mid_Value,
+        'getvalue': picker_wheel_keywords_object.get_value,
+        'getrowcount':table_keywords_object.get_row_count,
+        'verifyrowcount':table_keywords_object.verify_row_count,
+        'cellclick':table_keywords_object.cell_click,
+        'getcellvalue':table_keywords_object.get_cell_value,
+        'verifycellvalue':table_keywords_object.verify_cell_value,
+        'setdate' : date_keywords_object.Set_Date,
+        'getdate' : date_keywords_object.Get_Date,
+        'settime' : time_keywords_object.Set_Time,
+        'gettime' : time_keywords_object.Get_Time,
+        'setnumber':number_picker_object.Select_Number,
+        'getnumber':number_picker_object.Get_Selected_Number,
+        'verifynumber':number_picker_object.Verify_Selected_Number,
+        'setminvalue':seekBar_object.Set_Min_Value,
+        'setmidvalue':seekBar_object.Set_Mid_Value,
+        'setmaxvalue':seekBar_object.Set_Max_Value,
+        'verifytime':time_keywords_object.verify_time,
+        'verifydate':date_keywords_object.verify_date
+    }
 
     def dispatcher(self,teststepproperty,input,reporting_obj):
 
@@ -92,97 +182,8 @@ class MobileDispatcher:
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
 
         try:
-            dict={'settext':self.textbox_keywords_object.set_text,
-                    'cleartext' : self.textbox_keywords_object.clear_text,
-                    'setsecuretext' : self.textbox_keywords_object.setsecuretext,
-                    'sendvalue' : self.textbox_keywords_object.send_value,
-                    'gettext' : self.textbox_keywords_object.get_text,
-                    'verifytext' : self.textbox_keywords_object.verify_text,
-                    #'verifytextboxlength' : self.textbox_keywords_object.verify_textBoxLength,
-                    'selectradiobutton' : self.radio_button_object.select_radio_button,
-                    'getstatus' : self.radio_button_object.get_status,
-                    'selectcheckbox' : self.radio_button_object.select_checkbox,
-                    'unselectcheckbox' : self.radio_button_object.unselect_checkbox,
-                    'press' : self.button_link_object.press,
-                    'longpress' : self.button_link_object.long_press,
-                    'getbuttonname' : self.button_link_object.get_button_name,
-                    'verifybuttonname' : self.button_link_object.verify_button_name,
-                    'installapplication' : self.install_and_launch_object.installApplication,
-                    'launchapplication' : self.install_and_launch_object.launchApp,
-                    'uninstallapplication' : self.install_and_launch_object.uninstallApplication,
-                    'closeapplication' : self.install_and_launch_object.closeApplication,
-                    'swipeleft' : self.swipe_keywords_object.swipe_left,
-                    'swiperight': self.swipe_keywords_object.swipe_right,
-                    'swipeup': self.swipe_keywords_object.swipe_up,
-                    'swipedown': self.swipe_keywords_object.swipe_down,
-                    'toggleon' : self.toggle_keywords_object.toggle_on,
-                    'toggleoff':self.toggle_keywords_object.toggle_off,
-                    'verifyenabled' : self.slider_util_keywords_object.verify_enabled,
-                    'verifydisabled' : self.slider_util_keywords_object.verify_disabled,
-                    'verifyvisible' : self.slider_util_keywords_object.verify_visible,
-                    'verifyhidden' : self.slider_util_keywords_object.verify_hidden,
-                    'verifyexists' : self.slider_util_keywords_object.verify_exists,
-                    'getdevices' : self.device_keywords_object.get_device_list,
-                    'invokedevice' : self.device_keywords_object.invoke_device,
-                    'stopserver':self.install_and_launch_object.stop_server,
-                    'hidesoftkeyboard':self.swipe_keywords_object.hide_soft_keyboard,
-                    'backpress':self.swipe_keywords_object.backPress,
-                    'presselement':self.button_link_object.press,
-                    'longpresselement':self.button_link_object.long_press,
-                    'getelementtext':self.textbox_keywords_object.get_text,
-                    'setslidevalue': self.slider_util_keywords_object.set_slide_value,
-                    'getslidevalue': self.slider_util_keywords_object.get_slide_value,
-                    'verifyelementexists':self.slider_util_keywords_object.verify_exists,
-                    'verifyelementdisabled':self.slider_util_keywords_object.verify_disabled,
-                    'verifyelementdoesnotexists':self.slider_util_keywords_object.verify_does_not_exists,
-                    'verifyelementenabled':self.slider_util_keywords_object.verify_exists,
-                    'verifyelementtext':self.textbox_keywords_object.verify_text,
-                    'actionkey':self.action_keyowrds_object.action_key,
-                    'waitforelementexists':self.slider_util_keywords_object.waitforelement_exists,
-                    'getcount':self.spinner_keywords_object.get_count,
-                    'verifycount':self.spinner_keywords_object.verify_count,
-                    'selectvaluebyindex':self.spinner_keywords_object.select_value_by_index,
-                    'selectvaluebytext':self.spinner_keywords_object.select_value_by_text,
-                    'getmultiplevaluesbyindexes':self.spinner_keywords_object.get_multiple_values_by_indexs,
-                    'getvaluebyindex':self.spinner_keywords_object.get_value_by_index,
-                    'getallvalues':self.spinner_keywords_object.get_all_values,
-                    'verifyallvalues':self.spinner_keywords_object.verify_all_values,
-                    'getselectedvalue':self.spinner_keywords_object.get_selected_value,
-                    'verifyselectedvalue':self.spinner_keywords_object.verify_selected_value,
-                    'getlistcount':self.list_view_keywords_object.get_list_count,
-                    'verifylistcount':self.list_view_keywords_object.verify_list_count,
-                    'selectviewbyindex':self.list_view_keywords_object.select_view_by_index,
-                    'selectviewbytext':self.list_view_keywords_object.select_view_by_text,
-                    'getmultipleviewsbyindexes':self.list_view_keywords_object.get_multiple_views_by_indexs,
-                    'getviewbyindex':self.list_view_keywords_object.get_list_view_by_index,
-                    'getallviews':self.list_view_keywords_object.get_all_views,
-                    'verifyallviews':self.list_view_keywords_object.verify_all_views,
-                    'getselectedviews':self.list_view_keywords_object.get_selected_views,
-                    'verifyselectedviews':self.list_view_keywords_object.verify_selected_views,
-                    'selectmultipleviewsbyindexes':self.list_view_keywords_object.select_multiple_views_by_indexes,
-                    'selectmultipleviewsbytext':self.list_view_keywords_object.select_multiple_views_by_text,
-                    'setvalue': self.seekBar_object.Set_Mid_Value,
-                    'getvalue': self.picker_wheel_keywords_object.get_value,
-                    'getrowcount':self.table_keywords_object.get_row_count,
-                    'verifyrowcount':self.table_keywords_object.verify_row_count,
-                    'cellclick':self.table_keywords_object.cell_click,
-                    'getcellvalue':self.table_keywords_object.get_cell_value,
-                    'verifycellvalue':self.table_keywords_object.verify_cell_value,
-                    'setdate' : self.date_keywords_object.Set_Date,
-                    'getdate' : self.date_keywords_object.Get_Date,
-                    'settime' : self.time_keywords_object.Set_Time,
-                    'gettime' : self.time_keywords_object.Get_Time,
-                    'setnumber':self.number_picker_object.Select_Number,
-                    'getnumber':self.number_picker_object.Get_Selected_Number,
-                    'verifynumber':self.number_picker_object.Verify_Selected_Number,
-                    'setminvalue':self.seekBar_object.Set_Min_Value,
-                    'setmidvalue':self.seekBar_object.Set_Mid_Value,
-                    'setmaxvalue':self.seekBar_object.Set_Max_Value,
-                    'verifytime':self.time_keywords_object.verify_time,
-                    'verifydate':self.date_keywords_object.verify_date
-                }
             ELEMENT_FOUND=True
-            if keyword in list(dict.keys()):
+            if keyword in list(self.mob_dict.keys()):
 
 
 
@@ -403,16 +404,16 @@ class MobileDispatcher:
                             result=TERMINATE
                         else:
                             webelement,input=self.custom_object.custom_element(input)
-                            result=dict[keyword](webelement,input)
+                            result=self.mob_dict[keyword](webelement,input)
                     elif keyword==WAIT_FOR_ELEMENT_EXISTS:
-                        result=dict[keyword](objectname,input)
+                        result=self.mob_dict[keyword](objectname,input)
                     elif keyword == 'getnumber' or keyword == 'verifynumber':
-                        objectname = objectname+"/android.widget.EditText[1]"
-                        webelement=self.getMobileElement(driver,objectname)
-                        result=dict[keyword](webelement,input)
+                        xpath = objectname.split(';')[1]+"/android.widget.EditText[1]"
+                        #webelement, xpath=self.getMobileElement(driver,objectname)
+                        result=self.mob_dict[keyword](xpath,input)
                     else:
-                        webelement=self.getMobileElement(driver,objectname)
-                        result=dict[keyword](webelement,input)
+                        webelement, xpath=self.getMobileElement(driver,objectname)
+                        result=self.mob_dict[keyword](webelement,input,xpath)
                 if not(ELEMENT_FOUND) and self.exception_flag:
                     result=TERMINATE
             else:
@@ -445,30 +446,33 @@ class MobileDispatcher:
         objectname = str(objectname)
         mobileElement = None
         global ELEMENT_FOUND
+        xpath = None
         if objectname.strip() != '':
             if SYSTEM_OS=='Darwin':
                 objectname = objectname.replace("/AppiumAUT[1]/", "/")
                 print(objectname)
             identifiers = objectname.split(';')
+            id = identifiers[0]
+            xpath = identifiers[1]
             log.debug('Identifiers are ')
             log.debug(identifiers)
             try:
-                log.debug('trying to find mobileElement by Id')
+                log.debug('trying to find mobileElement by xpath')
                 import platform
                 if SYSTEM_OS=='Darwin':
                     mobileElement = driver.find_element_by_xpath(objectname)
                 else:
-                    mobileElement = driver.find_element_by_xpath(identifiers[1])
+                    mobileElement = driver.find_element_by_xpath(xpath)
             except Exception as Ex:
-                try:
-                    log.debug('Webelement not found by Id')
-                    log.debug('trying to find mobileElement by xpath')
-                    mobileElement = driver.find_element_by_id(identifiers[0])
-                except Exception as Ex:
-                    log.debug('Webelement not found')
-                    err_msg=str(Ex)
-    ##                    logger.print_on_console(err_msg)
-                    log.error(err_msg)
+                log.debug(str(Ex))
+                log.debug('Webelement not found by xpath')
+                if (id):
+                    try:
+                        log.debug('trying to find mobileElement by id')
+                        mobileElement = driver.find_element_by_id(id)
+                    except Exception as Ex:
+                        log.debug('Webelement not found')
+                        log.debug(str(Ex))
         if mobileElement==None:
             ELEMENT_FOUND=False
-        return mobileElement
+        return mobileElement, xpath

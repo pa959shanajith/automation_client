@@ -845,7 +845,7 @@ class Shell_Keywords():
         return nodes
 
     def singleSelectNode(self, elem, node):
-        if (elem.GetTreeType() == 2):
+        if ( elem.GetTreeType() == 2 ):  # @add - add more conditions based on tree types
             elem.SelectItem(node, elem.GetColumnNames()[0])
         else:
             elem.SelectNode(node)
@@ -1055,7 +1055,7 @@ class Shell_Keywords():
                             else:
                                 # SomeNodes with GetItemType = 2 does not work for Double Click But With SelectedNode
                                 # Selection and Double Click Both Operation so as to Select and DoubleClick in cases where Double Click Works and where selected Work
-                                elem.SelectedNode(node)
+                                elem.SelectNode(node)
                                 elem.DoubleClickNode(node)
                         status = sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
