@@ -255,7 +255,7 @@ class SliderKeywords():
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
             else:
-                log.info(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
+                log.info(ERROR_CODE_DICT['MSG_ELEMENT_NOT_EXISTS'])
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
 
@@ -279,7 +279,7 @@ class SliderKeywords():
             if timeout!=None:
                 start_time = time.time()
                 while True:
-                    element=dispatcher.getMobileElement(android_scrapping.driver,object_name)
+                    element, xpath=dispatcher.getMobileElement(android_scrapping.driver,object_name)
                     later=time.time()
                     if int(later-start_time)>=int(timeout):
                         logger.print_on_console('Delay timeout')

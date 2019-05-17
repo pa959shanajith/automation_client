@@ -56,46 +56,42 @@ class Number_Picker():
             log.error(e)
         return status,result,output,err_msg
 
-    def Get_Selected_Number(self,webelement,input,*args):
+    def Get_Selected_Number(self,xpath,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
+            webelement = android_scrapping.driver.find_element_by_xpath(xpath)
             if webelement is not None:
-                visibility=webelement.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=webelement.is_enabled()
+                if webelement.is_enabled():
                     log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
-                        output = webelement.text
-                        logger.print_on_console("Selected number: "+output)
-                        status=TEST_RESULT_PASS
-                        result=TEST_RESULT_TRUE
-                    else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                    output = webelement.text
+                    logger.print_on_console("Selected number: "+output)
+                    status=TEST_RESULT_PASS
+                    result=TEST_RESULT_TRUE
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
+                    err_msg='element is disabled'
+                    log.error(err_msg)
                     logger.print_on_console(err_msg)
+            else:
+                log.error(ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS'])
+                logger.print_on_console("Error in Get Number")
+
         except Exception as e:
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
-    def Verify_Selected_Number(self,webelement,input,*args):
+    def Verify_Selected_Number(self,xpath,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
+            webelement = android_scrapping.driver.find_element_by_xpath(xpath)
             input_val=input[0]
             if len(input_val)>0 :
-                #if type(webelement) is list:
-                #       webelement=webelement[0]
                 if webelement is not None:
                     elem_text = webelement.text
                     if webelement.is_enabled():
@@ -117,6 +113,10 @@ class Number_Picker():
                             result=TEST_RESULT_TRUE
                         else:
                             logger.print_on_console("Selected number: ;"+elem_text)
+                else:
+                    log.error(ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS'])
+                    logger.print_on_console("Error in Verify Number")
+
         except Exception as e:
                 log.error(e,exc_info=True)
                 logger.print_on_console(err_msg)
