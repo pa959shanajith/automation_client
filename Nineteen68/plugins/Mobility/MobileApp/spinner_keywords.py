@@ -407,10 +407,10 @@ class Spinner_Keywords():
                         driver=android_scrapping.driver
                         element = driver.find_element_by_xpath(args[0]+'/android.widget.TextView[1]')
                         if (element):
-                            if input==element.text
-                            logger.print_on_console("Output: "+output)
-                            status=TEST_RESULT_PASS
-                            result=TEST_RESULT_TRUE
+                            if (input==element.text):
+                                logger.print_on_console("Output: "+output)
+                                status=TEST_RESULT_PASS
+                                result=TEST_RESULT_TRUE
                         else:
                             action = TouchAction(driver)
                             action.tap(webelement).perform()
