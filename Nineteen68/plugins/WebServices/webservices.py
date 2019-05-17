@@ -644,7 +644,7 @@ class WSkeywords:
                         else:
                             output.append('null')
                             logger.print_on_console('Please provide valid Input - Invalid Header Key ='+key)
-            logger.print_on_console("Result obtained is: ",key+ "=" +output)
+            logger.print_on_console("Result obtained is: ",str(key)+ "=" +str(output))
         except Exception as e:
             log.error(e)
             err_msg=ws_constants.ERR_MSG1+'getHeader'
@@ -700,7 +700,7 @@ class WSkeywords:
                         output=response_body
                     else:
                         err_msg='Invalid input'
-            if output != "None":
+            if output != None:
                 logger.print_on_console("Result obtained is: ", output)
 
         except Exception as e:
