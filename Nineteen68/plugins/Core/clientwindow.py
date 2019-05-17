@@ -87,9 +87,10 @@ class MainNamespace(BaseNamespace):
                         logger.print_on_console(msg)
                         log.info(msg)
                     log.info('Normal Mode: Connection to the Nineteen68 Server established')
-                    conn_time= int(configvalues['connection_timeout'])
+                    conn_time= float(configvalues['connection_timeout'])
                     if (not (connection_Timer != None and connection_Timer.isAlive())
                      and ((conn_time !='') and (conn_time not in range(0,8)))):
+                        log.info("Connection Timeout timer Started")
                         connection_Timer = threading.Timer(conn_time*60*60, wxObject.closeConnection)
                         connection_Timer.start()
                 else:
@@ -557,9 +558,10 @@ class MainNamespace(BaseNamespace):
             wobj = webocular.Webocular()
             args=list(args)
             global socketIO
-            #args[0] is URL, args[1] is level, args[2] is agent
-            wobj.runCrawler(args[0],args[1],args[2],socketIO,wxObject)
+            #args[0] is URL, args[1] is level, args[2] is agent, args[3] is proxy
+            wobj.runCrawler(args[0],args[1],args[2],args[3],socketIO,wxObject)
         except Exception as e:
+            socketIO.emit('result_web_crawler_finished','{"progress" : "fail"}')
             err_msg='Error while Crawling'
             log.error(err_msg)
             logger.print_on_console(err_msg)
@@ -865,7 +867,7 @@ class TestThread(threading.Thread):
             else:
                 status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO,soc)
 
-            logger.print_on_console('Execution status',status)
+            logger.print_on_console('Execution status '+status)
 
             if status==TERMINATE:
                 logger.print_on_console('---------Termination Completed-------')
@@ -1139,13 +1141,15 @@ class ClientWindow(wx.Frame):
 
     def onChecked_Schedule(self, e):
         global connection_Timer,socketIO
-        conn_time= int(configvalues['connection_timeout'])
+        conn_time= float(configvalues['connection_timeout'])
         if ((conn_time !='') and (conn_time not in range(0,8))):
             if (connection_Timer != None and connection_Timer.isAlive()):
                 connection_Timer.cancel()
                 log.info("Timer Restarted due to change in connection mode")
-                connection_Timer = threading.Timer(conn_time*60*60, wxObject.closeConnection)
-                connection_Timer.start()
+            else:
+                log.info("Connection Timeout timer Started")
+            connection_Timer = threading.Timer(conn_time*60*60, wxObject.closeConnection)
+            connection_Timer.start()
         mode=self.schedule.GetValue()
         socketIO.emit('toggle_schedule',mode)
 
@@ -1174,7 +1178,7 @@ class ClientWindow(wx.Frame):
         controller.disconnect_flag=True
         logger.print_on_console('Disconnected from Nineteen68 server')
         if (connection_Timer != None and connection_Timer.isAlive()):
-            log.info("Timer Stopped Connection Timeout")
+            log.info("Connection Timeout timer Stopped")
             connection_Timer.cancel()
             connection_Timer=None
         stat = self.killChildWindow(True,True,True,True)
@@ -1239,7 +1243,7 @@ class ClientWindow(wx.Frame):
                 self.schedule.Disable()
                 self.connectbutton.Enable()
                 if (connection_Timer != None and connection_Timer.isAlive()):
-                    log.info("Connection Timer Stopped")
+                    log.info("Connection Timeout Timer Stopped")
                     connection_Timer.cancel()
                     connection_Timer=None
         except Exception as e:

@@ -208,7 +208,7 @@ class TextFile:
         """
         status=False
         err_msg=None
-        log.debug('Comparing content of pdf files: '+str(input_path1)+','+str(input_path2))
+        log.debug('Comparing content of text files: '+str(input_path1)+','+str(input_path2))
         try:
             content1=self.get_content(input_path1,"getfullcontent")
             content2=self.get_content(input_path2,"getfullcontent")
