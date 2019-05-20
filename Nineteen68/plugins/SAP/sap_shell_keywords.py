@@ -1010,52 +1010,52 @@ class Shell_Keywords():
                     node = self.treeTraverse(elem, input_val, column_data)
                     if ( node ):
                         isDoubleClick = int( isDoubleClick )
-                        if ( isDoubleClick ):
-                            if ( item ):  # Selection When Item is there
-                                check = False
-                                if ( item.isdigit() ):  # Item is Column Number or Item Index
-                                    # @add Code - Add Condition of selecting last item when item_no is 0
-                                    item = int(item)
-                                    if ( item > 0 ):
-                                        tree_type = elem.GetTreeType()
-                                        item_id = None
-                                        if ( tree_type == 1 ):  # List Tree
-                                            log.debug('Operation on item in list at index : ' + str(item))
-                                            item_count = elem.GetListTreeNodeItemCount(node)
-                                            item_id = item
-                                        elif ( tree_type == 2 ):  # Column Tree
-                                            columns = elem.GetColumnNames()
-                                            item_count = len(columns)
-                                            item_id = columns[item - 1]
-                                            log.debug('Operation on item at column index : ' + str(item))
-                                        check = (item <= item_count)
-                                    else:
-                                        err_msg = 'Invalid Item'
-                                        log.debug( err_msg )
-                                else:  # Item is Column Name
-                                    # To get Item ID when item is not a digit but column name
-                                    columns = elem.GetColumnNames()
-                                    column_titles = [elem.GetColumnTitleFromName(col) for col in columns]
-                                    try:
-                                        item_id = columns[column_titles.index(item)]
-                                        check = True
-                                        logger.debug( 'Operation on item with column name : ' + str(item) )
-                                    except ValueError:
-                                        err_msg = 'Column not found'
-                                        log.debug( err_msg )
-                                if ( check ):
-                                    if elem.GetItemType(node, item_id) == 5:
-                                        elem.clickLink(node, item_id)
-                                    else:
-                                        elem.DoubleClickItem(node, item_id)
-                                    elem.SelectItem(node, item_id)
+                        if ( item ):  # Selection When Item is there
+                            check = False
+                            if ( item.isdigit() ):  # Item is Column Number or Item Index
+                                # @add Code - Add Condition of selecting last item when item_no is 0
+                                item = int(item)
+                                if ( item > 0 ):
+                                    tree_type = elem.GetTreeType()
+                                    item_id = None
+                                    if ( tree_type == 1 ):  # List Tree
+                                        log.debug('Operation on item in list at index : ' + str(item))
+                                        item_count = elem.GetListTreeNodeItemCount(node)
+                                        item_id = item
+                                    elif ( tree_type == 2 ):  # Column Tree
+                                        columns = elem.GetColumnNames()
+                                        item_count = len(columns)
+                                        item_id = columns[item - 1]
+                                        log.debug('Operation on item at column index : ' + str(item))
+                                    check = (item <= item_count)
                                 else:
-                                    err_msg = 'Invalid item'
+                                    err_msg = 'Invalid Item'
                                     log.debug( err_msg )
+                            else:  # Item is Column Name
+                                # To get Item ID when item is not a digit but column name
+                                columns = elem.GetColumnNames()
+                                column_titles = [elem.GetColumnTitleFromName(col) for col in columns]
+                                try:
+                                    item_id = columns[column_titles.index(item)]
+                                    check = True
+                                    logger.debug( 'Operation on item with column name : ' + str(item) )
+                                except ValueError:
+                                    err_msg = 'Column not found'
+                                    log.debug( err_msg )
+                            if ( check ):
+                                if elem.GetItemType(node, item_id) == 5:
+                                    elem.clickLink(node, item_id)
+                                else:
+                                    elem.DoubleClickItem(node, item_id)
+                                elem.SelectItem(node, item_id)
                             else:
-                                # SomeNodes with GetItemType = 2 does not work for Double Click But With SelectedNode
-                                # Selection and Double Click Both Operation so as to Select and DoubleClick in cases where Double Click Works and where selected Work
-                                elem.SelectNode(node)
+                                err_msg = 'Invalid item'
+                                log.debug( err_msg )
+                        else:
+                            # SomeNodes with GetItemType = 2 does not work for Double Click But With SelectedNode
+                            # Selection and Double Click Both Operation so as to Select and DoubleClick in cases where Double Click Works and where selected Work
+                            elem.SelectNode(node)
+                            if ( isDoubleClick ):
                                 elem.DoubleClickNode(node)
                         status = sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
