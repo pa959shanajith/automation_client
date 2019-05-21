@@ -14,6 +14,7 @@ from mobile_app_constants import *
 import android_scrapping
 import logging
 import logger
+import readconfig
 
 log = logging.getLogger('Number_picker_keywords.py')
 
@@ -36,7 +37,9 @@ class Number_Picker():
                         try:
                             #input_date=int(input_date)
                             webelement.set_text(input_date)
-                            if android_scrapping.driver.is_keyboard_shown():
+                            configvalues = readconfig.configvalues
+                            hide_soft_key = configvalues['hide_soft_key']
+                            if android_scrapping.driver.is_keyboard_shown() and hide_soft_key == "Yes":
                                 android_scrapping.driver.hide_keyboard()
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE

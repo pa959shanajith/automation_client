@@ -17,6 +17,7 @@ import android_scrapping
 import logging
 import logger
 import time
+import readconfig
 
 
 log = logging.getLogger('Timepicker_Keywords_Mobility.py')
@@ -159,7 +160,9 @@ class Time_Keywords():
         except Exception as e:
             log.error(e)
         try:
-            if driver.is_keyboard_shown():
+            configvalues = readconfig.configvalues
+            hide_soft_key = configvalues['hide_soft_key']
+            if driver.is_keyboard_shown() and hide_soft_key == "Yes":
                 driver.hide_keyboard()
         except Exception as e:
             log.error(e)

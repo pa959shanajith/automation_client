@@ -18,6 +18,7 @@ import android_scrapping
 from appium.webdriver.common.touch_action import TouchAction
 import time
 import action_keyowrds_app
+import readconfig
 log = logging.getLogger('textbox_keywords_mobility.py')
 
 class Textbox_keywords():
@@ -48,7 +49,9 @@ class Textbox_keywords():
                             log.debug('clearing  the existing text')
                             element.clear()
                         element.set_text(text)
-                        if android_scrapping.driver.is_keyboard_shown():
+                        configvalues = readconfig.configvalues
+                        hide_soft_key = configvalues['hide_soft_key']
+                        if android_scrapping.driver.is_keyboard_shown() and hide_soft_key == "Yes":
                             android_scrapping.driver.hide_keyboard()
                         time.sleep(1)
                         status=TEST_RESULT_PASS
@@ -142,7 +145,9 @@ class Textbox_keywords():
 ##                            if user_input is not None:
 ##                                input_val=user_input
                         webelement.set_text(input_val)
-                        if android_scrapping.driver.is_keyboard_shown():
+                        configvalues = readconfig.configvalues
+                        hide_soft_key = configvalues['hide_soft_key']
+                        if android_scrapping.driver.is_keyboard_shown() and hide_soft_key == "Yes":
                             android_scrapping.driver.hide_keyboard()
                         time.sleep(3)
                         status=TEST_RESULT_PASS
@@ -186,7 +191,9 @@ class Textbox_keywords():
                         text1.append(text)
                         obj = action_keyowrds_app.Action_Key_App()
                         status,methodoutput,output,err_msg = obj.action_key(element,text1)
-                        if android_scrapping.driver.is_keyboard_shown():
+                        configvalues = readconfig.configvalues
+                        hide_soft_key = configvalues['hide_soft_key']
+                        if android_scrapping.driver.is_keyboard_shown() and hide_soft_key == "Yes":
                             android_scrapping.driver.hide_keyboard()
                         time.sleep(1)
                         status=TEST_RESULT_PASS
