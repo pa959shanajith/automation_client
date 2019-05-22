@@ -223,8 +223,6 @@ class TextFile:
             err_msg=generic_constants.ERR_MSG1+'Comparing Text content'+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
-        if err_msg!=None:
-            logger.print_on_console(err_msg)
         return status,err_msg
 
 
