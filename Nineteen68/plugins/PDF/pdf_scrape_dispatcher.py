@@ -9,20 +9,15 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-
-##import utils
 import logger
 import logging
-##import oebs_constants
 import wx
 import os
 import base64
 import json
 import time
 from constants import *
-from socketIO_client import SocketIO,BaseNamespace
 import core_utils
-##import pdf
 pdfV = None
 log = logging.getLogger('pdf_scrape_dispatcher.py')
 windownametoscrape = ''
@@ -30,7 +25,7 @@ windownametoscrape = ''
 class ScrapeDispatcher(wx.Frame):
     def __init__(self, parent,id, title,filePath,socketIO,irisFlag):
         try:
-            wx.Frame.__init__(self, parent, title=title,pos=(300, 150),  size=(200, 150) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
+            wx.Frame.__init__(self, parent, title=title,pos=(300, 150),  size=(210, 150) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
             self.SetBackgroundColour('#e6e7e8')
             self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
@@ -68,8 +63,8 @@ class ScrapeDispatcher(wx.Frame):
 
     def clickandadd(self,event):
         state = event.GetEventObject().GetValue()
-        import pdf
-        from pdf import PDFViewer
+        import pdf_main
+        from pdf_main import PDFViewer
 
         if state == True:
             try:

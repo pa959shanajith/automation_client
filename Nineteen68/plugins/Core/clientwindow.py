@@ -1509,6 +1509,7 @@ class Config_window(wx.Frame):
             "Brow_ch":[(115,368)],
             "High_ch":[ (225,368)],
             "Iris_prediction":[(12,428)],
+            "hide_soft_key":[(180,428)],
             "Save":[(100,518), (100, 28)],
             "Close":[(250,518), (100, 28)]
         }
@@ -1539,6 +1540,7 @@ class Config_window(wx.Frame):
             "Save":[(135,458),(100, 28)],
             "C_Timeout" :[(12,218),(120, 28),(180,218), (80,-1)],
             "Iris_prediction":[(12,398)],
+            "hide_soft_key":[(180,398)],
             "Close":[(285,458),(100, 28)]
         }
         wx.Frame.__init__(self, parent, title=title,
@@ -1721,6 +1723,14 @@ class Config_window(wx.Frame):
             self.rbox11.SetSelection(0)
         else:
             self.rbox11.SetSelection(1)
+        
+        self.rbox12 = wx.RadioBox(self.panel, label = "Hide Soft. Keyboard", pos = config_fields["hide_soft_key"][0], choices = lblList,
+         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson != False and isConfigJson['hide_soft_key'].title() == lblList[0]:
+            self.rbox12.SetSelection(0)
+        else:
+            self.rbox12.SetSelection(1)
+        
 
         self.error_msg=wx.StaticText(self.panel, label="", pos=(85,488),size=(350, 28), style=0, name="")
         self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])
@@ -1769,6 +1779,7 @@ class Config_window(wx.Frame):
         disable_server_cert=self.rbox9.GetStringSelection()
         highlight_check=self.rbox10.GetStringSelection()
         iris_prediction = self.rbox11.GetStringSelection()
+        hide_soft_key = self.rbox12.GetStringSelection()
         conn_timeout = self.conn_timeout.GetValue()
         #----------------creating data dictionary
         data['server_ip'] = server_add.strip()
@@ -1793,6 +1804,7 @@ class Config_window(wx.Frame):
         data['disable_server_cert'] = disable_server_cert.strip()
         data['highlight_check'] = highlight_check.strip()
         data['prediction_for_iris_objects'] = iris_prediction.strip()
+        data['hide_soft_key'] = hide_soft_key.strip()
         data['connection_timeout']= conn_timeout.strip()
         config_data=data
         if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='' and data['firefox_path']!='' and  data['connection_timeout']>='':

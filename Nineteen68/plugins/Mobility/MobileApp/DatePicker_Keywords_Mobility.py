@@ -16,6 +16,9 @@ import android_scrapping
 import logging
 import logger
 import time
+import readconfig
+import os
+import subprocess
 
 
 log = logging.getLogger('DatePicker_Keywords_Mobility.py')
@@ -33,6 +36,7 @@ class Date_Keywords():
         Tflag1=False
         Tflag2=False
         obj=[]
+        driver=android_scrapping.driver
         input_date=input[0].split('/')
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         years=[]
@@ -45,9 +49,10 @@ class Date_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=android_scrapping.driver
                         action = TouchAction(driver)
                         Date_picker=driver.find_elements_by_class_name('android.widget.DatePicker')
+                        date_inputs = driver.find_elements_by_id('android:id/numberpicker_input')
+                        count1 = len(date_inputs)
                         ViewGroup = driver.find_elements_by_class_name('android.view.ViewGroup')
                         countV = len(ViewGroup)
                         count = len(Date_picker)
@@ -132,6 +137,37 @@ class Date_Keywords():
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
 
+                        elif count1 == 3:
+                            if (input_date[0] and input_date[1] and input_date[2]):
+                                android_home = os.environ['ANDROID_HOME']
+                                cmd = android_home + '\\platform-tools\\'
+                                os.chdir(cmd)
+                                cmd = cmd + 'adb.exe'
+                                cmds = [
+                                    cmd+' shell input keyevent 61',
+                                    cmd+' shell input text '+input_date[0],
+                                    cmd+' shell input keyevent 61',
+                                    cmd+' shell input keyevent 61',
+                                    cmd+' shell input text '+input_date[1],
+                                    cmd+' shell input keyevent 61',
+                                    cmd+' shell input keyevent 61',
+                                    cmd+' shell input text '+input_date[2],
+                                    cmd+' shell input keyevent 66'
+                                ]
+                                for i in cmds:
+                                    op = subprocess.check_output(i)
+                                if (((date_inputs[0].text).lower() == input_date[0].lower()) and (date_inputs[1].text == input_date[1]) and (date_inputs[2].text == input_date[2])):
+                                    status=TEST_RESULT_PASS
+                                    result=TEST_RESULT_TRUE
+                                else:
+                                    err_msg='Error in setting the provided date'
+                                    log.error(err_msg)
+                                    logger.print_on_console(err_msg)
+                            else:
+                                err_msg='Invalid input'
+                                log.error(err_msg)
+                                logger.print_on_console(err_msg)
+
                         elif count == 1 :
                             if int(input_date[1])>0 or int(input_date[2])>0 :
                                 element=driver.find_elements_by_class_name('android.widget.EditText')
@@ -205,7 +241,9 @@ class Date_Keywords():
         except Exception as e:
             log.error(e)
         try:
-            if driver.is_keyboard_shown():
+            configvalues = readconfig.configvalues
+            hide_soft_key = configvalues['hide_soft_key']
+            if driver.is_keyboard_shown() and hide_soft_key == "Yes":
                 driver.hide_keyboard()
         except Exception as e:
             log.error(e)
@@ -234,6 +272,8 @@ class Date_Keywords():
                         driver=android_scrapping.driver
                         Date_picker=driver.find_elements_by_class_name('android.widget.DatePicker')
                         count= len(Date_picker)
+                        date_inputs = driver.find_elements_by_id('android:id/numberpicker_input')
+                        count1 = len(date_inputs)
                         ViewGroup = driver.find_elements_by_class_name('android.view.ViewGroup')
                         countV = len(ViewGroup)
                         if countV == 1:
@@ -245,6 +285,14 @@ class Date_Keywords():
                             logger.print_on_console("Date: "+output)
                             status = TEST_RESULT_PASS
                             methodoutput = TEST_RESULT_TRUE
+                        elif count1 == 3:
+                            Month=date_inputs[0].text
+                            Date=date_inputs[1].text
+                            Year=date_inputs[2].text
+                            output=Month+'/'+Date+'/'+Year
+                            logger.print_on_console("Date: "+output)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                         elif count == 1 :
                             element=driver.find_elements_by_class_name('android.widget.EditText')
                             Month=element[0].text
@@ -273,29 +321,30 @@ class Date_Keywords():
 
 
     def verify_date(self,webelement,input,*args):
-        status,result,output,err_msg = self.Get_Date(webelement,None)
+        err_msg=None
+        status=TEST_RESULT_FAIL
+        result=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        flag = True
+        driver=android_scrapping.driver
         try:
             input_date = input[0].split('/')
-            output_date = output.split('/')
+            date_inputs = driver.find_elements_by_id('android:id/numberpicker_input')
             if len(input_date) == 3:
                 for i in range(3):
-                    if input_date[i] != output_date[i]:
-                        output=OUTPUT_CONSTANT
-                        status=TEST_RESULT_FAIL
-                        result=TEST_RESULT_FALSE
+                    if (input_date[i] != date_inputs[i].text):
+                        flag = False
                         err_msg = 'Verifying date Failed'
+                        log.error(err_msg)
+                        logger.print_on_console(err_msg)
                         break
-                if output != OUTPUT_CONSTANT:
-                    output=OUTPUT_CONSTANT
+                if (flag == True):
                     status=TEST_RESULT_PASS
                     result=TEST_RESULT_TRUE
-                    err_msg=None
             else:
-                output=OUTPUT_CONSTANT
-                status=TEST_RESULT_FAIL
-                result=TEST_RESULT_FALSE
-                err_msg = 'Invalid input'
+                err_msg = 'Invalid input/object'
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
-            logger.print_on_console(err_msg)
-            log.error(e,exc_info = True)
+            log.error(e)
         return status,result,output,err_msg

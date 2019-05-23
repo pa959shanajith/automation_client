@@ -300,26 +300,31 @@ class BuildJson:
             text=''
             # print SYSTEM_OS
             if label[i] != '':
-                if class_name[i] in object_type:
-                    text=label[i]+'_'+object_type[class_name[i]]
-                else:
-                    text=label[i]+'_'+class_name[i]
+                text=label[i]
             elif content_desc[i]  != '':
-                if class_name[i] in object_type:
-                    text=content_desc[i]+'_'+object_type[class_name[i]]
-                else:
-                    text=content_desc[i]+'_'+class_name[i]
+                text=content_desc[i]
             if text=='' or text==None:
-                if class_name[i] in object_type:
-                    text='NONAME_'+object_type[class_name[i]]
+                text='NONAME'
+
+            if class_name[i] in object_type:
+                text1 = text + '_' + object_type[class_name[i]]
+                if text1 not in custnamelist:
+                    text = text1
+                    custnamelist.append(text)
                 else:
-                    text='NONAME_'+class_name[i]
-            if text not in custnamelist:
-                custnamelist.append(text)
+                    text=text+str(counter) + '_' + object_type[class_name[i]]
+                    custnamelist.append(text)
+                    counter=counter+1
             else:
-                text=text+str(counter)
-                custnamelist.append(text)
-                counter=counter+1
+                text1 = text + '_' + class_name[i]
+                if text1 not in custnamelist:
+                    text = text1
+                    custnamelist.append(text)
+                else:
+                    text=text+str(counter) + '_' + class_name[i]
+                    custnamelist.append(text)
+                    counter=counter+1
+
             if SYSTEM_OS!='Darwin':
                 xpath = resource_id[i] + ';' + XpathList[i]
                 ele_bounds=re.findall('\d+',rectangle[i])
