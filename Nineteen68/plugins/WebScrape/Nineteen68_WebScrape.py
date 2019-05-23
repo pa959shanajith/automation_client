@@ -93,7 +93,10 @@ class ScrapeWindow(wx.Frame):
                         self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
 
                 elif(self.action == 'compare'):
-                    browserops.driver.get(data['scrapedurl'])
+                    try:
+                        browserops.driver.get(data['scrapedurl'])
+                    except:
+                        log.error("scrapedurl is Empty")
                     self.comparebutton = wx.ToggleButton(self.panel, label="Start Compare",pos=(12,38 ), size=(175, 28))
                     self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)
                 self.Centre()

@@ -54,6 +54,8 @@ class Object_Mapper():
                     log.info('Got the window which has the focus')
                     self.currenthandle = eachdriverhand
             log.info("Comparing %d objects",len(elementsdata['view']))
+            if  not "scrapedurl" in elementsdata.keys():
+                raise Exception("Invalid url, Unable to navigate to the website")
             count = 0
             for element in elementsdata['view']:
                 # XPath and URL decryption logic implemented
