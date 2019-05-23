@@ -51,9 +51,8 @@ class Textbox_keywords():
                         element.set_text(text)
                         configvalues = readconfig.configvalues
                         hide_soft_key = configvalues['hide_soft_key']
-                        if android_scrapping.driver.is_keyboard_shown() and hide_soft_key == "Yes":
+                        if android_scrapping.driver.is_keyboard_shown() and (hide_soft_key == "Yes"):
                             android_scrapping.driver.hide_keyboard()
-                        time.sleep(1)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
@@ -147,9 +146,8 @@ class Textbox_keywords():
                         webelement.set_text(input_val)
                         configvalues = readconfig.configvalues
                         hide_soft_key = configvalues['hide_soft_key']
-                        if android_scrapping.driver.is_keyboard_shown() and hide_soft_key == "Yes":
+                        if android_scrapping.driver.is_keyboard_shown() and (hide_soft_key == "Yes"):
                             android_scrapping.driver.hide_keyboard()
-                        time.sleep(3)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
 
@@ -193,9 +191,8 @@ class Textbox_keywords():
                         status,methodoutput,output,err_msg = obj.action_key(element,text1)
                         configvalues = readconfig.configvalues
                         hide_soft_key = configvalues['hide_soft_key']
-                        if android_scrapping.driver.is_keyboard_shown() and hide_soft_key == "Yes":
+                        if android_scrapping.driver.is_keyboard_shown() and (hide_soft_key == "Yes"):
                             android_scrapping.driver.hide_keyboard()
-                        time.sleep(1)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
