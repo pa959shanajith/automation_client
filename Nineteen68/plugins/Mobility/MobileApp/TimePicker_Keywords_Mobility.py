@@ -109,8 +109,11 @@ class Time_Keywords():
                                     cmd+' shell input text '+input_time[1],
                                     cmd+' shell input keyevent 61',
                                     cmd+' shell input keyevent 61',
-                                    cmd+' shell input keyevent '+('20' if (input_time[2]=='PM') else '19')
+                                    cmd+' shell input keyevent '+('20' if (input_time[2].lower()=='pm') else '19'),
+                                    cmd+' shell input keyevent 66',
+                                    cmd+' shell input keyevent 61'
                                 ]
+                                logger.print_on_console("Do not change the focus area by tapping somewhere, it may cause the step to fail.")
                                 for i in cmds:
                                     op = subprocess.check_output(i)
                                 if ((time_inputs[0].text == input_time[0]) and (time_inputs[1].text == input_time[1]) and (time_inputs[2].text == input_time[2])):

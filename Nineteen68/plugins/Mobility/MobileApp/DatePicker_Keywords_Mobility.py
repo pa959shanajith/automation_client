@@ -152,8 +152,10 @@ class Date_Keywords():
                                     cmd+' shell input keyevent 61',
                                     cmd+' shell input keyevent 61',
                                     cmd+' shell input text '+input_date[2],
-                                    cmd+' shell input keyevent 66'
+                                    cmd+' shell input keyevent 66',
+                                    cmd+' shell input keyevent 61'
                                 ]
+                                logger.print_on_console("Do not change the focus area by tapping somewhere, it may cause the step to fail.")
                                 for i in cmds:
                                     op = subprocess.check_output(i)
                                 if (((date_inputs[0].text).lower() == input_date[0].lower()) and (date_inputs[1].text == input_date[1]) and (date_inputs[2].text == input_date[2])):

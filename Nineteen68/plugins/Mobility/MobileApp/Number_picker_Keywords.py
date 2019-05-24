@@ -15,6 +15,8 @@ import android_scrapping
 import logging
 import logger
 import readconfig
+import os
+import subprocess
 
 log = logging.getLogger('Number_picker_keywords.py')
 
@@ -36,6 +38,11 @@ class Number_Picker():
                         log.debug('performing the action')
                         try:
                             webelement.set_text(input_val)
+                            android_home = os.environ['ANDROID_HOME']
+                            cmd = android_home + '\\platform-tools\\'
+                            os.chdir(cmd)
+                            cmd = cmd + 'adb.exe shell input keyevent 61'
+                            op = subprocess.check_output(cmd)
                             configvalues = readconfig.configvalues
                             hide_soft_key = configvalues['hide_soft_key']
                             if android_scrapping.driver.is_keyboard_shown() and hide_soft_key == "Yes":
