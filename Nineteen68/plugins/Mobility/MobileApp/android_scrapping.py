@@ -275,26 +275,26 @@ class BuildJson:
         custnamelist=[]
         global counter
         object_type = {
-            'android.widget.TimePicker' : 'timepicker',
-            'android.widget.DatePicker' : 'datepicker',
-            'android.widget.RadioButton' : 'radiobutton',
-            'android.widget.Button' : 'button',
-            'android.widget.EditText' : 'edittext',
-            'android.widget.Switch' : 'switch',
-            'android.widget.CheckBox' : 'checkbox',
-            'android.widget.Spinner' : 'spinner',
-            'android.widget.NumberPicker' : 'numberpicker',
-            'android.widget.SeekBar' : 'seekbar',
-            'android.widget.ListView' : 'listview',
-            'android.widget.ImageButton' : 'imagebutton',
-            'android.widget.LinearLayout' : 'linearlayout',
-            'android.widget.TextView' : 'textview',
-            'android.widget.FrameLayout' : 'framelayout',
-            'android.widget.ImageView' : 'imageview',
-            'android.widget.RelativeLayout' : 'relativelayout',
-            'android.widget.ScrollView' : 'scrollview',
-            'android.view.View' : 'view',
-            'android.view.ViewGroup' : 'viewgroup'
+            'android.widget.TimePicker' : '_timepicker',
+            'android.widget.DatePicker' : '_datepicker',
+            'android.widget.RadioButton' : '_radiobtn',
+            'android.widget.Button' : '_btn',
+            'android.widget.EditText' : '_txtbox',
+            'android.widget.Switch' : '_switch',
+            'android.widget.CheckBox' : '_chkbox',
+            'android.widget.Spinner' : '_spinner',
+            'android.widget.NumberPicker' : '_numberpicker',
+            'android.widget.SeekBar' : '_seekbar',
+            'android.widget.ListView' : '_listview',
+            'android.widget.ImageButton' : '_imagebtn',
+            'android.widget.LinearLayout' : '_linearlayout',
+            'android.widget.TextView' : '_txtview',
+            'android.widget.FrameLayout' : '_framelayout',
+            'android.widget.ImageView' : '_img',
+            'android.widget.RelativeLayout' : '_relativelayout',
+            'android.widget.ScrollView' : '_scrollview',
+            'android.view.View' : '_view',
+            'android.view.ViewGroup' : '_viewgroup'
         }
         for i in range(len(XpathList)):
             text=''
@@ -307,21 +307,21 @@ class BuildJson:
                 text='NONAME'
 
             if class_name[i] in object_type:
-                text1 = text + '_' + object_type[class_name[i]]
+                text1 = text + object_type[class_name[i]]
                 if text1 not in custnamelist:
                     text = text1
                     custnamelist.append(text)
                 else:
-                    text=text+str(counter) + '_' + object_type[class_name[i]]
+                    text=text+str(counter) + object_type[class_name[i]]
                     custnamelist.append(text)
                     counter=counter+1
             else:
-                text1 = text + '_' + class_name[i]
+                text1 = text + '_elmnt'
                 if text1 not in custnamelist:
                     text = text1
                     custnamelist.append(text)
                 else:
-                    text=text+str(counter) + '_' + class_name[i]
+                    text=text+str(counter) + '_elmnt'
                     custnamelist.append(text)
                     counter=counter+1
 

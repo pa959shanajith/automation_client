@@ -27,36 +27,35 @@ class custom():
             logger.print_on_console("Incorrect input!!")
             return False
         if len(input) >= 3 and input[0] != "" and isinstance(input[2], int) and isinstance(input[1], str):
-            class_name = input[0]
+            class_name = input[0].lower()
             custom_dict = {
-                'button': ["getbuttonname", "longpress", "press", "verifybuttonname", "verifydisabled", "verifyenabled", "verifyexists",
-                           "verifyhidden", "verifyvisible", "waitforelementexists"],
-                'element': ["getelementtext", "longpresselement", "presselement", "verifyelementdisabled", "verifyelementdoesnotexists",
-                            "verifyelementenabled", "verifyelementexists", "verifyvisible", "verifyelementtext",
+                'button': ["getbuttonname", "longpress", "press", "verifybuttonname", "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
+                'element': ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
                             "verifyhidden", "waitforelementexists"],
                 'textbox': ["cleartext", "gettext", "longpress", "press", "sendvalue", "setsecuretext", "settext",
-                             "verifydisabled", "verifyenabled", "verifyexists", "verifyhidden", "verifytext",
+                             "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifytext",
                              "verifyvisible", "waitforelementexists"],
-                'timepicker': ["gettime", "settime", "verifydisabled", "verifyenabled", "verifyexists", "VerifyHidden", "verifytime", "verifyvisible", "waitforelementexists"],
-                'datepicker': ["getdate", "setdate", "verifydate", "verifydisabled", "verifyenabled", "verifyexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
-                'radio': ["getstatus", "selectradiobutton", "verifydisabled", "verifyenabled", "verifyexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
-                'switch': ["getstatus", "toggleoff", "toggleon", "verifydisabled", "verifyenabled", "verifyexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
-                'checkbox': ["getstatus", "selectcheckbox", "unselectcheckbox", "verifydisabled", "verifyenabled", "verifyexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
+                'timepicker': ["gettime", "settime", "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifytime", "verifyvisible", "waitforelementexists"],
+                'datepicker': ["getdate", "setdate", "verifydate", "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
+                'radio': ["getstatus", "selectradiobutton", "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
+                'switch': ["getstatus", "toggleoff", "toggleon", "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
+                'checkbox': ["getstatus", "selectcheckbox", "unselectcheckbox", "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
                 'spinner': ["getallvalues", "getcount", "getmultiplevaluesbyindexes", "getselectedvalue", "getvaluebyindex", "selectvaluebyindex", "selectvaluebytext", "verifyallvalues", "verifycount",
-                            "verifydisabled", "verifyenabled", "verifyexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
-                'numberpicker': ["setnumber", "getnumber", "verifynumber", "verifydisabled", "verifyenabled", "verifyexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
-                'seekbar': ["setvalue", "setmaxvalue", "setmidvalue", "setminvalue", "verifydisabled", "verifyenabled", "verifyexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
-                'listview':["getelementtext", "longpresselement", "presselement", "verifyelementdisabled", "verifyelementdoesnotexists",
-                            "verifyelementenabled", "verifyelementexists", "verifyvisible", "verifyelementtext",
+                            "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
+                'numberpicker': ["setnumber", "getnumber", "verifynumber", "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
+                'seekbar': ["setvalue", "setmaxvalue", "setmidvalue", "setminvalue", "verifydisabled", "verifyenabled", "verifyexists", "verifyhidden", "verifyvisible", "verifydoesnotexists", "waitforelementexists"],
+                'listview':["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
                             "verifyhidden", "waitforelementexists"],
-                'text': ["getelementtext", "longpresselement", "presselement", "verifyelementdisabled", "verifyelementdoesnotexists",
-                        "verifyelementenabled", "verifyelementexists", "verifyvisible", "verifyelementtext",
+                'text': ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
+                        "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
                         "verifyhidden", "waitforelementexists"],
-                'image': ["getelementtext", "longpresselement", "presselement", "verifyelementdisabled", "verifyelementdoesnotexists",
-                        "verifyelementenabled", "verifyelementexists", "verifyvisible", "verifyelementtext",
+                'image': ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
+                        "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
                         "verifyhidden", "waitforelementexists"],
-                'layout': ["getelementtext", "longpresselement", "presselement", "verifyelementdisabled", "verifyelementdoesnotexists",
-                            "verifyelementenabled", "verifyelementexists", "verifyvisible", "verifyelementtext",
+                'layout': ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
                             "verifyhidden", "waitforelementexists"]
             }
             try:
@@ -75,7 +74,7 @@ class custom():
     def custom_element(self,input):
         element = None
         driver_flag = False
-        object_name = input[0]
+        object_name = input[0].lower()
         visible_text = input[1]
         logger.print_on_console(input)
         driver = android_scrapping.driver
