@@ -853,7 +853,7 @@ class UtilWebKeywords:
     def image_similarity_percentage(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
@@ -911,7 +911,7 @@ class UtilWebKeywords:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
