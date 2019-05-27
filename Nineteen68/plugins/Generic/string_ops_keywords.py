@@ -250,7 +250,7 @@ class StringOperation:
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         try:
             if input is not None :
                 output = len(input)
