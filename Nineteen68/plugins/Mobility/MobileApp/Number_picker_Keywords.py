@@ -15,6 +15,8 @@ import android_scrapping
 import logging
 import logger
 import readconfig
+import os
+import subprocess
 
 log = logging.getLogger('Number_picker_keywords.py')
 
@@ -24,7 +26,7 @@ class Number_Picker():
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        input_date=str(input[0])
+        input_val=input[0]
         try:
             if webelement is not None:
                 visibility=webelement.is_displayed()
@@ -35,14 +37,22 @@ class Number_Picker():
                     if enable:
                         log.debug('performing the action')
                         try:
-                            #input_date=int(input_date)
-                            webelement.set_text(input_date)
+                            webelement.set_text(input_val)
+                            android_home = os.environ['ANDROID_HOME']
+                            cmd = android_home + '\\platform-tools\\'
+                            os.chdir(cmd)
+                            cmd = cmd + 'adb.exe shell input keyevent 61'
+                            op = subprocess.check_output(cmd)
                             configvalues = readconfig.configvalues
                             hide_soft_key = configvalues['hide_soft_key']
                             if android_scrapping.driver.is_keyboard_shown() and hide_soft_key == "Yes":
                                 android_scrapping.driver.hide_keyboard()
-                            status=TEST_RESULT_PASS
-                            result=TEST_RESULT_TRUE
+                            if (webelement.text == input_val):
+                                status=TEST_RESULT_PASS
+                                result=TEST_RESULT_TRUE
+                            else:
+                                log.error("Failed to set the correct value")
+                                logger.print_on_console("Failed to set the correct value")
                         except Exception as e:
                             err_msg='Invalid input'
                             log.error(e,exc_info=True)
