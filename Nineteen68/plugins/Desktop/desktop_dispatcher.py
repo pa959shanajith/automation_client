@@ -262,6 +262,15 @@ class DesktopDispatcher:
                 result[3]=err_msg
             configvalues = readconfig.configvalues
             screen_shot_obj = screenshot_keywords.Screenshot()
+            #------------------------------------------return null for get-keywords if keyword fails
+            if ( keyword in desktop_constants.GET_KEYWORDS and result[0] == desktop_constants.TEST_RESULT_FAIL and result[1] == desktop_constants.TEST_RESULT_FALSE ):
+                try:
+                    lst = list(result)
+                    lst[2] = 'null'
+                    result = tuple(lst)
+                except:
+                    pass
+            #------------------------------------------------------------------------------------------
             if self.action == constants.EXECUTE:
                 if result !=constants.TERMINATE:
                     result=list(result)

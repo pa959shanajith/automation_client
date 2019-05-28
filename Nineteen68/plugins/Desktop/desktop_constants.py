@@ -86,3 +86,5 @@ ELEMENT_FOUND=True
 ERROR_MSG = 'Error occured'
 
 APPLICATION_KEYWORDS = ['launchapplication','findwindowandattach','closeapplication','switchtofolder','getemail','getfrommailid','getattachmentstatus','getsubject','gettomailid','getbody','verifyemail']
+
+GET_KEYWORDS = ['getbuttonname','gettext','getelementtext','getpagetitle','getselected','getcount','getvaluebyindex','getmultiplevaluesbyindexes','getstatus','getselectedtab','getnodenamebyindex','getcellvalue','getcolcount','getcolnumbytext','getrowcount','getrownumbytext']
