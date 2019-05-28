@@ -266,7 +266,7 @@ class DesktopDispatcher:
             if ( keyword in desktop_constants.GET_KEYWORDS and result[0] == desktop_constants.TEST_RESULT_FAIL and result[1] == desktop_constants.TEST_RESULT_FALSE ):
                 try:
                     lst = list(result)
-                    lst[2] = 'null'
+                    lst[2] = None
                     result = tuple(lst)
                 except:
                     pass
