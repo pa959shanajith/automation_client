@@ -119,3 +119,5 @@ ICON_BITMAP = {'S_OKAY':'CHECKED',
              'STA_OK':'STATUS_OK',
              'STABST':'STATUS_BEST',
              'B_SPCE':'SPACE'}
+
+GET_KEYWORDS = ['gettext','gettextboxlength','getstatus','getbuttonname','getselected','getcount','getelementtext','gettooltiptext','geticonname','getinputhelp','getrowcount','getcolumncount','getcolnumbytext','getrownumbytext','getcellvalue','getcellstatus','getcountofrows','getcountofcolumns','getcelltext','getrowcolbytext','getcellcolor','gettreenodetext','gettreenodecount','getcolvaluecorrtoselectednode','getnodenamebyindex']
