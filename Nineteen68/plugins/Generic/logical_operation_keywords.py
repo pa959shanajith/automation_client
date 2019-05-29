@@ -24,7 +24,7 @@ class logical_eval():
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
-        output_res=OUTPUT_CONSTANT
+        output_res=None
         log.debug('reading the inputs')
         if len(expression==2):
             expression=expression[0]+expression[1]+expression[2]
