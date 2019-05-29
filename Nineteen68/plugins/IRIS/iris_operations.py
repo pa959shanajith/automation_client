@@ -288,6 +288,7 @@ def update_dataset(image_data):
     except Exception as e:
         log.error(e)
         return False
+    return True
 
 class IRISKeywords():
     def clickiris(self,element,*args):
