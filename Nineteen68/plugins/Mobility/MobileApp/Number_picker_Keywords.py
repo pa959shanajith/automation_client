@@ -39,20 +39,23 @@ class Number_Picker():
                         try:
                             webelement.set_text(input_val)
                             android_home = os.environ['ANDROID_HOME']
-                            cmd = android_home + '\\platform-tools\\'
-                            os.chdir(cmd)
-                            cmd = cmd + 'adb.exe shell input keyevent 61'
-                            op = subprocess.check_output(cmd)
-                            configvalues = readconfig.configvalues
-                            hide_soft_key = configvalues['hide_soft_key']
-                            if android_scrapping.driver.is_keyboard_shown() and hide_soft_key == "Yes":
-                                android_scrapping.driver.hide_keyboard()
-                            if (webelement.text == input_val):
-                                status=TEST_RESULT_PASS
-                                result=TEST_RESULT_TRUE
+                            if android_home is not None:
+                                cmd = android_home + '\\platform-tools\\'
+                                os.chdir(cmd)
+                                cmd = cmd + 'adb.exe shell input keyevent 61'
+                                op = subprocess.check_output(cmd)
+                                configvalues = readconfig.configvalues
+                                hide_soft_key = configvalues['hide_soft_key']
+                                if android_scrapping.driver.is_keyboard_shown() and hide_soft_key == "Yes":
+                                    android_scrapping.driver.hide_keyboard()
+                                if (webelement.text == input_val):
+                                    status=TEST_RESULT_PASS
+                                    result=TEST_RESULT_TRUE
+                                else:
+                                    log.error("Failed to set the correct value")
+                                    logger.print_on_console("Failed to set the correct value")
                             else:
-                                log.error("Failed to set the correct value")
-                                logger.print_on_console("Failed to set the correct value")
+                                logger.print_on_console('ANDROID_HOME not set in system path')
                         except Exception as e:
                             err_msg='Invalid input'
                             log.error(e,exc_info=True)
@@ -72,7 +75,7 @@ class Number_Picker():
     def Get_Selected_Number(self,xpath,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg=None
         try:
             webelement = android_scrapping.driver.find_element_by_xpath(xpath)

@@ -98,31 +98,34 @@ class Time_Keywords():
                         elif (count1 == 3):
                             if (input_time[0] and input_time[1] and input_time[2]):
                                 android_home = os.environ['ANDROID_HOME']
-                                cmd = android_home + '\\platform-tools\\'
-                                os.chdir(cmd)
-                                cmd = cmd + 'adb.exe'
-                                cmds = [
-                                    cmd+' shell input keyevent 61',
-                                    cmd+' shell input text '+input_time[0],
-                                    cmd+' shell input keyevent 61',
-                                    cmd+' shell input keyevent 61',
-                                    cmd+' shell input text '+input_time[1],
-                                    cmd+' shell input keyevent 61',
-                                    cmd+' shell input keyevent 61',
-                                    cmd+' shell input keyevent '+('20' if (input_time[2].lower()=='pm') else '19'),
-                                    cmd+' shell input keyevent 66',
-                                    cmd+' shell input keyevent 61'
-                                ]
-                                logger.print_on_console("Do not change the focus area by tapping somewhere, it may cause the step to fail.")
-                                for i in cmds:
-                                    op = subprocess.check_output(i)
-                                if ((time_inputs[0].text == input_time[0]) and (time_inputs[1].text == input_time[1]) and (time_inputs[2].text == input_time[2])):
-                                    status=TEST_RESULT_PASS
-                                    result=TEST_RESULT_TRUE
+                                if android_home is not None:
+                                    cmd = android_home + '\\platform-tools\\'
+                                    os.chdir(cmd)
+                                    cmd = cmd + 'adb.exe'
+                                    cmds = [
+                                        cmd+' shell input keyevent 61',
+                                        cmd+' shell input text '+input_time[0],
+                                        cmd+' shell input keyevent 61',
+                                        cmd+' shell input keyevent 61',
+                                        cmd+' shell input text '+input_time[1],
+                                        cmd+' shell input keyevent 61',
+                                        cmd+' shell input keyevent 61',
+                                        cmd+' shell input keyevent '+('20' if (input_time[2].lower()=='pm') else '19'),
+                                        cmd+' shell input keyevent 66',
+                                        cmd+' shell input keyevent 61'
+                                    ]
+                                    logger.print_on_console("Do not change the focus area by tapping somewhere, it may cause the step to fail.")
+                                    for i in cmds:
+                                        op = subprocess.check_output(i)
+                                    if ((time_inputs[0].text == input_time[0]) and (time_inputs[1].text == input_time[1]) and (time_inputs[2].text == input_time[2])):
+                                        status=TEST_RESULT_PASS
+                                        result=TEST_RESULT_TRUE
+                                    else:
+                                        err_msg='Error in setting the provided time'
+                                        log.error(err_msg)
+                                        logger.print_on_console(err_msg)
                                 else:
-                                    err_msg='Error in setting the provided time'
-                                    log.error(err_msg)
-                                    logger.print_on_console(err_msg)
+                                    logger.print_on_console('ANDROID_HOME not set in system path')
                             else:
                                 err_msg='Invalid input'
                                 log.error(err_msg)
@@ -209,7 +212,7 @@ class Time_Keywords():
     def Get_Time(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg=None
         driver=android_scrapping.driver
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)

@@ -26,7 +26,7 @@ class Spinner_Keywords():
     def get_count(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         className=''
         err_msg=None
         text=[]
@@ -843,7 +843,7 @@ class Spinner_Keywords():
     def get_value_by_index(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         temp=[]
         className=''
         err_msg=None
@@ -970,7 +970,7 @@ class Spinner_Keywords():
     def get_selected_value(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg=None
         className=''
         text=[]
@@ -1082,7 +1082,7 @@ class Spinner_Keywords():
 
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         temp=[]
         className=''
         err_msg=None
@@ -1190,7 +1190,7 @@ class Spinner_Keywords():
     def get_all_values(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg=None
         text=[]
         obj=[]
