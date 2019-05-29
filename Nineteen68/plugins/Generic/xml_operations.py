@@ -468,7 +468,7 @@ class JSONOperations():
         """
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
-        key_value=''
+        key_value=None
         exception_json=None
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
