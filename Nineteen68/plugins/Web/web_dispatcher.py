@@ -219,7 +219,7 @@ class Dispatcher:
             self.web_dict['verifytextiris'] = iris_object.verifytextiris
 
         def print_error(err_msg):
-##            err_msg=ERROR_CODE_DICT['ERR_CUSTOM_MISMATCH']
+            err_msg=ERROR_CODE_DICT[err_msg]
             logger.print_on_console(err_msg)
             log.error(err_msg)
 
@@ -239,11 +239,17 @@ class Dispatcher:
                         log.info('Custom flag is ')
                         log.info(teststepproperty.custom_flag)
                         if teststepproperty.custom_flag:
-                            if len(input)>3 and isinstance(input[-1],webdriver.remote.webelement.WebElement):
-                                reference_element=input[-1]
-                                getObjectFlag=True
-                                log.info("getObjectFlag is True. Reference element is taken from getObject")
-                                logger.print_on_console("getObjectFlag is True. Reference element is taken from getObject")
+                            if len(input)>3:
+                                if isinstance(input[-1],webdriver.remote.webelement.WebElement):
+                                    reference_element=input[-1]
+                                    getObjectFlag=True
+                                    log.info("getObjectFlag is True. Reference element is taken from getObject")
+                                    logger.print_on_console("getObjectFlag is True. Reference element is taken from getObject")
+                                else:
+                                    reference_element=None
+                                    err_msg=ERROR_CODE_DICT['INCORRECT_VARIABLE_FORMAT']
+                                    logger.print_on_console(err_msg)
+                                    log.error(err_msg)
                             else:
                                 reference_element=self.getwebelement(driver,teststepproperty.parent_xpath)
                             log.debug('Reference_element ')
@@ -417,6 +423,7 @@ class Dispatcher:
                         file_path = screen_shot_obj.captureScreenshot()
                         result.append(file_path[2])
         except TypeError as e:
+            log.error(e,exc_info=True)
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result=list(result)
             result[3]=err_msg
