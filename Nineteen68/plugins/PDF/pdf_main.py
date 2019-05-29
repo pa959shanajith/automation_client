@@ -236,8 +236,6 @@ class PDFViewer(sc.SizedFrame):
                     y1 = (self.c1.y + self.viewer.nom_page_gap)/perct_y
                     y2 = (self.c2.y + self.viewer.nom_page_gap)/perct_y
                 if ((a1 > x1 and a1 < x2) and (y2 > b2 and b2 > y1)) and ((a2 > x1 and a2 < x2) and (b1 < y2 and b1 > y1)):
-                    print (' x : ',x1/perct_x , ' y :',y1/perct_y)
-                    print (i)
                     siblingElementArr.append(i)
 
             tagV = ''
