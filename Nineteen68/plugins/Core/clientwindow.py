@@ -594,7 +594,7 @@ class MainNamespace(BaseNamespace):
         else:
             spath=spath["default"]
         if len(spath) != 0 and os.path.exists(spath):
-            constants.SCREENSHOT_PATH=spath
+            constants.SCREENSHOT_PATH=os.path.normpath(spath)+os.sep
         else:
             constants.SCREENSHOT_PATH="Disabled"
             logger.print_on_console("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
