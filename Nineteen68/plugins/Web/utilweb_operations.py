@@ -367,7 +367,7 @@ class UtilWebKeywords:
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if(len(args[0]) == 2):
+            if(webelement is not None and (args[0]) == 2):
                 row = int(args[0][0])-1
                 col = int(args[0][1])-1
                 from table_keywords import TableOperationKeywords
@@ -380,7 +380,7 @@ class UtilWebKeywords:
                 if(cell!=None):
                     webelement=cell
 
-            elif(len(args[0]) > 2):
+            elif(webelement is not None and len(args[0]) > 2):
                 row = int(args[0][0])-1
                 col = int(args[0][1])-1
                 tag=args[0][2].lower()
@@ -937,7 +937,3 @@ class UtilWebKeywords:
         logger.print_on_console('Window handles size '+str(len(window_handles)))
         return window_handles
 
-        """
-        Match with Exact text for table with dropdown and  dropdown
-
-        """
