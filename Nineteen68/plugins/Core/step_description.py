@@ -151,7 +151,10 @@ class StepDescription:
         def getsubstring():
             return "Get Substring of the string '"+ inputval[0]+ "' with index/range '"+ inputval[1]+ "'  and save the value '" + output+ "' in variable '"+ tsp.outputval + "'"
         def stringgeneration():
-            return "Generate a charecter string having a length '"+ input + "'."
+            if input.find("num") != -1:
+                return "Generate a number having a length '"+ input + "'."
+            else:
+                return "Generate a character string having a length '"+ input + "'."
 
         #Clipboard keywords
         def savetoclipboard():
