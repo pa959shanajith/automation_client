@@ -13,6 +13,9 @@ import logger
 import time
 from desktop_editable_text import Text_Box
 
+import logging
+log = logging.getLogger('desktop_highlight.py')
+
 class highLight():
 
     def get_desktop_element(self,xPath,url):
@@ -59,6 +62,7 @@ class highLight():
                 ch = ele.children()
                 ele = ch[int(index)]
         except Exception as e:
+            log.error("Error occoured in get_desktop_element : ",e)
             logger.print_on_console( e)
         return ele
 
@@ -68,6 +72,7 @@ class highLight():
             #time.sleep(2)
             logger.print_on_console('Element highlight completed successfully...')
         except Exception as e:
+            log.error("Error occoured in highlight_desktop_element : ",e)
             logger.print_on_console( e)
 
     def highLiht_element(self,objname,parent,*args):
@@ -83,5 +88,7 @@ class highLight():
                 self.highlight_desktop_element(element)
             else:
                 logger.print_on_console('Element highlight failed...')
+                log.error('Element highlight failed...')
         except Exception as e:
+            log.error("Error occoured in highLiht_element : ",e)
             logger.print_on_console('Element highlight failed...')

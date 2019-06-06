@@ -41,11 +41,11 @@ class DesktopDispatcher:
     element_keywords_obj = desktop_element_keywords.ElementKeywords()
     launch_keywords_obj = desktop_launch_keywords.Launch_Keywords()
     util_keywords_obj = desktop_util_keywords.Util_Keywords()
-    dropdown_keywords_obj=desktop_dropdown_keywords.Dropdown_Keywords()
+    dropdown_keywords_obj = desktop_dropdown_keywords.Dropdown_Keywords()
     radio_checkbox_keywords_obj = radio_checkbox_keywords_desktop.Radio_Checkbox_keywords()
     tab_control_keywords_obj = desktop_tab_control_keywords.Tab_Control_Keywords()
     date_control_keywords_obj = desktop_date_control_keywords.DateControlKeywords()
-    desktop_custom_object_obj =desktop_custom_object.CustomObjectHandler()
+    desktop_custom_object_obj = desktop_custom_object.CustomObjectHandler()
     tree_keywords_obj=desktop_treeview_keywords.Tree_View_Keywords()
     table_keywords_obj=desktop_table_keywords.Table_Keywords()
 ##    outook_obj=outlook.OutlookKeywords()
@@ -174,7 +174,7 @@ class DesktopDispatcher:
     def __init__(self):
         self.exception_flag = ''
         self.action = None
-        self.outook_obj=outlook.OutlookKeywords()
+        self.outook_obj = outlook.OutlookKeywords()
 
     def dispatcher(self,teststepproperty, input, iris_flag):
         objectname = teststepproperty.objectname
@@ -191,19 +191,19 @@ class DesktopDispatcher:
         self.desktop_dict['getattachmentstatus'] = self.outook_obj.GetAttachmentStatus
         self.desktop_dict['getsubject'] = self.outook_obj.GetSubject
         self.desktop_dict['gettomailid'] = self.outook_obj.GetToMailID
-        self.desktop_dict['getbody']= self.outook_obj.GetBody
+        self.desktop_dict['getbody'] = self.outook_obj.GetBody
         self.desktop_dict['verifyemail'] = self.outook_obj.VerifyEmail
-        self.desktop_dict['switchtofolder']=self.outook_obj.switchToFolder
-        self.desktop_dict['settomailid'] =self.outook_obj.send_to_mail
+        self.desktop_dict['switchtofolder'] = self.outook_obj.switchToFolder
+        self.desktop_dict['settomailid'] = self.outook_obj.send_to_mail
         self.desktop_dict['setcc'] = self.outook_obj.send_CC
         self.desktop_dict['setbcc'] = self.outook_obj.send_BCC
         self.desktop_dict['setsubject'] = self.outook_obj.send_subject
         self.desktop_dict['setbody'] = self.outook_obj.send_body
-        self.desktop_dict['setattachments']=self.outook_obj.send_attachments
+        self.desktop_dict['setattachments'] = self.outook_obj.send_attachments
         self.desktop_dict['sendemail'] = self.outook_obj.send_mail
 
 
-        if(iris_flag):
+        if ( iris_flag ):
             import iris_operations
             iris_object = iris_operations.IRISKeywords()
             self.desktop_dict['clickiris'] = iris_object.clickiris
@@ -220,23 +220,25 @@ class DesktopDispatcher:
                 if ( ele_type in self.get_ele_type ):
                     ele_type=self.get_ele_type[ele_type]
                 parent_xpath=teststepproperty.parent_xpath
-                if ( keyword in self.custom_dict and ele_type in self.custom_dict[keyword]):
+                if ( keyword in self.custom_dict and ele_type in self.custom_dict[keyword] ):
                     custom_desktop_element=self.desktop_custom_object_obj.getobjectforcustom(parent_xpath,ele_type,input[2] )
                     if ( custom_desktop_element != '' or None ):
                         objectname = custom_desktop_element
                 else:
-                    logger.print_on_console("unmapped or non existant custom objects")
+                    logger.print_on_console("Unmapped or non existant custom objects")
+                    log.error("Unmapped or non existant custom objects")
         except Exception as e:
-            logger.print_on_console("error has occured from custom objects")
+            logger.print_on_console("Error has occured in custom objects")
+            log.error("Error has occured in custom objects")
 #-----------------------------------------------------------------for custom objects
 
         try:
 
-            keyword=keyword.lower()
+            keyword = keyword.lower()
             ele = None
             if ( keyword in list(self.desktop_dict.keys()) ):
-                if ( keyword=='launchapplication' or keyword=='findwindowandattach' or keyword=='selectmenu' or keyword in list(self.email_dict.keys()) ):
-                    result= self.desktop_dict[keyword](input,output)
+                if ( keyword == 'launchapplication' or keyword == 'findwindowandattach' or keyword == 'selectmenu' or keyword in list(self.email_dict.keys()) ):
+                    result = self.desktop_dict[keyword](input,output)
                 else:
                     self.launch_keywords_obj.verifyWindowTitle()
                     if ( objectname != '' and teststepproperty.cord != None and teststepproperty.cord != '' ):
@@ -245,21 +247,21 @@ class DesktopDispatcher:
                         obj_props = teststepproperty.objectname.split(';')
                         coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
                         ele = {'cord': teststepproperty.cord, 'coordinates': coord}
-                        if( teststepproperty.custom_flag ):
+                        if ( teststepproperty.custom_flag ):
                             result = self.desktop_dict[keyword](ele, input, output, teststepproperty.parent_xpath)
                         else:
                             result= self.desktop_dict[keyword](ele, input, output)
                     else:
-                        if objectname != '':
+                        if ( objectname != '' ):
                             ele = self.get_desktop_element(objectname,url)
                         result= self.desktop_dict[keyword](ele, url, input, output)
 
-                if not(desktop_constants.ELEMENT_FOUND) and self.exception_flag:
+                if ( not(desktop_constants.ELEMENT_FOUND) and self.exception_flag ):
                     result=constants.TERMINATE
             else:
-                err_msg=desktop_constants.INVALID_KEYWORD
-                result=list(result)
-                result[3]=err_msg
+                err_msg = desktop_constants.INVALID_KEYWORD
+                result = list(result)
+                result[3] = err_msg
             configvalues = readconfig.configvalues
             screen_shot_obj = screenshot_keywords.Screenshot()
             #------------------------------------------return null for get-keywords if keyword fails
@@ -272,11 +274,11 @@ class DesktopDispatcher:
                     pass
             #------------------------------------------------------------------------------------------
             if ( self.action == constants.EXECUTE ):
-                if  ( result !=constants.TERMINATE  ):
-                    result=list(result)
+                if  ( result != constants.TERMINATE  ):
+                    result = list(result)
                     if ( configvalues['screenShot_Flag'].lower() == 'fail' ):
                         if ( result[0].lower() == 'fail' ):
-                            if keyword not in desktop_constants.APPLICATION_KEYWORDS:
+                            if ( keyword not in desktop_constants.APPLICATION_KEYWORDS ):
                                 file_path = screen_shot_obj.captureScreenshot()
                                 result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
@@ -284,9 +286,9 @@ class DesktopDispatcher:
                             file_path = screen_shot_obj.captureScreenshot()
                             result.append(file_path[2])
         except TypeError as e:
-            err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
-            result=list(result)
-            result[3]=err_msg
+            err_msg = constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
+            result = list(result)
+            result[3] = err_msg
         except Exception as e:
             log.error(e)
             #logger.print_on_console('Exception at dispatcher')
@@ -308,22 +310,22 @@ class DesktopDispatcher:
             xpath = x_var[0]
             xclass = x_var[1]
             try:
-                xconID=int(x_var[2])
+                xconID = int(x_var[2])
             except:
                 pass #as uia element sometimes has no conID
-            if ( len(x_var)==4 ):
-                xname=x_var[3]
-            if ( len(x_var)==5 ):
+            if ( len(x_var) == 4 ):
+                xname = x_var[3]
+            if ( len(x_var) == 5 ):
                 """checking for backend process"""
-                xname=x_var[3]
-                backend=x_var[4].strip()
+                xname = x_var[3]
+                backend = x_var[4].strip()
         else:
-            xpath=xPath
-            prev_flag=True # setting prev_flag to True since the xpath recieved is of an old test case.
+            xpath = xPath
+            prev_flag = True # setting prev_flag to True since the xpath recieved is of an old test case.
         #logic to find the desktop element using the xpath
-        if backend=='A':
+        if ( backend == 'A' ):
             app = desktop_launch_keywords.app_win32
-            app2=app
+            app2 = app
             try:
                 win = app.top_window()
                 ch = win.children()
@@ -338,10 +340,10 @@ class DesktopDispatcher:
                     ele = ch[int(index)]
                 #---------------------------------------------------
                 try:
-                    if ele!='':     #checking if element is not empty
-                        if xclass==ele.friendly_class_name(): #comparing top window element class with the one obtained from TSP
-                            if ele.friendly_class_name()=='TabControl':
-                                if xconID!=ele.control_id(): #comparing if the control ID of top window element is same as one from TSP
+                    if ( ele != '' ):     #checking if element is not empty
+                        if ( xclass == ele.friendly_class_name() ): #comparing top window element class with the one obtained from TSP
+                            if ( ele.friendly_class_name() == 'TabControl' ):
+                                if ( xconID != ele.control_id() ): #comparing if the control ID of top window element is same as one from TSP
                                     #-------element dosent handles matched
                                     ele=''
                             else:
@@ -351,38 +353,38 @@ class DesktopDispatcher:
                                     element_text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
                                 except:
                                     pass
-                                if element_text!='':
+                                if ( element_text != '' ):
                                     try:
-                                        comp_text=str(element_text)
+                                        comp_text = str(element_text)
                                     except:
-                                        comp_text=element_text.encode('ascii', 'replace')
+                                        comp_text = element_text.encode('ascii', 'replace')
                                 else :
-                                    comp_text=ele.texts()
+                                    comp_text = ele.texts()
                                 try:
-                                    comp_text=comp_text.strip()
+                                    comp_text = comp_text.strip()
                                 except:
-                                    comp_text=comp_text[0].strip()
+                                    comp_text = comp_text[0].strip()
                                 #----------------------------------------------------------------------------------
-                                if xname!=comp_text:
-                                    ele=''
+                                if ( xname != comp_text ):
+                                    ele = ''
                         else:
                             #print "friendly class name does not match",ele.friendly_class_name()
-                            ele=''
+                            ele = ''
                 except Exception as e:
-                    if prev_flag==False:#checking if previous test case flag is True or not.
-                        ele=''  #If false then new test case and AUT structure has changed, so setting the ele to ''
+                    if ( prev_flag == False ):#checking if previous test case flag is True or not.
+                        ele = ''  #If false then new test case and AUT structure has changed, so setting the ele to ''
                 #---------------------------------------------------
             except Exception as e:
                 log.error("Unable to get desktop elements because : ",e)
                 #import traceback
                 #traceback.print_exc()
-            if ele=='':
+            if ( ele == '' ):
                 #logger.print_on_console("Warning! AUT Structure has changed")
                 try:
-                    ele=self.get_element_if_empty(xclass,xname,app2)
+                    ele = self.get_element_if_empty(xclass,xname,app2)
                 except:# only for tables
-                    ele=self.get_desktop_static_element(xclass,xconID,app)
-            if ele=='':#last attempt if the element is still empty, then find element using original index
+                    ele = self.get_desktop_static_element(xclass,xconID,app)
+            if ( ele == '' ):#last attempt if the element is still empty, then find element using original index
                 try:
                     ele = ch[int(index)]
                 except Exception as e:
@@ -402,7 +404,7 @@ class DesktopDispatcher:
 ##                        c=ch[i].children()
 ##                        for a in c:
 ##                            ch.append(a)
-                ch=[]
+                ch = []
                 def rec_ch(child):
                     ch.append(child)
                     for c in child.children():
@@ -418,19 +420,19 @@ class DesktopDispatcher:
                     ch = ele.children()
                     ele = ch[int(index)]
                 #warning message
-                if (ele.friendly_class_name()=='ListView' or ele.friendly_class_name()=='ListBox'):
+                if (ele.friendly_class_name() == 'ListView' or ele.friendly_class_name() == 'ListBox'):
                     log.info('List keywords return inconsistant values for elements scraped via method B')
                     log.error('List keywords return inconsistant values for elements scraped via method B')
                     logger.print_on_console('List keywords return inconsistant values for elements scraped via method B')
             except Exception as e:
-                log.error(e)
+                log.error("Unable to get desktop element because : ",e)
                 #import traceback
                 #traceback.print_exc()
                 logger.print_on_console("Unable to get desktop element because :")
                 logger.print_on_console(e)
         return ele
 
-    def get_desktop_static_element(self,xclass,xconID,app):
+    def get_desktop_static_element(self, xclass, xconID, app):
         """This method was added to handle change in tabs, when different tabs are selected, the xpath of all elements will change
         This will result in increment or decrement of objects also!. Hence using this method to comapre the calss name and control ID of object
         returned from UI with all the elements of the top window. The first object whoes class name and control ID is the same is returned."""
@@ -471,26 +473,26 @@ class DesktopDispatcher:
             for i in range(0,len(ch2)):
                 try:
                     #------------------------------------------------
-                    handle= ch2[i].handle
+                    handle = ch2[i].handle
                     try:
                         element_text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
                     except:
                         pass
-                    if element_text!='':
+                    if ( element_text != '' ):
                                 try:
-                                    comp_text=str(element_text)
+                                    comp_text = str(element_text)
                                 except:
-                                    comp_text=element_text.encode('ascii', 'replace')
+                                    comp_text = element_text.encode('ascii', 'replace')
                     else :
-                        comp_text=ch2[i].texts()
+                        comp_text = ch2[i].texts()
                     #------------------------------------------------
-                    className=ch2[i].friendly_class_name()
+                    className = ch2[i].friendly_class_name()
                     try:
-                        comp_text=comp_text.strip()
+                        comp_text = comp_text.strip()
                     except:
-                        comp_text=comp_text[0].strip()
-                    if xclass==className:
-                        if xname==comp_text:
+                        comp_text = comp_text[0].strip()
+                    if ( xclass == className ):
+                        if ( xname == comp_text ):
                             ele=ch2[i]
                             break
                 except Exception as e:
