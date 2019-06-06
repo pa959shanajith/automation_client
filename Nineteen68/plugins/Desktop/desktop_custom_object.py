@@ -220,12 +220,18 @@ class CustomObjectHandler():
                 ch=win.children()
             elif backendType =='B':
                 win = desktop_launch_keywords.app_uia.top_window()
-                ch=win.children()[:]
-                for i in range(0,len(ch)):
-                    if len(ch[i].children()):
-                        c=ch[i].children()
-                        for a in c:
-                            ch.append(a)
+##                ch=win.children()[:]
+##                for i in range(0,len(ch)):
+##                    if len(ch[i].children()):
+##                        c=ch[i].children()
+##                        for a in c:
+##                            ch.append(a)
+                ch=[]
+                def rec_ch(child):
+                    ch.append(child)
+                    for c in child.children():
+                        rec_ch(c)
+                rec_ch(win)
             #----------------------Tooltips are treated as children to the top window, they will disappear after 7 seconds
             if win.friendly_class_name()=="ToolTips" or win.friendly_class_name()=="SysShadow": #---Checking if the win has a friendly class name Tooltips
                 time.sleep(7)                                   #---Waiting for 7 seconds so that the Tooltip disappears
@@ -234,12 +240,18 @@ class CustomObjectHandler():
                     ch=win.children()
                 elif backendType =='B':
                     win = desktop_launch_keywords.app_uia.top_window()
-                    ch=win.children()[:]
-                    for i in range(0,len(ch)):
-                        if len(ch[i].children()):
-                            c=ch[i].children()
-                            for a in c:
-                                ch.append(a)                     #---trying to get the top window again
+##                    ch=win.children()[:]
+##                    for i in range(0,len(ch)):
+##                        if len(ch[i].children()):
+##                            c=ch[i].children()
+##                            for a in c:
+##                                ch.append(a)                     #---trying to get the top window again
+                    ch=[]
+                    def rec_ch(child):
+                        ch.append(child)
+                        for c in child.children():
+                            rec_ch(c)
+                    rec_ch(win)
             #---------------------------------------------------
             allobjects = ''
             ne = []

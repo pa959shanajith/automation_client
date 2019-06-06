@@ -30,12 +30,18 @@ class highLight():
             try:
                 if str(backend).strip()=='B':
                     win = desktop_launch_keywords.app_uia.top_window()
-                    ch=win.children()[:]
-                    for i in range(0,len(ch)):
-                        if len(ch[i].children()):
-                            c=ch[i].children()
-                            for a in c:
-                                ch.append(a)
+##                    ch=win.children()[:]
+##                    for i in range(0,len(ch)):
+##                        if len(ch[i].children()):
+##                            c=ch[i].children()
+##                            for a in c:
+##                                ch.append(a)
+                    ch=[]
+                    def rec_ch(child):
+                        ch.append(child)
+                        for c in child.children():
+                            rec_ch(c)
+                    rec_ch(win)
                 elif str(backend).strip()=='A':
                     win = desktop_launch_keywords.app_win32.top_window()
                     ch = win.children()

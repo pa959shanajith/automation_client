@@ -33,11 +33,11 @@ log = logging.getLogger('desktop_scraping.py')
 actualobjects = []
 allobjects = []
 class Scrape:
-    def clickandadd(self,operation,wxobject):
+    def clickandadd(self, operation, wxobject):
         window_name=desktop_launch_keywords.window_name
         obj = desktop_launch_keywords.Launch_Keywords()
         obj.bring_Window_Front()
-        if operation == 'STARTCLICKANDADD':
+        if ( operation == 'STARTCLICKANDADD' ):
             obj.set_to_foreground()
             global view
             view = []
@@ -55,7 +55,7 @@ class Scrape:
                         pythoncom.CoInitialize()
                         #method returns 1 if the coordinates passed of any xpath, is near to the curson postion coordinates
                         #returns 0 if if coordinates doesnot fit into the condition
-                        def match(x,y,width,height,coord_x,coord_y):
+                        def match(x, y, width, height, coord_x, coord_y):
 
                             expectedx=int(x)+int(width)
                             expectedy=int(y)+int(height)
@@ -71,7 +71,7 @@ class Scrape:
                             tempobjects = []
                             for i in allobjects['view']:
                                 res = match(i['x_screen'],i['y_screen'],i['width'],i['height'],self.coordX,self.coordY)
-                                if res == 1:
+                                if ( res == 1 ):
                                     tempobjects.append(i)
                             actualelement = ''
                             for i in range (len(tempobjects)):
@@ -79,7 +79,7 @@ class Scrape:
                                     first_ele = tempobjects[i]
                                     actualelement = first_ele
                                     next_ele = tempobjects[i+1]
-                                    if((first_ele['x_screen']>next_ele['x_screen']) and (first_ele['y_screen']>next_ele['y_screen'])):
+                                    if( (first_ele['x_screen']>next_ele['x_screen']) and (first_ele['y_screen']>next_ele['y_screen']) ):
                                         tempobjects[i+1]=first_ele
                                         actualelement=first_ele
                                     else:
@@ -90,42 +90,48 @@ class Scrape:
                             disp_obj = desktop_dispatcher.DesktopDispatcher()
                             ele = disp_obj.get_desktop_element(actualelement['xpath'],actualelement['url'])
                             global actualobjects
-                            if actualelement not in actualobjects:#------check to remove duplicate elements
+                            if ( actualelement not in actualobjects ):#------check to remove duplicate elements
                                 actualobjects.append(actualelement)
                         except Exception as e:
                             import traceback
-                            traceback.print_exc()
-                            logger.print_on_console('Clicked option is not a part of DesktopGUI')
+##                            traceback.print_exc()
+##                            logger.print_on_console('Clicked option is not a part of DesktopGUI')
                         return True
 
                     def get_all_children_caller(self):
                         allobjs = {}
                         try:
                             #=====================================check for uia
-                            if str(wxobject.backend_process).strip() =='A':
+                            if ( str(wxobject.backend_process).strip() =='A' ):
                                 win = desktop_launch_keywords.app_win32.top_window()
-                                ch=win.children()
+                                ch = win.children()
                             elif str(wxobject.backend_process).strip() =='B':
                                 win = desktop_launch_keywords.app_uia.top_window()
-                                ch=win.children()[:]
-                                for i in range(0,len(ch)):
-                                    if len(ch[i].children()):
-                                        c=ch[i].children()
-                                        for a in c:
-                                            ch.append(a)
+##                                ch = win.children()[:]
+##                                for i in range(0,len(ch)):
+##                                    if len(ch[i].children()):
+##                                        c = ch[i].children()
+##                                        for a in c:
+##                                            ch.append(a)
+                                ch=[]
+                                def rec_ch(child):
+                                    ch.append(child)
+                                    for c in child.children():
+                                        rec_ch(c)
+                                rec_ch(win)
                             #===================================================
                             objects = None
                             ne = []
                             obj = desktop_launch_keywords.Launch_Keywords()
                             obj.bring_Window_Front()
                             winrect = desktop_launch_keywords.win_rect
-                            scrape_obj=Scrape()
+                            scrape_obj = Scrape()
                             objects =  scrape_obj.get_all_children(ch,ne,0,'',win,winrect,str(wxobject.backend_process).strip())
                             allobjs["view"] = objects
                         except Exception as e:
                             import traceback
-                            traceback.print_exc()
-                            logger.print_on_console(e)
+##                            traceback.print_exc()
+##                            logger.print_on_console(e)
                         return allobjs
 
                     def abort(self):
@@ -149,16 +155,16 @@ class Scrape:
                         def OnMouseLeftDown(evnt):
                             try:
                                 wndNames=evnt.WindowName
-                                if wndNames is not 'Running applications':
+                                if ( wndNames is not 'Running applications' ):
                                         clicked_handle=evnt.Window
                                         while True:
-                                            if clicked_handle==0:   #comparing wether parent window is same as clicked window
+                                            if ( clicked_handle==0 ):   #comparing wether parent window is same as clicked window
                                                 break
                                             else:
-                                                if not(clicked_handle == self.handle ):    #recursivelt getting the parent handle
+                                                if ( not(clicked_handle == self.handle ) ):    #recursivelt getting the parent handle
                                                     clicked_handle=win32gui.GetParent(clicked_handle)
                                                 else:
-                                                    if (self.ctrldownflag is True):
+                                                    if ( self.ctrldownflag is True ):
                                                         self.ctrldownflag = False       #if control flag is clicked
                                                         return True
                                                     else:
@@ -214,7 +220,7 @@ class Scrape:
                         handle = win32gui.FindWindow(None, wndName)
                         foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
                         appThread = win32api.GetCurrentThreadId()
-                        if( foreThread != appThread ):
+                        if ( foreThread != appThread ):
                             try:
                                 win32process.AttachThreadInput(foreThread[0], appThread, True)
                                 win32gui.BringWindowToTop(handle)
@@ -326,24 +332,24 @@ class Scrape:
                              text=text_initial
                              if text =='':
                                 t = ch[i].texts()
-                                if len(t) >= 2:
+                                if ( len(t) >= 2):
                                     text = t[1]
-                             if text == '':
+                             if ( text == '' ):
                                 text = ch[i].friendly_class_name()
                              text_old = text
                              text=text_old
                          elif backend_process=='B':
                             text_initial=ch[i].texts()
                             text=text_initial
-                            if type(text)==list:
-                                if text[0] =='':
+                            if ( type(text) == list):
+                                if ( text[0] == '' ):
                                     handle = ch[i].handle
                                     text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
-                                    if text=='' or text==None:
+                                    if ( text == '' or text == None ):
                                         text = ch[i].friendly_class_name()
                                 else:
                                     try:
-                                        if type(text[0])==list:
+                                        if ( type(text[0]) == list ):
                                             try:
                                                 text=str(text[0][0])
                                             except:
@@ -353,15 +359,15 @@ class Scrape:
                                     except:
                                         text=text[0].encode('ascii', 'replace')
                             else:
-                                if text=='' or text[0]=='':
+                                if ( text == '' or text[0] == '' ):
                                     handle = ch[i].handle
                                     text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
-                                    if text=='' or None:
-                                        text= ch[i].friendly_class_name()
+                                    if ( text == '' or None ):
+                                        text = ch[i].friendly_class_name()
                                 else:
-                                    text=text_initial[0]
+                                    text = text_initial[0]
                             text_old = text
-                            text=text_old
+                            text = text_old
                          url = properties['url']
                          parent = properties['parent']
                          rectangle = properties['rectangle']
@@ -413,25 +419,25 @@ class Scrape:
                             width = coordinates.width()
                             height = coordinates.height()
                          except:
-                            width=coordinates_obj.width
-                            height=coordinates_obj.height
+                            width=  coordinates_obj.width
+                            height = coordinates_obj.height
                             pass
                          x_screen = cor.left
                          y_screen = cor.top
                          left = cor.left - winrect[0]
                          top = cor.top - winrect[1]
-                         if top < 0:
+                         if (top < 0 ):
                             top = -top
-                         if left < 0:
+                         if ( left < 0 ):
                             left = -left
                          control_id = properties['control_id']
                          if control_id == None:
                             control_id ='null'
-                         if properties['is_visible'] == True :
+                         if ( properties['is_visible'] == True ):
                             hiddentag = 'No'
                             flag = False
                             for k in range(len(ne)):
-                                if ne[k]['xpath'] == path:
+                                if ( ne[k]['xpath'] == path ):
                                     flag = True
                             #----------------------------------------------------
                             new_path=''
@@ -447,14 +453,14 @@ class Scrape:
                                         new_text=', '.join(str(v) for v in text_initial)
                                 else:
                                     try:
-                                        new_text=str(text_initial)
+                                        new_text = str(text_initial)
                                     except:
-                                        new_text=text_initial.encode('ascii', 'replace')
+                                        new_text = text_initial.encode('ascii', 'replace')
                             else :
                                 new_text=text_old
                             new_path=path+';'+className+';'+str(control_id)+";"+new_text+';'+backend_process
                             #----------------------------------------------------
-                            if not flag:
+                            if ( not flag ):
                                 ne.append({"custname":text,
                                         "tag":tag,
                                         "url":url,
@@ -477,30 +483,39 @@ class Scrape:
                         handle = ch[i].handle
                         text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
                  except Exception as e:
-                    import traceback
-                    traceback.print_exc()
                     logger.print_on_console(e)
+                    log.error(e)
+##                    import traceback
+##                    traceback.print_exc()
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             logger.print_on_console(e)
+            log.error(e)
+##            import traceback
+##            traceback.print_exc()
+##
         return ne
 
-    def full_scrape(self,wxobject):
+    def full_scrape(self, wxobject):
         allobjects = {}
         try:
             #=====================================check for uia
-            if str(wxobject.backend_process).strip() =='A':
+            if ( str(wxobject.backend_process).strip() == 'A' ):
                 win = desktop_launch_keywords.app_win32.top_window()
                 ch=win.children()
-            elif str(wxobject.backend_process).strip() =='B':
+            elif ( str(wxobject.backend_process).strip() == 'B' ):
                 win = desktop_launch_keywords.app_uia.top_window()
-                ch=win.children()[:]
-                for i in range(0,len(ch)):
-                    if len(ch[i].children()):
-                        c=ch[i].children()
-                        for a in c:
-                            ch.append(a)
+##                ch=win.children()[:]
+##                for i in range(0,len(ch)):
+##                    if len(ch[i].children()):
+##                        c=ch[i].children()
+##                        for a in c:
+##                            ch.append(a)
+                ch=[]
+                def rec_ch(child):
+                    ch.append(child)
+                    for c in child.children():
+                        rec_ch(c)
+                rec_ch(win)
             #===================================================
             ne = []
             obj = desktop_launch_keywords.Launch_Keywords()
@@ -509,9 +524,10 @@ class Scrape:
             winrect = desktop_launch_keywords.win_rect;
             allobjects =  self.get_all_children(ch,ne,0,'',win,winrect,str(wxobject.backend_process).strip())
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             logger.print_on_console(e)
+            log.error(e)
+##            import traceback
+##            traceback.print_exc()
         return allobjects
 
 class Rectangle:
@@ -520,8 +536,8 @@ class Rectangle:
         self.width = None
     def set_coordinates(self,child):
         try:
-            self.height= int(child.rectangle().bottom)-int(child.rectangle().top)
-            self.width= int(child.rectangle().right)-int(child.rectangle().left)
+            self.height = int(child.rectangle().bottom) - int(child.rectangle().top)
+            self.width = int(child.rectangle().right) - int(child.rectangle().left)
         except Exception as e:
             logger.print_on_console('Error fetching object coordinates')
             log.error(e)

@@ -50,7 +50,7 @@ class DesktopDispatcher:
     table_keywords_obj=desktop_table_keywords.Table_Keywords()
 ##    outook_obj=outlook.OutlookKeywords()
 
-    desktop_dict={ 'click': button_link_keywords_obj.click,
+    desktop_dict = { 'click': button_link_keywords_obj.click,
         'press':button_link_keywords_obj.press,
         'doubleclick' : button_link_keywords_obj.double_click,
         'verifybuttonname' : button_link_keywords_obj.verify_button_name,
@@ -121,7 +121,7 @@ class DesktopDispatcher:
     }
 
 
-    email_dict={'getemail': 1,
+    email_dict = {'getemail': 1,
           'getfrommailid' : 2,
           'getattachmentstatus'    : 3,
           'getsubject'     : 4,
@@ -162,7 +162,7 @@ class DesktopDispatcher:
         "verifyallvalues":['select']
     }
 
-    get_ele_type={
+    get_ele_type = {
         'radio': 'radiobutton',
         'checkbox':'checkbox',
         'dropdown':'select',
@@ -172,35 +172,35 @@ class DesktopDispatcher:
 
 
     def __init__(self):
-        self.exception_flag=''
+        self.exception_flag = ''
         self.action = None
         self.outook_obj=outlook.OutlookKeywords()
 
-    def dispatcher(self,teststepproperty,input,iris_flag):
+    def dispatcher(self,teststepproperty, input, iris_flag):
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
         keyword = teststepproperty.name.lower()
         url = teststepproperty.url
-        err_msg=None
-        result=[desktop_constants.TEST_RESULT_FAIL,desktop_constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
+        err_msg = None
+        result = [desktop_constants.TEST_RESULT_FAIL,desktop_constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
 ##        if objectname != '@Browser' or objectname != '@BrowserPopUp' or objectname != '@Custom':
 
-        self.desktop_dict['getemail']= self.outook_obj.GetEmail
-        self.desktop_dict['getfrommailid']=self.outook_obj.GetFromMailId
-        self.desktop_dict['getattachmentstatus']= self.outook_obj.GetAttachmentStatus
-        self.desktop_dict['getsubject']= self.outook_obj.GetSubject
-        self.desktop_dict['gettomailid']= self.outook_obj.GetToMailID
+        self.desktop_dict['getemail'] = self.outook_obj.GetEmail
+        self.desktop_dict['getfrommailid'] = self.outook_obj.GetFromMailId
+        self.desktop_dict['getattachmentstatus'] = self.outook_obj.GetAttachmentStatus
+        self.desktop_dict['getsubject'] = self.outook_obj.GetSubject
+        self.desktop_dict['gettomailid'] = self.outook_obj.GetToMailID
         self.desktop_dict['getbody']= self.outook_obj.GetBody
-        self.desktop_dict['verifyemail']= self.outook_obj.VerifyEmail
+        self.desktop_dict['verifyemail'] = self.outook_obj.VerifyEmail
         self.desktop_dict['switchtofolder']=self.outook_obj.switchToFolder
-        self.desktop_dict['settomailid']=self.outook_obj.send_to_mail
-        self.desktop_dict['setcc']=self.outook_obj.send_CC
-        self.desktop_dict['setbcc']=self.outook_obj.send_BCC
-        self.desktop_dict['setsubject']=self.outook_obj.send_subject
-        self.desktop_dict['setbody']=self.outook_obj.send_body
+        self.desktop_dict['settomailid'] =self.outook_obj.send_to_mail
+        self.desktop_dict['setcc'] = self.outook_obj.send_CC
+        self.desktop_dict['setbcc'] = self.outook_obj.send_BCC
+        self.desktop_dict['setsubject'] = self.outook_obj.send_subject
+        self.desktop_dict['setbody'] = self.outook_obj.send_body
         self.desktop_dict['setattachments']=self.outook_obj.send_attachments
-        self.desktop_dict['sendemail']=self.outook_obj.send_mail
+        self.desktop_dict['sendemail'] = self.outook_obj.send_mail
 
 
         if(iris_flag):
@@ -215,14 +215,14 @@ class DesktopDispatcher:
             self.desktop_dict['verifyexistsiris'] = iris_object.verifyexistsiris
             self.desktop_dict['verifytextiris'] = iris_object.verifytextiris
         try:
-            if objectname==desktop_constants.CUSTOM and teststepproperty.custom_flag:
+            if ( objectname == desktop_constants.CUSTOM and teststepproperty.custom_flag ):
                 ele_type=input[0].lower()
-                if ele_type in self.get_ele_type:
+                if ( ele_type in self.get_ele_type ):
                     ele_type=self.get_ele_type[ele_type]
                 parent_xpath=teststepproperty.parent_xpath
-                if (keyword in self.custom_dict and ele_type in self.custom_dict[keyword]):
-                    custom_desktop_element=self.desktop_custom_object_obj.getobjectforcustom(parent_xpath,ele_type,input[2])
-                    if(custom_desktop_element != '' or None):
+                if ( keyword in self.custom_dict and ele_type in self.custom_dict[keyword]):
+                    custom_desktop_element=self.desktop_custom_object_obj.getobjectforcustom(parent_xpath,ele_type,input[2] )
+                    if ( custom_desktop_element != '' or None ):
                         objectname = custom_desktop_element
                 else:
                     logger.print_on_console("unmapped or non existant custom objects")
@@ -234,25 +234,25 @@ class DesktopDispatcher:
 
             keyword=keyword.lower()
             ele = None
-            if keyword in list(self.desktop_dict.keys()):
-                if keyword=='launchapplication' or keyword=='findwindowandattach' or keyword=='selectmenu' or keyword in list(self.email_dict.keys()) :
+            if ( keyword in list(self.desktop_dict.keys()) ):
+                if ( keyword=='launchapplication' or keyword=='findwindowandattach' or keyword=='selectmenu' or keyword in list(self.email_dict.keys()) ):
                     result= self.desktop_dict[keyword](input,output)
                 else:
                     self.launch_keywords_obj.verifyWindowTitle()
-                    if objectname != '' and teststepproperty.cord != None and teststepproperty.cord != '':
-                        if(desktop_launch_keywords.window_name != None):
+                    if ( objectname != '' and teststepproperty.cord != None and teststepproperty.cord != '' ):
+                        if( desktop_launch_keywords.window_name != None ):
                             SetForegroundWindow(find_window(title=self.launch_keywords_obj.windowname))
                         obj_props = teststepproperty.objectname.split(';')
                         coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
                         ele = {'cord': teststepproperty.cord, 'coordinates': coord}
-                        if(teststepproperty.custom_flag):
-                            result = self.desktop_dict[keyword](ele,input,output,teststepproperty.parent_xpath)
+                        if( teststepproperty.custom_flag ):
+                            result = self.desktop_dict[keyword](ele, input, output, teststepproperty.parent_xpath)
                         else:
-                            result= self.desktop_dict[keyword](ele,input,output)
+                            result= self.desktop_dict[keyword](ele, input, output)
                     else:
                         if objectname != '':
                             ele = self.get_desktop_element(objectname,url)
-                        result= self.desktop_dict[keyword](ele,url,input,output)
+                        result= self.desktop_dict[keyword](ele, url, input, output)
 
                 if not(desktop_constants.ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE
@@ -271,16 +271,16 @@ class DesktopDispatcher:
                 except:
                     pass
             #------------------------------------------------------------------------------------------
-            if self.action == constants.EXECUTE:
-                if result !=constants.TERMINATE:
+            if ( self.action == constants.EXECUTE ):
+                if  ( result !=constants.TERMINATE  ):
                     result=list(result)
-                    if configvalues['screenShot_Flag'].lower() == 'fail':
-                        if result[0].lower() == 'fail':
+                    if ( configvalues['screenShot_Flag'].lower() == 'fail' ):
+                        if ( result[0].lower() == 'fail' ):
                             if keyword not in desktop_constants.APPLICATION_KEYWORDS:
                                 file_path = screen_shot_obj.captureScreenshot()
                                 result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
-                        if keyword not in desktop_constants.APPLICATION_KEYWORDS:
+                        if  ( keyword not in desktop_constants.APPLICATION_KEYWORDS ):
                             file_path = screen_shot_obj.captureScreenshot()
                             result.append(file_path[2])
         except TypeError as e:
@@ -290,7 +290,7 @@ class DesktopDispatcher:
         except Exception as e:
             log.error(e)
             #logger.print_on_console('Exception at dispatcher')
-        if err_msg!=None:
+        if  ( err_msg != None ):
             #import traceback
             #traceback.print_exc()
             log.error(err_msg)
@@ -299,21 +299,21 @@ class DesktopDispatcher:
         return result
 
     def get_desktop_element(self,xPath,url):
-        index=None
+        index = None
         ele = ''
-        backend='A'
-        prev_flag=False
-        if ";" in xPath:
-            x_var=xPath.split(';')
-            xpath=x_var[0]
-            xclass=x_var[1]
+        backend = 'A'
+        prev_flag = False
+        if ( ";" in xPath ):
+            x_var = xPath.split(';')
+            xpath = x_var[0]
+            xclass = x_var[1]
             try:
                 xconID=int(x_var[2])
             except:
                 pass #as uia element sometimes has no conID
-            if len(x_var)==4:
+            if ( len(x_var)==4 ):
                 xname=x_var[3]
-            if len(x_var)==5:
+            if ( len(x_var)==5 ):
                 """checking for backend process"""
                 xname=x_var[3]
                 backend=x_var[4].strip()
@@ -396,12 +396,18 @@ class DesktopDispatcher:
                 import pythoncom
                 pythoncom.CoInitialize()
                 win = desktop_launch_keywords.app_uia.top_window()
-                ch=win.children()[:]
-                for i in range(0,len(ch)):
-                    if len(ch[i].children()):
-                        c=ch[i].children()
-                        for a in c:
-                            ch.append(a)
+##                ch=win.children()[:]
+##                for i in range(0,len(ch)):
+##                    if len(ch[i].children()):
+##                        c=ch[i].children()
+##                        for a in c:
+##                            ch.append(a)
+                ch=[]
+                def rec_ch(child):
+                    ch.append(child)
+                    for c in child.children():
+                        rec_ch(c)
+                rec_ch(win)
                 split_xpath = xpath.split('/')
                 parent = split_xpath[0]
                 index = int(parent[parent.index('[') + 1 : parent.index(']')])
