@@ -80,7 +80,7 @@ class Scrape:
                                     actualelement = first_ele
                                     next_ele = tempobjects[i+1]
                                     if( (first_ele['x_screen'] > next_ele['x_screen']) and (first_ele['y_screen'] > next_ele['y_screen']) ):
-                                        tempobjects[i+1]=first_ele
+                                        tempobjects[i+1] = first_ele
                                         actualelement = first_ele
                                     else:
                                         actualelement = next_ele
@@ -93,10 +93,10 @@ class Scrape:
                             if ( actualelement not in actualobjects ):#------check to remove duplicate elements
                                 actualobjects.append(actualelement)
                         except Exception as e:
+                            logger.print_on_console( 'Clicked option is not a part of DesktopGUI' )
+                            log.error( 'Clicked option is not a part of DesktopGUI ,Error msg : ', e )
 ##                            import traceback
 ##                            traceback.print_exc()
-                            log.error('Clicked option is not a part of DesktopGUI ,Error msg : ',e)
-                            logger.print_on_console('Clicked option is not a part of DesktopGUI')
                         return True
 
                     def get_all_children_caller(self):
@@ -130,9 +130,9 @@ class Scrape:
                             objects =  scrape_obj.get_all_children(ch, ne, 0, '', win, winrect, str(wxobject.backend_process).strip())
                             allobjs["view"] = objects
                         except Exception as e:
-                            import traceback
+                            logger.print_on_console(e)
+##                            import traceback
 ##                            traceback.print_exc()
-##                            logger.print_on_console(e)
                         return allobjs
 
                     def abort(self):
@@ -226,7 +226,7 @@ class Scrape:
                             try:
                                 win32process.AttachThreadInput(foreThread[0], appThread, True)
                                 win32gui.BringWindowToTop(handle)
-                                win32gui.ShowWindow(handle,5)
+                                win32gui.ShowWindow(handle, 5)
                                 win32process.AttachThreadInput(foreThread[0], appThread, False)
                             except Exception as e:
                                 pass
@@ -238,7 +238,8 @@ class Scrape:
                 global obj_ref
                 obj_ref = StartPump()
             except Exception as exception:
-                pass
+                logger.print_on_console ( 'Exception occoured when trying to perform START_CLICK_AND_ADD' )
+                log.error('Exception occoured when trying to perform START_CLICK_AND_ADD, Error Msg : ',exception)
         elif ( operation == 'STOPCLICKANDADD' ):
             global actualobjects
             try:
@@ -246,7 +247,8 @@ class Scrape:
                 allobjects = actualobjects
                 actualobjects = []
             except Exception as exception:
-                pass
+                logger.print_on_console ( 'Exception occoured when trying to perform STOP_CLICK_AND_ADD' )
+                log.error('Exception occoured when trying to perform STOP_CLICK_AND_ADD, Error Msg : ',exception)
             return allobjects
 
     def get_all_children(self, ch, ne, i, path, win, winrect, backend_process):
@@ -254,9 +256,9 @@ class Scrape:
             for i in range(len(ch)):
                  hiddentag = 'Yes'
                  text = ''
-                 new_text =''
-                 text_initial =''
-                 text_old =''
+                 new_text = ''
+                 text_initial = ''
+                 text_old = ''
                  parent = ''
                  coordinates = ''
                  canselectmultiple = 'false'
@@ -282,210 +284,209 @@ class Scrape:
                         #----Please Refer SWAPY application and check the element ,if all the properties are not populating , chances are this
                         #--- error will occour.I have noticed most of the time ch[i].texts() is the problem hence setting it to u''
                         try:
-                            getProperties = {'is_enabled': ch[i].is_enabled(),
-                                           'is_visible': ch[i].is_visible(),
-                                           'style': ch[i].style(),
-                                           'fonts': ch[i].fonts(),
-                                           'client_rects': ch[i].client_rects(),
-                                           'texts': '',
-                                           'class_name': ch[i].class_name(),
-                                           'is_unicode': ch[i].is_unicode(),
-                                           'control_id': ch[i].control_id(),
-                                           'menu_items': ch[i].menu_items(),
-                                           'user_data': ch[i].user_data(),
-                                           'friendly_class_name': ch[i].friendly_class_name(),
-                                           'control_count': ch[i].control_count(),
-                                           'exstyle': ch[i].exstyle(),
-                                           'context_help_id': ch[i].context_help_id(),
-                                           'rectangle': ch[i].rectangle()
+                            getProperties = {'is_enabled' : ch[i].is_enabled(),
+                                           'is_visible' : ch[i].is_visible(),
+                                           'style' : ch[i].style(),
+                                           'fonts' : ch[i].fonts(),
+                                           'client_rects' : ch[i].client_rects(),
+                                           'texts' : '',
+                                           'class_name' : ch[i].class_name(),
+                                           'is_unicode' : ch[i].is_unicode(),
+                                           'control_id' : ch[i].control_id(),
+                                           'menu_items' : ch[i].menu_items(),
+                                           'user_data' : ch[i].user_data(),
+                                           'friendly_class_name' : ch[i].friendly_class_name(),
+                                           'control_count' : ch[i].control_count(),
+                                           'exstyle' : ch[i].exstyle(),
+                                           'context_help_id' : ch[i].context_help_id(),
+                                           'rectangle' : ch[i].rectangle()
                                           }
                             properties = json.loads(json.dumps(getProperties, default=lambda x: str(x)))
                         except Exception as e:
                             """Some properties dont exists in ele<uia> when comapred to ele<win32>"""
                             try:
-                                getProperties = {'is_enabled': ch[i].is_enabled(),
-                                           'is_visible': ch[i].is_visible(),
-                                           'style': '',
-                                           'fonts': '',
-                                           'client_rects': '',
-                                           'texts': '',
-                                           'class_name': ch[i].class_name(),
-                                           'is_unicode': '',
-                                           'control_id': '',
-                                           'menu_items':'',
-                                           'user_data': '',
-                                           'friendly_class_name': ch[i].friendly_class_name(),
-                                           'control_count': '',
-                                           'exstyle': '',
-                                           'context_help_id':'',
-                                           'rectangle': ch[i].rectangle()
+                                getProperties = {'is_enabled' : ch[i].is_enabled(),
+                                           'is_visible' : ch[i].is_visible(),
+                                           'style' : '',
+                                           'fonts' : '',
+                                           'client_rects' : '',
+                                           'texts' : '',
+                                           'class_name' : ch[i].class_name(),
+                                           'is_unicode' : '',
+                                           'control_id' : '',
+                                           'menu_items' :'',
+                                           'user_data' : '',
+                                           'friendly_class_name' : ch[i].friendly_class_name(),
+                                           'control_count' : '',
+                                           'exstyle' : '',
+                                           'context_help_id' :'',
+                                           'rectangle' : ch[i].rectangle()
                                           }
-                                properties = json.loads(json.dumps(getProperties, default=lambda x: str(x)))
+                                properties = json.loads(json.dumps(getProperties, default=lambda x:str(x)))
                             except Exception as e:
-                                log.error('Error occoured while getting properties of the element, Error Msg : ',e)
-                                logger.print_on_console ( e )
+                                log.error( 'Error occoured while getting properties of the element, Error Msg : ', e )
+                                logger.print_on_console ( 'Error occoured while getting properties of the element' )
                                 pass
-                     if ( properties['is_visible'] == True ):
-                         properties["url"] =  win.texts()[0] if len(win.texts())>0 else ""
-                         properties['control_id'] = ch[i].element_info.control_id
-                         properties['parent'] = ch[i].element_info.parent.class_name
-                         if ( backend_process == 'A' ):
-                             handle = ch[i].handle
-                             text_initial = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
-                             text=text_initial
-                             if ( text == '' ):
-                                t = ch[i].texts()
-                                if ( len(t) >= 2 ):
-                                    text = t[1]
-                             if ( text == '' ):
-                                text = ch[i].friendly_class_name()
-                             text_old = text
-                             text = text_old
-                         elif ( backend_process == 'B' ):
-                            text_initial = ch[i].texts()
-                            text = text_initial
-                            if ( type(text) == list ):
-                                if ( text[0] == '' ):
-                                    handle = ch[i].handle
-                                    text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
-                                    if ( text == '' or text == None ):
-                                        text = ch[i].friendly_class_name()
-                                else:
-                                    try:
-                                        if ( type(text[0]) == list ):
-                                            try:
-                                                text=str(text[0][0])
-                                            except:
-                                                text=text[0][0].encode('ascii', 'replace')
-                                        else:
-                                            text=str(text[0])
-                                    except:
-                                        text=text[0].encode('ascii', 'replace')
+                     properties["url"] =  win.texts()[0] if len(win.texts()) > 0 else ""
+                     properties['control_id'] = ch[i].element_info.control_id
+                     properties['parent'] = ch[i].element_info.parent.class_name
+                     if ( backend_process == 'A' ):
+                         handle = ch[i].handle
+                         text_initial = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem = handle, cache_enable = False).name
+                         text = text_initial
+                         if ( text == '' ):
+                            t = ch[i].texts()
+                            if ( len(t) >= 2 ):
+                                text = t[1]
+                         if ( text == '' ):
+                            text = ch[i].friendly_class_name()
+                         text_old = text
+                         text = text_old
+                     elif ( backend_process == 'B' ):
+                        text_initial = ch[i].texts()
+                        text = text_initial
+                        if ( type(text) == list ):
+                            if ( text[0] == '' ):
+                                handle = ch[i].handle
+                                text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem = handle, cache_enable = False).name
+                                if ( text == '' or text == None ):
+                                    text = ch[i].friendly_class_name()
                             else:
-                                if ( text == '' or text[0] == '' ):
-                                    handle = ch[i].handle
-                                    text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
-                                    if ( text == '' or None ):
-                                        text = ch[i].friendly_class_name()
-                                else:
-                                    text = text_initial[0]
-                            text_old = text
-                            text = text_old
-                         url = properties['url']
-                         parent = properties['parent']
-                         rectangle = properties['rectangle']
-                         path = str (parent) + '[' + str(i) + ']'
-                         if ( tag == 'Button' ):
-                            tag = 'button'
-                            text =  str(text) + '_btn'
-                         elif ( tag == 'Edit' ):
-                            tag = 'input'
-                            text =  str(text) + '_txtbox'
-                         elif ( tag == 'RadioButton' ):
-                            tag = 'radiobutton'
-                            text = str(text) + '_radiobtn'
-                         elif ( tag == 'ComboBox' ):
-                            tag = 'select'
-                            text= str(text) + '_select'
-                         elif ( tag == 'CheckBox' ):
-                            tag ='checkbox'
-                            text = str(text) + '_chkbox'
-                         elif ( tag == 'ListView' ):
-                            tag = 'list'
-                            canselectmultiple="true"
-                            text = str(text) + '_lst'
-                         elif ( tag == 'ListBox' ):
-                            tag = 'list'
-                            canselectmultiple="true"
-                            text = str(text) + '_lst'
-                         elif ( tag == 'TabControl' ):
-                            tag = 'tab'
-                            text = str(text) + '_tab'
-                         elif ( tag == 'TreeView' ):
-                            tag = 'tree'
-                            text = str(text) + '_tree'
-                         elif ( tag == 'DateTimePicker' ):
-                            tag = 'datepicker'
-                            text = str(text) + '_dtp'
-                         elif ( tag == 'Table' ):
-                            tag = 'table'
-                            text = str(text) + '_table'
-                         else:
-                            tag = 'label'
-                            if ( not isinstance(text,str) ):
-                                text = str(text)+'_elmnt'
+                                try:
+                                    if ( type(text[0]) == list ):
+                                        try:
+                                            text = str(text[0][0])
+                                        except:
+                                            text = text[0][0].encode('ascii', 'replace')
+                                    else:
+                                        text = str(text[0])
+                                except:
+                                    text = text[0].encode('ascii', 'replace')
+                        else:
+                            if ( text == '' or text[0] == '' ):
+                                handle = ch[i].handle
+                                text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem = handle, cache_enable = False).name
+                                if ( text == '' or None ):
+                                    text = ch[i].friendly_class_name()
                             else:
-                                text = text+'_elmnt'
-                         left = 0
-                         top = 0
-                         try:
-                            width = coordinates.width()
-                            height = coordinates.height()
-                         except:
-                            width = coordinates_obj.width
-                            height = coordinates_obj.height
-                            pass
-                         x_screen = cor.left
-                         y_screen = cor.top
-                         left = cor.left - winrect[0]
-                         top = cor.top - winrect[1]
-                         if ( top < 0 ):
-                            top = -top
-                         if ( left < 0 ):
-                            left = -left
-                         control_id = properties['control_id']
-                         if ( control_id == None ):
-                            control_id ='null'
-                         if ( properties['is_visible'] == True ):
-                            hiddentag = 'No'
-                            flag = False
-                            for k in range(len(ne)):
-                                if ( ne[k]['xpath'] == path ):
-                                    flag = True
-                            #----------------------------------------------------
-                            new_path=''
-                            className=ch[i].friendly_class_name()
-                            #handling for UIA listbox
-                            if ( ch[i].backend.name == 'uia' and ch[i].friendly_class_name() == 'ListBox' ):
-                                new_text=text_old
-                            elif ( text_initial != '' ):
-                                if ( type(text_initial) == list ):
-                                    try:
-                                        new_text = ', '.join([x.encode('utf-8') for x in text_initial])
-                                    except:
-                                        new_text = ', '.join(str(v) for v in text_initial)
-                                else:
-                                    try:
-                                        new_text = str(text_initial)
-                                    except:
-                                        new_text = text_initial.encode('ascii', 'replace')
-                            else :
-                                new_text = text_old
-                            new_path = path + ';' + className + ';' + str(control_id) + ";" + new_text + ';' + backend_process
-                            #----------------------------------------------------
-                            if ( not flag ):
-                                ne.append({"custname":text,
-                                        "tag":tag,
-                                        "url":url,
-                                        'control_id':control_id,
-                                        'parent':parent,
-                                        'xpath' : new_path,
-                                        'hiddentag':hiddentag,
-                                        'top': top,
-                                        'left': left,
-                                        'height': height,
-                                        'width': width,
-                                        'x_screen':x_screen,
-                                        'y_screen':y_screen,
-                                        'canselectmultiple':canselectmultiple
-                                        })
-                            else:
-                                logger.print_on_console( 'This element is duplicate' )
-                                log.error( 'This element is duplicate' )
+                                text = text_initial[0]
+                        text_old = text
+                        text = text_old
+                     url = properties['url']
+                     parent = properties['parent']
+                     rectangle = properties['rectangle']
+                     path = str (parent) + '[' + str(i) + ']'
+                     if ( tag == 'Button' ):
+                        tag = 'button'
+                        text =  str(text) + '_btn'
+                     elif ( tag == 'Edit' ):
+                        tag = 'input'
+                        text =  str(text) + '_txtbox'
+                     elif ( tag == 'RadioButton' ):
+                        tag = 'radiobutton'
+                        text = str(text) + '_radiobtn'
+                     elif ( tag == 'ComboBox' ):
+                        tag = 'select'
+                        text= str(text) + '_select'
+                     elif ( tag == 'CheckBox' ):
+                        tag ='checkbox'
+                        text = str(text) + '_chkbox'
+                     elif ( tag == 'ListView' ):
+                        tag = 'list'
+                        canselectmultiple="true"
+                        text = str(text) + '_lst'
+                     elif ( tag == 'ListBox' ):
+                        tag = 'list'
+                        canselectmultiple="true"
+                        text = str(text) + '_lst'
+                     elif ( tag == 'TabControl' ):
+                        tag = 'tab'
+                        text = str(text) + '_tab'
+                     elif ( tag == 'TreeView' ):
+                        tag = 'tree'
+                        text = str(text) + '_tree'
+                     elif ( tag == 'DateTimePicker' ):
+                        tag = 'datepicker'
+                        text = str(text) + '_dtp'
+                     elif ( tag == 'Table' ):
+                        tag = 'table'
+                        text = str(text) + '_table'
                      else:
-                        text = ''
-                        handle = ch[i].handle
-                        text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
+                        tag = 'label'
+                        if ( not isinstance(text, str) ):
+                            text = str(text) + '_elmnt'
+                        else:
+                            text = text + '_elmnt'
+                     left = 0
+                     top = 0
+                     try:
+                        width = coordinates.width()
+                        height = coordinates.height()
+                     except:
+                        width = coordinates_obj.width
+                        height = coordinates_obj.height
+                        pass
+                     x_screen = cor.left
+                     y_screen = cor.top
+                     left = cor.left - winrect[0]
+                     top = cor.top - winrect[1]
+                     if ( top < 0 ):
+                        top = -top
+                     if ( left < 0 ):
+                        left = -left
+                     control_id = properties['control_id']
+                     if ( control_id == None ):
+                        control_id ='null'
+                     #--------------------------------------------hidden_flag
+                     if ( properties['is_visible'] == True ):
+                        hiddentag = False
+                     elif ( properties['is_visible'] == False ):
+                        hiddentag = True
+                     #------------------------------------------------------
+                     flag = False
+                     for k in range(len(ne)):
+                        if ( ne[k]['xpath'] == path ):
+                            flag = True
+                     #----------------------------------------------------
+                     new_path = ''
+                     className = ch[i].friendly_class_name()
+                     #handling for UIA listbox
+                     if ( ch[i].backend.name == 'uia' and ch[i].friendly_class_name() == 'ListBox' ):
+                        new_text=text_old
+                     elif ( text_initial != '' ):
+                        if ( type(text_initial) == list ):
+                            try:
+                                new_text = ', '.join([x.encode('utf-8') for x in text_initial])
+                            except:
+                                new_text = ', '.join(str(v) for v in text_initial)
+                        else:
+                            try:
+                                new_text = str(text_initial)
+                            except:
+                                new_text = text_initial.encode('ascii', 'replace')
+                     else :
+                        new_text = text_old
+                     new_path = path + ';' + className + ';' + str(control_id) + ";" + new_text + ';' + backend_process
+                     #----------------------------------------------------
+                     if ( not flag ):
+                        ne.append({"custname" : text,
+                                "tag" : tag,
+                                "url" : url,
+                                'control_id' : control_id,
+                                'parent' : parent,
+                                'xpath' : new_path,
+                                'hiddentag' : hiddentag,
+                                'top' : top,
+                                'left' : left,
+                                'height' : height,
+                                'width' : width,
+                                'x_screen' : x_screen,
+                                'y_screen' : y_screen,
+                                'canselectmultiple' : canselectmultiple
+                                })
+                     else:
+                        logger.print_on_console( 'This element is duplicate' )
+                        log.info( 'This element is duplicate' )
                  except Exception as e:
                     logger.print_on_console(e)
                     log.error(e)
@@ -496,7 +497,6 @@ class Scrape:
             log.error(e)
 ##            import traceback
 ##            traceback.print_exc()
-##
         return ne
 
     def full_scrape(self, wxobject):
@@ -526,10 +526,10 @@ class Scrape:
             obj.set_to_foreground()
             obj.bring_Window_Front()
             winrect = desktop_launch_keywords.win_rect;
-            allobjects =  self.get_all_children(ch,ne,0,'',win,winrect,str(wxobject.backend_process).strip())
+            allobjects =  self.get_all_children(ch, ne, 0, '', win, winrect, str(wxobject.backend_process).strip())
         except Exception as e:
-            logger.print_on_console(e)
-            log.error('Error occoured while performing full_scrape, Error Msg : ',e)
+            log.error( 'Error occoured while performing full_scrape, Error Msg : ', e )
+            logger.print_on_console( 'Error occoured while performing full_scrape' )
 ##            import traceback
 ##            traceback.print_exc()
         return allobjects
@@ -543,5 +543,5 @@ class Rectangle:
             self.height = int(child.rectangle().bottom) - int(child.rectangle().top)
             self.width = int(child.rectangle().right) - int(child.rectangle().left)
         except Exception as e:
-            logger.print_on_console('Error fetching object coordinates')
-            log.error('Error fetching object coordinates, Error Msg : ',e)
+            logger.print_on_console( 'Error fetching object coordinates' )
+            log.error( 'Error fetching object coordinates, Error Msg : ', e )
