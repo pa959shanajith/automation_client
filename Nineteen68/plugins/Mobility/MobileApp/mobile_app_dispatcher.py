@@ -400,12 +400,19 @@ class MobileDispatcher:
                 else:
                     driver = android_scrapping.driver
                     if teststepproperty.custname == "@Android_Custom":
-                        if self.custom_object.custom_check(input,keyword) == False:
-                            logger.print_on_console("The object and the keyword do not match")
-                            result=TERMINATE
+                        if (input[0] and input[1] and input[2]):
+                            logger.print_on_console("Element type is ",input[0])
+                            logger.print_on_console("Visible text is ",input[1])
+                            logger.print_on_console("Index is ",input[2])
+                            if self.custom_object.custom_check(input,keyword) == False:
+                                logger.print_on_console("The object and the keyword do not match")
+                                result=TERMINATE
+                            else:
+                                webelement,input=self.custom_object.custom_element(input)
+                                result=self.mob_dict[keyword](webelement,input)
                         else:
-                            webelement,input=self.custom_object.custom_element(input)
-                            result=self.mob_dict[keyword](webelement,input)
+                            logger.print_on_console("Invalid input, Please provide the valid input")
+                            result=TERMINATE
                     elif keyword==WAIT_FOR_ELEMENT_EXISTS:
                         result=self.mob_dict[keyword](objectname,input)
                     elif keyword == 'getnumber' or keyword == 'verifynumber':
