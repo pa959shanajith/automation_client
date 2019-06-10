@@ -185,7 +185,7 @@ class Util_Keywords():
                         log.debug(check)
                         if (check):
                             log.info('Parent matched')
-                            if(element == None):
+                            if( not element.is_visible() ):
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
