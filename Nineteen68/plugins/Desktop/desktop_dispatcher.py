@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        desktop_dispatcher.py
-# Purpose:
+# Purpose:     Dispatcher acts like a terminal for the flow of input/output.
 #
 # Author:      rakesh.v,anas.ahmed
 #
@@ -33,7 +33,7 @@ from pywinauto.application import Application
 import pywinauto
 from pywinauto.findwindows import find_window
 from pywinauto.win32functions import SetForegroundWindow
-log = logging.getLogger('desktop_dispatcher.py')
+log = logging.getLogger( 'desktop_dispatcher.py' )
 
 class DesktopDispatcher:
     button_link_keywords_obj = button_link_keywords_desktop.ButtonLinkKeyword()
@@ -46,12 +46,12 @@ class DesktopDispatcher:
     tab_control_keywords_obj = desktop_tab_control_keywords.Tab_Control_Keywords()
     date_control_keywords_obj = desktop_date_control_keywords.DateControlKeywords()
     desktop_custom_object_obj = desktop_custom_object.CustomObjectHandler()
-    tree_keywords_obj=desktop_treeview_keywords.Tree_View_Keywords()
-    table_keywords_obj=desktop_table_keywords.Table_Keywords()
+    tree_keywords_obj = desktop_treeview_keywords.Tree_View_Keywords()
+    table_keywords_obj = desktop_table_keywords.Table_Keywords()
 ##    outook_obj=outlook.OutlookKeywords()
 
     desktop_dict = { 'click': button_link_keywords_obj.click,
-        'press':button_link_keywords_obj.press,
+        'press' : button_link_keywords_obj.press,
         'doubleclick' : button_link_keywords_obj.double_click,
         'verifybuttonname' : button_link_keywords_obj.verify_button_name,
         'getbuttonname' : button_link_keywords_obj.get_button_name,
@@ -68,7 +68,7 @@ class DesktopDispatcher:
         'clickelement' : element_keywords_obj.click_element,
         'getelementtext' : element_keywords_obj.get_element_text,
         'verifyelementtext' : element_keywords_obj.verify_element_text,
-        'mousehover':element_keywords_obj.mouseHover,
+        'mousehover' : element_keywords_obj.mouseHover,
         'launchapplication' : launch_keywords_obj.launch_application,
         'findwindowandattach' : launch_keywords_obj.find_window_and_attach,
         'selectmenu': launch_keywords_obj.select_menu,
@@ -89,85 +89,85 @@ class DesktopDispatcher:
         'verifyselectedvalue': dropdown_keywords_obj.verifySelected,
         'getcount': dropdown_keywords_obj.getCount,
         'verifycount': dropdown_keywords_obj.verifyCount,
-        'verifyvaluesexists': dropdown_keywords_obj.verifyValuesExists,
-        'verifyallvalues': dropdown_keywords_obj.verifyAllValues,
-        'getvaluebyindex': dropdown_keywords_obj.getValueByIndex,
-        'getmultiplevaluesbyindexes': dropdown_keywords_obj.getMultpleValuesByIndexs,
-        'selectallvalues': dropdown_keywords_obj.selectAllValues,
-        'deselectall': dropdown_keywords_obj.deSelectAll,
-        'selectmultiplevaluesbyindexes': dropdown_keywords_obj.selectMultpleValuesByIndexs,
-        'selectmultiplevaluesbytext': dropdown_keywords_obj.selectMultpleValuesByText,
+        'verifyvaluesexists' : dropdown_keywords_obj.verifyValuesExists,
+        'verifyallvalues' : dropdown_keywords_obj.verifyAllValues,
+        'getvaluebyindex' : dropdown_keywords_obj.getValueByIndex,
+        'getmultiplevaluesbyindexes' : dropdown_keywords_obj.getMultpleValuesByIndexs,
+        'selectallvalues' : dropdown_keywords_obj.selectAllValues,
+        'deselectall' : dropdown_keywords_obj.deSelectAll,
+        'selectmultiplevaluesbyindexes' : dropdown_keywords_obj.selectMultpleValuesByIndexs,
+        'selectmultiplevaluesbytext' : dropdown_keywords_obj.selectMultpleValuesByText,
         'selectradiobutton' : radio_checkbox_keywords_obj.select_radiobutton,
         'selectcheckbox' : radio_checkbox_keywords_obj.select_checkbox,
         'unselectcheckbox' : radio_checkbox_keywords_obj.unselect_checkbox,
         'getstatus' : radio_checkbox_keywords_obj.get_status,
-        'selecttabbyindex': tab_control_keywords_obj.selectTabByIndex,
+        'selecttabbyindex' : tab_control_keywords_obj.selectTabByIndex,
         'selecttabbytext' : tab_control_keywords_obj.selectTabByText,
         'getselectedtab' : tab_control_keywords_obj.getSelectedTab,
         'verifyselectedtab' : tab_control_keywords_obj.verifySelectedTab,
         'getdate' : date_control_keywords_obj.getDate,
         'setdate' : date_control_keywords_obj.setDate,
-        'selecttreenode':tree_keywords_obj.click_tree_element,
-        'getnodenamebyindex':tree_keywords_obj.getElementTextByIndex,
-        'getcellvalue':table_keywords_obj.get_cell_value,
-        'getcolcount':table_keywords_obj.get_col_count,
+        'selecttreenode' : tree_keywords_obj.click_tree_element,
+        'getnodenamebyindex' : tree_keywords_obj.getElementTextByIndex,
+        'getcellvalue' : table_keywords_obj.get_cell_value,
+        'getcolcount' : table_keywords_obj.get_col_count,
         'getcolnumbytext':table_keywords_obj.get_col_num_by_text,
-        'getrowcount':table_keywords_obj.get_row_count,
+        'getrowcount' : table_keywords_obj.get_row_count,
         'getrownumbytext':table_keywords_obj.get_row_num_by_text,
-        'selectrow':table_keywords_obj.select_row,
-        'clickcell':table_keywords_obj.click_cell,
-        'doubleclickcell':table_keywords_obj.double_click_cell,
-        'verifycellvalue':table_keywords_obj.verify_cell_value
+        'selectrow' : table_keywords_obj.select_row,
+        'clickcell' : table_keywords_obj.click_cell,
+        'doubleclickcell' : table_keywords_obj.double_click_cell,
+        'verifycellvalue' : table_keywords_obj.verify_cell_value
     }
 
 
-    email_dict = {'getemail': 1,
+    email_dict = {'getemail' : 1,
           'getfrommailid' : 2,
-          'getattachmentstatus'    : 3,
-          'getsubject'     : 4,
+          'getattachmentstatus' : 3,
+          'getsubject' : 4,
           'gettomailid'  : 5,
           'getbody' : 6,
           'verifyemail' : 7,
-          'switchtofolder':8,
+          'switchtofolder' : 8,
           'settomailid' : 9,
-          'setcc'    : 10,
-          'setbcc'     :11,
-          'setsubject'  : 12,
+          'setcc' : 10,
+          'setbcc' : 11,
+          'setsubject' : 12,
           'setbody' : 13,
           'setattachments' : 14,
-          'sendemail':15
+          'sendemail' : 15
     }
 
     # For custom objects
     custom_dict = {
-        "clickelement":['radiobutton','checkbox','input','button','select'],
-        "doubleclick":['radiobutton','checkbox','input','button','select'],
-        "getelementtext":['radiobutton','checkbox','input','button','select'],
-        "getstatus":['radiobutton','checkbox'],
-        "gettext":['input'],
-        "rightclick":['button'],
-        "selectcheckbox":['checkbox'],
-        "selectradiobutton":['radiobutton'],
-        "setfocus" :['radiobutton','checkbox','input','button','select'],
-        "setsecuretext":['input'],
-        "selectvaluebyindex":['select'],
-        "selectvaluebytext":['select'],
-        "settext":['input'],
-        "unselectcheckbox":['checkbox'],
-        'verifyhidden' :['radiobutton','checkbox','input','button','select'],
-        'verifyvisible':['radiobutton','checkbox','input','button','select'],
-        "verifyelementtext":['radiobutton','checkbox','input','button','select'],
-        "verifyexists":['radiobutton','checkbox','input','button','select'],
-        "mousehover":['radiobutton','checkbox','input','button'],
-        "verifyallvalues":['select']
+        "clickelement" : ['radiobutton', 'checkbox', 'input', 'button', 'select'],
+        "doubleclick" : ['radiobutton', 'checkbox', 'input', 'button', 'select'],
+        "getelementtext" : ['radiobutton', 'checkbox', 'input', 'button', 'select'],
+        "getstatus" : ['radiobutton', 'checkbox'],
+        "gettext" : ['input'],
+        "rightclick" : ['button'],
+        "selectcheckbox" : ['checkbox'],
+        "selectradiobutton" : ['radiobutton'],
+        "setfocus" : ['radiobutton', 'checkbox', 'input', 'button', 'select'],
+        "setsecuretext" : ['input'],
+        "selectvaluebyindex" : ['select'],
+        "selectvaluebytext" : ['select'],
+        "settext" : ['input'],
+        "unselectcheckbox" : ['checkbox'],
+        'verifyhidden' : ['radiobutton', 'checkbox', 'input', 'button', 'select'],
+        'verifyvisible': ['radiobutton', 'checkbox', 'input', 'button', 'select'],
+        "verifyelementtext" : ['radiobutton', 'checkbox', 'input', 'button', 'select'],
+        "verifyexists" : ['radiobutton', 'checkbox', 'input', 'button', 'select'],
+        "mousehover" : ['radiobutton', 'checkbox', 'input', 'button'],
+        "verifyallvalues" : ['select']
     }
 
     get_ele_type = {
-        'radio': 'radiobutton',
-        'checkbox':'checkbox',
-        'dropdown':'select',
-        'textbox':'input',
-        'button':'button',
+        'radio' : 'radiobutton',
+        'checkbox' : 'checkbox',
+        'dropdown' : 'select',
+        'textbox' : 'input',
+        'button' : 'button',
     }
 
 
@@ -183,7 +183,7 @@ class DesktopDispatcher:
         keyword = teststepproperty.name.lower()
         url = teststepproperty.url
         err_msg = None
-        result = [desktop_constants.TEST_RESULT_FAIL,desktop_constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
+        result = [desktop_constants.TEST_RESULT_FAIL, desktop_constants.TEST_RESULT_FALSE, constants.OUTPUT_CONSTANT, err_msg]
 ##        if objectname != '@Browser' or objectname != '@BrowserPopUp' or objectname != '@Custom':
 
         self.desktop_dict['getemail'] = self.outook_obj.GetEmail
@@ -216,20 +216,20 @@ class DesktopDispatcher:
             self.desktop_dict['verifytextiris'] = iris_object.verifytextiris
         try:
             if ( objectname == desktop_constants.CUSTOM and teststepproperty.custom_flag ):
-                ele_type=input[0].lower()
+                ele_type = input[0].lower()
                 if ( ele_type in self.get_ele_type ):
                     ele_type=self.get_ele_type[ele_type]
                 parent_xpath=teststepproperty.parent_xpath
                 if ( keyword in self.custom_dict and ele_type in self.custom_dict[keyword] ):
-                    custom_desktop_element=self.desktop_custom_object_obj.getobjectforcustom(parent_xpath,ele_type,input[2] )
+                    custom_desktop_element = self.desktop_custom_object_obj.getobjectforcustom(parent_xpath, ele_type, input[2])
                     if ( custom_desktop_element != '' or None ):
                         objectname = custom_desktop_element
                 else:
-                    logger.print_on_console("Unmapped or non existant custom objects")
-                    log.error("Unmapped or non existant custom objects")
+                    logger.print_on_console( "Unmapped or non existant custom objects" )
+                    log.error( "Unmapped or non existant custom objects" )
         except Exception as e:
-            logger.print_on_console("Error has occured in custom objects")
-            log.error("Error has occured in custom objects")
+            logger.print_on_console( "Error has occured in custom objects" )
+            log.error( "Error has occured in custom objects" )
 #-----------------------------------------------------------------for custom objects
 
         try:
@@ -250,14 +250,14 @@ class DesktopDispatcher:
                         if ( teststepproperty.custom_flag ):
                             result = self.desktop_dict[keyword](ele, input, output, teststepproperty.parent_xpath)
                         else:
-                            result= self.desktop_dict[keyword](ele, input, output)
+                            result = self.desktop_dict[keyword](ele, input, output)
                     else:
                         if ( objectname != '' ):
-                            ele = self.get_desktop_element(objectname,url)
-                        result= self.desktop_dict[keyword](ele, url, input, output)
+                            ele = self.get_desktop_element(objectname, url)
+                        result = self.desktop_dict[keyword](ele, url, input, output)
 
                 if ( not(desktop_constants.ELEMENT_FOUND) and self.exception_flag ):
-                    result=constants.TERMINATE
+                    result = constants.TERMINATE
             else:
                 err_msg = desktop_constants.INVALID_KEYWORD
                 result = list(result)
@@ -290,17 +290,17 @@ class DesktopDispatcher:
             result = list(result)
             result[3] = err_msg
         except Exception as e:
-            log.error(e)
+            log.error( e )
             #logger.print_on_console('Exception at dispatcher')
         if  ( err_msg != None ):
             #import traceback
             #traceback.print_exc()
-            log.error(err_msg)
-            logger.print_on_console(err_msg)
+            log.error( err_msg )
+            logger.print_on_console( err_msg )
 
         return result
 
-    def get_desktop_element(self,xPath,url):
+    def get_desktop_element(self, xPath, url):
         index = None
         ele = ''
         backend = 'A'
@@ -333,7 +333,7 @@ class DesktopDispatcher:
                 parent = split_xpath[0]
                 index = int(parent[parent.index('[') + 1 : parent.index(']')])
                 ele = ch[int(index)]
-                for i in range(1,len(split_xpath)):
+                for i in range(1, len(split_xpath)):
                     child = split_xpath[i]
                     index = child[child.index('[') + 1 : child.index(']')]
                     ch = ele.children()
@@ -350,7 +350,7 @@ class DesktopDispatcher:
                                 #-------------------------------------getting text and comparing with xname
                                 handle= ele.handle
                                 try:
-                                    element_text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
+                                    element_text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem = handle, cache_enable = False).name
                                 except:
                                     pass
                                 if ( element_text != '' ):
@@ -375,33 +375,32 @@ class DesktopDispatcher:
                         ele = ''  #If false then new test case and AUT structure has changed, so setting the ele to ''
                 #---------------------------------------------------
             except Exception as e:
-                log.error("Unable to get desktop elements because : ",e)
+                log.error( "Unable to get desktop elements because : ", e)
                 #import traceback
                 #traceback.print_exc()
             if ( ele == '' ):
                 #logger.print_on_console("Warning! AUT Structure has changed")
                 try:
-                    ele = self.get_element_if_empty(xclass,xname,app2)
+                    ele = self.get_element_if_empty(xclass, xname, app2)
                 except:# only for tables
-                    ele = self.get_desktop_static_element(xclass,xconID,app)
+                    ele = self.get_desktop_static_element(xclass, xconID, app)
             if ( ele == '' ):#last attempt if the element is still empty, then find element using original index
                 try:
                     ele = ch[int(index)]
                 except Exception as e:
-                    log.error(e)
+                    log.error( e )
                     #import traceback
                     #traceback.print_exc()
-                    logger.print_on_console("Unable to get desktop element because :")
-                    logger.print_on_console(e)
-        elif backend =='B':
+                    logger.print_on_console( "Unable to get desktop element because : ", e )
+        elif ( backend == 'B' ):
             try:
                 import pythoncom
                 pythoncom.CoInitialize()
                 win = desktop_launch_keywords.app_uia.top_window()
-##                ch=win.children()[:]
+##                ch = win.children()[:]
 ##                for i in range(0,len(ch)):
 ##                    if len(ch[i].children()):
-##                        c=ch[i].children()
+##                        c = ch[i].children()
 ##                        for a in c:
 ##                            ch.append(a)
                 ch = []
@@ -420,16 +419,15 @@ class DesktopDispatcher:
                     ch = ele.children()
                     ele = ch[int(index)]
                 #warning message
-                if (ele.friendly_class_name() == 'ListView' or ele.friendly_class_name() == 'ListBox'):
-                    log.info('List keywords return inconsistant values for elements scraped via method B')
-                    log.error('List keywords return inconsistant values for elements scraped via method B')
-                    logger.print_on_console('List keywords return inconsistant values for elements scraped via method B')
+                if ( ele.friendly_class_name() == 'ListView' or ele.friendly_class_name() == 'ListBox' ):
+                    log.info( 'List keywords return inconsistant values for elements scraped via method B' )
+                    log.error( 'List keywords return inconsistant values for elements scraped via method B' )
+                    logger.print_on_console( 'List keywords return inconsistant values for elements scraped via method B' )
             except Exception as e:
-                log.error("Unable to get desktop element because : ",e)
+                log.error( "Unable to get desktop element because : ", e)
                 #import traceback
                 #traceback.print_exc()
-                logger.print_on_console("Unable to get desktop element because :")
-                logger.print_on_console(e)
+                logger.print_on_console( "Unable to get desktop element because : ", e )
         return ele
 
     def get_desktop_static_element(self, xclass, xconID, app):
@@ -441,23 +439,23 @@ class DesktopDispatcher:
         try:
             win1 = app.top_window()
             ch1 = win1.children()
-            for i in range(0,len(ch1)):
+            for i in range(0, len(ch1)):
                 try:
                     conID = ch1[i].control_id()
-                    className=ch1[i].friendly_class_name()
-                    if xclass==className:
-                        if xconID==conID:
-                            ele=ch1[i]
+                    className = ch1[i].friendly_class_name()
+                    if ( xclass == className ):
+                        if ( xconID == conID ):
+                            ele = ch1[i]
                 except Exception as e:
-                    log.error(e)
+                    log.error( 'Error occoured in get_desktop_static_element, Err Msg : ', e )
                     #import traceback
                     #traceback.print_exc()
         except Exception as e:
-            log.error(e)
+            log.error( 'Error occoured in get_desktop_static_element, Err Msg : ', e )
             #import traceback
             #traceback.print_exc()
         return ele
-    def get_element_if_empty(self,xclass,xname,app):
+    def get_element_if_empty(self, xclass, xname, app):
         """This method was added as a check, The name of the element is passed as an argument,it
         comes to this method only when the friendly class name does not match"""
         #logic to find the desktop element using custname of the element returned from UI
@@ -475,7 +473,7 @@ class DesktopDispatcher:
                     #------------------------------------------------
                     handle = ch2[i].handle
                     try:
-                        element_text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle,cache_enable=False).name
+                        element_text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem = handle, cache_enable = False).name
                     except:
                         pass
                     if ( element_text != '' ):
@@ -496,11 +494,11 @@ class DesktopDispatcher:
                             ele=ch2[i]
                             break
                 except Exception as e:
-                    log.error(e)
+                    log.error( 'Error occoured in get_element_if_empty, Err Msg : ', e )
                     #import traceback
                     #traceback.print_exc()
         except Exception as e:
-            log.error(e)
+            log.error( 'Error occoured in get_element_if_empty, Err Msg : ', e )
             #import traceback
             #traceback.print_exc()
         return ele
