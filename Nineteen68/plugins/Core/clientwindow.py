@@ -239,31 +239,58 @@ class MainNamespace(BaseNamespace):
     def on_webscrape(self,*args):
         try:
             if check_execution_lic("scrape"): return None
-            global action,wxObject,browsername,desktopScrapeFlag,data
+            global action,wxObject,browsername,desktopScrapeFlag,data,socketIO
             args = list(args)
             d = args[0]
+            print(args)
             action = d['action']
-            task = d['task']
             data = {}
-            if action == 'scrape':
-                if str(task) == 'OPEN BROWSER CH':
-                    browsername = '1'
-                elif str(task) == 'OPEN BROWSER IE':
-                    browsername = '3'
-                elif str(task) == 'OPEN BROWSER FX':
-                    browsername = '2'
-                elif str(task) == 'OPEN BROWSER SF':
-                    browsername = '6'
-            elif action == 'compare':
-                data['view'] = d['viewString']
-                data['scrapedurl'] = d['scrapedurl']
-                if str(task) == 'OPEN BROWSER CH':
-                    browsername = '1'
-                elif str(task) == 'OPEN BROWSER IE':
-                    browsername = '3'
-                elif str(task) == 'OPEN BROWSER FX':
-                    browsername = '2'
-            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+            if action == 'userobject':
+                if d['operation']=='encrypt':
+                    obj=core_utils.CoreUtils()
+                    data['url']= obj.scrape_wrap(d['url'])
+                    left_part=obj.scrape_wrap(d['rpath']+";"+d["id"])
+                    right_part=obj.scrape_wrap(d["name"]+";"+d["tagname"]+";"+d["classname"]+"; ; ; ; ; ;"+d['selector'])
+                    data['xpath'] = left_part+';'+d["apath"]+';'+right_part
+                    socketIO.emit('scrape',data)
+                elif d['operation']=='decrypt':
+                    obj=core_utils.CoreUtils()
+                    xpath_string=d['xpath'].split(';')
+                    left_part=obj.scrape_unwrap(xpath_string[0])
+                    right_part=obj.scrape_unwrap(xpath_string[2])
+                    data['url']=obj.scrape_unwrap(d['url'])
+                    data['rpath']=left_part.split(';')[0]
+                    data['apath']=xpath_string[1]
+                    data['id']=left_part.split(';')[1]
+                    data['tag']=d['tag']
+                    data["name"]=right_part.split(';')[0]
+                    data["tagname"]=right_part.split(';')[1]
+                    data["classname"]=right_part.split(';')[2]
+                    data["selector"]=right_part.split(';')[8]
+                    print('d',data)
+                    socketIO.emit('scrape',data)
+            else:
+                if action == 'scrape':
+                    task = d['task']
+                    if str(task) == 'OPEN BROWSER CH':
+                        browsername = '1'
+                    elif str(task) == 'OPEN BROWSER IE':
+                        browsername = '3'
+                    elif str(task) == 'OPEN BROWSER FX':
+                        browsername = '2'
+                    elif str(task) == 'OPEN BROWSER SF':
+                        browsername = '6'
+                elif action == 'compare':
+                    task = d['task']
+                    data['view'] = d['viewString']
+                    data['scrapedurl'] = d['scrapedurl']
+                    if str(task) == 'OPEN BROWSER CH':
+                        browsername = '1'
+                    elif str(task) == 'OPEN BROWSER IE':
+                        browsername = '3'
+                    elif str(task) == 'OPEN BROWSER FX':
+                        browsername = '2'
+                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
         except Exception as e:
             err_msg='Error while Scraping Web application'
             log.error(err_msg)
@@ -1723,14 +1750,14 @@ class Config_window(wx.Frame):
             self.rbox11.SetSelection(0)
         else:
             self.rbox11.SetSelection(1)
-        
+
         self.rbox12 = wx.RadioBox(self.panel, label = "Hide Soft. Keyboard", pos = config_fields["hide_soft_key"][0], choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson != False and isConfigJson['hide_soft_key'].title() == lblList[0]:
             self.rbox12.SetSelection(0)
         else:
             self.rbox12.SetSelection(1)
-        
+
 
         self.error_msg=wx.StaticText(self.panel, label="", pos=(85,488),size=(350, 28), style=0, name="")
         self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])

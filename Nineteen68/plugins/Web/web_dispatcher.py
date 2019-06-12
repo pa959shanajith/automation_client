@@ -473,7 +473,6 @@ class Dispatcher:
 ##        objectname = str(objectname)
         webElement = None
         if objectname.strip() != '':
-
             identifiers = objectname.split(';')
             log.debug('Identifiers are ')
             log.debug(identifiers)
@@ -527,7 +526,55 @@ class Dispatcher:
                             webElement = tempwebElement
 ##                            log.debug('Webelement found by absolute Xpath')
                         except Exception as webEx:
-                            err_msg=WEB_ELEMENT_NOT_FOUND
+                            try:
+                                if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                    tempwebElement = driver.find_elements_by_name(identifiers[3])
+                                    if (len(tempwebElement) == 1):
+                                        logger.print_on_console('Webelement found by name')
+                                        log.debug('Webelement found by name')
+                                    if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                        tempwebElement = driver.find_elements_by_class_name(identifiers[5])
+                                        if (len(tempwebElement) == 1):
+                                            logger.print_on_console('Webelement found by class name')
+                                            log.debug('Webelement found by class name')
+                                    if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                        if(len(identifiers)==12):
+                                            tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
+                                            if (len(tempwebElement) == 1):
+                                                logger.print_on_console('Webelement found by selector')
+                                                log.debug('Webelement found by selector')
+                                            else:
+                                                tempwebElement = None
+                                webElement = tempwebElement
+                            except Exception as webEx:
+                                    try:
+                                        if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                            tempwebElement = driver.find_elements_by_class_name(identifiers[5])
+                                            if (len(tempwebElement) == 1):
+                                                logger.print_on_console('Webelement found by class name')
+                                                log.debug('Webelement found by class name')
+                                            if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                                if(len(identifiers)==12):
+                                                    tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
+                                                    if (len(tempwebElement) == 1):
+                                                        logger.print_on_console('Webelement found by selector')
+                                                        log.debug('Webelement found by selector')
+                                                    else:
+                                                        tempwebElement = None
+                                        webElement = tempwebElement
+                                    except Exception as webEx:
+                                        try:
+                                            if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                                if(len(identifiers)==12):
+                                                    tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
+                                                    if (len(tempwebElement) == 1):
+                                                        logger.print_on_console('Webelement found by selector')
+                                                        log.debug('Webelement found by selector')
+                                                    else:
+                                                        tempwebElement = None
+                                            webElement = tempwebElement
+                                        except Exception as webEx:
+                                            err_msg=WEB_ELEMENT_NOT_FOUND
             #enhance object reconition changes
             if(webElement == None):
                 try:
