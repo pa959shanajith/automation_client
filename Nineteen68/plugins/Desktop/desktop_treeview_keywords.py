@@ -18,7 +18,7 @@ import time
 import string
 from constants import *
 import logging
-log = logging.getLogger('desktop_treeview_keywords.py')
+log = logging.getLogger( 'desktop_treeview_keywords.py' )
 
 class Tree_View_Keywords():
 ##    def get_item_count(self, element , parent , input_val , *args):
@@ -389,98 +389,97 @@ class Tree_View_Keywords():
 ##        return status,result,verb,err_msg
 
     def click_tree_element(self, element , parent , input_val , *args):
-        status=desktop_constants.TEST_RESULT_FAIL
-        result=desktop_constants.TEST_RESULT_FALSE
+        status = desktop_constants.TEST_RESULT_FAIL
+        result = desktop_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
-        err_msg=None
-        flag=False
-        tree_elm=''
-        slash='\\'
-        if len(input_val)==1:
-            if input_val[0]=='':
-                flag=True
+        err_msg = None
+        flag = False
+        tree_elm = ''
+        slash = '\\'
+        if ( len(input_val) == 1 ):
+            if ( input_val[0] == '' ):
+                flag = True
         else:
 ##            input_val=input_val[0]
             #------------------------------------------------ replacing ";" with "\\"
-            input_val=slash.join(input_val)
+            input_val = slash.join(input_val)
 ##            if "\\" in input_val:
 ##                input_val=string.replace(input_val ,'\\','\ ')
-            input_val="\\"+input_val
+            input_val = "\\" + input_val
             #-------------------------------------------------
-        if flag!=True:
+        if ( flag != True ):
             try:
-                if desktop_launch_keywords.window_name!=None:
+                if ( desktop_launch_keywords.window_name != None ):
                     verify_obj = Text_Box()
-                    log.info('Recieved element from the desktop dispatcher')
-                    check = verify_obj.verify_parent(element,parent)
-                    log.debug('Parent of element while scraping')
-                    log.debug(parent)
-                    log.debug('Parent check status')
-                    log.debug(check)
-                    if (check):
+                    log.info( 'Recieved element from the desktop dispatcher' )
+                    check = verify_obj.verify_parent(element, parent)
+                    log.debug( 'Parent of element while scraping' )
+                    log.debug( parent )
+                    log.debug( 'Parent check status' )
+                    log.debug( check )
+                    if ( check ):
                         log.info('Parent matched')
-                        if(element.is_enabled()):
-                                if element.backend.name=='win32':
-                                    tree_elm=element.item(input_val, exact=True)
-                                    tree_elm.click_input(button='left', double=False, wheel_dist=0, where='text', pressed='')
-                                elif element.backend.name=='uia':
-                                    tree_elm=element.get_item(input_val, exact=True)
-                                    tree_elm.click_input(button='left', double=False, wheel_dist=0, pressed='')
+                        if( element.is_enabled() ):
+                                if ( element.backend.name == 'win32' ):
+                                    tree_elm = element.item(input_val, exact = True)
+                                    tree_elm.click_input(button = 'left', double = False, wheel_dist = 0, where = 'text', pressed = '')
+                                elif ( element.backend.name == 'uia' ):
+                                    tree_elm = element.get_item(input_val, exact = True)
+                                    tree_elm.click_input(button = 'left', double = False, wheel_dist = 0, pressed = '')
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                         else:
-                          log.info('Element state does not allow to perform the operation')
-                          logger.print_on_console('Element state does not allow to perform the operation')
-                          err_msg= 'Element state does not allow to perform the operation'
+                            err_msg = 'Element state does not allow to perform the operation'
                     else:
-                       log.info('Element not present on the page where operation is trying to be performed')
-                       err_msg='Element not present on the page where operation is trying to be performed'
-                       logger.print_on_console('Element not present on the page where operation is trying to be performed')
+                       err_msg = 'Element not present on the page where operation is trying to be performed'
+                if ( err_msg ):
+                    log.info( err_msg )
+                    logger.print_on_console( err_msg )
             except Exception as exception:
-                log.error(exception)
-                logger.print_on_console(exception)
-                err_msg="Unable to perform action on this element."
-        elif flag==True:
-            Rect=''
+                err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
+                log.error( err_msg )
+                logger.print_on_console( err_msg )
+        elif ( flag == True ):
+            Rect = ''
             try:
                 #----------get the element coordinates
-                Rect=str(element.rectangle())
-                Rect=Rect[1:len(Rect)-1]
-                Rect=Rect.split(",")
-                Left=Rect[0].strip()#left
-                if "L" in Left:
-                    Left=int(Left[1:])
+                Rect = str(element.rectangle())
+                Rect = Rect[1 : len(Rect) - 1]
+                Rect = Rect.split(",")
+                Left = Rect[0].strip()#left
+                if ( "L" in Left ):
+                    Left = int(Left[1:])
                 else:
-                    Left=int(Left)
-                Top=Rect[1].strip()#top
-                if "T" in Top:
-                    Top=int(Top[1:])
+                    Left = int(Left)
+                Top = Rect[1].strip()#top
+                if ( "T" in Top ):
+                    Top = int(Top[1:])
                 else:
-                    Top=int(Top)
-                Right=Rect[2].strip()#right
-                if "R" in Right:
-                    Right=int(Right[1:])
+                    Top = int(Top)
+                Right = Rect[2].strip()#right
+                if ( "R" in Right ):
+                    Right = int(Right[1:])
                 else:
-                    Right=int(Right)
-                Bottom=Rect[3].strip()#bottom
-                if "B" in Bottom:
-                    Bottom=int(Bottom[1:])
+                    Right = int(Right)
+                Bottom = Rect[3].strip()#bottom
+                if ( "B" in Bottom ):
+                    Bottom = int(Bottom[1:])
                 else:
-                    Bottom=int(Bottom)
+                    Bottom = int(Bottom)
                 #---------------------Finding height and width
-                height=Bottom-Top
-                width=Right-Left
+                height = Bottom - Top
+                width = Right - Left
                 #--------------------Finding X and Y co-ordinates
-                x = Left + width/2
-                y= Top + height/2
-                pywinauto.mouse.click(button='left',coords=(int(x), int(y)))
+                x = Left + width / 2
+                y = Top + height / 2
+                pywinauto.mouse.click(button = 'left', coords = (int(x), int(y)))
                 status = desktop_constants.TEST_RESULT_PASS
                 result = desktop_constants.TEST_RESULT_TRUE
             except Exception as exception:
-                log.error(exception)
-                logger.print_on_console(exception)
-                err_msg="Unable to perform Mouse Hover"
-        return status,result,verb,err_msg
+                err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
+                log.error( err_msg )
+                logger.print_on_console( err_msg )
+        return status, result, verb, err_msg
 
 ##    def double_click_tree_element(self, element , parent , input_val , *args):
 ##        status=desktop_constants.TEST_RESULT_FAIL
@@ -572,75 +571,74 @@ class Tree_View_Keywords():
 ##        return status,result,verb,err_msg
 
     def getElementTextByIndex(self, element , parent , input_val , *args):
-        status=desktop_constants.TEST_RESULT_FAIL
-        result=desktop_constants.TEST_RESULT_FALSE
+        status = desktop_constants.TEST_RESULT_FAIL
+        result = desktop_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
-        err_msg=None
-        flag=False
+        err_msg = None
+        flag = False
         try:
-            if desktop_launch_keywords.window_name!=None:
+            if ( desktop_launch_keywords.window_name != None ):
                 verify_obj = Text_Box()
-                log.info('Recieved element from the desktop dispatcher')
-                check = verify_obj.verify_parent(element,parent)
-                log.debug('Parent of element while scraping')
-                log.debug(parent)
-                log.debug('Parent check status')
-                log.debug(check)
-                if (check):
-                    log.info('Parent matched')
-                    if(element.is_enabled()):
+                log.info( 'Recieved element from the desktop dispatcher' )
+                check = verify_obj.verify_parent(element, parent)
+                log.debug( 'Parent of element while scraping' )
+                log.debug( parent )
+                log.debug( 'Parent check status' )
+                log.debug( check )
+                if ( check ):
+                    log.info( 'Parent matched' )
+                    if( element.is_enabled() ):
                         try:
-                            roots=element.roots()
-                            root_elem=roots[int(input_val[0])-1]
-                            if len(input_val)>1:
-                                input_val=input_val[1:]
+                            roots = element.roots()
+                            root_elem = roots[int(input_val[0]) - 1]
+                            if ( len(input_val) > 1 ):
+                                input_val = input_val[1:]
                                 #------------------------win32
-                                if element.backend.name=='win32':
-                                    new_elem=root_elem
-                                    def recur(elem,index):
-                                        children=elem.children()
+                                if ( element.backend.name == 'win32' ):
+                                    new_elem = root_elem
+                                    def recur(elem, index):
+                                        children = elem.children()
                                         return children[index]
                                     for i in input_val:
-                                        index=int(i)-1
-                                        new_elem=recur(new_elem,index)
-                                    verb=new_elem.text()
-                                    flag=True
+                                        index = int(i) - 1
+                                        new_elem = recur(new_elem, index)
+                                    verb = new_elem.text()
+                                    flag = True
                                 #------------------------uia
-                                elif element.backend.name=='uia':
-                                    new_elem=root_elem
-                                    def recur(elem,index):
-                                        if elem.is_expanded()==False:
+                                elif ( element.backend.name == 'uia' ):
+                                    new_elem = root_elem
+                                    def recur(elem, index):
+                                        if ( elem.is_expanded() == False):
                                             elem.expand()
-                                        children=elem.children()
+                                        children = elem.children()
                                         return children[index]
                                     for i in input_val:
-                                        index=int(i)-1
-                                        new_elem=recur(new_elem,index)
-                                    verb=new_elem.texts()[0]
-                                    flag=True
-                                if flag==True:
+                                        index = int(i) - 1
+                                        new_elem = recur(new_elem, index)
+                                    verb = new_elem.texts()[0]
+                                    flag = True
+                                if ( flag == True ):
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
                             else:
-                                if element.backend.name=='win32':
-                                    verb=root_elem.text()
-                                elif element.backend.name=='uia':
-                                    verb=root_elem.texts()[0]
+                                if ( element.backend.name == 'win32' ):
+                                    verb = root_elem.text()
+                                elif ( element.backend.name == 'uia' ):
+                                    verb = root_elem.texts()[0]
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                         except Exception as e:
                             log.info(e)
                             log.error(e)
                     else:
-                      log.info('Element state does not allow to perform the operation')
-                      logger.print_on_console('Element state does not allow to perform the operation')
-                      err_msg= 'Element state does not allow to perform the operation'
+                        err_msg = 'Element state does not allow to perform the operation'
                 else:
-                   log.info('Element not present on the page where operation is trying to be performed')
-                   err_msg='Element not present on the page where operation is trying to be performed'
-                   logger.print_on_console('Element not present on the page where operation is trying to be performed')
+                   err_msg = 'Element not present on the page where operation is trying to be performed'
+            if ( err_msg ):
+                    log.info( err_msg )
+                    logger.print_on_console( err_msg )
         except Exception as exception:
-            log.error(exception)
-            logger.print_on_console(exception)
-            err_msg="Unable to perform action on this element."
-        return status,result,verb,err_msg
+            err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
+            logger.print_on_console( err_msg )
+            log.error( err_msg )
+        return status, result, verb, err_msg

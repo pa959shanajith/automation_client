@@ -19,7 +19,7 @@ from constants import *
 editable_text = desktop_editable_text.Text_Box()
 
 import logging
-log = logging.getLogger('desktop_date_control_keywords.py')
+log = logging.getLogger( 'desktop_date_control_keywords.py' )
 
 
 month_dict1 = {'JAN' : 1,
@@ -113,8 +113,11 @@ class DateControlKeywords():
                                         log.info( STATUS_METHODOUTPUT_UPDATE )
                                     else:
                                         err_msg = 'Input date should contain day, month and year'
+<<<<<<< HEAD
+=======
                                         log.info( err_msg )
                                         logger.print_on_console( err_msg )
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
                                 except Exception as e:
                                     log.error(e)
                                     logger.print_on_console(e)
@@ -128,10 +131,16 @@ class DateControlKeywords():
                         logger.print_on_console( err_msg )
                 else:
                     err_msg = 'Date picker control l not present on the Application where operation is trying to be performed'
+<<<<<<< HEAD
+            else:
+                err_msg = 'Invalid input : Please provide input date and the date format'
+            if ( err_msg ):
+=======
                     log.info( err_msg )
                     logger.print_on_console( err_msg )
             else:
                 err_msg = 'Invalid input : Please provide input date and the date format'
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
                 log.info( err_msg )
                 logger.print_on_console( err_msg )
         except Exception as exception:
@@ -203,6 +212,15 @@ class DateControlKeywords():
                             logger.print_on_console( e )
                     else:
                         err_msg = 'Invalid Date format : Please provide the valid date format.'
+<<<<<<< HEAD
+                else:
+                    err_msg = 'Date picker control l not present on the Application where operation is trying to be performed.'
+            else:
+                err_msg = 'Invalid input : Please provide input date and the date format.'
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+=======
                         log.info( err_msg )
                         logger.print_on_console( err_msg )
                 else:
@@ -214,6 +232,7 @@ class DateControlKeywords():
                 log.info( err_msg )
                 logger.print_on_console( err_msg )
 
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
         except Exception as exception:
             err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
             log.error( err_msg )

@@ -114,8 +114,14 @@ class Dropdown_Keywords():
                                     logger.print_on_console( err_msg )
                         else:
                             err_msg = 'Element not present on the page where operation is trying to be performed'
+<<<<<<< HEAD
+                if ( err_msg ):
+                    log.info( err_msg )
+                    logger.print_on_console( err_msg )
+=======
                             log.info( err_msg )
                             logger.print_on_console( err_msg )
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
             except Exception as exception:
                 err_msg=  desktop_constants.ERROR_MSG + ' : ' + str(exception)
                 log.error( err_msg )
@@ -210,6 +216,10 @@ class Dropdown_Keywords():
                         #========================================================================
                else:
                     err_msg = 'Element not present on the page where operation is trying to be performed'
+<<<<<<< HEAD
+               if ( err_msg ):
+=======
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
                     log.info( err_msg )
                     logger.print_on_console( err_msg )
             except Exception as exception:
@@ -610,8 +620,14 @@ class Dropdown_Keywords():
                             #==============================================================================
                         else:
                             err_msg = 'Element not present on the page where operation is trying to be performed'
+<<<<<<< HEAD
+                if ( err_msg ):
+                    log.info( err_msg )
+                    logger.print_on_console( err_msg )
+=======
                             log.info( err_msg )
                             logger.print_on_console( err_msg )
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
             except Exception as exception:
                 err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
                 log.error( err_msg )
@@ -780,8 +796,11 @@ class Dropdown_Keywords():
                                             result = desktop_constants.TEST_RESULT_TRUE
                                     else:
                                         err_msg = 'List is a single selection type.Could not select all values'
+<<<<<<< HEAD
+=======
                                         log.info( err_msg )
                                         logger.print_on_console( err_msg )
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
                                 elif ( element.friendly_class_name() == 'ListView' ):
                                      if ( element.is_active() == False ):
                                         element.click()
@@ -793,10 +812,16 @@ class Dropdown_Keywords():
                             #============================================================================
                         else:
                             err_msg = 'Element state does not allow to perform the operation'
+<<<<<<< HEAD
+               else:
+                    err_msg = 'Element not present on the page where operation is trying to be performed'
+               if ( err_msg ):
+=======
                             log.info( err_msg )
                             logger.print_on_console( err_msg )
                else:
                     err_msg = 'Element not present on the page where operation is trying to be performed'
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
                     log.info( err_msg )
                     logger.print_on_console( err_msg )
             except Exception as exception:
@@ -848,10 +873,16 @@ class Dropdown_Keywords():
                             #===============================================================
                         else:
                             err_msg = 'Element state does not allow to perform the operation'
+<<<<<<< HEAD
+               else:
+                    err_msg = 'Element not present on the page where operation is trying to be performed'
+               if ( err_msg ):
+=======
                             log.info( err_msg )
                             logger.print_on_console( err_msg )
                else:
                     err_msg = 'Element not present on the page where operation is trying to be performed'
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
                     log.info( err_msg )
                     logger.print_on_console( err_msg )
             except Exception as exception:
@@ -901,7 +932,11 @@ class Dropdown_Keywords():
                                         verbList.append(items[index])
                                 verb = [nitem for nitem in verbList]
                                 if ( false_flag == False ):
+<<<<<<< HEAD
+                                    #err_msg = "Entered indexs are out of bound"
+=======
                                     err_msg = "Entered indexs are out of bound"
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
                                     log.info( STATUS_METHODOUTPUT_UPDATE )
@@ -956,12 +991,18 @@ class Dropdown_Keywords():
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                             log.info( STATUS_METHODOUTPUT_UPDATE )
+<<<<<<< HEAD
+=======
 
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
                else:
                     err_msg = 'Element not present on the page where operation is trying to be performed'
                     log.error( err_msg )
                     logger.print_on_console( err_msg )
+<<<<<<< HEAD
+=======
 
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
             except Exception as exception:
                 err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
                 log.error( err_msg )
@@ -1007,13 +1048,20 @@ class Dropdown_Keywords():
                                             else:
                                                 element.Select(index)
                                         if ( fail_flag == False ):
+<<<<<<< HEAD
+                                            #err_msg = "Entered indexs are out of bound"
+=======
                                             err_msg = "Entered indexs are out of bound"
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
                                             status = desktop_constants.TEST_RESULT_PASS
                                             result = desktop_constants.TEST_RESULT_TRUE
                                     else:
                                         err_msg = 'List is a single selection type.Could not select all values'
+<<<<<<< HEAD
+=======
                                         log.info( err_msg )
                                         logger.print_on_console( err_msg )
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
                                 elif ( element.friendly_class_name() == 'ListView' ):
                                     item_count = element.item_count()
                                     items = list(element.items())
@@ -1037,8 +1085,11 @@ class Dropdown_Keywords():
                                                 log.info( STATUS_METHODOUTPUT_UPDATE )
                                          else:
                                             err_msg = 'List item is already selected'
+<<<<<<< HEAD
+=======
                                             log.info( err_msg )
                                             logger.print_on_console( err_msg )
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
                                       else:
                                             err_msg = 'There is no List item in List view with the given index'
                                             log.info( err_msg )
@@ -1046,12 +1097,20 @@ class Dropdown_Keywords():
                             #====================================================================================
                         else:
                             err_msg = 'Element state does not allow to perform the operation'
+<<<<<<< HEAD
+                    else:
+                        err_msg = 'Element not present on the page where operation is trying to be performed'
+                if ( err_msg ):
+                    log.info( err_msg )
+                    logger.print_on_console( err_msg )
+=======
                             log.info( err_msg )
                             logger.print_on_console( err_msg )
                     else:
                         err_msg = 'Element not present on the page where operation is trying to be performed'
                         log.info( err_msg )
                         logger.print_on_console( err_msg )
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
             except Exception as exception:
                 err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
                 log.error( err_msg )
@@ -1104,8 +1163,11 @@ class Dropdown_Keywords():
                                             result = desktop_constants.TEST_RESULT_TRUE
                                     else:
                                         err_msg = 'List is a single selection type.Could not select all values'
+<<<<<<< HEAD
+=======
                                         log.info( err_msg )
                                         log.error( err_msg )
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
                                 elif ( checkName == 'ListView' ):
                                     item_count = element.item_count()
                                     items = list(element.items())
@@ -1131,41 +1193,52 @@ class Dropdown_Keywords():
                                         for i in range(0,len(items)):
                                             items[i].deselect()
                                         err_msg = 'Element/Elements not present on the page where operation is trying to be performed'
+<<<<<<< HEAD
+=======
                                         log.error( err_msg )
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
                             #=======================================================================================================
 
                         else:
                             err_msg = 'Element state does not allow to perform the operation'
+<<<<<<< HEAD
+                    else:
+                        err_msg = 'Element not present on the page where operation is trying to be performed'
+                if ( err_msg ):
+                    log.info( err_msg )
+                    logger.print_on_console( err_msg )
+=======
                             log.info( err_msg )
                             log.error( err_msg )
                     else:
                         err_msg='Element not present on the page where operation is trying to be performed'
                         log.info( err_msg )
                         log.error( err_msg )
+>>>>>>> db28caf7830db007ea213b691df85daf62888918
             except Exception as exception:
                 err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
                 log.error( err_msg )
                 logger.print_on_console( err_msg )
             return status, result, verb, err_msg
 
-        def multiListGetter(self,cols,elelist,input_val):
-            rows=int(len(elelist)/cols)
+        def multiListGetter(self, cols, elelist, input_val):
+            rows=int(len(elelist) / cols)
             #-------------------------------------------------creating a 2D list
             #print"creating a 2D list"
             Matrix = [[0 for x in range(cols)] for y in range(rows)]
             #-------------------------------------------------creating a 2D list
             #-------------------------------------------------populating the 2D list
             #print"populating the 2D list"
-            index_i=0
-            for j in range(0,rows):
-                for k in range (0,cols):
+            index_i = 0
+            for j in range(0, rows):
+                for k in range (0, cols):
                     try:
-                        Matrix[j][k]=elelist[index_i]
-                        index_i=index_i+1
+                        Matrix[j][k] = elelist[index_i]
+                        index_i = index_i + 1
                     except Exception as e:
-                        logger.print_on_console("Error occoured in populating the 2D matrix")
-                        log.error("Error occoured in populating the 2D matrix")
-                        log.error(e)
+                        logger.print_on_console( "Error occoured in populating the 2D matrix" )
+                        log.error( "Error occoured in populating the 2D matrix" )
+                        log.error( e )
             #-------------------------------------------------populating the 2D list
             #-------------------------------------------------printing the 2D list
 ##                                print"printing the 2D list"
@@ -1182,18 +1255,18 @@ class Dropdown_Keywords():
             #-------------------------------------------------creating new Matrix based on indexes given
             #-------------------------------------------------poulating the new martix
             #print"populating the new matrix"
-            new_input_val=[]
-            for z in range(0,len(input_val)):
-                new_input_val.append(str(int(input_val[z])-1))
+            new_input_val = []
+            for z in range(0, len(input_val)):
+                new_input_val.append(str(int(input_val[z]) - 1))
             try:
-                r=0
+                r = 0
                 for nr in new_input_val:
-                    rowindex=int(nr)
-                    for c in range(0,cols):
-                        NewMatrix[r][c]=Matrix[rowindex][c]
-                    r=r+1
+                    rowindex = int(nr)
+                    for c in range(0, cols):
+                        NewMatrix[r][c] = Matrix[rowindex][c]
+                    r = r + 1
             except Exception as e:
-                log.error(e)
+                log.error( e )
             #-------------------------------------------------poulating the new martix
             #-------------------------------------------------printing the new 2D list
 ##            print"printing the new 2D list"

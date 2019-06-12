@@ -229,7 +229,7 @@ class ScrapeWindow(wx.Frame):
             time.sleep(1)
             d = cropandaddobj.stopcropandadd()
             logger.print_on_console( 'Scraped data saved successfully in domelements.json file' )
-            self.socketIO.emit( 'scrape', d)
+            self.socketIO.emit('scrape', d)
             self.parent.schedule.Enable()
             self.Close()
             logger.print_on_console( 'Crop and add scrape completed' )
