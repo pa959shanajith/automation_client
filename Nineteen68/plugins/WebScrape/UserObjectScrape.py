@@ -17,6 +17,7 @@ class UserObject:
         pass
 
     def get_user_object(self,d,socketIO):
+        data={}
         if d['operation']=='encrypt':
             obj=core_utils.CoreUtils()
             data['url']= obj.scrape_wrap(d['url'])
