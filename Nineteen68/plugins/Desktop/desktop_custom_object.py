@@ -39,7 +39,6 @@ class CustomObjectHandler():
                  coordinates = ''
                  tag = ch[i].friendly_class_name()
                  log.info( tag )
-##                 if tag == 'Button' or tag =='RadioButton' or tag == 'Edit' or tag == 'ComboBox' or tag == 'Static' or tag == 'GroupBox' or tag == 'CheckBox' or tag== 'ListView' or tag == 'ListBox'or tag == 'TreeView'or tag == 'TabControl' or tag == 'DateTimePicker'  or tag == 'Toolbar':
                  try:
                     coordinates = ch[i].client_rect()
                  except:
@@ -190,8 +189,8 @@ class CustomObjectHandler():
                                         'left' : left,
                                         'height' : height,
                                         'width' : width,
-                                        'x_screen' :x_screen,
-                                        'y_screen' :y_screen
+                                        'x_screen' : x_screen,
+                                        'y_screen' : y_screen
                                         })
                             else:
                                 logger.print_on_console( 'This element is duplicate' )
@@ -200,14 +199,9 @@ class CustomObjectHandler():
                         handle = ch[i].handle
                         text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem = handle, cache_enable = False).name
                  except Exception as e:
-##                    import traceback
-##                    traceback.print_exc()
-
                     logger.print_on_console( e )
                     log.error ( 'Error occoured in CustomObjectHandler, Error Msg : ', e )
         except Exception as e:
-##            import traceback
-##            traceback.print_exc()
             logger.print_on_console( e )
             log.error ( 'Error occoured in CustomObjectHandler, Error Msg : ', e )
         return ne
@@ -223,12 +217,6 @@ class CustomObjectHandler():
                 ch = win.children()
             elif ( backendType == 'B' ):
                 win = desktop_launch_keywords.app_uia.top_window()
-##                ch=win.children()[:]
-##                for i in range(0,len(ch)):
-##                    if len(ch[i].children()):
-##                        c=ch[i].children()
-##                        for a in c:
-##                            ch.append(a)
                 ch = []
                 def rec_ch(child):
                     ch.append(child)
@@ -243,12 +231,6 @@ class CustomObjectHandler():
                     ch = win.children()
                 elif ( backendType == 'B' ) :
                     win = desktop_launch_keywords.app_uia.top_window()
-##                    ch = win.children()[:]
-##                    for i in range(0,len(ch)):
-##                        if len(ch[i].children()):
-##                            c = ch[i].children()
-##                            for a in c:
-##                                ch.append(a)                     #---trying to get the top window again
                     ch = []
                     def rec_ch(child):
                         ch.append(child)
@@ -260,8 +242,6 @@ class CustomObjectHandler():
             ne = []
             allobjects =  self.get_all_custom_children(ch, ne, 0, '', win)
         except Exception as e:
-##            import traceback
-##            traceback.print_exc()
             logger.print_on_console( e )
             log.error( 'Error occoured in fullscrape, warning Msg : ', e )
         return allobjects
@@ -290,14 +270,9 @@ class CustomObjectHandler():
                     newdata = data[index + 1 :]
             for elem in newdata :
                 if ( elem['tag'].lower() == eleType.strip().lower() ):
-##                    try:
                         eleIndex = int(eleIndex) - 1
                         if ( eleIndex == 0 ):
                             xpath = elem['xpath']
-##                        elif ( eleIndex < 0 ):
-##                            logger.print_on_console( "Entered index value is 0 or lesser,please provide a correct index value" )
-##                    except:
-##                        logger.print_on_console( e )
         except Exception as e:
             logger.print_on_console( e )
         if ( xpath == None ):

@@ -8,7 +8,6 @@
 # Copyright:   (c) wasimakram.sutar 2017
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-
 from pywinauto.application import Application
 import win32gui
 import win32process
@@ -181,9 +180,6 @@ class Launch_Keywords():
                 log.error( desktop_constants.ERROR_MSG + ' : ' + str(e) )
         return image
 
-
-
-
     def capture_window(self, handle):
         img = None
         bbox = None
@@ -196,8 +192,6 @@ class Launch_Keywords():
         bbox = win32gui.GetWindowRect(handle)
         img = ImageGrab.grab(bbox)
         return img
-
-
 
     def getProcessWindows(self, windowName):
         EnumWindows = ctypes.windll.user32.EnumWindows
@@ -212,7 +206,6 @@ class Launch_Keywords():
                 length = GetWindowTextLength(hwnd)
                 buff = ctypes.create_unicode_buffer(length + 1)
                 GetWindowText(hwnd, buff, length + 1)
-    ##                titles.append(buff.value)
                 if ( self.patternMatching(windowName, buff.value) ):
                     handles.append(hwnd)
             return True
@@ -243,7 +236,6 @@ class Launch_Keywords():
                 return False
         return False
 
-
     def set_to_foreground(self):
         try:
             app = Application()
@@ -253,30 +245,6 @@ class Launch_Keywords():
             app_dialog.restore()
             pid = self.get_window_pid(window_name)
             rect = self.getParentRectangle(pid, window_name)
-##            aut_handle=window_handle
-##            if aut_handle> 0:
-##                foreground=win32gui.GetForegroundWindow()
-##                application_pid=win32process.GetWindowThreadProcessId(aut_handle)
-##                foreground_pid=win32process.GetWindowThreadProcessId(foreground)
-##                if application_pid!=foreground_pid:
-##                    process_id=win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
-##                    i= win32gui.GetWindowRect(aut_handle)
-##                    pid = self.get_window_pid(window_name)
-##                    rect = self.getParentRectangle(pid,window_name)
-##                    if i[0] <= -32000:
-##                        fg_thread, fg_process = win32process.GetWindowThreadProcessId(foreground)
-##                        aut_thread, aut_process = win32process.GetWindowThreadProcessId(aut_handle)
-##                        win32process.AttachThreadInput(aut_thread, fg_thread, True)
-##                        self.bring_to_top(aut_handle,5)
-##                        return True
-##                    else:
-##                        self.bring_to_top(aut_handle,5)
-##                        self.hide_always_on_top_windows()
-##                        win32gui.SetForegroundWindow(aut_handle)
-##                        return True
-##                else:
-##                    self.bring_to_top(aut_handle,5)
-##                    return True
         except Exception as e:
             log.error( desktop_constants.ERROR_MSG + ' : ' + str(e) )
         return False
@@ -303,7 +271,6 @@ class Launch_Keywords():
         try:
             win32gui.BringWindowToTop(aut_handle)
             win32gui.ShowWindow(aut_handle,value)
-            #win32gui.SetForegroundWindow(aut_handle)
         except Exception as e:
             log.error( desktop_constants.ERROR_MSG + ' : ' + str(e) )
             logger.print_on_console( desktop_constants.ERROR_MSG + ' : ' + str(e) )
@@ -371,7 +338,7 @@ class Launch_Keywords():
                 if ( len(pidset) == 1 ):
                     flag = True
                 else:
-                    for i in range(0,len(pidset)):
+                    for i in range(0, len(pidset)):
                         if ( pidset.pop() == temp_pid ):
                             flag = True
                         else:
@@ -386,8 +353,8 @@ class Launch_Keywords():
                                 self.windowHandle = title_matched_windows[0]
                                 self.windowname = self.getWindowText(self.windowHandle)
                                 window_name = self.windowname
-                                logger.print_on_console('Given windowname is '+ windowname)
-                                logger.print_on_console('Select the type of scrape (Full scrape/Click and Add) from scrape window')
+                                logger.print_on_console( 'Given windowname is ' + windowname )
+                                logger.print_on_console( 'Select the type of scrape (Full scrape/Click and Add) from scrape window' )
                                 window_handle = title_matched_windows[0]
                                 window_pid = self.get_window_pid(self.windowname)
                                 self.windowHandle=title_matched_windows[0]
@@ -397,7 +364,7 @@ class Launch_Keywords():
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 break
                 else:
-                    self.multiInstance=title_matched_windows[0]
+                    self.multiInstance = title_matched_windows[0]
                     term = TERMINATE
             if ( len(title_matched_windows) == 1 ):
                 if ( not(windowname is None and windowname is '' )):

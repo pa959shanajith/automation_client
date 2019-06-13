@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import desktop_constants
-from desktop_editable_text import Text_Box,CursorPositionCorrection
+from desktop_editable_text import Text_Box, CursorPositionCorrection
 import desktop_launch_keywords
 import pywinauto
 import pythoncom
@@ -19,7 +19,7 @@ import logger
 log = logging.getLogger( 'desktop_element_keywords.py' )
 
 class ElementKeywords():
-    def verify_element_exists(self, element , parent , *args):
+    def verify_element_exists(self, element, parent, *args):
         status = desktop_constants.TEST_RESULT_FAIL
         result = desktop_constants.TEST_RESULT_FALSE
         log.debug( 'Got window name : ' )
@@ -57,7 +57,7 @@ class ElementKeywords():
         log.info( RETURN_RESULT )
         return status, result, verb, err_msg
 
-    def verify_element_doesNot_exists(self, element , parent , *args):
+    def verify_element_doesNot_exists(self, element, parent, *args):
         status = desktop_constants.TEST_RESULT_FAIL
         result = desktop_constants.TEST_RESULT_FALSE
         log.debug( desktop_launch_keywords.window_name )
@@ -94,7 +94,7 @@ class ElementKeywords():
         log.info( RETURN_RESULT )
         return status, result, verb, err_msg
 
-    def click_element(self, element , parent  , *args):
+    def click_element(self, element, parent, *args):
         status = desktop_constants.TEST_RESULT_FAIL
         result = desktop_constants.TEST_RESULT_FALSE
         log.debug( desktop_launch_keywords.window_name )
@@ -136,7 +136,7 @@ class ElementKeywords():
         log.info( RETURN_RESULT )
         return status, result, verb, err_msg
 
-    def get_element_text(self, element , parent , *args):
+    def get_element_text(self, element, parent, *args):
         pythoncom.CoInitialize()
         status = desktop_constants.TEST_RESULT_FAIL
         result = desktop_constants.TEST_RESULT_FALSE
@@ -173,7 +173,7 @@ class ElementKeywords():
         log.info( RETURN_RESULT )
         return status, result, output, err_msg
 
-    def verify_element_text(self, element , parent , input_value, *args):
+    def verify_element_text(self, element, parent, input_value, *args):
         pythoncom.CoInitialize()
         if ( len(input_value) > 1 ):
             text_verify = input_value[3]
@@ -204,9 +204,8 @@ class ElementKeywords():
                     text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem = handle, cache_enable = False).name
                     logger.print_on_console('Text obtained : ', text)
                     log.info( 'Text obtained' )
-                    text = str(text)
-                    log.info(text)
-                    if ( text == input_val ):
+                    log.info( str(text) )
+                    if ( str(text) == input_val ):
                         log.info( STATUS_METHODOUTPUT_UPDATE )
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE

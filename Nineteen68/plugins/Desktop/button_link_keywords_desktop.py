@@ -18,46 +18,36 @@ import logger
 log = logging.getLogger( 'button_link_keywords_desktop.py' )
 import pywinauto
 class ButtonLinkKeyword():
-<<<<<<< HEAD
     def double_click(self, element, parent, *args):
         log.debug( 'Got window name after launching application' )
         log.debug( desktop_launch_keywords.window_name )
-=======
     def double_click(self, element , parent  , *args):
         log.debug( 'Got window name after launching application' )
         log.debug(desktop_launch_keywords.window_name)
->>>>>>> db28caf7830db007ea213b691df85daf62888918
         status = desktop_constants.TEST_RESULT_FAIL
         result = desktop_constants.TEST_RESULT_FALSE
         log.info( STATUS_METHODOUTPUT_LOCALVARIABLES )
         verb = OUTPUT_CONSTANT
         err_msg = None
         try:
-<<<<<<< HEAD
             if ( desktop_launch_keywords.window_name ):
-=======
-            if ( desktop_launch_keywords.window_name != None ):
->>>>>>> db28caf7830db007ea213b691df85daf62888918
-                log.info( 'Recieved element from the desktop dispatcher' )
-                dektop_element = element
-                verify_obj = Text_Box()
-                check = verify_obj.verify_parent(element, parent)
-                log.debug( 'Parent of element while scraping' )
-                log.debug( parent )
-                log.debug( 'Parent check status' )
-                log.debug( check )
-                if ( check ):
-                    log.info( 'Parent matched' )
-<<<<<<< HEAD
-                    if ( element.is_enabled() ):
-=======
-                    if( element.is_enabled() ):
->>>>>>> db28caf7830db007ea213b691df85daf62888918
-                        if ( element.backend.name == 'win32' ):
-                            element.click(button = 'left', double = True, coords = (0, 0), absolute = False,  pressed = '')
-                        elif ( element.backend.name == 'uia'):
-                            for i in range(0, 2):
-                                element.click()
+                if ( desktop_launch_keywords.window_name != None ):
+                    log.info( 'Recieved element from the desktop dispatcher' )
+                    dektop_element = element
+                    verify_obj = Text_Box()
+                    check = verify_obj.verify_parent(element, parent)
+                    log.debug( 'Parent of element while scraping' )
+                    log.debug( parent )
+                    log.debug( 'Parent check status' )
+                    log.debug( check )
+                    if ( check ):
+                        log.info( 'Parent matched' )
+                        if ( element.is_enabled() ):
+                            if ( element.backend.name == 'win32' ):
+                                element.click(button = 'left', double = True, coords = (0, 0), absolute = False,  pressed = '')
+                            elif ( element.backend.name == 'uia'):
+                                for i in range(0, 2):
+                                    element.click()
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                         log.info( STATUS_METHODOUTPUT_UPDATE )
@@ -67,14 +57,11 @@ class ButtonLinkKeyword():
                         logger.print_on_console( err_msg )
                 else:
                     err_msg = 'Element not present on the page where operation is trying to be performed'
-<<<<<<< HEAD
             if ( err_msg ):
                 log.info( err_msg )
                 logger.print_on_console( err_msg )
-=======
-                    log.info( err_msg )
-                    logger.print_on_console( err_msg )
->>>>>>> db28caf7830db007ea213b691df85daf62888918
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as exception:
             err_msg = desktop_constants.ERROR_MSG
             log.error(exception)
@@ -91,11 +78,7 @@ class ButtonLinkKeyword():
         verb = OUTPUT_CONSTANT
         err_msg = None
         try:
-<<<<<<< HEAD
             if ( desktop_launch_keywords.window_name ):
-=======
-            if ( desktop_launch_keywords.window_name != None ):
->>>>>>> db28caf7830db007ea213b691df85daf62888918
                 log.info( 'Recieved element from the desktop dispatcher' )
                 dektop_element = element
                 verify_obj = Text_Box()
@@ -240,11 +223,7 @@ class ButtonLinkKeyword():
         text = None
         err_msg = None
         try:
-<<<<<<< HEAD
             if ( desktop_launch_keywords.window_name ):
-=======
-            if ( desktop_launch_keywords.window_name != None ):
->>>>>>> db28caf7830db007ea213b691df85daf62888918
                 log.info('Recieved element from the desktop dispatcher')
                 dektop_element = element
                 verify_obj = Text_Box()
@@ -263,7 +242,6 @@ class ButtonLinkKeyword():
 
                 else:
                     err_msg = 'Element not present on the page where operation is trying to be performed'
-<<<<<<< HEAD
             if ( err_msg ):
                 log.info( err_msg )
                 logger.print_on_console( err_msg )
@@ -272,37 +250,19 @@ class ButtonLinkKeyword():
             log.error( err_msg )
             logger.print_on_console( err_msg )
         log.info( RETURN_RESULT )
-=======
-                    log.info( err_msg )
-                    logger.print_on_console( err_msg )
-        except Exception as exception:
-            err_msg = desktop_constants.ERROR_MSG
-            log.error(exception)
-            logger.print_on_console( exception )
-        log.info(RETURN_RESULT)
->>>>>>> db28caf7830db007ea213b691df85daf62888918
         return status, result, text, err_msg
 
     def right_click(self, element , parent , *args):
         status = desktop_constants.TEST_RESULT_FAIL
         result = desktop_constants.TEST_RESULT_FALSE
         log.debug( 'Got window name after launching application' )
-<<<<<<< HEAD
         log.debug( desktop_launch_keywords.window_name )
         log.info( STATUS_METHODOUTPUT_LOCALVARIABLES )
-=======
-        log.debug(desktop_launch_keywords.window_name)
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
->>>>>>> db28caf7830db007ea213b691df85daf62888918
         label = None
         err_msg = None
         verb = OUTPUT_CONSTANT
         try:
-<<<<<<< HEAD
             if ( desktop_launch_keywords.window_name ):
-=======
-            if ( desktop_launch_keywords.window_name != None ):
->>>>>>> db28caf7830db007ea213b691df85daf62888918
                 log.info( 'Recieved element from the desktop dispatcher' )
                 dektop_element = element
                 verify_obj = Text_Box()
@@ -312,11 +272,7 @@ class ButtonLinkKeyword():
                 log.debug( 'Parent check status' )
                 log.debug( check )
                 if ( check ):
-<<<<<<< HEAD
                     log.info( 'Parent matched' )
-=======
-                    log.info('Parent matched')
->>>>>>> db28caf7830db007ea213b691df85daf62888918
                     if( element.is_enabled() ):
                         element.right_click()
                         status = desktop_constants.TEST_RESULT_PASS
@@ -328,7 +284,6 @@ class ButtonLinkKeyword():
                         logger.print_on_console( err_msg )
                 else:
                     err_msg = 'Element not present on the page where operation is trying to be performed'
-<<<<<<< HEAD
             if ( err_msg ):
                 log.info( err_msg )
                 logger.print_on_console( err_msg )
@@ -336,14 +291,6 @@ class ButtonLinkKeyword():
             err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
             log.error( err_msg )
             logger.print_on_console( err_msg )
-=======
-                    log.info( err_msg )
-                    logger.print_on_console( err_msg )
-        except Exception as exception:
-            err_msg = desktop_constants.ERROR_MSG
-            log.error( exception )
-            logger.print_on_console (exception )
->>>>>>> db28caf7830db007ea213b691df85daf62888918
         log.info( RETURN_RESULT )
         return status, result, verb, err_msg
 
@@ -353,20 +300,12 @@ class ButtonLinkKeyword():
         status = desktop_constants.TEST_RESULT_FAIL
         result = desktop_constants.TEST_RESULT_FALSE
         log.debug( 'Got window name after launching application' )
-<<<<<<< HEAD
         log.debug( desktop_launch_keywords.window_name )
-=======
-        log.debug(desktop_launch_keywords.window_name )
->>>>>>> db28caf7830db007ea213b691df85daf62888918
         log.info( STATUS_METHODOUTPUT_LOCALVARIABLES)
         text = None
         err_msg = None
         try:
-<<<<<<< HEAD
             if ( desktop_launch_keywords.window_name ):
-=======
-            if ( desktop_launch_keywords.window_name != None ):
->>>>>>> db28caf7830db007ea213b691df85daf62888918
                 log.info( 'Recieved element from the desktop dispatcher' )
                 dektop_element = element
                 verify_obj = Text_Box()
@@ -378,7 +317,6 @@ class ButtonLinkKeyword():
                 if ( check ):
                     log.info( 'Parent matched' )
                     handle = element.handle
-<<<<<<< HEAD
                     text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem = handle ,cache_enable = False).name
                     status = desktop_constants.TEST_RESULT_PASS
                     result = desktop_constants.TEST_RESULT_TRUE
@@ -392,21 +330,6 @@ class ButtonLinkKeyword():
             err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
             log.error( err_msg )
             logger.print_on_console( err_msg )
-=======
-                    text = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem=handle ,cache_enable = False).name
-                    status = desktop_constants.TEST_RESULT_PASS
-                    result = desktop_constants.TEST_RESULT_TRUE
-                    log.info( STATUS_METHODOUTPUT_UPDATE )
-
-                else:
-                    err_msg = 'Element not present on the page where operation is trying to be performed'
-                    log.info( err_msg )
-                    logger.print_on_console( err_msg )
-        except Exception as exception:
-            log.error( exception )
-            logger.print_on_console( exception )
-            err_msg = desktop_constants.ERROR_MSG
->>>>>>> db28caf7830db007ea213b691df85daf62888918
         log.info( RETURN_RESULT )
         return status, result, link_text, err_msg
 
@@ -417,20 +340,12 @@ class ButtonLinkKeyword():
         result = desktop_constants.TEST_RESULT_FALSE
         log.debug( 'Got window name after launching application' )
         log.debug( desktop_launch_keywords.window_name )
-<<<<<<< HEAD
         log.info( STATUS_METHODOUTPUT_LOCALVARIABLES )
-=======
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
->>>>>>> db28caf7830db007ea213b691df85daf62888918
         err_msg = None
         verb = OUTPUT_CONSTANT
         text = None
         try:
-<<<<<<< HEAD
             if ( desktop_launch_keywords.window_name ):
-=======
-            if ( desktop_launch_keywords.window_name != None ):
->>>>>>> db28caf7830db007ea213b691df85daf62888918
                 log.info( 'Recieved element from the desktop dispatcher' )
                 input_val = input[0]
                 log.info( 'input value obtained' )
@@ -459,15 +374,8 @@ class ButtonLinkKeyword():
                 log.info( err_msg )
                 logger.print_on_console( err_msg )
         except Exception as exception:
-<<<<<<< HEAD
             err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
             log.error( err_msg )
             logger.print_on_console( err_msg )
         log.info( RETURN_RESULT )
-=======
-            log.error( exception )
-            logger.print_on_console( exception)
-            err_msg=desktop_constants.ERROR_MSG
-        log.info(RETURN_RESULT)
->>>>>>> db28caf7830db007ea213b691df85daf62888918
         return status, result, verb, err_msg

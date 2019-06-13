@@ -8,7 +8,6 @@
 # Copyright:   (c) prudhvi.gujjuboyina 2016, (c) anas.ahmed 2018
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-
 from  win32com.client import Dispatch
 import outlook_constants
 from   pywintypes import  com_error
@@ -64,8 +63,6 @@ class OutlookKeywords:
 
             return outlookObj
 
-
-
 #To support seperate accounts and  subFolders this method is implemented , Input should be the folder path in properties of outlook folder
         def switchToFolder(self, input, *args):
             status = desktop_constants.TEST_RESULT_FAIL
@@ -82,11 +79,6 @@ class OutlookKeywords:
                     folders.remove('')
                 #---------------------------------
                 accountname = folders[0]
-##                global count
-##                if count>0:
-##                    import pythoncom
-##                    pythoncom.CoInitializeEx(pythoncom.COINIT_MULTITHREADED)
-##                count=count+1
                 self.outlook = self.getOutlookComObj(1)
 #               get the message stores in outlook
                 stores = self.outlook.Stores
@@ -110,7 +102,6 @@ class OutlookKeywords:
                                     error_msg = 'Unable to find the target folder'
                                     break
                                 else:
-                                    ##logger.print_on_console('Switched to folder')
                                     status = desktop_constants.TEST_RESULT_PASS
                                     method_output = desktop_constants.TEST_RESULT_TRUE
                             else:
@@ -155,7 +146,6 @@ class OutlookKeywords:
                     inbox = self.outlook.GetDefaultFolder(outlook_constants.INBOX_FOLDER)
                 all_inbox = inbox.Items
                 folders = inbox.Folders
-                #all_inbox=reversed(list(all_inbox))
                 #-------------fetching sorted mails and storing in list variable mails
                 mails = self.messageSegregator(all_inbox, self.toMail, self.senderEmail, self.subject)
                 msg = mails[0] # as it is the latest msg object by date/time.
@@ -364,11 +354,8 @@ class OutlookKeywords:
                 lowerAccount = searchIn.Folders
                 for x in lowerAccount:
                     if ( x.Name == folderName ):
-##                        print 'found it %s '%x.Name
                         objective = x
                         return objective
-##                    else:
-##                        print folderName+' folder not found'
                 return None
             except Exception as error:
                 logger.print_on_console( "Looks like we had an issue accessing the searchIn object" )

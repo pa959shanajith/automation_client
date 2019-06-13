@@ -20,7 +20,7 @@ import logger
 log = logging.getLogger( 'desktop_editable_text.py' )
 
 class Text_Box:
-    def set_text(self , element , parent , input_val ,*args):
+    def set_text(self , element, parent, input_val, *args):
         if ( len(input_val) > 1 ):
             text = input_val[3]
         else:
@@ -70,7 +70,7 @@ class Text_Box:
         return status, result, verb, err_msg
 
 
-    def set_secure_text(self, element , parent , input_val , *args):
+    def set_secure_text(self, element, parent, input_val, *args):
         if ( len(input_val) > 1 ):
             text = input_val[3]
         else:
@@ -124,7 +124,7 @@ class Text_Box:
         log.info( RETURN_RESULT )
         return status, result, verb, err_msg
 
-    def get_text(self, element , parent  , *args):
+    def get_text(self, element, parent, *args):
         status = desktop_constants.TEST_RESULT_FAIL
         result = desktop_constants.TEST_RESULT_FALSE
         log.debug( 'Got window name after launching application' )
@@ -161,7 +161,7 @@ class Text_Box:
         log.info( RETURN_RESULT )
         return status, result, output, err_msg
 
-    def clear_text(self, element , parent, *args):
+    def clear_text(self, element, parent, *args):
         status = desktop_constants.TEST_RESULT_FAIL
         result = desktop_constants.TEST_RESULT_FALSE
         log.debug( 'Got window name after launching application' )
@@ -203,7 +203,7 @@ class Text_Box:
             logger.print_on_console( err_msg )
         return status,result,verb,err_msg
 
-    def verify_text(self, element , parent , input_val, *args):
+    def verify_text(self, element, parent, input_val, *args):
         status = desktop_constants.TEST_RESULT_FAIL
         result = desktop_constants.TEST_RESULT_FALSE
         log.debug( 'Got window name after launching application' )

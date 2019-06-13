@@ -29,7 +29,7 @@ ctrldownflag = False
 stopumpingmsgs = False
 
 import logging
-log = logging.getLogger('desktop_scraping.py')
+log = logging.getLogger( 'desktop_scraping.py' )
 actualobjects = []
 allobjects = []
 class Scrape:
@@ -56,10 +56,8 @@ class Scrape:
                         #method returns 1 if the coordinates passed of any xpath, is near to the curson postion coordinates
                         #returns 0 if if coordinates doesnot fit into the condition
                         def match(x, y, width, height, coord_x, coord_y):
-
                             expectedx = int(x) + int(width)
                             expectedy = int(y) + int(height)
-
                             if ( (coord_x >= x and coord_x <= expectedx) and (coord_y >= y and coord_y <= expectedy) ):
                                 return 1
                             else:
@@ -94,9 +92,7 @@ class Scrape:
                                 actualobjects.append(actualelement)
                         except Exception as e:
                             logger.print_on_console( 'Clicked option is not a part of DesktopGUI' )
-                            log.error( 'Clicked option is not a part of DesktopGUI ,Error msg : ', e )
-##                            import traceback
-##                            traceback.print_exc()
+                            log.error( 'Clicked option is not a part of DesktopGUI. Error msg : ', e )
                         return True
 
                     def get_all_children_caller(self):
@@ -108,12 +104,6 @@ class Scrape:
                                 ch = win.children()
                             elif ( str(wxobject.backend_process).strip() == 'B' ):
                                 win = desktop_launch_keywords.app_uia.top_window()
-##                                ch = win.children()[:]
-##                                for i in range(0,len(ch)):
-##                                    if len(ch[i].children()):
-##                                        c = ch[i].children()
-##                                        for a in c:
-##                                            ch.append(a)
                                 ch=[]
                                 def rec_ch(child):
                                     ch.append(child)
@@ -130,9 +120,8 @@ class Scrape:
                             objects =  scrape_obj.get_all_children(ch, ne, 0, '', win, winrect, str(wxobject.backend_process).strip())
                             allobjs["view"] = objects
                         except Exception as e:
-                            logger.print_on_console(e)
-##                            import traceback
-##                            traceback.print_exc()
+                            logger.print_on_console( e )
+                            log.error( e )
                         return allobjs
 
                     def abort(self):
@@ -175,8 +164,8 @@ class Scrape:
                                                         obj = OutlookThread(coordX, coordY, window_id)
                                                         return False
                             except Exception as e:
-                                log.error('Error occoured while performing OnMouseLeftDown function, Error Msg : ',e)
-                                logger.print_on_console(e)
+                                log.error( 'Error occoured while performing OnMouseLeftDown function, Error Msg : ', e )
+                                logger.print_on_console( 'Error occoured while performing OnMouseLeftDown function.' )
 
                             if ( self.stopumpingmsgs is True ):
                                 self.hm.UnhookKeyboard()
@@ -203,7 +192,6 @@ class Scrape:
                             return True
 
                         global window_id
-                        #global handle
                         get_obj = GetObject()
                         window_id, self.handle = get_obj.GetWindow()
                         self.hm = pyHook.HookManager()
@@ -239,7 +227,7 @@ class Scrape:
                 obj_ref = StartPump()
             except Exception as exception:
                 logger.print_on_console ( 'Exception occoured when trying to perform START_CLICK_AND_ADD' )
-                log.error('Exception occoured when trying to perform START_CLICK_AND_ADD, Error Msg : ',exception)
+                log.error('Exception occoured when trying to perform START_CLICK_AND_ADD, Error Msg : ', exception)
         elif ( operation == 'STOPCLICKANDADD' ):
             global actualobjects
             try:
@@ -248,7 +236,7 @@ class Scrape:
                 actualobjects = []
             except Exception as exception:
                 logger.print_on_console ( 'Exception occoured when trying to perform STOP_CLICK_AND_ADD' )
-                log.error('Exception occoured when trying to perform STOP_CLICK_AND_ADD, Error Msg : ',exception)
+                log.error('Exception occoured when trying to perform STOP_CLICK_AND_ADD, Error Msg : ', exception)
             return allobjects
 
     def get_all_children(self, ch, ne, i, path, win, winrect, backend_process):
@@ -264,7 +252,6 @@ class Scrape:
                  canselectmultiple = 'false'
                  tag = ch[i].friendly_class_name()
                  log.info(tag)
-##                 if tag == 'Button' or tag =='RadioButton' or tag == 'Edit' or tag == 'ComboBox' or tag == 'Static' or tag == 'GroupBox' or tag == 'CheckBox' or tag== 'ListView' or tag == 'ListBox'or tag == 'TreeView'or tag == 'TabControl' or tag == 'DateTimePicker'  or tag == 'Toolbar':
                  try:
                     coordinates = ch[i].client_rect()
                  except:
@@ -488,15 +475,11 @@ class Scrape:
                         logger.print_on_console( 'This element is duplicate' )
                         log.info( 'This element is duplicate' )
                  except Exception as e:
-                    logger.print_on_console(e)
-                    log.error(e)
-##                    import traceback
-##                    traceback.print_exc()
+                    logger.print_on_console( e )
+                    log.error( e )
         except Exception as e:
-            logger.print_on_console(e)
-            log.error(e)
-##            import traceback
-##            traceback.print_exc()
+            logger.print_on_console( e )
+            log.error( e )
         return ne
 
     def full_scrape(self, wxobject):
@@ -508,13 +491,7 @@ class Scrape:
                 ch = win.children()
             elif ( str(wxobject.backend_process).strip() == 'B' ):
                 win = desktop_launch_keywords.app_uia.top_window()
-##                ch=win.children()[:]
-##                for i in range(0,len(ch)):
-##                    if len(ch[i].children()):
-##                        c=ch[i].children()
-##                        for a in c:
-##                            ch.append(a)
-                ch=[]
+                ch = []
                 def rec_ch(child):
                     ch.append(child)
                     for c in child.children():
@@ -530,8 +507,6 @@ class Scrape:
         except Exception as e:
             log.error( 'Error occoured while performing full_scrape, Error Msg : ', e )
             logger.print_on_console( 'Error occoured while performing full_scrape' )
-##            import traceback
-##            traceback.print_exc()
         return allobjects
 
 class Rectangle:

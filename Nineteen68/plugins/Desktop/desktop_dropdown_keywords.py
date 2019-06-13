@@ -47,17 +47,13 @@ class Dropdown_Keywords():
                                             try:
                                                 selected_index = element.selected_index()
                                             except Exception as e:
-                                                log.error('SelectValueByIndex returns inconsistent outputs for method B elements, Err Msg : ', e)
-                                                logger.print_on_console('SelectValueByIndex returns inconsistent outputs for method B elements')
+                                                err_msg = 'SelectValueByIndex returns inconsistent outputs for method B elements, Err Msg : ' +  str(e)
+                                                log.error( err_msg )
                                         if ( selected_index == item_index -1 ):
                                             err_msg = 'Combobox with given index is already selected'
-                                            log.info( err_msg )
-                                            logger.print_on_console( err_msg )
                                         else:
                                             if ( item_index <= 0 ):
                                                 err_msg = 'Combobox index starts with 1'
-                                                log.info( err_msg )
-                                                logger.print_on_console( err_msg )
                                             else:
                                                 element.select(item_index-1)
                                                 log.info( 'Combobox item selected' )
@@ -67,12 +63,8 @@ class Dropdown_Keywords():
                                                 log.info( STATUS_METHODOUTPUT_UPDATE )
                                     else:
                                         err_msg = 'Element state does not allow to perform the operation'
-                                        log.info( err_msg )
-                                        logger.print_on_console( err_msg )
                                 else:
                                     err_msg = 'There is no item in Combobox with the given index'
-                                    log.info( err_msg )
-                                    logger.print_on_console( err_msg )
                             #---------------------------------------------------------------------------List element
                             elif ( checkName == 'ListView' or 'ListBox' ):
                                 item_count = element.item_count()
@@ -80,8 +72,7 @@ class Dropdown_Keywords():
                                      #----------------------------------------------------ListBox
                                     if ( checkName == 'ListBox' ):
                                         if ( item_index <= 0 ):
-                                                log.info( 'List item index starts with 1' )
-                                                logger.print_on_console( 'List item index starts with 1' )
+                                            err_msg = 'List item index starts with 1'
                                         else:
                                             element.Select(item_index - 1)
                                             status = desktop_constants.TEST_RESULT_PASS
@@ -94,8 +85,7 @@ class Dropdown_Keywords():
                                             if ( element.is_active() == False ):
                                                 element.click()
                                             if ( item_index <= 0 ):
-                                                log.info( 'List item index starts with 1' )
-                                                logger.print_on_console( 'List item index starts with 1' )
+                                                err_msg = 'List item index starts with 1'
                                             else:
                                                 item.select()
                                                 log.info( 'List item selected' )
@@ -105,23 +95,14 @@ class Dropdown_Keywords():
                                                 log.info( STATUS_METHODOUTPUT_UPDATE )
                                         else:
                                             err_msg = 'List item is already selected'
-                                            log.info( err_msg )
-                                            logger.print_on_console( err_msg )
                                     #----------------------------------------------------ListView
                                 else:
                                     err_msg = 'There is no List item in List view with the given index'
-                                    log.info( err_msg )
-                                    logger.print_on_console( err_msg )
                         else:
                             err_msg = 'Element not present on the page where operation is trying to be performed'
-<<<<<<< HEAD
                 if ( err_msg ):
                     log.info( err_msg )
                     logger.print_on_console( err_msg )
-=======
-                            log.info( err_msg )
-                            logger.print_on_console( err_msg )
->>>>>>> db28caf7830db007ea213b691df85daf62888918
             except Exception as exception:
                 err_msg=  desktop_constants.ERROR_MSG + ' : ' + str(exception)
                 log.error( err_msg )
@@ -147,8 +128,6 @@ class Dropdown_Keywords():
                             elelist.pop(0)
                             if ( int(input_val[0]) < 0 ):
                                 err_msg = 'Combobox index starts with 1'
-                                log.info( err_msg )
-                                logger.print_on_console( err_msg )
                             else:
                                 if ( element.backend.name == 'uia' ):
                                     verb = elelist[int(input_val[0]) - 1]
@@ -216,10 +195,7 @@ class Dropdown_Keywords():
                         #========================================================================
                else:
                     err_msg = 'Element not present on the page where operation is trying to be performed'
-<<<<<<< HEAD
                if ( err_msg ):
-=======
->>>>>>> db28caf7830db007ea213b691df85daf62888918
                     log.info( err_msg )
                     logger.print_on_console( err_msg )
             except Exception as exception:
@@ -343,8 +319,8 @@ class Dropdown_Keywords():
                                         verb = element.selected_text()
                                         flag = True
                                     except Exception as e:
-                                        logger.print_on_console( 'GetSelected returns inconsistent outputs for method B elements.' )
-                                        log.error( 'GetSelected returns inconsistent outputs for method B elements.Err Msg : ', e )
+                                        err_msg = 'GetSelected returns inconsistent outputs for method B elements. Err Msg : ' + str(e)
+                                        log.error( err_msg )
                                 elif ( element.backend.name == 'win32' ):
                                     verb = element.selected_text()
                                     flag = True
@@ -354,7 +330,7 @@ class Dropdown_Keywords():
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
                             except Exception as e :
                                 err_msg = desktop_constants.ERROR_MSG + ' : ' + str(e)
-                                log.error(err_msg)
+                                log.error( err_msg )
                         elif ( checkName == 'ListView' or 'ListBox' ):
                             if ( checkName == 'ListBox' ):
                                 if ( element.is_active() == False ):
@@ -387,8 +363,8 @@ class Dropdown_Keywords():
                                                 newlist.append(items[i])
                                         flag = True
                                     except Exception as e:
-                                        logger.print_on_console( 'GetSelected returns inconsistent outputs for method B elements.' )
-                                        log.error( 'GetSelected returns inconsistent outputs for method B elements. Err Msg : ', e )
+                                        err_msg = 'GetSelected returns inconsistent outputs for method B elements. Err Msg : ' + str(e)
+                                        log.error( err_msg )
                                 if ( flag == True ):
                                     verb = newlist
                                     status = desktop_constants.TEST_RESULT_PASS
@@ -413,6 +389,7 @@ class Dropdown_Keywords():
                         #=========================================================
                else:
                    err_msg = 'Element not present on the page where operation is trying to be performed'
+               if ( err_msg ):
                    log.info( err_msg )
                    logger.print_on_console( err_msg )
             except Exception as exception:
@@ -444,8 +421,8 @@ class Dropdown_Keywords():
                                         verb = element.selected_text()
                                         flag = True
                                     except Exception as e:
-                                        logger.print_on_console( 'VerifySelectedValue returns inconsistent outputs for method B elements.' )
-                                        log.error( 'VerifySelectedValue returns inconsistent outputs for method B elements. Err Msg : ', e )
+                                        err_msg = 'VerifySelectedValue returns inconsistent outputs for method B elements. Err Msg : ' + str(e)
+                                        log.error( err_msg )
                                 elif ( element.backend.name == 'win32' ):
                                     verb = element.selected_text()
                                     flag = True
@@ -504,10 +481,11 @@ class Dropdown_Keywords():
                                             result = desktop_constants.TEST_RESULT_TRUE
                                         else:
                                             status = desktop_constants.TEST_RESULT_FAIL
-                                    result = desktop_constants.TEST_RESULT_FALSE
+                                            result = desktop_constants.TEST_RESULT_FALSE
                             #================================================================
                    else:
                        err_msg = 'Element not present on the page where operation is trying to be performed'
+                   if ( err_msg ):
                        log.info( err_msg )
                        logger.print_on_console( err_msg )
                 except Exception as exception:
@@ -547,12 +525,10 @@ class Dropdown_Keywords():
                                             try:
                                                 selected_text = element.selected_text()
                                             except Exception as e:
-                                                logger.print_on_console( 'SelectValueByText returns inconsistent outputs for method B elements.' )
-                                                log.error( 'SelectValueByText returns inconsistent outputs for method B elements. Err Msg :', e )
+                                                err_msg = 'SelectValueByText returns inconsistent outputs for method B elements.Err Msg : ' + str(e)
+                                                log.error( err_msg )
                                         if ( selected_text == item_text ):
                                             err_msg = 'Combobox with given text is already selected'
-                                            log.info( err_msg )
-                                            logger.print_on_console( err_msg )
                                         else:
                                             try:
                                                 element.select(item_text)
@@ -563,31 +539,25 @@ class Dropdown_Keywords():
                                                 log.info( STATUS_METHODOUTPUT_UPDATE )
                                             except Exception as e:
                                                 err_msg = 'There is no item in Combobox with the given text'
-                                                log.info( err_msg )
-                                                logger.print_on_console( err_msg )
                                     else:
                                         err_msg = 'Element state does not allow to perform the operation'
-                                        log.info( err_msg )
-                                        logger.print_on_console( err_msg )
                                 else:
                                     err_msg = 'There is no item in Combobox with the given text'
-                                    log.info( err_msg )
-                                    logger.print_on_console( err_msg )
                             #==============================================================================
                             elif ( checkName == 'ListView' or 'ListBox' ):
                                 if ( checkName == 'ListBox' ):
                                     if ( item_text != '' or item_text != None ):
                                         items = element.item_texts()
-                                        for i in range(0,len(items)):
-                                            if ( item_text==str(items[i]) ):
+                                        for i in range(0, len(items)):
+                                            if ( item_text == str(items[i]) ):
                                                 try:
                                                     element.Select(item_text)
                                                     status = desktop_constants.TEST_RESULT_PASS
                                                     result = desktop_constants.TEST_RESULT_TRUE
                                                     log.info( STATUS_METHODOUTPUT_UPDATE )
                                                 except Exception as e:
-                                                    log.error( e )
-                                                    logger.print_on_console( 'There is no item in List with the given text', e)
+                                                    err_msg = 'There is no item in List with the given text. Err Msg : ' + str(e)
+                                                    log.error( err_msg )
 
                                 elif ( checkName == 'ListView' ):
                                     if ( item_text != '' or item_text != None ):
@@ -607,27 +577,16 @@ class Dropdown_Keywords():
                                                 log.info( STATUS_METHODOUTPUT_UPDATE )
                                             else:
                                                 err_msg = 'List item is already selected'
-                                                log.info( err_msg )
-                                                logger.print_on_console( err_msg )
                                         else:
                                             err_msg = 'There is no List item in List view with the given text'
-                                            log.info( err_msg )
-                                            logger.print_on_console( err_msg )
                                 else:
                                     err_msg = 'There is no List item in List view with the given text'
-                                    log.info( err_msg )
-                                    logger.print_on_console( err_msg )
                             #==============================================================================
                         else:
                             err_msg = 'Element not present on the page where operation is trying to be performed'
-<<<<<<< HEAD
                 if ( err_msg ):
                     log.info( err_msg )
                     logger.print_on_console( err_msg )
-=======
-                            log.info( err_msg )
-                            logger.print_on_console( err_msg )
->>>>>>> db28caf7830db007ea213b691df85daf62888918
             except Exception as exception:
                 err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
                 log.error( err_msg )
@@ -706,52 +665,52 @@ class Dropdown_Keywords():
                check = verify_obj.verify_parent(element, parent)
                checkName = element.friendly_class_name()
                if (check):
-                        log.info( 'Parent matched' )
-                        if ( checkName == 'ComboBox' ):
-                            items = element.texts()
-                            items.pop(0)
-                            flag = True
-                            for i in range(0, len(input_val)):
-                                if ( input_val[i] not in items ):
-                                    flag = False
+                    log.info( 'Parent matched' )
+                    if ( checkName == 'ComboBox' ):
+                        items = element.texts()
+                        items.pop(0)
+                        flag = True
+                        for i in range(0, len(input_val)):
+                            if ( input_val[i] not in items ):
+                                flag = False
 
-                            if ( flag == True ):
+                        if ( flag == True ):
+                            status = desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                        else:
+                            status = desktop_constants.TEST_RESULT_FAIL
+                            result = desktop_constants.TEST_RESULT_FALSE
+                    #==============================================================
+                    elif ( checkName == 'ListView' or 'ListBox' ):
+                        if ( checkName == 'ListBox' ):
+                            fail_flag = False #will set to true if item is not apart of original list,if set to true result is set to fail
+                            items = element.item_texts()
+                            newlist = []
+                            newlist = [item for item in items] #removing unicode
+                            #items_list=input_val
+                            for i in range(0, len(input_val)):
+                                if ( input_val[i] not in newlist ):
+                                    fail_flag = True
+                            if ( fail_flag == False ):
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
-                            else:
-                                status = desktop_constants.TEST_RESULT_FAIL
-                                result = desktop_constants.TEST_RESULT_FALSE
-                        #==============================================================
-                        elif ( checkName == 'ListView' or 'ListBox' ):
-                            if ( checkName == 'ListBox' ):
-                                fail_flag = False #will set to true if item is not apart of original list,if set to true result is set to fail
-                                items = element.item_texts()
-                                newlist = []
-                                newlist = [item for item in items] #removing unicode
-                                #items_list=input_val
-                                for i in range(0,len(input_val)):
-                                    if ( input_val[i] not in newlist ):
-                                        fail_flag = True
-                                if ( fail_flag == False ):
-                                    status = desktop_constants.TEST_RESULT_PASS
-                                    result = desktop_constants.TEST_RESULT_TRUE
 
-                            if ( checkName == 'ListView' ):
-                                 items = list(element.items())
-                                 elelist = element.texts()
-                                 elelist.pop(0)
-                                 newlist = []
-                                 items_list = input_val
-                                 for i in range(0, len(items)):
-                                        newlist.append(elelist[i])
-                                        for i in range(0, len(items_list)):
-                                            if ( items_list[i] in newlist ):
-                                                status = desktop_constants.TEST_RESULT_PASS
-                                                result = desktop_constants.TEST_RESULT_TRUE
-                                            else:
-                                                status = desktop_constants.TEST_RESULT_FAIL
-                                                result = desktop_constants.TEST_RESULT_FALSE
-                        #=================================================================
+                        if ( checkName == 'ListView' ):
+                             items = list(element.items())
+                             elelist = element.texts()
+                             elelist.pop(0)
+                             newlist = []
+                             items_list = input_val
+                             for i in range(0, len(items)):
+                                    newlist.append(elelist[i])
+                                    for i in range(0, len(items_list)):
+                                        if ( items_list[i] in newlist ):
+                                            status = desktop_constants.TEST_RESULT_PASS
+                                            result = desktop_constants.TEST_RESULT_TRUE
+                                        else:
+                                            status = desktop_constants.TEST_RESULT_FAIL
+                                            result = desktop_constants.TEST_RESULT_FALSE
+                    #=================================================================
                else:
                    err_msg = 'Element not present on the page where operation is trying to be performed'
                    log.info( err_msg )
@@ -796,11 +755,6 @@ class Dropdown_Keywords():
                                             result = desktop_constants.TEST_RESULT_TRUE
                                     else:
                                         err_msg = 'List is a single selection type.Could not select all values'
-<<<<<<< HEAD
-=======
-                                        log.info( err_msg )
-                                        logger.print_on_console( err_msg )
->>>>>>> db28caf7830db007ea213b691df85daf62888918
                                 elif ( element.friendly_class_name() == 'ListView' ):
                                      if ( element.is_active() == False ):
                                         element.click()
@@ -812,16 +766,9 @@ class Dropdown_Keywords():
                             #============================================================================
                         else:
                             err_msg = 'Element state does not allow to perform the operation'
-<<<<<<< HEAD
                else:
                     err_msg = 'Element not present on the page where operation is trying to be performed'
                if ( err_msg ):
-=======
-                            log.info( err_msg )
-                            logger.print_on_console( err_msg )
-               else:
-                    err_msg = 'Element not present on the page where operation is trying to be performed'
->>>>>>> db28caf7830db007ea213b691df85daf62888918
                     log.info( err_msg )
                     logger.print_on_console( err_msg )
             except Exception as exception:
@@ -861,7 +808,7 @@ class Dropdown_Keywords():
                                             status = desktop_constants.TEST_RESULT_PASS
                                             result = desktop_constants.TEST_RESULT_TRUE
                                     else:
-                                        logger.print_on_console( 'Element state does not allow to perform the operation' )
+                                        err_msg = 'Element state does not allow to perform the operation'
                                 elif ( element.friendly_class_name() == 'ListView' ):
                                      if ( element.is_active() == False ):
                                         element.click()
@@ -873,16 +820,9 @@ class Dropdown_Keywords():
                             #===============================================================
                         else:
                             err_msg = 'Element state does not allow to perform the operation'
-<<<<<<< HEAD
                else:
                     err_msg = 'Element not present on the page where operation is trying to be performed'
                if ( err_msg ):
-=======
-                            log.info( err_msg )
-                            logger.print_on_console( err_msg )
-               else:
-                    err_msg = 'Element not present on the page where operation is trying to be performed'
->>>>>>> db28caf7830db007ea213b691df85daf62888918
                     log.info( err_msg )
                     logger.print_on_console( err_msg )
             except Exception as exception:
@@ -927,16 +867,11 @@ class Dropdown_Keywords():
                                     index = int(ilist[i])
                                     if ( index < 0 or index >= len(items) ):
                                         verbList.append("No Value")
-                                        false_flag=True
+                                        false_flag = True
                                     else:
                                         verbList.append(items[index])
                                 verb = [nitem for nitem in verbList]
                                 if ( false_flag == False ):
-<<<<<<< HEAD
-                                    #err_msg = "Entered indexs are out of bound"
-=======
-                                    err_msg = "Entered indexs are out of bound"
->>>>>>> db28caf7830db007ea213b691df85daf62888918
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
                                     log.info( STATUS_METHODOUTPUT_UPDATE )
@@ -959,13 +894,11 @@ class Dropdown_Keywords():
                                 list_input = input_val
                                 item_list = []
                                 for item in list_input:
-                                    #logger.print_on_console(item)
-                                    item_new = (int(item)-1)*2
-                                    #logger.print_on_console(item_new)
+                                    item_new = (int(item) - 1) * 2
                                     item_list.append(item_new)
                                 val=''
                                 res=''
-                                for i in range(0,len(item_list)):
+                                for i in range(0, len(item_list)):
                                     if ( cols == 1 ):
                                         val = item_list[i]
                                         res = elelist[int(val)]
@@ -985,24 +918,17 @@ class Dropdown_Keywords():
                         #=================================================================================
 
                         elif ( element.friendly_class_name() == 'ComboBox' ):
-                            selected=element.selected_text()
+                            selected = element.selected_text()
                             verb = selected
                             logger.print_on_console('Values obtained are : ', verb)
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                             log.info( STATUS_METHODOUTPUT_UPDATE )
-<<<<<<< HEAD
-=======
-
->>>>>>> db28caf7830db007ea213b691df85daf62888918
                else:
                     err_msg = 'Element not present on the page where operation is trying to be performed'
-                    log.error( err_msg )
+               if ( err_msg ):
+                    log.info( err_msg )
                     logger.print_on_console( err_msg )
-<<<<<<< HEAD
-=======
-
->>>>>>> db28caf7830db007ea213b691df85daf62888918
             except Exception as exception:
                 err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
                 log.error( err_msg )
@@ -1044,38 +970,27 @@ class Dropdown_Keywords():
                                             index = None
                                             index = int(ilist[i])
                                             if ( index < 0 or index >= len(items) ):
-                                                fail_flag=True
+                                                fail_flag = True
                                             else:
                                                 element.Select(index)
                                         if ( fail_flag == False ):
-<<<<<<< HEAD
-                                            #err_msg = "Entered indexs are out of bound"
-=======
-                                            err_msg = "Entered indexs are out of bound"
->>>>>>> db28caf7830db007ea213b691df85daf62888918
                                             status = desktop_constants.TEST_RESULT_PASS
                                             result = desktop_constants.TEST_RESULT_TRUE
                                     else:
-                                        err_msg = 'List is a single selection type.Could not select all values'
-<<<<<<< HEAD
-=======
-                                        log.info( err_msg )
-                                        logger.print_on_console( err_msg )
->>>>>>> db28caf7830db007ea213b691df85daf62888918
+                                        err_msg = 'List is a single selection type. Could not select all values'
                                 elif ( element.friendly_class_name() == 'ListView' ):
                                     item_count = element.item_count()
                                     items = list(element.items())
-                                    for i in range(0,len(items)):
+                                    for i in range(0, len(items)):
                                         items[i].deselect()
-                                    for i in range(0,len(item_index)):
+                                    for i in range(0, len(item_index)):
                                       if ( int(item_index[i]) <= item_count ):
                                          item = element.get_item(int(item_index[i]) - 1)
                                          if ( not item.is_selected() ):
                                             if ( element.is_active() == False ):
                                                 element.click()
                                             if ( int(item_index[i]) <= 0 ):
-                                                log.info( 'List item index starts with 1' )
-                                                logger.print_on_console( 'List item index starts with 1' )
+                                                err_msg = 'List item index starts with 1'
                                             else:
                                                 item.select()
                                                 log.info( 'List item selected' )
@@ -1085,32 +1000,16 @@ class Dropdown_Keywords():
                                                 log.info( STATUS_METHODOUTPUT_UPDATE )
                                          else:
                                             err_msg = 'List item is already selected'
-<<<<<<< HEAD
-=======
-                                            log.info( err_msg )
-                                            logger.print_on_console( err_msg )
->>>>>>> db28caf7830db007ea213b691df85daf62888918
                                       else:
-                                            err_msg = 'There is no List item in List view with the given index'
-                                            log.info( err_msg )
-                                            logger.print_on_console( err_msg )
+                                        err_msg = 'There is no List item in List view with the given index'
                             #====================================================================================
                         else:
                             err_msg = 'Element state does not allow to perform the operation'
-<<<<<<< HEAD
                     else:
                         err_msg = 'Element not present on the page where operation is trying to be performed'
                 if ( err_msg ):
                     log.info( err_msg )
                     logger.print_on_console( err_msg )
-=======
-                            log.info( err_msg )
-                            logger.print_on_console( err_msg )
-                    else:
-                        err_msg = 'Element not present on the page where operation is trying to be performed'
-                        log.info( err_msg )
-                        logger.print_on_console( err_msg )
->>>>>>> db28caf7830db007ea213b691df85daf62888918
             except Exception as exception:
                 err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
                 log.error( err_msg )
@@ -1147,8 +1046,6 @@ class Dropdown_Keywords():
                                 if ( checkName == 'ListBox' ):
                                     fail_flag = False
                                     if ( element.is_single_selection() != True ):
-##                                        if element.is_active() == False:
-##                                           element.click()
                                         newlist = []
                                         items = element.item_texts()
                                         newlist = [item for item in items]#removing unicode
@@ -1158,16 +1055,10 @@ class Dropdown_Keywords():
                                         if ( fail_flag == False ):
                                             for i in range(len(item_text)):
                                                 element.Select(item_text[i])
-                                            #err_msg="Entered indexs are out of bound"
                                             status = desktop_constants.TEST_RESULT_PASS
                                             result = desktop_constants.TEST_RESULT_TRUE
                                     else:
                                         err_msg = 'List is a single selection type.Could not select all values'
-<<<<<<< HEAD
-=======
-                                        log.info( err_msg )
-                                        log.error( err_msg )
->>>>>>> db28caf7830db007ea213b691df85daf62888918
                                 elif ( checkName == 'ListView' ):
                                     item_count = element.item_count()
                                     items = list(element.items())
@@ -1182,39 +1073,25 @@ class Dropdown_Keywords():
                                                 itemtext.select()
                                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                                              else:
-                                                log.info( 'List item is already selected' )
-                                                log.debug( 'List item is already selected' )
+                                                err_msg = 'List item is already selected'
                                         else:
                                             pass_flag = False
                                     if ( pass_flag == True ):
                                         status = desktop_constants.TEST_RESULT_PASS
                                         result = desktop_constants.TEST_RESULT_TRUE
                                     else:
-                                        for i in range(0,len(items)):
+                                        for i in range(0, len(items)):
                                             items[i].deselect()
                                         err_msg = 'Element/Elements not present on the page where operation is trying to be performed'
-<<<<<<< HEAD
-=======
-                                        log.error( err_msg )
->>>>>>> db28caf7830db007ea213b691df85daf62888918
                             #=======================================================================================================
 
                         else:
                             err_msg = 'Element state does not allow to perform the operation'
-<<<<<<< HEAD
                     else:
                         err_msg = 'Element not present on the page where operation is trying to be performed'
                 if ( err_msg ):
                     log.info( err_msg )
                     logger.print_on_console( err_msg )
-=======
-                            log.info( err_msg )
-                            log.error( err_msg )
-                    else:
-                        err_msg='Element not present on the page where operation is trying to be performed'
-                        log.info( err_msg )
-                        log.error( err_msg )
->>>>>>> db28caf7830db007ea213b691df85daf62888918
             except Exception as exception:
                 err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
                 log.error( err_msg )
@@ -1224,11 +1101,9 @@ class Dropdown_Keywords():
         def multiListGetter(self, cols, elelist, input_val):
             rows=int(len(elelist) / cols)
             #-------------------------------------------------creating a 2D list
-            #print"creating a 2D list"
             Matrix = [[0 for x in range(cols)] for y in range(rows)]
             #-------------------------------------------------creating a 2D list
             #-------------------------------------------------populating the 2D list
-            #print"populating the 2D list"
             index_i = 0
             for j in range(0, rows):
                 for k in range (0, cols):
@@ -1240,21 +1115,10 @@ class Dropdown_Keywords():
                         log.error( "Error occoured in populating the 2D matrix" )
                         log.error( e )
             #-------------------------------------------------populating the 2D list
-            #-------------------------------------------------printing the 2D list
-##                                print"printing the 2D list"
-##                                for j in range(0,rows):
-##                                    for k in range (0,cols):
-##                                        try:
-##                                            print"Matrix"+"["+str(j+1)+"]["+str(k+1)+"]:"+str(Matrix[j][k])+"."
-##                                        except Exception as e:
-##                                            print"out of bound",e
-            #-------------------------------------------------printing the 2D list
             #-------------------------------------------------creating new Matrix based on indexes given
-            #print"creating new matrix based on input vals"
             NewMatrix = [[0 for x in range(cols)] for y in range(len(input_val))]
             #-------------------------------------------------creating new Matrix based on indexes given
             #-------------------------------------------------poulating the new martix
-            #print"populating the new matrix"
             new_input_val = []
             for z in range(0, len(input_val)):
                 new_input_val.append(str(int(input_val[z]) - 1))
@@ -1268,13 +1132,4 @@ class Dropdown_Keywords():
             except Exception as e:
                 log.error( e )
             #-------------------------------------------------poulating the new martix
-            #-------------------------------------------------printing the new 2D list
-##            print"printing the new 2D list"
-##            for j1 in range(0,len(input_val)):
-##                for k1 in range (0,cols):
-##                    try:
-##                        print"NewMatrix"+"["+str(j1+1)+"]["+str(k1+1)+"]:"+str(NewMatrix[j1][k1])+"."
-##                    except Exception as e:
-##                        print"out of bound",e
-            #-------------------------------------------------printing the new 2D list
             return NewMatrix

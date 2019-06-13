@@ -8,7 +8,6 @@
 # Copyright:   (c) rakesh.v 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-
 import button_link_keywords_desktop
 import desktop_editable_text
 import desktop_element_keywords
@@ -48,7 +47,6 @@ class DesktopDispatcher:
     desktop_custom_object_obj = desktop_custom_object.CustomObjectHandler()
     tree_keywords_obj = desktop_treeview_keywords.Tree_View_Keywords()
     table_keywords_obj = desktop_table_keywords.Table_Keywords()
-##    outook_obj=outlook.OutlookKeywords()
 
     desktop_dict = { 'click': button_link_keywords_obj.click,
         'press' : button_link_keywords_obj.press,
@@ -184,7 +182,6 @@ class DesktopDispatcher:
         url = teststepproperty.url
         err_msg = None
         result = [desktop_constants.TEST_RESULT_FAIL, desktop_constants.TEST_RESULT_FALSE, constants.OUTPUT_CONSTANT, err_msg]
-##        if objectname != '@Browser' or objectname != '@BrowserPopUp' or objectname != '@Custom':
 
         self.desktop_dict['getemail'] = self.outook_obj.GetEmail
         self.desktop_dict['getfrommailid'] = self.outook_obj.GetFromMailId
@@ -201,7 +198,6 @@ class DesktopDispatcher:
         self.desktop_dict['setbody'] = self.outook_obj.send_body
         self.desktop_dict['setattachments'] = self.outook_obj.send_attachments
         self.desktop_dict['sendemail'] = self.outook_obj.send_mail
-
 
         if ( iris_flag ):
             import iris_operations
@@ -291,10 +287,7 @@ class DesktopDispatcher:
             result[3] = err_msg
         except Exception as e:
             log.error( e )
-            #logger.print_on_console('Exception at dispatcher')
         if  ( err_msg != None ):
-            #import traceback
-            #traceback.print_exc()
             log.error( err_msg )
             logger.print_on_console( err_msg )
 
@@ -368,7 +361,6 @@ class DesktopDispatcher:
                                 if ( xname != comp_text ):
                                     ele = ''
                         else:
-                            #print "friendly class name does not match",ele.friendly_class_name()
                             ele = ''
                 except Exception as e:
                     if ( prev_flag == False ):#checking if previous test case flag is True or not.
@@ -376,10 +368,7 @@ class DesktopDispatcher:
                 #---------------------------------------------------
             except Exception as e:
                 log.error( "Unable to get desktop elements because : ", e)
-                #import traceback
-                #traceback.print_exc()
             if ( ele == '' ):
-                #logger.print_on_console("Warning! AUT Structure has changed")
                 try:
                     ele = self.get_element_if_empty(xclass, xname, app2)
                 except:# only for tables
@@ -389,20 +378,12 @@ class DesktopDispatcher:
                     ele = ch[int(index)]
                 except Exception as e:
                     log.error( e )
-                    #import traceback
-                    #traceback.print_exc()
                     logger.print_on_console( "Unable to get desktop element because : ", e )
         elif ( backend == 'B' ):
             try:
                 import pythoncom
                 pythoncom.CoInitialize()
                 win = desktop_launch_keywords.app_uia.top_window()
-##                ch = win.children()[:]
-##                for i in range(0,len(ch)):
-##                    if len(ch[i].children()):
-##                        c = ch[i].children()
-##                        for a in c:
-##                            ch.append(a)
                 ch = []
                 def rec_ch(child):
                     ch.append(child)
@@ -425,8 +406,6 @@ class DesktopDispatcher:
                     logger.print_on_console( 'List keywords return inconsistant values for elements scraped via method B' )
             except Exception as e:
                 log.error( "Unable to get desktop element because : ", e)
-                #import traceback
-                #traceback.print_exc()
                 logger.print_on_console( "Unable to get desktop element because : ", e )
         return ele
 
@@ -448,12 +427,8 @@ class DesktopDispatcher:
                             ele = ch1[i]
                 except Exception as e:
                     log.error( 'Error occoured in get_desktop_static_element, Err Msg : ', e )
-                    #import traceback
-                    #traceback.print_exc()
         except Exception as e:
             log.error( 'Error occoured in get_desktop_static_element, Err Msg : ', e )
-            #import traceback
-            #traceback.print_exc()
         return ele
     def get_element_if_empty(self, xclass, xname, app):
         """This method was added as a check, The name of the element is passed as an argument,it
@@ -495,10 +470,6 @@ class DesktopDispatcher:
                             break
                 except Exception as e:
                     log.error( 'Error occoured in get_element_if_empty, Err Msg : ', e )
-                    #import traceback
-                    #traceback.print_exc()
         except Exception as e:
             log.error( 'Error occoured in get_element_if_empty, Err Msg : ', e )
-            #import traceback
-            #traceback.print_exc()
         return ele

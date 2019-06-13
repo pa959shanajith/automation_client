@@ -12,7 +12,6 @@ import desktop_launch_keywords
 import logger
 import time
 from desktop_editable_text import Text_Box
-
 import logging
 log = logging.getLogger( 'desktop_highlight.py' )
 
@@ -33,12 +32,6 @@ class highLight():
             try:
                 if ( str(backend).strip() == 'B' ):
                     win = desktop_launch_keywords.app_uia.top_window()
-##                    ch=win.children()[:]
-##                    for i in range(0,len(ch)):
-##                        if len(ch[i].children()):
-##                            c=ch[i].children()
-##                            for a in c:
-##                                ch.append(a)
                     ch = []
                     def rec_ch(child):
                         ch.append(child)
@@ -69,7 +62,6 @@ class highLight():
     def highlight_desktop_element(self, ele):
         try:
             ele.draw_outline(thickness = 5)
-            #time.sleep(2)
             logger.print_on_console( 'Element highlight completed successfully...' )
         except Exception as e:
             log.error( "Error occoured in highlight_desktop_element : ", e )
