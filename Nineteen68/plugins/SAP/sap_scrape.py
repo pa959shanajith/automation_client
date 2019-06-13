@@ -46,7 +46,7 @@ class ScrapeWindow(wx.Frame):
         status = obj.launch_application(input_val)
         self.irisFlag = irisFlag
         self.scrapeoptions = ['Full', 'Button', 'Textbox', 'Dropdown', 'Label', 'Radiobutton', 'Checkbox', 'Table', 'Scroll Bar', 'Tab', 'Shell', 'Other Tags']
-        self.tag_map={'Full':'full','Button':'button', 'Textbox':'input', 'Dropdown':'select', 'Label':'GuiLabel', 'Radiobutton':'radiobutton', 'Checkbox':'checkbox', 'Table':'table', 'Scroll Bar':'GuiScrollContainer', 'Tab':'GuiTab', 'Shell':'shell', 'Other Tags':'others'}
+        self.tag_map = {'Full':'full','Button':'button', 'Textbox':'input', 'Dropdown':'select', 'Label':'GuiLabel', 'Radiobutton':'radiobutton', 'Checkbox':'checkbox', 'Table':'table', 'Scroll Bar':'GuiScrollContainer', 'Tab':'GuiTab', 'Shell':'shell', 'Other Tags':'others'}
         if ( status != TERMINATE ):
             try:
                 self.panel = wx.Panel(self)
@@ -61,7 +61,8 @@ class ScrapeWindow(wx.Frame):
                 self.fullscrapebutton = wx.Button(self.panel, label="Scrape", pos = (101, 48), size = (86, 25))
                 self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)
             except Exception as e:
-                print (e)
+                log.error(e)
+                logger.print_on_console(e)
             if ( irisFlag ):
                 import cropandadd
                 global cropandaddobj
@@ -108,7 +109,7 @@ class ScrapeWindow(wx.Frame):
             data['mirror'] = encoded_string.decode('UTF-8').strip()
             data['view'] = d
             # 10 is the limit of MB set as per Nineteen68 standards
-            if self.core_utilsobject.getdatasize(str(data),'mb') < 10:
+            if ( self.core_utilsobject.getdatasize(str(data),'mb') < 10 ):
                 self.socketIO.emit('scrape',data)
             else:
                 logger.print_on_console( 'Scraped data exceeds max. Limit.' )
@@ -188,5 +189,5 @@ class ScrapeWindow(wx.Frame):
         except Exception as e:
             log.error(e)
         if ( len( new_data ) == 0 ):
-            log.error('Unable to find object_type : ' + tag_choice + 'when scraping ')
+            log.error('Unable to find object_type : ' + tag_choice + ' when scraping ')
         return new_data

@@ -52,13 +52,16 @@ class Device_Keywords():
                         continue
                     serial = line.split('\\t')
                     devices.append(serial[0])
+                output = devices
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
                 os.chdir(maindir)
+            else:
+                logger.print_on_console('ANDROID_HOME not set in system path')
         except Exception as e:
             log.error(e,exc_info=True)
             logger.print_on_console(err_msg)
-        return status,methodoutput,devices,err_msg
+        return status,methodoutput,output,err_msg
 
     def wifi_connect(self,*args):
         try:
@@ -106,6 +109,8 @@ class Device_Keywords():
                 else:
                     logger.print_on_console('No devices found please connect the device via usb to configure adb through WiFi')
                     return ''
+            else:
+                logger.print_on_console('ANDROID_HOME not set in system path')
         except Exception as e:
             log.error(e,exc_info=True)
             logger.print_on_console(err_msg)
@@ -145,6 +150,8 @@ class Device_Keywords():
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 os.chdir(maindir)
+            else:
+                logger.print_on_console('ANDROID_HOME not set in system path')
         except Exception as e:
             log.error(e,exc_info=True)
             logger.print_on_console(err_msg)
@@ -155,16 +162,19 @@ class Device_Keywords():
         maindir=os.getcwd()
         try:
             aapt_home=os.environ['AAPT_HOME']
-            cmd=aapt_home
-            os.chdir(cmd)
-            cmd = cmd + 'aapt.exe'
-            out = subprocess.Popen([cmd, 'dump','badging',apk],stdout= subprocess.PIPE)
-            for line in out.stdout.readlines():
-                curr_line = str(line)[2:-1]
-                if 'package:' in curr_line:
-                    curr_line = curr_line.strip().split()
-                    packageName = curr_line[1][6:-1]
-                    break
+            if aapt_home != None:
+                cmd=aapt_home
+                os.chdir(cmd)
+                cmd = cmd + 'aapt.exe'
+                out = subprocess.Popen([cmd, 'dump','badging',apk],stdout= subprocess.PIPE)
+                for line in out.stdout.readlines():
+                    curr_line = str(line)[2:-1]
+                    if 'package:' in curr_line:
+                        curr_line = curr_line.strip().split()
+                        packageName = curr_line[1][6:-1]
+                        break
+            else:
+                logger.print_on_console('AAPT_HOME not set in system path')
             os.chdir(maindir)
         except Exception as e:
             log.error(e,exc_info=True)
@@ -176,16 +186,19 @@ class Device_Keywords():
         maindir=os.getcwd()
         try:
             aapt_home=os.environ['AAPT_HOME']
-            cmd=aapt_home
-            os.chdir(cmd)
-            cmd = cmd + 'aapt.exe'
-            out = subprocess.Popen([cmd, 'dump', 'badging', apk],stdout= subprocess.PIPE)
-            for line in out.stdout.readlines():
-                curr_line = str(line)[2:-1]
-                if 'launchable' in curr_line:
-                    curr_line = curr_line.strip().split()
-                    activityName = curr_line[1][6:-1]
-                    break
+            if aapt_home != None:
+                cmd=aapt_home
+                os.chdir(cmd)
+                cmd = cmd + 'aapt.exe'
+                out = subprocess.Popen([cmd, 'dump', 'badging', apk],stdout= subprocess.PIPE)
+                for line in out.stdout.readlines():
+                    curr_line = str(line)[2:-1]
+                    if 'launchable' in curr_line:
+                        curr_line = curr_line.strip().split()
+                        activityName = curr_line[1][6:-1]
+                        break
+            else:
+                logger.print_on_console('AAPT_HOME not set in system path')
             os.chdir(maindir)
         except Exception as e:
             log.error(e,exc_info=True)
@@ -212,6 +225,8 @@ class Device_Keywords():
                 os.chdir(maindir)
                 if flag is False:
                     raise Exception('Error Uninstalling App using adb; App not installed')
+            else:
+                logger.print_on_console('ANDROID_HOME not set in system path')
         except Exception as e:
             log.error(e, exc_info=True)
             logger.print_on_console('Error Uninstalling App using adb; App not installed')
@@ -234,6 +249,8 @@ class Device_Keywords():
                 else:
                     raise Exception('Driver not running; App not launched')
                 os.chdir(maindir)
+            else:
+                logger.print_on_console('ANDROID_HOME not set in system path')
         except Exception as e:
             log.error(e,exc_info=True)
             logger.print_on_console('Driver not running; App not launched')
@@ -276,6 +293,8 @@ class Device_Keywords():
                     if 'Error' in curr_line:
                         result = 'Error in Starting App'
                         break
+            else:
+                logger.print_on_console('ANDROID_HOME not set in system path')
             os.chdir(maindir)
         except Exception as e:
             log.error(e, exc_info=True)

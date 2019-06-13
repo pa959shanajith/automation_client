@@ -168,7 +168,7 @@ class WordFile():
     def getAllTablesFromDoc(self, filename, *args):
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
-        output = OUTPUT_CONSTANT
+        output = None
         err_msg = None
         try:
             if SYSTEM_OS == "Windows":
@@ -211,7 +211,7 @@ class WordFile():
     def readjson(self, filename, jsonpara, *args):
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
-        output = OUTPUT_CONSTANT
+        output = None
         err_msg = None
         try:
             fileName,file_ext=os.path.splitext(filename)
@@ -254,7 +254,7 @@ class WordFile():
     def readxml(self,filename,xmlpara,*args):
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
-        output = OUTPUT_CONSTANT
+        output = None
         err_msg = None
         try:
             fileName,file_ext=os.path.splitext(filename)
@@ -297,7 +297,7 @@ class WordFile():
     def readPdf(self, filename,pageno, *args):
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
-        output = OUTPUT_CONSTANT
+        output = None
         err_msg = None
         try:
             if os.path.exists(os.path.normpath(filename)):

@@ -157,7 +157,7 @@ class RadioCheckboxKeywords():
     def get_status(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg=None
         status=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)

@@ -343,7 +343,7 @@ class UtilOperations:
             status=TEST_RESULT_FAIL
             result=TEST_RESULT_FALSE
             err_msg=None
-            output=OUTPUT_CONSTANT
+            output=None
             if any(isinstance(el, list) for el in variable):
                 output=str(len(variable))+'@'+str(len(variable[0]))
                 status=TEST_RESULT_PASS
