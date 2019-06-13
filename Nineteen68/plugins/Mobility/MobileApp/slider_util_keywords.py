@@ -60,7 +60,7 @@ class SliderKeywords():
 
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:

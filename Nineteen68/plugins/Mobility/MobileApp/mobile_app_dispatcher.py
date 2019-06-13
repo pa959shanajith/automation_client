@@ -96,21 +96,22 @@ class MobileDispatcher:
         'verifyvisible' : slider_util_keywords_object.verify_visible,
         'verifyhidden' : slider_util_keywords_object.verify_hidden,
         'verifyexists' : slider_util_keywords_object.verify_exists,
+        'verifydoesnotexists': slider_util_keywords_object.verify_does_not_exists,
         'getdevices' : device_keywords_object.get_device_list,
         'invokedevice' : device_keywords_object.invoke_device,
         'stopserver':install_and_launch_object.stop_server,
         'hidesoftkeyboard':swipe_keywords_object.hide_soft_keyboard,
         'backpress':swipe_keywords_object.backPress,
-        'presselement':button_link_object.press,
-        'longpresselement':button_link_object.long_press,
-        'getelementtext':textbox_keywords_object.get_text,
+        #'presselement':button_link_object.press,
+        #'longpresselement':button_link_object.long_press,
+        #'getelementtext':textbox_keywords_object.get_text,
         'setslidevalue': slider_util_keywords_object.set_slide_value,
         'getslidevalue': slider_util_keywords_object.get_slide_value,
-        'verifyelementexists':slider_util_keywords_object.verify_exists,
-        'verifyelementdisabled':slider_util_keywords_object.verify_disabled,
-        'verifyelementdoesnotexists':slider_util_keywords_object.verify_does_not_exists,
-        'verifyelementenabled':slider_util_keywords_object.verify_exists,
-        'verifyelementtext':textbox_keywords_object.verify_text,
+        #'verifyelementexists':slider_util_keywords_object.verify_exists,
+        #'verifyelementdisabled':slider_util_keywords_object.verify_disabled,
+        #'verifyelementdoesnotexists':slider_util_keywords_object.verify_does_not_exists,
+        #'verifyelementenabled':slider_util_keywords_object.verify_exists,
+        #'verifyelementtext':textbox_keywords_object.verify_text,
         'actionkey':action_keyowrds_object.action_key,
         'waitforelementexists':slider_util_keywords_object.waitforelement_exists,
         'getcount':spinner_keywords_object.get_count,
@@ -399,12 +400,19 @@ class MobileDispatcher:
                 else:
                     driver = android_scrapping.driver
                     if teststepproperty.custname == "@Android_Custom":
-                        if self.custom_object.custom_check(input,keyword) == False:
-                            logger.print_on_console("The object and the keyword do not match")
-                            result=TERMINATE
+                        if (input[0] and input[1] and input[2]):
+                            logger.print_on_console("Element type is ",input[0])
+                            logger.print_on_console("Visible text is ",input[1])
+                            logger.print_on_console("Index is ",input[2])
+                            if self.custom_object.custom_check(input,keyword) == False:
+                                logger.print_on_console("The object and the keyword do not match")
+                                result=TERMINATE
+                            else:
+                                webelement,input=self.custom_object.custom_element(input)
+                                result=self.mob_dict[keyword](webelement,input)
                         else:
-                            webelement,input=self.custom_object.custom_element(input)
-                            result=self.mob_dict[keyword](webelement,input)
+                            logger.print_on_console("Invalid input, Please provide the valid input")
+                            result=TERMINATE
                     elif keyword==WAIT_FOR_ELEMENT_EXISTS:
                         result=self.mob_dict[keyword](objectname,input)
                     elif keyword == 'getnumber' or keyword == 'verifynumber':

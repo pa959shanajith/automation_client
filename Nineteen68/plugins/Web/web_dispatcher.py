@@ -219,7 +219,7 @@ class Dispatcher:
             self.web_dict['verifytextiris'] = iris_object.verifytextiris
 
         def print_error(err_msg):
-##            err_msg=ERROR_CODE_DICT['ERR_CUSTOM_MISMATCH']
+            err_msg=ERROR_CODE_DICT[err_msg]
             logger.print_on_console(err_msg)
             log.error(err_msg)
 
@@ -239,11 +239,17 @@ class Dispatcher:
                         log.info('Custom flag is ')
                         log.info(teststepproperty.custom_flag)
                         if teststepproperty.custom_flag:
-                            if len(input)>3 and isinstance(input[-1],webdriver.remote.webelement.WebElement):
-                                reference_element=input[-1]
-                                getObjectFlag=True
-                                log.info("getObjectFlag is True. Reference element is taken from getObject")
-                                logger.print_on_console("getObjectFlag is True. Reference element is taken from getObject")
+                            if len(input)>3:
+                                if isinstance(input[-1],webdriver.remote.webelement.WebElement):
+                                    reference_element=input[-1]
+                                    getObjectFlag=True
+                                    log.info("getObjectFlag is True. Reference element is taken from getObject")
+                                    logger.print_on_console("getObjectFlag is True. Reference element is taken from getObject")
+                                else:
+                                    reference_element=None
+                                    err_msg=ERROR_CODE_DICT['INCORRECT_VARIABLE_FORMAT']
+                                    logger.print_on_console(err_msg)
+                                    log.error(err_msg)
                             else:
                                 reference_element=self.getwebelement(driver,teststepproperty.parent_xpath)
                             log.debug('Reference_element ')
@@ -417,6 +423,7 @@ class Dispatcher:
                         file_path = screen_shot_obj.captureScreenshot()
                         result.append(file_path[2])
         except TypeError as e:
+            log.error(e,exc_info=True)
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result=list(result)
             result[3]=err_msg
@@ -466,7 +473,6 @@ class Dispatcher:
 ##        objectname = str(objectname)
         webElement = None
         if objectname.strip() != '':
-
             identifiers = objectname.split(';')
             log.debug('Identifiers are ')
             log.debug(identifiers)
@@ -520,7 +526,55 @@ class Dispatcher:
                             webElement = tempwebElement
 ##                            log.debug('Webelement found by absolute Xpath')
                         except Exception as webEx:
-                            err_msg=WEB_ELEMENT_NOT_FOUND
+                            try:
+                                if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                    tempwebElement = driver.find_elements_by_name(identifiers[3])
+                                    if (len(tempwebElement) == 1):
+                                        logger.print_on_console('Webelement found by OI4')
+                                        log.debug('Webelement found by OI4')
+                                    if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                        tempwebElement = driver.find_elements_by_class_name(identifiers[5])
+                                        if (len(tempwebElement) == 1):
+                                            logger.print_on_console('Webelement found by OI5')
+                                            log.debug('Webelement found by OI5')
+                                    if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                        if(len(identifiers)==12):
+                                            tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
+                                            if (len(tempwebElement) == 1):
+                                                logger.print_on_console('Webelement found by OI6')
+                                                log.debug('Webelement found by OI6')
+                                            else:
+                                                tempwebElement = None
+                                webElement = tempwebElement
+                            except Exception as webEx:
+                                    try:
+                                        if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                            tempwebElement = driver.find_elements_by_class_name(identifiers[5])
+                                            if (len(tempwebElement) == 1):
+                                                logger.print_on_console('Webelement found by OI5')
+                                                log.debug('Webelement found by OI5')
+                                            if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                                if(len(identifiers)==12):
+                                                    tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
+                                                    if (len(tempwebElement) == 1):
+                                                        logger.print_on_console('Webelement found by OI6')
+                                                        log.debug('Webelement found by OI6')
+                                                    else:
+                                                        tempwebElement = None
+                                        webElement = tempwebElement
+                                    except Exception as webEx:
+                                        try:
+                                            if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                                if(len(identifiers)==12):
+                                                    tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
+                                                    if (len(tempwebElement) == 1):
+                                                        logger.print_on_console('Webelement found by OI6')
+                                                        log.debug('Webelement found by OI6')
+                                                    else:
+                                                        tempwebElement = None
+                                            webElement = tempwebElement
+                                        except Exception as webEx:
+                                            err_msg=WEB_ELEMENT_NOT_FOUND
             #enhance object reconition changes
             if(webElement == None):
                 try:
@@ -544,8 +598,8 @@ class Dispatcher:
                     if (elementname!='null'):
                             tempwebElement = driver.find_elements_by_name(elementname)
                             if (len(tempwebElement) == 1):
-                                logger.print_on_console('Webelement found by OI4')
-                                log.debug('Webelement found by OI4')
+                                logger.print_on_console('Webelement found by OI7')
+                                log.debug('Webelement found by OI7')
                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                 webElement=None
                     if(webElement==None):

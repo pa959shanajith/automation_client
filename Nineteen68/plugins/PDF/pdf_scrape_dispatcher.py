@@ -69,7 +69,7 @@ class ScrapeDispatcher(wx.Frame):
         if state == True:
             try:
                 global pdfV
-                pdfV = PDFViewer(None, size=(615,850))
+                pdfV = PDFViewer(None, title="PDF Window", size=(615,850))
                 pdfV.Show()
                 pdfV.Centre()
             except Exception as e:
