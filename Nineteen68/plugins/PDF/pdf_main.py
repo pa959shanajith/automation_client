@@ -58,13 +58,19 @@ class PDFViewer(sc.SizedFrame):
     def __init__(self, parent, **kwds):
         try:
             super(PDFViewer, self).__init__(parent, **kwds)
+
+            # Adding slk icon to window
+            self.iconpath = IMAGES_PATH+"slk.ico"
+            self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
+            self.SetIcon(self.wicon)
+
             paneCont = self.GetContentsPane()
             paneCont.SetSizerType("vertical")
             paneCont.SetBackgroundColour("#350066")
             hsizer = wx.BoxSizer( wx.HORIZONTAL)
             vsizer = wx.BoxSizer( wx.VERTICAL)
             self.loadbutton = wx.Button(paneCont, wx.ID_ANY, "Load PDF file", wx.DefaultPosition, wx.DefaultSize, 0 )
-            operations = ['Sibling Element','Between Elements']
+            operations = ['Sibling Element','Between Elements', 'PDF Image']
             self.combobox = wx.ComboBox(paneCont,wx.ID_ANY,"Select Action",wx.DefaultPosition,wx.DefaultSize,operations ,0)
             size = '4'
 ##            self.startbutton = btn.GenBitmapButton(paneCont,wx.ID_ANY,bitmap=wx.Bitmap("./images/toolbarButton-actionStart.png"),style=wx.NO_BORDER|wx.BU_EXACTFIT)
@@ -163,11 +169,113 @@ class PDFViewer(sc.SizedFrame):
 
     def OnSelect(self,event):
         selectop = self.combobox.Value
-##        self.startbutton.Enable()
-##        self.stopbutton.Enable()
-        self.search.Enable()
-        currentpage = self.viewer.buttonpanel
-        self.OnResize()
+
+        if selectop == 'Sibling Element':
+    ##        self.startbutton.Enable()
+    ##        self.stopbutton.Enable()
+            self.search.Enable()
+            currentpage = self.viewer.buttonpanel
+            self.OnResize()
+        elif selectop == 'PDF Image':
+##            self.Freeze()
+##            self.Thaw()
+            import time
+            time.sleep(0.5)
+            self.c1 = None
+            self.c2 = None
+            try:
+                self.viewer.Bind(wx.EVT_MOTION, self.OnMouseMove)
+                self.viewer.Bind(wx.EVT_LEFT_DOWN, self.OnMouseDown)
+                self.viewer.Bind(wx.EVT_LEFT_UP, self.OnMouseUp)
+                self.viewer.Bind(wx.EVT_PAINT, self.OnPaint)
+                self.viewer.SetCursor(wx.StockCursor(wx.CURSOR_CROSS))
+            except Exception as e :
+                logger.print_on_console('Error at pdf image in onselect')
+                log.error(e)
+
+
+    def OnMouseMove(self, event):
+        if event.Dragging() and event.LeftIsDown():
+            self.c2 = event.GetPosition()
+            self.Refresh()
+
+    def OnMouseDown(self, event):
+        self.c1 = event.GetPosition()
+
+    def OnMouseUp(self, event):
+        self.viewer.SetCursor(wx.StockCursor(wx.CURSOR_ARROW))
+        self.viewer.Unbind(wx.EVT_MOTION)
+        self.viewer.Unbind(wx.EVT_LEFT_DOWN)
+        self.viewer.Unbind(wx.EVT_LEFT_UP)
+        self.viewer.Unbind(wx.EVT_PAINT)
+        global pageToFind
+        global siblingElementArr
+        try:
+            currentpage = self.viewer.buttonpanel.pageno
+            pageToFind =  doc[currentpage-1]
+
+            parentwindow_w = self.viewer.Xpagepixels
+            parentwindow_h = self.viewer.GetSize().Height
+            page_w = pageToFind.bound().width
+            page_h = pageToFind.bound().height
+
+            perct_x = parentwindow_w/page_w
+            perct_y = parentwindow_h/page_h
+
+            x1 = self.c1.x/perct_x
+            y1 = self.c1.y/perct_y
+            x2 = self.c2.x/perct_x
+            y2 = self.c2.y/perct_y
+            pagewords = pageToFind.getTextWords()
+            for i in pagewords:
+                a1 = i[0]
+                a2 = i[2]
+                b1 = i[1]
+                b2 = i[3]
+                if pageToFind.number > 0:
+                    y1 = (self.c1.y + self.viewer.nom_page_gap)/perct_y
+                    y2 = (self.c2.y + self.viewer.nom_page_gap)/perct_y
+                if ((a1 > x1 and a1 < x2) and (y2 > b2 and b2 > y1)) and ((a2 > x1 and a2 < x2) and (b1 < y2 and b1 > y1)):
+                    siblingElementArr.append(i)
+
+            tagV = ''
+            imageStartText = ''
+            if len(siblingElementArr) > 0:
+                if self.combobox.Value == 'Sibling Element':
+                    tagV = 'siblingElement'
+                elif self.combobox.Value == 'Between Elements':
+                    tagV = 'betweenElements'
+                elif self.combobox.Value == 'PDF Image':
+                    tagV = 'pdfImage'
+                    imageStartText = (siblingElementArr[0])[4]
+                lis = {"custname": '@PDF_'+tagV+'_'+str(imageStartText)+str(counter),
+                    "tag":'@PDF_'+tagV,
+                    "xpath":str(siblingElementArr) ,
+                    "hiddentag":'No',
+                    "id":'null',
+                    "text":'',
+                    "url":'',
+                    "left":'',
+                    "top":'',
+                    "width":'',
+                    "height":''}
+                eleList.append(lis)
+            siblingElementArr = []
+        except Exception as e:
+            logger.print_on_console('Error at pdf image in onmouseup')
+            log.error(e)
+
+##        self.viewer.U.StopPropagation()
+
+
+    def OnPaint(self, event):
+        if self.c1 is None or self.c2 is None: return
+##        dc = wx.PaintDC(self.viewer)
+        dc = wx.WindowDC(self.viewer)
+        dc.SetPen(wx.Pen('black', 0.5))
+##        dc.SetBrush(wx.TRANSPARENT_BRUSH)
+##        dc.SetBrush(wx.Brush(wx.TRANSPARENT_BRUSH))
+        dc.DrawRectangle(self.c1.x, self.c1.y, self.c2.x - self.c1.x, self.c2.y - self.c1.y)
 
     def OnStart(self,event):
         currentpage = self.viewer.buttonpanel
@@ -186,18 +294,19 @@ class PDFViewer(sc.SizedFrame):
             tagV = 'siblingElement'
         if self.combobox.Value == 'Between Elements':
             tagV = 'betweenElements'
-        lis = {"custname": '@PDF_'+tagV+'_'+self.search.Value+str(counter),
-            "tag":'@PDF_'+tagV,
-            "xpath":str(siblingElementArr) ,
-            "hiddentag":'No',
-            "id":'null',
-            "text":'',
-            "url":'',
-            "left":'',
-            "top":'',
-            "width":'',
-            "height":''}
-        eleList.append(lis)
+        if len(siblingElementArr) > 0 :
+            lis = {"custname": '@PDF_'+tagV+'_'+self.search.Value+str(counter),
+                "tag":'@PDF_'+tagV,
+                "xpath":str(siblingElementArr) ,
+                "hiddentag":'No',
+                "id":'null',
+                "text":'',
+                "url":'',
+                "left":'',
+                "top":'',
+                "width":'',
+                "height":''}
+            eleList.append(lis)
         return eleList
 
     def OnResize(self):
@@ -357,22 +466,23 @@ class PDFViewer(sc.SizedFrame):
         global eleList
         hopIndex = 1
         tagV = ''
-        if self.combobox.Value == 'Sibling Element':
-            tagV = 'siblingElement'
-        if self.combobox.Value == 'Between Elements':
-            tagV = 'betweenElements'
-        lis = {"custname": '@PDF_'+tagV+'_'+self.search.Value+str(counter),
-            "tag":'@PDF_'+tagV,
-            "xpath":str(siblingElementArr) ,
-            "hiddentag":'No',
-            "id":'null',
-            "text":'',
-            "url":'',
-            "left":'',
-            "top":'',
-            "width":'',
-            "height":''}
-        eleList.append(lis)
+        if len(siblingElementArr) > 0:
+            if self.combobox.Value == 'Sibling Element':
+                tagV = 'siblingElement'
+            if self.combobox.Value == 'Between Elements':
+                tagV = 'betweenElements'
+            lis = {"custname": '@PDF_'+tagV+'_'+self.search.Value+str(counter),
+                "tag":'@PDF_'+tagV,
+                "xpath":str(siblingElementArr) ,
+                "hiddentag":'No',
+                "id":'null',
+                "text":'',
+                "url":'',
+                "left":'',
+                "top":'',
+                "width":'',
+                "height":''}
+            eleList.append(lis)
         if counter < len(found) and counter >= 0 and len(found) >1:
             counter += 1
         increment = 0
@@ -391,22 +501,23 @@ class PDFViewer(sc.SizedFrame):
 
         decrement = 0
         tagV = ''
-        if self.combobox.Value == 'Sibling Element':
-            tagV = 'siblingElement'
-        if self.combobox.Value == 'Between Elements':
-            tagV = 'betweenElements'
-        lis = {"custname": '@PDF_'+tagV+'_'+self.search.Value+str(counter),
-            "tag":'@PDF_'+tagV,
-            "xpath":str(siblingElementArr) ,
-            "hiddentag":'No',
-            "id":'null',
-            "text":'',
-            "url":'',
-            "left":'',
-            "top":'',
-            "width":'',
-            "height":''}
-        eleList.append(lis)
+        if len(siblingElementArr) > 0:
+            if self.combobox.Value == 'Sibling Element':
+                tagV = 'siblingElement'
+            if self.combobox.Value == 'Between Elements':
+                tagV = 'betweenElements'
+            lis = {"custname": '@PDF_'+tagV+'_'+self.search.Value+str(counter),
+                "tag":'@PDF_'+tagV,
+                "xpath":str(siblingElementArr) ,
+                "hiddentag":'No',
+                "id":'null',
+                "text":'',
+                "url":'',
+                "left":'',
+                "top":'',
+                "width":'',
+                "height":''}
+            eleList.append(lis)
         siblingElementArr = []
 
     def capture_window(self):
