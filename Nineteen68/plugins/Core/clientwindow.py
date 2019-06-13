@@ -2137,7 +2137,13 @@ def check_browser():
                 choptions1.binary_location=str(configvalues['chrome_path'])
             choptions1.add_argument('--headless')
             driver = webdriver.Chrome(chrome_options=choptions1, executable_path=CHROME_DRIVER_PATH)
-            browser_ver = driver.capabilities['version']
+            # Check for the chrome 75 version.
+            # As the key value of 'version' is changed from 'version' to 'browserVersion'
+            browser_ver=''
+            if 'version' in  driver.capabilities.keys():
+                browser_ver = driver.capabilities['version']
+            elif 'browserVersion' in  driver.capabilities.keys():
+                browser_ver = driver.capabilities['browserVersion']
             browser_ver1 = browser_ver.encode('utf-8')
             browser_ver = int(browser_ver1[:2])
             try:
