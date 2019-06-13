@@ -530,19 +530,19 @@ class Dispatcher:
                                 if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                     tempwebElement = driver.find_elements_by_name(identifiers[3])
                                     if (len(tempwebElement) == 1):
-                                        logger.print_on_console('Webelement found by name')
-                                        log.debug('Webelement found by name')
+                                        logger.print_on_console('Webelement found by OI4')
+                                        log.debug('Webelement found by OI4')
                                     if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                         tempwebElement = driver.find_elements_by_class_name(identifiers[5])
                                         if (len(tempwebElement) == 1):
-                                            logger.print_on_console('Webelement found by class name')
-                                            log.debug('Webelement found by class name')
+                                            logger.print_on_console('Webelement found by OI5')
+                                            log.debug('Webelement found by OI5')
                                     if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                         if(len(identifiers)==12):
                                             tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
                                             if (len(tempwebElement) == 1):
-                                                logger.print_on_console('Webelement found by selector')
-                                                log.debug('Webelement found by selector')
+                                                logger.print_on_console('Webelement found by OI6')
+                                                log.debug('Webelement found by OI6')
                                             else:
                                                 tempwebElement = None
                                 webElement = tempwebElement
@@ -551,14 +551,14 @@ class Dispatcher:
                                         if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                             tempwebElement = driver.find_elements_by_class_name(identifiers[5])
                                             if (len(tempwebElement) == 1):
-                                                logger.print_on_console('Webelement found by class name')
-                                                log.debug('Webelement found by class name')
+                                                logger.print_on_console('Webelement found by OI5')
+                                                log.debug('Webelement found by OI5')
                                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                                 if(len(identifiers)==12):
                                                     tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
                                                     if (len(tempwebElement) == 1):
-                                                        logger.print_on_console('Webelement found by selector')
-                                                        log.debug('Webelement found by selector')
+                                                        logger.print_on_console('Webelement found by OI6')
+                                                        log.debug('Webelement found by OI6')
                                                     else:
                                                         tempwebElement = None
                                         webElement = tempwebElement
@@ -568,8 +568,8 @@ class Dispatcher:
                                                 if(len(identifiers)==12):
                                                     tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
                                                     if (len(tempwebElement) == 1):
-                                                        logger.print_on_console('Webelement found by selector')
-                                                        log.debug('Webelement found by selector')
+                                                        logger.print_on_console('Webelement found by OI6')
+                                                        log.debug('Webelement found by OI6')
                                                     else:
                                                         tempwebElement = None
                                             webElement = tempwebElement
@@ -598,8 +598,8 @@ class Dispatcher:
                     if (elementname!='null'):
                             tempwebElement = driver.find_elements_by_name(elementname)
                             if (len(tempwebElement) == 1):
-                                logger.print_on_console('Webelement found by OI4')
-                                log.debug('Webelement found by OI4')
+                                logger.print_on_console('Webelement found by OI7')
+                                log.debug('Webelement found by OI7')
                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                 webElement=None
                     if(webElement==None):
