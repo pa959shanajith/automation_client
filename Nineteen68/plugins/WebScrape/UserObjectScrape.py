@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import core_utils
-##import logging
+import logging
 ##import logger
 log = logging.getLogger('clientwindow.py')
 class UserObject:
