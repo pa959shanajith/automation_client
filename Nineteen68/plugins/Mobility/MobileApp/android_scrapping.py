@@ -48,14 +48,12 @@ class InstallAndLaunch():
         self.desired_caps={}
     def start_server(self,platform_name=""):
         try:
-            ##            maindir = os.getcwd()
-            ##            os.chdir('..')
             curdir = os.environ["NINETEEN68_HOME"]
             if (SYSTEM_OS != 'Darwin'):
                 path = curdir + '\\Nineteen68\\plugins\\Mobility\\MobileApp\\node_modules\\appium\\build\\lib\\main.js'
                 nodePath = os.environ["NINETEEN68_HOME"] + "\\Drivers" + '\\node.exe'
                 proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
-                time.sleep(5)
+                time.sleep(10)
                 logger.print_on_console('Server started')
             elif platform_name != "ios":
                 path = curdir + '/Nineteen68/plugins/Mobility/node_modules/appium/build/lib/main.js'
