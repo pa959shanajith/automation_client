@@ -6,7 +6,7 @@
 #
 # Created:
 # Copyright:   (c) sadia
-# Licence:     <your licence>
+# Licence:     <your license>
 #------------------------------------------------------------------------------
 
 
@@ -68,6 +68,7 @@ class PDFOperations:
         status = pdf_constants.TEST_RESULT_FAIL
         methodoutput = pdf_constants.TEST_RESULT_FALSE
         err_msg=None
+        output=None
         #gettext keyword implementation
         fulltext = ''
         listVal = []
@@ -93,7 +94,9 @@ class PDFOperations:
                 status = pdf_constants.TEST_RESULT_PASS
                 methodoutput = pdf_constants.TEST_RESULT_TRUE
                 logger.print_on_console('Get Text : ' , output)
-
+        except ValueError as v:
+            log.error(v)
+            logger.print_on_console("Invalid Input! Only blank and number values are allowed.")
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
@@ -108,6 +111,7 @@ class PDFOperations:
         methodoutput = pdf_constants.TEST_RESULT_FALSE
         err_msg=None
         fulltext = ''
+        output=OUTPUT_CONSTANT
         #verifytext keyword implementation
         try:
             listVal = self.pdf_convertStrToList(objectname)
@@ -132,24 +136,24 @@ class PDFOperations:
                     log.error(INVALID_INPUT)
                     err_msg=INVALID_INPUT
                     logger.print_on_console(INVALID_INPUT)
-
+                methodoutput = [inputs[0],output]
                 if inputs[0] == output:
                     output = True
                     status = pdf_constants.TEST_RESULT_PASS
-                    methodoutput = pdf_constants.TEST_RESULT_TRUE
                 else:
                     logger.print_on_console('Values does not match')
                     output = False
-
             else:
                 log.error(INVALID_INPUT)
                 err_msg=INVALID_INPUT
                 logger.print_on_console(INVALID_INPUT)
-
+        except ValueError as v:
+            log.error(v)
+            logger.print_on_console("Invalid Input! Only number is allowed as the index input.")
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            err_msg="Error occcured during verifying values"
+            err_msg="Error occurred during verifying values"
 
         #return status and methodoutput
         return status,methodoutput,output,err_msg
