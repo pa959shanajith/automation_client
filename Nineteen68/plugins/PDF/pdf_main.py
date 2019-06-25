@@ -286,6 +286,7 @@ class PDFViewer(sc.SizedFrame):
         self.findbar_left.Disable()
         self.forwardbutton.Disable()
         self.backwardbutton.Disable()
+        global siblingElementArr
         if self.viewer.page_buffer_valid:
             self.viewer.SetZoom(-2)
 ##        if len(eleList) < 1 and len(siblingElementArr) > 0:
@@ -307,6 +308,7 @@ class PDFViewer(sc.SizedFrame):
                 "width":'',
                 "height":''}
             eleList.append(lis)
+        siblingElementArr = []
         return eleList
 
     def OnResize(self):
