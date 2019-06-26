@@ -58,7 +58,8 @@ class PDFViewer(sc.SizedFrame):
     def __init__(self, parent, **kwds):
         try:
             super(PDFViewer, self).__init__(parent, **kwds)
-
+            global eleList
+            eleList = []
             # Adding slk icon to window
             self.iconpath = IMAGES_PATH+"slk.ico"
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
