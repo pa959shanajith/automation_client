@@ -167,7 +167,6 @@ class WebScrape_Utils:
                     if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                         tempwebElement = None
             webElement = tempwebElement
-
         except Exception as webEx:
             try:
                 # find by id
@@ -182,10 +181,43 @@ class WebScrape_Utils:
                     # find by absolute xpath
                     tempwebElement = driver.find_elements_by_xpath(identifiers[2])
                     if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                        tempwebElement = None
+                        tempwebElement = driver.find_elements_by_name(identifiers[3])
+                        if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                            tempwebElement = driver.find_elements_by_class_name(identifiers[5])
+                            if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
+                                if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                    tempwebElement = None
                     webElement = tempwebElement
                 except Exception as webEx:
-                    webElement = None
+                    try:
+                        # find by name
+                        tempwebElement = driver.find_elements_by_name(identifiers[3])
+                        if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                            tempwebElement = driver.find_elements_by_class_name(identifiers[5])
+                            if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
+                                if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                    tempwebElement = None
+                        webElement = tempwebElement
+                    except Exception as webEx:
+                        try:
+                            # find by class_name
+                            tempwebElement = driver.find_elements_by_class_name(identifiers[5])
+                            if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
+                                if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                    tempwebElement = None
+                            webElement = tempwebElement
+                        except Exception as webEx:
+                            try:
+                                # find by css_selector
+                                tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
+                                if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
+                                    tempwebElement = None
+                                webElement = tempwebElement
+                            except Exception as webEx:
+                                webElement = None
         return webElement
 
     """Method to check whether a given element URL belongs to frame/iframe page or to the outer page"""
