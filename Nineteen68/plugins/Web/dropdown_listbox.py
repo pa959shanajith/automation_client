@@ -1729,7 +1729,6 @@ class DropdownKeywords():
                     except Exception as e:
                         log.error(e)
                         logger.print_on_console(e)
-                        err_msg=e
             elif (len(input) == 1):
                 if(webelement.is_enabled()):
                     if input[0] != '':
@@ -1762,7 +1761,6 @@ class DropdownKeywords():
                         except Exception as e:
                             log.error(e)
                             logger.print_on_console(e)
-                            err_msg=e
                     else:
                         logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
