@@ -1,7 +1,0 @@
-#usage: element_ids;row_col expectedresult
-
-cp1_search1_dl1_modelStatus;[3,2] /html[1]/body[1]/form[1]/div[3]/table[1]/tbody[1]/tr[3]/td[2]/div[1]/div[4]/div[1]/div[2]/table[1]/tbody[1]/tr[3]/td[2]/select[1]-true
-cp1_search1_dl1_furnacedocs;[2,4] /html[1]/body[1]/form[1]/div[3]/table[1]/tbody[1]/tr[3]/td[2]/div[1]/div[4]/div[1]/div[2]/table[1]/tbody[1]/tr[2]/td[4]/input[1]-true
-cp1_search1_dl1_modelNumber;[2,4,'input',1] /html[1]/body[1]/form[1]/div[3]/table[1]/tbody[1]/tr[3]/td[2]/div[1]/div[4]/div[1]/div[2]/table[1]/tbody[1]/tr[2]/td[4]/input[1]-true
-label1;[''] /html[1]/body[1]/form[1]/div[3]/table[1]/tbody[1]-true
-lab;[''] /html[1]/body[1]/form[1]/div[3]/table[1]/tbody[1]-false

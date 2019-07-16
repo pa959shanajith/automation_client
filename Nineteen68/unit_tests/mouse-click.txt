@@ -1,7 +1,0 @@
-
-
-#usage: input;xpath expectedresult
-
-[3,2];cp1_search1_dl1_modelStatus true
-[0,0];'' false
-[1,4];cp1_search1_dl1_furnacedocs true
