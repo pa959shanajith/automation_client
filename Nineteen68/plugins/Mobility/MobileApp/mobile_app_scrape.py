@@ -140,7 +140,7 @@ class ScrapeWindow(wx.Frame):
             self.Close()
             log_info('Fullscrape completed')
         except Exception as e:
-            self.print_error(e)
+            self.print_error("Error occurred in FullScrape")
             log.error(e, exc_info=True)
 
 
@@ -152,7 +152,7 @@ class ScrapeWindow(wx.Frame):
                 self.print_error(DRIVER_ERROR)
                 self.Close()
         except Exception as e:
-            self.print_error(e)
+            self.print_error("Error occurred in SwipeDown")
             log.error(e, exc_info=True)
 
 
@@ -164,5 +164,5 @@ class ScrapeWindow(wx.Frame):
                 self.print_error(DRIVER_ERROR)
                 self.Close()
         except Exception as e:
-            self.print_error(e)
+            self.print_error("Error occurred in SwipeUp")
             log.error(e, exc_info=True)

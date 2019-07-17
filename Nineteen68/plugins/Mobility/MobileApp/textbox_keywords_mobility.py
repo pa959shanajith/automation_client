@@ -61,7 +61,7 @@ class Textbox_keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in SetText")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
@@ -93,7 +93,7 @@ class Textbox_keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in ClearText")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
@@ -136,7 +136,7 @@ class Textbox_keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in SetSecureText")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
@@ -178,7 +178,7 @@ class Textbox_keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in SendValue")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
@@ -208,7 +208,7 @@ class Textbox_keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in GetText")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -247,6 +247,6 @@ class Textbox_keywords():
             else:
                 err_msg=self.print_error(INVALID_INPUT)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in VerifyText")
             log.error(e,exc_info=True)
         return status,result,output,err_msg

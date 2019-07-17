@@ -52,7 +52,7 @@ class Button_Keywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in Press")
             log.error(e,exc_info = True)
         return status,methodoutput,output,err_msg
 
@@ -86,7 +86,7 @@ class Button_Keywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in LongPress")
             log.error(e,exc_info = True)
         return status,methodoutput,output,err_msg
 
@@ -120,7 +120,7 @@ class Button_Keywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in GetButtonName")
             log.error(e,exc_info = True)
         return status,result,output,err_msg
 
@@ -162,6 +162,6 @@ class Button_Keywords():
             else:
                 err_msg = self.print_error(INVALID_INPUT)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in VerifyButtonName")
             log.error(e,exc_info = True)
         return status,result,output,err_msg

@@ -51,7 +51,7 @@ class SliderKeywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in SetSlideValue")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
@@ -81,7 +81,7 @@ class SliderKeywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in GetSlideValue")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
@@ -108,7 +108,7 @@ class SliderKeywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in VerifyEnabled")
             log.error(e,exc_info = True)
         return status,methodoutput,output,err_msg
 
@@ -135,7 +135,7 @@ class SliderKeywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in VerifyDisabled")
             log.error(e,exc_info = True)
         return status,methodoutput,output,err_msg
 
@@ -157,7 +157,7 @@ class SliderKeywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in VerifyVisible")
             log.error(e,exc_info = True)
         return status,methodoutput,output,err_msg
 
@@ -179,7 +179,7 @@ class SliderKeywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in VerifyHidden")
             log.error(e,exc_info = True)
         return status,methodoutput,output,err_msg
 
@@ -198,7 +198,7 @@ class SliderKeywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in VerifyExists")
             log.error(e,exc_info = True)
         return status,methodoutput,output,err_msg
 
@@ -217,7 +217,7 @@ class SliderKeywords():
             else:
                 err_msg = self.print_error(ELEMENT_EXISTS)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in VerifyDoesNotExists")
             log.error(e,exc_info = True)
         return status,methodoutput,output,err_msg
 
@@ -248,7 +248,7 @@ class SliderKeywords():
             else:
                 err_msg = self.print_error(INVALID_INPUT)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in WaitForElementExists")
             log.error(e,exc_info = True)
         return status,methodoutput,output,err_msg
 

@@ -120,7 +120,7 @@ class MobileDispatcher:
         'verifylistcount':list_view_keywords_object.verify_list_count,
         'selectviewbyindex':list_view_keywords_object.select_view_by_index,
         'selectviewbytext':list_view_keywords_object.select_view_by_text,
-        'getmultipleviewsbyindexes':list_view_keywords_object.get_multiple_views_by_indexs,
+        'getmultipleviewsbyindexes':list_view_keywords_object.get_multiple_views_by_indexes,
         'getviewbyindex':list_view_keywords_object.get_list_view_by_index,
         'getallviews':list_view_keywords_object.get_all_views,
         'verifyallviews':list_view_keywords_object.verify_all_views,

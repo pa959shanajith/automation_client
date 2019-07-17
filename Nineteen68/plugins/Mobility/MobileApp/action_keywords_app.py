@@ -93,6 +93,6 @@ class Action_Key_App():
             else:
                 err_msg = self.print_error(INVALID_INPUT,': Maximum two inputs Accepted')
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in Action Key")
             log.error(e, exc_info=True)
         return status,methodoutput,output,err_msg

@@ -134,7 +134,7 @@ class Time_Keywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in SetTime")
             log.error(e,exc_info=True)
         try:
             configvalues = readconfig.configvalues
@@ -189,7 +189,7 @@ class Time_Keywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in GetTime")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -238,6 +238,6 @@ class Time_Keywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in VerifyTime")
             log.error(e,exc_info=True)
         return status,result,output,err_msg

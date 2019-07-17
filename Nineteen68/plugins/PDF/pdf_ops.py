@@ -95,6 +95,7 @@ class PDFOperations:
                 methodoutput = pdf_constants.TEST_RESULT_TRUE
                 logger.print_on_console('Get Text : ' , output)
         except ValueError as v:
+            err_msg = "Invalid Input! Only blank and number values are allowed."
             log.error(v)
             logger.print_on_console("Invalid Input! Only blank and number values are allowed.")
         except Exception as e:
@@ -148,6 +149,7 @@ class PDFOperations:
                 err_msg=INVALID_INPUT
                 logger.print_on_console(INVALID_INPUT)
         except ValueError as v:
+            err_msg = "Invalid Input! Only number is allowed as the index input."
             log.error(v)
             logger.print_on_console("Invalid Input! Only number is allowed as the index input.")
         except Exception as e:

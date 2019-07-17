@@ -124,9 +124,8 @@ class Spinner_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in GetCount")
             log.error(e,exc_info=True)
-            #logger.print_on_console("Error occured in GetCount")
         return status,result,output,err_msg
 
 
@@ -225,9 +224,8 @@ class Spinner_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in VerifyCount")
             log.error(e,exc_info=True)
-            #logger.print_on_console("Error occured in VerifyCount")
         return status,result,output,err_msg
 
 
@@ -349,7 +347,7 @@ class Spinner_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in SelectValueByText")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -497,7 +495,7 @@ class Spinner_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in VerifySelectedValue")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -619,7 +617,7 @@ class Spinner_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in SelectValueByIndex")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -690,7 +688,7 @@ class Spinner_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in SelectMultipleValuesByIndex")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -762,7 +760,7 @@ class Spinner_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in SelectMultipleValuesByText")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -863,7 +861,7 @@ class Spinner_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in GetValueByIndex")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -967,7 +965,7 @@ class Spinner_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in GetSelectedValue")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -1068,7 +1066,7 @@ class Spinner_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in GetMultipleValuesByIndexes")
             log.error(e,exc_info=True)
             #logger.print_on_console("Error occured in get_multiple_values_by_indexs")
         return status,result,output,err_msg
@@ -1173,7 +1171,7 @@ class Spinner_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in GetAllValues")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -1282,6 +1280,6 @@ class Spinner_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in VerifyAllValues")
             log.error(e,exc_info=True)
         return status,result,output,err_msg

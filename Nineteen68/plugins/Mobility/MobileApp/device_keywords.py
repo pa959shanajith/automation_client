@@ -63,7 +63,7 @@ class Device_Keywords():
             else:
                 err_msg = self.print_error(NO_ANDROID_HOME)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in GetDevices")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
@@ -117,7 +117,7 @@ class Device_Keywords():
             else:
                 logger.print_on_console('ANDROID_HOME not set in system path')
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in WifiConnect")
             log.error(e,exc_info=True)
 
 
@@ -158,7 +158,7 @@ class Device_Keywords():
             else:
                 err_msg = self.print_error(NO_ANDROID_HOME)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in InvokeDevice")
             log.error(e,exc_info=True)
         return status,methodoutput,OUTPUT_CONSTANT,err_msg
 
@@ -183,7 +183,7 @@ class Device_Keywords():
                 err_msg = self.print_error(NO_AAPT_HOME)
             os.chdir(maindir)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in Fetching Package")
             log.error(e,exc_info=True)
         return packageName
 
@@ -208,7 +208,7 @@ class Device_Keywords():
                 err_msg = self.print_error(NO_AAPT_HOME)
             os.chdir(maindir)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in Fetching Activity")
             log.error(e,exc_info=True)
         return activityName
 
@@ -236,7 +236,7 @@ class Device_Keywords():
             else:
                 err_msg = self.print_error(NO_ANDROID_HOME)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in Uninstall App")
             log.error(e, exc_info=True)
         return err_msg
 
@@ -260,7 +260,7 @@ class Device_Keywords():
             else:
                 err_msg = self.print_error(NO_ANDROID_HOME)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in Close App")
             log.error(e,exc_info=True)
         return err_msg
 

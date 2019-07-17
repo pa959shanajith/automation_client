@@ -56,7 +56,7 @@ class Seek_Bar_Keywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in SetMinValue")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
@@ -105,7 +105,7 @@ class Seek_Bar_Keywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in SetValue")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
@@ -139,6 +139,6 @@ class Seek_Bar_Keywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in SetMaxValue")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg

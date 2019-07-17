@@ -51,7 +51,7 @@ class Radio_Button_Keywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in SelectRadioButton")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
@@ -103,7 +103,7 @@ class Radio_Button_Keywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in GetStatus")
             log.error(e,exc_info = True)
         return status,methodoutput,output,err_msg
 
@@ -137,7 +137,7 @@ class Radio_Button_Keywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in SelectCheckBox")
             log.error(e,exc_info = True)
         return status,methodoutput,output,err_msg
 
@@ -171,6 +171,6 @@ class Radio_Button_Keywords():
             else:
                 err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in UnSelectCheckBox")
             log.error(e,exc_info = True)
         return status,methodoutput,output,err_msg

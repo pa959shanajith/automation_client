@@ -105,7 +105,7 @@ class LaunchAndInstall():
                     status = mobile_app_constants.TEST_RESULT_PASS
                     result = mobile_app_constants.TEST_RESULT_TRUE
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in Uninstall App")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -123,7 +123,7 @@ class LaunchAndInstall():
                 status=mobile_app_constants.TEST_RESULT_PASS
                 result=mobile_app_constants.TEST_RESULT_TRUE
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in Close App")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -159,6 +159,6 @@ class LaunchAndInstall():
             else:
                 status, result, output, err_msg = self.installApplication(ele, input_val)
         except Exception as e:
-            err_msg = self.print_error(e)
+            err_msg = self.print_error("Error occurred in Launch App")
             log.error(e,exc_info=True)
         return status,result,output,err_msg

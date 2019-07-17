@@ -99,7 +99,7 @@ class List_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in VerifySelectedViews")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -177,7 +177,7 @@ class List_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in SelectMultipleViewsByIndexes")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -254,7 +254,7 @@ class List_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in SelectMultipleViewsByText")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -318,7 +318,7 @@ class List_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in GetSelectedViews")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -373,7 +373,7 @@ class List_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in GetListCount")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -433,7 +433,7 @@ class List_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in VerifyListCount")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -507,7 +507,7 @@ class List_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in SelectViewByText")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -584,7 +584,7 @@ class List_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in SelectViewsByText")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -659,12 +659,12 @@ class List_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in GetListViewByIndex")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
 
-    def get_multiple_views_by_indexs(self,element,input,*args):
+    def get_multiple_views_by_indexes(self,element,input,*args):
 
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
@@ -735,7 +735,7 @@ class List_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in GetMultipleViewsByIndexes")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -792,7 +792,7 @@ class List_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in GetAllViews")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -859,6 +859,6 @@ class List_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error(e)
+            err_msg=self.print_error("Error occurred in VerifyAllViews")
             log.error(e,exc_info=True)
         return status,result,output,err_msg

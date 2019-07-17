@@ -60,7 +60,7 @@ class SliderKeywords():
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            self.print_error(e)
+            self.print_error("Error occurred in SwipeLeft")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
@@ -79,7 +79,7 @@ class SliderKeywords():
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            self.print_error(e)
+            self.print_error("Error occurred in SwipeRight")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
@@ -98,7 +98,7 @@ class SliderKeywords():
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            self.print_error(e)
+            self.print_error("Error occurred in SwipeUp")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
@@ -117,7 +117,7 @@ class SliderKeywords():
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            self.print_error(e)
+            self.print_error("Error occurred in SwipeDown")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
@@ -135,7 +135,7 @@ class SliderKeywords():
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            self.print_error(e)
+            self.print_error("Error occurred in HideSoftKeyboard")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
@@ -152,6 +152,6 @@ class SliderKeywords():
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            self.print_error(e)
+            self.print_error("Error occurred in BackPress")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg

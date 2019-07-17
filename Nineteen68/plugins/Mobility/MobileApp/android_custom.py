@@ -135,7 +135,7 @@ class custom():
             else:
                 self.print_error(DRIVER_ERROR)
         except Exception as e:
-            self.print_error(e)
+            self.print_error("Error occurred in Finding Custom element")
             log.error(e, exc_info=True)
         return element,new_input
 
