@@ -40,6 +40,8 @@ PHANTOM_DRIVER_PATH =  drivers_path +'\\phantomjs.exe'
 
 GECKODRIVER_PATH =  drivers_path +'\\geckodriver.exe'
 
+EXTENSION_PATH = drivers_path + '\\extension.crx'
+
 SET_TEXT_SCRIPT="""arguments[0].value=arguments[1]"""
 
 CLICK_RADIO_CHECKBOX="""arguments[0].click()"""
