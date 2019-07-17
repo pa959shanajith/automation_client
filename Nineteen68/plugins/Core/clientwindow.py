@@ -69,12 +69,13 @@ if SYSTEM_OS == "Windows":
     GECKODRIVER_PATH += ".exe"
 
 class MainNamespace(BaseNamespace):
+    core_utils_obj = core_utils.CoreUtils()
+
     def on_message(self, *args):
         global action,wxObject,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag,connection_Timer
         try:
             if(str(args[0]) == 'connected'):
                 if(allow_connect):
-                    logger.print_on_console('Normal Mode: Connection to the Nineteen68 Server established')
                     wxObject.schedule.Enable()
                     wxObject.cancelbutton.Enable()
                     wxObject.terminatebutton.Enable()
@@ -86,10 +87,14 @@ class MainNamespace(BaseNamespace):
                         msg='Execution only Mode enabled'
                         logger.print_on_console(msg)
                         log.info(msg)
-                    log.info('Normal Mode: Connection to the Nineteen68 Server established')
-                    conn_time= float(configvalues['connection_timeout'])
+                    sch_mode = wxObject.schedule.GetValue()
+                    if sch_mode: socketIO.emit('toggle_schedule',sch_mode)
+                    msg = ("Schedule" if sch_mode else "Normal") + " Mode: Connection to the Nineteen68 Server established"
+                    logger.print_on_console(msg)
+                    log.info(msg)
+                    conn_time = float(configvalues['connection_timeout'])
                     if (not (connection_Timer != None and connection_Timer.isAlive())
-                     and ((conn_time !='') and (conn_time not in range(0,8)))):
+                     and (conn_time >= 8)):
                         log.info("Connection Timeout timer Started")
                         connection_Timer = threading.Timer(conn_time*60*60, wxObject.closeConnection)
                         connection_Timer.start()
@@ -109,8 +114,7 @@ class MainNamespace(BaseNamespace):
                     global icesession,plugins_list
                     ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                         'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-                    core_utils_obj = core_utils.CoreUtils()
-                    response = json.loads(core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
+                    response = json.loads(self.core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
                     plugins_list = response['plugins']
                     err_res = None
                     if(response['id'] != icesession['ice_id'] and response['connect_time'] != icesession['connect_time']):
@@ -530,7 +534,9 @@ class MainNamespace(BaseNamespace):
             global socketIO
             filepath = args[0]
             data_URIs=[]
-            log.info("Request recieved for processing screenshots for report")
+            msg = "Request recieved for processing screenshots for report"
+            logger.print_on_console(msg)
+            log.info(msg)
             num_path = len(filepath)
             for i in range(num_path):
                 path = filepath[i]
@@ -548,8 +554,9 @@ class MainNamespace(BaseNamespace):
                     socketIO.emit('render_screenshot',data_URIs)
                     data_URIs=[]
             socketIO.emit('render_screenshot',"finished")
-            logger.print_on_console("Request for processing screenshots completed successfully")
-            log.info("Request for processing screenshots completed successfully")
+            msg = "Request for processing screenshots completed successfully"
+            logger.print_on_console(msg)
+            log.info(msg)
         except Exception as e:
             err_msg='Error while sending screenshot data'
             log.error(err_msg)
@@ -670,6 +677,13 @@ class MainNamespace(BaseNamespace):
 
     def on_disconnect(self, *args):
         log.info('Disconnected from Nineteen68 server')
+        if socketIO is not None:
+            ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+                'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
+            icesession=json.loads(self.core_utils_obj.unwrap(socketIO._http_session.params['icesession'], ice_ndac_key))
+            icesession['connect_time'] = str(datetime.now())
+            icesession = self.core_utils_obj.wrap(json.dumps(icesession), ice_ndac_key)
+            socketIO._http_session.params['icesession'] = icesession
         if not bool(wxObject): return
         wxObject.connectbutton.SetBitmapLabel(wxObject.connect_img)
         wxObject.connectbutton.SetName('connect')
@@ -697,14 +711,13 @@ class MainNamespace(BaseNamespace):
 
 class SocketThread(threading.Thread):
     """Test Worker Thread Class."""
+    daemon = True
 
-    #----------------------------------------------------------------------
     def __init__(self):
         """Init Worker Thread Class."""
         threading.Thread.__init__(self)
         self.start()
 
-    #----------------------------------------------------------------------
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
@@ -726,14 +739,14 @@ class SocketThread(threading.Thread):
         username=str(os.environ[key]).lower()
         core_utils_obj = core_utils.CoreUtils()
         icesession = {
-            'ice_id':str(uuid.uuid4()),
-            'connect_time':str(datetime.now()),
-            'username':username
+            'ice_id': str(uuid.uuid4()),
+            'connect_time': str(datetime.now()),
+            'username': username
         }
         ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
         icesession_enc = core_utils_obj.wrap(json.dumps(icesession), ice_ndac_key)
-        params={'username':username,'icesession':icesession_enc}
+        params={'username':username,'icesession': icesession_enc}
         try:
             socketIO = SocketIO(temp_server_IP,server_port,MainNamespace,verify=server_cert,cert=client_cert,params=params)
             socketIO.wait()
@@ -904,9 +917,9 @@ class TestThread(threading.Thread):
                 elif self.action==EXECUTE:
                     socketIO.emit('result_executeTestSuite',status)
         if closeActiveConnection:
+            closeActiveConnection = False
             connection_Timer = threading.Timer(300, wxObject.closeConnection)
             connection_Timer.start()
-            closeActiveConnection = False
         self.wxObject.mythread = None
         execution_flag = False
         self.wxObject.schedule.Enable()
@@ -1148,8 +1161,8 @@ class ClientWindow(wx.Frame):
 
     def onChecked_Schedule(self, e):
         global connection_Timer,socketIO
-        conn_time= float(configvalues['connection_timeout'])
-        if ((conn_time !='') and (conn_time not in range(0,8))):
+        conn_time = float(configvalues['connection_timeout'])
+        if conn_time >= 8:
             if (connection_Timer != None and connection_Timer.isAlive()):
                 connection_Timer.cancel()
                 log.info("Timer Restarted due to change in connection mode")
@@ -1158,6 +1171,9 @@ class ClientWindow(wx.Frame):
             connection_Timer = threading.Timer(conn_time*60*60, wxObject.closeConnection)
             connection_Timer.start()
         mode=self.schedule.GetValue()
+        msg = ("En" if mode else "Dis") + "abling Schedule mode"
+        logger.print_on_console(msg)
+        log.info(msg)
         socketIO.emit('toggle_schedule',mode)
 
     def onRadioBox(self,e):
@@ -1243,6 +1259,7 @@ class ClientWindow(wx.Frame):
                 self.OnTerminate(event,"term_exec")
                 self.killSocket(True)
                 log.info('Disconnected from Nineteen68 server')
+                logger.print_on_console('Disconnected from Nineteen68 server')
                 self.connectbutton.SetBitmapLabel(self.connect_img)
                 self.connectbutton.SetName('connect')
                 self.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))

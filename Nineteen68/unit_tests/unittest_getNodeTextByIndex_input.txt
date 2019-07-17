@@ -1,1 +1,0 @@
-SAP Easy Access/usr/cntlIMAGE_CONTAINER/shellcont/shell/shellcont[0]/shell,2;1;2#Telephone Integration

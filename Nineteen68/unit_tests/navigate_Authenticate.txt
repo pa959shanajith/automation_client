@@ -1,2 +1,0 @@
-#usage: element_ids;row_col expectedresult
-yes-True

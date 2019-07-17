@@ -1,2 +1,0 @@
-SAP Easy Access/usr/cntlIMAGE_CONTAINER/shellcont/shell/shellcont[0]/shell,SAP Menu;Tools;Find;Information System;Release Notes#True
-
