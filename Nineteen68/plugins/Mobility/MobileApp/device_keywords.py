@@ -18,10 +18,15 @@ import logging
 import logger
 import android_scrapping
 import time
-
 log = logging.getLogger('device_keywords.py')
 
 class Device_Keywords():
+
+    def print_error(self,e):
+        log.error(e)
+        logger.print_on_console(e)
+        return e
+
 
     def get_device_list(self,input_val,*args):
         status=TEST_RESULT_FAIL
@@ -38,8 +43,7 @@ class Device_Keywords():
             cmd=cmd +'adb.exe'
             if android_home!=None:
                 with open(os.devnull, 'wb') as devnull:
-                    subprocess.check_call([cmd, 'start-server'], stdout=devnull,
-                              stderr=devnull)
+                    subprocess.check_call([cmd, 'start-server'], stdout=devnull, stderr=devnull)
                 proc = subprocess.Popen([cmd, 'devices'], stdout=subprocess.PIPE)
                 for line in proc.stdout.readlines():
                     line = str(line)[2:-1]
@@ -57,11 +61,12 @@ class Device_Keywords():
                 methodoutput=TEST_RESULT_TRUE
                 os.chdir(maindir)
             else:
-                logger.print_on_console('ANDROID_HOME not set in system path')
+                err_msg = self.print_error(NO_ANDROID_HOME)
         except Exception as e:
+            err_msg = self.print_error(e)
             log.error(e,exc_info=True)
-            logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
+
 
     def wifi_connect(self,*args):
         try:
@@ -112,8 +117,8 @@ class Device_Keywords():
             else:
                 logger.print_on_console('ANDROID_HOME not set in system path')
         except Exception as e:
+            err_msg = self.print_error(e)
             log.error(e,exc_info=True)
-            logger.print_on_console(err_msg)
 
 
     def invoke_device(self,input_val,*args):
@@ -146,16 +151,17 @@ class Device_Keywords():
                         continue
                     serial = line.split('\\t')
                     devices.append(serial[0])
-                if device is not None and device[0] in devices:
+                if device is not None and device in devices:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 os.chdir(maindir)
             else:
-                logger.print_on_console('ANDROID_HOME not set in system path')
+                err_msg = self.print_error(NO_ANDROID_HOME)
         except Exception as e:
+            err_msg = self.print_error(e)
             log.error(e,exc_info=True)
-            logger.print_on_console(err_msg)
         return status,methodoutput,OUTPUT_CONSTANT,err_msg
+
 
     def package_name(self,apk):
         packageName = None
@@ -174,12 +180,13 @@ class Device_Keywords():
                         packageName = curr_line[1][6:-1]
                         break
             else:
-                logger.print_on_console('AAPT_HOME not set in system path')
+                err_msg = self.print_error(NO_AAPT_HOME)
             os.chdir(maindir)
         except Exception as e:
+            err_msg = self.print_error(e)
             log.error(e,exc_info=True)
-            logger.print_on_console(e)
         return packageName
+
 
     def activity_name(self, apk):
         activityName = None
@@ -198,12 +205,13 @@ class Device_Keywords():
                         activityName = curr_line[1][6:-1]
                         break
             else:
-                logger.print_on_console('AAPT_HOME not set in system path')
+                err_msg = self.print_error(NO_AAPT_HOME)
             os.chdir(maindir)
         except Exception as e:
+            err_msg = self.print_error(e)
             log.error(e,exc_info=True)
-            logger.print_on_console(e)
         return activityName
+
 
     def uninstall_app(self, pkg, device):
         maindir = os.getcwd()
@@ -226,12 +234,12 @@ class Device_Keywords():
                 if flag is False:
                     raise Exception('Error Uninstalling App using adb; App not installed')
             else:
-                logger.print_on_console('ANDROID_HOME not set in system path')
+                err_msg = self.print_error(NO_ANDROID_HOME)
         except Exception as e:
+            err_msg = self.print_error(e)
             log.error(e, exc_info=True)
-            logger.print_on_console('Error Uninstalling App using adb; App not installed')
-            err_msg = e
         return err_msg
+
 
     def close_app(self, pkg, device):
         maindir = os.getcwd()
@@ -250,12 +258,12 @@ class Device_Keywords():
                     raise Exception('Driver not running; App not launched')
                 os.chdir(maindir)
             else:
-                logger.print_on_console('ANDROID_HOME not set in system path')
+                err_msg = self.print_error(NO_ANDROID_HOME)
         except Exception as e:
+            err_msg = self.print_error(e)
             log.error(e,exc_info=True)
-            logger.print_on_console('Driver not running; App not launched')
-            err_msg = e
         return err_msg
+
 
     def launch_app(self, apk_path, package, activity, device):
         maindir = os.getcwd()
@@ -294,11 +302,9 @@ class Device_Keywords():
                         result = 'Error in Starting App'
                         break
             else:
-                logger.print_on_console('ANDROID_HOME not set in system path')
+                err_msg = self.print_error(NO_ANDROID_HOME)
             os.chdir(maindir)
         except Exception as e:
+            err_msg = self.print_error('Error in Starting App')
             log.error(e, exc_info=True)
-            logger.print_on_console(e)
-            logger.print_on_console('Error in Starting App')
         return connected+result1+result
-

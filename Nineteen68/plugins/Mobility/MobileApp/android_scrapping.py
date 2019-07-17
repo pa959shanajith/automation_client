@@ -44,8 +44,17 @@ device_id = None
 device_keywords_object = device_keywords.Device_Keywords()
 
 class InstallAndLaunch():
+
     def __init__(self):
         self.desired_caps={}
+
+
+    def print_error(self,e):
+        log.error(e)
+        logger.print_on_console(e)
+        return e
+
+
     def start_server(self,platform_name=""):
         try:
             curdir = os.environ["NINETEEN68_HOME"]
@@ -61,10 +70,9 @@ class InstallAndLaunch():
                 time.sleep(15)
                 logger.print_on_console('Server started')
         except Exception as e:
-            err = 'Error while starting server'
-            logger.print_on_console(err)
-            log.error(err)
-            log.error(e)
+            self.print_error('Error while starting server')
+            log.error(e,exc_info=True)
+
 
     def installApplication(self, apk_path, platform_version, device_name, udid, *args):
         global driver, device_id, packageName, device_keywords_object
@@ -145,6 +153,9 @@ class InstallAndLaunch():
                             time.sleep(1)
                     return self.driver
                 return self.driver
+
+
+
             else:
                 processes = psutil.net_connections()
                 for line in processes:
@@ -177,18 +188,17 @@ class InstallAndLaunch():
                         driver = webdriver.Remote('http://localhost:4723/wd/hub', self.desired_caps)
                         device_id = device_name
                 except Exception as e:
-                    err = "Not able to install or launch application"
-                    logger.print_on_console(err)
+                    self.print_error("Not able to install or launch application")
                     log.error(e,exc_info=True)
                     driver = None
                     device_id = None
         except Exception as e:
-            err = "Not able to install or launch application"
-            logger.print_on_console(err)
+            self.print_error("Not able to install or launch application")
             log.error(e,exc_info=True)
             driver = None
             device_id = None
         return driver
+
 
     def scrape(self):
         finalJson=''
@@ -242,9 +252,7 @@ class InstallAndLaunch():
                     new_file.write('')
                     new_file.close()
             except Exception as e:
-                err = "Error occured in scraping"
-                logger.print_on_console(err)
-                log.error(err)
+                self.print_error("Error occured in scraping")
                 log.error(e,exc_info=True)
             return finalJson
         else:
@@ -379,7 +387,6 @@ class BuildJson:
 
 
 
-
 class Exact(xml.sax.handler.ContentHandler):
 
     def __init__(self,xpath,xmlreader,parent):
@@ -488,12 +495,14 @@ class Exact(xml.sax.handler.ContentHandler):
         child = Exact(childXPath,self.parser,curobj)
         self.parser.setContentHandler(child)
 
+
     def endElement(self, name):
         value = self.buffer.strip()
         if(value != ''):
             log.info(self.xPath + "='" + self.buffer.toString() + "'")
 
         self.parser.setContentHandler(self.parent)
+
 
     def characters(self, data):
         self.buffer += data

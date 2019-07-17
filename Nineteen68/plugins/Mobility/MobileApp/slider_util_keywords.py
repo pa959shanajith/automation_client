@@ -11,8 +11,6 @@
 
 from constants import *
 from mobile_app_constants import *
-from appium.webdriver.common.touch_action import TouchAction
-import install_and_launch
 import android_scrapping
 import logging
 import logger
@@ -24,6 +22,12 @@ log = logging.getLogger('slider_util_keywords.py')
 
 class SliderKeywords():
 
+    def print_error(self,e):
+        log.error(e)
+        logger.print_on_console(e)
+        return e
+
+
     def set_slide_value(self, element,input_val,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
@@ -32,32 +36,27 @@ class SliderKeywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if element is not None:
-                visibility=element.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=element.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         element.set_value(input_val[0])
                         methodoutput=TEST_RESULT_TRUE
                         status = TEST_RESULT_PASS
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg = self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
-
+                    err_msg = self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(err_msg)
+            err_msg = self.print_error(e)
+            log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
-    def get_slide_value(self, element,input_val,*args):
 
+    def get_slide_value(self, element,input_val,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=None
@@ -65,12 +64,10 @@ class SliderKeywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if element is not None:
-                visibility=element.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=element.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         output= x=str(float(element.get_attribute('value').replace('%',''))/100)[:3]
                         logger.print_on_console("Slide value: "+element.text)
@@ -78,18 +75,16 @@ class SliderKeywords():
                         status = TEST_RESULT_PASS
 
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg = self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
-
+                    err_msg = self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(err_msg)
+            err_msg = self.print_error(e)
+            log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
+
 
     def verify_enabled(self, element,input_val,*args):
         status=TEST_RESULT_FAIL
@@ -99,32 +94,22 @@ class SliderKeywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if element is not None:
-                visibility=element.is_displayed()
-                if visibility:
-                    log.debug(ERROR_CODE_DICT['ERR_OBJECT_VISIBLE'])
-                    enable=element.is_enabled()
-                    if enable:
-                        log.info(WEB_ELEMENT_ENABLED)
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg=WEB_ELEMENT_DISABLED
-                        log.error(err_msg)
-                        logger.print_on_console(err_msg)
+                        err_msg = self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
-                    log.error(err_msg)
-                    logger.print_on_console(err_msg)
+                    err_msg = self.print_error(ELEMENT_HIDDEN)
             else:
-                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
-                log.error(err_msg)
-                logger.print_on_console(err_msg)
-
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=ANDROID_ERROR
+            err_msg = self.print_error(e)
             log.error(e,exc_info = True)
-            logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
 
@@ -136,32 +121,22 @@ class SliderKeywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if element is not None:
-                visibility=element.is_displayed()
-                if visibility:
-                    log.debug(ERROR_CODE_DICT['ERR_OBJECT_VISIBLE'])
-                    enable=element.is_enabled()
-                    if not(enable):
-                        log.info(WEB_ELEMENT_DISABLED)
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if not(element.is_enabled()):
+                        log.info(ELEMENT_DISABLED)
                         log.debug('performing the action')
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg=ELEMENT_ENABLED
-                        log.error(err_msg)
-                        logger.print_on_console(err_msg)
+                        err_msg = self.print_error(ELEMENT_ENABLED)
                 else:
-                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
-                    log.error(err_msg)
-                    logger.print_on_console(err_msg)
+                    err_msg = self.print_error(ELEMENT_HIDDEN)
             else:
-                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
-                log.error(err_msg)
-                logger.print_on_console(err_msg)
-
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=ANDROID_ERROR
+            err_msg = self.print_error(e)
             log.error(e,exc_info = True)
-            logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
 
@@ -173,25 +148,19 @@ class SliderKeywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if element is not None:
-                visibility=element.is_displayed()
-                if visibility:
-                    log.info(ERROR_CODE_DICT['ERR_OBJECT_VISIBLE'])
+                if element.is_displayed():
+                    log.info(ELEMENT_VISIBLE)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
-                    log.error(err_msg)
-                    logger.print_on_console(err_msg)
+                    err_msg = self.print_error(ELEMENT_HIDDEN)
             else:
-                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
-                log.error(err_msg)
-                logger.print_on_console(err_msg)
-
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=ANDROID_ERROR
+            err_msg = self.print_error(e)
             log.error(e,exc_info = True)
-            logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
+
 
     def verify_hidden(self, element,input_val,*args):
         status=TEST_RESULT_FAIL
@@ -201,25 +170,19 @@ class SliderKeywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if element is not None:
-                visibility=element.is_displayed()
-                if visibility:
-                    err_msg=ERROR_CODE_DICT['ERR_OBJECT_VISIBLE']
-                    log.error(err_msg)
-                    logger.print_on_console(err_msg)
-                else:
-                    log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
+                if not(element.is_displayed()):
+                    log.info(ELEMENT_HIDDEN)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                else:
+                    err_msg = self.print_error(ELEMENT_VISIBLE)
             else:
-                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
-                log.error(err_msg)
-                logger.print_on_console(err_msg)
-
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=ANDROID_ERROR
+            err_msg = self.print_error(e)
             log.error(e,exc_info = True)
-            logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
+
 
     def verify_exists(self, element,input_val,*args):
         status=TEST_RESULT_FAIL
@@ -229,19 +192,16 @@ class SliderKeywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if element is not None:
-                log.info(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
+                log.info(ELEMENT_EXISTS)
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
             else:
-                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
-                log.error(err_msg)
-                logger.print_on_console(err_msg)
-
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=ANDROID_ERROR
+            err_msg = self.print_error(e)
             log.error(e,exc_info = True)
-            logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
+
 
     def verify_does_not_exists(self, element,input_val,*args):
         status=TEST_RESULT_FAIL
@@ -250,20 +210,17 @@ class SliderKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if element is not None:
-                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_EXISTS']
-                log.error(err_msg)
-                logger.print_on_console(err_msg)
-            else:
-                log.info(ERROR_CODE_DICT['MSG_ELEMENT_NOT_EXISTS'])
+            if element is None:
+                log.info(ELEMENT_NOT_EXIST)
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
-
+            else:
+                err_msg = self.print_error(ELEMENT_EXISTS)
         except Exception as e:
-            err_msg=ANDROID_ERROR
+            err_msg = self.print_error(e)
             log.error(e,exc_info = True)
-            logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
+
 
     def waitforelement_exists(self, object_name,input_val,*args):
         status=TEST_RESULT_FAIL
@@ -275,25 +232,23 @@ class SliderKeywords():
             dispatcher=mobile_app_dispatcher.MobileDispatcher()
             configvalues = readconfig.configvalues
             timeout= configvalues['timeOut']
-##            timeout='120'
             if timeout!=None:
                 start_time = time.time()
                 while True:
                     element, xpath=dispatcher.getMobileElement(android_scrapping.driver,object_name)
                     later=time.time()
                     if int(later-start_time)>=int(timeout):
-                        logger.print_on_console('Delay timeout')
+                        err_msg = self.print_error(DELAY_TIMEOUT)
                         break
                     if element is not None:
-                        logger.print_on_console('Element Exists')
+                        logger.print_on_console(ELEMENT_EXISTS)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                         break
             else:
-                err_msg='Invalid Input'
+                err_msg = self.print_error(INVALID_INPUT)
         except Exception as e:
-            err_msg='error occured'
+            err_msg = self.print_error(e)
             log.error(e,exc_info = True)
-            logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 

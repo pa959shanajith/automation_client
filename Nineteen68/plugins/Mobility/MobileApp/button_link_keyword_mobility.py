@@ -21,8 +21,13 @@ log = logging.getLogger('button_link_keywords_mobility.py')
 
 class Button_Keywords():
 
-    def press(self, element,input_val,*args):
+    def print_error(self,e):
+        log.error(e)
+        logger.print_on_console(e)
+        return e
 
+
+    def press(self, element,input_val,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -30,12 +35,10 @@ class Button_Keywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if element is not None:
-                visibility=element.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=element.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
                         action = TouchAction(driver)
@@ -43,23 +46,18 @@ class Button_Keywords():
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg = self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
-
+                    err_msg = self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(err_msg)
-
+            err_msg = self.print_error(e)
+            log.error(e,exc_info = True)
         return status,methodoutput,output,err_msg
 
 
     def long_press(self, element,input_val,*args):
-
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -68,12 +66,10 @@ class Button_Keywords():
         input = input_val[0]
         try:
             if element is not None:
-                visibility=element.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=element.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
                         action = TouchAction(driver)
@@ -84,44 +80,52 @@ class Button_Keywords():
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg = self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
-
+                    err_msg = self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(err_msg)
-
+            err_msg = self.print_error(e)
+            log.error(e,exc_info = True)
         return status,methodoutput,output,err_msg
 
 
-    def get_button_name(self,webelement,input,*args):
+    def get_button_name(self,element,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=None
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if type(webelement) is list:
-                   webelement=webelement[0]
-            if webelement is not None:
-
+            if type(element) is list:
+                element=element[0]
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
                         log.debug(WEB_ELEMENT_ENABLED)
-                        output=webelement.text
+                        output=element.text
                         logger.print_on_console("Button name: "+output)
                         status=TEST_RESULT_PASS
                         result=TEST_RESULT_TRUE
-
+                    else:
+                        err_msg = self.print_error(ELEMENT_DISABLED)
+                        output=element.text
+                        logger.print_on_console("Button name: "+output)
+                        status=TEST_RESULT_PASS
+                        result=TEST_RESULT_TRUE
+                else:
+                    err_msg = self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-                log.error(e)
-                logger.print_on_console(err_msg)
+            err_msg = self.print_error(e)
+            log.error(e,exc_info = True)
         return status,result,output,err_msg
 
-    def verify_button_name(self,webelement,input,*args):
+
+    def verify_button_name(self,element,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -130,18 +134,34 @@ class Button_Keywords():
         try:
             input_val=input[0]
             if len(input_val)>0 :
-                if type(webelement) is list:
-                       webelement=webelement[0]
-                if webelement is not None:
-
-                            log.debug(WEB_ELEMENT_ENABLED)
-                            if webelement.text==input_val:
+                if type(element) is list:
+                    element=element[0]
+                if element is not None:
+                    if element.is_displayed():
+                        log.debug(ELEMENT_VISIBLE)
+                        if element.is_enabled():
+                            log.debug(ELEMENT_ENABLED)
+                            if element.text==input_val:
                                 log.debug('text matched')
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
-
+                            else:
+                                logger.print_on_console("Button name: "+element.text)
+                        else:
+                            err_msg = self.print_error(ELEMENT_DISABLED)
+                            if element.text==input_val:
+                                log.debug('text matched')
+                                status=TEST_RESULT_PASS
+                                result=TEST_RESULT_TRUE
+                            else:
+                                logger.print_on_console("Button name: "+element.text)
+                    else:
+                        err_msg = self.print_error(ELEMENT_HIDDEN)
+                else:
+                    err_msg = self.print_error(ELEMENT_NOT_EXIST)
+            else:
+                err_msg = self.print_error(INVALID_INPUT)
         except Exception as e:
-                log.error(e)
-                logger.print_on_console(err_msg)
+            err_msg = self.print_error(e)
+            log.error(e,exc_info = True)
         return status,result,output,err_msg
-
