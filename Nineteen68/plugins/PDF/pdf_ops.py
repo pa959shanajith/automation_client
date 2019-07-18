@@ -96,12 +96,13 @@ class PDFOperations:
                 logger.print_on_console('Get Text : ' , output)
         except ValueError as v:
             err_msg = "Invalid Input! Only blank and number values are allowed."
-            log.error(v)
-            logger.print_on_console("Invalid Input! Only blank and number values are allowed.")
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
             err_msg = "Error while fetching the value"
+            log.error(e)
+            logger.print_on_console(err_msg)
+            
 
         #return status and methodoutput
         return status,methodoutput,output,err_msg
@@ -151,11 +152,12 @@ class PDFOperations:
         except ValueError as v:
             err_msg = "Invalid Input! Only number is allowed as the index input."
             log.error(v)
-            logger.print_on_console("Invalid Input! Only number is allowed as the index input.")
+            logger.print_on_console(err_msg)
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
             err_msg="Error occurred during verifying values"
+            log.error(e)
+            logger.print_on_console(err_msg)
+            
 
         #return status and methodoutput
         return status,methodoutput,output,err_msg
