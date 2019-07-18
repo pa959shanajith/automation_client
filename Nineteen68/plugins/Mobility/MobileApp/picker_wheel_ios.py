@@ -62,7 +62,7 @@ class Picker_Wheel_Keywords():
         return status,methodoutput,output,err_msg
 
 
-    def get_value(self, element,*args):
+    def get_value(self, element,input_val,*args):
 
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
@@ -81,6 +81,7 @@ class Picker_Wheel_Keywords():
                         # for set value
                         # element.set_value(input_val[0])
                         output=element.text
+                        logger.print_on_console("Output: "+output)
                         status = TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:

@@ -41,21 +41,28 @@ counter=0
 driver=None
 packageName=None
 device_id = None
-
+device_keywords_object = device_keywords.Device_Keywords()
 
 class InstallAndLaunch():
+
     def __init__(self):
         self.desired_caps={}
+
+
+    def print_error(self,e):
+        log.error(e)
+        logger.print_on_console(e)
+        return e
+
+
     def start_server(self,platform_name=""):
         try:
-            ##            maindir = os.getcwd()
-            ##            os.chdir('..')
             curdir = os.environ["NINETEEN68_HOME"]
             if (SYSTEM_OS != 'Darwin'):
                 path = curdir + '\\Nineteen68\\plugins\\Mobility\\MobileApp\\node_modules\\appium\\build\\lib\\main.js'
                 nodePath = os.environ["NINETEEN68_HOME"] + "\\Drivers" + '\\node.exe'
                 proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
-                time.sleep(5)
+                time.sleep(10)
                 logger.print_on_console('Server started')
             elif platform_name != "ios":
                 path = curdir + '/Nineteen68/plugins/Mobility/node_modules/appium/build/lib/main.js'
@@ -63,13 +70,12 @@ class InstallAndLaunch():
                 time.sleep(15)
                 logger.print_on_console('Server started')
         except Exception as e:
-            err = 'Error while starting server'
-            logger.print_on_console(err)
-            log.error(err)
-            log.error(e)
+            self.print_error('Error while starting server')
+            log.error(e,exc_info=True)
+
 
     def installApplication(self, apk_path, platform_version, device_name, udid, *args):
-        global driver, device_id, packageName
+        global driver, device_id, packageName, device_keywords_object
         #import appium
         from appium import webdriver
         try:
@@ -147,6 +153,9 @@ class InstallAndLaunch():
                             time.sleep(1)
                     return self.driver
                 return self.driver
+
+
+
             else:
                 processes = psutil.net_connections()
                 for line in processes:
@@ -154,7 +163,6 @@ class InstallAndLaunch():
                     if p[1] == 4723 and driver is not None:
                         return driver
                 try:
-                    device_keywords_object = device_keywords.Device_Keywords()
                     if device_name == 'wifi':
                         device_name = device_keywords_object.wifi_connect()
                     if device_name != '':
@@ -162,7 +170,6 @@ class InstallAndLaunch():
                         packageName = device_keywords_object.package_name(apk_path)
                         logger.print_on_console("Connected device name:",device_name)
                         logger.print_on_console("App package name:",packageName)
-                        device_id = device_name
                         self.start_server()
                         self.desired_caps = {}
                         if platform_version is not None:
@@ -179,17 +186,19 @@ class InstallAndLaunch():
                         self.desired_caps['appPackage'] = packageName
                         self.desired_caps['appActivity'] = activityName
                         driver = webdriver.Remote('http://localhost:4723/wd/hub', self.desired_caps)
+                        device_id = device_name
                 except Exception as e:
-                    err = "Not able to install or launch application"
-                    logger.print_on_console(err)
+                    self.print_error("Not able to install or launch application")
                     log.error(e,exc_info=True)
                     driver = None
+                    device_id = None
         except Exception as e:
-            err = "Not able to install or launch application"
-            logger.print_on_console(err)
+            self.print_error("Not able to install or launch application")
             log.error(e,exc_info=True)
             driver = None
+            device_id = None
         return driver
+
 
     def scrape(self):
         finalJson=''
@@ -243,9 +252,7 @@ class InstallAndLaunch():
                     new_file.write('')
                     new_file.close()
             except Exception as e:
-                err = "Error occured in scraping"
-                logger.print_on_console(err)
-                log.error(err)
+                self.print_error("Error occured in scraping")
                 log.error(e,exc_info=True)
             return finalJson
         else:
@@ -274,51 +281,56 @@ class BuildJson:
         custnamelist=[]
         global counter
         object_type = {
-            'android.widget.TimePicker' : 'timepicker',
-            'android.widget.DatePicker' : 'datepicker',
-            'android.widget.RadioButton' : 'radiobutton',
-            'android.widget.Button' : 'button',
-            'android.widget.EditText' : 'edittext',
-            'android.widget.Switch' : 'switch',
-            'android.widget.CheckBox' : 'checkbox',
-            'android.widget.Spinner' : 'spinner',
-            'android.widget.NumberPicker' : 'numberpicker',
-            'android.widget.SeekBar' : 'seekbar',
-            'android.widget.ListView' : 'listview',
-            'android.widget.ImageButton' : 'imagebutton',
-            'android.widget.LinearLayout' : 'linearlayout',
-            'android.widget.TextView' : 'textview',
-            'android.widget.FrameLayout' : 'framelayout',
-            'android.widget.ImageView' : 'imageview',
-            'android.widget.RelativeLayout' : 'relativelayout',
-            'android.widget.ScrollView' : 'scrollview',
-            'android.view.View' : 'view',
-            'android.view.ViewGroup' : 'viewgroup'
+            'android.widget.TimePicker' : '_timepicker',
+            'android.widget.DatePicker' : '_datepicker',
+            'android.widget.RadioButton' : '_radiobtn',
+            'android.widget.Button' : '_btn',
+            'android.widget.EditText' : '_txtbox',
+            'android.widget.Switch' : '_switch',
+            'android.widget.CheckBox' : '_chkbox',
+            'android.widget.Spinner' : '_spinner',
+            'android.widget.NumberPicker' : '_numberpicker',
+            'android.widget.SeekBar' : '_seekbar',
+            'android.widget.ListView' : '_listview',
+            'android.widget.ImageButton' : '_imagebtn',
+            'android.widget.LinearLayout' : '_linearlayout',
+            'android.widget.TextView' : '_txtview',
+            'android.widget.FrameLayout' : '_framelayout',
+            'android.widget.ImageView' : '_img',
+            'android.widget.RelativeLayout' : '_relativelayout',
+            'android.widget.ScrollView' : '_scrollview',
+            'android.view.View' : '_view',
+            'android.view.ViewGroup' : '_viewgroup'
         }
         for i in range(len(XpathList)):
             text=''
             # print SYSTEM_OS
             if label[i] != '':
-                if class_name[i] in object_type:
-                    text=label[i]+'_'+object_type[class_name[i]]
-                else:
-                    text=label[i]+'_'+class_name[i]
+                text=label[i]
             elif content_desc[i]  != '':
-                if class_name[i] in object_type:
-                    text=content_desc[i]+'_'+object_type[class_name[i]]
-                else:
-                    text=content_desc[i]+'_'+class_name[i]
+                text=content_desc[i]
             if text=='' or text==None:
-                if class_name[i] in object_type:
-                    text='NONAME_'+object_type[class_name[i]]
+                text='NONAME'
+
+            if class_name[i] in object_type:
+                text1 = text + object_type[class_name[i]]
+                if text1 not in custnamelist:
+                    text = text1
+                    custnamelist.append(text)
                 else:
-                    text='NONAME_'+class_name[i]
-            if text not in custnamelist:
-                custnamelist.append(text)
+                    text=text+str(counter) + object_type[class_name[i]]
+                    custnamelist.append(text)
+                    counter=counter+1
             else:
-                text=text+str(counter)
-                custnamelist.append(text)
-                counter=counter+1
+                text1 = text + '_elmnt'
+                if text1 not in custnamelist:
+                    text = text1
+                    custnamelist.append(text)
+                else:
+                    text=text+str(counter) + '_elmnt'
+                    custnamelist.append(text)
+                    counter=counter+1
+
             if SYSTEM_OS!='Darwin':
                 xpath = resource_id[i] + ';' + XpathList[i]
                 ele_bounds=re.findall('\d+',rectangle[i])
@@ -372,7 +384,6 @@ class BuildJson:
             json.dump(jsonArray, outfile, indent=4, sort_keys=False)
             outfile.close()
         return jsonArray
-
 
 
 
@@ -484,12 +495,14 @@ class Exact(xml.sax.handler.ContentHandler):
         child = Exact(childXPath,self.parser,curobj)
         self.parser.setContentHandler(child)
 
+
     def endElement(self, name):
         value = self.buffer.strip()
         if(value != ''):
             log.info(self.xPath + "='" + self.buffer.toString() + "'")
 
         self.parser.setContentHandler(self.parent)
+
 
     def characters(self, data):
         self.buffer += data

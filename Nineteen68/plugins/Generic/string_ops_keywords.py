@@ -13,9 +13,9 @@ import random
 import logger
 import generic_constants
 import core_utils
-from unidecode import unidecode
 from constants import SYSTEM_OS
 import subprocess
+from unidecode import unidecode
 if SYSTEM_OS == "Windows":
     import win32clipboard
 
@@ -34,7 +34,7 @@ class StringOperation:
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         try:
             if  not (input is None or input is ''):
                 output=''
@@ -76,7 +76,7 @@ class StringOperation:
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         try:
             if not (input is None or input is ''):
                 output=''
@@ -115,7 +115,7 @@ class StringOperation:
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         try:
             if not (input is None or input is ''):
                 output = input.strip()
@@ -145,7 +145,7 @@ class StringOperation:
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         try:
             if not (actual_string is None or actual_string is ''):
                 if not (index is None or index is ''):
@@ -180,7 +180,7 @@ class StringOperation:
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         try:
             if not (actual_string is None or actual_string is ''):
                 if not (index is None or index is ''):
@@ -220,7 +220,7 @@ class StringOperation:
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         try:
             if not (input is None or input is ''):
                 coreutilsobj=core_utils.CoreUtils()
@@ -250,7 +250,7 @@ class StringOperation:
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         try:
             if input is not None :
                 output = len(input)
@@ -278,7 +278,7 @@ class StringOperation:
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         try:
             if not (actual_string is None or actual_string is ''):
                 if not (to_find is None or to_find is ''):
@@ -315,7 +315,7 @@ class StringOperation:
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         try:
             if not (actual_string is None or actual_string is ''):
                 if not (to_be_replaced is None):
@@ -364,7 +364,7 @@ class StringOperation:
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         try:
             if not (input is None or input is ''):
                 if not (character is None):
@@ -403,7 +403,7 @@ class StringOperation:
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         try:
             input_vals = args
             len_input_val = len(input_vals)
@@ -441,7 +441,7 @@ class StringOperation:
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         try:
             if not (actual_string is None or actual_string is ''):
                 coreutilsobj=core_utils.CoreUtils()
@@ -495,7 +495,7 @@ class StringOperation:
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         try:
             if not (data_type is None or data_type is ''):
                 if not (data_length is None or data_length is ''):
@@ -579,7 +579,7 @@ class StringOperation:
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         try:
             if SYSTEM_OS == "Windows":
                 win32clipboard.OpenClipboard()

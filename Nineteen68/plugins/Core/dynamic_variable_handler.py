@@ -56,13 +56,13 @@ class DynamicVariables:
             if status==TEST_RESULT_TRUE:
                 value=self.get_nestedDyn_value(nested_var,input_var)
                 actual_value=value
-                if self.check_for_dynamicvariables(value)==TEST_RESULT_TRUE:
+                if self.check_for_dynamicvariables(value,keyword)==TEST_RESULT_TRUE:
                     actual_value=self.get_dynamic_value(value)
                     if actual_value==None:
                         db_result=self.getDBdata(value,con_obj)
                         actual_value=db_result[1]
 
-            elif self.check_for_dynamicvariables(input_var)==TEST_RESULT_TRUE:
+            elif self.check_for_dynamicvariables(input_var,keyword)==TEST_RESULT_TRUE:
                 temp_value=self.get_dynamic_value(input_var)
                 if temp_value is None:
                     actual_value=temp_value
@@ -130,9 +130,13 @@ class DynamicVariables:
                         status = TEST_RESULT_FALSE
                         json_flag=True
                     elif keyword is not None and keyword.lower()=='getobject':
-                        outputval.startswith('{{') and outputval.endswith('}}') and outputval[0:2].find('{') <0 and a[2:-2].find('}')
                         json_flag=True
-                        status = TEST_RESULT_TRUE
+                        if(outputval.startswith('{{') and outputval.endswith('}}') and outputval[2:].find('{') <0 and outputval[2:-2].find('}')<0):
+                            status = TEST_RESULT_TRUE
+                        else:
+                            err_msg=ERROR_CODE_DICT['INCORRECT_VARIABLE_FORMAT']
+                            logger.print_on_console(err_msg)
+                            log.error(err_msg)
                     else:
                         ast.literal_eval(str(outputval))
                         status = TEST_RESULT_FALSE
@@ -144,7 +148,6 @@ class DynamicVariables:
                     var_list=re.findall("\{(.*?)\}",outputval)
                     if len(var_list)>0:
                         status = TEST_RESULT_TRUE
-
         return status
 
     #To get the value of given dynamic variable

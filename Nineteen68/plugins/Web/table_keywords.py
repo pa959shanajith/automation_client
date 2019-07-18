@@ -100,7 +100,6 @@ class TableOperationKeywords():
 
 #   returns the cell value of cell with ',' seperated values, if the table found with the given xpath
         def getCellValue(self,webElement,input_val,*args):
-
             logger.print_on_console('Executing keyword : ','getCellValue')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
@@ -122,9 +121,8 @@ class TableOperationKeywords():
                             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                             logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         else:
-                            remoteWebElement=self.javascriptExecutor(webElement,row_num-1,col_num-1)
-                            cellVal=self.getChildNodes(remoteWebElement)
-                            cellVal=cellVal.strip()
+                            js='for(i=0;i<arguments[0].children.length;i++){if(arguments[0].children[i].tagName=="TBODY" || arguments[0].children[i].tagName=="tbody"){var row_count = arguments[0].children[i].children.length; var col_ch = arguments[0].children[i];for(row=0;row<row_count;row++){var column_count = col_ch.children[row].cells.length; var column=col_ch.children[row];for(col=0;col<column_count;col++){if(row==arguments[1] && col==arguments[2] && column.children[arguments[2]].firstChild.tagName == "INPUT" ){return column.children[arguments[2]].children[0].value;}else if(row==arguments[1] && col==arguments[2]){return column.children[arguments[2]].innerText;}}}}}'
+                            cellVal=browser_Keywords.local_bk.driver_obj.execute_script(js,webElement,row_num-1,col_num-1)
                             local_tk.log.info('Got the result : %s',str(cellVal))
                             logger.print_on_console('Cell value is : ',str(cellVal))
                             status=TEST_RESULT_PASS
@@ -145,7 +143,6 @@ class TableOperationKeywords():
 
 #   verifies the cell value with the given text input, if the table found with the given xpath
         def verifyCellValue(self,webElement,input_val,*args):
-
             logger.print_on_console('Executing keyword : verifyCellValue')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
@@ -168,11 +165,8 @@ class TableOperationKeywords():
                             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                             logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         else:
-                            actual_rowNum=row_num-1
-                            actual_colNum=col_num-1
-                            remoteWebElement=self.javascriptExecutor(webElement,actual_rowNum,actual_colNum)
-                            cellVal=self.getChildNodes(remoteWebElement)
-                            cellVal=cellVal.strip()
+                            js='for(i=0;i<arguments[0].children.length;i++){if(arguments[0].children[i].tagName=="TBODY" || arguments[0].children[i].tagName=="tbody"){var row_count = arguments[0].children[i].children.length; var col_ch = arguments[0].children[i];for(row=0;row<row_count;row++){var column_count = col_ch.children[row].cells.length; var column=col_ch.children[row];for(col=0;col<column_count;col++){if(row==arguments[1] && col==arguments[2] && column.children[arguments[2]].firstChild.tagName == "INPUT" ){return column.children[arguments[2]].children[0].value;}else if(row==arguments[1] && col==arguments[2]){return column.children[arguments[2]].innerText;}}}}}'
+                            cellVal=browser_Keywords.driver_obj.execute_script(js,webElement,row_num-1,col_num-1)
                             expected_value=input_val[2].strip()
                             coreutilsobj=core_utils.CoreUtils()
                             expected_value=coreutilsobj.get_UTF_8(expected_value)
@@ -322,7 +316,6 @@ class TableOperationKeywords():
 
 #   lclicks on the given cell, if the table found with the given xpath
         def cellClick(self,webElement,input_arr,*args):
-
             logger.print_on_console('Executing keyword : cellClick')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
@@ -344,24 +337,24 @@ class TableOperationKeywords():
                             element_list=cell.find_elements_by_xpath('.//*')
                             if len(list(element_list))>0:
                                 xpath=self.getElemntXpath(element_list[0])
-                                cell=browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
+                                cell=local_tk.driver.find_element_by_xpath(xpath)
                             try:
                                 local_tk.log.debug('checking for element not none')
                                 if(cell!=None):
                                     local_tk.log.debug('checking for element enabled')
                                     if cell.is_enabled():
-                                        if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Ie):
+                                        if isinstance(local_tk.driver,webdriver.Ie):
                                             try:
                                                 local_tk.log.debug('performing java script click')
                                                 js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
-                                                click=browser_Keywords.local_bk.driver_obj.execute_script(js,cell)
+                                                click=local_tk.driver.execute_script(js,cell)
                                                 status=webconstants.TEST_RESULT_PASS
                                                 methodoutput=TEST_RESULT_TRUE
                                                 local_tk.log.info('click action performed successfully')
                                                 #logger.print_on_console('click action performed successfully')
                                             except Exception as e:
                                                 local_tk.log.debug('error occured so trying action events')
-                                                action=action_chains.ActionChains(browser_Keywords.local_bk.driver_obj)
+                                                action=action_chains.ActionChains(local_tk.driver)
                                                 action.move_to_element(cell).click(cell).perform()
                                                 status=TEST_RESULT_PASS
                                                 methodoutput=TEST_RESULT_TRUE
@@ -377,7 +370,7 @@ class TableOperationKeywords():
                                                 #logger.print_on_console('click action performed successfully')
                                             except Exception as e:
                                                 js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
-                                                click=browser_Keywords.local_bk.driver_obj.execute_script(js,webElement)
+                                                click=local_tk.driver.execute_script(js,webElement)
                                                 status=TEST_RESULT_PASS
                                                 methodoutput=TEST_RESULT_TRUE
                                                 local_tk.log.info('click action performed successfully')
@@ -513,7 +506,7 @@ class TableOperationKeywords():
                                     if cellChild.is_enabled():
                                         try:
                                           if not (cellChild is None):
-                                            browser_Keywords.local_bk.driver_obj.execute_script("arguments[0].scrollIntoView(true);",cellChild);
+                                            browser_Keywords.local_bk.driver_obj.execute_script("arguments[0].scrollIntoView(true);",cellChild)
                                             if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Ie):
                                                 try:
                                                     local_tk.log.debug('performing click')
@@ -521,14 +514,14 @@ class TableOperationKeywords():
                                                     click=browser_Keywords.local_bk.driver_obj.execute_script(js,cellChild)
                                                     status=webconstants.TEST_RESULT_PASS
                                                     methodoutput=TEST_RESULT_TRUE
-                                                    break;
+                                                    break
                                                 except Exception as e:
                                                     local_tk.log.debug('performing click')
                                                     action=action_chains.ActionChains(browser_Keywords.local_bk.driver_obj)
                                                     action.move_to_element(cellChild).click(cellChild).perform()
                                                     status=webconstants.TEST_RESULT_PASS
                                                     methodoutput=TEST_RESULT_TRUE
-                                                    break;
+                                                    break
                                             else:
                                                 try:
                                                     local_tk.log.debug('performing click')
@@ -585,8 +578,9 @@ class TableOperationKeywords():
                     try:
                         js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return yyy + cell.rowSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return yyy + cell.rowSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return yyy + cell.rowSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
                         row_number=browser_Keywords.local_bk.driver_obj.execute_script(js,webElement,text)
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                        if row_number:
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                         local_tk.log.info('Got the result : %s',str(row_number))
                         logger.print_on_console('Got the result : ',str(row_number))
                     except Exception as e:
@@ -685,12 +679,12 @@ class TableOperationKeywords():
                 local_tk.log.error(e)
             return xpath
 
-
         def getInnerTable(self,webElement,input_val,*args):
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             web_element=None
             err_msg=None
+            driver=browser_Keywords.driver_obj
             if((webElement is not None) and (input_val is not None)):
                 try:
                     if(len(input_val) == 2):

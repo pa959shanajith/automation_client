@@ -34,6 +34,7 @@ from  selenium.webdriver.common import action_chains
 from selenium.webdriver.common.action_chains import ActionChains
 import threading
 local_uo = threading.local()
+local_uo.log = logging.getLogger('utilweb_operations.py')
 
 class UtilWebKeywords:
     def __create_keyinfo_dict(self):
@@ -94,7 +95,6 @@ class UtilWebKeywords:
 
 
     def __init__(self):
-        local_uo.log = logging.getLogger('utilweb_operations.py')
         self.verify_image_obj=None
         self.keys_info={}
         self.__create_keyinfo_dict()
@@ -369,7 +369,7 @@ class UtilWebKeywords:
         err_msg=None
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if(len(args[0]) == 2):
+            if(webelement is not None and (args[0]) == 2):
                 row = int(args[0][0])-1
                 col = int(args[0][1])-1
                 from table_keywords import TableOperationKeywords
@@ -382,7 +382,7 @@ class UtilWebKeywords:
                 if(cell!=None):
                     webelement=cell
 
-            elif(len(args[0]) > 2):
+            elif(webelement is not None and len(args[0]) > 2):
                 row = int(args[0][0])-1
                 col = int(args[0][1])-1
                 tag=args[0][2].lower()
@@ -565,7 +565,7 @@ class UtilWebKeywords:
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
-                #input=input[0]
+                digits= 1
                 input1=input[0]
                 info_msg='Focus the given webelement '+webelement.tag_name+' before sending keys'
                 local_uo.log.info(info_msg)
@@ -573,8 +573,12 @@ class UtilWebKeywords:
                 self.__setfocus(webelement)
                 if len(args)==0 and input1 in list(self.keys_info.keys()):
                     if webelement.get_attribute('type')!='text':
-                        webelement.send_keys(self.keys_info[input1.lower()])
-                        local_uo.log.debug('It is not a textbox')
+                        digits = [int(i)for i in input if i.isdigit()]
+                        try:
+                            webelement.send_keys(self.keys_info[input1.lower()]*digits[0])
+                        except Exception as e:
+                            local_uo.log.debug('Operated using option 2',e)
+                            webelement.send_keys(self.keys_info[input1.lower()])
                     else:
                         local_uo.log.debug('It is a textbox')
                         #self.generic_sendfucntion_keys(input1.lower(),*args)
@@ -853,7 +857,7 @@ class UtilWebKeywords:
     def image_similarity_percentage(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg=None
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
@@ -911,7 +915,7 @@ class UtilWebKeywords:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -937,7 +941,3 @@ class UtilWebKeywords:
         logger.print_on_console('Window handles size '+str(len(window_handles)))
         return window_handles
 
-        """
-        Match with Exact text for table with dropdown and  dropdown
-
-        """

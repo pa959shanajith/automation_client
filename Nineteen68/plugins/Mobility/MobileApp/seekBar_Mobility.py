@@ -21,23 +21,26 @@ log = logging.getLogger('seekBar_Mobility.py')
 
 class Seek_Bar_Keywords():
 
-    def Set_Min_Value(self,webelement,input,*args):
+    def print_error(self,e):
+        log.error(e)
+        logger.print_on_console(e)
+        return e
+
+
+    def Set_Min_Value(self,element,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            if webelement is not None:
-                visibility=webelement.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=webelement.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
-                        ##webelement.send_keys('0')
-                        location=webelement.location
-                        size=webelement.size
+                        location=element.location
+                        size=element.size
                         start_x=location['x'] + (size['width']/2)
                         start_y=location['y'] + (size['height']/2)
                         end_x=location['x'] + 1
@@ -47,82 +50,80 @@ class Seek_Bar_Keywords():
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg = self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
+                    err_msg = self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-                log.error(e)
-
+            err_msg = self.print_error("Error occurred in SetMinValue")
+            log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
-    def Set_Mid_Value(self,webelement,input,*args):
+
+    def Set_Mid_Value(self,element,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
             inp=input[0]
-            if webelement is not None:
-                visibility=webelement.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=webelement.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
-                        if inp != '':
-                            inp = int(inp)
-                            location=webelement.location
-                            size=webelement.size
-                            start_x=location['x'] + (size['width']/2)
-                            start_y=location['y'] + (size['height']/2)
-                            if inp <= 0:
-                                end_x=location['x'] + 1
-                            elif inp >= 100:
-                                end_x=location['x'] + (size['width'] - 1)
+                        if (inp != ''):
+                            if (inp.isdigit()):
+                                inp = int(inp)
+                                location=element.location
+                                size=element.size
+                                start_x=location['x'] + (size['width']/2)
+                                start_y=location['y'] + (size['height']/2)
+                                if inp <= 0:
+                                    end_x=location['x'] + 1
+                                elif inp >= 100:
+                                    end_x=location['x'] + (size['width'] - 1)
+                                else:
+                                    end_x=location['x'] + (size['width'] * (inp/100))
+                                end_y=start_y
+                                driver=android_scrapping.driver
+                                driver.swipe(start_x,start_y,end_x,end_y,3000)
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
                             else:
-                                end_x=location['x'] + (size['width'] * (inp/100))
-                            end_y=start_y
-                            driver=android_scrapping.driver
-                            driver.swipe(start_x,start_y,end_x,end_y,3000)
+                                err_msg = self.print_error(INVALID_INPUT)
                         else:
-                            webelement.click()
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                            element.click()
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg = self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
+                    err_msg = self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-                log.error(e)
-
+            err_msg = self.print_error("Error occurred in SetValue")
+            log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
 
-    def Set_Max_Value(self,webelement,input,*args):
+    def Set_Max_Value(self,element,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            if webelement is not None:
-                visibility=webelement.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=webelement.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
-                        location=webelement.location
-                        size=webelement.size
+                        location=element.location
+                        size=element.size
                         start_x=location['x'] + (size['width']/2)
                         start_y=location['y'] + (size['height']/2)
                         end_x=location['x'] + (size['width'] - 1)
@@ -132,14 +133,12 @@ class Seek_Bar_Keywords():
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg = self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
+                    err_msg = self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-                log.error(e)
-
+            err_msg = self.print_error("Error occurred in SetMaxValue")
+            log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg

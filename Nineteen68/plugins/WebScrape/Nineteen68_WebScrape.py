@@ -93,7 +93,10 @@ class ScrapeWindow(wx.Frame):
                         self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
 
                 elif(self.action == 'compare'):
-                    browserops.driver.get(data['scrapedurl'])
+                    try:
+                        browserops.driver.get(data['scrapedurl'])
+                    except:
+                        log.error("scrapedurl is Empty")
                     self.comparebutton = wx.ToggleButton(self.panel, label="Start Compare",pos=(12,38 ), size=(175, 28))
                     self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)
                 self.Centre()
@@ -117,10 +120,12 @@ class ScrapeWindow(wx.Frame):
             self.scrape_type = "clickandadd"
             self.fullscrapebutton.Disable()
             self.fullscrapedropdown.Disable()
+            self.visibilityCheck.Disable()
             if(self.irisFlag):
                     self.cropbutton.Disable()
             if not isinstance(self.driver,webdriver.Ie) and len(self.driver.window_handles) > 1 and not self.window_selected:
                 self.fullscrapebutton.Hide()
+                self.visibilityCheck.Hide()
                 self.startbutton.Hide()
                 if(self.irisFlag):
                     self.cropbutton.Hide()
@@ -196,6 +201,7 @@ class ScrapeWindow(wx.Frame):
             if not isinstance(self.driver,webdriver.Ie) and len(self.driver.window_handles) > 1 and not self.window_selected:
                 self.fullscrapebutton.Hide()
                 self.startbutton.Hide()
+                self.visibilityCheck.Hide()
                 if(self.irisFlag):
                     self.cropbutton.Hide()
                 self.fullscrapedropdown.Hide()
@@ -217,6 +223,7 @@ class ScrapeWindow(wx.Frame):
 
         '''if any of the last two options are selected then
         scrape_selected_option must be having one more entry as the value of tagname/xpath'''
+        global visiblity_status
         if self.scrape_selected_option[0]  == self.scrapeoptions[-1]:
             self.scrape_selected_option.append(self.fullscrapedropdown.GetValue())
         elif self.scrape_selected_option[0] == self.scrapeoptions[-2]:
@@ -238,12 +245,14 @@ class ScrapeWindow(wx.Frame):
             self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
         self.parent.schedule.Enable()
         self.Close()
+        visiblity_status =False
 
     def cropandadd(self,event):
         state = event.GetEventObject().GetValue()
         global cropandaddobj
         if state == True:
             self.fullscrapebutton.Disable()
+            self.visibilityCheck.Disbale()
             self.startbutton.Disable()
             event.GetEventObject().SetLabel("Stop IRIS")
             status = cropandaddobj.startcropandadd(self)
@@ -277,7 +286,7 @@ class ScrapeWindow(wx.Frame):
 
     def resume_scraping(self,event):
         selector_window_buttons = [self.nextbutton,self.resume_scraping_button,self.prevbutton]
-        scrape_window_basic_buttons = [self.fullscrapebutton, self.startbutton, self.fullscrapedropdown]
+        scrape_window_basic_buttons = [self.fullscrapebutton, self.startbutton, self.fullscrapedropdown,self.visibilityCheck]
         list(map(lambda button: button.Disable(),selector_window_buttons))
         if self.scrape_type == "fullscrape":
             self.perform_fullscrape()

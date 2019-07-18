@@ -18,13 +18,13 @@ import json
 import logger
 import logging
 import time
+from urllib.parse import quote_plus as encodeURL
+from encryption_utility import AESCipher
 log = logging.getLogger(__name__)
 import controller
-#from selenium import webdriver
 import webocular_constants
-#import readconfig
-#import webconstants
-#configvalues = readconfig.configvalues
+
+
 class Webocular():
 
     def __init__(self):
@@ -43,6 +43,7 @@ class Webocular():
         self.crawlStatus = True
         self.notParsedURLs = []
         self.socketIO=None
+        self.proxy=None
         #self.driver = webdriver.PhantomJS(executable_path="some\\path")
 
     def get_complete_url(self,url, new_url) :
@@ -69,7 +70,6 @@ class Webocular():
         for image in images:
             if image.get('href') != None :
                 imglinks.append(image.get('href'))
-
         return imglinks
 
     def crawl(self,start_url, level,agent) :
@@ -113,7 +113,7 @@ class Webocular():
 
             if not url.endswith(webocular_constants.IGNORE_FILE_EXTENSIONS):
                 obj["noOfTries"] = obj["noOfTries"] + 1
-                r = requests.get(url, headers = headers,verify = False,timeout = timeout)
+                r = requests.get(url, headers = headers,verify = False,timeout = timeout, proxies=self.proxy)
                 rurl = r.url
 
                 #Check whether this URL redirects to some other URL
@@ -123,25 +123,6 @@ class Webocular():
                     obj["redirected"] = rurl
                 status = r.status_code
                 obj["status"] = status
-                #screen capture
-##                if screenCapture == "failed":
-##                    if status != 200:
-##                        self.driver.get(url)
-##                        print self.driver.current_url
-##                        curr_url = self.driver.current_url
-##                        self.driver.maximize_window()
-##                        curr_url = curr_url.replace("/","_")
-##                        curr_url = curr_url.replace("\\","_")
-##                        curr_url = curr_url.replace(":","_")
-##                        curr_url = curr_url.replace(".","_")
-##                        curr_url = curr_url.replace("?","_")
-##                        curr_url = curr_url.replace("<","_")
-##                        curr_url = curr_url.replace(">","_")
-##                        curr_url = curr_url.replace("*","_")
-##                        curr_url = curr_url.replace("\"","_")
-##                        curr_url = curr_url.replace("|","_")
-##                        filename = curr_url
-##                        self.driver.save_screenshot(filename + ".png")
                 soup = BeautifulSoup(r.text, "lxml")
                 if soup.title :
                     obj["title"] = soup.title.text
@@ -248,7 +229,7 @@ class Webocular():
                                             self.reversedLinks.append(
                                                 {"name": new_url, "parent": rurl, "level": obj['level'] + 1})
             else:
-                headerResponse = requests.get(url,headers = headers,verify = False,stream = True)
+                headerResponse = requests.get(url, headers = headers, verify = False, stream = True, proxies=self.proxy)
                 obj["status"] = headerResponse.status_code
                 obj['type'] = "others"
                 self.nodedata[url] = obj
@@ -309,15 +290,30 @@ class Webocular():
             #traceback.format_exc()
             self.crawlStatus = False
 
-    def runCrawler(self,url,level,agent,socketIO,mainwxobj) :
+    def runCrawler(self,url,level,agent,proxy,socketIO,mainwxobj) :
         self.socketIO=socketIO
         log.debug("inside runCrawler method")
         level  = int(level)
         start_url = url
         self.rooturl = start_url
         start = time.clock()
-        log.info("\nNew Webocular request has started with following parameters: [URL] : " + start_url  +  " [LEVEL] : "  +  str(level) + " [Agent] : " + str(agent) )
-        logger.print_on_console("New Webocular request has started with following parameters: [URL] : " + start_url  +  " [LEVEL] : "  +  str(level) + " [Agent] : " + str(agent) )
+        msg = "New Webocular request has started with following parameters: [URL] : " + start_url  +  " [LEVEL] : "  +  str(level) + " [Agent] : " + str(agent)
+        if proxy["enable"]:
+            msg += "*(Proxy Enabled)"
+            proxy_url = proxy["url"]
+            if proxy["username"] and proxy["password"]:
+                encryption_obj = AESCipher()
+                proxy["password"] = encryption_obj.decrypt(proxy["password"])
+                if proxy["password"] is None:
+                    raise ValueError("Invalid password")
+                proxy_url = encodeURL(proxy["username"])+":"+encodeURL(proxy["password"])+"@"+proxy_url
+            self.proxy = {}
+            #protocols = ["http", "https", "ftp"]
+            protocols = ["http", "https"]
+            for protocol in protocols:
+                self.proxy[protocol] = protocol+"://"+proxy_url
+        log.info(msg)
+        logger.print_on_console(msg)
         try:
             #Check if terminate flag is true or not:
             if controller.terminate_flag:

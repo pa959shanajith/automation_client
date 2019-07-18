@@ -208,12 +208,10 @@ class TextFile:
         """
         status=False
         err_msg=None
-        log.debug('Comparing content of pdf files: '+str(input_path1)+','+str(input_path2))
+        log.debug('Comparing content of text files: '+str(input_path1)+','+str(input_path2))
         try:
-            content1=self.get_content(input_path1,1)
-            content2=self.get_content(input_path2,1)
-            log.debug('File1 content is ',content1)
-            log.debug('File2 content is ',content2)
+            content1=self.get_content(input_path1,"getfullcontent")
+            content2=self.get_content(input_path2,"getfullcontent")
 
             if content1==content2:
                 status=True
@@ -225,8 +223,6 @@ class TextFile:
             err_msg=generic_constants.ERR_MSG1+'Comparing Text content'+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
-        if err_msg!=None:
-            logger.print_on_console(err_msg)
         return status,err_msg
 
 
@@ -274,17 +270,20 @@ class TextFile:
         try:
             with open(input_path) as myFile:
                 content = myFile.read()
-                linenumber = int(linenumber)
-                split_content = content.splitlines()
-                if linenumber > 0:
-                    linenumber = int(linenumber) - 1
-                if (linenumber <= len(split_content)) and (linenumber >= 0):
-                    content = split_content[int(linenumber)]
-                    log.info('Content is '+str(content))
+                if linenumber == "getfullcontent":
                     status=True
                 else:
-                    content = ''
-                    err_msg=constants.ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                    linenumber = int(linenumber)
+                    split_content = content.splitlines()
+                    if linenumber > 0:
+                        linenumber = linenumber - 1
+                    if (linenumber <= len(split_content)) and (linenumber >= 0):
+                        content = split_content[linenumber]
+                        log.info('Content is '+str(content))
+                        status=True
+                    else:
+                        content = ''
+                        err_msg=constants.ERROR_CODE_DICT['ERR_INVALID_INPUT']
         except IOError:
             err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:

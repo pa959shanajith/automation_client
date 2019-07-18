@@ -151,7 +151,10 @@ class StepDescription:
         def getsubstring():
             return "Get Substring of the string '"+ inputval[0]+ "' with index/range '"+ inputval[1]+ "'  and save the value '" + output+ "' in variable '"+ tsp.outputval + "'"
         def stringgeneration():
-            return "Generate a charecter string having a length '"+ input + "'."
+            if input.find("num") != -1:
+                return "Generate a number having a length '"+ input + "'."
+            else:
+                return "Generate a character string having a length '"+ input + "'."
 
         #Clipboard keywords
         def savetoclipboard():
@@ -457,21 +460,21 @@ class StepDescription:
         #-----------------------------------------
         #Launch keywords
         def launchapplication():
-            return ' The application present in the path '+"'"+ inputval[0]+"'"+ ' is launched'+ '.'
+            return ' The application present in the path ' + "'" + inputval[0] + "'" + ' is launched' + '.'
         def getpagetitle():
-            return ' The page title is '+"'"+output +"'"+' and  is saved  in the variable ' +"'"+tsp.outputval+"'"+ '.'
+            return ' The page title is '+ "'" + output + "'" + ' and  is saved  in the variable ' + "'" + tsp.outputval + "'" + '.'
         def closeapplication():
-            return ' The application is closed'+ '.'
+            return ' The application is closed' + '.'
         def geterrormessage():
-            return ' Get the error message '+"'"+output+"'"+'.'
+            return ' Get the error message ' + "'" +output + "'" + '.'
         def starttransaction():
-            return ' Start the transaction with ID'+"'"+inputval+"'"+'.'
+            return ' Start the transaction with ID' + "'" + inputval + "'" + '.'
         def toolbaraction():
-            return ' Perform '+"'"+inputval+"'"+' action from tool bar. '
+            return ' Perform ' + "'" + inputval + "'" + ' action from tool bar. '
         def getpopuptext():
-            return ' Get pop-up text and save the text '+"'"+output+"'"+' in '+"'"+ tsp.outputval+"'"+'.'
+            return ' Get pop-up text and save the text ' + "'" + output + "'" + ' in ' + "'" + tsp.outputval + "'" + '.'
         def serverconnect():
-            return ' Connect to SAP server '+"'"+inputval+"'"+'.'
+            return ' Connect to SAP server ' + "'" + inputval + "'" + '.'
 
 
         #Textbox keywords
@@ -524,6 +527,8 @@ class StepDescription:
             return ' Get the text of the element '+ "'" + tsp.custname + "'"+ ' and save the value  '+"'"+output +"'"+ ' in '+"'"+ tsp.outputval+"'"+'.'
         def verifyelementtext():
             return ' Verify '+ "'" + input + "'"+ ' is the text of '+"'" + tsp.custname + "'"+'.'
+        def verifyiconname():
+            return ' Verify '+ "'" + input + "'"+ ' is the icon name of '+"'" + tsp.custname + "'"+'.'
 
         #Radio checkbox keywords
         def selectradiobutton():
@@ -534,6 +539,7 @@ class StepDescription:
             return ' Select '+ "'" + tsp.custname + "'"+'.'
         def unselectcheckbox():
             return ' Unselect '+ "'" + tsp.custname + "'"+'.'
+
         #Table Keywords
         def getrowcount():
             return ' Get row count of '+ "'" + tsp.custname + "'"+ ' and save the count '+"'"+output+"'"+ ' in '+"'"+ tsp.outputval+"'"+ '.'
@@ -544,7 +550,7 @@ class StepDescription:
         def getrownumbytext():
             return ' Get row number of ' + "'" + tsp.custname + "'" + ' by text '+"'" +input +"'" +' and save the row number ' + "'"+ output +"'" + ' in '+ tsp.outputval+"'"+'.'
         def getcellvalue():
-            return ' Get cell value of  '+ "'" + tsp.custname +input + "'" +'in the table and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp.custname +"'"+'.'
+            return ' Get cell value of  '+ "'" + tsp.custname + "'" +' in row number ' + "'" + input[0] + "'" +' and column number '+"'"+input[1] +"'"+'in the table and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp.outputval +"'"+'.'
         def verifycellvalue():
             return ' Verify cell value of element in row number ' +"'"+ input[0] +"'"+' and column number '+"'"+input[1] +"'"+' against the input value '+"'"+input[2]+"'"+' present in ' +"'" + tsp.custname + "'"+'.'
         def verifytextexists():
@@ -571,6 +577,8 @@ class StepDescription:
             return ' Unselect the row  '+"'" +input+"'" +' of '+ "'" + tsp.custname + "'"+ '.'
         ##        def GetStatus():
         ##            return 'Get the status of the ' + "'" + tsp.custname + "'"+ ' and save the status ' + "'" +output +"'" + ' in '+ tsp.outputval
+        def setcelltext():
+            return ' Set cell value of  '+ "'" + tsp.custname + "'" +' in row number ' + "'" + input[0] + "'" + ' and column number ' + "'" + input[1] + "'" +' in the table and save the value '+ "'" + output + "'" + " in " + "'" + tsp.outputval + "'" +'.'
 
         #SAP gerenal keywords
         def click():
@@ -603,9 +611,11 @@ class StepDescription:
             return ' Scroll right by '+"'"+inputval+"'"+' units and store the output as '+"'"+output+"'"+'.'
         def scrollup():
             return ' Scroll up by '+"'"+inputval+"'"+' units and store the output as '+"'"+output+"'"+'.'
+
         #Tab Keywords
         def movetabs():
             return ' Move tab '+ "'" + tsp.custname + "'"+'to left and store the output as '+"'"+output+"'"+'.'
+
         #Shell(Grid) Keywords
         def presstoolbarbutton():
             return ' Pressing Toolbar Button '+"'"+input[0]+"' of '"+tsp.custname+"'"+' and store the output as '+"'"+output+"'"+'.'
@@ -626,7 +636,39 @@ class StepDescription:
             inp = input
             if(len(inputval)>1):
                 inp = '->'.join(inputval)
-            return ' Get name of node at index'+"'"+inp+"'"+' and store the output as '+"'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
+            return ' Get name of node at index' + "'" + inp + "'" + ' and store the output as ' + "'" + output + "'" + ' in ' + "'" + tsp.outputval + "'" + '.'
+        def setshelltext():
+            return ' Set cell text of row '+ "'" + input[0] + "'" + 'and column ' + "'" + input[1] + "'" + ' and store the output as '+ "'" + output + "'" + ' in ' + "'" + tsp.outputval + "'" + '.'
+        def getrowcolbytext():
+            return ' Get row and column of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'" + output + "'" + ' in ' + "'" + tsp.outputval + "'" + '.'
+        def toolbaractionkeys():
+            return ' Performing toolbar action ' + "'" + input[0] + "' of '" + tsp.custname + "'" + ' and store the output as ' + "'" + output + "'" + ' in ' + "'" + tsp.outputval + "'" + '.'
+        def settextincell():
+            return ' Set cell value of  '+ "'" + tsp.custname + "'" +' in row number ' + "'" + input[0] + "'" + ' and column number ' + "'" + input[1] + "'" +' in the table and save the value '+ "'" + output + "'" + " in " + "'" + tsp.outputval + "'" + '.'
+        def selectallrows():
+            return ' Select all the rows.'
+        def unselectallselections():
+            return ' Unselecting all the sections.'
+        def scrolltorownumber():
+            return ' Scroll to row number ' + "'" + input[0] + "'" + 'and save the value '+ "'" + output + "'" + " in " + "'" + tsp.outputval + "'" +'.'
+        def getcellcolor():
+            return ' Get cell colour of row' + "'" + input[0] + "'" +' and column ' + "'" + input[1] + "'" + ' and store the output as ' + "'" + output + "'" + ' in '+ "'" + tsp.outputval + "'" +'.'
+        def selecttreeelement():
+            return ' Select the tree element and save the result as '+ "'" + output + "'" + " in " + "'" + tsp.outputval + "'" +'.'
+        def gettreenodetext():
+            return ' Get tree node text and save the result as '+ "'" + output + "'" + " in " + "'" + tsp.outputval + "'" +'.'
+        def gettreenodecount():
+            return ' Get tree node count and save the result as '+ "'" + output + "'" + " in " + "'" + tsp.outputval + "'" +'.'
+        def singleselectparentofselected():
+            return ' Get the single parent node of the selected node and save the result as '+ "'" + output + "'" + " in " + "'" + tsp.outputval + "'" +'.'
+        def collapsetree():
+            return ' Collapse tree and save the result as '+ "'" + output + "'" + " in " + "'" + tsp.outputval + "'" +'.'
+        def getcolvaluecorrtoselectednode():
+            return ' Get the column corresponding to the node and save the result as '+ "'" + output + "'" + " in " + "'" + tsp.outputval + "'" +'.'
+        def verifytreepath():
+            return ' Verify tree path and save the result as '+ "'" + output + "'" + " in " + "'" + tsp.outputval + "'" +'.'
+
+        #iris
         def clickiris():
             return ' Click on '+ "'" +tsp.custname+ "'" +'.'
         def settextiris():
@@ -638,11 +680,11 @@ class StepDescription:
         def getcolcountiris():
             return ' Get column Count of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
         def getcellvalueiris():
-            return 'Get cell value of ' + "'" + tsp.custname +'['+input[0]+']['+input[1]+']'+"'" + ' in the table and save the value ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
+            return ' Get cell value of ' + "'" + tsp.custname +'['+input[0]+']['+input[1]+']'+"'" + ' in the table and save the value ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
         def verifyexistsiris():
             return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         def verifytextiris():
-            return ' Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'
+            return ' Verify ' + "'"+ input + "'" +' is the text in the ' + "'" + tsp.custname + "'" + '.'
         return locals()[keyword]()
 
 

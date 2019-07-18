@@ -32,7 +32,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg=None
         try:
             if not (input is None or input is ''):
@@ -67,7 +67,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg = None
         try:
             if not (input is None or input is ''):
@@ -103,7 +103,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg = None
         try:
             if not (input is None or input is ''):
@@ -139,7 +139,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg = None
         try:
             cur_day = datetime.datetime.now()
@@ -165,7 +165,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg = None
         try:
             cur_day = datetime.datetime.now()
@@ -191,7 +191,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg = None
         try:
             if not (input_date is None or input_date is ''):
@@ -247,7 +247,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg = None
         try:
             if not (input_date is None or input_date is ''):
@@ -296,7 +296,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg = None
         try:
             if not (input_date is None or input_date is ''):
@@ -348,7 +348,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg = None
         try:
             if not (input_date is None or input_date is ''):
@@ -399,7 +399,7 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg = None
         try:
             if not (inp_date is None or inp_date is ''):
@@ -449,8 +449,8 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
+        verb = None
         err_msg = None
-        verb = OUTPUT_CONSTANT
         try:
             if not (input_from is None or input_from is ''):
 #                try:

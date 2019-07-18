@@ -61,10 +61,11 @@ APPTYPE_SAP = 'sap'
 
 APPTYPE_DESKTOP_JAVA = 'desktopjava'
 
-
 APPTYPE_MOBILE='mobileweb'
 
 APPTYPE_MOBILE_APP = 'mobileapp'
+
+APPTYPE_PDF = 'pdf'
 
 IGNORE_THIS_STEP = '<<Ignore.This.Step>>'
 
@@ -113,6 +114,7 @@ SERIAL = 'serial'
 ERROR_CODE_DICT ={
                     'MSG_STATUS' : 'Executed and the status is:',
                     'ERR_INVALID_INPUT':'Input error: please provide the valid input.',
+                    'INCORRECT_VARIABLE_FORMAT':'Incorrect variable format to store cutsom object',
                     'MSG_RESULT':'Executed and the result is:',
                     'ERR_INVALID_OBJECT':'This Element is not Accessible.',
                     'ERR_HIDDEN_OBJECT':'The element is Hidden.',

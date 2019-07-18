@@ -41,6 +41,7 @@ desktopScrapeFlag=False
 sapScrapeFlag=False
 mobileScrapeFlag=False
 mobileWebScrapeFlag=False
+pdfScrapeFlag = False
 debugFlag = False
 oebsScrapeFlag = False
 irisFlag = False
@@ -53,27 +54,28 @@ configvalues = None
 execution_flag = False
 closeActiveConnection = False
 connection_Timer = None
-ICE_CONST= os.environ["NINETEEN68_HOME"] + '/Lib/ice_const.json'
-CONFIG_PATH= os.environ["NINETEEN68_HOME"] + '/Lib/config.json'
-IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Core/Images/"
+NINETEEN68_HOME = os.environ["NINETEEN68_HOME"]
+IMAGES_PATH = NINETEEN68_HOME + "/Nineteen68/plugins/Core/Images/"
 os.environ["IMAGES_PATH"] = IMAGES_PATH
-CERTIFICATE_PATH = os.environ["NINETEEN68_HOME"] + "/Scripts/CA_BUNDLE"
-LOGCONFIG_PATH = os.environ["NINETEEN68_HOME"] + "/logging.conf"
-DRIVERS_PATH = os.environ["NINETEEN68_HOME"] + "/Drivers"
-CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver.exe"
-GECKODRIVER_PATH = DRIVERS_PATH + '/geckodriver.exe'
-if SYSTEM_OS=='Darwin':
-    CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
-    GECKODRIVER_PATH = DRIVERS_PATH + '/geckodriver'
-
+ICE_CONST= NINETEEN68_HOME + "/Lib/ice_const.json"
+CONFIG_PATH= NINETEEN68_HOME + "/Lib/config.json"
+CERTIFICATE_PATH = NINETEEN68_HOME + "/Scripts/CA_BUNDLE"
+LOGCONFIG_PATH = NINETEEN68_HOME + "/logging.conf"
+DRIVERS_PATH = NINETEEN68_HOME + "/Drivers"
+CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
+GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
+if SYSTEM_OS == "Windows":
+    CHROME_DRIVER_PATH += ".exe"
+    GECKODRIVER_PATH += ".exe"
 
 class MainNamespace(BaseNamespace):
+    core_utils_obj = core_utils.CoreUtils()
+
     def on_message(self, *args):
         global action,wxObject,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag,connection_Timer
         try:
             if(str(args[0]) == 'connected'):
                 if(allow_connect):
-                    logger.print_on_console('Normal Mode: Connection to the Nineteen68 Server established')
                     wxObject.schedule.Enable()
                     wxObject.cancelbutton.Enable()
                     wxObject.terminatebutton.Enable()
@@ -85,9 +87,15 @@ class MainNamespace(BaseNamespace):
                         msg='Execution only Mode enabled'
                         logger.print_on_console(msg)
                         log.info(msg)
-                    log.info('Normal Mode: Connection to the Nineteen68 Server established')
-                    conn_time= int(configvalues['connection_timeout'])
-                    if ((conn_time !='') and (conn_time not in range(0,8))):
+                    sch_mode = wxObject.schedule.GetValue()
+                    if sch_mode: socketIO.emit('toggle_schedule',sch_mode)
+                    msg = ("Schedule" if sch_mode else "Normal") + " Mode: Connection to the Nineteen68 Server established"
+                    logger.print_on_console(msg)
+                    log.info(msg)
+                    conn_time = float(configvalues['connection_timeout'])
+                    if (not (connection_Timer != None and connection_Timer.isAlive())
+                     and (conn_time >= 8)):
+                        log.info("Connection Timeout timer Started")
                         connection_Timer = threading.Timer(conn_time*60*60, wxObject.closeConnection)
                         connection_Timer.start()
                 else:
@@ -106,8 +114,7 @@ class MainNamespace(BaseNamespace):
                     global icesession,plugins_list
                     ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                         'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-                    core_utils_obj = core_utils.CoreUtils()
-                    response = json.loads(core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
+                    response = json.loads(self.core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
                     plugins_list = response['plugins']
                     err_res = None
                     if(response['id'] != icesession['ice_id'] and response['connect_time'] != icesession['connect_time']):
@@ -236,31 +243,38 @@ class MainNamespace(BaseNamespace):
     def on_webscrape(self,*args):
         try:
             if check_execution_lic("scrape"): return None
-            global action,wxObject,browsername,desktopScrapeFlag,data
+            global action,wxObject,browsername,desktopScrapeFlag,data,socketIO
             args = list(args)
             d = args[0]
             action = d['action']
-            task = d['task']
             data = {}
-            if action == 'scrape':
-                if str(task) == 'OPEN BROWSER CH':
-                    browsername = '1'
-                elif str(task) == 'OPEN BROWSER IE':
-                    browsername = '3'
-                elif str(task) == 'OPEN BROWSER FX':
-                    browsername = '2'
-                elif str(task) == 'OPEN BROWSER SF':
-                    browsername = '6'
-            elif action == 'compare':
-                data['view'] = d['viewString']
-                data['scrapedurl'] = d['scrapedurl']
-                if str(task) == 'OPEN BROWSER CH':
-                    browsername = '1'
-                elif str(task) == 'OPEN BROWSER IE':
-                    browsername = '3'
-                elif str(task) == 'OPEN BROWSER FX':
-                    browsername = '2'
-            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+            if action == 'userobject':
+                core_utils.get_all_the_imports('WebScrape')
+                import UserObjectScrape
+                webscrape=UserObjectScrape.UserObject()
+                webscrape.get_user_object(d,socketIO)
+            else:
+                if action == 'scrape':
+                    task = d['task']
+                    if str(task) == 'OPEN BROWSER CH':
+                        browsername = '1'
+                    elif str(task) == 'OPEN BROWSER IE':
+                        browsername = '3'
+                    elif str(task) == 'OPEN BROWSER FX':
+                        browsername = '2'
+                    elif str(task) == 'OPEN BROWSER SF':
+                        browsername = '6'
+                elif action == 'compare':
+                    task = d['task']
+                    data['view'] = d['viewString']
+                    data['scrapedurl'] = d['scrapedurl']
+                    if str(task) == 'OPEN BROWSER CH':
+                        browsername = '1'
+                    elif str(task) == 'OPEN BROWSER IE':
+                        browsername = '3'
+                    elif str(task) == 'OPEN BROWSER FX':
+                        browsername = '2'
+                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
         except Exception as e:
             err_msg='Error while Scraping Web application'
             log.error(err_msg)
@@ -354,6 +368,25 @@ class MainNamespace(BaseNamespace):
             wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
         except Exception as e:
             err_msg='Error while Scraping Mobile application'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e,exc_info=True)
+
+    def on_PDF_SCRAPE(self, *args):
+        try:
+            if check_execution_lic("scrape"): return None
+            logger.print_on_console(" Entering inside PDF scrape")
+            global pdfScrapeObj,pdfScrapeFlag
+            global browsername
+            browsername = args[0]
+#           con =controller.Controller()
+            core_utils.get_all_the_imports('PDF')
+            import pdf_scrape_dispatcher
+            pdfScrapeObj=pdf_scrape_dispatcher
+            pdfScrapeFlag=True
+            wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+        except Exception as e:
+            err_msg='Error while Scraping in PDF Window'
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
@@ -459,7 +492,7 @@ class MainNamespace(BaseNamespace):
                     qcdata = args[0]
                     if soc is None:
                         import subprocess
-                        path = os.environ["NINETEEN68_HOME"] + "/Nineteen68/plugins/Qc/QcController.exe"
+                        path = NINETEEN68_HOME + "/Nineteen68/plugins/Qc/QcController.exe"
                         pid = subprocess.Popen(path, shell=True)
                         soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         try:
@@ -501,7 +534,9 @@ class MainNamespace(BaseNamespace):
             global socketIO
             filepath = args[0]
             data_URIs=[]
-            log.info("Request recieved for processing screenshots for report")
+            msg = "Request recieved for processing screenshots for report"
+            logger.print_on_console(msg)
+            log.info(msg)
             num_path = len(filepath)
             for i in range(num_path):
                 path = filepath[i]
@@ -519,7 +554,9 @@ class MainNamespace(BaseNamespace):
                     socketIO.emit('render_screenshot',data_URIs)
                     data_URIs=[]
             socketIO.emit('render_screenshot',"finished")
-            log.info("Request for processing screenshots completed successfully")
+            msg = "Request for processing screenshots completed successfully"
+            logger.print_on_console(msg)
+            log.info(msg)
         except Exception as e:
             err_msg='Error while sending screenshot data'
             log.error(err_msg)
@@ -535,9 +572,10 @@ class MainNamespace(BaseNamespace):
             wobj = webocular.Webocular()
             args=list(args)
             global socketIO
-            #args[0] is URL, args[1] is level, args[2] is agent
-            wobj.runCrawler(args[0],args[1],args[2],socketIO,wxObject)
+            #args[0] is URL, args[1] is level, args[2] is agent, args[3] is proxy
+            wobj.runCrawler(args[0],args[1],args[2],args[3],socketIO,wxObject)
         except Exception as e:
+            socketIO.emit('result_web_crawler_finished','{"progress" : "fail"}')
             err_msg='Error while Crawling'
             log.error(err_msg)
             logger.print_on_console(err_msg)
@@ -570,7 +608,7 @@ class MainNamespace(BaseNamespace):
         else:
             spath=spath["default"]
         if len(spath) != 0 and os.path.exists(spath):
-            constants.SCREENSHOT_PATH=spath
+            constants.SCREENSHOT_PATH=os.path.normpath(spath)+os.sep
         else:
             constants.SCREENSHOT_PATH="Disabled"
             logger.print_on_console("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
@@ -638,7 +676,15 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_disconnect(self, *args):
-        logger.print_on_console('Disconnected from Nineteen68 server')
+        log.info('Disconnected from Nineteen68 server')
+        if socketIO is not None:
+            ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+                'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
+            icesession=json.loads(self.core_utils_obj.unwrap(socketIO._http_session.params['icesession'], ice_ndac_key))
+            icesession['connect_time'] = str(datetime.now())
+            icesession = self.core_utils_obj.wrap(json.dumps(icesession), ice_ndac_key)
+            socketIO._http_session.params['icesession'] = icesession
+        if not bool(wxObject): return
         wxObject.connectbutton.SetBitmapLabel(wxObject.connect_img)
         wxObject.connectbutton.SetName('connect')
         wxObject.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
@@ -665,18 +711,18 @@ class MainNamespace(BaseNamespace):
 
 class SocketThread(threading.Thread):
     """Test Worker Thread Class."""
+    daemon = True
 
-    #----------------------------------------------------------------------
     def __init__(self):
         """Init Worker Thread Class."""
         threading.Thread.__init__(self)
         self.start()
 
-    #----------------------------------------------------------------------
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
-        global socketIO, icesession
+        global socketIO, icesession, allow_connect
+        allow_connect = False
         server_port = int(configvalues['server_port'])
         server_IP = configvalues['server_ip']
         server_cert = configvalues['server_cert']
@@ -693,14 +739,14 @@ class SocketThread(threading.Thread):
         username=str(os.environ[key]).lower()
         core_utils_obj = core_utils.CoreUtils()
         icesession = {
-            'ice_id':str(uuid.uuid4()),
-            'connect_time':str(datetime.now()),
-            'username':username
+            'ice_id': str(uuid.uuid4()),
+            'connect_time': str(datetime.now()),
+            'username': username
         }
         ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
         icesession_enc = core_utils_obj.wrap(json.dumps(icesession), ice_ndac_key)
-        params={'username':username,'icesession':icesession_enc}
+        params={'username':username,'icesession': icesession_enc}
         try:
             socketIO = SocketIO(temp_server_IP,server_port,MainNamespace,verify=server_cert,cert=client_cert,params=params)
             socketIO.wait()
@@ -841,7 +887,7 @@ class TestThread(threading.Thread):
             else:
                 status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO,soc)
 
-            logger.print_on_console('Execution status',status)
+            logger.print_on_console('Execution status '+status)
 
             if status==TERMINATE:
                 logger.print_on_console('---------Termination Completed-------')
@@ -871,9 +917,9 @@ class TestThread(threading.Thread):
                 elif self.action==EXECUTE:
                     socketIO.emit('result_executeTestSuite',status)
         if closeActiveConnection:
+            closeActiveConnection = False
             connection_Timer = threading.Timer(300, wxObject.closeConnection)
             connection_Timer.start()
-            closeActiveConnection = False
         self.wxObject.mythread = None
         execution_flag = False
         self.wxObject.schedule.Enable()
@@ -886,6 +932,8 @@ class RedirectText(object):
     def write(self,string):
         wx.CallAfter(self.out.AppendText, string)
 
+    def flush(self):
+        pass
 
 
 class ClientWindow(wx.Frame):
@@ -1113,14 +1161,19 @@ class ClientWindow(wx.Frame):
 
     def onChecked_Schedule(self, e):
         global connection_Timer,socketIO
-        conn_time= int(configvalues['connection_timeout'])
-        if ((conn_time !='') and (conn_time not in range(0,8))):
+        conn_time = float(configvalues['connection_timeout'])
+        if conn_time >= 8:
             if (connection_Timer != None and connection_Timer.isAlive()):
                 connection_Timer.cancel()
-                log.info("Timer Restarted")
-                connection_Timer =threading.Timer(conn_time*60*60, wxObject.closeConnection)
-                connection_Timer.start()
+                log.info("Timer Restarted due to change in connection mode")
+            else:
+                log.info("Connection Timeout timer Started")
+            connection_Timer = threading.Timer(conn_time*60*60, wxObject.closeConnection)
+            connection_Timer.start()
         mode=self.schedule.GetValue()
+        msg = ("En" if mode else "Dis") + "abling Schedule mode"
+        logger.print_on_console(msg)
+        log.info(msg)
         socketIO.emit('toggle_schedule',mode)
 
     def onRadioBox(self,e):
@@ -1148,7 +1201,7 @@ class ClientWindow(wx.Frame):
         controller.disconnect_flag=True
         logger.print_on_console('Disconnected from Nineteen68 server')
         if (connection_Timer != None and connection_Timer.isAlive()):
-            log.info("Timer Stopped Connection Timeout")
+            log.info("Connection Timeout timer Stopped")
             connection_Timer.cancel()
             connection_Timer=None
         stat = self.killChildWindow(True,True,True,True)
@@ -1188,12 +1241,12 @@ class ClientWindow(wx.Frame):
     def OnClear(self,event):
         self.log.Clear()
         print('********************************************************************************************************')
-        print(('============================================ '+self.appName+' ============================================'))
+        print('============================================ '+self.appName+' ============================================')
         print('********************************************************************************************************')
 
     def OnNodeConnect(self,event):
         try:
-            global socketIO
+            global socketIO, connection_Timer
             name = self.connectbutton.GetName()
             self.connectbutton.Disable()
             if(name == 'connect'):
@@ -1205,6 +1258,7 @@ class ClientWindow(wx.Frame):
             else:
                 self.OnTerminate(event,"term_exec")
                 self.killSocket(True)
+                log.info('Disconnected from Nineteen68 server')
                 logger.print_on_console('Disconnected from Nineteen68 server')
                 self.connectbutton.SetBitmapLabel(self.connect_img)
                 self.connectbutton.SetName('connect')
@@ -1212,6 +1266,10 @@ class ClientWindow(wx.Frame):
                 self.schedule.SetValue(False)
                 self.schedule.Disable()
                 self.connectbutton.Enable()
+                if (connection_Timer != None and connection_Timer.isAlive()):
+                    log.info("Connection Timeout Timer Stopped")
+                    connection_Timer.cancel()
+                    connection_Timer=None
         except Exception as e:
             emsg="Forbidden request, Connection refused, please configure server ip and server port in Edit -> Configuration, and re-connect."
             logger.print_on_console(emsg)
@@ -1314,7 +1372,7 @@ class ClientWindow(wx.Frame):
 
     def test(self,event):
         try:
-            global mobileScrapeFlag,qcConFlag,mobileWebScrapeFlag,desktopScrapeFlag
+            global mobileScrapeFlag,qcConFlag,mobileWebScrapeFlag,desktopScrapeFlag, pdfScrapeFlag
             global sapScrapeFlag,debugFlag,browsername,action,oebsScrapeFlag
             global socketIO,data
             #con = controller.Controller()
@@ -1340,6 +1398,9 @@ class ClientWindow(wx.Frame):
             elif oebsScrapeFlag==True:
                 self.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = self,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
                 oebsScrapeFlag=False
+            elif pdfScrapeFlag==True:
+                self.scrapewindow = pdfScrapeObj.ScrapeDispatcher(parent = self,id = -1, title="SLK Nineteen68 - PDF Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+                pdfScrapeFlag=False
             elif debugFlag == True:
                 self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
                 debugFlag = False
@@ -1399,7 +1460,7 @@ class ClientWindow(wx.Frame):
                     flag = True
                     if system_mac in execMAC:
                         executionOnly=True
-                    if ((system_mac in irisMAC) and os.path.isdir(os.environ["NINETEEN68_HOME"]+'/Nineteen68/plugins/IRIS')):
+                    if ((system_mac in irisMAC) and os.path.isdir(NINETEEN68_HOME+'/Nineteen68/plugins/IRIS')):
                         irisFlag = True
                         controller.iris_flag = True
         except Exception as e:
@@ -1472,6 +1533,7 @@ class Config_window(wx.Frame):
             "Brow_ch":[(115,368)],
             "High_ch":[ (225,368)],
             "Iris_prediction":[(12,428)],
+            "hide_soft_key":[(180,428)],
             "Save":[(100,518), (100, 28)],
             "Close":[(250,518), (100, 28)]
         }
@@ -1502,6 +1564,7 @@ class Config_window(wx.Frame):
             "Save":[(135,458),(100, 28)],
             "C_Timeout" :[(12,218),(120, 28),(180,218), (80,-1)],
             "Iris_prediction":[(12,398)],
+            "hide_soft_key":[(180,398)],
             "Close":[(285,458),(100, 28)]
         }
         wx.Frame.__init__(self, parent, title=title,
@@ -1513,7 +1576,7 @@ class Config_window(wx.Frame):
         self.updated = False
         self.panel = wx.Panel(self)
 
-        self.currentDirectory = os.environ["NINETEEN68_HOME"]
+        self.currentDirectory = NINETEEN68_HOME
         self.defaultServerCrt = './Scripts/CA_BUNDLE/server.crt'
 
         self.sev_add=wx.StaticText(self.panel, label="Server Address", pos=config_fields["S_address"][0],size=config_fields["S_address"][1], style=0, name="")
@@ -1685,6 +1748,14 @@ class Config_window(wx.Frame):
         else:
             self.rbox11.SetSelection(1)
 
+        self.rbox12 = wx.RadioBox(self.panel, label = "Hide Soft. Keyboard", pos = config_fields["hide_soft_key"][0], choices = lblList,
+         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson != False and isConfigJson['hide_soft_key'].title() == lblList[0]:
+            self.rbox12.SetSelection(0)
+        else:
+            self.rbox12.SetSelection(1)
+
+
         self.error_msg=wx.StaticText(self.panel, label="", pos=(85,488),size=(350, 28), style=0, name="")
         self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])
         self.save_btn.Bind(wx.EVT_BUTTON, self.config_check)
@@ -1732,6 +1803,7 @@ class Config_window(wx.Frame):
         disable_server_cert=self.rbox9.GetStringSelection()
         highlight_check=self.rbox10.GetStringSelection()
         iris_prediction = self.rbox11.GetStringSelection()
+        hide_soft_key = self.rbox12.GetStringSelection()
         conn_timeout = self.conn_timeout.GetValue()
         #----------------creating data dictionary
         data['server_ip'] = server_add.strip()
@@ -1756,6 +1828,7 @@ class Config_window(wx.Frame):
         data['disable_server_cert'] = disable_server_cert.strip()
         data['highlight_check'] = highlight_check.strip()
         data['prediction_for_iris_objects'] = iris_prediction.strip()
+        data['hide_soft_key'] = hide_soft_key.strip()
         data['connection_timeout']= conn_timeout.strip()
         config_data=data
         if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='' and data['firefox_path']!='' and  data['connection_timeout']>='':
@@ -2061,7 +2134,13 @@ def check_browser():
                 choptions1.binary_location=str(configvalues['chrome_path'])
             choptions1.add_argument('--headless')
             driver = webdriver.Chrome(chrome_options=choptions1, executable_path=CHROME_DRIVER_PATH)
-            browser_ver = driver.capabilities['version']
+            # Check for the chrome 75 version.
+            # As the key value of 'version' is changed from 'version' to 'browserVersion'
+            browser_ver=''
+            if 'version' in  driver.capabilities.keys():
+                browser_ver = driver.capabilities['version']
+            elif 'browserVersion' in  driver.capabilities.keys():
+                browser_ver = driver.capabilities['browserVersion']
             browser_ver1 = browser_ver.encode('utf-8')
             browser_ver = int(browser_ver1[:2])
             try:

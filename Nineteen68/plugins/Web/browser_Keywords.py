@@ -142,6 +142,7 @@ class BrowserKeywords():
                         pid = pidie.pid
                         local_bk.pid_set.add(pid)
                     hwndg = utilobject.bring_Window_Front(pid)
+                self.update_pid_set(enableSecurityFlag)
                 local_bk.webdriver_list.append(local_bk.driver_obj)
                 local_bk.parent_handle =  None
                 try:
@@ -198,6 +199,7 @@ class BrowserKeywords():
                 if enableSecurityFlag:
                     local_bk.driver_obj = driver.set_security_zones(
                         self.browser_num, local_bk.driver_obj)
+                self.update_pid_set(enableSecurityFlag)
                 local_bk.webdriver_list.append(local_bk.driver_obj)
                 local_bk.parent_handle = local_bk.driver_obj.current_window_handle
                 self.update_recent_handle(local_bk.parent_handle)
@@ -537,22 +539,20 @@ class BrowserKeywords():
                 count = count - 2
                 local_bk.webdriver_list[driver_instance].quit()
                 if SYSTEM_OS == 'Darwin':
-
-                        import os
-                        os.system("killall -9 Safari")
-
-
+                    import os
+                    os.system("killall -9 Safari")
                 logger.print_on_console('browser closed')
                 local_bk.log.info('browser closed')
                 ## Issue #190 Driver control won't switch back to parent window
-                local_bk.webdriver_list.pop(len(local_bk.webdriver_list)-1)
+                del local_bk.webdriver_list[:]
+                del local_bk.pid_set[:]
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         else:
-            logger.print_on_console('For this close browser open browser or open new browser is not present')
-            local_bk.log.error('For this close browser open browser or open new browser is not present')
+            logger.print_on_console('For this closeBrowser keyword, openBrowser or openNewBrowser keyword is not present')
+            local_bk.log.error('For this closeBrowser keyword, openBrowser or openNewBrowser keyword is not present')
         return status,result,output,err_msg
 
 
@@ -706,6 +706,39 @@ class BrowserKeywords():
         global local_bk
         if len(local_bk.recent_handles)==0 or local_bk.recent_handles[-1]!=h:
             local_bk.recent_handles.append(h)
+
+    def update_pid_set(self,enableSecurityFlag):
+        global pid_set,driver_obj
+        if SYSTEM_OS!='Darwin':
+            utilobject = utils_web.Utils()
+            pid = None
+            if (self.browser_num == '1'):
+                #Logic to the pid of chrome window
+                p = psutil.Process(driver_obj.service.process.pid)
+                pidchrome = p.children()[0]
+                pid = pidchrome.pid
+                pid_set.append(pid)
+            elif(self.browser_num == '2'):
+                #logic to get the pid of the firefox window
+                try:
+                    pid = driver_obj.binary.process.pid
+                except Exception as e:
+                    p = psutil.Process(driver_obj.service.process.pid)
+                    pidchrome = p.children()[0]
+                    pid = pidchrome.pid
+                    pid_set.append(pid)
+            elif(self.browser_num == '3'):
+                # Logic checks if security settings needs to be addressed
+                # ref: <gitlabpath>/nineteen68v2.0/Nineteen68/issues/1556
+                if enableSecurityFlag:
+                    driver_obj = obj.set_security_zones(
+                        self.browser_num, driver_obj)
+                #Logic to get the pid of the ie window
+                p = psutil.Process(driver_obj.iedriver.process.pid)
+                pidie = p.children()[0]
+                pid = pidie.pid
+                pid_set.append(pid)
+            hwndg = utilobject.bring_Window_Front(pid)
 
 
 class Singleton_DriverUtil():

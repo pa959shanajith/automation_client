@@ -66,7 +66,7 @@ class XMLOperations():
             try:
                 json_obj=json.loads(encoded_inp_string)
                 if len(args)>0:
-                    block_number=int(args[0])-1
+                    block_number=args[0]
             except Exception as e:
                try:
                     json_obj=ast.literal_eval(encoded_inp_string)
@@ -78,23 +78,49 @@ class XMLOperations():
             if json_obj != None:
                 #json logic
                 json_obj_dict=self.build_dict(json_obj)
-                if(input_tag in json_obj_dict):
-                    log.info(json_obj_dict)
-                    value=json_obj_dict[input_tag]
-                    if isinstance(value,list):
-                        if block_number>-1:
-                            block_count=len(value[block_number])
-                        else:
-                            block_count=len(value)
-                    elif isinstance(value,dict) or isinstance(value,str) or isinstance(value,str):
+                block = input_tag.split('.')
+                number = block_number.split(',')
+                log.info('Json Input:',json_obj_dict)
+                log.info('Block:',block)
+                log.info('Block_Number:',number)
+                if len(block)==1:
+                    if block[0] in json_obj_dict:
                         block_count=1
-                    if(block_count>0):
-                        status = TEST_RESULT_PASS
-                        methodoutput = TEST_RESULT_TRUE
+                    else:
+                        log.debug("Key Not Found")
+                        err_msg=ERR_XML
+                else:
+                    for i in range(0,len(block)-1):
+                        if(block[i] in json_obj_dict and isinstance(json_obj_dict,dict)):
+                            json_obj_dict=json_obj_dict[block[i]]
+                        elif(isinstance(json_obj_dict,list)):
+                            if int(number[i])-1 != -1:
+                                json_obj_dict=json_obj_dict[int(number[i])-1]
+                            else:
+                                json_obj_dict=json_obj_dict[0]
+                    try:
+                        if isinstance(json_obj_dict,dict) and block[i+1] in json_obj_dict:
+                            block_count=1
+                        elif isinstance(json_obj_dict,list):
+                            if int(number[i+1])-1 != -1:
+                                log.debug('Finding key in given index')
+                                json_obj_dict=json_obj_dict[int(number[i])-1]
+                                if(block[i+1] in json_obj_dict):
+                                    block_count=1
+                            else:
+                                log.debug('Finding count keys in list')
+                                for j in json_obj_dict:
+                                    if block[i+1] in j:
+                                        block_count+=1
+                    except Exception as e:
+                        log.debug(e)
+                        log.debug('Number of index doesnot match number of key blocks')
+                        err_msg=ERR_XML
+                if(block_count>0 and err_msg == None):
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
                     log.info("Number of blocks in input Json :", block_count)
                     logger.print_on_console("Number of blocks in input Json:  ",block_count)
-                else:
-                    err_msg=ERR_XML
 
             else:
                 root = ET.fromstring(encoded_inp_string)
@@ -442,7 +468,7 @@ class JSONOperations():
         """
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
-        key_value=''
+        key_value=None
         exception_json=None
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -451,41 +477,53 @@ class JSONOperations():
             if isinstance(input_string,str):
                 encoded_inp_string=input_string.encode('utf-8')
             input_json=json.loads(encoded_inp_string)
-            blocks=block_key_name.split('.')
+            block=block_key_name.split('.')
+            number=block_count.split(',')
             nested=input_json
-            for k in blocks:
-                if k in nested:
-                    nested=nested[k]
-            if type(nested)==list and block_count != None and block_count!='':
-                block_count=int(block_count)
-                if block_count-1 <= len(nested) :
-                    if key_name in nested[block_count-1]:
-                        key_value = nested[block_count-1][key_name];
+            for i in range(0,len(block)):
+                if(block[i] in nested and isinstance(nested,dict)):
+                    nested=nested[block[i]]
+                elif(isinstance(nested,list)):
+                    if int(number[i])-1 != -1:
+                        nested=nested[int(number[i])-1]
+                    else:
+                        nested=nested[0]
+            try:
+                if isinstance(nested,list) and int(number[i+1]) != None and int(number[i+1])!='':
+                    if int(number[i+1])-1 != -1 :
+                        if key_name in nested[int(number[i+1])-1]:
+                            key_value = nested[int(number[i+1])-1][key_name];
+                            logger.print_on_console('Key : ',key_name, ' Value : ',key_value)
+                            status = TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
+                        else:
+                            log.debug('Invalid key given')
+                            err_msg= ERR_XML
+                    else:
+                        log.debug('Index out of range')
+                        err_msg= ERR_XML
+                elif isinstance(nested,dict):
+                    if key_name in nested:
+                        key_value = nested[key_name]
                         logger.print_on_console('Key : ',key_name, ' Value : ',key_value)
                         status = TEST_RESULT_PASS
                         methodoutput = TEST_RESULT_TRUE
                     else:
-                        err_msg= 'Invalid key given'
+                        log.debug('Invalid key given')
+                        err_msg= ERR_XML
                 else:
-                    err_msg= 'Index out of range'
-            elif type(nested)==dict:
-                if key_name in nested:
-                    key_value = nested[key_name]
-                    logger.print_on_console('Key : ',key_name, ' Value : ',key_value)
-                    status = TEST_RESULT_PASS
-                    methodoutput = TEST_RESULT_TRUE
-                else:
-                    err_msg= 'Invalid key given'
-            else:
-                try:
-                    key_value = nested[0][key_name];
-                    logger.print_on_console('Key : ',key_name, ' Value : ',key_value)
-                    status = TEST_RESULT_PASS
-                    methodoutput = TEST_RESULT_TRUE
-                except Exception as e:
-                    log.error(e)
+                        key_value = nested[0][key_name];
+                        logger.print_on_console('Key : ',key_name, ' Value : ',key_value)
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                if(err_msg != None):
+                    logger.print_on_console(err_msg)
+            except Exception as e:
+                err_msg=ERR_XML
+                logger.print_on_console(err_msg)
+                log.error(e)
         except Exception as e:
             err_msg=EXCEPTION_OCCURED
             log.error(e)
-        key_value=key_value.encode('utf-8')
+##        key_value=key_value.encode('utf-8')
         return status,methodoutput,key_value,err_msg

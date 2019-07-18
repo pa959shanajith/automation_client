@@ -40,7 +40,6 @@ if sys.platform == 'win32':
 if __name__ == "__main__":
     app = wx.App()
     appName = "Nineteen68 ICE"
-    global SYSTEM_OS
     constants.SYSTEM_OS = platform.system()
     import clientwindow as cw_obj
     cw_obj.configvalues = configvalues

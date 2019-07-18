@@ -54,10 +54,14 @@ class Object_Mapper():
                     log.info('Got the window which has the focus')
                     self.currenthandle = eachdriverhand
             log.info("Comparing %d objects",len(elementsdata['view']))
+            if  not "scrapedurl" in elementsdata.keys():
+                raise Exception("Invalid url, Unable to navigate to the website")
             count = 0
             for element in elementsdata['view']:
                 # XPath and URL decryption logic implemented
                 xpath_string = element['xpath'].split(';')
+                if not xpath_string[0]:
+                    raise ValueError('xpath of the object is empty')
                 left_part = self.coreutilsobj.scrape_unwrap(xpath_string[0])
                 right_part = self.coreutilsobj.scrape_unwrap(xpath_string[2])
                 decryptedxpath = left_part + ';' + xpath_string[1] + ';' + right_part
@@ -120,6 +124,10 @@ class Object_Mapper():
             with open('domelements.json', 'w') as outfile:
                 json.dump(self.data, outfile, indent=4, sort_keys=False)
             self.status  = domconstants.STATUS_SUCCESS
+        except ValueError as e:
+            self.status = "EMPTY_OBJECT"
+            logger.print_on_console("Unmapped object(s) found")
+            log.error(e)
         except Exception as e:
             logger.print_on_console("Error while comparing objects")
             log.error(e)

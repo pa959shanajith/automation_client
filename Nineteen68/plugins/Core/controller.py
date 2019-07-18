@@ -8,6 +8,7 @@
 # Copyright:   (c) wasimakram.sutar 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
+from concurrent.futures import ThreadPoolExecutor
 import threading
 from datetime import datetime
 import logging
@@ -80,6 +81,7 @@ class Controller():
     mobile_app_dispatcher_obj = None
     mainframe_dispatcher_obj = None
     system_dispatcher_obj = None
+    pdf_dispatcher_obj = None
     def __init__(self):
         global local
         local.web_dispatcher_obj = None
@@ -122,6 +124,16 @@ class Controller():
         except Exception as e:
             logger.print_on_console('Error loading Generic plugin')
             local.log.error(e,exc_info=True)
+
+    def __load_pdf(self):
+        try:
+            if self.pdf_dispatcher_obj==None:
+                core_utils.get_all_the_imports('PDF')
+                import pdf_dispatcher
+                self.pdf_dispatcher_obj = pdf_dispatcher.PDFDispatcher()
+        except Exception as e:
+            logger.print_on_console('Error loading PDF plugin')
+            log.error(e,exc_info=True)
 
     def __load_mobile_web(self):
         try:
@@ -513,7 +525,7 @@ class Controller():
                         logger.print_on_console('Response Body: \n',respBody,'\n')
                     else:
                         logger.print_on_console('NON SOAP XML')
-                        logger.print_on_console('Response Body: \n',display_keyword_response[1][2:-1],'\n')
+                        logger.print_on_console('Response Body: \n',display_keyword_response[1][2:-1].replace("\\n","\n").replace("\\r","\r").replace("\\t","\t"),'\n')
                 else:
                     logger.print_on_console('Response Body exceeds max. Limit, please use writeToFile keyword.')
                     local.log.info('Result obtained is: ')
@@ -696,6 +708,11 @@ class Controller():
                         self.__load_mainframe()
                     result = self.invokemainframekeyword(teststepproperty,self.mainframe_dispatcher_obj,inpval)
                 #----------------------------------------------------------------------------------------------Mainframe change
+                elif teststepproperty.apptype.lower() == APPTYPE_PDF:
+                    #pdf apptype module call
+                    if self.pdf_dispatcher_obj == None:
+                        self.__load_pdf()
+                    result = self.invokepdfkeyword(teststepproperty,self.pdf_dispatcher_obj,inpval,iris_flag)
 			#Fixed issue num #389 (Taiga)
             temp_result=result
             if result!=TERMINATE:
@@ -829,6 +846,10 @@ class Controller():
 
     def invokemainframekeyword(self,teststepproperty,dispatcher_obj,inputval):
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
+        return res
+
+    def invokepdfkeyword(self, teststepproperty, dispatcher_obj,inputval,iris_flag):
+        res = dispatcher_obj.dispatcher(teststepproperty, inputval, iris_flag)
         return res
 
     def invoke_debug(self,mythread,runfrom_step,json_data):
@@ -1109,6 +1130,12 @@ class Controller():
             local.web_dispatcher_obj.action=action
         self.debug_choice=wxObject.choice
         if action.lower()==EXECUTE:
+            self.execution_mode=SERIAL
+            #Parallel Execution
+            ##obj=handler.Handler()
+            kill_process()
+            ##if execution_mode.lower() == PARALLEL:
+            ##    status=self.invoke_execution(mythread,json_data)
             if self.execution_mode.lower() == SERIAL:
                 status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc)
             elif self.execution_mode.lower() == PARALLEL:
@@ -1198,18 +1225,17 @@ def kill_process():
             for p in wmi.InstancesOf('win32_process'):
                 if p.Name in my_processes:
                     os.system("TASKKILL /F /IM " + p.Name )
-            try:
-                processes = psutil.net_connections()
-                for line in processes:
-                    p =  line.laddr
-                    if p[1] == 4723:
-                        log.info( 'Pid Found' )
-                        log.info(line.pid)
-                        os.system("TASKKILL /F /PID " + str(line.pid))
-            except Exception as e:
-                log.error(e)
-            log.info('Stale processes killed')
-            logger.print_on_console( 'Stale processes killed')
+        except Exception as e:
+            log.error(e)
+
+        try:
+            processes = psutil.net_connections()
+            for line in processes:
+                p =  line.laddr
+                if p[1] == 4723:
+                    log.info( 'Pid Found' )
+                    log.info(line.pid)
+                    os.system("TASKKILL /F /PID " + str(line.pid))
         except Exception as e:
             log.error(e)
 
@@ -1222,36 +1248,40 @@ def kill_process():
                 log.info(pid)
                 os.system("TASKKILL /F /PID " + str(pid))
             browser_Keywords.local_bk.pid_set.clear()
+            browser_Keywords.local_bk.driver_obj = None
         except Exception as e:
             log.error(e,exc_info=True)
+        time.sleep(3)
         try:
-            time.sleep(3)
-            try:
-                folder = tempfile.gettempdir()
-                profdir = ["~DF","scoped_dir","IE","chrome_","anonymous", "userprofile",
-                            "seleniumSslSupport","webdriver-ie", "Low", "screenshot",
-                            "_MEI", "CVR","tmp","jar_cache","DMI","~nsu","moz-","gen"]
-                for the_file in os.listdir(folder):
-                    folderwithnum = ''
-                    try:
-                        folderwithnum = int(the_file[0:3])
-                    except:
-                        pass
-                    for name in profdir:
-                        if the_file.startswith(name) or isinstance(folderwithnum,int):
-                            try:
-                                file_path = os.path.join(folder, the_file)
-                                if os.path.isfile(file_path):
-                                    os.unlink(file_path)
-                                    break
-                                elif os.path.isdir(file_path):
-                                    shutil.rmtree(file_path,ignore_errors=True)
-                                    break
-                            except:
-                                pass
-            except Exception as e:
-                log.error('Error while deleting file/folder')
-                log.error(e)
+            folder = tempfile.gettempdir()
+            profdir = ["~DF","scoped_dir","IE","chrome_","anonymous", "userprofile",
+                        "seleniumSslSupport","webdriver-ie", "Low", "screenshot",
+                        "_MEI", "CVR","tmp","jar_cache","DMI","~nsu","moz-","gen"]
+            for the_file in os.listdir(folder):
+                folderwithnum = ''
+
+                try:
+                    folderwithnum = int(the_file[0:3])
+                except:
+                    pass
+
+                for name in profdir:
+                    if the_file.startswith(name) or isinstance(folderwithnum,int):
+
+                        try:
+                            file_path = os.path.join(folder, the_file)
+                            if os.path.isfile(file_path):
+                                os.unlink(file_path)
+                                break
+                            elif os.path.isdir(file_path):
+                                shutil.rmtree(file_path,ignore_errors=True)
+                                break
+                        except:
+                            pass
+
         except Exception as e:
             log.error('Error while deleting file/folder')
             log.error(e)
+
+        log.info('Stale processes killed')
+        logger.print_on_console( 'Stale processes killed')

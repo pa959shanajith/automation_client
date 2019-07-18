@@ -70,13 +70,11 @@ class UtilOperations:
         err_msg=None
         log.info('Input is '+input+' type to be converted is '+to_type)
         logger.print_on_console('Input is '+input+' type to be converted is '+to_type)
-
         if not (input is None or input is '' or to_type is None or to_type is ''):
             try:
                 if len(args)>0 and (args[0] is not None or args[0] != ''):
                     fmt_type=args[0]
                 to_type=to_type.strip().lower()
-                import numpy as np
                 if to_type=='string':
                     log.debug('converting into string')
                     output=input
@@ -91,12 +89,35 @@ class UtilOperations:
                 elif to_type=='float':
                     log.debug('converting into float')
                     input=self.check_input(input)
-                    output=np.float32(input)
-
+                    output=float(input)
+                    temp_var = output
+                    output=str('{:.7f}'.format(float(output)))
+                    for i in range(-1,-len(output)-1,-1):
+                        if output[i] =='0':
+                            temp_var = output[:i]
+                        elif output[i]=='.':
+                            output=output[:i+2]
+                            break
+                        else:
+                            output=temp_var
+                            break
+                    output=float(output)
                 elif to_type=='double':
                     log.debug('converting into double')
                     input=self.check_input(input)
-                    output=np.float64(input)
+                    output=float(input)
+                    temp_var = output
+                    output=str('{:.15f}'.format(float(output)))
+                    for i in range(-1,-len(output)-1,-1):
+                        if output[i] =='0':
+                            temp_var = output[:i]
+                        elif output[i]=='.':
+                            output=output[:i+2]
+                            break
+                        else:
+                            output=temp_var
+                            break
+                    output=float(output)
                 elif to_type=='date':
                     #Supported date formats are
                     log.debug('converting into date format')
@@ -322,7 +343,7 @@ class UtilOperations:
             status=TEST_RESULT_FAIL
             result=TEST_RESULT_FALSE
             err_msg=None
-            output=OUTPUT_CONSTANT
+            output=None
             if any(isinstance(el, list) for el in variable):
                 output=str(len(variable))+'@'+str(len(variable[0]))
                 status=TEST_RESULT_PASS

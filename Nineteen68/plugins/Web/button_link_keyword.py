@@ -117,7 +117,7 @@ class ButtonLinkKeyword():
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
         err_msg=None
-        output=OUTPUT_CONSTANT
+        output=None
         local_blk.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         #verify_button_name keyword implementation
         try:
@@ -239,7 +239,7 @@ class ButtonLinkKeyword():
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
         local_blk.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        linktext = ''
+        linktext = None
         err_msg = None
         try:
             if webelement != None:

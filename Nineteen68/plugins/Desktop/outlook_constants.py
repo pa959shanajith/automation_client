@@ -10,14 +10,14 @@
 #-------------------------------------------------------------------------------
 
 
-PR_SMTP_ADDRESS ='http://schemas.microsoft.com/mapi/proptag/0x39FE001E'
+PR_SMTP_ADDRESS = 'http://schemas.microsoft.com/mapi/proptag/0x39FE001E'
 
-ATTACH_STATUS_NO='No'
+ATTACH_STATUS_NO = 'No'
 
-ATTACH_STATUS_YES='Yes'
+ATTACH_STATUS_YES = 'Yes'
 
-STATUS_FAIL='fail'
+STATUS_FAIL = 'fail'
 
-INBOX_FOLDER='6'
+INBOX_FOLDER = '6'
 
-METHOD_INVALID='Invalid Method'
+METHOD_INVALID = 'Invalid Method'

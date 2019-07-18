@@ -238,18 +238,7 @@ class DropdownKeywords():
             if webelement.tag_name=='table':
                     if len(input)==5:
                         dropVal=input[2]
-                        ##webelement=self.radioKeywordsObj.getActualElement(webelement,input)
-                        """
-                        author :arpitha
-                        changes made for multiple dropdowns present in the table.
-                        Date :12-05-2017
-                        """
-                        if dropVal.lower()=='dropdown':
-                            ## webelement1=self.jsExecutorForMultipleDropdown(webelement,input)
-                            ##New javascript was not providing the accurate element still keeping the if else condition for future checks if any
-                            webelement=self.radioKeywordsObj.getActualElement(webelement,input)
-                        else:
-                            webelement=self.radioKeywordsObj.getActualElement(webelement,input)
+                        webelement=self.radioKeywordsObj.getActualElement(webelement,input)
             if ((webelement.is_enabled())):
                 if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                     #performing js code
@@ -1718,6 +1707,19 @@ class DropdownKeywords():
                                         if len(inp_val.strip()) != 0:
                                             select = Select(cell)
                                             iList = select.options
+                                            temp=[]
+                                            for i in range (0,len(iList)):
+                                                internal_val = iList[i].text
+                                                temp.append(internal_val)
+                                            if (inp_val in temp):
+                                                select.select_by_visible_text(inp_val)
+                                                status=webconstants.TEST_RESULT_PASS
+                                                result=webconstants.TEST_RESULT_TRUE
+                                                log.info('Values Match')
+                                            else:
+                                                logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                                log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                                         else:
                                             logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                             local_ddl.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -1729,7 +1731,6 @@ class DropdownKeywords():
                     except Exception as e:
                         local_ddl.log.error(e)
                         logger.print_on_console(e)
-                        err_msg=e
             elif (len(input) == 1):
                 if(webelement.is_enabled()):
                     if input[0] != '':
@@ -1762,7 +1763,6 @@ class DropdownKeywords():
                         except Exception as e:
                             local_ddl.log.error(e)
                             logger.print_on_console(e)
-                            err_msg=e
                     else:
                         logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         local_ddl.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])

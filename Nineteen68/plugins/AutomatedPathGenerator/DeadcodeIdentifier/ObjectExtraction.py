@@ -11,6 +11,7 @@ sys.setrecursionlimit(15000)
 
 def main(root,data,filePath):
 	try:
+		sys.setrecursionlimit(15000)
 		main.nested = -1
 		main.obj = []
 		main.imports = {}
@@ -26,7 +27,6 @@ def main(root,data,filePath):
 	return main.showData
 
 def additiveExpressionExtraction(root):
-
 	for i in range(0,root.total_child()):
 		line=(root.child[i].get_value())[0]
 		if re.match('PrimaryExpression',line):
@@ -236,6 +236,7 @@ def conditionalExpressionExtraction(root):
 			expressionExtraction(root.child[i])
 		elif re.match("PrimaryExpression",line):
 			primaryExpressionExtraction(root.child[i])
+
 def conditionalAndExpressionExtraction(root):
 	for i in range(0,root.total_child()):
 		line = root.child[i].get_value()[0]

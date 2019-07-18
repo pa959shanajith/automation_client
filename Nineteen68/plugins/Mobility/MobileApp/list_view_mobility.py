@@ -22,14 +22,16 @@ log = logging.getLogger('list_view_mobility.py')
 
 class List_Keywords():
 
+    def print_error(self,e):
+        log.error(e)
+        logger.print_on_console(e)
+        return e
 
-
-    def verify_selected_views(self,webelement,input,*args):
+    def verify_selected_views(self,element,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-
         selected=[]
         count=0
         text=[]
@@ -38,19 +40,16 @@ class List_Keywords():
 
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement is not None:
-                visibility=webelement.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=webelement.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
-
                         while(True):
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(str(i.text))
                                     obj.append(i)
@@ -64,8 +63,8 @@ class List_Keywords():
 
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
@@ -81,49 +80,32 @@ class List_Keywords():
                                     for k in input :
                                         if k in selected:
                                             count=count+1
-
-
-
                                         else :
-                                            err_msg='invalid input'
-                                            log.error('invalid input')
-                                            logger.print_on_console(err_msg)
+                                            err_msg=self.print_error(INVALID_INPUT)
                                             break
                                     if count==len(input):
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE
-
-
-
                                 else :
-                                        err_msg='invalid input'
-                                        log.error('invalid input')
-                                        logger.print_on_console(err_msg)
-                                        break
+                                    err_msg=self.print_error(INVALID_INPUT)
+                                    break
 
                             if (length1==length2):
                                 break
-
-
-
-
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
+                    err_msg=self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-                log.error(e)
-
+            err_msg=self.print_error("Error occurred in VerifySelectedViews")
+            log.error(e,exc_info=True)
         return status,result,output,err_msg
 
 
 
-
-    def select_multiple_views_by_indexes(self,webelement,input,*args):
+    def select_multiple_views_by_indexes(self,element,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -135,19 +117,16 @@ class List_Keywords():
         flag=False
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement is not None:
-                visibility=webelement.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=webelement.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
-
                         while(True):
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(str(i.text))
                                     obj.append(i)
@@ -166,8 +145,8 @@ class List_Keywords():
                                 scrollele2=obj[length1-2]
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(str(i.text))
                                     obj.append(i)
@@ -185,39 +164,26 @@ class List_Keywords():
 
                             if (length1==length2):
                                 if len(input) == count:
-
                                     status=TEST_RESULT_PASS
                                     result=TEST_RESULT_TRUE
                                     break
-
-
                                 else :
-                                        err_msg='invalid input'
-                                        log.error('invalid input')
-                                        logger.print_on_console(err_msg)
-                                        break
-
-
-
-
-
-
+                                    err_msg=self.print_error(INVALID_INPUT)
+                                    break
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
+                    err_msg=self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-                log.error(e)
-
+            err_msg=self.print_error("Error occurred in SelectMultipleViewsByIndexes")
+            log.error(e,exc_info=True)
         return status,result,output,err_msg
 
 
 
-    def select_multiple_views_by_text(self,webelement,input,*args):
+    def select_multiple_views_by_text(self,element,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -229,19 +195,17 @@ class List_Keywords():
         flag=False
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement is not None:
-                visibility=webelement.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=webelement.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
 
                         while(True):
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(str(i.text))
                                     obj.append(i)
@@ -258,8 +222,8 @@ class List_Keywords():
                                 scrollele2=obj[length1-2]
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(str(i.text))
                                     obj.append(i)
@@ -280,30 +244,22 @@ class List_Keywords():
                                     status=TEST_RESULT_PASS
                                     result=TEST_RESULT_TRUE
                                     break
-
-
                                 else :
-                                        err_msg='invalid input'
-                                        log.error('invalid input')
-                                        logger.print_on_console(err_msg)
-                                        break
-
-
+                                    err_msg=self.print_error(INVALID_INPUT)
+                                    break
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
+                    err_msg=self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-                log.error(e)
-
+            err_msg=self.print_error("Error occurred in SelectMultipleViewsByText")
+            log.error(e,exc_info=True)
         return status,result,output,err_msg
 
 
-    def get_selected_views(self,webelement,input,*args):
+    def get_selected_views(self,element,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=None
@@ -311,23 +267,19 @@ class List_Keywords():
         text=[]
         selected=[]
         obj=[]
-##        input=int(input[0])
         flag=False
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement is not None:
-                visibility=webelement.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=webelement.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
-
                         while(True):
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(str(i.text))
                                     obj.append(i)
@@ -341,8 +293,8 @@ class List_Keywords():
 
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
@@ -355,25 +307,22 @@ class List_Keywords():
 
                             if (length1==length2):
                                 output=selected
+                                logger.print_on_console("Output: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
-
-
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
+                    err_msg=self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-                log.error(e)
-
+            err_msg=self.print_error("Error occurred in GetSelectedViews")
+            log.error(e,exc_info=True)
         return status,result,output,err_msg
 
-    def get_list_count(self,webelement,input,*args):
+    def get_list_count(self,element,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=None
@@ -382,19 +331,16 @@ class List_Keywords():
         obj=[]
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement is not None:
-                visibility=webelement.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=webelement.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
-
                         while(True):
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
@@ -405,8 +351,8 @@ class List_Keywords():
 
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
@@ -416,26 +362,23 @@ class List_Keywords():
 
                             if (length1==length2):
                                 output=length1
+                                logger.print_on_console("Count: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
-
-
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
+                    err_msg=self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-                log.error(e)
-
+            err_msg=self.print_error("Error occurred in GetListCount")
+            log.error(e,exc_info=True)
         return status,result,output,err_msg
 
 
-    def verify_list_count(self,webelement,input,*args):
+    def verify_list_count(self,element,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -446,19 +389,16 @@ class List_Keywords():
         obj=[]
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement is not None:
-                visibility=webelement.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=webelement.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
-
                         while(True):
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
@@ -468,8 +408,8 @@ class List_Keywords():
                                 scrollele2=obj[length1-2]
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
@@ -482,31 +422,23 @@ class List_Keywords():
                                 break
 
                         if (input==count):
-                                log.debug('count matched')
-                                status=TEST_RESULT_PASS
-                                result=TEST_RESULT_TRUE
-                        else :
-                                err_msg='count not matching'
-                                log.error('count not matching')
-                                logger.print_on_console(err_msg)
-
-
-
+                            log.debug('count matched')
+                            logger.print_on_console("Count: "+count)
+                            status=TEST_RESULT_PASS
+                            result=TEST_RESULT_TRUE
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
+                    err_msg=self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-                log.error(e)
-
+            err_msg=self.print_error("Error occurred in VerifyListCount")
+            log.error(e,exc_info=True)
         return status,result,output,err_msg
 
 
-    def select_view_by_text(self,webelement,input,*args):
+    def select_view_by_text(self,element,input,*args):
         global flag
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
@@ -516,22 +448,18 @@ class List_Keywords():
         text=[]
         obj=[]
         flag=False
-
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement is not None:
-                visibility=webelement.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=webelement.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
-
                         while(True):
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
@@ -543,17 +471,15 @@ class List_Keywords():
                                         result=TEST_RESULT_TRUE
                                         flag=True
                                 else :
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
-                                    logger.print_on_console(err_msg)
+                                    err_msg=self.print_error(INVALID_INPUT)
                             length1=len(text)
                             if length1 >4 :
                                 scrollele1=obj[length1-1]
                                 scrollele2=obj[length1-2]
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
@@ -565,39 +491,30 @@ class List_Keywords():
                                         result=TEST_RESULT_TRUE
                                         flag=True
                                 else :
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
-                                    logger.print_on_console(err_msg)
+                                    err_msg=self.print_error(INVALID_INPUT)
                             length2=len(text)
                             time.sleep(3)
                             driver.scroll(scrollele1,scrollele2)
 
                             if (length1==length2):
                                 if flag == False:
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
-                                    logger.print_on_console(err_msg)
-
+                                    err_msg=self.print_error(INVALID_INPUT)
                                 break
-
-
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
+                    err_msg=self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-                log.error(e)
-
+            err_msg=self.print_error("Error occurred in SelectViewByText")
+            log.error(e,exc_info=True)
         return status,result,output,err_msg
 
 
 
 
-    def select_view_by_index(self,webelement,input,*args):
+    def select_view_by_index(self,element,input,*args):
         global flag
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
@@ -609,19 +526,16 @@ class List_Keywords():
         flag=False
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement is not None:
-                visibility=webelement.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=webelement.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
-
                         while(True):
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
@@ -634,17 +548,15 @@ class List_Keywords():
                                             result=TEST_RESULT_TRUE
                                             flag=True
                                     else :
-                                        err_msg='invalid input'
-                                        log.error('invalid input')
-                                        logger.print_on_console(err_msg)
+                                        err_msg=self.print_error(INVALID_INPUT)
                             length1=len(text)
                             if length1 >4 :
                                 scrollele1=obj[length1-1]
                                 scrollele2=obj[length1-2]
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
@@ -656,35 +568,28 @@ class List_Keywords():
                                         result=TEST_RESULT_TRUE
                                         flag=True
                                 else :
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
-                                    logger.print_on_console(err_msg)
+                                    err_msg=self.print_error(INVALID_INPUT)
                             length2=len(text)
                             time.sleep(3)
                             driver.scroll(scrollele1,scrollele2)
 
                             if (length1==length2):
                                 if flag == False:
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
-                                    logger.print_on_console(err_msg)
-
+                                    err_msg=self.print_error(INVALID_INPUT)
                                 break
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
+                    err_msg=self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-                log.error(e)
-
+            err_msg=self.print_error("Error occurred in SelectViewsByText")
+            log.error(e,exc_info=True)
         return status,result,output,err_msg
 
 
-    def get_list_view_by_index(self,webelement,input,*args):
+    def get_list_view_by_index(self,element,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=None
@@ -692,24 +597,20 @@ class List_Keywords():
         err_msg=None
         text=[]
         obj=[]
-##        input=int(input)
         count=0
         flag=False
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement is not None:
-                visibility=webelement.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=webelement.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
-
                         while(True):
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(str(i.text))
                                     obj.append(i)
@@ -726,8 +627,8 @@ class List_Keywords():
                                 scrollele2=obj[length1-2]
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(str(i.text))
                                     obj.append(i)
@@ -744,39 +645,26 @@ class List_Keywords():
                             if (length1==length2):
                                 if len(input) == count:
                                     output=temp[0]
+                                    logger.print_on_console("Output: "+output)
                                     status=TEST_RESULT_PASS
                                     result=TEST_RESULT_TRUE
                                     break
-
-
                                 else :
-                                        err_msg='invalid input'
-                                        log.error('invalid input')
-                                        logger.print_on_console(err_msg)
-                                        break
-
-
-
-
-
+                                    err_msg=self.print_error(INVALID_INPUT)
+                                    break
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
+                    err_msg=self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-
-
-                log.error(e)
-
+            err_msg=self.print_error("Error occurred in GetListViewByIndex")
+            log.error(e,exc_info=True)
         return status,result,output,err_msg
 
 
-
-    def get_multiple_views_by_indexs(self,webelement,input,*args):
+    def get_multiple_views_by_indexes(self,element,input,*args):
 
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
@@ -785,24 +673,20 @@ class List_Keywords():
         err_msg=None
         text=[]
         obj=[]
-##        input=int(input)
         count=0
         flag=False
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement is not None:
-                visibility=webelement.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=webelement.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
-
                         while(True):
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(str(i.text))
                                     obj.append(i)
@@ -819,8 +703,8 @@ class List_Keywords():
                                 scrollele2=obj[length1-2]
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(str(i.text))
                                     obj.append(i)
@@ -837,39 +721,27 @@ class List_Keywords():
                             if (length1==length2):
                                 if len(input) == count:
                                     output=temp
+                                    logger.print_on_console("Output: "+output)
                                     status=TEST_RESULT_PASS
                                     result=TEST_RESULT_TRUE
                                     break
-
-
                                 else :
-                                        err_msg='invalid input'
-                                        log.error('invalid input')
-                                        logger.print_on_console(err_msg)
-                                        break
-
-
-
-
-
+                                    err_msg=self.print_error(INVALID_INPUT)
+                                    break
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
+                    err_msg=self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-
-
-                log.error(e)
-
+            err_msg=self.print_error("Error occurred in GetMultipleViewsByIndexes")
+            log.error(e,exc_info=True)
         return status,result,output,err_msg
 
 
 
-    def get_all_views(self,webelement,input,*args):
+    def get_all_views(self,element,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=None
@@ -878,19 +750,17 @@ class List_Keywords():
         obj=[]
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement is not None:
-                visibility=webelement.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=webelement.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
 
                         while(True):
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(str(i.text))
                                     obj.append(i)
@@ -900,8 +770,8 @@ class List_Keywords():
                                 scrollele2=obj[length1-2]
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
@@ -911,26 +781,23 @@ class List_Keywords():
 
                             if (length1==length2):
                                 output=text
+                                logger.print_on_console("Output: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
-
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
+                    err_msg=self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-                log.error(e)
-
+            err_msg=self.print_error("Error occurred in GetAllViews")
+            log.error(e,exc_info=True)
         return status,result,output,err_msg
 
 
-
-    def verify_all_views(self,webelement,input,*args):
+    def verify_all_views(self,element,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -940,19 +807,16 @@ class List_Keywords():
         obj=[]
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement is not None:
-                visibility=webelement.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=webelement.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
-
                         while(True):
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(str(i.text))
                                     obj.append(i)
@@ -962,8 +826,8 @@ class List_Keywords():
                                 scrollele2=obj[length1-2]
                                 time.sleep(3)
                                 driver.scroll(scrollele1,scrollele2)
-                            element=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in element:
+                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            for i in elementlist:
                                 if i.text not in text:
                                     text.append(i.text)
                                     obj.append(i)
@@ -976,43 +840,25 @@ class List_Keywords():
                                     for k in input :
                                         if k in text:
                                             count=count+1
-
-
-
                                         else :
-                                            err_msg='invalid input'
-                                            log.error('invalid input')
-                                            logger.print_on_console(err_msg)
+                                            err_msg=self.print_error(INVALID_INPUT)
                                             break
                                     if count==len(input):
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE
-
-
-
                                 else :
-                                        err_msg='invalid input'
-                                        log.error('invalid input')
-                                        logger.print_on_console(err_msg)
-                                        break
+                                    err_msg=self.print_error(INVALID_INPUT)
+                                    break
 
                             if (length1==length2):
                                 break
-
-
-
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
+                    err_msg=self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-                log.error(e)
-
+            err_msg=self.print_error("Error occurred in VerifyAllViews")
+            log.error(e,exc_info=True)
         return status,result,output,err_msg
-
-
-
