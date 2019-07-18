@@ -10,8 +10,10 @@
 #-------------------------------------------------------------------------------
 import core_utils
 import logging
+import wx
 ##import logger
 log = logging.getLogger('clientwindow.py')
+update_data={}
 class UserObject:
     def __init__(self):
         pass
@@ -42,3 +44,13 @@ class UserObject:
             data["selector"]=right_part.split(';')[8]
             log.debug('data decrypt',data)
             socketIO.emit('scrape',data)
+
+    def update_scrape_object(self,url,objectname,obj_flag,stepnum):
+        data={}
+        identifier=objectname.split(';')
+        obj=core_utils.CoreUtils()
+        left_part=obj.scrape_wrap(obj_flag+";"+identifier[1])
+        right_part=obj.scrape_wrap(';'.join(identifier[3:]))
+        data['url']= obj.scrape_wrap(url)
+        data['xpath'] = left_part+';'+identifier[2]+';'+right_part
+        update_data[str(stepnum)]=data

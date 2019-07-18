@@ -834,7 +834,10 @@ class Singleton_DriverUtil():
                 if( clientwindow.chromeFlag == True ):
                     choptions = webdriver.ChromeOptions()
                     choptions.add_argument('start-maximized')
-                    choptions.add_argument('--disable-extensions')
+                    if True:
+                        choptions.add_extension(webconstants.EXTENSION_PATH)
+                    else:
+                        choptions.add_argument('--disable-extensions')
                     if ((str(chrome_path).lower()) != 'default'):
                         choptions.binary_location=str(chrome_path)
                     driver = webdriver.Chrome(executable_path=exec_path,chrome_options=choptions)

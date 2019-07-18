@@ -33,6 +33,7 @@ import readconfig
 import logging
 import json
 from selenium import webdriver
+import wx
 
 log = logging.getLogger('web_dispatcher.py')
 
@@ -168,8 +169,10 @@ class Dispatcher:
     def __init__(self):
         self.exception_flag=''
         self.action=None
+        self.wxObject=None
+        self.thread=None
 
-    def dispatcher(self,teststepproperty,input,reporting_obj,iris_flag):
+    def dispatcher(self,teststepproperty,input,reporting_obj,iris_flag,wxObject,mythread):
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
@@ -177,6 +180,8 @@ class Dispatcher:
         keyword = teststepproperty.name
         keyword = keyword.lower()
         driver = browser_Keywords.driver_obj
+        self.wxObject=wxObject
+        self.thread=mythread
         webelement = None
         element = None
         err_msg=None
@@ -293,6 +298,11 @@ class Dispatcher:
                             webelement = {'cord': teststepproperty.cord, 'coordinates':coord}
                         else:
                             webelement = self.getwebelement(driver,objectname)
+                            if(obj_flag!=False):
+                                import UserObjectScrape
+                                webscrape=UserObjectScrape.UserObject()
+                                # obj=core_utils.CoreUtils()
+                                webscrape.update_scrape_object(url,objectname,obj_flag,teststepproperty.stepnum)
                             if webelement != None:
                                 if isinstance(webelement,list):
                                     webelement = webelement[0]
@@ -471,6 +481,7 @@ class Dispatcher:
 
     def getwebelement(self,driver,objectname):
 ##        objectname = str(objectname)
+
         webElement = None
         if objectname.strip() != '':
             identifiers = objectname.split(';')
@@ -627,6 +638,47 @@ class Dispatcher:
                 err_msg=WEB_ELEMENT_NOT_FOUND
                 logger.print_on_console(err_msg)
                 log.error(err_msg)
+                configvalues = readconfig.configvalues
+        if((webElement==None or webElement== '') and configvalues['extn_enabled'].lower() == 'yes'):
+            try:
+                logger.print_on_console('Scrape the Element using extension')
+                import pause_display_operation
+                from itertools import combinations
+                o = pause_display_operation.PauseAndDisplay()
+                o.execute(self.wxObject,self.thread)
+                attributes=driver.execute_script("return JSON.parse(window.localStorage.attributes)")
+                ele='//*'
+                a=[]
+                combo=''
+                obj_flag=False
+                for k,v in list(attributes.items()):
+                    if k != 'style':
+                        ele=ele+'[@'+k+'="'+v+'"]'
+                        a.append('[@'+k+'="'+v+'"]')
+                tempwebElement=driver.find_elements_by_xpath(ele)
+                if(len(tempwebElement)==1):
+                    webElement=tempwebElement
+                    identifiers[0]=ele
+                    obj_flag=ele
+                    log.debug('Element has been Captured with all properties')
+                for i in range(len(a),1,-1):
+                    comb=combinations(a,i)
+                    for j in list(comb):
+                        combo="//*"+"".join(j)
+                        tempwebElement=driver.find_elements_by_xpath(combo)
+                        if(len(tempwebElement)==1):
+                            webElement=tempwebElement
+                            identifiers[0]=combo
+                            obj_flag=combo
+                            log.debug('Element has been Captured using some properties')
+                            break
+                    else:
+                        continue
+                    break
+                if(webElement==None):
+                    logger.print_on_console("Webelement not found through extension")
+            except Exception as e:
+                log.debug(e)
         if isinstance(webElement,list):
             webElement=webElement[0]
         return webElement
