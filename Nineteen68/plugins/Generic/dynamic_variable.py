@@ -183,7 +183,7 @@ class DynamicVariables:
         output_res=OUTPUT_CONSTANT
         values=[]
         try:
-            if not (args is None or args is ''):
+            if len(args)!= 0:
                 if len(args)>1:
                     values.append(args[0])
                     values.extend(args[1].split(';'))
