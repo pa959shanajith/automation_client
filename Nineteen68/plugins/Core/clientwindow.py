@@ -76,6 +76,7 @@ class MainNamespace(BaseNamespace):
         try:
             if(str(args[0]) == 'connected'):
                 if(allow_connect):
+
                     wxObject.schedule.Enable()
                     wxObject.cancelbutton.Enable()
                     wxObject.terminatebutton.Enable()
@@ -114,6 +115,7 @@ class MainNamespace(BaseNamespace):
                     global icesession,plugins_list
                     ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                         'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
+
                     response = json.loads(self.core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
                     plugins_list = response['plugins']
                     err_res = None
@@ -713,10 +715,12 @@ class SocketThread(threading.Thread):
     """Test Worker Thread Class."""
     daemon = True
 
+
     def __init__(self):
         """Init Worker Thread Class."""
         threading.Thread.__init__(self)
         self.start()
+
 
     def run(self):
         """Run Worker Thread."""
@@ -902,7 +906,14 @@ class TestThread(threading.Thread):
             if self.action==DEBUG:
                 self.wxObject.killChildWindow(debug=True)
                 if (len(testcasename) > 0 or apptype.lower() not in plugins_list):
-                    socketIO.emit('result_debugTestCase',status)
+                    import UserObjectScrape
+                    if(UserObjectScrape.update_data!={}):
+                        data=UserObjectScrape.update_data
+                        UserObjectScrape.update_data={}
+                        data['status']=status
+                        socketIO.emit('result_debugTestCase',data)
+                    else:
+                        socketIO.emit('result_debugTestCase',status)
                 else:
                     socketIO.emit('result_debugTestCaseWS',status)
             elif self.action==EXECUTE:
@@ -920,6 +931,7 @@ class TestThread(threading.Thread):
             closeActiveConnection = False
             connection_Timer = threading.Timer(300, wxObject.closeConnection)
             connection_Timer.start()
+
         self.wxObject.mythread = None
         execution_flag = False
         self.wxObject.schedule.Enable()
@@ -1534,6 +1546,7 @@ class Config_window(wx.Frame):
             "High_ch":[ (225,368)],
             "Iris_prediction":[(12,428)],
             "hide_soft_key":[(180,428)],
+            "extn_enabled":[(320,428)],
             "Save":[(100,518), (100, 28)],
             "Close":[(250,518), (100, 28)]
         }
@@ -1565,6 +1578,7 @@ class Config_window(wx.Frame):
             "C_Timeout" :[(12,218),(120, 28),(180,218), (80,-1)],
             "Iris_prediction":[(12,398)],
             "hide_soft_key":[(180,398)],
+            "extn_enabled":[(370,428)],
             "Close":[(285,458),(100, 28)]
         }
         wx.Frame.__init__(self, parent, title=title,
@@ -1755,6 +1769,13 @@ class Config_window(wx.Frame):
         else:
             self.rbox12.SetSelection(1)
 
+        self.rbox13 = wx.RadioBox(self.panel, label = "Extention Enable", pos = config_fields["extn_enabled"][0], choices = lblList,
+         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson != False and isConfigJson['extn_enabled'].title() == lblList[0]:
+            self.rbox13.SetSelection(0)
+        else:
+            self.rbox13.SetSelection(1)
+
 
         self.error_msg=wx.StaticText(self.panel, label="", pos=(85,488),size=(350, 28), style=0, name="")
         self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])
@@ -1805,6 +1826,7 @@ class Config_window(wx.Frame):
         iris_prediction = self.rbox11.GetStringSelection()
         hide_soft_key = self.rbox12.GetStringSelection()
         conn_timeout = self.conn_timeout.GetValue()
+        extn_enabled = self.rbox13.GetStringSelection()
         #----------------creating data dictionary
         data['server_ip'] = server_add.strip()
         data['server_port'] = server_port.strip()
@@ -1830,6 +1852,7 @@ class Config_window(wx.Frame):
         data['prediction_for_iris_objects'] = iris_prediction.strip()
         data['hide_soft_key'] = hide_soft_key.strip()
         data['connection_timeout']= conn_timeout.strip()
+        data['extn_enabled']= extn_enabled.strip()
         config_data=data
         if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='' and data['firefox_path']!='' and  data['connection_timeout']>='':
             #---------------------------------------resetting the static texts
