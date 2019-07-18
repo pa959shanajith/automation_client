@@ -176,46 +176,53 @@ class DynamicVariables:
         return status,methodoutput,output_res,err_msg
 
 
-    def delete_dyn_value(self,variable):
+    def delete_dyn_value(self,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_res=OUTPUT_CONSTANT
+        values=[]
         try:
-            log.debug('Reading the inputs')
-            if not(variable is None or variable is ''):
-                coreutilsobj=core_utils.CoreUtils()
-                variable=coreutilsobj.get_UTF_8(variable)
-                #Check if the given variable to be modified is dynamic or not
-                log.debug('Check if the given variable to be modified is dynamic or not')
-                res=self.dyn_obj.check_for_dynamicvariables(variable)
-                if res==TEST_RESULT_TRUE:
-                    #Check if the variable already exists
-                    log.debug('Check if the variable already exists')
-                    if variable in dynamic_variable_handler.dynamic_variable_map:
-                        value=dynamic_variable_handler.dynamic_variable_map.pop(variable)
-##                        log.debug('Variable deleted is '+str(variable)+'='+str(value))
-##                        logger.print_on_console('Variable deleted is '+str(variable)+'='+str(value))
-                        log.debug('Variable deleted is ',variable,' = ',value)
-                        logger.print_on_console('Variable deleted is ',variable,' = ',value)
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
-                    else:
-                        err_msg=ERROR_CODE_DICT['ERR_DYNVAR']
+            if len(args)!= 0:
+                if len(args)>1:
+                    values.append(args[0])
+                    values.extend(args[1].split(';'))
                 else:
-                    err_msg=INVALID_INPUT
+                    values.append(args[0])
+                log.debug('Reading the inputs')
+                for i in range (len(values)):
+                    variable=values[i]
+                    if not(variable is None or variable is ''):
+                        coreutilsobj=core_utils.CoreUtils()
+                        variable=coreutilsobj.get_UTF_8(variable)
+                        #Check if the given variable to be modified is dynamic or not
+                        log.debug('Check if the given variable to be modified is dynamic or not')
+                        res=self.dyn_obj.check_for_dynamicvariables(variable)
+                        if res==TEST_RESULT_TRUE:
+                            #Check if the variable already exists
+                            log.debug('Check if the variable already exists')
+                            if variable in dynamic_variable_handler.dynamic_variable_map:
+                                value=dynamic_variable_handler.dynamic_variable_map.pop(variable)
+                                log.debug('Variable deleted is ',variable,' = ',value)
+                                logger.print_on_console('Variable deleted is ',variable,' = ',value)
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                            else:
+                                err_msg=ERROR_CODE_DICT['ERR_DYNVAR']
+                        else:
+                            err_msg=INVALID_INPUT
+                    else:
+                       err_msg=INVALID_INPUT
+                    if err_msg is not None:
+                        log.error(err_msg)
+                        logger.print_on_console(err_msg)
             else:
-               err_msg=INVALID_INPUT
-            if err_msg is not None:
-                log.error(err_msg)
-                logger.print_on_console(err_msg)
-
+                logger.print_on_console("Please provide valid Inputs")
         except Exception as e:
              log.error(e)
              logger.print_on_console(e)
              err_msg=INPUT_ERROR
         return status,methodoutput,output_res,err_msg
-
 
 
 

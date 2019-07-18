@@ -20,12 +20,14 @@ import logger
 log = logging.getLogger('radio_button_keywords_mobility.py')
 
 class Radio_Button_Keywords():
-    def __init__(self):
-        self.status={'radio':'Selected',
-                    'checkbox':'Checked'}
+
+    def print_error(self,e):
+        log.error(e)
+        logger.print_on_console(e)
+        return e
+
 
     def select_radio_button(self, element,input_val,*args):
-
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -33,96 +35,80 @@ class Radio_Button_Keywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if element is not None:
-                visibility=element.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=element.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         action = TouchAction(android_scrapping.driver)
                         action.tap(element).perform()
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg = self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
-
+                    err_msg = self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(err_msg)
+            err_msg = self.print_error("Error occurred in SelectRadioButton")
+            log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
-    def get_status(self,webelement,input,*args):
+
+    def get_status(self,element,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         visibilityFlag=True
         output=None
         err_msg=None
-
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-
         try:
-
-            if webelement is not None:
-                visibility=webelement.is_displayed()
-                log.debug('element is visible')
-
-                if visibility:
-                    enable=webelement.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
-                        classname= webelement.get_attribute("className")
+                        classname= element.get_attribute("className")
                         if 'Switch' in classname:
-                            res = webelement.text
-                            if res.upper() == 'OFF' or webelement.get_attribute('checked') == 'false':
+                            res = element.text
+                            if res.upper() == 'OFF' or element.get_attribute('checked') == 'false':
                                 output = 'OFF'
                             else:
                                 output = 'ON'
                         elif 'Radio' in classname:
-                            output=webelement.get_attribute("checked")
+                            output=element.get_attribute("checked")
                             if output=='true':
                                 output='Selected'
                             else:
                                 output="UnSelected"
                         elif 'CheckBox' in classname:
-                            output=webelement.get_attribute("checked")
+                            output=element.get_attribute("checked")
                             if output=='true':
                                 output='Checked'
                             else:
                                 output="UnChecked"
                         else :
-                            output=webelement.get_attribute("checked")
-
-                        if output!=None:
+                            output=element.get_attribute("checked")
+                        if output is not None:
                             logger.print_on_console("Status: "+output)
                             log.info(output)
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg = self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
-
-
-
+                    err_msg = self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
+            err_msg = self.print_error("Error occurred in GetStatus")
             log.error(e,exc_info = True)
-
         return status,methodoutput,output,err_msg
 
-    def select_checkbox(self, element,input_val,*args):
 
+    def select_checkbox(self, element,input_val,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -130,12 +116,10 @@ class Radio_Button_Keywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if element is not None:
-                visibility=element.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=element.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         action = TouchAction(android_scrapping.driver)
                         if element.get_attribute('checked') == 'false':
@@ -147,22 +131,18 @@ class Radio_Button_Keywords():
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg = self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
-
+                    err_msg = self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(err_msg)
+            err_msg = self.print_error("Error occurred in SelectCheckBox")
+            log.error(e,exc_info = True)
         return status,methodoutput,output,err_msg
 
 
     def unselect_checkbox(self, element,input_val,*args):
-
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -170,12 +150,10 @@ class Radio_Button_Keywords():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if element is not None:
-                visibility=element.is_displayed()
-                log.debug('element is visible')
-                if visibility:
-                    enable=element.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    if enable:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         action = TouchAction(android_scrapping.driver)
                         if element.get_attribute('checked') == 'true':
@@ -187,15 +165,12 @@ class Radio_Button_Keywords():
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        logger.print_on_console(err_msg)
+                        err_msg = self.print_error(ELEMENT_DISABLED)
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    logger.print_on_console(err_msg)
-
+                    err_msg = self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(err_msg)
+            err_msg = self.print_error("Error occurred in UnSelectCheckBox")
+            log.error(e,exc_info = True)
         return status,methodoutput,output,err_msg

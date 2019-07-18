@@ -58,7 +58,8 @@ class PDFViewer(sc.SizedFrame):
     def __init__(self, parent, **kwds):
         try:
             super(PDFViewer, self).__init__(parent, **kwds)
-
+            global eleList
+            eleList = []
             # Adding slk icon to window
             self.iconpath = IMAGES_PATH+"slk.ico"
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
@@ -286,6 +287,7 @@ class PDFViewer(sc.SizedFrame):
         self.findbar_left.Disable()
         self.forwardbutton.Disable()
         self.backwardbutton.Disable()
+        global siblingElementArr
         if self.viewer.page_buffer_valid:
             self.viewer.SetZoom(-2)
 ##        if len(eleList) < 1 and len(siblingElementArr) > 0:
@@ -307,6 +309,7 @@ class PDFViewer(sc.SizedFrame):
                 "width":'',
                 "height":''}
             eleList.append(lis)
+        siblingElementArr = []
         return eleList
 
     def OnResize(self):

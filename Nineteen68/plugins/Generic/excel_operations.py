@@ -30,6 +30,7 @@ from xlrd.sheet import ctype_text
 import itertools
 import csv
 import platform
+import win32com.client
 if SYSTEM_OS == "Windows":
     import win32api
 
@@ -63,10 +64,8 @@ class ExcelFile:
     def open_and_save_file(self,input_path):
         #win32 part opening and closing of file to claculate and save values of the formula
         #This is to support the feature of   simulataneous writing and reading to a file
-        import pythoncom
-        pythoncom.CoInitialize()
-        from win32com.client.gencache import EnsureDispatch
-        excel = EnsureDispatch("Excel.Application")
+        excelobj= object_creator()
+        excel=excelobj.excel_object()
         excel.DisplayAlerts = False
         excel_file = excel.Workbooks.Open(input_path)
         excel_file.Close(True)
@@ -634,10 +633,8 @@ class ExcelXLS:
         log.debug('Deleting a row of .xls file')
         excel_file=None
         try:
-            import pythoncom
-            pythoncom.CoInitialize()
-            from win32com.client.gencache import EnsureDispatch
-            excel = EnsureDispatch("Excel.Application")
+            excelobj= object_creator()
+            excel=excelobj.excel_object()
             excel.DisplayAlerts = False
             excel_file = excel.Workbooks.Open(excel_path)
 
@@ -742,10 +739,8 @@ class ExcelXLS:
         return : nothing (if it fails then through the exception)
 
         """
-        import pythoncom
-        from win32com.client.gencache import EnsureDispatch
-        pythoncom.CoInitialize()
-        excel = EnsureDispatch("Excel.Application")
+        excelobj= object_creator()
+        excel=excelobj.excel_object()
         excel.DisplayAlerts = False
         excel_file = excel.Workbooks.Open(inputpath)
         sheet = excel.Sheets(sheetname)
@@ -1548,3 +1543,18 @@ class ExcelCSV:
 
         log.info('Status is '+str(status))
         return status,err_msg
+
+class object_creator:
+    def excel_object(self):
+        excel = None
+        try:
+            import pythoncom
+            pythoncom.CoInitialize()
+            try:
+                excel = win32com.client.dynamic.Dispatch("Excel.Application")
+            except Exception as e:
+                log.info("Error in dynamic.Dispatch proceeding with gencache.EnsureDispatc, err_msg : ",e)
+                excel = win32com.client.gencache.EnsureDispatch("Excel.Application")
+        except Exception as e:
+            log.info("EnsureDispatch and Dispatch failed, the error is : ",e)
+        return excel

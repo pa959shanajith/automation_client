@@ -9,25 +9,52 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-TEST_RESULT_PASS = "Pass";
+TEST_RESULT_PASS = "Pass"
 
-TEST_RESULT_FAIL = "Fail";
+TEST_RESULT_FAIL = "Fail"
 
-TEST_RESULT_TRUE = "True";
+TEST_RESULT_TRUE = "True"
 
-TEST_RESULT_FALSE = "False";
+TEST_RESULT_FALSE = "False"
 
-ELEMENT_NOT_DISPALYED = "Element not displayed"
+ELEMENT_HIDDEN = "Element is hidden"
 
-ELEMENT_IS_DISPALYED = 'Element is displayed'
+ELEMENT_VISIBLE = 'Element is visible'
 
 CLASS_NAME = 'android.widget.TextView'
 
 INVALID_KEYWORD = 'Invalid keyword'
 
-ELEMENT_FOUND=True
+INVALID_INPUT = 'Invalid input'
 
-WAIT_FOR_ELEMENT_EXISTS='waitforelementexists'
+ELEMENT_FOUND = True
 
+CUSTOM_ELEMENT_FOUND = 'Custom element found'
 
-NON_WEBELEMENT_KEYWORDS=['getdevices','invokedevice','actionkey','closeapplication','installapplication','uninstallapplication','waitforelementexists']
+CUSTOM_ELEMENT_NOT_FOUND = 'Custom element not found'
+
+WAIT_FOR_ELEMENT_EXISTS = 'waitforelementexists'
+
+DRIVER_ERROR = 'Driver not active, please launch/install an app using Nineteen68 to proceed'
+
+NO_ANDROID_HOME = 'ANDROID_HOME not in system path'
+
+NO_AAPT_HOME = 'AAPT_HOME not in system path'
+
+WIDGET_INCOMPATIBLE = 'Incompatible widget'
+
+SOFT_KEYBOARD_ERROR = 'Error hiding the Soft. keyboard'
+
+DELAY_TIMEOUT = 'Delay timeout'
+
+VERIFY_DOESNOT_EXISTS = 'verifydoesnotexists'
+
+ELEMENT_DISABLED = 'Element is disabled'
+
+ELEMENT_ENABLED = 'Element is enabled'
+
+ELEMENT_NOT_EXIST = 'Element doesn\'t exist'
+
+ELEMENT_EXISTS = 'Element exists'
+
+NON_WEBELEMENT_KEYWORDS = ['getdevices','invokedevice','actionkey','closeapplication','installapplication','uninstallapplication','waitforelementexists']
