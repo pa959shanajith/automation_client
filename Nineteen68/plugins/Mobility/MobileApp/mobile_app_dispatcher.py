@@ -25,7 +25,7 @@ import seekBar_Mobility
 import logger
 from mobile_app_constants import *
 from constants import *
-import action_keyowrds_app
+import action_keywords_app
 import mob_screenshot
 import readconfig
 import spinner_keywords
@@ -52,7 +52,7 @@ class MobileDispatcher:
     swipe_keywords_object = swipe_keywords.SliderKeywords()
     toggle_keywords_object = toggle_keywords.ToggleKeywords()
     device_keywords_object = device_keywords.Device_Keywords()
-    action_keyowrds_object=action_keyowrds_app.Action_Key_App()
+    action_keywords_object=action_keywords_app.Action_Key_App()
     spinner_keywords_object=spinner_keywords.Spinner_Keywords()
     list_view_keywords_object=list_view_mobility.List_Keywords()
     picker_wheel_keywords_object = picker_wheel_ios.Picker_Wheel_Keywords()
@@ -102,17 +102,9 @@ class MobileDispatcher:
         'stopserver':install_and_launch_object.stop_server,
         'hidesoftkeyboard':swipe_keywords_object.hide_soft_keyboard,
         'backpress':swipe_keywords_object.backPress,
-        #'presselement':button_link_object.press,
-        #'longpresselement':button_link_object.long_press,
-        #'getelementtext':textbox_keywords_object.get_text,
         'setslidevalue': slider_util_keywords_object.set_slide_value,
         'getslidevalue': slider_util_keywords_object.get_slide_value,
-        #'verifyelementexists':slider_util_keywords_object.verify_exists,
-        #'verifyelementdisabled':slider_util_keywords_object.verify_disabled,
-        #'verifyelementdoesnotexists':slider_util_keywords_object.verify_does_not_exists,
-        #'verifyelementenabled':slider_util_keywords_object.verify_exists,
-        #'verifyelementtext':textbox_keywords_object.verify_text,
-        'actionkey':action_keyowrds_object.action_key,
+        'actionkey':action_keywords_object.action_key,
         'waitforelementexists':slider_util_keywords_object.waitforelement_exists,
         'getcount':spinner_keywords_object.get_count,
         'verifycount':spinner_keywords_object.verify_count,
@@ -128,7 +120,7 @@ class MobileDispatcher:
         'verifylistcount':list_view_keywords_object.verify_list_count,
         'selectviewbyindex':list_view_keywords_object.select_view_by_index,
         'selectviewbytext':list_view_keywords_object.select_view_by_text,
-        'getmultipleviewsbyindexes':list_view_keywords_object.get_multiple_views_by_indexs,
+        'getmultipleviewsbyindexes':list_view_keywords_object.get_multiple_views_by_indexes,
         'getviewbyindex':list_view_keywords_object.get_list_view_by_index,
         'getallviews':list_view_keywords_object.get_all_views,
         'verifyallviews':list_view_keywords_object.verify_all_views,
@@ -187,7 +179,7 @@ class MobileDispatcher:
             if keyword in list(self.mob_dict.keys()):
 
 
-
+#################################                 IOS                ###################################
                 # input[0]=bundleid,input[1]=os version ,input[2]=IP,,input[3]=device_name
                 if SYSTEM_OS == 'Darwin':
 
@@ -394,34 +386,30 @@ class MobileDispatcher:
                                 log.error(e)
 
 
-
-
-
+#################################                 Android                ###################################
                 else:
                     driver = android_scrapping.driver
                     if teststepproperty.custname == "@Android_Custom":
-                        if (input[0] and input[1] and input[2]):
+                        if (input[0] and (input[1] is not None) and input[2]):
                             logger.print_on_console("Element type is ",input[0])
                             logger.print_on_console("Visible text is ",input[1])
                             logger.print_on_console("Index is ",input[2])
                             if self.custom_object.custom_check(input,keyword) == False:
                                 logger.print_on_console("The object and the keyword do not match")
                                 result=TERMINATE
+                            elif (keyword==WAIT_FOR_ELEMENT_EXISTS):
+                                result=self.custom_object.waitforelement_exists(input)
                             else:
-                                webelement,input=self.custom_object.custom_element(input)
-                                result=self.mob_dict[keyword](webelement,input)
+                                element,input=self.custom_object.custom_element(input,keyword)
+                                result=self.mob_dict[keyword](element,input)
                         else:
-                            logger.print_on_console("Invalid input, Please provide the valid input")
-                            result=TERMINATE
+                            logger.print_on_console(INVALID_INPUT,": NULL object used in input")
+                            result[3]=INVALID_INPUT+": NULL object used in input"
                     elif keyword==WAIT_FOR_ELEMENT_EXISTS:
                         result=self.mob_dict[keyword](objectname,input)
-                    elif keyword == 'getnumber' or keyword == 'verifynumber':
-                        xpath = objectname.split(';')[1]+"/android.widget.EditText[1]"
-                        #webelement, xpath=self.getMobileElement(driver,objectname)
-                        result=self.mob_dict[keyword](xpath,input)
                     else:
-                        webelement, xpath=self.getMobileElement(driver,objectname)
-                        result=self.mob_dict[keyword](webelement,input,xpath)
+                        element, xpath=self.getMobileElement(driver,objectname)
+                        result=self.mob_dict[keyword](element,input,xpath)
                 if not(ELEMENT_FOUND) and self.exception_flag:
                     result=TERMINATE
             else:
@@ -434,7 +422,6 @@ class MobileDispatcher:
                         screen_shot_obj = mob_screenshot.Screenshot()
                         configobj = readconfig.readConfig()
                         configvalues = configobj.readJson()
-
                         if configvalues['screenShot_Flag'].lower() == 'fail':
                             if result[0].lower() == 'fail':
                                 file_path =screen_shot_obj.captureScreenshot()
@@ -447,7 +434,7 @@ class MobileDispatcher:
             result[3]=err_msg
         except Exception as e:
             log.error(e,exc_info=True)
-            #logger.print_on_console('Exception at dispatcher')
+            logger.print_on_console('Exception at dispatcher')
         return result
 
     def getMobileElement(self,driver,objectname):
@@ -473,13 +460,13 @@ class MobileDispatcher:
                     mobileElement = driver.find_element_by_xpath(xpath)
             except Exception as Ex:
                 log.debug(str(Ex))
-                log.debug('Webelement not found by xpath')
+                log.debug('Element not found by xpath')
                 if (id):
                     try:
                         log.debug('trying to find mobileElement by id')
                         mobileElement = driver.find_element_by_id(id)
                     except Exception as Ex:
-                        log.debug('Webelement not found')
+                        log.debug('Element not found')
                         log.debug(str(Ex))
         if mobileElement==None:
             ELEMENT_FOUND=False

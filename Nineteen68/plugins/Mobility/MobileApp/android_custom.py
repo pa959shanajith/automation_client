@@ -15,16 +15,25 @@ import android_scrapping
 import logging
 import logger
 import psutil
+import readconfig
+import time
+
 log = logging.getLogger('android_custom.py')
 
 class custom():
+
+    def print_error(self,e):
+        log.error(e)
+        logger.print_on_console(e)
+        return e
+
 
     def custom_check(self,input,keyword):
         try:
             input[2] = int(input[2])
         except Exception as e:
+            self.print_error(INVALID_INPUT)
             log.error(e,exc_info=True)
-            logger.print_on_console("Incorrect input!!")
             return False
         if len(input) >= 3 and input[0] != "" and isinstance(input[2], int) and isinstance(input[1], str):
             class_name = input[0].lower()
@@ -41,7 +50,7 @@ class custom():
                 'radio': ["getstatus", "selectradiobutton", "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
                 'switch': ["getstatus", "toggleoff", "toggleon", "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
                 'checkbox': ["getstatus", "selectcheckbox", "unselectcheckbox", "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
-                'spinner': ["getallvalues", "getcount", "getmultiplevaluesbyindexes", "getselectedvalue", "getvaluebyindex", "selectvaluebyindex", "selectvaluebytext", "verifyallvalues", "verifycount",
+                'spinner': ["getallvalues", "getcount", "getmultiplevaluesbyindexes", "getselectedvalue", "verifyselectedvalue", "getvaluebyindex", "selectvaluebyindex", "selectvaluebytext", "verifyallvalues", "verifycount",
                             "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
                 'numberpicker': ["setnumber", "getnumber", "verifynumber", "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
                 'seekbar': ["setvalue", "setmaxvalue", "setmidvalue", "setminvalue", "verifydisabled", "verifyenabled", "verifyexists", "verifyhidden", "verifyvisible", "verifydoesnotexists", "waitforelementexists"],
@@ -64,19 +73,19 @@ class custom():
                 else:
                     return False
             except Exception as e:
+                self.print_error("Object name incorrect!!")
                 log.error(e,exc_info=True)
-                logger.print_on_console("Object name incorrect!!")
                 return False
-        logger.print_on_console("Incorrect input!!")
+        self.print_error(INVALID_INPUT)
         return False
 
 
-    def custom_element(self,input):
+    def custom_element(self,input,*args):
         element = None
         driver_flag = False
         object_name = input[0].lower()
         visible_text = input[1]
-        logger.print_on_console(input)
+        #logger.print_on_console(input)
         driver = android_scrapping.driver
         classes = {
             'textbox': ['android.widget.EditText'],
@@ -95,7 +104,6 @@ class custom():
             'layout': ['android.widget.LinearLayout','android.widget.RelativeLayout'],
             'element': ['android.widget.ScrollView','android.view.View','android.view.ViewGroup','android.widget.FrameLayout']
         }
-        elements = []
         element_list = []
         try:
             index = int(input[2])
@@ -115,16 +123,49 @@ class custom():
                     for item in classes[object_name]:
                         element_list = element_list + driver.find_elements_by_class_name(item)
                 if index < len(element_list):
+                    log.info(CUSTOM_ELEMENT_FOUND)
+                    logger.print_on_console(CUSTOM_ELEMENT_FOUND)
                     element = element_list[index]
-                else:
-                    logger.print_on_console("The custom element with index '"+str(index)+"' not found on the Screen!! Please make sure the element is visible on the screen")
+                elif not (args[0] == VERIFY_DOESNOT_EXISTS or args[0] == WAIT_FOR_ELEMENT_EXISTS):
+                    self.print_error(CUSTOM_ELEMENT_NOT_FOUND)
                 if len(input) == 3:
-                    input = [""]
+                    new_input = [""]
                 elif len(input) > 3:
-                    input = input[3:]
+                    new_input = input[3:]
             else:
-                logger.print_on_console("The driver is not running!! Please launch or install the application to continue")
+                self.print_error(DRIVER_ERROR)
         except Exception as e:
+            self.print_error("Error occurred in Finding Custom element")
             log.error(e, exc_info=True)
-            logger.print_on_console("Error in fetching the Custom Element")
-        return element,input
+        return element,new_input
+
+
+    def waitforelement_exists(self,input):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            configvalues = readconfig.configvalues
+            timeout= configvalues['timeOut']
+            if timeout!=None:
+                start_time = time.time()
+                while True:
+                    element, inp = self.custom_element(input,WAIT_FOR_ELEMENT_EXISTS)
+                    later=time.time()
+                    if int(later-start_time)>=int(timeout):
+                        err_msg = self.print_error('Delay timeout')
+                        break
+                    if element is not None:
+                        #log.info(CUSTOM_ELEMENT_FOUND)
+                        #logger.print_on_console(CUSTOM_ELEMENT_FOUND)
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                        break
+            else:
+                err_msg = self.print_error(INVALID_INPUT)
+        except Exception as e:
+            err_msg = self.print_error(e)
+            log.error(e,exc_info = True)
+        return status,methodoutput,output,err_msg

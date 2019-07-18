@@ -8,11 +8,10 @@
 # Copyright:   (c) rakesh.v 2017
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
+from mobile_app_constants import *
 import android_scrapping
 import wx
 from socketIO_client import SocketIO,BaseNamespace
-##import launch_keywords
-##desktop_scraping_obj = desktop_scraping.Scrape()
 import os
 import logger
 import logging
@@ -21,6 +20,13 @@ obj=android_scrapping.InstallAndLaunch()
 import core_utils
 
 class ScrapeWindow(wx.Frame):
+
+    def print_error(self,e):
+        log.error(e)
+        logger.print_on_console(e)
+        return e
+
+
     def __init__(self, parent,id, title,filePath,socketIO):
         wx.Frame.__init__(self, parent, title=title, size=(190, 170), style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER|wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
         self.SetBackgroundColour('#e6e7e8')
@@ -40,6 +46,8 @@ class ScrapeWindow(wx.Frame):
                 self.min_y=(size['height']/4)
                 self.max_y=(size['height']*0.75)
                 self.x_Value=(size['width']*0.50)
+            else:
+                self.print_error(DRIVER_ERROR)
         elif filePath.split(';')[4]== "ios":
             deviceName = filePath.split(';')[0]
             platform_version = filePath.split(';')[1]
@@ -123,15 +131,16 @@ class ScrapeWindow(wx.Frame):
                 if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
                     self.socketIO.emit('scrape',d)
                 else:
-                    logger.print_on_console('Scraped data exceeds max. Limit.')
+                    self.print_error('Scraped data exceeds max. Limit.')
                     self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
             else:
-                logger.print_on_console('Error in scraping')
+                self.print_error('Error in scraping')
                 self.socketIO.emit('scrape','Error in scraping')
             self.parent.schedule.Enable()
             self.Close()
-            logger.print_on_console('Full scrape  completed')
+            log_info('Fullscrape completed')
         except Exception as e:
+            self.print_error("Error occurred in FullScrape")
             log.error(e, exc_info=True)
 
 
@@ -140,9 +149,10 @@ class ScrapeWindow(wx.Frame):
             if android_scrapping.driver is not None:
                 android_scrapping.driver.swipe(self.x_Value, self.min_y, self.x_Value, self.max_y, 3000)
             else:
-                logger.print_on_console("Couldn't Scroll as the appium driver is not running!!")
+                self.print_error(DRIVER_ERROR)
                 self.Close()
         except Exception as e:
+            self.print_error("Error occurred in SwipeDown")
             log.error(e, exc_info=True)
 
 
@@ -151,7 +161,8 @@ class ScrapeWindow(wx.Frame):
             if android_scrapping.driver is not None:
                 android_scrapping.driver.swipe(self.x_Value, self.max_y, self.x_Value, self.min_y, 3000)
             else:
-                logger.print_on_console("Couldn't Scroll as the appium driver is not running!!")
+                self.print_error(DRIVER_ERROR)
                 self.Close()
         except Exception as e:
+            self.print_error("Error occurred in SwipeUp")
             log.error(e, exc_info=True)

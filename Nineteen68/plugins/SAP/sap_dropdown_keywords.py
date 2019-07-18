@@ -14,7 +14,7 @@ from constants import *
 from saputil_operations import SapUtilKeywords
 from sap_launch_keywords import Launch_Keywords
 import logging
-log = logging.getLogger('sap_dropdown_keywords.py')
+log = logging.getLogger( 'sap_dropdown_keywords.py' )
 
 class Dropdown_Keywords():
     def __init__(self):
@@ -49,96 +49,96 @@ class Dropdown_Keywords():
         return status, result, value ,err_msg
 
 
+    def selectValueByIndex(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg = None
+        i = 0
+        arr = []
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                if ( ses.FindById(id).Changeable == True ):
+                    entries = ses.FindById(id).Entries
+                    while True:
+                        try:
+                            arr.append(entries(i).value)
+                        except :
+                            break
+                        i = i + 1
+                    try:
+                        ses.FindById(id).value = arr[int(input_val[0])]
+                        status = sap_constants.TEST_RESULT_PASS
+                        result = sap_constants.TEST_RESULT_TRUE
+                    except Exception as e:
+                        err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+                        log.error( err_msg )
+                        logger.print_on_console( "Error occured : Index out of bound" )
+                else:
+                    err_msg = sap_constants.ELEMENT_NOT_CHANGEABLE
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in getValueByIndex" )
+        return status, result, value, err_msg
 
-##    def selectValueByIndex(self,sap_id,url,input_val, *args):
-##        id,ses=self.uk.getSapElement(sap_id)
-##        status = sap_constants.TEST_RESULT_FAIL
-##        result = sap_constants.TEST_RESULT_FALSE
-##        verb = OUTPUT_CONSTANT
-##        index = int(input_val[0])
-##        #index = index+1
-##        err_msg = None
-##        i = 0
-##        arr = []
-##        try:
-##            if(id != None):
-##                if(ses.FindById(id).Changeable == True):
-##                    entries = ses.FindById(id).Entries
-##                    while True:
-##                        try:
-##                            arr.append(entries(i).value)
-##                        except :
-##                            break
-##                        i = i + 1
-##                    try:
-##                        ses.FindById(id).value = arr[index]
-##                        status = sap_constants.TEST_RESULT_PASS
-##                        result = sap_constants.TEST_RESULT_TRUE
-##                    except Exception as e:
-##                        err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
-##                        log.error( err_msg )
-##                        logger.print_on_console( "Error occured : Index out of bound" )
-##                else:
-##                    err_msg = sap_constants.ELEMENT_NOT_CHANGEABLE
-##            if ( err_msg ):
-##                log.info(err_msg)
-##                logger.print_on_console(err_msg)
-##        except Exception as e:
-##            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
-##            log.error( err_msg )
-##            logger.print_on_console( "Error occured in getValueByIndex" )
-##        return status,result,verb,err_msg
+    def getValueByIndex(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg = None
+        i = 0
+        arr = []
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                if ( ses.FindById(id).Changeable == True ):
+                    entries = ses.FindById(id).Entries
+                    while True:
+                        try:
+                            arr.append(entries(i).value)
+                        except :
+                            break
+                        i = i + 1
+                    try:
+                        value = arr[int(input_val[0])]
+                        status = sap_constants.TEST_RESULT_PASS
+                        result = sap_constants.TEST_RESULT_TRUE
+                    except Exception as e:
+                        err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+                        log.error( err_msg )
+                        logger.print_on_console( "Error occured : Index out of bound" )
+                else:
+                    err_msg = sap_constants.ELEMENT_NOT_CHANGEABLE
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in getValueByIndex" )
+        return status, result, value, err_msg
 
-##    def getValueByIndex(self, sap_id, url,input_val,*args):
-##        id,ses=self.uk.getSapElement(sap_id)
-##        status = sap_constants.TEST_RESULT_FAIL
-##        result = sap_constants.TEST_RESULT_FALSE
-##        #verb = OUTPUT_CONSTANT
-##        value = OUTPUT_CONSTANT
-##        index = int(input_val[0])
-##        #index = index+1
-##        err_msg = None
-##        i = 0
-##        arr = []
-##        try:
-##            if(id != None):
-##                if(ses.FindById(id).Changeable == True):
-##                    entries = ses.FindById(id).Entries
-##                    while True:
-##                        try:
-##                            arr.append(entries(i).value)
-##                        except :
-##                            break
-##                        i = i + 1
-##                    try:
-##                        value = arr[index]
-##                        status=sap_constants.TEST_RESULT_PASS
-##                        result=sap_constants.TEST_RESULT_TRUE
-##                    except Exception as e:
-##                        err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
-##                        log.error( err_msg )
-##                        logger.print_on_console( "Error occured : Index out of bound" )
-##                else:
-##                    err_msg = sap_constants.ELEMENT_NOT_CHANGEABLE
-##            if ( err_msg ):
-##                log.info(err_msg)
-##                logger.print_on_console(err_msg)
-##        except Exception as e:
-##            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
-##            log.error( err_msg )
-##            logger.print_on_console( "Error occured in getValueByIndex" )
-##        return status,result,value,err_msg
-
-    def selectValueByText(self,sap_id,input_val, *args):
+    def selectValueByText(self, sap_id, input_val, *args):
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
             self.lk.setWindowToForeground(sap_id)
-            id,ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
             if ( id and ses ):
-                if ( len(input_val)>1 ):
+                if ( len(input_val) > 1 ):
                     text = input_val[2]
                 else:
                     text = input_val[0]
@@ -160,8 +160,8 @@ class Dropdown_Keywords():
                 err_msg = sap_constants.ELELMENT_NOT_FOUND
             #------------------------logging error messages
             if ( err_msg ):
-                log.info(err_msg)
-                logger.print_on_console(err_msg)
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
@@ -176,7 +176,7 @@ class Dropdown_Keywords():
         err_msg = None
         try:
             self.lk.setWindowToForeground(sap_id)
-            id,ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
             if ( id and ses ):
                 if ( ses.FindById(id).Changeable == True ):
                     if ( ses.FindById(id).Text.strip() == input_val[0] ):
@@ -207,7 +207,7 @@ class Dropdown_Keywords():
         count = 0
         try:
             self.lk.setWindowToForeground(sap_id)
-            id,ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
             if ( id and ses ):
                 if ( ses.FindById(id).type == "GuiComboBox" ):
                     entries = ses.FindById(id).Entries
@@ -243,7 +243,7 @@ class Dropdown_Keywords():
         count = 0
         try:
             self.lk.setWindowToForeground(sap_id)
-            id,ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
             if ( id and ses ):
                 value = count
                 entries = ses.FindById(id).Entries
@@ -260,7 +260,7 @@ class Dropdown_Keywords():
                     status = sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_TRUE
                 else:
-                    err_msg ='Count Verify has failed '
+                    err_msg = 'Count Verify has failed '
             else:
                 err_msg = sap_constants.ELELMENT_NOT_FOUND
             #------------------------logging error messages
@@ -283,7 +283,7 @@ class Dropdown_Keywords():
         flag = True
         try:
             self.lk.setWindowToForeground(sap_id)
-            id,ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
             if ( id and ses ):
                 entries = ses.FindById(id).Entries
                 while True:
