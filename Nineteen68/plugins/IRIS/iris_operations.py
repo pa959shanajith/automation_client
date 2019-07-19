@@ -89,6 +89,7 @@ def hough_transform_p(img,pos):
         else:
             horizontal = sort_line_list(lines)
 
+
 def data_in_cells(image,row,column):
     text = None
     if(row<len(horizontal) and column<len(vertical)):
@@ -99,7 +100,10 @@ def data_in_cells(image,row,column):
     return text
 
 def gotoobject(elem):
-    byte_mirror = base64.b64encode(elem['cord'].encode('utf-8'))
+    if type(elem['cord']) == str and elem['cord'][0:2] != "b'":
+        byte_mirror = base64.b64encode(str(elem['cord'].encode('utf-8')).encode('utf-8'))
+    else:
+        byte_mirror = base64.b64encode(elem['cord'].encode('utf-8'))
     b64 = base64.b64decode(byte_mirror)
     mirror = b64[2:len(b64)-1]
     img_rgb = base64.b64decode(mirror)
@@ -152,6 +156,7 @@ def gotoobject(elem):
         os.remove('test.png')
     return point
 
+
 def find_relative_image(elements,const_new_coordinates):
     try:
         coordinates = []
@@ -203,7 +208,10 @@ def check_duplicates(scrapedata, socketIO):
         img_rgb = cv2.imread('screen.png')
         img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
         for elem in scrapedata['view']:
-            byte_mirror = base64.b64encode(elem['cord'].encode('utf-8'))
+            if type(elem['cord']) == str and elem['cord'][0:2] != "b'":
+                byte_mirror = base64.b64encode(str(elem['cord'].encode('utf-8')).encode('utf-8'))
+            else:
+                byte_mirror = base64.b64encode(elem['cord'].encode('utf-8'))
             b64 = base64.b64decode(byte_mirror)
             mirror = b64[2:len(b64)-1]
             img = base64.b64decode(mirror)
@@ -274,7 +282,10 @@ def update_dataset(image_data):
     try:
         if(image_data['type'] != 'others'):
             mirror = image_data['cord']
-            byte_mirror = base64.b64encode(mirror.encode('utf-8'))
+            if type(mirror) == str and mirror[0:2] != "b'":
+                byte_mirror = base64.b64encode(str(mirror.encode('utf-8')).encode('utf-8'))
+            else:
+                byte_mirror = base64.b64encode(mirror.encode('utf-8'))
             b64 = base64.b64decode(byte_mirror)
             mirror = b64[2:len(b64)-1]
             filename = SCREENSHOT_PATH + '/Dataset/' + str(image_data['type']) + '/' + str(uuid4()).replace("-","") + ".png"
@@ -288,7 +299,6 @@ def update_dataset(image_data):
     except Exception as e:
         log.error(e)
         return False
-    return True
 
 class IRISKeywords():
     def clickiris(self,element,*args):
@@ -378,7 +388,10 @@ class IRISKeywords():
                             (elem_coordinates[2], elem_coordinates[3])]
                     img,res = find_relative_image(elements, verifyexists)
                 else:
-                    byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
+                    if  type(element['cord']) == str and element['cord'][0:2] != "b'" :
+                        byte_mirror = base64.b64encode(str(element['cord'].encode('utf-8')).encode('utf-8'))
+                    else:
+                        byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
                     b64 = base64.b64decode(byte_mirror)
                     img = b64[2:len(b64)-1]
                 with open("cropped.png", "wb") as f:
@@ -461,7 +474,10 @@ class IRISKeywords():
                         (elem_coordinates[2], elem_coordinates[3])]
                 img,res = find_relative_image(elements, verifyexists)
             else:
-                byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
+                if type(element['cord']) == str and element['cord'][0:2] != "b'":
+                    byte_mirror = base64.b64encode(str(element['cord'].encode('utf-8')).encode('utf-8'))
+                else:
+                    byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
                 b64 = base64.b64decode(byte_mirror)
                 img = b64[2:len(b64)-1]
             with open("cropped.png", "wb") as f:
@@ -505,7 +521,10 @@ class IRISKeywords():
                         (elem_coordinates[2], elem_coordinates[3])]
                 img,res = find_relative_image(elements, verifyexists)
             else:
-                byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
+                if type(element['cord']) == str and element['cord'][0:2] != "b'":
+                    byte_mirror = base64.b64encode(str(element['cord'].encode('utf-8')).encode('utf-8'))
+                else:
+                    byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
                 b64 = base64.b64decode(byte_mirror)
                 img = b64[2:len(b64)-1]
             with open("cropped.png", "wb") as f:
@@ -555,7 +574,10 @@ class IRISKeywords():
                             (elem_coordinates[2], elem_coordinates[3])]
                     img,res = find_relative_image(elements, verifyexists)
                 else:
-                    byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
+                    if  type(element['cord']) == str and element['cord'][0:2] != "b'" :
+                        byte_mirror = base64.b64encode(str(element['cord'].encode('utf-8')).encode('utf-8'))
+                    else:
+                        byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
                     b64 = base64.b64decode(byte_mirror)
                     img = b64[2:len(b64)-1]
                 with open("cropped.png", "wb") as f:
@@ -627,7 +649,10 @@ class IRISKeywords():
                             (elem_coordinates[2], elem_coordinates[3])]
                     img,res = find_relative_image(elements, verifyexists)
                 else:
-                    byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
+                    if  type(element['cord']) == str and element['cord'][0:2] != "b'" :
+                        byte_mirror = base64.b64encode(str(element['cord'].encode('utf-8')).encode('utf-8'))
+                    else:
+                        byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
                     b64 = base64.b64decode(byte_mirror)
                     img = b64[2:len(b64)-1]
                 with open("cropped.png", "wb") as f:
