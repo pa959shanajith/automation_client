@@ -189,8 +189,6 @@ class MainNamespace(BaseNamespace):
                 core_utils.get_all_the_imports('SAP')
                 import sap_highlight
                 highlightObj=sap_highlight.highLight()
-    ##            i = args[0].rfind(",")
-    ##            var = args[0][:i]
                 highlightObj.highlight_element(args[0])
         except Exception as e:
             err_msg='Error while Highlighting'
@@ -547,15 +545,11 @@ class MainNamespace(BaseNamespace):
                     logger.print_on_console("Error while rendering Screenshot: File \""+path+"\" not found!")
                     log.error("File \""+path+"\" not found!")
                 else:
-                    encoded_string = ''
                     with open(path, "rb") as image_file:
                         encoded_string = base64.b64encode(image_file.read())
-                    base64_data=encoded_string.decode('UTF-8').strip()
-                    data_URIs.append(base64_data)
-                if i%25==0 or i==(num_path-1):
-                    socketIO.emit('render_screenshot',data_URIs)
-                    data_URIs=[]
-            socketIO.emit('render_screenshot',"finished")
+                        base64_data=encoded_string.decode('UTF-8').strip()
+                        data_URIs.append(base64_data)
+            socketIO.emit('render_screenshot',data_URIs)
             msg = "Request for processing screenshots completed successfully"
             logger.print_on_console(msg)
             log.info(msg)
