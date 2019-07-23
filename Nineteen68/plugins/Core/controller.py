@@ -147,7 +147,7 @@ class Controller():
                 self.mobile_web_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading MobileWeb plugin')
-            local.log.error(e,exc_info=True)
+            log.error(e,exc_info=True)
 
     def __load_mobile_app(self):
         try:
@@ -161,7 +161,7 @@ class Controller():
                 self.mobile_app_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading MobileApp plugin')
-            local.log.error(e,exc_info=True)
+            log.error(e,exc_info=True)
 
     def __load_webservice(self):
         try:
@@ -170,7 +170,7 @@ class Controller():
             self.webservice_dispatcher_obj = websevice_dispatcher.Dispatcher()
         except Exception as e:
             logger.print_on_console('Error loading Web services plugin')
-            local.log.error(e)
+            log.error(e)
 
     def __load_oebs(self):
         try:
@@ -183,7 +183,7 @@ class Controller():
             self.oebs_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading OEBS plugin')
-            local.log.error(e)
+            log.error(e)
 
     def __load_web(self):
         try:
@@ -211,7 +211,7 @@ class Controller():
             self.desktop_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading Desktop plugin')
-            local.log.error(e)
+            log.error(e)
 
     def __load_sap(self):
         try:
@@ -224,7 +224,7 @@ class Controller():
             self.sap_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading SAP plugin')
-            local.log.error(e)
+            log.error(e)
 
     def __load_mainframe(self):
         try:
@@ -235,7 +235,7 @@ class Controller():
             self.mainframe_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading Mainframe plugin')
-            local.log.error(e)
+            log.error(e)
 
     def __load_system(self):
         try:
@@ -246,7 +246,7 @@ class Controller():
             self.system_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading System plugin')
-            local.log.error(e)
+            log.error(e)
 
 
     def dangling_status(self,index):
@@ -825,7 +825,7 @@ class Controller():
         return res
 
     def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj,iris_flag):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,iris_flag)
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,iris_flag,self.wx_object,self.conthread)
         return res
 
     def invokemobilekeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
@@ -893,7 +893,7 @@ class Controller():
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc):
-        global terminate_flag,local
+        global terminate_flag
         qc_url=''
         qc_password=''
         qc_username=''
@@ -1130,7 +1130,7 @@ class Controller():
             local.web_dispatcher_obj.action=action
         self.debug_choice=wxObject.choice
         if action.lower()==EXECUTE:
-            self.execution_mode=SERIAL
+            #self.execution_mode=SERIAL
             #Parallel Execution
             ##obj=handler.Handler()
             kill_process()
@@ -1247,7 +1247,7 @@ def kill_process():
                 log.info( 'Pid Found' )
                 log.info(pid)
                 os.system("TASKKILL /F /PID " + str(pid))
-            browser_Keywords.local_bk.pid_set.clear()
+            browser_Keywords.local_bk.pid_set[:]
             browser_Keywords.local_bk.driver_obj = None
         except Exception as e:
             log.error(e,exc_info=True)

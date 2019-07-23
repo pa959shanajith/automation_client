@@ -60,7 +60,7 @@ class BrowserKeywords():
         local_bk.recent_handles=[]
         local_bk.webdriver_list = []
         local_bk.drivermap = []
-        local_bk.pid_set = set()
+        local_bk.pid_set = []
         local_bk.log = logging.getLogger('browser_Keywords.py')
 
     def __web_driver_exception(self,e):
@@ -120,7 +120,7 @@ class BrowserKeywords():
                         p = psutil.Process(local_bk.driver_obj.service.process.pid)
                         pidchrome = p.children()[0]
                         pid = pidchrome.pid
-                        local_bk.pid_set.add(pid)
+                        local_bk.pid_set.append(pid)
                     elif(self.browser_num == '2'):
                         #logic to get the pid of the firefox window
                         try:
@@ -129,7 +129,7 @@ class BrowserKeywords():
                             p = psutil.Process(local_bk.driver_obj.service.process.pid)
                             pidchrome = p.children()[0]
                             pid = pidchrome.pid
-                            local_bk.pid_set.add(pid)
+                            local_bk.pid_set.append(pid)
                     elif(self.browser_num == '3'):
                         # Logic checks if security settings needs to be addressed
                         # ref: <gitlabpath>/nineteen68v2.0/Nineteen68/issues/1556
@@ -140,7 +140,7 @@ class BrowserKeywords():
                         p = psutil.Process(local_bk.driver_obj.iedriver.process.pid)
                         pidie = p.children()[0]
                         pid = pidie.pid
-                        local_bk.pid_set.add(pid)
+                        local_bk.pid_set.append(pid)
                     hwndg = utilobject.bring_Window_Front(pid)
                 self.update_pid_set(enableSecurityFlag)
                 local_bk.webdriver_list.append(local_bk.driver_obj)
@@ -708,36 +708,37 @@ class BrowserKeywords():
             local_bk.recent_handles.append(h)
 
     def update_pid_set(self,enableSecurityFlag):
-        global pid_set,driver_obj
         if SYSTEM_OS!='Darwin':
             utilobject = utils_web.Utils()
             pid = None
             if (self.browser_num == '1'):
                 #Logic to the pid of chrome window
-                p = psutil.Process(driver_obj.service.process.pid)
+                p = psutil.Process(local_bk.driver_obj.service.process.pid)
                 pidchrome = p.children()[0]
                 pid = pidchrome.pid
-                pid_set.append(pid)
+                local_bk.pid_set.append(pid)
             elif(self.browser_num == '2'):
                 #logic to get the pid of the firefox window
                 try:
-                    pid = driver_obj.binary.process.pid
+                    pid = local_bk.driver_obj.binary.process.pid
+                    local_bk.pid_set.append(pid)
                 except Exception as e:
-                    p = psutil.Process(driver_obj.service.process.pid)
+                    p = psutil.Process(local_bk.driver_obj.service.process.pid)
                     pidchrome = p.children()[0]
                     pid = pidchrome.pid
-                    pid_set.append(pid)
+                    local_bk.pid_set.append(pid)
+
             elif(self.browser_num == '3'):
                 # Logic checks if security settings needs to be addressed
                 # ref: <gitlabpath>/nineteen68v2.0/Nineteen68/issues/1556
                 if enableSecurityFlag:
-                    driver_obj = obj.set_security_zones(
-                        self.browser_num, driver_obj)
+                    local_bk.driver_obj = obj.set_security_zones(
+                        self.browser_num, local_bk.driver_obj)
                 #Logic to get the pid of the ie window
-                p = psutil.Process(driver_obj.iedriver.process.pid)
+                p = psutil.Process(local_bk.driver_obj.iedriver.process.pid)
                 pidie = p.children()[0]
                 pid = pidie.pid
-                pid_set.append(pid)
+                local_bk.pid_set.append(pid)
             hwndg = utilobject.bring_Window_Front(pid)
 
 
@@ -863,7 +864,7 @@ class Singleton_DriverUtil():
                 if( clientwindow.chromeFlag == True ):
                     choptions = webdriver.ChromeOptions()
                     choptions.add_argument('start-maximized')
-                    if True:
+                    if configvalues['extn_enabled'].lower()=='yes':
                         choptions.add_extension(webconstants.EXTENSION_PATH)
                     else:
                         choptions.add_argument('--disable-extensions')
@@ -880,6 +881,7 @@ class Singleton_DriverUtil():
                     local_bk.log.info('Chrome browser version not supported')
                     driver = None
             except Exception as e:
+                local_bk.log.error(e,exc_info=True)
                 logger.print_on_console("Requested browser is not available")
                 local_bk.log.info('Requested browser is not available')
 

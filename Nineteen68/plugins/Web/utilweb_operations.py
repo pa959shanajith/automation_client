@@ -34,9 +34,16 @@ from  selenium.webdriver.common import action_chains
 from selenium.webdriver.common.action_chains import ActionChains
 import threading
 local_uo = threading.local()
-local_uo.log = logging.getLogger('utilweb_operations.py')
 
 class UtilWebKeywords:
+    def __init__(self):
+        local_uo.log = logging.getLogger('utilweb_operations.py')
+        self.verify_image_obj=None
+        self.keys_info={}
+        self.__create_keyinfo_dict()
+        self.__load_Image_processingobj()
+
+
     def __create_keyinfo_dict(self):
          self.keys_info['null']=Keys.NULL
          self.keys_info['cancel']=Keys.CANCEL
@@ -92,13 +99,6 @@ class UtilWebKeywords:
          self.keys_info['divide']=Keys.DIVIDE
          self.keys_info['separator']=Keys.SEPARATOR
          self.keys_info['decimal']=Keys.DECIMAL
-
-
-    def __init__(self):
-        self.verify_image_obj=None
-        self.keys_info={}
-        self.__create_keyinfo_dict()
-        self.__load_Image_processingobj()
 
 
     def __load_Image_processingobj(self):

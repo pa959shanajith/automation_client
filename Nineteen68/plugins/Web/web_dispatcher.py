@@ -36,7 +36,6 @@ from selenium import webdriver
 import threading
 import wx
 local_Wd = threading.local()
-local_Wd.log = logging.getLogger('web_dispatcher.py')
 
 class Dispatcher:
     
@@ -53,6 +52,7 @@ class Dispatcher:
         local_Wd.statict_text_object = static_text_keywords.StaticTextKeywords()
         local_Wd.custom_object=custom_keyword.CustomKeyword()
         local_Wd.webelement_map=OrderedDict()
+        local_Wd.log = logging.getLogger('web_dispatcher.py')
         self.web_dict={
             'getobjectcount':local_Wd.custom_object.get_object_count,
             'getobject':local_Wd.custom_object.get_object,
@@ -480,7 +480,8 @@ class Dispatcher:
 
     def getwebelement(self,driver,objectname):
 ##        objectname = str(objectname)
-
+        global obj_flag
+        obj_flag=False
         webElement = None
         if objectname.strip() != '':
             identifiers = objectname.split(';')
@@ -649,7 +650,6 @@ class Dispatcher:
                 ele='//*'
                 a=[]
                 combo=''
-                obj_flag=False
                 for k,v in list(attributes.items()):
                     if k != 'style':
                         ele=ele+'[@'+k+'="'+v+'"]'

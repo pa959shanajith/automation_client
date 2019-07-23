@@ -25,8 +25,7 @@ class CustomKeyword:
         self.tagtype={'link':'a',
         'tablecell':'td',
         'textbox':'text',
-        'radiobutton':'radio',
-        'textbox':'text',
+        'radiobutton':'radio'
         }
         self.object_count_flag={'dropdown':0,
                             'listbox':1}

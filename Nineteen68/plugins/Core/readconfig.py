@@ -29,7 +29,7 @@ class readConfig():
         "queryTimeOut":"", "timeOut":"", "stepExecutionWait":"", "displayVariableTimeOut":"",
         "retrieveURL":"", "delay":"", "ignoreVisibilityCheck":"", "exception_flag":"",
         "server_cert":"", "enableSecurityCheck":"","browser_check":"","disable_server_cert":"","highlight_check":"","firefox_path":"",
-        "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":""}
+        "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":"","extn_enabled":""}
         if os.path.isfile(self.config_path)==True:
             try:
                 params = json.load(open(self.config_path))
@@ -57,6 +57,7 @@ class readConfig():
                 configvalues['prediction_for_iris_objects'] = params['prediction_for_iris_objects']
                 configvalues['hide_soft_key'] = params['hide_soft_key']
                 configvalues['connection_timeout'] = params['connection_timeout']
+                configvalues['extn_enabled'] = params['extn_enabled']
             except Exception as e:
                 configvalues['errorflag']=e
         else:

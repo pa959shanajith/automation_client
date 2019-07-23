@@ -12,7 +12,7 @@
 import selenium
 import logger
 import browser_Keywords
-from utilweb_operations import UtilWebKeywords
+import utilweb_operations
 import table_keywords
 import webconstants
 from constants import *
@@ -24,7 +24,7 @@ local_rco = threading.local()
 class RadioCheckboxKeywords():
 
     def __init__(self):
-        self.utilobj=UtilWebKeywords()
+        self.utilobj=utilweb_operations.UtilWebKeywords()
         self.status={'radio':'Selected',
                     'checkbox':'Checked'}
         local_rco.log = logging.getLogger('radio_checkbox_operations.py')

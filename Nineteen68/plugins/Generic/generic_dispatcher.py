@@ -31,7 +31,6 @@ import constants
 import logging
 import threading
 local_generic = threading.local()
-log = logging.getLogger("generic_dispatcher.py")
 
 class GenericKeywordDispatcher:
     def __init__(self):
@@ -53,6 +52,7 @@ class GenericKeywordDispatcher:
         local_generic.json_oper = xml_operations.JSONOperations()
         local_generic.util_operation_obj=util_operations.UtilOperations()
         local_generic.dyn_var_obj=dynamic_variable.DynamicVariables()
+        local_generic.log = logging.getLogger("generic_dispatcher.py")
         self.generic_dict={
             'tolowercase': local_generic.generic_string.toLowerCase,
             'touppercase' : local_generic.generic_string.toUpperCase,
@@ -150,7 +150,7 @@ class GenericKeywordDispatcher:
         try:
             output=local_generic.generic_database.fetchData(input)
         except Exception as e:
-            log.error(e)
+            local_generic.log.error(e)
         return output
 
     def dispatcher(self,tsp,wxObject,mythread,*message):
@@ -211,9 +211,9 @@ class GenericKeywordDispatcher:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
          except Exception as e:
-            log.error(e)
+            local_generic.log.error(e)
 ##            logger.print_on_console('Exception at dispatcher')
          if err_msg!=None:
-            log.error(err_msg)
+            local_generic.log.error(err_msg)
             logger.print_on_console(err_msg)
          return result
