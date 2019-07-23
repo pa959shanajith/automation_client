@@ -29,7 +29,7 @@ __all__ = ['SocketIO','BaseNamespace']
 def socketIO_warn(self, msg, *attrs):
     self._log(logging.WARNING, msg, *attrs)
     if ("[SSL: CERTIFICATE_VERIFY_FAILED]" in msg) or ("hostname" in msg and "doesn't match " in msg):
-        raise ValueError("[Certifiate Mismatch] "+ msg)
+        raise ValueError("[Certificate Mismatch] "+ msg)
 
 """ Override SocketIO library's _transport method used for generating new Transport instance.
     This is needed because this library opens new instance after invoking disconnect. Ref #1823.
