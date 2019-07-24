@@ -16,6 +16,7 @@ from pyrobot import Robot
 import imutils
 import sys,math
 from uuid import uuid4
+import codecs
 vertical = []
 horizontal = []
 verifyexists = []
@@ -100,12 +101,7 @@ def data_in_cells(image,row,column):
     return text
 
 def gotoobject(elem):
-    if type(elem['cord']) == str and elem['cord'][0:2] != "b'":
-        byte_mirror = base64.b64encode(str(elem['cord'].encode('utf-8')).encode('utf-8'))
-    else:
-        byte_mirror = base64.b64encode(elem['cord'].encode('utf-8'))
-    b64 = base64.b64decode(byte_mirror)
-    mirror = b64[2:len(b64)-1]
+    mirror = get_byte_mirror(elem['cord'])
     img_rgb = base64.b64decode(mirror)
     fh = open("sample.png", "wb")
     fh.write(img_rgb)
@@ -192,28 +188,20 @@ def find_relative_image(elements,const_new_coordinates):
             os.remove('find_relative.png')
             os.remove('output.png')
     except Exception as e:
-        log.error(e)
-        logger.print_on_console("Error occured in finding relative image.")
+        log.error("Error occurred in finding relative image, Err_Msg : ",e)
+        logger.print_on_console("Error occurred in finding relative image.")
     return rel_image,coordinates
 
 def check_duplicates(scrapedata, socketIO):
     try:
         duplicates = []
-        mirror = scrapedata['mirror']
-        byte_mirror = base64.b64encode(mirror.encode('utf-8'))
-        b64 = base64.b64decode(byte_mirror)
-        mirror = b64[2:len(b64)-1]
+        mirror = get_byte_mirror(scrapedata['mirror'])
         with open('screen.png','wb') as f:
             f.write(base64.b64decode(mirror))
         img_rgb = cv2.imread('screen.png')
         img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
         for elem in scrapedata['view']:
-            if type(elem['cord']) == str and elem['cord'][0:2] != "b'":
-                byte_mirror = base64.b64encode(str(elem['cord'].encode('utf-8')).encode('utf-8'))
-            else:
-                byte_mirror = base64.b64encode(elem['cord'].encode('utf-8'))
-            b64 = base64.b64decode(byte_mirror)
-            mirror = b64[2:len(b64)-1]
+            mirror = get_byte_mirror(elem['cord'])
             img = base64.b64decode(mirror)
             fh = open("sample.png", "wb")
             fh.write(img)
@@ -240,7 +228,7 @@ def check_duplicates(scrapedata, socketIO):
         if(os.path.isfile('screen.png')):
             os.remove('screen.png')
     except Exception as e:
-        log.error(e)
+        log.error("Error while checking for duplicate objects, Err_Msg : ",e)
         logger.print_on_console("Error while checking for duplicate objects.")
 
 def scaleUpOrDown(arg,elem,template,img_rgb):
@@ -274,31 +262,45 @@ def scaleUpOrDown(arg,elem,template,img_rgb):
                     point = (ind[1],ind[0])
                 break
     except Exception as e:
-        log.error(e)
+        log.error("Error while scaling image, Err_Msg : ",e)
         logger.print_on_console("Error while scaling image.")
     return point,resized_width,resized_height
 
 def update_dataset(image_data):
     try:
         if(image_data['type'] != 'others'):
-            mirror = image_data['cord']
-            if type(mirror) == str and mirror[0:2] != "b'":
-                byte_mirror = base64.b64encode(str(mirror.encode('utf-8')).encode('utf-8'))
-            else:
-                byte_mirror = base64.b64encode(mirror.encode('utf-8'))
-            b64 = base64.b64decode(byte_mirror)
-            mirror = b64[2:len(b64)-1]
+            mirror = get_byte_mirror(image_data['cord'])
             filename = SCREENSHOT_PATH + '/Dataset/' + str(image_data['type']) + '/' + str(uuid4()).replace("-","") + ".png"
             if (os.path.exists(SCREENSHOT_PATH + '/Dataset')):
                 with open(filename,'wb') as f:
                     f.write(base64.b64decode(mirror))
                 return True
             else:
-                logger.print_on_console("Dataset folder not found.")
+                log.error( "Dataset folder not found." )
+                logger.print_on_console( "Dataset folder not found." )
                 return False
     except Exception as e:
-        log.error(e)
+        log.error("Error occurred in update_dataset, Err_Msg : ",e)
+        logger.print_on_console("Error while updating dataset.")
         return False
+
+def get_byte_mirror(element_cord):
+    """Input : element['cord']"""
+    img = None
+    byte_mirror = None
+    try:
+        """ This check is done for IRIS 1.0 elements """
+        if type(element_cord) == str and element_cord[0:2] != "b'":
+            byte_mirror = base64.b64encode(codecs.encode(str(codecs.encode(element_cord))))
+        else:
+            byte_mirror = base64.b64encode(codecs.encode(element_cord))
+        """Converting to a mirror image"""
+        b64 = base64.b64decode(byte_mirror)
+        img = b64[2:len(b64) - 1]
+    except Exception as e:
+        log.error("Error occurred in get_byte_mirror, Err_Msg : ", e)
+        logger.print_on_console("Error occurred while fetching byte mirror")
+    return img
 
 class IRISKeywords():
     def clickiris(self,element,*args):
@@ -328,8 +330,8 @@ class IRISKeywords():
             else:
                 logger.print_on_console("Object not found")
         except Exception as e:
-            log.error(e)
-            logger.print_on_console("Error occured in clickiris")
+            log.error("Error occurred in clickiris, Err_Msg :",e)
+            logger.print_on_console("Error occurred in clickiris")
         return status,result,value,err_msg
 
     def settextiris(self,element,*args):
@@ -365,8 +367,8 @@ class IRISKeywords():
             else:
                 logger.print_on_console("Object not found")
         except Exception as e:
-            log.error(e)
-            logger.print_on_console("Error occured in settextiris")
+            log.error("Error occurred in SetTextIris, Err_Msg : ",e)
+            logger.print_on_console("Error occurred in SetTextIris")
         return status,result,value,err_msg
 
     def gettextiris(self,element,*args):
@@ -388,12 +390,7 @@ class IRISKeywords():
                             (elem_coordinates[2], elem_coordinates[3])]
                     img,res = find_relative_image(elements, verifyexists)
                 else:
-                    if  type(element['cord']) == str and element['cord'][0:2] != "b'" :
-                        byte_mirror = base64.b64encode(str(element['cord'].encode('utf-8')).encode('utf-8'))
-                    else:
-                        byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
-                    b64 = base64.b64decode(byte_mirror)
-                    img = b64[2:len(b64)-1]
+                    img = get_byte_mirror(element['cord'])
                 with open("cropped.png", "wb") as f:
                     f.write(base64.b64decode(img))
                 image = cv2.imread("cropped.png")
@@ -453,8 +450,8 @@ class IRISKeywords():
             else:
                 log.error("Tesseract module not found.")
         except Exception as e:
-            log.error(e)
-            logger.print_on_console("Error occured in gettextiris")
+            log.error("Error occurred in GetTextIris, Err_Msg : ",e)
+            logger.print_on_console("Error occurred in GetTextIris")
         return status,result,value,err_msg
 
     def getrowcountiris(self,element,*args):
@@ -474,12 +471,7 @@ class IRISKeywords():
                         (elem_coordinates[2], elem_coordinates[3])]
                 img,res = find_relative_image(elements, verifyexists)
             else:
-                if type(element['cord']) == str and element['cord'][0:2] != "b'":
-                    byte_mirror = base64.b64encode(str(element['cord'].encode('utf-8')).encode('utf-8'))
-                else:
-                    byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
-                b64 = base64.b64decode(byte_mirror)
-                img = b64[2:len(b64)-1]
+                img = get_byte_mirror(element['cord'])
             with open("cropped.png", "wb") as f:
                 f.write(base64.b64decode(img))
             img = cv2.imread("cropped.png")
@@ -500,8 +492,8 @@ class IRISKeywords():
             os.remove('cropped.png')
             os.remove('rotated.png')
         except Exception as e:
-            log.error(e)
-            logger.print_on_console("Error occured in getrowcountiris")
+            log.error("Error occurred in GetRowCountIris, Err_Msg : ",e)
+            logger.print_on_console("Error occurred in GetRowCountIris")
         return status,result,value,err_msg
 
     def getcolcountiris(self,element,*args):
@@ -521,12 +513,7 @@ class IRISKeywords():
                         (elem_coordinates[2], elem_coordinates[3])]
                 img,res = find_relative_image(elements, verifyexists)
             else:
-                if type(element['cord']) == str and element['cord'][0:2] != "b'":
-                    byte_mirror = base64.b64encode(str(element['cord'].encode('utf-8')).encode('utf-8'))
-                else:
-                    byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
-                b64 = base64.b64decode(byte_mirror)
-                img = b64[2:len(b64)-1]
+                img = get_byte_mirror(element['cord'])
             with open("cropped.png", "wb") as f:
                 f.write(base64.b64decode(img))
             img = cv2.imread("cropped.png")
@@ -547,8 +534,8 @@ class IRISKeywords():
             os.remove('cropped.png')
             os.remove('rotated.png')
         except Exception as e:
-            log.error(e)
-            logger.print_on_console("Error occured in getcolcountiris")
+            log.error("Error occurred in GetColCountIris, Err_Msg : ",e)
+            logger.print_on_console("Error occurred in GetColCountIris")
         return status,result,value,err_msg
 
     def getcellvalueiris(self,element,*args):
@@ -561,11 +548,11 @@ class IRISKeywords():
         col = int(args[0][1])
         try:
             self.getrowcountiris(element)
-            if(TESSERACT_PATH_EXISTS):
+            if( TESSERACT_PATH_EXISTS ):
                 pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
                 os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
                 img = None
-                if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+                if( (args) == 3 and args[2] != '' and len(verifyexists) > 0 ):
                     elem_coordinates = element['coordinates']
                     const_coordintes = args[2]['coordinates']
                     elements = [(const_coordintes[0],const_coordintes[1]),
@@ -574,12 +561,7 @@ class IRISKeywords():
                             (elem_coordinates[2], elem_coordinates[3])]
                     img,res = find_relative_image(elements, verifyexists)
                 else:
-                    if  type(element['cord']) == str and element['cord'][0:2] != "b'" :
-                        byte_mirror = base64.b64encode(str(element['cord'].encode('utf-8')).encode('utf-8'))
-                    else:
-                        byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
-                    b64 = base64.b64decode(byte_mirror)
-                    img = b64[2:len(b64)-1]
+                    img = get_byte_mirror(element['cord'])
                 with open("cropped.png", "wb") as f:
                     f.write(base64.b64decode(img))
                 img = cv2.imread("cropped.png")
@@ -592,8 +574,8 @@ class IRISKeywords():
             else:
                 log.error("Tesseract module not found.")
         except Exception as e:
-            log.error(e)
-            logger.print_on_console("Error occured in getcellvalueiris")
+            log.error("Error occurred in GetCellValueIris, Err_Msg : ",e)
+            logger.print_on_console("Error occurred in GetCellValueIris")
         return status,result,value,err_msg
 
     def verifyexistsiris(self,element,*args):
@@ -603,7 +585,7 @@ class IRISKeywords():
         value = OUTPUT_CONSTANT
         try:
             global verifyexists
-            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+            if( len(args) == 3 and args[2] != '' and len(verifyexists) > 0 ):
                 elem_coordinates = element['coordinates']
                 const_coordintes = args[2]['coordinates']
                 elements = [(const_coordintes[0],const_coordintes[1]),
@@ -624,8 +606,8 @@ class IRISKeywords():
             else:
                 logger.print_on_console("Object not found.")
         except Exception as e:
-            log.error(e)
-            logger.print_on_console("Error occured in verifyexistsiris")
+            log.error("Error occurred in VerifyExistsIris, Err_Msg :",e)
+            logger.print_on_console("Error occurred in VerifyExistsIris")
         return status,result,value,err_msg
 
     def verifytextiris(self,element,*args):
@@ -649,12 +631,7 @@ class IRISKeywords():
                             (elem_coordinates[2], elem_coordinates[3])]
                     img,res = find_relative_image(elements, verifyexists)
                 else:
-                    if  type(element['cord']) == str and element['cord'][0:2] != "b'" :
-                        byte_mirror = base64.b64encode(str(element['cord'].encode('utf-8')).encode('utf-8'))
-                    else:
-                        byte_mirror = base64.b64encode(element['cord'].encode('utf-8'))
-                    b64 = base64.b64decode(byte_mirror)
-                    img = b64[2:len(b64)-1]
+                    img = get_byte_mirror(element['cord'])
                 with open("cropped.png", "wb") as f:
                     f.write(base64.b64decode(img))
                 image = cv2.imread("cropped.png")
@@ -670,6 +647,6 @@ class IRISKeywords():
             else:
                 log.error("Tesseract module not found.")
         except Exception as e:
-            log.error(e)
-            logger.print_on_console("Error occured in verifytextiris")
+            log.error("Error occurred in VerifyTextIris, Err_Msg : ",e)
+            logger.print_on_console("Error occurred in VerifyTextIris")
         return status,result,value,err_msg
