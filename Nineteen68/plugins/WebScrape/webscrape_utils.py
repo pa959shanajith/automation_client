@@ -10,6 +10,8 @@
 #-------------------------------------------------------------------------------
 import time
 import os
+import base64
+import codecs
 from constants import SYSTEM_OS
 if SYSTEM_OS=='Windows':
     import win32gui
@@ -115,7 +117,8 @@ class WebScrape_Utils:
                     previous = rectangle
                 stitched_image.save(screen_shot_path)
                 with open(screen_shot_path, "rb") as f:
-                    screen = f.read().encode("base64")
+                    b64_screen = base64.b64encode(f.read())
+                    screen=codecs.decode(b64_screen)
             else:
                 screen = driver.get_screenshot_as_base64()
         except Exception as e:

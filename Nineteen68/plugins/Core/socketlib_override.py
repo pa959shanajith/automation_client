@@ -22,14 +22,14 @@ CHUNK_SIZE = 10*1024*1024 # 10 MB
 
 __all__ = ['SocketIO','BaseNamespace']
 
-""" Override SocketIO library's warn method used for logging.
+""" Override SocketIO library's _warn method used for logging.
     This is needed because this library doesn't gives anything to stdout or stderr
     on exception/warning. Hence Adding custom check and raising exception. Ref #1847.
 """
 def socketIO_warn(self, msg, *attrs):
     self._log(logging.WARNING, msg, *attrs)
     if ("[SSL: CERTIFICATE_VERIFY_FAILED]" in msg) or ("hostname" in msg and "doesn't match " in msg):
-        raise ValueError("[Certifiate Mismatch] "+ msg)
+        raise ValueError("[Certificate Mismatch] "+ msg)
 
 """ Override SocketIO library's _transport method used for generating new Transport instance.
     This is needed because this library opens new instance after invoking disconnect. Ref #1823.
@@ -69,7 +69,7 @@ def socketIO_close(self):
     self._transport_instance.close()
     self._opened = False
 
-""" Add close method in XHR_PollingTransport for closing a Transport instance connection.
+""" Add close method in transports.XHR_PollingTransport for closing a Transport instance connection.
     This is needed because this library never actually closes the connection.
     Ref: https://github.com/invisibleroads/socketIO-client/issues/176
     Ref: https://github.com/invisibleroads/socketIO-client/pull/126
@@ -77,7 +77,7 @@ def socketIO_close(self):
 def socketIO_XHR_close(self):
     pass
 
-""" Add close method in WebsocketTransport for closing a Transport instance connection.
+""" Add close method in transports.WebsocketTransport for closing a Transport instance connection.
     This is needed because this library never actually closes the connection.
     Ref: https://github.com/invisibleroads/socketIO-client/issues/176
     Ref: https://github.com/invisibleroads/socketIO-client/pull/126
@@ -108,6 +108,10 @@ def socketIO_read_packet_text(content, content_index, packet_length):
     packet_text = content.decode()[content_index:content_index + packet_length]
     return content_index + packet_length, packet_text.encode()
 
+""" Override SocketIO library's transports.WebsocketTransport.__init__ method
+    used for creating websocket connection.
+    This is needed because this library doesn't support passing server certificate
+"""
 def socketIO_WS_init(self, http_session, is_secure, url, engineIO_session=None):
     super(WebsocketTransport, self).__init__(
         http_session, is_secure, url, engineIO_session)
@@ -129,7 +133,7 @@ def socketIO_WS_init(self, http_session, is_secure, url, engineIO_session=None):
             kw['http_proxy_auth'] = (
                 proxy_url_pack.username, proxy_url_pack.password)
     if http_session.verify:
-        kw['sslopt'] = {'cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': http_session.verify}
+        kw['sslopt'] = {'cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': http_session.verify, 'check_hostname': False}  ## New Change
         if http_session.cert:  # Specify certificate path on disk
             if isinstance(http_session.cert, six.string_types):
                 kw['ca_certs'] = http_session.cert
@@ -141,6 +145,41 @@ def socketIO_WS_init(self, http_session, is_secure, url, engineIO_session=None):
         self._connection = create_connection(ws_url, **kw)
     except Exception as e:
         raise ConnectionError(e)
+
+""" Override SocketIO library's wait method used for creating a blocking connection.
+    This is needed because this library doesn't handle empty packages.
+"""
+def socketIO_wait(self, seconds=None, **kw):
+    self._heartbeat_thread.hurry()
+    #self._transport.set_timeout(seconds=1)
+    warning_screen = self._yield_warning_screen(seconds)
+    for elapsed_time in warning_screen:
+        if self._should_stop_waiting(**kw):
+            break
+        try:
+            try:
+                self._process_packets()
+            except TimeoutError:
+                pass
+            except KeyboardInterrupt:
+                self._close()
+                raise
+        except ConnectionError as e:
+            self._opened = False
+            try:
+                warning = Exception('[connection error] %s' % e)
+                warning_screen.throw(warning)
+            except StopIteration:
+                self._warn(warning)
+            try:
+                namespace = self.get_namespace()
+                namespace._find_packet_callback('disconnect')()
+            except PacketError:
+                pass
+        except IndexError:  ## New Change
+            pass            ## New Change
+    self._heartbeat_thread.relax()
+    self._transport.set_timeout()
 
 """ Add a ACK_EVENT listener in SocketIO library's socketIO_client.BaseNamespace class
     This is needed to free up memory consumed by stored packet.
@@ -185,7 +224,6 @@ def socketIO_emit(self, event, *args, **kw):
         return self._emit(event, data[0], **kw)
 
 ##def socketIO_on_event(self, data_parsed, namespace):
-##    #print("Inside ON_EVENT override")
 ##    self._custom_on_event(data_parsed, namespace)
 
 
@@ -194,16 +232,17 @@ socketIO_client.parsers._read_packet_text = socketIO_read_packet_text
 socketIO_client.XHR_PollingTransport.close = socketIO_XHR_close
 socketIO_client.WebsocketTransport.__init__ = socketIO_WS_init
 socketIO_client.WebsocketTransport.close = socketIO_WS_close
-#socketIO_client.BaseNamespace.on_data_ack = socketIO_on_data_ack
-#socketIO_client.BaseNamespace.on_data_nack = socketIO_on_data_nack
-#socketIO_client.SocketIO._emit = socketIO_client.SocketIO.emit
-#socketIO_client.SocketIO.emit = socketIO_emit
+socketIO_client.BaseNamespace.on_data_ack = socketIO_on_data_ack
+socketIO_client.BaseNamespace.on_data_nack = socketIO_on_data_nack
+socketIO_client.SocketIO._emit = socketIO_client.SocketIO.emit
+socketIO_client.SocketIO.emit = socketIO_emit
 #socketIO_client.SocketIO._custom_on_event = socketIO_client.SocketIO._on_event
 #socketIO_client.SocketIO._on_event = socketIO_on_event
 socketIO_client.SocketIO._warn = socketIO_warn
 socketIO_client.SocketIO._close = socketIO_close
 socketIO_client.SocketIO._transport = socketIO_transport
-#socketIO_client.SocketIO.evdata = {}
+socketIO_client.SocketIO.wait = socketIO_wait
+socketIO_client.SocketIO.evdata = {}
 
 SocketIO = socketIO_client.SocketIO
 BaseNamespace = socketIO_client.BaseNamespace
