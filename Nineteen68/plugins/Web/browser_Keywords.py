@@ -539,7 +539,6 @@ class BrowserKeywords():
                 count = count - 2
                 local_bk.webdriver_list[driver_instance].quit()
                 if SYSTEM_OS == 'Darwin':
-                    import os
                     os.system("killall -9 Safari")
                 logger.print_on_console('browser closed')
                 local_bk.log.info('browser closed')
@@ -864,7 +863,7 @@ class Singleton_DriverUtil():
                 if( clientwindow.chromeFlag == True ):
                     choptions = webdriver.ChromeOptions()
                     choptions.add_argument('start-maximized')
-                    if configvalues['extn_enabled'].lower()=='yes':
+                    if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
                         choptions.add_extension(webconstants.EXTENSION_PATH)
                     else:
                         choptions.add_argument('--disable-extensions')
@@ -886,7 +885,6 @@ class Singleton_DriverUtil():
                 local_bk.log.info('Requested browser is not available')
 
         elif(browser_num == '2'):
-            import os
             try:
                 caps=webdriver.DesiredCapabilities.FIREFOX
                 caps['marionette'] = True

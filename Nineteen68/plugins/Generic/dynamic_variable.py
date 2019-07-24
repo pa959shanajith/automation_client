@@ -201,8 +201,8 @@ class DynamicVariables:
                         if res==TEST_RESULT_TRUE:
                             #Check if the variable already exists
                             log.debug('Check if the variable already exists')
-                            if variable in dynamic_variable_handler.dynamic_variable_map:
-                                value=dynamic_variable_handler.dynamic_variable_map.pop(variable)
+                            if variable in dynamic_variable_handler.local_dynamic.dynamic_variable_map:
+                                value=dynamic_variable_handler.local_dynamic.dynamic_variable_map.pop(variable)
                                 log.debug('Variable deleted is ',variable,' = ',value)
                                 logger.print_on_console('Variable deleted is ',variable,' = ',value)
                                 status=TEST_RESULT_PASS
