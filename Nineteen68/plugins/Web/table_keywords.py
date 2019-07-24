@@ -53,9 +53,9 @@ class TableOperationKeywords():
                         log.error('Element not found')
                         logger.print_on_console('Element not found')
                 except Exception as e:
-                     log.error(e)
-                     logger.print_on_console(e)
-                     err_msg=e
+                    log.error(e)
+                    logger.print_on_console(e)
+                    err_msg = ERROR_CODE_DICT['MSG_ELEMENT_NOT_FOUND']
             else:
                 log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                 err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
