@@ -57,9 +57,9 @@ class TableOperationKeywords():
                         local_tk.log.error('Element not found')
                         logger.print_on_console('Element not found')
                 except Exception as e:
-                     local_tk.log.error(e)
-                     logger.print_on_console(e)
-                     err_msg=e
+                    local_tk.log.error(e)
+                    logger.print_on_console(e)
+                    err_msg = ERROR_CODE_DICT['MSG_ELEMENT_NOT_FOUND']
             else:
                 local_tk.log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                 err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']

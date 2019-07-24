@@ -189,8 +189,6 @@ class MainNamespace(BaseNamespace):
                 core_utils.get_all_the_imports('SAP')
                 import sap_highlight
                 highlightObj=sap_highlight.highLight()
-    ##            i = args[0].rfind(",")
-    ##            var = args[0][:i]
                 highlightObj.highlight_element(args[0])
         except Exception as e:
             err_msg='Error while Highlighting'
@@ -547,15 +545,11 @@ class MainNamespace(BaseNamespace):
                     logger.print_on_console("Error while rendering Screenshot: File \""+path+"\" not found!")
                     log.error("File \""+path+"\" not found!")
                 else:
-                    encoded_string = ''
                     with open(path, "rb") as image_file:
                         encoded_string = base64.b64encode(image_file.read())
-                    base64_data=encoded_string.decode('UTF-8').strip()
-                    data_URIs.append(base64_data)
-                if i%25==0 or i==(num_path-1):
-                    socketIO.emit('render_screenshot',data_URIs)
-                    data_URIs=[]
-            socketIO.emit('render_screenshot',"finished")
+                        base64_data=encoded_string.decode('UTF-8').strip()
+                        data_URIs.append(base64_data)
+            socketIO.emit('render_screenshot',data_URIs)
             msg = "Request for processing screenshots completed successfully"
             logger.print_on_console(msg)
             log.info(msg)
@@ -758,8 +752,13 @@ class SocketThread(threading.Thread):
             msg = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
             if "_ssl.c" in msg:
                 msg = msg[:msg.index("(_ssl")]
-            #msg = msg.replace("[Certifiate Mismatch] ",'')
             logger.print_on_console(msg)
+            wxObject.connectbutton.Enable()
+        except Exception as e:
+            msg = "Error in server connection"
+            logger.print_on_console(msg)
+            log.error(msg)
+            log.error(e,exc_info=True)
             wxObject.connectbutton.Enable()
 
 
@@ -1769,13 +1768,12 @@ class Config_window(wx.Frame):
         else:
             self.rbox12.SetSelection(1)
 
-        self.rbox13 = wx.RadioBox(self.panel, label = "Extention Enable", pos = config_fields["extn_enabled"][0], choices = lblList,
+        self.rbox13 = wx.RadioBox(self.panel, label = "Extension Enable", pos = config_fields["extn_enabled"][0], choices = lblList,
          majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson != False and isConfigJson['extn_enabled'].title() == lblList[0]:
             self.rbox13.SetSelection(0)
         else:
             self.rbox13.SetSelection(1)
-
 
         self.error_msg=wx.StaticText(self.panel, label="", pos=(85,488),size=(350, 28), style=0, name="")
         self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])

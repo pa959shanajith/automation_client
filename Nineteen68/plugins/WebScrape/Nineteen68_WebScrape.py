@@ -252,7 +252,7 @@ class ScrapeWindow(wx.Frame):
         global cropandaddobj
         if state == True:
             self.fullscrapebutton.Disable()
-            self.visibilityCheck.Disbale()
+            self.visibilityCheck.Disable()
             self.startbutton.Disable()
             event.GetEventObject().SetLabel("Stop IRIS")
             status = cropandaddobj.startcropandadd(self)
