@@ -334,7 +334,7 @@ class UtilOperations:
         logger.print_on_console('Execution Stopped')
         log.debug('Execution Stopped')
         import handler
-        output=len(handler.tspList)
+        output=len(handler.local_handler.tspList)
         return status,methodoutput,output,err_msg
 
     def getIndexCount(self,variable):

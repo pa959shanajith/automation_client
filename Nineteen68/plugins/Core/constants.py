@@ -114,7 +114,7 @@ SERIAL = 'serial'
 ERROR_CODE_DICT ={
                     'MSG_STATUS' : 'Executed and the status is:',
                     'ERR_INVALID_INPUT':'Input error: please provide the valid input.',
-                    'INCORRECT_VARIABLE_FORMAT':'Incorrect variable format to store cutsom object',
+                    'INCORRECT_VARIABLE_FORMAT':'Incorrect variable format to store custom object',
                     'MSG_RESULT':'Executed and the result is:',
                     'ERR_INVALID_OBJECT':'This Element is not Accessible.',
                     'ERR_HIDDEN_OBJECT':'The element is Hidden.',

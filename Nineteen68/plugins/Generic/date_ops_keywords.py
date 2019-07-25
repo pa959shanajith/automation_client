@@ -203,7 +203,7 @@ class DateOperation:
                                 date1 = datetime.datetime.strptime(input_date, ret_inp_format)
                                 date2 = datetime.datetime.strptime(date_or_count, ret_inp_format)
                                 output = abs((date2 - date1).days)
-                                logger.print_on_console('Output is :' ,output)
+                                logger.print_on_console('Output is :' ,str(output))
                                 log.info('output is')
                                 log.info(output)
                                 status=generic_constants.TEST_RESULT_PASS

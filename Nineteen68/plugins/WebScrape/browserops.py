@@ -35,6 +35,7 @@ status = ''
 driver = None
 browser = 0
 import browser_Keywords
+obj = browser_Keywords.BrowserKeywords()
 class BrowserOperations():
     """
     ___init__ def
@@ -78,7 +79,6 @@ class BrowserOperations():
 
 ##        print 'driver:',driver
         browser = browserType
-        obj = browser_Keywords.BrowserKeywords()
         s = obj.openBrowser(None,browserType)
 
 ##        print 'status in :',s
@@ -88,7 +88,7 @@ class BrowserOperations():
         if s[0] == 'Pass':
 ##            global driver_obj
 ##            print 'browserkeywords ::::',browser_Keywords.driver_obj
-            driver = browser_Keywords.driver_obj
+            driver = browser_Keywords.local_bk.driver_obj
 ##            print 'my driver ::::',driver
             status=True
         return status

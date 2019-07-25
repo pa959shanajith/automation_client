@@ -18,13 +18,15 @@ if SYSTEM_OS=='Windows':
     import win32gui
     import win32process
     import win32con
-log = logging.getLogger('utils_web.py')
+import threading
+local_uw = threading.local()
 
 class Utils:
 
     def __init__(self):
         self.robot=Robot()
         self.rect=''
+        local_uw.log = logging.getLogger('utils_web.py')
 
     def slide(self,a,b,speed=0):
         from time import sleep
@@ -56,47 +58,47 @@ class Utils:
             self.mouse_move(x,y)
 
     def mouse_move(self,x,y):
-        log.debug('Moving the mouse to')
-        log.debug(x)
-        log.debug(y)
+        local_uw.log.debug('Moving the mouse to')
+        local_uw.log.debug(x)
+        local_uw.log.debug(y)
         self.robot.set_mouse_pos(x,y)
 
     def loop_childwindows(self,actwindow,param):
-        log.debug('Inside loop_childwindows')
+        local_uw.log.debug('Inside loop_childwindows')
         class_name = win32gui.GetClassName(actwindow)
         if class_name == 'Internet Explorer_Server' or class_name == 'Chrome_RenderWidgetHostHWND' or class_name == 'WebKit2WebViewWindowClass':
-            log.debug(class_name)
+            local_uw.log.debug(class_name)
             rect=win32gui.GetWindowRect(actwindow)
-            log.info('Rect is ')
-            log.info(rect)
+            local_uw.log.info('Rect is ')
+            local_uw.log.info(rect)
             self.rect=rect
         return True
 
     def getpos(self):
-        log.debug('Getting the mouse position')
+        local_uw.log.debug('Getting the mouse position')
         point=self.robot.get_mouse_pos()
-        log.debug(point)
+        local_uw.log.debug(point)
         return point[0],point[1]
 
     def mouse_press(self,button):
-        log.debug('Mouse press ')
-        log.debug(button)
+        local_uw.log.debug('Mouse press ')
+        local_uw.log.debug(button)
         self.robot.mouse_down(button)
 
     def mouse_release(self,button):
-        log.debug('Release mouse ')
-        log.debug(button)
+        local_uw.log.debug('Release mouse ')
+        local_uw.log.debug(button)
         self.robot.mouse_up(button)
 
     def enumwindows(self):
-        log.info('Finding the active window')
+        local_uw.log.info('Finding the active window')
         actwindow = win32gui.GetForegroundWindow()
-        log.debug('ACtive window is ')
-        log.debug(actwindow)
+        local_uw.log.debug('ACtive window is ')
+        local_uw.log.debug(actwindow)
         win32gui.EnumChildWindows(actwindow, self.loop_childwindows,None)
 
     def get_element_location(self,webelement):
-        log.info('Getting the element location')
+        local_uw.log.info('Getting the element location')
         return webelement.location_once_scrolled_into_view
 
 
@@ -122,7 +124,7 @@ class Utils:
             hwnds = []
             win32gui.EnumWindows(callback, hwnds)
         except Exception as e:
-            log.error(e)
+            local_uw.log.error(e)
         return hwnds
 
     def bring_Window_Front(self,pid):
@@ -136,8 +138,8 @@ class Utils:
             win32gui.SetWindowPos(hwnd[winSize - 1], win32con.HWND_NOTOPMOST, 0, 0, 0, 0, win32con.SWP_SHOWWINDOW + win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
             if winSize>0:
                 win_handle=hwnd[winSize - 1]
-                log.debug(win_handle)
-            log.info(win_handle)
+                local_uw.log.debug(win_handle)
+            local_uw.log.info(win_handle)
         except Exception as e:
-            log.error(e)
+            local_uw.log.error(e)
         return win_handle

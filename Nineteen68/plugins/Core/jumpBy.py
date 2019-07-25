@@ -49,7 +49,7 @@ class  JumpBy():
             log.debug('Reading the inputs')
             index=int(self.index)
             stepToJump=int(input[0])
-            tspList=handler.tspList
+            tspList=handler.local_handler.tspList
             self.jumpByStepNum=-1
 
             log.debug('Finding out the step number to jump')
@@ -106,12 +106,12 @@ class  JumpBy():
     def __validate_jumpbystep(self,stepToJump):
         import handler
         try:
-            if len(handler.cond_nest_info)==0:
-                handler.cond_nest_info = self.__generate_conditional_structure(handler.copy_condition_keywords)
-            if handler.tspList[self.jumpByStepNum].name.lower()==STARTLOOP:
+            if len(handler.local_handler.cond_nest_info)==0:
+                handler.local_handler.cond_nest_info = self.__generate_conditional_structure(handler.local_handler.copy_condition_keywords)
+            if handler.local_handler.tspList[self.jumpByStepNum].name.lower()==STARTLOOP:
                 return False, ['Jump By The given step is not allowed']
             else:
-                t_obj=handler.cond_nest_info
+                t_obj=handler.local_handler.cond_nest_info
                 for item in t_obj:
                     if self.jumpByStepNum==item['st']:
                         break

@@ -7,6 +7,7 @@ from Var import VarInfo
 import Check
 import logging
 log = logging.getLogger('ObjectExtraction.py')
+sys.setrecursionlimit(15000)
 
 def main(root,data,filePath):
 	try:

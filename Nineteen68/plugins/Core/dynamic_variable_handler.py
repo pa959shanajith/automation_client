@@ -10,25 +10,29 @@
 #-------------------------------------------------------------------------------
 
 import logger
-
 from collections import OrderedDict
 from constants import *
 import re
 import core_utils
-dynamic_variable_map=OrderedDict()
+##dynamic_variable_map=OrderedDict()
 import logging
-log = logging.getLogger('dynamic_variable_handler.py')
+#log = logging.getLogger('dynamic_variable_handler.py')
 import ast
+import threading
+local_dynamic = threading.local()
 
 class DynamicVariables:
+    def __init__(self):
+        local_dynamic.dynamic_variable_map=OrderedDict()
+        local_dynamic.log = logging.getLogger('dynamic_variable_handler.py')
 
 	#TO ftech the value form Data base
     def getDBdata(self,inp_value,con_obj):
         res=False
         dyn_value=None
         variable=re.findall("\{(.*?)\[",inp_value)
-        if len(variable)>0 and variable[0] != '' and DB_VAR in dynamic_variable_map:
-            dbvalue=dynamic_variable_map[DB_VAR]
+        if len(variable)>0 and variable[0] != '' and DB_VAR in local_dynamic.dynamic_variable_map:
+            dbvalue=local_dynamic.dynamic_variable_map[DB_VAR]
             temp_dbvalue=re.findall("\{(.*?)\[",dbvalue[-1])
             #To Fix issue with displaying/Fetching of Databse values
             if len(temp_dbvalue)==0:
@@ -87,8 +91,8 @@ class DynamicVariables:
         if len(value)>0 and not(isinstance(value[0],list)):
             variable=variable[0:len(variable)-1]
             for i in range(len(value)):
-                dynamic_variable_map[variable+'['+str(i)+']}']=value[i]
-            dynamic_variable_map[variable+'}'] = value
+                local_dynamic.dynamic_variable_map[variable+'['+str(i)+']}']=value[i]
+            local_dynamic.dynamic_variable_map[variable+'}'] = value
 
         else:
             variable=variable[0:len(variable)-1]
@@ -96,8 +100,8 @@ class DynamicVariables:
                 p=i+1
                 for j in range(len(value[i])):
                     q=j+1
-                    dynamic_variable_map[variable+'['+str(p)+']['+str(q)+']}']=value[i][j]
-            dynamic_variable_map[variable+'}'] = value
+                    local_dynamic.dynamic_variable_map[variable+'['+str(p)+']['+str(q)+']}']=value[i][j]
+            local_dynamic.dynamic_variable_map[variable+'}'] = value
 
 
      #To Store the output from keyword as an array if it is single value
@@ -108,9 +112,9 @@ class DynamicVariables:
                     self.store_as_array(output_var,output_value)
                 else:
                     output_value.append(output_var)
-                    dynamic_variable_map[DB_VAR]=output_value
+                    local_dynamic.dynamic_variable_map[DB_VAR]=output_value
             else:
-                dynamic_variable_map[output_var]=output_value
+                local_dynamic.dynamic_variable_map[output_var]=output_value
 
 
 
@@ -132,13 +136,13 @@ class DynamicVariables:
                         else:
                             err_msg=ERROR_CODE_DICT['INCORRECT_VARIABLE_FORMAT']
                             logger.print_on_console(err_msg)
-                            log.error(err_msg)
+                            local_dynamic.log.error(err_msg)
                     else:
                         ast.literal_eval(str(outputval))
                         status = TEST_RESULT_FALSE
                         json_flag=True
                 except Exception as e:
-                    log.debug('Not a json input')
+                    local_dynamic.log.debug('Not a json input')
             if not(json_flag):
                 if '{' in outputval and '}' in outputval:
                     var_list=re.findall("\{(.*?)\}",outputval)
@@ -151,8 +155,8 @@ class DynamicVariables:
         #returns the value of the dynamic variable if it exists otherwise returns None
 
         value=None
-        if variable in dynamic_variable_map:
-            value=dynamic_variable_map.get(variable)
+        if variable in local_dynamic.dynamic_variable_map:
+            value=local_dynamic.dynamic_variable_map.get(variable)
         return value
 
      #To Check if the given pattern of the variable matches '{a[{b}]}'
@@ -178,8 +182,8 @@ class DynamicVariables:
                 #Check if the nested variable is again a dynamic variable or actual value
                 replacestring=nested_variable[i]
                 if self.check_for_dynamicvariables(nested_variable[i])==TEST_RESULT_TRUE:
-                    if nested_variable[i] in dynamic_variable_map:
-                        replacestring = dynamic_variable_map.get(nested_variable[i])
+                    if nested_variable[i] in local_dynamic.dynamic_variable_map:
+                        replacestring = local_dynamic.dynamic_variable_map.get(nested_variable[i])
                 if not isinstance(replacestring,str):
                     replacestring = str(replacestring)
                 inputvar = inputvar.replace(nested_variable[i],replacestring)
@@ -198,7 +202,7 @@ class DynamicVariables:
             input_var='('+input_var[0]+')'
         else:
             return [INVALID,None]
-        log.debug('___INPUT: ',input_var)
+        local_dynamic.log.debug('___INPUT: ',input_var)
         disp_expression=''
         invalid_flag=False
         invalid_msg=''
@@ -207,13 +211,13 @@ class DynamicVariables:
         #    return [input_var,ERROR_CODE_DICT['ERR_INVALID_INPUT']]
         if not(input_var.startswith('(') and input_var.endswith(')')):
             invalid_msg=keyword+': Expression must be enclosed within "(" and ")"\n'
-            log.error(keyword+': Expression must be enclosed within "(" and ")"')
+            local_dynamic.log.error(keyword+': Expression must be enclosed within "(" and ")"')
             return [input_var,invalid_msg]
         if k==1:
             input_list=input_var.split(';')
             if len(input_list)<3:
                 invalid_msg=keyword+': Expression must have atleast 1 operator and 2 operands for comparision\n'
-                log.error(keyword+': Expression must have atleast 1 operator and 2 operands for comparision')
+                local_dynamic.log.error(keyword+': Expression must have atleast 1 operator and 2 operands for comparision')
                 return [input_var,invalid_msg]
             for e in input_list:
                 if e.replace('(','').strip()=='' or e.replace(')','').strip()=='' or e.replace('(','').replace(')','').strip()=='':
@@ -222,7 +226,7 @@ class DynamicVariables:
                     log.error(keyword+': Expression must have atleast two operands present for comparision')
             for i in range(len(input_list)):
                 input_list[i]=input_list[i].strip()
-            log.debug('Stage 0: ',input_list)
+            local_dynamic.log.debug('Stage 0: ',input_list)
             exp=';'.join(input_list)
             exp=re.sub(r'[)][\s]*AND[\s]*[(]', ')and(',exp)
             exp=re.sub(r'[)][\s]*OR[\s]*[(]', ')or(',exp)
@@ -240,7 +244,7 @@ class DynamicVariables:
             exp=exp.replace('+~$(','+(').replace('-~$(','-(').replace('*~$(','*(').replace('/~$(','/(').replace('^~$(','^(').replace(')$~+',')+').replace(')$~-',')-').replace(')$~*',')*').replace(')$~/',')/').replace(')$~^',')^')
         exp=re.sub(r'[(][\s]*', '(',exp)
         exp=re.sub(r'[\s]*[)]', ')',exp)
-        log.debug('Stage 1: ',exp)
+        local_dynamic.log.debug('Stage 1: ',exp)
         dv_flag=i=0
         paran_cnt=0
         try:
@@ -267,15 +271,15 @@ class DynamicVariables:
                     invalid_flag=True
                     invalid_msg=keyword+': Expression must be enclosed within "(" and ")" and balanced\n'
                 i+=1
-            log.debug('Stage 2: ',exp)
+            local_dynamic.log.debug('Stage 2: ',exp)
             inp_err_list=exp.split('~')
             exp=exp.split('~')
-            log.debug('Stage 3: ',exp)
+            local_dynamic.log.debug('Stage 3: ',exp)
             for i in range(len(exp)):
                 if exp[i][0]=='$' and exp[i][-1]!='$':
                     inp_err_list[i]=inp_err_list[i][1:]
                     invalid_msg+=keyword+': Special Characters "(", ")" and ";" should be passed through dynamic variables\n'
-                    log.error(keyword+': Special Characters "(", ")" and ";" should be passed through dynamic variables')
+                    local_dynamic.log.error(keyword+': Special Characters "(", ")" and ";" should be passed through dynamic variables')
                     invalid_flag=True
                 elif exp[i][0]!='$' and exp[i][-1]=='$':
                     inp_err_list[i]=inp_err_list[i][:-1]
@@ -300,9 +304,9 @@ class DynamicVariables:
                             invalid_flag=True
                             inp_err_list[i]=' "'+exp[i]+'" '
                         exp[i]="'"+exp[i].replace("\\","\\\\").replace("'","\\'")+"'"
-            log.debug('Stage 4: ',exp)
+            local_dynamic.log.debug('Stage 4: ',exp)
         except Exception as e:
-            log.error(e)
+            local_dynamic.log.error(e)
             return [input_var,e]
 
         ## Issue #156 None is getting stored in dynamic variable instead of null if no value is assigned
@@ -319,11 +323,11 @@ class DynamicVariables:
             disp_expression=disp_expression[1:-1]
         if none_count>0:
             invalid_msg+=keyword+': Null values not allowed in expression'
-            log.error(keyword+': Null values not allowed in expression')
+            local_dynamic.log.error(keyword+': Null values not allowed in expression')
             return [disp_expression,invalid_msg]
         ## Fix of Issue #156 Ends here
 
         if invalid_flag:
             return [disp_expression,invalid_msg]
-        log.debug('__OUTPUT: ',exp)
+        local_dynamic.log.debug('__OUTPUT: ',exp)
         return [exp,None,disp_expression]

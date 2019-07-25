@@ -221,7 +221,6 @@ class SliderKeywords():
             log.error(e,exc_info = True)
         return status,methodoutput,output,err_msg
 
-
     def waitforelement_exists(self, object_name,input_val,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
