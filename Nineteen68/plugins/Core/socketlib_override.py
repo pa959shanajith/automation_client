@@ -11,6 +11,7 @@
 #-------------------------------------------------------------------------------
 
 import json
+import time
 import logging
 import socketIO_client
 from uuid import uuid4 as uuid
@@ -185,7 +186,9 @@ def socketIO_wait(self, seconds=None, **kw):
     This is needed to free up memory consumed by stored packet.
 """
 def socketIO_on_data_ack(self, pack_id, *args):
+    self._io.emitting = False
     if (pack_id in self._io.evdata): del self._io.evdata[pack_id]
+
 
 """ Add a NACK_EVENT listener in SocketIO library's socketIO_client.BaseNamespace class
     This is needed to resend lost chunks of stored packet.
@@ -196,13 +199,16 @@ def socketIO_on_data_nack(self, pack_id, indexes, *args):
     kw = packet['kw']
     if indexes == "all": indexes = range(1,packet['b']+1)
     for i in indexes:
-        self._io.emit(ev, packet['d'][i], **kw)
-    return self._io.emit(ev, pack_id+";eof", **kw)
+        self._io.emit(ev, packet['d'][i], enable_loop=False,**kw)
+    return self._io.emit(ev, pack_id+";eof", enable_loop=False, **kw)
 
 """ Override SocketIO library's emit method used for sending data.
     This is needed because this library doesn't support packet size largen than 100 MB
 """
 def socketIO_emit(self, event, *args, **kw):
+    enable_loop = kw.pop('enable_loop', True)
+    while self.emitting and enable_loop:
+        time.sleep(1)
     if len(args) == 0 or (len(args) > 0 and type(args[0]) == bool): return self._emit(event, *args, **kw)
     payload = args[0]
     stringify = False
@@ -213,6 +219,7 @@ def socketIO_emit(self, event, *args, **kw):
     # Increasing 45 bytes (36 bytes for uuid, 2 bytes for separator, 7 bytes for index)
     if not (size > CHUNK_MAX_LIMIT+45): return self._emit(event, *args, **kw)
     else:
+        self.emitting = True
         pack_id = str(uuid())
         data = []
         blocks = int(size/CHUNK_SIZE) + 1
@@ -243,6 +250,7 @@ socketIO_client.SocketIO._close = socketIO_close
 socketIO_client.SocketIO._transport = socketIO_transport
 socketIO_client.SocketIO.wait = socketIO_wait
 socketIO_client.SocketIO.evdata = {}
+socketIO_client.SocketIO.emitting = False
 
 SocketIO = socketIO_client.SocketIO
 BaseNamespace = socketIO_client.BaseNamespace
