@@ -38,7 +38,7 @@ import wx
 local_Wd = threading.local()
 
 class Dispatcher:
-    
+
     def __init__(self):
         local_Wd.popup_object = popup_keywords.PopupKeywords()
         local_Wd.browser_object = browser_Keywords.BrowserKeywords()
@@ -231,11 +231,11 @@ class Dispatcher:
         def send_webelement_to_keyword(driver,objectname,url):
             webelement=None
             getObjectFlag=False
-            if driver != None:
+            if driver:
                 local_Wd.log.debug('In send_webelement_to_keyword method')
                 #check if the element is in iframe or frame
                 try:
-                    if url !=  '' and local_Wd.custom_object.is_int(url):
+                    if url and local_Wd.custom_object.is_int(url):
                         local_Wd.log.debug('Encountered iframe/frame url')
                         local_Wd.custom_object.switch_to_iframe(url,driver.current_window_handle)
                         driver = browser_Keywords.local_bk.driver_obj
@@ -243,8 +243,9 @@ class Dispatcher:
                         local_Wd.log.info('Encountered custom object')
                         local_Wd.log.info('Custom flag is ')
                         local_Wd.log.info(teststepproperty.custom_flag)
+                        custom_input=teststepproperty.inputval[0].split(';')
                         if teststepproperty.custom_flag:
-                            if len(input)>3:
+                            if len(input)>3 and custom_input[-1].startswith('{{') and custom_input.endswith('}}'):
                                 if isinstance(input[-1],webdriver.remote.webelement.WebElement):
                                     reference_element=input[-1]
                                     getObjectFlag=True
