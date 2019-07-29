@@ -45,7 +45,7 @@ class UserObject:
             log.debug('data decrypt',data)
             socketIO.emit('scrape',data)
 
-    def update_scrape_object(self,url,objectname,obj_flag,stepnum):
+    def update_scrape_object(self,url,objectname,obj_flag,stepnum,custname):
         data={}
         identifier=objectname.split(';')
         obj=core_utils.CoreUtils()
@@ -53,4 +53,7 @@ class UserObject:
         right_part=obj.scrape_wrap(';'.join(identifier[3:]))
         data['url']= obj.scrape_wrap(url)
         data['xpath'] = left_part+';'+identifier[2]+';'+right_part
+        for i in range(1,len(identifier)):
+            obj_flag=obj_flag+';'+identifier[i]
+        data[custname]=obj_flag
         update_data[str(stepnum)]=data

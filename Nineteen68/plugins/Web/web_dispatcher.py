@@ -298,12 +298,19 @@ class Dispatcher:
                             coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
                             webelement = {'cord': teststepproperty.cord, 'coordinates':coord}
                         else:
+                            import UserObjectScrape
+                            webscrape=UserObjectScrape.UserObject()
+                            obj1=UserObjectScrape.update_data.copy()
+                            for k,v in obj1.items():
+                                if teststepproperty.custname in v:
+                                    objectname=v[teststepproperty.custname]
+                                    UserObjectScrape.update_data[str(teststepproperty.stepnum)]=v
                             webelement = self.getwebelement(driver,objectname)
                             if(obj_flag!=False):
                                 import UserObjectScrape
                                 webscrape=UserObjectScrape.UserObject()
                                 # obj=core_utils.CoreUtils()
-                                webscrape.update_scrape_object(url,objectname,obj_flag,teststepproperty.stepnum)
+                                webscrape.update_scrape_object(url,objectname,obj_flag,teststepproperty.stepnum,teststepproperty.custname)
                             if webelement != None:
                                 if isinstance(webelement,list):
                                     webelement = webelement[0]
@@ -640,7 +647,7 @@ class Dispatcher:
                 logger.print_on_console(err_msg)
                 local_Wd.log.error(err_msg)
                 configvalues = readconfig.configvalues
-        if((webElement==None or webElement== '') and configvalues['extn_enabled'].lower() == 'yes'):
+        if((webElement==None or webElement== '') and configvalues['extn_enabled'].lower() == 'yes' and self.action=='debug' and isinstance(driver, webdriver.Chrome)):
             try:
                 logger.print_on_console('Scrape the Element using extension')
                 import pause_display_operation
