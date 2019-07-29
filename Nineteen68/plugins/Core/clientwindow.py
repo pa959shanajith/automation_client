@@ -678,12 +678,14 @@ class MainNamespace(BaseNamespace):
             icesession['connect_time'] = str(datetime.now())
             icesession = self.core_utils_obj.wrap(json.dumps(icesession), ice_ndac_key)
             socketIO._http_session.params['icesession'] = icesession
+            msg = 'Connectivity issue with Nineteen68 Server. Attempting to restore connectivity...'
+            logger.print_on_console(msg)
+            log.error(msg)
         if not bool(wxObject): return
         wxObject.connectbutton.SetBitmapLabel(wxObject.connect_img)
         wxObject.connectbutton.SetName('connect')
-        wxObject.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
         wxObject.schedule.Disable()
-        wxObject.connectbutton.Enable()
+        wxObject.connectbutton.Disable()
 
     def on_irisOperations(self, *args):
         try:
