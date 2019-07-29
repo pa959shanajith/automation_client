@@ -15,7 +15,7 @@ import time
 import logging
 import socketIO_client
 from uuid import uuid4 as uuid
-from socketIO_client import TimeoutError, ConnectionError
+from socketIO_client.exceptions import *
 from socketIO_client.transports import *
 
 CHUNK_MAX_LIMIT = 15*1024*1024 # 15 MB
@@ -45,6 +45,11 @@ def socketIO_transport(self):
     self._opened = True
     self._reset_heartbeat()
     return self._transport_instance
+
+""" Add property to SocketIO library to check closing status of socketIO object """
+@property
+def socketIO_waiting_for_close(self):
+    return self._should_stop_waiting()
 
 """ Override SocketIO library's _close method used for closing a Transport instance.
     This is needed because this library never actually closes the connection.
@@ -180,7 +185,7 @@ def socketIO_wait(self, seconds=None, **kw):
         except IndexError:  ## New Change
             pass            ## New Change
     self._heartbeat_thread.relax()
-    self._transport.set_timeout()
+    #self._transport.set_timeout()
 
 """ Add a ACK_EVENT listener in SocketIO library's socketIO_client.BaseNamespace class
     This is needed to free up memory consumed by stored packet.
@@ -248,6 +253,7 @@ socketIO_client.SocketIO.emit = socketIO_emit
 socketIO_client.SocketIO._warn = socketIO_warn
 socketIO_client.SocketIO._close = socketIO_close
 socketIO_client.SocketIO._transport = socketIO_transport
+socketIO_client.SocketIO.waiting_for_close = socketIO_waiting_for_close
 socketIO_client.SocketIO.wait = socketIO_wait
 socketIO_client.SocketIO.evdata = {}
 socketIO_client.SocketIO.emitting = False

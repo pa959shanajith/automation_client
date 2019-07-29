@@ -76,7 +76,6 @@ class MainNamespace(BaseNamespace):
         try:
             if(str(args[0]) == 'connected'):
                 if(allow_connect):
-
                     wxObject.schedule.Enable()
                     wxObject.cancelbutton.Enable()
                     wxObject.terminatebutton.Enable()
@@ -115,7 +114,6 @@ class MainNamespace(BaseNamespace):
                     global icesession,plugins_list
                     ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                         'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-
                     response = json.loads(self.core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
                     plugins_list = response['plugins']
                     err_res = None
@@ -672,8 +670,8 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_disconnect(self, *args):
-        log.info('Disconnected from Nineteen68 server')
-        if socketIO is not None:
+        log.info('Disconnect triggered')
+        if (socketIO is not None) and (not socketIO.waiting_for_close):
             ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                 'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
             icesession=json.loads(self.core_utils_obj.unwrap(socketIO._http_session.params['icesession'], ice_ndac_key))
@@ -709,12 +707,10 @@ class SocketThread(threading.Thread):
     """Test Worker Thread Class."""
     daemon = True
 
-
     def __init__(self):
         """Init Worker Thread Class."""
-        threading.Thread.__init__(self)
+        super(SocketThread, self).__init__()
         self.start()
-
 
     def run(self):
         """Run Worker Thread."""
@@ -768,7 +764,7 @@ class Parallel(threading.Thread):
     #----------------------------------------------------------------------
     def __init__(self,wxObject):
         """Init Worker Thread Class."""
-        threading.Thread.__init__(self)
+        super(Parallel, self).__init__()
         self.wxObject = wxObject
         self.paused = False
         # Explicitly using Lock over RLock since the use of self.paused
@@ -824,7 +820,7 @@ class TestThread(threading.Thread):
     #----------------------------------------------------------------------
     def __init__(self,wxObject,action,json_data,debug_mode):
         """Init Worker Thread Class."""
-        threading.Thread.__init__(self)
+        super(TestThread, self).__init__()
         self.wxObject = wxObject
          #flag to pause thread
         self.paused = False
@@ -853,9 +849,6 @@ class TestThread(threading.Thread):
         # This is the code executing in the new thread.
         global socketIO, execution_flag, closeActiveConnection,connection_Timer
         try:
-            self.wxObject.cancelbutton.Disable()
-            self.wxObject.terminatebutton.Enable()
-            self.wxObject.schedule.Disable()
             runfrom_step=1
             if self.action==DEBUG:
                 self.debug_mode=False
@@ -869,6 +862,7 @@ class TestThread(threading.Thread):
                             runfrom_step=int(runfrom_step)
                         except Exception as e:
                             runfrom_step=0
+            self.wxObject.schedule.Disable()
             self.wxObject.rbox.Disable()
             self.wxObject.breakpoint.Disable()
             self.con = controller.Controller()
@@ -900,7 +894,6 @@ class TestThread(threading.Thread):
             self.wxObject.rbox.Enable()
             self.wxObject.breakpoint.Enable()
             self.wxObject.cancelbutton.Enable()
-            self.wxObject.terminatebutton.Disable()
             testcasename = handler.local_handler.testcasename
             if self.action==DEBUG:
                 self.wxObject.killChildWindow(debug=True)
@@ -1290,7 +1283,7 @@ class ClientWindow(wx.Frame):
             self.clearbutton.Disable()
             self.connectbutton.Enable()
             self.rbox.Disable()
-            log.error(e)
+            log.error(e,exc_info=True)
 
     def killSocket(self, disconn=False):
         #Disconnects socket client
@@ -1298,16 +1291,16 @@ class ClientWindow(wx.Frame):
         try:
             if socketIO is not None:
                 if disconn:
-                    log.info('Sending Socket disconnect request')
+                    log.info('Sending socket disconnect request')
                     socketIO.emit('unavailableLocalServer')
                 socketIO.disconnect()
                 del socketIO
                 socketIO = None
-                log.info('Disconnected from Nineteen68 server')
                 wxObject.socketthread.join()
+                log.info('Connection Closed')
         except Exception as e:
-            log.error("Error while disconnecting from server")
-            log.error(e)
+            log.error("Error while closing connection")
+            log.error(e,exc_info=True)
 
     def closeConnection(self):
         global closeActiveConnection
