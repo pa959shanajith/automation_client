@@ -106,7 +106,7 @@ class DynamicVariables:
 
      #To Store the output from keyword as an array if it is single value
     def store_dynamic_value(self,output_var,output_value,keyword):
-        if self.check_for_dynamicvariables(output_var,keyword)==TEST_RESULT_TRUE:
+        if self.check_for_dynamicvariables(output_var,keyword,True)==TEST_RESULT_TRUE:
             if isinstance(output_value,list):
                 if not(keyword.lower() in DATABASE_KEYWORDS):
                     self.store_as_array(output_var,output_value)
@@ -119,7 +119,7 @@ class DynamicVariables:
 
 
      #To Check if the given pattern of the variable matches '{a}'
-    def check_for_dynamicvariables(self,outputval,keyword=None):
+    def check_for_dynamicvariables(self,outputval,keyword=None,store_val=False):
         #checks whether the given variable is dynamic or not
         status = TEST_RESULT_FALSE
         json_flag=False
@@ -129,7 +129,7 @@ class DynamicVariables:
                     if type(outputval)==dict:
                         status = TEST_RESULT_FALSE
                         json_flag=True
-                    elif keyword is not None and keyword.lower()=='getobject':
+                    elif keyword is not None and keyword.lower()=='getobject' and store_val:
                         json_flag=True
                         if(outputval.startswith('{{') and outputval.endswith('}}') and outputval[2:].find('{') <0 and outputval[2:-2].find('}')<0):
                             status = TEST_RESULT_TRUE
