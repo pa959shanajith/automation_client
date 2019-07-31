@@ -1774,7 +1774,8 @@ class Config_window(wx.Frame):
         self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])
         self.save_btn.Bind(wx.EVT_BUTTON, self.config_check)
         self.close_btn=wx.Button(self.panel, label="Close",pos=config_fields["Close"][0], size=config_fields["Close"][1])
-        self.close_btn.Bind(wx.EVT_BUTTON, self.close)
+        self.close_btn.Bind(wx.EVT_BUTTON, self.Close)
+        self.Bind(wx.EVT_CLOSE, self.close)
 
         if wxObject.connectbutton.GetName().lower() != "connect":
             self.sev_add.Enable(False)
@@ -2061,8 +2062,7 @@ class Config_window(wx.Frame):
         dlg.Destroy()
 
     """This method closes the wxPython instance"""
-    def close(self,event):
-        self.Close()
+    def close(self, event):
         self.Destroy()
         global configvalues, browsercheckFlag, chromeFlag, firefoxFlag
         configvalues = readconfig.readConfig().readJson() # Re-reading config values
@@ -2102,6 +2102,7 @@ class DebugWindow(wx.Frame):
         self.Centre()
         style = self.GetWindowStyle()
         self.SetWindowStyle( style|wx.STAY_ON_TOP )
+        self.Bind(wx.EVT_CLOSE, self.Resume)
         wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
         self.Show()
 
@@ -2112,6 +2113,7 @@ class DebugWindow(wx.Frame):
         wxObject.mythread.resume(False)
         wxObject.debugwindow = None
         self.Destroy()
+        self.Close()
 
     def OnContinue(self, event):
         logger.print_on_console('Event Triggered to Resume')
