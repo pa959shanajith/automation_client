@@ -900,12 +900,13 @@ class TestThread(threading.Thread):
             if self.action==DEBUG:
                 self.wxObject.killChildWindow(debug=True)
                 if (len(testcasename) > 0 or apptype.lower() not in plugins_list):
-                    import UserObjectScrape
-                    if(UserObjectScrape.update_data!={}):
-                        data=UserObjectScrape.update_data
-                        UserObjectScrape.update_data={}
-                        data['status']=status
-                        socketIO.emit('result_debugTestCase',data)
+                    if('UserObjectScrape' in sys.modules):
+                        import UserObjectScrape
+                        if(UserObjectScrape.update_data!={}):
+                            data=UserObjectScrape.update_data
+                            UserObjectScrape.update_data={}
+                            data['status']=status
+                            socketIO.emit('result_debugTestCase',data)
                     else:
                         socketIO.emit('result_debugTestCase',status)
                 else:
