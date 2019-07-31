@@ -32,7 +32,9 @@ class readConfig():
         "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":"","extn_enabled":""}
         if os.path.isfile(self.config_path)==True:
             try:
-                params = json.load(open(self.config_path))
+                conf = open(self.config_path, 'r')
+                params = json.load(conf)
+                conf.close()
                 configvalues['server_ip']=params['server_ip']
                 configvalues['server_port']=params['server_port']
                 configvalues['ignore_certificate']=params['ignore_certificate']
