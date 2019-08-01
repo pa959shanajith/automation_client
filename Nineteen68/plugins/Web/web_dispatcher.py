@@ -245,7 +245,7 @@ class Dispatcher:
                         local_Wd.log.info(teststepproperty.custom_flag)
                         custom_input=teststepproperty.inputval[0].split(';')
                         if teststepproperty.custom_flag:
-                            if len(input)>3 and custom_input[-1].startswith('{{') and custom_input.endswith('}}'):
+                            if len(input)>3 and custom_input[-1].startswith('{{') and custom_input[-1].endswith('}}'):
                                 if isinstance(input[-1],webdriver.remote.webelement.WebElement):
                                     reference_element=input[-1]
                                     getObjectFlag=True
