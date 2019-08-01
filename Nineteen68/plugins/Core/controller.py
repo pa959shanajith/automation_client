@@ -1123,24 +1123,18 @@ class Controller():
         self.conthread=mythread
         self.clear_data()
         socket_object = socketIO
-        obj = handler.Handler()
-        suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path,self.execution_mode=obj.parse_json_execute(json_data)
         #Logic to make sure that logic of usage of existing driver is not applicable to execution
         if local_cont.web_dispatcher_obj != None:
             local_cont.web_dispatcher_obj.action=action
         self.debug_choice=wxObject.choice
-        if action.lower()==EXECUTE:
-            #self.execution_mode=SERIAL
-            #Parallel Execution
-            ##obj=handler.Handler()
+        if action==EXECUTE:
+            self.execution_mode = json_data['exec_mode'].lower()
             kill_process()
-            ##if execution_mode.lower() == PARALLEL:
-            ##    status=self.invoke_execution(mythread,json_data)
-            if self.execution_mode.lower() == SERIAL:
+            if self.execution_mode == SERIAL:
                 status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc)
-            elif self.execution_mode.lower() == PARALLEL:
+            elif self.execution_mode == PARALLEL:
                 status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc)
-        elif action.lower()==DEBUG:
+        elif action==DEBUG:
             self.debug_mode=debug_mode
             self.wx_object=wxObject
             status=self.invoke_debug(mythread,runfrom_step,json_data)
