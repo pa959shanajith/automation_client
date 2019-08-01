@@ -834,7 +834,7 @@ class TestThread(threading.Thread):
         # boosts performance.
         self.pause_cond = threading.Condition(threading.Lock())
         self.con=''
-        self.action=action
+        self.action=action.lower()
         self.json_data=json_data
         self.debug_mode=debug_mode
         self.start()    # start the thread
@@ -900,12 +900,15 @@ class TestThread(threading.Thread):
             if self.action==DEBUG:
                 self.wxObject.killChildWindow(debug=True)
                 if (len(testcasename) > 0 or apptype.lower() not in plugins_list):
-                    import UserObjectScrape
-                    if(UserObjectScrape.update_data!={}):
-                        data=UserObjectScrape.update_data
-                        UserObjectScrape.update_data={}
-                        data['status']=status
-                        socketIO.emit('result_debugTestCase',data)
+                    if('UserObjectScrape' in sys.modules):
+                        import UserObjectScrape
+                        if(UserObjectScrape.update_data!={}):
+                            data=UserObjectScrape.update_data
+                            UserObjectScrape.update_data={}
+                            data['status']=status
+                            socketIO.emit('result_debugTestCase',data)
+                        else:
+                            socketIO.emit('result_debugTestCase',status)
                     else:
                         socketIO.emit('result_debugTestCase',status)
                 else:
@@ -1774,7 +1777,7 @@ class Config_window(wx.Frame):
         self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])
         self.save_btn.Bind(wx.EVT_BUTTON, self.config_check)
         self.close_btn=wx.Button(self.panel, label="Close",pos=config_fields["Close"][0], size=config_fields["Close"][1])
-        self.close_btn.Bind(wx.EVT_BUTTON, self.Close)
+        self.close_btn.Bind(wx.EVT_BUTTON, self.close)
         self.Bind(wx.EVT_CLOSE, self.close)
 
         if wxObject.connectbutton.GetName().lower() != "connect":
@@ -2095,10 +2098,10 @@ class DebugWindow(wx.Frame):
         self.panel = wx.Panel(self)
         self.continue_debugbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"play.png", wx.BITMAP_TYPE_ANY), (65, 15), (35, 28))
         self.continue_debugbutton.Bind(wx.EVT_LEFT_DOWN, self.Resume)
-        self.continue_debugbutton.SetToolTip(wx.ToolTip("To continue the execution"))
+        self.continue_debugbutton.SetToolTip(wx.ToolTip("Resume"))
         self.continuebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"step.png", wx.BITMAP_TYPE_ANY), (105, 15), (35, 28))
         self.continuebutton.Bind(wx.EVT_LEFT_DOWN, self.OnContinue)
-        self.continuebutton.SetToolTip(wx.ToolTip("To Resume the execution "))
+        self.continuebutton.SetToolTip(wx.ToolTip("Proceed to next step"))
         self.Centre()
         style = self.GetWindowStyle()
         self.SetWindowStyle( style|wx.STAY_ON_TOP )
@@ -2107,17 +2110,17 @@ class DebugWindow(wx.Frame):
         self.Show()
 
     def Resume(self, event):
-        logger.print_on_console('Event Triggered to Resume Debug')
-        log.info('Event Triggered to Resume Debug')
+        msg = "Event Triggered to Resume Debug"
+        logger.print_on_console(msg)
+        log.info(msg)
         controller.pause_flag=False
         wxObject.mythread.resume(False)
         wxObject.debugwindow = None
         self.Destroy()
-        self.Close()
 
     def OnContinue(self, event):
-        logger.print_on_console('Event Triggered to Resume')
-        log.info('Event Triggered to Resume')
+        msg = "Event Triggered to proceed to next step"
+        logger.print_on_console(msg)
         controller.pause_flag=False
         wxObject.mythread.resume(True)
 

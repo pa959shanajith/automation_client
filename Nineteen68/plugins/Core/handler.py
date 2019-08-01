@@ -247,7 +247,8 @@ class Handler():
                 if 'dataparampath' in json_data:
                     dataparam_path[suite_id]=json_data['dataparampath']
         except Exception as e:
-            print(e)
+            local_handler.log.error("Error while parsing data")
+            local_handler.log.error(e,exc_info=True)
         return suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path,exec_mode
 
     def validate(self,start,end):

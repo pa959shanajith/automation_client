@@ -29,7 +29,7 @@ import pause_execution
 import dynamic_variable_handler
 import reporting
 import core_utils
-local = threading.local()
+local_cont = threading.local()
 #index for iterating the teststepproperty for executor
 ##i = 0
 #Terminate Flag
@@ -39,34 +39,6 @@ iris_flag = False
 iris_constant_step = -1
 socket_object = None
 log = logging.getLogger("controller.py")
-
-
-class TestThread(threading.Thread):
-    """Test Worker Thread Class."""
-    #----------------------------------------------------------------------
-    def __init__(self,browser,mythread):
-        """Init Worker Thread Class."""
-        logger.print_on_console( 'Browser number: ',str(browser))
-        log.debug('Browser number:  %d',str(browser))
-        threading.Thread.__init__(self)
-        self.browser = browser
-        self.thread=mythread
-        self.start()    # start the thread
-    #----------------------------------------------------------------------
-    def run(self):
-        """Run Worker Thread."""
-        # This is the code executing in the new thread.
-        try:
-            time.sleep(2)
-            con = Controller()
-            con.conthread=self.thread
-            status = con.invoke_controller(EXECUTE,'',con.conthread,self.browser)
-            if status==TERMINATE:
-                logger.print_on_console( '---------Termination Completed-------')
-            else:
-                logger.print_on_console('***SUITE EXECUTION COMPLETED***')
-        except Exception as m:
-            log.error(m)
 
 
 class Controller():
@@ -83,9 +55,9 @@ class Controller():
     system_dispatcher_obj = None
     pdf_dispatcher_obj = None
     def __init__(self):
-        global local
-        local.web_dispatcher_obj = None
-        local.generic_dispatcher_obj = None
+        global local_cont
+        local_cont.web_dispatcher_obj = None
+        local_cont.generic_dispatcher_obj = None
         self.action=None
         core_utils.get_all_the_imports(CORE)
         self.cur_dir= os.getcwd()
@@ -109,21 +81,20 @@ class Controller():
         self.configvalues={}
         self.core_utilsobject = core_utils.CoreUtils()
         self.exception_flag=None
-        local.log = logging.getLogger("controller.py")
-        local.i = 0
+        local_cont.i = 0
         self.execution_mode = None
         self.__load_generic()
 
     def __load_generic(self):
         try:
-            if local.generic_dispatcher_obj==None:
+            if local_cont.generic_dispatcher_obj==None:
                 core_utils.get_all_the_imports('ImageProcessing')
                 core_utils.get_all_the_imports('Generic')
                 import generic_dispatcher
-                local.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
+                local_cont.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
         except Exception as e:
             logger.print_on_console('Error loading Generic plugin')
-            local.log.error(e,exc_info=True)
+            log.error(e,exc_info=True)
 
     def __load_pdf(self):
         try:
@@ -193,12 +164,12 @@ class Controller():
             if iris_flag:
                 core_utils.get_all_the_imports('IRIS')
             import web_dispatcher
-            local.web_dispatcher_obj = web_dispatcher.Dispatcher()
-            local.web_dispatcher_obj.exception_flag=self.exception_flag
-            local.web_dispatcher_obj.action=self.action
+            local_cont.web_dispatcher_obj = web_dispatcher.Dispatcher()
+            local_cont.web_dispatcher_obj.exception_flag=self.exception_flag
+            local_cont.web_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading Web plugin')
-            local.log.error(e)
+            log.error(e)
 
     def __load_desktop(self):
         try:
@@ -284,10 +255,10 @@ class Controller():
                 status=False
         if not(status) and len(errormsg)>0:
             logger.print_on_console(errormsg+' in '+tsp.testscript_name+'\n')
-            local.log.error(errormsg+' in '+tsp.testscript_name)
+            log.error(errormsg+' in '+tsp.testscript_name)
         elif not(status):
             logger.print_on_console('Dangling: '+tsp.name +' in '+tsp.testscript_name+'\n')
-            local.log.error('Dangling: '+tsp.name +' in '+tsp.testscript_name)
+            log.error('Dangling: '+tsp.name +' in '+tsp.testscript_name)
         return status
 
     def __print_details(self,tsp,input,inpval):
@@ -295,12 +266,12 @@ class Controller():
         input_val='Input :'+str(input)
         output='Output :'+tsp.outputval
         apptype='Apptype : '+str(tsp.apptype)
-        local.log.info(keyowrd)
-        local.log.info(input_val)
-        local.log.info(output)
-        local.log.info(apptype)
+        log.info(keyowrd)
+        log.info(input_val)
+        log.info(output)
+        log.info(apptype)
         for i in range(len(inpval)):
-            local.log.info('Input: '+str(i + 1)+ '= '+repr(inpval[i]))
+            log.info('Input: '+str(i + 1)+ '= '+repr(inpval[i]))
 
     def clear_data(self):
         global terminate_flag,pause_flag,iris_constant_step
@@ -310,7 +281,7 @@ class Controller():
     def resume_execution(self):
         global pause_flag
         logger.print_on_console('=======Resuming=======')
-        local.log.info('=======Resuming=======')
+        log.info('=======Resuming=======')
         self.conthread.paused = False
         pause_flag=False
         # Notify so thread will wake after lock released
@@ -319,13 +290,13 @@ class Controller():
             # Now release the lock
             self.conthread.pause_cond.release()
         except Exception as e:
-            local.log.error('Debug is not paused to Resume')
+            log.error('Debug is not paused to Resume')
             logger.print_on_console('Debug is not paused to Resume')
-            local.log.error(e)
+            log.error(e)
 
     def pause_execution(self):
         logger.print_on_console('=======Pausing=======')
-        local.log.info('=======Pausing=======')
+        log.info('=======Pausing=======')
         self.conthread.paused=True
         self.conthread.pause_cond.acquire()
         with self.conthread.pause_cond:
@@ -365,7 +336,7 @@ class Controller():
                     self.__print_details(tsp,input,inpval)
                 #Calculating Start time
                 logger.print_on_console('Step number is : ',str(tsp.stepnum))
-                local.log.info('Step number is : '+str(tsp.stepnum))
+                log.info('Step number is : '+str(tsp.stepnum))
                 if ignore_stat:
                     teststepproperty = handler.local_handler.tspList[index]
                     keyword=teststepproperty.name
@@ -373,11 +344,11 @@ class Controller():
                     index=index+1
                 else:
                     if tsp != None and isinstance(tsp,TestStepProperty) :
-                        local.log.info( "----Keyword :"+str(tsp.name)+' execution Started----')
+                        log.info( "----Keyword :"+str(tsp.name)+' execution Started----')
                         start_time = datetime.now()
                         start_time_string=start_time.strftime(TIME_FORMAT)
                         logger.print_on_console('Step Execution start time is : '+start_time_string)
-                        local.log.info('Step Execution start time is : '+start_time_string)
+                        log.info('Step Execution start time is : '+start_time_string)
                         index,result = self.keywordinvocation(index,inpval,self.reporting_obj,*args)
                         if tsp.name=='verifyValues' or tsp.name.lower()=='verifytextiris':
                             #testcase_details_orig=tsp.testcase_details
@@ -528,8 +499,8 @@ class Controller():
                         logger.print_on_console('Response Body: \n',display_keyword_response[1][2:-1].replace("\\n","\n").replace("\\r","\r").replace("\\t","\t"),'\n')
                 else:
                     logger.print_on_console('Response Body exceeds max. Limit, please use writeToFile keyword.')
-                    local.log.info('Result obtained is: ')
-                    local.log.info(display_keyword_response)
+                    log.info('Result obtained is: ')
+                    log.info(display_keyword_response)
             elif(len(display_keyword_response) == 1):
                 logger.print_on_console('Response Header: ',display_keyword_response[0])
             else:
@@ -538,8 +509,8 @@ class Controller():
                     if not isinstance(display_keyword_response,list):
                         logger.print_on_console('Result obtained is ',display_keyword_response)
                     else:
-                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[local.i])
-                        if not isinstance(display_keyword_response[local.i],str) else display_keyword_response[local.i] for local.i in range(len(display_keyword_response))]))
+                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[local_cont.i])
+                        if not isinstance(display_keyword_response[local_cont.i],str) else display_keyword_response[local_cont.i] for local_cont.i in range(len(display_keyword_response))]))
                 else:
                     logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         else:
@@ -564,12 +535,12 @@ class Controller():
                         elif result:
                             logger.print_on_console('Result obtained is: ',result[1])
                     else:
-                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[local.i])
-                        if not isinstance(display_keyword_response[local.i],str) else display_keyword_response[local.i] for local.i in range(len(display_keyword_response))]))
+                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[local_cont.i])
+                        if not isinstance(display_keyword_response[local_cont.i],str) else display_keyword_response[local_cont.i] for local_cont.i in range(len(display_keyword_response))]))
             else:
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
-        local.log.info('Result obtained is: ')
-        local.log.info(display_keyword_response)
+        log.info('Result obtained is: ')
+        log.info(display_keyword_response)
         if tsp.apptype.lower()=='desktop' or tsp.apptype.lower()=='sap' or tsp.apptype.lower()=='desktopjava' or (tsp.cord!='' and tsp.cord!=None):
             if result[2]!='9cc33d6fe25973868b30f4439f09901a' and tsp.name.lower()!='verifytextiris':
                 logger.print_on_console('Result obtained is: ',result[2])
@@ -592,9 +563,9 @@ class Controller():
             import time
             time.sleep(int(configvalues['stepExecutionWait']))
         except Exception as e:
-            local.log.error('stepExecutionWait should be a integer, please change it in config.json')
+            log.error('stepExecutionWait should be a integer, please change it in config.json')
             logger.print_on_console('stepExecutionWait should be a integer, please change it in config.json')
-            local.log.error(e)
+            log.error(e)
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
         #Check for 'terminate_flag' before execution
         if not(terminate_flag):
@@ -624,14 +595,14 @@ class Controller():
                 self.verify_exists=False
             #Checking of  Drag and Drop keyowrds Issue #115 in Git
             if teststepproperty.name.lower()==DROP:
-                local.log.debug('Drop keyword encountered')
+                log.debug('Drop keyword encountered')
                 teststepproperty_prev = handler.local_handler.tspList[index-1]
                 if teststepproperty_prev.name.lower()!=DRAG:
                     teststepproperty.execute_flag=False
                     result=list(result)
                     result[3]='Drag Keyword is missing'
             elif keyword.lower()==DRAG:
-                local.log.debug('Drag keyword encountered')
+                log.debug('Drag keyword encountered')
                 if(index+1)<len(handler.local_handler.tspList):
                     teststepproperty_next = handler.local_handler.tspList[index+1]
                     if teststepproperty_next.name.lower()!=DROP:
@@ -654,9 +625,9 @@ class Controller():
                 if teststepproperty.apptype.lower() == APPTYPE_GENERIC:
                     #Generic apptype module call
 
-                    if local.generic_dispatcher_obj == None:
+                    if local_cont.generic_dispatcher_obj == None:
                         self.__load_generic()
-                    result = self.invokegenerickeyword(teststepproperty,local.generic_dispatcher_obj,inpval)
+                    result = self.invokegenerickeyword(teststepproperty,local_cont.generic_dispatcher_obj,inpval)
 
                 elif teststepproperty.apptype.lower() == APPTYPE_SYSTEM:
                     #System apptype module call
@@ -666,9 +637,9 @@ class Controller():
 
                 elif teststepproperty.apptype.lower() == APPTYPE_WEB:
                     #Web apptype module call
-                    if local.web_dispatcher_obj == None:
+                    if local_cont.web_dispatcher_obj == None:
                         self.__load_web()
-                    result = self.invokewebkeyword(teststepproperty,local.web_dispatcher_obj,inpval,args[0],iris_flag)
+                    result = self.invokewebkeyword(teststepproperty,local_cont.web_dispatcher_obj,inpval,args[0],iris_flag)
                 elif teststepproperty.apptype.lower() == APPTYPE_MOBILE:
                     #MobileWeb apptype module call
                     if self.mobile_web_dispatcher_obj == None:
@@ -724,8 +695,8 @@ class Controller():
             if pause_flag:
                 self.pause_execution()
 ##            logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',temp_result)
-            local.log.info('Result in methodinvocation : '+ str(teststepproperty.name)+' : ')
-            local.log.info(result)
+            log.info('Result in methodinvocation : '+ str(teststepproperty.name)+' : ')
+            log.info(result)
             self.keyword_status=TEST_RESULT_FAIL
             if result!=TERMINATE:
                 self.store_result(result,teststepproperty)
@@ -737,7 +708,7 @@ class Controller():
                 self.status=result
             #Fixing issue #382
             logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n')
-            local.log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
+            log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
             if teststepproperty.name.lower()==STOP:
                 ## Issue #160
@@ -753,8 +724,8 @@ class Controller():
         start_time_string=self.scenario_start_time.strftime(TIME_FORMAT)
         logger.print_on_console('Scenario Execution start time is : '+start_time_string,'\n')
         global pause_flag
-        if local.generic_dispatcher_obj is not None and local.generic_dispatcher_obj.action is None:
-            local.generic_dispatcher_obj.action=action
+        if local_cont.generic_dispatcher_obj is not None and local_cont.generic_dispatcher_obj.action is None:
+            local_cont.generic_dispatcher_obj.action=action
         while (i < len(tsplist)):
             #Check for 'terminate_flag' before execution
             if not(terminate_flag):
@@ -773,7 +744,7 @@ class Controller():
                         break
                     ## Issue #160
                     elif i==STOP:
-                        local.log.info('Encountered STOP keyword')
+                        log.info('Encountered STOP keyword')
                         break
                     elif i==JUMP_TO:
                         i=self.jumpto_previousindex[-1]
@@ -781,7 +752,7 @@ class Controller():
                             self.jumpto_previousindex.pop()
                             self.counter.pop()
                 except Exception as e:
-                    local.log.error(e,exc_info=True)
+                    log.error(e,exc_info=True)
                     logger.print_on_console("Error encountered during Execution")
                     status=False
                     i=i+1
@@ -859,7 +830,7 @@ class Controller():
         handler.local_handler.tspList=[]
         scenario=[json_data]
         print('=======================================================================================================')
-        local.log.info('***DEBUG STARTED***')
+        log.info('***DEBUG STARTED***')
         logger.print_on_console('***DEBUG STARTED***')
         print('=======================================================================================================')
         for d in scenario:
@@ -879,11 +850,11 @@ class Controller():
                 status = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread)
             else:
                 logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
-                local.log.info('Invalid step number!! Please provide run from step number')
+                log.info('Invalid step number!! Please provide run from step number')
         else:
             logger.print_on_console('Invalid script')
         print('=======================================================================================================')
-        local.log.info('***DEBUG COMPLETED***')
+        log.info('***DEBUG COMPLETED***')
         logger.print_on_console('***DEBUG COMPLETED***')
         print('=======================================================================================================')
         #clearing of dynamic variables
@@ -908,7 +879,7 @@ class Controller():
         #Getting all the details by parsing the json_data
         suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path,self.execution_mode=obj.parse_json_execute(json_data)
         self.action=EXECUTE
-        local.log.info( 'No  of Suites : '+str(len(suiteId_list)))
+        log.info( 'No  of Suites : '+str(len(suiteId_list)))
         logger.print_on_console('No  of Suites : ',str(len(suiteId_list)))
         j=1
         #Iterate through the suites-list
@@ -919,11 +890,11 @@ class Controller():
             if terminate_flag:
                 status=TERMINATE
 ##                break
-            local.log.info('---------------------------------------------------------------------')
+            log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
-            local.log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
+            log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
             logger.print_on_console('***SUITE ', str(j) ,' EXECUTION STARTED***')
-            local.log.info('-----------------------------------------------')
+            log.info('-----------------------------------------------')
             print('=======================================================================================================')
             do_not_execute = False
             #Check for the disabled scenario
@@ -946,7 +917,7 @@ class Controller():
                                 print('=======================================================================================================')
                                 logger.print_on_console( '***Scenario ' ,str(i+1) ,' execution started***')
                                 print('=======================================================================================================')
-                                local.log.info('***Scenario '  + str(i+1)+ ' execution started***')
+                                log.info('***Scenario '  + str(i+1)+ ' execution started***')
                             if(len(scenario)==3 and len(scenario['qcdetails'])==7):
                                 qc_details_creds=scenario['qccredentials']
                                 qc_username=qc_details_creds['qcusername']
@@ -975,7 +946,7 @@ class Controller():
                                         logger.print_on_console('Condition Check: Terminated by program ')
                                     info_msg=str("Scenario cannot be executed, since the following testcases are empty: "+','.join(empty_testcase_names))
                                     logger.print_on_console(info_msg)
-                                    local.log.info(info_msg)
+                                    log.info(info_msg)
                                     status = TERMINATE
                                     execute_flag=False
                                 else:
@@ -1001,7 +972,7 @@ class Controller():
                             if execute_flag:
                                 #Saving the report for the scenario
                                 logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
-                                local.log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
+                                log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                                 os.chdir(self.cur_dir)
                                 filename='Scenario'+str(i  + 1)+'.json'
                                 #check if user has manually terminated during execution, then check if the teststep data and overallstatus is [] if so poputale default values in teststep data and overallstatus
@@ -1060,7 +1031,7 @@ class Controller():
                                             logger.print_on_console('Condition Check: Terminated by program ')
                             elif (True in testcase_empty_flag):
                                 logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
-                                local.log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
+                                log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                                 os.chdir(self.cur_dir)
                                 filename='Scenario'+str(i  + 1)+'.json'
                                 con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg)
@@ -1069,7 +1040,7 @@ class Controller():
                                 i+=1
                         else:
                             logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
-                            local.log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
+                            log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                             os.chdir(self.cur_dir)
                             filename='Scenario'+str(i  + 1)+'.json'
                             con.reporting_obj.save_report_json_conditioncheck(filename)
@@ -1078,13 +1049,13 @@ class Controller():
                             i+=1
                             #logic for condition check
                             report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-            local.log.info('---------------------------------------------------------------------')
+            log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
-            local.log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
+            log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
             logger.print_on_console('***SUITE ', str(j) ,' EXECUTION COMPLETED***')
-            local.log.info('-----------------------------------------------')
+            log.info('-----------------------------------------------')
             print('=======================================================================================================')
             j=j+1
         if status==TERMINATE:
@@ -1123,24 +1094,18 @@ class Controller():
         self.conthread=mythread
         self.clear_data()
         socket_object = socketIO
-        obj = handler.Handler()
-        suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path,self.execution_mode=obj.parse_json_execute(json_data)
         #Logic to make sure that logic of usage of existing driver is not applicable to execution
-        if local.web_dispatcher_obj != None:
-            local.web_dispatcher_obj.action=action
+        if local_cont.web_dispatcher_obj != None:
+            local_cont.web_dispatcher_obj.action=action
         self.debug_choice=wxObject.choice
-        if action.lower()==EXECUTE:
-            #self.execution_mode=SERIAL
-            #Parallel Execution
-            ##obj=handler.Handler()
+        if action==EXECUTE:
+            self.execution_mode = json_data['exec_mode'].lower()
             kill_process()
-            ##if execution_mode.lower() == PARALLEL:
-            ##    status=self.invoke_execution(mythread,json_data)
-            if self.execution_mode.lower() == SERIAL:
+            if self.execution_mode == SERIAL:
                 status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc)
-            elif self.execution_mode.lower() == PARALLEL:
+            elif self.execution_mode == PARALLEL:
                 status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc)
-        elif action.lower()==DEBUG:
+        elif action==DEBUG:
             self.debug_mode=debug_mode
             self.wx_object=wxObject
             status=self.invoke_debug(mythread,runfrom_step,json_data)
@@ -1162,7 +1127,7 @@ class Controller():
                 th[i].join()
         except Exception as e:
             logger.print_on_console("Exception in Parallel Execution")
-            local.log("Exception in Parallel Execution"+str(e))
+            log("Exception in Parallel Execution"+str(e))
         if not(terminate_flag):
             status =COMPLETED
         return status
