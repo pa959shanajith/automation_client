@@ -907,6 +907,8 @@ class TestThread(threading.Thread):
                             UserObjectScrape.update_data={}
                             data['status']=status
                             socketIO.emit('result_debugTestCase',data)
+                        else:
+                            socketIO.emit('result_debugTestCase',status)
                     else:
                         socketIO.emit('result_debugTestCase',status)
                 else:
