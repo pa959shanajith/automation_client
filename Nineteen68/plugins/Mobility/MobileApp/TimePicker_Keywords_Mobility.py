@@ -162,7 +162,7 @@ class Time_Keywords():
                         log.debug('performing the action')
                         time_inputs = driver.find_elements_by_id('android:id/numberpicker_input')
                         radial_buttons=driver.find_elements_by_class_name('android.widget.RadialTimePickerView$RadialPickerTouchHelper')
-                        if len(radial_buttons) == 12 :
+                        if len(radial_buttons) >= 12 :
                             element1=driver.find_elements_by_class_name('android.widget.TextView')
                             AmorPm=driver.find_elements_by_class_name('android.widget.RadioButton')
                             Hour=element1[0].text
@@ -210,7 +210,7 @@ class Time_Keywords():
                         if len(input_time) == 3:
                             time_inputs = driver.find_elements_by_id('android:id/numberpicker_input')
                             radial_buttons=driver.find_elements_by_class_name('android.widget.RadialTimePickerView$RadialPickerTouchHelper')
-                            if len(radial_buttons) == 12 :
+                            if len(radial_buttons) >= 12 :
                                 element1=driver.find_elements_by_class_name('android.widget.TextView')
                                 AmorPm=driver.find_elements_by_class_name('android.widget.RadioButton')
                                 Hour=element1[0].text
