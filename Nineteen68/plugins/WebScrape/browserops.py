@@ -72,24 +72,54 @@ class BrowserOperations():
     param : Browser name such as CH - Chrome, IE - Internet Explorer and FX - Firefox
     """
     def openBrowser(self,browserType):
-        global driver
-        global browser
+        global driver, browser
         status=False
 
-
-##        print 'driver:',driver
+    ##        print 'driver:',driver
         browser = browserType
-        s = obj.openBrowser(None,browserType)
-
-##        print 'status in :',s
-##        print 'status type',type(s)
-
-
-        if s[0] == 'Pass':
-##            global driver_obj
-##            print 'browserkeywords ::::',browser_Keywords.driver_obj
-            driver = browser_Keywords.local_bk.driver_obj
-##            print 'my driver ::::',driver
+        # if browser_Keywords.driver_pre:
+        #     browser_Keywords.local_bk.driver_obj=browser_Keywords.driver_pre
+        #     driver = browser_Keywords.local_bk.driver_obj
+        #     return True
+        d = self.check_if_driver_exists_in_list(browser)
+        if d is not None:
+            browser_Keywords.local_bk.driver_obj = d
+            driver = d
             status=True
+        else:
+            s = obj.openBrowser(None,browser)
+    ##        print 'status in :',s
+    ##        print 'status type',type(s)
+            if s[0] == 'Pass':
+    ##            global driver_obj
+    ##            print 'browserkeywords ::::',browser_Keywords.driver_obj
+                driver = browser_Keywords.local_bk.driver_obj
+    ##            print 'my driver ::::',driver
+                status=True
         return status
 
+    def check_if_driver_exists_in_list(self,browserType):
+        d = None
+        instance={
+            '1':webdriver.Chrome,
+            '2':webdriver.Firefox,
+            '3':webdriver.Ie,
+            '6':webdriver.Safari
+        }
+        if len(browser_Keywords.drivermap) > 0:
+            for i in browser_Keywords.drivermap:
+                if isinstance(i,instance[browserType]):
+                    try:
+                        if (browserType == '1') or (browserType == '2'):
+                            if len (i.window_handles) > 0:
+                                d = i
+                        else:
+                            if len (i.window_handles) == 0:
+                                d = 'stale'
+                                break
+                            else:
+                                d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
+        return d
