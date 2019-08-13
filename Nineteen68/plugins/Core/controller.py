@@ -1125,6 +1125,9 @@ class Controller():
                 th[i+1].start()
             for i in range (1,len(browsers_data)):
                 th[i].join()
+            for i in th:
+                while th[i].is_alive():
+                    pass
         except Exception as e:
             logger.print_on_console("Exception in Parallel Execution")
             log("Exception in Parallel Execution"+str(e))
