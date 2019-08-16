@@ -374,7 +374,7 @@ class UtilWebKeywords:
         err_msg=None
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if(webelement is not None and (args[0]) == 2):
+            if(webelement is not None and len(args[0]) == 2):
                 row = int(args[0][0])-1
                 col = int(args[0][1])-1
                 from table_keywords import TableOperationKeywords
