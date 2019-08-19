@@ -75,7 +75,7 @@ class PDFOperations:
         try:
             listVal = self.pdf_convertStrToList(objectname)
 
-            if inputs[0].strip() != None and len(inputs[0].strip()) > 0:
+            if inputs[0].strip() != None and len(inputs[0].strip()) >= 0:
                 inpIndex = inputs[0]
                 inpIndex = int(inpIndex)
 
@@ -127,7 +127,7 @@ class PDFOperations:
                         output = listVal[inpIndex][4]
                         logger.print_on_console('Input value provided : ' , inputs[0])
                         logger.print_on_console('Value fetched : ' , output)
-                elif(inputs[0].strip() != None and len(inputs[0].strip()) > 0):
+                elif(inputs[0].strip() != None and len(inputs[0].strip()) >= 0):
                     for i in range(0,self.indexcount(objectname)):
                         fulltext = fulltext + " " + listVal[i][4]
                         fulltext = fulltext.strip()

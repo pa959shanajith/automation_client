@@ -30,7 +30,8 @@ import readconfig
 import core_utils
 import time
 from sendfunction_keys import SendFunctionKeys as SF
-driver_pre =None
+driver_pre = None
+drivermap = []
 local_bk = threading.local()
 
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
@@ -59,7 +60,6 @@ class BrowserKeywords():
         local_bk.all_handles=[]
         local_bk.recent_handles=[]
         local_bk.webdriver_list = []
-        local_bk.drivermap = []
         local_bk.pid_set = []
         local_bk.log = logging.getLogger('browser_Keywords.py')
 
@@ -70,7 +70,7 @@ class BrowserKeywords():
         return err_msg
 
     def openBrowser(self,webelement,browser_num,*args):
-        global local_bk,driver_pre
+        global local_bk, driver_pre, drivermap
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -98,7 +98,7 @@ class BrowserKeywords():
                                 os.system("TASKKILL /F /IM " + p.Name)
                     except Exception as e:
                         local_bk.log.error(e)
-                    del local_bk.drivermap[:]
+                    del drivermap[:]
                     local_bk.driver_obj = obj.getBrowser(self.browser_num)
                 elif d != None:
                     #driver exist in map, get it
@@ -108,7 +108,7 @@ class BrowserKeywords():
                     local_bk.driver_obj = obj.getBrowser(self.browser_num)
             elif browser_num[-1] == EXECUTE:
                 local_bk.driver_obj=obj.getBrowser(self.browser_num)
-                del local_bk.drivermap[:]
+                del drivermap[:]
             if(local_bk.driver_obj == None):
                 result = TERMINATE
             else:
@@ -783,12 +783,12 @@ class Singleton_DriverUtil():
 ##                    return driver_instance
 
     def chech_if_driver_exists_in_map(self,browserType):
-        global local_bk
+        global local_bk, drivermap
         d = None
 ##        drivermap.reverse()
         if browserType == '1':
-            if len(local_bk.drivermap) > 0:
-                for i in local_bk.drivermap:
+            if len(drivermap) > 0:
+                for i in drivermap:
                     if isinstance(i,webdriver.Chrome ):
                         try:
                             if len (i.window_handles) > 0:
@@ -798,8 +798,8 @@ class Singleton_DriverUtil():
                             break
 
         elif browserType == '2':
-            if len(local_bk.drivermap) > 0:
-                for i in local_bk.drivermap:
+            if len(drivermap) > 0:
+                for i in drivermap:
                     if isinstance(i,webdriver.Firefox ):
                         try:
                             if len (i.window_handles) > 0:
@@ -808,8 +808,8 @@ class Singleton_DriverUtil():
                             d = 'stale'
                             break
         elif browserType == '3':
-            if len(local_bk.drivermap) > 0:
-                for i in local_bk.drivermap:
+            if len(drivermap) > 0:
+                for i in drivermap:
                     if isinstance(i,webdriver.Ie ):
                         try:
                             if len (i.window_handles) == 0:
@@ -821,8 +821,8 @@ class Singleton_DriverUtil():
                             d = 'stale'
                             break
         elif browserType == '6':
-            if len(local_bk.drivermap) > 0:
-                for i in local_bk.drivermap:
+            if len(drivermap) > 0:
+                for i in drivermap:
                     if isinstance(i, webdriver.Safari):
                         try:
                             if len(i.window_handles) == 0:
@@ -838,7 +838,7 @@ class Singleton_DriverUtil():
         return d
 
     def getBrowser(self,browser_num):
-        global local_bk
+        global local_bk, drivermap
         del local_bk.recent_handles[:]
         del local_bk.all_handles[:]
         driver=None
@@ -871,7 +871,7 @@ class Singleton_DriverUtil():
                         choptions.binary_location=str(chrome_path)
                     driver = webdriver.Chrome(executable_path=exec_path,chrome_options=choptions)
                     ##driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
-                    local_bk.drivermap.append(driver)
+                    drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('Chrome browser started')
                     local_bk.log.info('Chrome browser started')
@@ -899,7 +899,7 @@ class Singleton_DriverUtil():
                         driver = webdriver.Firefox(capabilities=caps, firefox_binary=binary, executable_path=exec_path)
                     else:
                         driver = webdriver.Firefox(capabilities=caps,executable_path=exec_path)
-                    local_bk.drivermap.append(driver)
+                    drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('Firefox browser started using geckodriver')
                     local_bk.log.info('Firefox browser started using geckodriver ')
@@ -929,7 +929,7 @@ class Singleton_DriverUtil():
 ##                browser_ver1 = browser_ver.encode('utf-8')
 ##                browser_ver = int(browser_ver1)
 ##                if(browser_ver >= int(webconstants.IE_BROWSER_VERSION[0]) and browser_ver <= int(webconstants.IE_BROWSER_VERSION[1])):
-                local_bk.drivermap.append(driver)
+                drivermap.append(driver)
                 driver.maximize_window()
                 logger.print_on_console('IE browser started')
                 local_bk.log.info('IE browser started')
@@ -947,7 +947,7 @@ class Singleton_DriverUtil():
         elif(browser_num == '4'):
             try:
                 driver = webdriver.Opera()
-                local_bk.drivermap.append(driver)
+                drivermap.append(driver)
                 logger.print_on_console('Opera browser started')
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
@@ -956,7 +956,7 @@ class Singleton_DriverUtil():
         elif(browser_num == '5'):
             try:
                 driver = webdriver.PhantomJS(executable_path=webconstants.PHANTOM_DRIVER_PATH)
-                local_bk.drivermap.append(driver)
+                drivermap.append(driver)
                 logger.print_on_console('Phantom browser started')
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
@@ -966,8 +966,7 @@ class Singleton_DriverUtil():
             try:
                 driver = webdriver.Safari()
                 driver.set_window_size(1024, 768)
-                local_bk.drivermap.append(driver)
-
+                drivermap.append(driver)
 
                 logger.print_on_console('Safari browser started')
                 local_bk.log.info('Safari browser started')
