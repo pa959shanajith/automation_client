@@ -1193,7 +1193,6 @@ class DropdownKeywords():
                             logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                             local_ddl.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-
                     except Exception as e:
                         local_ddl.log.error(e)
                         logger.print_on_console(e)
@@ -1715,10 +1714,10 @@ class DropdownKeywords():
                                                 select.select_by_visible_text(inp_val)
                                                 status=webconstants.TEST_RESULT_PASS
                                                 result=webconstants.TEST_RESULT_TRUE
-                                                log.info('Values Match')
+                                                local_ddl.log.info('Values Match')
                                             else:
                                                 logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                                log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                                local_ddl.log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
                                                 err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                                         else:
                                             logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])

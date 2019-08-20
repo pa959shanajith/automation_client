@@ -216,6 +216,7 @@ class DynamicVariables:
                     if err_msg is not None:
                         log.error(err_msg)
                         logger.print_on_console(err_msg)
+                    err_msg=None
             else:
                 logger.print_on_console("Please provide valid Inputs")
         except Exception as e:

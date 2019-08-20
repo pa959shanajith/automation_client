@@ -813,7 +813,7 @@ class UtilWebKeywords:
             from PIL import Image
             if webelement!=None and webelement !='':
                 img_src = webelement.get_attribute("src")
-                file1 = io.StringIO(urllib.request.urlopen(img_src).read())
+                file1 = io.BytesIO(urllib.request.urlopen(img_src).read())
                 file2=input[0]
                 local_uo.log.info(INPUT_IS)
                 local_uo.log.info(file2)
@@ -869,7 +869,7 @@ class UtilWebKeywords:
             from PIL import Image
             if webelement!=None and webelement !='':
                 img_src = webelement.get_attribute("src")
-                file1 = io.StringIO(urllib.request.urlopen(img_src).read())
+                file1 = io.BytesIO(urllib.request.urlopen(img_src).read())
                 file2=input[0]
                 local_uo.log.info(INPUT_IS)
                 local_uo.log.info(file2)
