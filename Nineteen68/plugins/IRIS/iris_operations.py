@@ -279,6 +279,8 @@ def update_dataset(image_data):
                 log.error( "Dataset folder not found." )
                 logger.print_on_console( "Dataset folder not found." )
                 return False
+        else:# When the selected type is others
+            return True
     except Exception as e:
         log.error("Error occurred in update_dataset, Err_Msg : ",e)
         logger.print_on_console("Error while updating dataset.")
