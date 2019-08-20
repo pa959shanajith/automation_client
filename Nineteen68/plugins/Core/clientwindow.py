@@ -564,10 +564,14 @@ class MainNamespace(BaseNamespace):
             core_utils.get_all_the_imports('WebOcular')
             import webocular
             wobj = webocular.Webocular()
+            # logger.print_on_console("length is ",len(args))
             args=list(args)
             global socketIO
-            #args[0] is URL, args[1] is level, args[2] is agent, args[3] is proxy
-            wobj.runCrawler(args[0],args[1],args[2],args[3],socketIO,wxObject)
+            # Currently there are 5 arguments.
+            #args[0] is URL, args[1] is level, args[2] is agent, args[3] is proxy,args[4] is searchData
+            # wobj.runCrawler(args[0],args[1],args[2],args[3],socketIO,wxObject)
+            wobj.runCrawler(socketIO,wxObject,*args)
+
         except Exception as e:
             socketIO.emit('result_web_crawler_finished','{"progress" : "fail"}')
             err_msg='Error while Crawling'

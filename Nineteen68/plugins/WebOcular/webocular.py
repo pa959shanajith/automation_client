@@ -44,6 +44,9 @@ class Webocular():
         self.notParsedURLs = []
         self.socketIO=None
         self.proxy=None
+        self.searchText=None
+        self.totalSearchTextCount=0
+        self.searchImage=None
         #self.driver = webdriver.PhantomJS(executable_path="some\\path")
 
     def get_complete_url(self,url, new_url) :
@@ -96,7 +99,7 @@ class Webocular():
         for thread in threads :
             thread.join()
 
-    def parse(self,url, obj, lev,agent,timeout) :
+    def parse(self,url, obj, lev,agent,timeout):
 
         if controller.terminate_flag:
             return
@@ -124,6 +127,15 @@ class Webocular():
                 status = r.status_code
                 obj["status"] = status
                 soup = BeautifulSoup(r.text, "lxml")
+                if self.searchText=="NA":
+                    obj["searchTextCount"]="NA"
+                else:
+                    pageHTML = BeautifulSoup(r.content)
+                    pageText = pageHTML.getText() # get_text() can also be used
+                    searchList=re.findall(self.searchText,pageText)
+                    obj["searchTextCount"]=str(len(searchList))
+                    self.totalSearchTextCount+=int(obj["searchTextCount"])
+
                 if soup.title :
                     obj["title"] = soup.title.text
                 else :
@@ -290,7 +302,7 @@ class Webocular():
             #traceback.format_exc()
             self.crawlStatus = False
 
-    def runCrawler(self,url,level,agent,proxy,socketIO,mainwxobj) :
+    def runCrawler(self,socketIO,mainwxobj,url,level,agent,proxy,searchData):
         self.socketIO=socketIO
         log.debug("inside runCrawler method")
         level  = int(level)
@@ -298,6 +310,17 @@ class Webocular():
         self.rooturl = start_url
         start = time.clock()
         msg = "New Webocular request has started with following parameters: [URL] : " + start_url  +  " [LEVEL] : "  +  str(level) + " [Agent] : " + str(agent)
+        if len(searchData["text"])>0:
+            msg += " [SEARCH TEXT] : "+ str(searchData["text"])
+            self.searchText=searchData["text"]
+        else:
+            self.searchText="NA"
+            self.totalSearchTextCount=0
+        if searchData["image"]!="":
+            self.searchImage=searchData["image"]
+            msg += " [SEARCH IMAGE] : YES"
+        else:
+            self.searchImage="NA"
         if proxy["enable"]:
             msg += "*(Proxy Enabled)"
             proxy_url = proxy["url"]
@@ -369,7 +392,7 @@ class Webocular():
         log.info("Webocular request completed " + crawling_status +" in " +  time_str)
 
         #send the completion object to Node
-        completetionObj = json.dumps({"progress" : "complete" ,"sdata" : sdata, "status": "success" ,"subdomains":  self.subdomains, "others" : self.others, "notParsedURLs" : self.notParsedURLs, "time_taken" : str(time_taken) +  " seconds"})
+        completetionObj = json.dumps({"progress" : "complete" ,"sdata" : sdata, "status": "success" ,"subdomains":  self.subdomains, "others" : self.others, "notParsedURLs" : self.notParsedURLs, "time_taken" : str(time_taken) +  " seconds","totalSearchTextCount":str(self.totalSearchTextCount),"searchText":str(self.searchText)})
         self.socketIO.emit('result_web_crawler_finished',completetionObj)
         logger.print_on_console("Webocular request completed " + crawling_status +" in " +  time_str)
 

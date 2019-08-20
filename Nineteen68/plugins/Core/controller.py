@@ -1215,7 +1215,7 @@ def kill_process():
                 log.info( 'Pid Found' )
                 log.info(pid)
                 os.system("TASKKILL /F /PID " + str(pid))
-            browser_Keywords.local_bk.pid_set[:]
+            del browser_Keywords.local_bk.pid_set[:]
             browser_Keywords.local_bk.driver_obj = None
         except Exception as e:
             log.error(e,exc_info=True)

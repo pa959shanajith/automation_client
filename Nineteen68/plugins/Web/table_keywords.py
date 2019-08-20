@@ -166,7 +166,7 @@ class TableOperationKeywords():
                             logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         else:
                             js='for(i=0;i<arguments[0].children.length;i++){if(arguments[0].children[i].tagName=="TBODY" || arguments[0].children[i].tagName=="tbody"){var row_count = arguments[0].children[i].children.length; var col_ch = arguments[0].children[i];for(row=0;row<row_count;row++){var column_count = col_ch.children[row].cells.length; var column=col_ch.children[row];for(col=0;col<column_count;col++){if(row==arguments[1] && col==arguments[2] && column.children[arguments[2]].firstChild.tagName == "INPUT" ){return column.children[arguments[2]].children[0].value;}else if(row==arguments[1] && col==arguments[2]){return column.children[arguments[2]].innerText;}}}}}'
-                            cellVal=browser_Keywords.driver_obj.execute_script(js,webElement,row_num-1,col_num-1)
+                            cellVal=local_tk.driver.execute_script(js,webElement,row_num-1,col_num-1)
                             expected_value=input_val[2].strip()
                             coreutilsobj=core_utils.CoreUtils()
                             expected_value=coreutilsobj.get_UTF_8(expected_value)

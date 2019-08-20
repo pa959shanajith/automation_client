@@ -535,7 +535,7 @@ class WSkeywords:
         return status,methodoutput,output,err_msg
 
      def executeRequest(self,*args):
-        testcasename = handler.testcasename
+        testcasename = handler.local_handler.testcasename
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -982,9 +982,8 @@ class WSkeywords:
         err_msg=None
         output=OUTPUT_CONSTANT
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        import handler
         if self.baseReqBody == '':
-            self.baseReqBody=handler.ws_template
+            self.baseReqBody=handler.local_handler.ws_template
         try:
             splitattr=element_path.split('/')
             attribute_name=splitattr[len(splitattr)-1]
@@ -994,7 +993,7 @@ class WSkeywords:
                     result=self.parse_xml(self.baseReqBody,element_path,attribute_value,attribute_name,'attribute')
                     if result != None:
                         self.baseReqBody=result
-                        handler.ws_template=self.baseReqBody
+                        handler.local_handler.ws_template=self.baseReqBody
                         log.debug(STATUS_METHODOUTPUT_UPDATE)
                         status = ws_constants.TEST_RESULT_PASS
                         methodoutput = ws_constants.TEST_RESULT_TRUE
@@ -1019,16 +1018,15 @@ class WSkeywords:
         err_msg=None
         output=OUTPUT_CONSTANT
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        import handler
         if self.baseReqBody == '':
-            self.baseReqBody=handler.ws_template
+            self.baseReqBody=handler.local_handler.ws_template
         try:
             if value != None and value != '' and element_path != None and element_path != '':
                 if self.baseReqBody != None and self.baseReqBody != '':
                     result=self.parse_xml(self.baseReqBody,element_path,value,'','tagname')
                     if result != None:
                         self.baseReqBody=result
-                        handler.ws_template=self.baseReqBody
+                        handler.local_handler.ws_template=self.baseReqBody
                         log.debug(STATUS_METHODOUTPUT_UPDATE)
                         status = ws_constants.TEST_RESULT_PASS
                         methodoutput = ws_constants.TEST_RESULT_TRUE
