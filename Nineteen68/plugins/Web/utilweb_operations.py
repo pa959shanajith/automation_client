@@ -706,7 +706,7 @@ class UtilWebKeywords:
                 err_msg=INVALID_INPUT
                 local_uo.log.error(INVALID_INPUT)
         except Exception as e:
-            err_msg=self.__web_driver_exception(e)
+            local_uo.log.error(e)
             local_uo.log.info('Inside Exception block')
             try:
                 if isinstance(e,NoSuchWindowException):
