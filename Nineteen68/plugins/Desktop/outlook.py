@@ -386,7 +386,7 @@ class OutlookKeywords:
                     except Exception as e:
                         log.error( 'Error at mail segregator : ' + str(e) )
                         logger.print_on_console( 'Error at mail segregator : ' + str(e) )
-                        return mSegList
+                    return mSegList
 
                 """To segregate msg objects by 'To' address and then by day/date/time """
                 """Returns a List of msg objects"""
