@@ -706,11 +706,10 @@ class UtilWebKeywords:
                 err_msg=INVALID_INPUT
                 local_uo.log.error(INVALID_INPUT)
         except Exception as e:
-            etype=type(e)
             err_msg=self.__web_driver_exception(e)
             local_uo.log.info('Inside Exception block')
             try:
-                if isinstance(etype,NoSuchWindowException):
+                if isinstance(e,NoSuchWindowException):
                     window_handles=self.__get_window_handles()
                     local_uo.log.info('Current window handles are ')
                     local_uo.log.info(window_handles)
@@ -727,7 +726,6 @@ class UtilWebKeywords:
                         logger.print_on_console(err_msg)
                         local_uo.log.error(err_msg)
             except Exception as e:
-                etype=type(e)
                 err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
 
