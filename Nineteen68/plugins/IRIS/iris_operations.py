@@ -554,7 +554,7 @@ class IRISKeywords():
                 pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
                 os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
                 img = None
-                if( (args) == 3 and args[2] != '' and len(verifyexists) > 0 ):
+                if( len(args) == 3 and args[2] != '' and len(verifyexists) > 0 ):
                     elem_coordinates = element['coordinates']
                     const_coordintes = args[2]['coordinates']
                     elements = [(const_coordintes[0],const_coordintes[1]),
