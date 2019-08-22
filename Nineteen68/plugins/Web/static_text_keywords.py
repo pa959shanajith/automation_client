@@ -116,12 +116,14 @@ class StaticTextKeywords:
                     output = 0
                     logger.print_on_console('Text is not present')
                     local_stk.log.error('Text is not present')
+                    err_msg = 'Text is not present'
                 text_occurrences = 0
             else:
                 local_stk.log.error(INVALID_INPUT)
                 err_msg=INVALID_INPUT
                 logger.print_on_console(INVALID_INPUT)
         except Exception as e:
+                err_msg = 'Error occured while verifying text'
                 local_stk.log.error(e)
                 logger.print_on_console(e)
         return status,methodoutput,output,err_msg

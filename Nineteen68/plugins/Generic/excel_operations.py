@@ -1361,11 +1361,13 @@ class ExcelXLSX:
             if not(workbook_info[0].read_only):
                 status,err_msg=self.__write_to_cell_xlsx(excel_path,workbook_info[0],sheetname,int(row),int(col),value,*args)
             else:
+                err_msg = 'No sheet found, write to cell failed'
                 logger.print_on_console('Excel is readonly')
                 log.info('Excel is readonly')
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
+            err_msg = 'Error writing to excel cell of .xlsx file'
         return status,err_msg
 
 

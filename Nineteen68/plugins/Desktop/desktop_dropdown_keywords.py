@@ -678,8 +678,7 @@ class Dropdown_Keywords():
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                         else:
-                            status = desktop_constants.TEST_RESULT_FAIL
-                            result = desktop_constants.TEST_RESULT_FALSE
+                            err_msg = 'Element not present on the page where operation is trying to be performed'
                     #==============================================================
                     elif ( checkName == 'ListView' or 'ListBox' ):
                         if ( checkName == 'ListBox' ):
@@ -694,6 +693,8 @@ class Dropdown_Keywords():
                             if ( fail_flag == False ):
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
+                            else:
+                                err_msg = 'Element not present on the page where operation is trying to be performed'
 
                         if ( checkName == 'ListView' ):
                              items = list(element.items())
@@ -708,8 +709,7 @@ class Dropdown_Keywords():
                                             status = desktop_constants.TEST_RESULT_PASS
                                             result = desktop_constants.TEST_RESULT_TRUE
                                         else:
-                                            status = desktop_constants.TEST_RESULT_FAIL
-                                            result = desktop_constants.TEST_RESULT_FALSE
+                                            err_msg = 'Element not present on the page where operation is trying to be performed'
                     #=================================================================
                else:
                    err_msg = 'Element not present on the page where operation is trying to be performed'
