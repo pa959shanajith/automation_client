@@ -278,7 +278,7 @@ class StringOperation:
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
-        output=None
+        output=OUTPUT_CONSTANT
         try:
             if not (actual_string is None or actual_string is ''):
                 if not (to_find is None or to_find is ''):
