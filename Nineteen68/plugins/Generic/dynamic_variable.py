@@ -190,7 +190,10 @@ class DynamicVariables:
                 else:
                     values.append(args[0])
                 log.debug('Reading the inputs')
+                invalid_input_error=[]
+                dynamic_variable_error=[]
                 for i in range (len(values)):
+                    error_message = None
                     variable=values[i]
                     if not(variable is None or variable is ''):
                         coreutilsobj=core_utils.CoreUtils()
@@ -208,23 +211,33 @@ class DynamicVariables:
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
                             else:
-                                err_msg=ERROR_CODE_DICT['ERR_DYNVAR']
+                                error_message=ERROR_CODE_DICT['ERR_DYNVAR']
+                                dynamic_variable_error.append(variable)
                         else:
-                            err_msg=INVALID_INPUT
+                            error_message=INVALID_INPUT
+                            invalid_input_error.append(variable)
                     else:
-                       err_msg=INVALID_INPUT
-                    if err_msg is not None:
-                        log.error(err_msg)
-                        logger.print_on_console(err_msg)
-                    err_msg=None
+                        error_message=INVALID_INPUT
+                        invalid_input_error.append(variable)
+                    if error_message is not None:
+                        log.error(error_message)
+                        logger.print_on_console(error_message)
+                if len(dynamic_variable_error)!=0:
+                    if err_msg is None:
+                        err_msg = str(dynamic_variable_error).replace('[','').replace(']','')+": variables doesnot exists.;"
+                    else:
+                        err_msg = err_msg+str(dynamic_variable_error).replace('[','').replace(']','')+": variables doesnot exists.;"
+                if len(invalid_input_error)!=0:
+                    if err_msg is None:
+                        err_msg = str(invalid_input_error).replace('[','').replace(']','')+": Invalid Inputs. Please provide valid inputs.;"
+                    else:
+                        err_msg = err_msg+str(invalid_input_error).replace('[','').replace(']','')+": Invalid Inputs. Please provide valid inputs."
             else:
                 logger.print_on_console("Please provide valid Inputs")
         except Exception as e:
-             log.error(e)
-             logger.print_on_console(e)
-             err_msg=INPUT_ERROR
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg=INPUT_ERROR
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
         return status,methodoutput,output_res,err_msg
-
-
-
-

@@ -172,7 +172,7 @@ class StepDescription:
         def createdynvariable():
             return "Create a variable '"+str(inputval[0])+"' with value '"+ str(inputval[1]) + "'"
         def deletedynvariable():
-            return "Delete variable '"+inputval[0]+"'"
+            return ("Delete variable "+str(inputval)).replace('[','').replace(']','')
         def displayvariablevalue():
             return output.replace('\n',' ')
         def verifyvalues():
