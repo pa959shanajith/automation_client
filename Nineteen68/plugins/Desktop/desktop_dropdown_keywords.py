@@ -431,8 +431,6 @@ class Dropdown_Keywords():
                                    result = desktop_constants.TEST_RESULT_TRUE
                                    verb = OUTPUT_CONSTANT
                                 else:
-                                  status = desktop_constants.TEST_RESULT_FAIL
-                                  result = desktop_constants.TEST_RESULT_FALSE
                                   verb = OUTPUT_CONSTANT
                             #================================================================
                             elif ( checkName == 'ListView' or 'ListBox' ):
@@ -479,9 +477,6 @@ class Dropdown_Keywords():
                                         if ( item in newlist ):
                                             status = desktop_constants.TEST_RESULT_PASS
                                             result = desktop_constants.TEST_RESULT_TRUE
-                                        else:
-                                            status = desktop_constants.TEST_RESULT_FAIL
-                                            result = desktop_constants.TEST_RESULT_FALSE
                             #================================================================
                    else:
                        err_msg = 'Element not present on the page where operation is trying to be performed'
@@ -619,9 +614,6 @@ class Dropdown_Keywords():
                             if ( input_val == items ):
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
-                            else:
-                                status = desktop_constants.TEST_RESULT_FAIL
-                                result = desktop_constants.TEST_RESULT_FALSE
                         #==================================================================
                         elif ( checkName == 'ListView' or 'ListBox' ):
                              if ( checkName == 'ListBox' ):
@@ -638,9 +630,6 @@ class Dropdown_Keywords():
                                 if ( input_val == items ):
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
-                                else:
-                                    status = desktop_constants.TEST_RESULT_FAIL
-                                    result = desktop_constants.TEST_RESULT_FALSE
                         #==================================================================
                else:
                    err_msg = 'Element not present on the page where operation is trying to be performed'
