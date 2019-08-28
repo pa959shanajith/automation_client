@@ -905,7 +905,11 @@ class Controller():
                     #Logic to iterate through each scenario in the suite
                     for scenario,scenario_id,condition_check_value,dataparam_path_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id],dataparam_path[suite_id]):
                         execute_flag=True
-                        con =Controller()
+                        ''' To fix Bug 653: Web Browser and Dynamic variables do not work across Scenarios
+                            Controller object should be created for each execution and not for each scenario
+                            Hence commenting the creation of controller object in this block
+                        '''
+                        #con =Controller()
                         con.configvalues=configvalues
                         con.exception_flag=self.exception_flag
                         con.wx_object=wxObject

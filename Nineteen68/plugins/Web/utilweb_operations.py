@@ -42,6 +42,7 @@ class UtilWebKeywords:
         self.keys_info={}
         self.__create_keyinfo_dict()
         self.__load_Image_processingobj()
+        self.bk_obj=browser_Keywords.BrowserKeywords()
 
 
     def __create_keyinfo_dict(self):
