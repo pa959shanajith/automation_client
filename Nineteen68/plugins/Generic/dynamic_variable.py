@@ -190,8 +190,7 @@ class DynamicVariables:
                 else:
                     values.append(args[0])
                 log.debug('Reading the inputs')
-                invalid_input_error=[]
-                dynamic_variable_error=[]
+                errors= {"invalid_input_error":"","dynamic_variable_error":""}
                 for i in range (len(values)):
                     error_message = None
                     variable=values[i]
@@ -212,26 +211,23 @@ class DynamicVariables:
                                 methodoutput=TEST_RESULT_TRUE
                             else:
                                 error_message=ERROR_CODE_DICT['ERR_DYNVAR']
-                                dynamic_variable_error.append(variable)
+                                errors["dynamic_variable_error"]=errors["dynamic_variable_error"]+str(variable)+", "
                         else:
                             error_message=INVALID_INPUT
-                            invalid_input_error.append(variable)
+                            errors["invalid_input_error"]=errors["invalid_input_error"]+str(variable)+", "
                     else:
                         error_message=INVALID_INPUT
-                        invalid_input_error.append(variable)
+                        errors["invalid_input_error"]=errors["invalid_input_error"]+str(variable)+", "
                     if error_message is not None:
                         log.error(error_message)
                         logger.print_on_console(error_message)
-                if len(dynamic_variable_error)!=0:
+                if errors["dynamic_variable_error"]!="":
+                    err_msg = errors["dynamic_variable_error"][:len(errors["dynamic_variable_error"])-2]+": variables doesnot exists.;"
+                if errors["invalid_input_error"]!="":
                     if err_msg is None:
-                        err_msg = str(dynamic_variable_error).replace('[','').replace(']','')+": variables doesnot exists.;"
+                        err_msg = errors["invalid_input_error"][:len(errors["invalid_input_error"])-2] + ": Invalid Inputs. Please provide valid inputs.;"
                     else:
-                        err_msg = err_msg+str(dynamic_variable_error).replace('[','').replace(']','')+": variables doesnot exists.;"
-                if len(invalid_input_error)!=0:
-                    if err_msg is None:
-                        err_msg = str(invalid_input_error).replace('[','').replace(']','')+": Invalid Inputs. Please provide valid inputs.;"
-                    else:
-                        err_msg = err_msg+str(invalid_input_error).replace('[','').replace(']','')+": Invalid Inputs. Please provide valid inputs."
+                        err_msg = err_msg + errors["invalid_input_error"][:len(errors["invalid_input_error"])-2] + ": Invalid Inputs. Please provide valid inputs.;"
             else:
                 logger.print_on_console("Please provide valid Inputs")
         except Exception as e:
