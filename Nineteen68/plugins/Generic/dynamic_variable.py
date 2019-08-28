@@ -207,29 +207,32 @@ class DynamicVariables:
                                 value=dynamic_variable_handler.local_dynamic.dynamic_variable_map.pop(variable)
                                 log.debug('Variable deleted is ',variable,' = ',value)
                                 logger.print_on_console('Variable deleted is ',variable,' = ',value)
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
                             else:
                                 error_message=ERROR_CODE_DICT['ERR_DYNVAR']
-                                errors["dynamic_variable_error"]=errors["dynamic_variable_error"]+str(variable)+", "
+                                errors["dynamic_variable_error"]+=str(variable)+", "
                         else:
                             error_message=INVALID_INPUT
-                            errors["invalid_input_error"]=errors["invalid_input_error"]+str(variable)+", "
+                            errors["invalid_input_error"]+=str(variable)+", "
                     else:
                         error_message=INVALID_INPUT
-                        errors["invalid_input_error"]=errors["invalid_input_error"]+str(variable)+", "
+                        errors["invalid_input_error"]+=str(variable)+", "
                     if error_message is not None:
                         log.error(error_message)
                         logger.print_on_console(error_message)
                 if errors["dynamic_variable_error"]!="":
-                    err_msg = errors["dynamic_variable_error"][:len(errors["dynamic_variable_error"])-2]+": variables doesnot exists.;"
+                    err_msg = errors["dynamic_variable_error"][:-2]+": variables doesnot exists.;"
                 if errors["invalid_input_error"]!="":
                     if err_msg is None:
-                        err_msg = errors["invalid_input_error"][:len(errors["invalid_input_error"])-2] + ": Invalid Inputs. Please provide valid inputs.;"
+                        err_msg = errors["invalid_input_error"][:-2] + ": Invalid Inputs. Please provide valid inputs.;"
                     else:
-                        err_msg = err_msg + errors["invalid_input_error"][:len(errors["invalid_input_error"])-2] + ": Invalid Inputs. Please provide valid inputs.;"
+                        err_msg = err_msg + errors["invalid_input_error"][:-2] + ": Invalid Inputs. Please provide valid inputs.;"
+                if not err_msg:
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
             else:
-                logger.print_on_console("Please provide valid Inputs")
+                err_msg=INVALID_INPUT
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
