@@ -1129,6 +1129,9 @@ class Controller():
                 th[i+1].start()
             for i in range (1,len(browsers_data)):
                 th[i].join()
+            for i in th:
+                while th[i].is_alive():
+                    pass
         except Exception as e:
             logger.print_on_console("Exception in Parallel Execution")
             log("Exception in Parallel Execution"+str(e))
@@ -1218,6 +1221,7 @@ def kill_process():
                 os.system("TASKKILL /F /PID " + str(pid))
             del browser_Keywords.local_bk.pid_set[:]
             browser_Keywords.local_bk.driver_obj = None
+            del browser_Keywords.drivermap[:]
         except Exception as e:
             log.error(e,exc_info=True)
         time.sleep(3)
