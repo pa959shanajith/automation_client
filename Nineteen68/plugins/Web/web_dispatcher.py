@@ -159,7 +159,7 @@ class Dispatcher:
             'verifycurrenturl':local_Wd.browser_object.verifyCurrentURL,
             'closebrowser':local_Wd.browser_object.closeBrowser,
             'closesubwindows':local_Wd.browser_object.closeSubWindows,
-            'switchtowindow':local_Wd.util_object.switch_to_window,
+            'switchtowindow':local_Wd.browser_object.switch_to_window,
             'verifytextexists':local_Wd.statict_text_object.verify_text_exists,
             'verifypagetitle':local_Wd.browser_object.verify_page_title,
             'clearcache':local_Wd.browser_object.clear_cache,
