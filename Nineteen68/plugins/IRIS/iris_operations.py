@@ -279,6 +279,8 @@ def update_dataset(image_data):
                 log.error( "Dataset folder not found." )
                 logger.print_on_console( "Dataset folder not found." )
                 return False
+        else:# When the selected type is others
+            return True
     except Exception as e:
         log.error("Error occurred in update_dataset, Err_Msg : ",e)
         logger.print_on_console("Error while updating dataset.")
@@ -552,7 +554,7 @@ class IRISKeywords():
                 pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
                 os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
                 img = None
-                if( (args) == 3 and args[2] != '' and len(verifyexists) > 0 ):
+                if( len(args) == 3 and args[2] != '' and len(verifyexists) > 0 ):
                     elem_coordinates = element['coordinates']
                     const_coordintes = args[2]['coordinates']
                     elements = [(const_coordintes[0],const_coordintes[1]),
