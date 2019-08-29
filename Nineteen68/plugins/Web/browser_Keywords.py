@@ -552,7 +552,7 @@ class BrowserKeywords():
         else:
             err_msg = 'For this closeBrowser keyword, openBrowser or openNewBrowser keyword is not present'
             logger.print_on_console(err_msg)
-            log.info(err_msg )
+            local_bk.log.error(err_msg)
         return status,result,output,err_msg
 
 
@@ -618,7 +618,7 @@ class BrowserKeywords():
             else:
                 err_msg = 'No sub windows to close'
                 logger.print_on_console(err_msg)
-                log.info(err_msg )
+                local_bk.log.error(err_msg)
 
         except Exception as e:
             err_msg=self.__web_driver_exception(e)

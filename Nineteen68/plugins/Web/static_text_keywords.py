@@ -114,9 +114,9 @@ class StaticTextKeywords:
                     logger.print_on_console('No. of occurrences of the text ',actual_text, ' is ',str(text_occurrences),' time(s).')
                 else:
                     output = 0
-                    logger.print_on_console('Text is not present')
-                    local_stk.log.error('Text is not present')
                     err_msg = 'Text is not present'
+                    logger.print_on_console(err_msg)
+                    local_stk.log.error(err_msg)
                 text_occurrences = 0
             else:
                 local_stk.log.error(INVALID_INPUT)
@@ -125,6 +125,6 @@ class StaticTextKeywords:
         except Exception as e:
                 err_msg = 'Error occured while verifying text'
                 local_stk.log.error(e)
-                logger.print_on_console(e)
+                logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 

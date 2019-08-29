@@ -402,7 +402,7 @@ class Dropdown_Keywords():
                 status = desktop_constants.TEST_RESULT_FAIL
                 result = desktop_constants.TEST_RESULT_FALSE
                 verb = OUTPUT_CONSTANT
-                flag = False
+                flag = True
                 err_msg = None
                 try:
                    checkName = element.friendly_class_name()
@@ -419,19 +419,18 @@ class Dropdown_Keywords():
                                 if ( element.backend.name == 'uia' ):
                                     try:
                                         verb = element.selected_text()
-                                        flag = True
                                     except Exception as e:
                                         err_msg = 'VerifySelectedValue returns inconsistent outputs for method B elements. Err Msg : ' + str(e)
                                         log.error( err_msg )
                                 elif ( element.backend.name == 'win32' ):
                                     verb = element.selected_text()
-                                    flag = True
                                 if ( input_val[0] == verb ):
                                    status = desktop_constants.TEST_RESULT_PASS
                                    result = desktop_constants.TEST_RESULT_TRUE
                                    verb = OUTPUT_CONSTANT
                                 else:
                                   verb = OUTPUT_CONSTANT
+                                  err_msg = 'Failed to verify selected value'
                             #================================================================
                             elif ( checkName == 'ListView' or 'ListBox' ):
                                 if ( element.is_active() == False ):
@@ -444,7 +443,7 @@ class Dropdown_Keywords():
                                     elelist.pop(0)
                                     oldlist = len(items)
                                     itemcount = element.item_count()
-                                    newlist = []
+                                    verbnewlist = []
                                     if ( element.is_single_selection() == True ):
                                         logger.print_on_console( 'List is a single selection type.' )
                                     n = element.selected_indices()
@@ -456,9 +455,13 @@ class Dropdown_Keywords():
                                     verb = newlist
                                     item_list=input_val
                                     for item in item_list:
-                                        if ( item in verb ):
-                                            status = desktop_constants.TEST_RESULT_PASS
-                                            result = desktop_constants.TEST_RESULT_TRUE
+                                        if ( item not in verb ):
+                                            flag = False
+                                            err_msg = 'Failed to verify selected value'
+                                            break
+                                    if (flag == True):
+                                        status = desktop_constants.TEST_RESULT_PASS
+                                        result = desktop_constants.TEST_RESULT_TRUE
                                 if ( checkName == 'ListView' ):
                                     items = list(element.items())
                                     elelist = element.texts()
@@ -474,9 +477,13 @@ class Dropdown_Keywords():
                                            newlist.append(elelist[i])
                                     item_list = input_val
                                     for item in item_list:
-                                        if ( item in newlist ):
-                                            status = desktop_constants.TEST_RESULT_PASS
-                                            result = desktop_constants.TEST_RESULT_TRUE
+                                        if ( item not in newlist ):
+                                            flag = False
+                                            err_msg = 'Failed to verify selected value'
+                                            break
+                                    if (flag == True):
+                                        status = desktop_constants.TEST_RESULT_PASS
+                                        result = desktop_constants.TEST_RESULT_TRUE
                             #================================================================
                    else:
                        err_msg = 'Element not present on the page where operation is trying to be performed'
@@ -614,6 +621,10 @@ class Dropdown_Keywords():
                             if ( input_val == items ):
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
+                            else:
+                                err_msg = 'Failed to verify values'
+                                log.info( err_msg )
+                                logger.print_on_console( err_msg )
                         #==================================================================
                         elif ( checkName == 'ListView' or 'ListBox' ):
                              if ( checkName == 'ListBox' ):
@@ -630,6 +641,10 @@ class Dropdown_Keywords():
                                 if ( input_val == items ):
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
+                                else:
+                                    err_msg = 'Failed to verify values'
+                                    log.info( err_msg )
+                                    logger.print_on_console( err_msg )
                         #==================================================================
                else:
                    err_msg = 'Element not present on the page where operation is trying to be performed'
@@ -662,12 +677,15 @@ class Dropdown_Keywords():
                         for i in range(0, len(input_val)):
                             if ( input_val[i] not in items ):
                                 flag = False
+                                break
 
                         if ( flag == True ):
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                         else:
                             err_msg = 'Element not present on the page where operation is trying to be performed'
+                            log.info( err_msg )
+                            logger.print_on_console( err_msg )
                     #==============================================================
                     elif ( checkName == 'ListView' or 'ListBox' ):
                         if ( checkName == 'ListBox' ):
@@ -679,11 +697,14 @@ class Dropdown_Keywords():
                             for i in range(0, len(input_val)):
                                 if ( input_val[i] not in newlist ):
                                     fail_flag = True
+                                    break
                             if ( fail_flag == False ):
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                             else:
                                 err_msg = 'Element not present on the page where operation is trying to be performed'
+                                log.info( err_msg )
+                                logger.print_on_console( err_msg )
 
                         if ( checkName == 'ListView' ):
                              items = list(element.items())
@@ -691,14 +712,22 @@ class Dropdown_Keywords():
                              elelist.pop(0)
                              newlist = []
                              items_list = input_val
+                             flag1 = False
                              for i in range(0, len(items)):
                                     newlist.append(elelist[i])
                                     for i in range(0, len(items_list)):
-                                        if ( items_list[i] in newlist ):
-                                            status = desktop_constants.TEST_RESULT_PASS
-                                            result = desktop_constants.TEST_RESULT_TRUE
-                                        else:
-                                            err_msg = 'Element not present on the page where operation is trying to be performed'
+                                        if ( items_list[i] not in newlist ):
+                                            flag1 = True
+                                            break
+                                    if(flag1 == True):
+                                        break
+                             if(flag1 == False):
+                                status = desktop_constants.TEST_RESULT_PASS
+                                result = desktop_constants.TEST_RESULT_TRUE
+                             else:
+                                err_msg = 'Element not present on the page where operation is trying to be performed'
+                                log.info( err_msg )
+                                logger.print_on_console( err_msg )
                     #=================================================================
                else:
                    err_msg = 'Element not present on the page where operation is trying to be performed'

@@ -283,11 +283,11 @@ class ElementKeywords:
                    methodoutput=TEST_RESULT_TRUE
                else:
                     tool_tip=None
+                    err_msg = 'No tool tip text found'
                local_eo.log.info('Tool tip text is : ')
                local_eo.log.info(tool_tip)
 ##               logger.print_on_console('Tool tip text: '+str(tool_tip))
                logger.print_on_console('Tool tip text: ',tool_tip)
-               err_msg = 'No tool tip text found'
             except Exception as e:
                 local_eo.log.error(e)
                 logger.print_on_console(e)
