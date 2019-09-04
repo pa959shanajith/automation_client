@@ -910,6 +910,7 @@ class Controller():
                             Hence commenting the creation of controller object in this block
                         '''
                         #con =Controller()
+                        con.reporting_obj=reporting.Reporting()
                         con.configvalues=configvalues
                         con.exception_flag=self.exception_flag
                         con.wx_object=wxObject
