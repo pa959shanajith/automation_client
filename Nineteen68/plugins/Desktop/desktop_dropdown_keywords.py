@@ -443,7 +443,7 @@ class Dropdown_Keywords():
                                     elelist.pop(0)
                                     oldlist = len(items)
                                     itemcount = element.item_count()
-                                    verbnewlist = []
+                                    newlist = []
                                     if ( element.is_single_selection() == True ):
                                         logger.print_on_console( 'List is a single selection type.' )
                                     n = element.selected_indices()
