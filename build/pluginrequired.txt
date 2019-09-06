@@ -1,0 +1,17 @@
+#! To ignore a plugin add a '#' in front of plugin name
+AutomatedPathGenerator
+Desktop
+ImageProcessing
+IRIS
+Jira
+Mainframe
+Mobility
+Oebs
+PdfReport
+Qc
+SAP
+System
+Web
+WebOcular
+WebScrape
+WebServices
