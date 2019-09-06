@@ -30,9 +30,9 @@ def dataTransmitter(a,*args):
         key = "".join(['h','f','g','w','e','u','y','R','^','%','$','&','B','8','7',
             'n','x','z','t','7','0','8','r','n','t','.','&','%','^','(','*','@'])
         d={"action":a,"inputs":args}
-        data_to_send = core_utils_obj.wrap(json.dumps(d).encode('utf-8'), key) + MF_API_DATA_EOF
+        data_to_send = core_utils_obj.wrap(json.dumps(d), key) + MF_API_DATA_EOF
         soc_api.send(data_to_send)
-        data=""
+        data=b''
         while True:
             data_stream = soc_api.recv(1024)
             data += data_stream
@@ -54,6 +54,7 @@ def check_n_init(emulator_type):
             soc_api.connect(("localhost",10001))
             data = dataTransmitter("test", emulator_type)
             if data["stat"] != 0:
+                logger.print_on_console(data["emsg"])
                 raise Exception(data["emsg"])
         except Exception as e:
             err_msg = "Error: Unable to launch nineteen68MFapi."

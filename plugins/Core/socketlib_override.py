@@ -235,9 +235,6 @@ def socketIO_emit(self, event, *args, **kw):
         self.evdata[pack_id] = {'e': event, 'b': blocks, 'd': data, 'kw': kw}
         return self._emit(event, data[0], **kw)
 
-##def socketIO_on_event(self, data_parsed, namespace):
-##    self._custom_on_event(data_parsed, namespace)
-
 
 socketIO_client.parsers._read_packet_length = socketIO_read_packet_length
 socketIO_client.parsers._read_packet_text = socketIO_read_packet_text
@@ -248,8 +245,6 @@ socketIO_client.BaseNamespace.on_data_ack = socketIO_on_data_ack
 socketIO_client.BaseNamespace.on_data_nack = socketIO_on_data_nack
 socketIO_client.SocketIO._emit = socketIO_client.SocketIO.emit
 socketIO_client.SocketIO.emit = socketIO_emit
-#socketIO_client.SocketIO._custom_on_event = socketIO_client.SocketIO._on_event
-#socketIO_client.SocketIO._on_event = socketIO_on_event
 socketIO_client.SocketIO._warn = socketIO_warn
 socketIO_client.SocketIO._close = socketIO_close
 socketIO_client.SocketIO._transport = socketIO_transport

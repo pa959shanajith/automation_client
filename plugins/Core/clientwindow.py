@@ -125,6 +125,7 @@ class MainNamespace(BaseNamespace):
                     if(err_res is not None):
                         logger.print_on_console(err_res)
                         log.info(err_res)
+                        threading.Timer(0.5,wxObject.killSocket).start()
                     else:
                         allow_connect = True
                         wxObject.connectbutton.SetBitmapLabel(wxObject.disconnect_img)
@@ -685,11 +686,12 @@ class MainNamespace(BaseNamespace):
             msg = 'Connectivity issue with Nineteen68 Server. Attempting to restore connectivity...'
             logger.print_on_console(msg)
             log.error(msg)
+            if not bool(wxObject): return
+            wxObject.schedule.Disable()
+            wxObject.connectbutton.Disable()
         if not bool(wxObject): return
         wxObject.connectbutton.SetBitmapLabel(wxObject.connect_img)
         wxObject.connectbutton.SetName('connect')
-        wxObject.schedule.Disable()
-        wxObject.connectbutton.Disable()
 
     def on_irisOperations(self, *args):
         try:
@@ -755,6 +757,7 @@ class SocketThread(threading.Thread):
             if "_ssl.c" in msg:
                 msg = msg[:msg.index("(_ssl")]
             logger.print_on_console(msg)
+            log.error(msg)
             wxObject.connectbutton.Enable()
         except Exception as e:
             msg = "Error in server connection"
@@ -762,62 +765,6 @@ class SocketThread(threading.Thread):
             log.error(msg)
             log.error(e,exc_info=True)
             wxObject.connectbutton.Enable()
-
-
-class Parallel(threading.Thread):
-    """Test Worker Thread Class."""
-
-    #----------------------------------------------------------------------
-    def __init__(self,wxObject):
-        """Init Worker Thread Class."""
-        super(Parallel, self).__init__()
-        self.wxObject = wxObject
-        self.paused = False
-        # Explicitly using Lock over RLock since the use of self.paused
-        # break reentrancy anyway, and I believe using Lock could allow
-        # one thread to pause the worker, while another resumes; haven't
-        # checked if Condition imposes additional limitations that would
-        # prevent that. In Python 2, use of Lock instead of RLock also
-        # boosts performance.
-        self.pause_cond = threading.Condition(threading.Lock())
-        self.con=''
-        self.start()    # start the thread
-
-     #should just resume the thread
-    def resume(self):
-        self.con.resume_execution()
-
-    #----------------------------------------------------------------------
-    def run(self):
-        global socketIO
-        """Run Worker Thread."""
-        # This is the code executing in the new thread.
-        try:
-            #Removed execute button
-##            self.wxObject.executebutton.Disable()
-            #Removed debug button
-##            self.wxObject.debugbutton.Disable()
-            self.wxObject.cancelbutton.Disable()
-            self.wxObject.terminatebutton.Enable()
-##            self.wxObject.pausebutton.Show()
-            time.sleep(2)
-##            controller.kill_process()
-            self.con = controller.Controller()
-            self.con.conthread=self
-            #Removed breakpoint
-##            value= self.wxObject.breakpoint.GetValue()
-            value=''
-            status = self.con.invoke_parralel_exe(EXECUTE,value,self)
-            if status==TERMINATE:
-                logger.print_on_console('---------Termination Completed-------')
-            else:
-                logger.print_on_console('***SUITE EXECUTION COMPLETED***')
-##            self.wxObject.debugbutton.Enable()
-##            self.wxObject.executebutton.Enable()
-            self.wxObject.cancelbutton.Enable()
-            socketIO.emit('result_executeTestSuite',status)
-        except Exception as m:
-            log.error(m)
 
 
 class TestThread(threading.Thread):
@@ -1017,7 +964,7 @@ class ClientWindow(wx.Frame):
         self.loggerMenu.Append(self.debugItem)
         self.errorItem = wx.MenuItem(self.loggerMenu, 102,text = "Error",kind = wx.ITEM_NORMAL)
         self.loggerMenu.Append(self.errorItem)
-        self.fileMenu.Append(wx.ID_ANY, "Logger Level", self.loggerMenu)
+        self.fileMenu.AppendSubMenu(self.loggerMenu, "&Logger Level")
         self.menubar.Append(self.fileMenu, '&File')
 
         self.configItem = wx.MenuItem(self.editMenu, 103,text = "Configuration",kind = wx.ITEM_NORMAL)

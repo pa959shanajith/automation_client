@@ -83,7 +83,7 @@ MAINFRAME_FN_KEYS = { "enter": "<Enter>", "tab": "<Tab>", "home": "<Home>",
     "insert mode": "@A@I", "sys request": "@A@H", "test request": "@A@C"
 }
 
-MF_API_DATA_EOF = "$r^mB@$"
+MF_API_DATA_EOF = b"$r^mB@$"
 EHLLAPI_MNEMONICS = {
     "left tab": "@B", "clear": "@C", "delete": "@D", "enter": "@E", "erase eof": "@F",
     "help": "@H", "insert": "@I", "jump": "@J", "left": "@L", "new line": "@N",

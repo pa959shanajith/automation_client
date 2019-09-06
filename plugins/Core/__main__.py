@@ -36,11 +36,13 @@ if sys.platform == 'win32':
         return result
     __builtins__.open = __open_inheritance_hack
 
-
 if __name__ == "__main__":
     app = wx.App()
     appName = "Nineteen68 ICE"
     constants.SYSTEM_OS = platform.system()
+    path = args.NINETEEN68_HOME+os.sep
+    if not os.path.exists(path+"logs"): os.mkdir(path+"logs")
+    if not os.path.exists(path+"output"): os.mkdir(path+"output")
     import clientwindow as cw_obj
     cw_obj.configvalues = configvalues
     cw = cw_obj.ClientWindow(appName)
