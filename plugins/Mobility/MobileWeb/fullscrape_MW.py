@@ -12,8 +12,9 @@
 import browserops_MW
 from constants import SYSTEM_OS
 if SYSTEM_OS != "Darwin":
-        import win32gui
-        import win32con
+    import win32gui
+    import win32con
+import os
 import time
 import json
 import domconstants_MW
