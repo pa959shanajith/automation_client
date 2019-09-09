@@ -1,3 +1,5 @@
+![Build Status](https://dev.azure.com/dimensionlabs/Nineteen68/_apis/build/status/Nineteen68?branchName=master)
+
 # Nineteen68 Version 2.0
 
 ## Technologies Used
