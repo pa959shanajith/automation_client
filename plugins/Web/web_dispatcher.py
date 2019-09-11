@@ -148,6 +148,11 @@ class Dispatcher:
             'waitforelementvisible':local_Wd.element_object.waitforelement_visible,
             'getelementtagvalue': local_Wd.util_object.get_element_tag_value,
 
+            #author :priyanka.r
+            #Added getAttributeValue and verifyAttribute keywords
+            'getattributevalue': local_Wd.util_object.get_attribute_value,
+            'verifyattribute': local_Wd.util_object.verify_attribute,
+
 
             'openbrowser':local_Wd.browser_object.openBrowser,
             'navigatetourl':local_Wd.browser_object.navigateToURL,
