@@ -539,6 +539,7 @@ class BrowserKeywords():
                 logger.print_on_console('browser closed')
                 local_bk.log.info('browser closed')
                 ## Issue #190 Driver control won't switch back to parent window
+                del drivermap[:]
                 del local_bk.webdriver_list[:]
                 del local_bk.pid_set[:]
                 status=webconstants.TEST_RESULT_PASS
