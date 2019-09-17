@@ -29,7 +29,7 @@ import time
 import logging
 import datetime
 date_obj = datetime.datetime.now()
-LOG_FILEPATH = str(os.getcwd()) + '\\RollBack\\logs\\' + 'Rollback_Logs_' + str(date_obj.year) + '_' + str(date_obj.month) + '_' + str(date_obj.day) + '_' + str(date_obj.hour) +str(date_obj.minute) + '.log'
+LOG_FILEPATH = str(os.getcwd()) + '\\assets\\RollBack\\logs\\' + 'Rollback_Logs_' + str(date_obj.year) + '_' + str(date_obj.month) + '_' + str(date_obj.day) + '_' + str(date_obj.hour) +str(date_obj.minute) + '.log'
 logging.basicConfig(filename=LOG_FILEPATH,level=logging.DEBUG)
 try:
     log = logging.getLogger("rollback.py")
