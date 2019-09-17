@@ -108,7 +108,7 @@ class Rollback():
 
     def assignment(self,NINETEEN68_LOC,loc_7z):
         """Assigning value to class variables"""
-        self.ROLLBACK_LOC = NINETEEN68_LOC+"\\Rollback\\Nineteen68_backup.7z"
+        self.ROLLBACK_LOC = NINETEEN68_LOC+"\\assets\\Rollback\\Nineteen68_backup.7z"
         log.info( '=>Rollback location : ' + str(self.ROLLBACK_LOC))
         self.NINETEEN68_LOC = NINETEEN68_LOC
         log.info( '=>Nineteen68 location : ' + str(self.NINETEEN68_LOC))
@@ -135,17 +135,17 @@ class Rollback():
         try:
             log.debug( 'Inside delete_old_instance function' )
             #-----------------------------------------deleting Nineteen68 folder and its contents
-            print( '=>Deleting : ',self.NINETEEN68_LOC+"\\Nineteen68" )
-            log.info( 'Deleting : ' + str(self.NINETEEN68_LOC+"\\Nineteen68") )
-            shutil.rmtree(self.NINETEEN68_LOC+"\\Nineteen68", ignore_errors=False, onerror=None)
-            print( '=>Deleted : ',self.NINETEEN68_LOC+"\\Nineteen68" )
-            log.info( 'Deleted : ' + str(self.NINETEEN68_LOC+"\\Nineteen68") )
+            print( '=>Deleting : ',self.NINETEEN68_LOC+"\\plugins" )
+            log.info( 'Deleting : ' + str(self.NINETEEN68_LOC+"\\plugins") )
+            shutil.rmtree(self.NINETEEN68_LOC+"\\plugins", ignore_errors=False, onerror=None)
+            print( '=>Deleted : ',self.NINETEEN68_LOC+"\\plugins" )
+            log.info( 'Deleted : ' + str(self.NINETEEN68_LOC+"\\plugins") )
             #-------------------------------------------deleting client manifest
-            print( '=>Deleting : ',self.NINETEEN68_LOC+"\\about_manifest.json" )
-            log.info( 'Deleting : ' + str(self.NINETEEN68_LOC+"\\about_manifest.json") )
-            os.remove(self.NINETEEN68_LOC+"\\about_manifest.json")
-            print( '=>Deleted : ',self.NINETEEN68_LOC+"\\about_manifest.json" )
-            log.info( 'Deleted : ' + str(self.NINETEEN68_LOC+"\\about_manifest.json") )
+            print( '=>Deleting : ',self.NINETEEN68_LOC+"\\assets\\about_manifest.json" )
+            log.info( 'Deleting : ' + str(self.NINETEEN68_LOC+"\\assets\\about_manifest.json") )
+            os.remove(self.NINETEEN68_LOC+"\\assets\\about_manifest.json")
+            print( '=>Deleted : ',self.NINETEEN68_LOC+"\\assets\\about_manifest.json" )
+            log.info( 'Deleted : ' + str(self.NINETEEN68_LOC+"\\assets\\about_manifest.json") )
         except Exception as e:
             print ( "=>Error occoured in delete_old_instance : ", e )
             log.error( "Error occoured in delete_old_instance : " + str(e) )

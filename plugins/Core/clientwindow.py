@@ -2340,7 +2340,7 @@ class rollback_window(wx.Frame):
             self.close_btn.Bind(wx.EVT_BUTTON, self.close)
 
             self.rollback_btn.Disable()
-            res = os.path.exists(UNPACK_LOC+'\\Rollback\\Nineteen68_backup.7z')
+            res = os.path.exists(UNPACK_LOC+'\\assets\\Rollback\\Nineteen68_backup.7z')
             self.rollback_obj = update_module.Check_for_rollback()
             if ( res == False ):
                 self.disp_msg.AppendText( "Nineteen68 backup not found, cannot rollback changes.")
