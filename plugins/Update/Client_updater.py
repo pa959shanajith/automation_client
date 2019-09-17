@@ -257,9 +257,9 @@ class Updater:
                 fileObj = requests.get(str(url),verify=False)
                 open(temp_file_path, 'wb').write(fileObj.content)
                 print ('=>navigating to extract_files')
-                #self.extract_files(temp_file_path)
+                self.extract_files(temp_file_path)
                 print ('=>deleting the extracted file')
-                #self.delete_temp_file(temp_file_path)
+                self.delete_temp_file(temp_file_path)
                 print (str(filename), ' was extracted and deleted')
             pass
         except Exception as e:
