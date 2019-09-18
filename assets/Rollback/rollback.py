@@ -194,6 +194,8 @@ class Rollback():
             json_decoded['rollback_on'] =str(date_obj.day)+'/'+str(date_obj.month)+'/'+str(date_obj.year)+', '+str(date_obj.hour)+':'+str(date_obj.minute)+':'+str(date_obj.second)
             with open(path, 'w') as json_file:
                 json.dump(json_decoded, json_file)
+            #moving about manifest
+            shutil.move(self.NINETEEN68_LOC+"\\about_manifest.json", self.NINETEEN68_LOC+"\\assets\\about_manifest.json")
         except Exception as e:
             print ( "=>Error occoured in modify_client_manifest : ", e )
             log.error( "Error occoured in modify_client_manifest : " + str(e) )
