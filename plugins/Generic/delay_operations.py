@@ -122,9 +122,9 @@ class Delay_keywords:
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 else:
                     err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-        except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
+            except Exception as e:
+                log.error(e)
+                logger.print_on_console(e)
         if err_msg!=None:
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg,display_input
