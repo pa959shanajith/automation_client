@@ -338,11 +338,11 @@ class UtilOperations:
 
     def getIndexCount(self,variable):
         try:
-            variable = ast.literal_eval(variable)
             status=TEST_RESULT_FAIL
             result=TEST_RESULT_FALSE
             err_msg=None
             output=None
+            variable = ast.literal_eval(variable)
             if any(isinstance(el, list) for el in variable):
                 output=str(len(variable))+'@'+str(len(variable[0]))
                 status=TEST_RESULT_PASS

@@ -547,8 +547,9 @@ class BrowserKeywords():
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         else:
-            logger.print_on_console('For this closeBrowser keyword, openBrowser or openNewBrowser keyword is not present')
-            local_bk.log.error('For this closeBrowser keyword, openBrowser or openNewBrowser keyword is not present')
+            err_msg = 'For this closeBrowser keyword, openBrowser or openNewBrowser keyword is not present'
+            logger.print_on_console(err_msg)
+            local_bk.log.error(err_msg)
         return status,result,output,err_msg
 
 
@@ -612,8 +613,9 @@ class BrowserKeywords():
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
             else:
-                logger.print_on_console('No sub windows to close')
-                local_bk.log.info('No sub windows to close')
+                err_msg = 'No sub windows to close'
+                logger.print_on_console(err_msg)
+                local_bk.log.error(err_msg)
 
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
@@ -645,10 +647,18 @@ class BrowserKeywords():
                     logger.print_on_console('No Cookies found')
                     local_bk.log.error('No Cookies found')
                     err_msg = 'No Cookies found'
+            #clear cache for chrome driver.
+            elif local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Chrome):
+                    local_bk.driver_obj.get('chrome://settings/clearBrowserData')
+                    local_bk.driver_obj.execute_script('return document.querySelector("body > settings-ui").shadowRoot.querySelector("#main").shadowRoot.querySelector("settings-basic-page").shadowRoot.querySelector("#advancedPage > settings-section:nth-child(1) > settings-privacy-page").shadowRoot.querySelector("settings-clear-browsing-data-dialog").shadowRoot.querySelector("#clearBrowsingDataConfirm").click();')
+                    logger.print_on_console('Cleared cache')
+                    local_bk.log.info('Cleared Cache')
+                    status=webconstants.TEST_RESULT_PASS
+                    result=webconstants.TEST_RESULT_TRUE
             else:
-                logger.print_on_console("This feature is available only for Internet Explorer.")
-                local_bk.log.error("This feature is available only for Internet Explorer.")
-                err_msg = "This feature is available only for Internet Explorer."
+                err_msg = "This feature is not available."
+                logger.print_on_console(err_msg)
+                local_bk.log.error(err_msg)
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
