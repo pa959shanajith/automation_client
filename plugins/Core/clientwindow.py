@@ -1178,7 +1178,7 @@ class ClientWindow(wx.Frame):
 
         elif id==162:      # When user selects Edit > Rollback
             try:
-                msg = '--Rolling back changes--'
+                msg = '--Rollback selected--'
                 logger.print_on_console(msg)
                 log.info(msg)
                 rollback_window(parent = None,id = -1, title="Rollback")
@@ -2370,6 +2370,7 @@ class rollback_window(wx.Frame):
         self.Close()
         self.Destroy()
         wxObject.EnableAll()
+        logger.print_on_console('--Rollback pop-up closed--')
         log.info('--Rollback pop-up closed--')
 #------------------
 
