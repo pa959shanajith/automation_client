@@ -20,13 +20,14 @@ import socket
 import requests
 import io
 import handler
+import update_module
 try:
     from socketlib_override import SocketIO,BaseNamespace
 except ImportError:
     from socketIO_client import SocketIO,BaseNamespace
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-
+global update_obj
 log = logging.getLogger('clientwindow.py')
 wxObject = None
 browsername = None
@@ -35,6 +36,7 @@ soc=None
 pdfgentool = None
 qcConFlag=False
 browsercheckFlag=False
+updatecheckFlag=False
 chromeFlag=False
 firefoxFlag=False
 desktopScrapeFlag=False
@@ -67,12 +69,27 @@ GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
 if SYSTEM_OS == "Windows":
     CHROME_DRIVER_PATH += ".exe"
     GECKODRIVER_PATH += ".exe"
+#-------------------------------------------------------------------------------
+
+ABOUT_PATH= NINETEEN68_HOME + '/assets/about_manifest.json'
+UNPACK_LOC = NINETEEN68_HOME
+LOC_7Z = NINETEEN68_HOME + '/assets/7_Zip/7z.exe'
+if ( os.path.exists(NINETEEN68_HOME + '/plugins/Update/Client_updater.py') ):
+    UPDATER_LOC = NINETEEN68_HOME + '/plugins/Update/Client_updater.py'
+elif ( os.path.exists(NINETEEN68_HOME + '/plugins/Update/Client_updater.exe') ):
+    UPDATER_LOC = NINETEEN68_HOME + '/plugins/Update/Client_updater.exe'
+if( os.path.exists(NINETEEN68_HOME +'/assets/Rollback/rollback.py') ):
+    ROLLBACK_LOC = NINETEEN68_HOME +'/assets/Rollback/rollback.py'
+elif( os.path.exists(NINETEEN68_HOME +'/assets/Rollback/rollback.exe') ):
+    ROLLBACK_LOC = NINETEEN68_HOME +'/assets/Rollback/rollback.exe'
+SERVER_LOC = None
+#-------------------------------------------------------------------------------
 
 class MainNamespace(BaseNamespace):
     core_utils_obj = core_utils.CoreUtils()
 
     def on_message(self, *args):
-        global action,wxObject,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag,connection_Timer
+        global action,wxObject,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag,connection_Timer,updatecheckFlag
         try:
             if(str(args[0]) == 'connected'):
                 if(allow_connect):
@@ -83,6 +100,10 @@ class MainNamespace(BaseNamespace):
                     wxObject.rbox.Enable()
                     if browsercheckFlag == False:
                         browsercheckFlag = check_browser()
+                    if updatecheckFlag == False:
+                        logger.print_on_console("Checking for client package updates...")
+                        log.info("Checking for client package updates...")
+                        updatecheckFlag = check_update(True)
                     if executionOnly:
                         msg='Execution only Mode enabled'
                         logger.print_on_console(msg)
@@ -918,7 +939,7 @@ class ClientWindow(wx.Frame):
         self.action=''
         self.debug_mode=False
         self.choice='Normal'
-        global wxObject,browsercheckFlag
+        global wxObject,browsercheckFlag,updatecheckFlag
         wxObject = self
         self.iconpath = IMAGES_PATH +"slk.ico"
         self.connect_img=wx.Image(IMAGES_PATH +"connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
@@ -954,6 +975,7 @@ class ClientWindow(wx.Frame):
         self.fileMenu = wx.Menu()
         self.editMenu = wx.Menu()
         self.toolMenu = wx.Menu()
+        self.helpMenu = wx.Menu()
         #own event
         self.Bind(wx.EVT_CHOICE, self.test)
         #own event
@@ -977,6 +999,14 @@ class ClientWindow(wx.Frame):
         self.toolMenu.Append(self.pdfReportBatchItem)
         self.menubar.Append(self.toolMenu, '&Tools')
         self.SetMenuBar(self.menubar)
+
+        self.aboutItem = wx.MenuItem(self.helpMenu, 160, text="About", kind=wx.ITEM_NORMAL)
+        self.helpMenu.Append(self.aboutItem)
+        self.updateItem = wx.MenuItem(self.helpMenu, 161, text="Check for Updates", kind=wx.ITEM_NORMAL)
+        self.helpMenu.Append(self.updateItem)
+        self.rollbackItem = wx.MenuItem(self.helpMenu, 162, text="Rollback", kind=wx.ITEM_NORMAL)
+        self.helpMenu.Append(self.rollbackItem)
+        self.menubar.Append(self.helpMenu, '&Help')
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
         self.connectbutton = wx.BitmapButton(self.panel, bitmap=self.connect_img,pos=(10, 10), size=(100, 25), name='connect')
@@ -1040,6 +1070,10 @@ class ClientWindow(wx.Frame):
             browsercheckFlag=True
         else:
             browsercheckFlag=False
+        if configvalues['update_check'].lower()=='no':
+            updatecheckFlag=True
+        else:
+            updatecheckFlag=False
         self.OnClear(wx.EVT_LEFT_DOWN)
         self.verifyMACAddress()
         self.connectbutton.SetFocus()
@@ -1115,6 +1149,41 @@ class ClientWindow(wx.Frame):
                 log.info(msg)
             except Exception as e:
                 msg = "Error while loading PDF generation plugin (Batch mode)"
+                logger.print_on_console(msg)
+                log.info(msg)
+                log.error(e)
+
+        elif id == 160:      # When user selects Edit > About
+            try:
+                msg = '--About selected--'
+                logger.print_on_console(msg)
+                log.info(msg)
+                About_window(parent = None,id = -1, title="About")
+            except Exception as e:
+                msg = "Error while selecting about file"
+                logger.print_on_console(msg)
+                log.info(msg)
+                log.error(e)
+        elif id==161:      # When user selects Edit > Check for updates
+            try:
+                msg = '--Check for updates selected--'
+                logger.print_on_console(msg)
+                log.info(msg)
+                Check_Update_window(parent = None,id = -1, title="Check for Updates")
+            except Exception as e:
+                msg = "Error while updating file"
+                logger.print_on_console(msg)
+                log.info(msg)
+                log.error(e)
+
+        elif id==162:      # When user selects Edit > Rollback
+            try:
+                msg = '--Rollback selected--'
+                logger.print_on_console(msg)
+                log.info(msg)
+                rollback_window(parent = None,id = -1, title="Rollback")
+            except Exception as e:
+                msg = "Error while rolling back file"
                 logger.print_on_console(msg)
                 log.info(msg)
                 log.error(e)
@@ -1475,7 +1544,7 @@ class Config_window(wx.Frame):
         #------------------------------------Different co-ordinates for Windows and Mac
         if SYSTEM_OS=='Windows':
             config_fields= {
-            "Frame":[(300, 150),(470,620)],
+            "Frame":[(300, 150),(470,700)],
             "S_address":[(12,8 ),(90, 28),(100,8 ),(140,-1)],
             "S_port": [(270,8 ),(70, 28),(340,8 ), (105,-1)],
             "Chrm_path":[(12,38),(80, 28),(100,38), (310,-1),(415,38),(30, -1)],
@@ -1501,8 +1570,9 @@ class Config_window(wx.Frame):
             "Iris_prediction":[(12,428)],
             "hide_soft_key":[(180,428)],
             "extn_enabled":[(320,428)],
-            "Save":[(100,518), (100, 28)],
-            "Close":[(250,518), (100, 28)]
+            "update_check":[(12,488)],
+            "Save":[(100,608), (100, 28)],
+            "Close":[(250,608), (100, 28)]
         }
         else:
             config_fields={
@@ -1728,7 +1798,14 @@ class Config_window(wx.Frame):
         else:
             self.rbox13.SetSelection(1)
 
-        self.error_msg=wx.StaticText(self.panel, label="", pos=(85,488),size=(350, 28), style=0, name="")
+        self.rbox14 = wx.RadioBox(self.panel, label = "Update Check", pos = config_fields["update_check"][0], choices = lblList,
+         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson != False and isConfigJson['update_check'].title() == lblList[0]:
+            self.rbox14.SetSelection(0)
+        else:
+            self.rbox14.SetSelection(1)
+
+        self.error_msg=wx.StaticText(self.panel, label="", pos=(85,568),size=(350, 28), style=0, name="")
         self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])
         self.save_btn.Bind(wx.EVT_BUTTON, self.config_check)
         self.close_btn=wx.Button(self.panel, label="Close",pos=config_fields["Close"][0], size=config_fields["Close"][1])
@@ -1779,6 +1856,7 @@ class Config_window(wx.Frame):
         hide_soft_key = self.rbox12.GetStringSelection()
         conn_timeout = self.conn_timeout.GetValue()
         extn_enabled = self.rbox13.GetStringSelection()
+        update_check = self.rbox14.GetStringSelection()
         #----------------creating data dictionary
         data['server_ip'] = server_add.strip()
         data['server_port'] = server_port.strip()
@@ -1805,6 +1883,7 @@ class Config_window(wx.Frame):
         data['hide_soft_key'] = hide_soft_key.strip()
         data['connection_timeout']= conn_timeout.strip()
         data['extn_enabled']= extn_enabled.strip()
+        data['update_check']= update_check.strip()
         config_data=data
         if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='' and data['firefox_path']!='' and  data['connection_timeout']>='':
             #---------------------------------------resetting the static texts
@@ -1833,7 +1912,6 @@ class Config_window(wx.Frame):
             self.dispVarTimeOut.SetForegroundColour((0,0,0))
             self.connection_timeout.SetLabel('Connection Timeout')
             self.connection_timeout.SetForegroundColour((0,0,0))
-
             #---------------------------------------creating the file in specified path
             try:
                 f = open(data['logFile_Path'], "a+")
@@ -2022,13 +2100,19 @@ class Config_window(wx.Frame):
     """This method closes the wxPython instance"""
     def close(self, event):
         self.Destroy()
-        global configvalues, browsercheckFlag, chromeFlag, firefoxFlag
+        global configvalues, browsercheckFlag, chromeFlag, firefoxFlag,updatecheckFlag
         configvalues = readconfig.readConfig().readJson() # Re-reading config values
         if configvalues['browser_check'].lower()=='no':
             browsercheckFlag=True
             chromeFlag=firefoxFlag=False
         else:
             browsercheckFlag=False
+
+        if configvalues['update_check'].lower()=='no':
+            updatecheckFlag=True
+        else:
+            updatecheckFlag=False
+
         try:
             logfilename = os.path.normpath(configvalues["logFile_Path"]).replace("\\","\\\\")
             logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename},disable_existing_loggers=False)
@@ -2040,6 +2124,262 @@ class Config_window(wx.Frame):
         msg = '--Edit Config closed--'
         logger.print_on_console(msg)
         log.info(msg)
+
+#-------------------
+"""Displays the details of ICE, versions, etc.(can be customised/it is read only)"""
+class About_window(wx.Frame):
+    """Initialization and defining the wx-components of the pop-up"""
+    def __init__(self, parent, id, title):
+        try:
+            data = self.get_client_manifest()
+            msg = 'A product of Dimension Labs \n'
+            msg = msg +str(self.get_Info_1(data))+str(self.get_Info_2(data))+str(self.get_Info_3(data))+str(self.get_Info_4())+str(self.get_Info_5(data))+str(self.get_Info_6())
+            #------------------------------------Different co-ordinates for Windows and Mac
+            if SYSTEM_OS=='Windows':
+                upload_fields= {
+                "Frame":[(300, 150),(465,220)],
+                "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
+                "Close":[(340,148), (100, 28)]
+            }
+            else:
+                upload_fields={
+                "Frame":[(300, 150),(550,220)],#(diff +85,+10 from windows)
+                "disp_msg":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
+                "Close":[(285,88),(100, 28)]
+            }
+            wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
+            self.SetBackgroundColour('#e6e7e8')
+            self.iconpath = IMAGES_PATH +"slk.ico"
+            self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
+            self.SetIcon(self.wicon)
+            self.panel = wx.Panel(self)
+
+            """Text area"""
+            self.disp_msg = wx.TextCtrl(self.panel, pos = upload_fields["disp_msg"][0], size = (425, 120), style = wx.TE_MULTILINE|wx.TE_READONLY)
+
+            """Close btn"""
+            self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
+            self.close_btn.Bind(wx.EVT_BUTTON, self.close)
+
+            self.disp_msg.AppendText( msg )
+
+            self.Centre()
+            wx.Frame(self.panel)
+            self.Show()
+        except Exception as e:
+            logger.print_on_console("Error occoured in About")
+            log.error("Error occoured in About ,Err msg : " + str(e))
+
+
+    def get_client_manifest(self):
+        data=None
+        try:
+            with open(ABOUT_PATH) as f:
+                data = json.load(f)
+        except Exception as e:
+            msg = 'Unable to fetch About Manifest'
+            logger.print_on_console(msg)
+            log.error(msg)
+        return data
+    def get_Info_1(self,data):
+        str1=''
+        try:
+            str1='Version : '+list(data['version'])[0]+'.'+list(data['version'][list(data['version'])[0]]['subversion'])[0]+' \n'
+        except Exception as e:
+            log.error(e)
+        return str1
+    def get_Info_2(self,data):
+        str1=''
+        try:
+            str1='Updated on : '+(data['version'][list(data['version'])[0]]['subversion'][list(data['version'][list(data['version'])[0]]['subversion'])[0]]['updated_on'])+' \n'
+        except Exception as e:
+            log.error(e)
+        return str1
+    def get_Info_3(self,data):
+        str1=''
+        try:
+            str1='Baseline : '+(data['version'][list(data['version'])[0]]['subversion'][list(data['version'][list(data['version'])[0]]['subversion'])[0]]['baseline'])+' \n'
+        except Exception as e:
+            log.error(e)
+        return str1
+    def get_Info_4(self):
+        return 'Copyright ?? -SLK Software Solutions \n'
+    def get_Info_5(self,data):
+        str1=''
+        try:
+            str1='Fixes :'+' \n'
+            b=(data['version'][list(data['version'])[0]]['subversion'][list(data['version'][list(data['version'])[0]]['subversion'])[0]]['fixes'])
+            for i in b:
+                str1=str1+i+' : '+b[i]+' \n'
+        except Exception as e:
+            log.error(e)
+        return str1
+    def get_Info_6(self):
+        return 'For any queries write to us @ : support.nineteen68@slkgroup.com'
+
+    def close(self, event):
+        self.Close()
+        self.Destroy()
+        wxObject.EnableAll()
+        log.info('--Updater pop-up closed--')
+
+#-------------
+"""Checks if config file is present, if not prompts the user to enter config file details"""
+class Check_Update_window(wx.Frame):
+    """Initialization and defining the wx-components of the pop-up"""
+    global update_obj
+    def __init__(self, parent, id, title):
+        """Check if updates are avaliable"""
+        try:
+            boolval,l_ver=check_update(False)
+            self.currentDirectory = os.environ["NINETEEN68_HOME"]
+            #------------------------------------Different co-ordinates for Windows and Mac
+            if SYSTEM_OS=='Windows':
+                upload_fields= {
+                "Frame":[(300, 150),(465,160)],
+                "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
+                "Update":[(100,88), (100, 28)],
+                "Close":[(250,88), (100, 28)]
+            }
+            else:
+                upload_fields={
+                "Frame":[(300, 150),(550,160)],#(diff +85,+10 from windows)
+                "disp_msg":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
+                "Update":[(135,88),(100, 28)],
+                "Close":[(285,88),(100, 28)]
+            }
+            wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
+            self.SetBackgroundColour('#e6e7e8')
+            self.iconpath = IMAGES_PATH +"slk.ico"
+            self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
+            self.SetIcon(self.wicon)
+            self.updated = False
+            self.panel = wx.Panel(self)
+
+            """Text area"""
+            self.disp_msg = wx.TextCtrl(self.panel, pos = upload_fields["disp_msg"][0], size = (425, 60), style = wx.TE_MULTILINE|wx.TE_READONLY)
+
+            """Update btn"""
+            self.update_btn = wx.Button(self.panel, label="Update",pos=upload_fields["Update"][0], size=upload_fields["Update"][1])
+            self.update_btn.Bind(wx.EVT_BUTTON, self.update_ice)
+
+            """Close btn"""
+            self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
+            self.close_btn.Bind(wx.EVT_BUTTON, self.close)
+
+            self.update_btn.Disable()
+            UPDATE_MSG = update_obj.send_update_message()
+            if ( UPDATE_MSG == 'Update Available!!! Click on update' ):
+                self.disp_msg.AppendText( "An update is available, click on 'Update' button to install the latest patch : " + str(l_ver) + "\n")
+                self.disp_msg.AppendText( "Warning! ICE will close when update starts...")
+                self.update_btn.Enable()
+            else:
+                self.disp_msg.SetValue(UPDATE_MSG)
+
+            self.Centre()
+            wx.Frame(self.panel)
+            self.Show()
+
+        except Exception as e:
+            if ( str(e) == "'NoneType' object has no attribute 'emit'" ):
+                logger.print_on_console( "Connection not established, cannot check for updates")
+                log.error( "Connection not established, cannot check for updates")
+            else:
+                logger.print_on_console( "Error occoured while checking for updates : ",e)
+                log.error( "Error occoured while checking for updates : ",e)
+
+    """updates ICE"""
+    def update_ice(self,event):
+        try:
+            self.close(event)
+            logger.print_on_console("--Updating Files and Packages--")
+            log.info("--Updating Files and Packages--")
+            update_obj.download_and_run_updater()
+        except Exception as e:
+            log.error('Error occoured in update_ice : ' + str(e))
+            logger.print_on_console('Error occoured in update_ice : ' + str(e))
+
+
+    def close(self, event):
+        self.Close()
+        self.Destroy()
+        wxObject.EnableAll()
+        log.info('--Updater pop-up closed--')
+
+class rollback_window(wx.Frame):
+    """Initialization and defining the wx-components of the pop-up"""
+    def __init__(self, parent, id, title):
+        """Check if updates are avaliable"""
+        try:
+            #------------------------------------Different co-ordinates for Windows and Mac
+            if SYSTEM_OS=='Windows':
+                upload_fields= {
+                "Frame":[(300, 150),(465,160)],
+                "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
+                "Rollback":[(100,88), (100, 28)],
+                "Close":[(250,88), (100, 28)]
+            }
+            else:
+                upload_fields={
+                "Frame":[(300, 150),(550,160)],#(diff +85,+10 from windows)
+                "disp_msg":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
+                "Rollback":[(135,88),(100, 28)],
+                "Close":[(285,88),(100, 28)]
+            }
+            wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
+            self.SetBackgroundColour('#e6e7e8')
+            self.iconpath = IMAGES_PATH +"slk.ico"
+            self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
+            self.SetIcon(self.wicon)
+            self.panel = wx.Panel(self)
+            self.rollback_obj = None
+
+            """Text area"""
+            self.disp_msg = wx.TextCtrl(self.panel, pos = upload_fields["disp_msg"][0], size = (425, 60), style = wx.TE_MULTILINE|wx.TE_READONLY)
+
+            """Rollback btn"""
+            self.rollback_btn = wx.Button(self.panel, label="Rollback",pos=upload_fields["Rollback"][0], size=upload_fields["Rollback"][1])
+            self.rollback_btn.Bind(wx.EVT_BUTTON, self.rollback)
+
+            """Close btn"""
+            self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
+            self.close_btn.Bind(wx.EVT_BUTTON, self.close)
+
+            self.rollback_btn.Disable()
+            res = os.path.exists(UNPACK_LOC+'\\assets\\Rollback\\Nineteen68_backup.7z')
+            self.rollback_obj = update_module.Check_for_rollback()
+            if ( res == False ):
+                self.disp_msg.AppendText( "Nineteen68 backup not found, cannot rollback changes.")
+            else:
+                self.rollback_obj.update(UNPACK_LOC, LOC_7Z, ROLLBACK_LOC)
+                self.disp_msg.AppendText( "Click 'Rollback' to run previous version of Nineteen68.")
+                self.rollback_btn.Enable()
+            self.Centre()
+            wx.Frame(self.panel)
+            self.Show()
+        except Exception as e:
+            log.error('Error occoured in rollback_window class : ' + str(e))
+            logger.print_on_console('Error occoured while trying to rollback.')
+
+    def rollback(self,event):
+        """Rolls back Nineteen68"""
+        try:
+            self.close(event)
+            logger.print_on_console("--Rolling back to previous version of Nineteen68--")
+            log.info("--Rolling back to previous version of Nineteen68--")
+            self.rollback_obj.run_rollback()
+        except Exception as e:
+            log.error('Error occoured in rollback : ' + str(e))
+            logger.print_on_console('Error occoured in rollback : ' + str(e))
+
+    def close(self, event):
+        self.Close()
+        self.Destroy()
+        wxObject.EnableAll()
+        logger.print_on_console('--Rollback pop-up closed--')
+        log.info('--Rollback pop-up closed--')
+#------------------
+
 
 class DebugWindow(wx.Frame):
     def __init__(self, parent,id, title):
@@ -2185,3 +2525,41 @@ def check_execution_lic(event):
         logger.print_on_console(msg)
         socketIO.emit(event,'ExecutionOnlyAllowed')
     return executionOnly
+
+def check_update(flag):
+    global update_obj
+    SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/fileserver/'
+    #------------------------------------------------------------getting server manifest
+    def get_server_manifest_data():
+        data = None
+        request = None
+        try:
+            request = requests.get(SERVER_LOC + "/manifest.json", verify=False)
+            try:
+                data = json.loads(request.text)#will return json of the manifest
+            except exception as e:
+                log.error(e)
+                logger.print_on_console( "Error in fetching server manifest, kinldy contact Nineteen68 Support Team for further assistance" )
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console( "NewConnectionError : Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it")
+        return data
+    #-----------------------------------------------------------Updater Module
+    def update_updater_module(data):
+        global update_obj
+        update_obj = update_module.Check_for_updates()
+        update_obj.update(data, ABOUT_PATH, SERVER_LOC, UNPACK_LOC, LOC_7Z, UPDATER_LOC)
+    #---------------------------------------updater
+    data = get_server_manifest_data()
+    update_updater_module(data)
+    UPDATE_MSG=update_obj.send_update_message()
+    l_ver = update_obj.fetch_current_value()
+    #check if update avaliable
+    if ( UPDATE_MSG == 'Update Available!!! Click on update' and flag == True ):
+        logger.print_on_console("An update is available. Click on 'Help' menu option -> 'Check for Updates' sub-menu option -> 'Update' button")
+        logger.print_on_console('The latest ICE version : ',l_ver)
+        log.info(UPDATE_MSG)
+    elif ( UPDATE_MSG == 'You are running the latest version of Nineteen68' and flag == True ):
+        logger.print_on_console( "No updates available" )
+        log.info( "No updates available" )
+    return False,l_ver
