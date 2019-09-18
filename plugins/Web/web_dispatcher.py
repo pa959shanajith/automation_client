@@ -449,6 +449,7 @@ class Dispatcher:
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result=list(result)
             result[3]=err_msg
+            result[2]=None
         except Exception as e:
             local_Wd.log.error(e)
 ##            logger.print_on_console('Exception at dispatcher')

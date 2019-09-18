@@ -210,6 +210,7 @@ class GenericKeywordDispatcher:
          except TypeError as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
+            result[2]=None
          except Exception as e:
             local_generic.log.error(e)
 ##            logger.print_on_console('Exception at dispatcher')
