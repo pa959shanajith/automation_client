@@ -1384,6 +1384,12 @@ class ClientWindow(wx.Frame):
                     elif flag == 'display':
                         #call display logic
                         self.pausewindow = pause_display_operation.Display(parent = self,id = -1, title="SLK Nineteen68 - Display Variable",input = inputvalue)
+                    elif flag == 'debug':
+                        #call debug logic
+                        self.pausewindow = pause_display_operation.Debug(parent = self,id = -1, title="SLK Nineteen68 - Debug Mode",input = inputvalue)
+                    elif flag == 'error':
+                        #call debug error logic
+                        self.pausewindow = pause_display_operation.Error(parent = self,id = -1, title="SLK Nineteen68 - Debug Mode",input = inputvalue)
         except Exception as e:
             log.error(e,exc_info=True)
 
