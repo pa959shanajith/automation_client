@@ -849,3 +849,83 @@ class UtilWebKeywords:
                  err_msg=self.__web_driver_exception(e)
         local_uo.log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
+
+    def get_attribute_value(self,webelement,input,*args):
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        err_msg = None
+        output = None
+        attr_name = input[0]
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if webelement != None and webelement !='':
+                local_uo.log.info(INPUT_IS)
+                local_uo.log.info(input)
+                if attr_name:
+                    output = webelement.get_attribute(attr_name)
+                    local_uo.log.info(output)
+                    if output is not None:
+                        logger.print_on_console('Result: ',output)
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                    else:
+                        err_msg = 'Attribute does not exists'
+                        logger.print_on_console(err_msg)
+                        local_uo.log.error(err_msg)
+                else:
+                    err_msg = 'Failed to fetch the attribute value'
+                    logger.print_on_console(err_msg)
+                    local_uo.log.error(err_msg)
+        except Exception as e:
+            err_msg = 'Error occured while fetching attribute value'
+            logger.print_on_console(err_msg)
+            local_uo.log.error(e)
+        return status,methodoutput,output,err_msg
+
+    def verify_attribute(self,webelement,input,*args):
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        err_msg = None
+        output = None
+        att_name = input[0]
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if webelement != None and webelement !='':
+                local_uo.log.info(INPUT_IS)
+                local_uo.log.info(input)
+                if att_name:
+                    output = webelement.get_attribute(att_name)
+                    if output is not None:
+                        if len(input)>1:
+                            result = input[1]
+                            if output == result:
+                                local_uo.log.info('Attribute values matched')
+                                logger.print_on_console('Attribute values matched')
+                                status = TEST_RESULT_PASS
+                                methodoutput = TEST_RESULT_TRUE
+                            else:
+                                err_msg = 'Attribute values does not match'
+                                logger.print_on_console(err_msg)
+                                local_uo.log.error(err_msg)
+                        else:
+                            local_uo.log.info('Attribute exists')
+                            logger.print_on_console('Attribute exists')
+                            status = TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
+                    else:
+                        err_msg = 'Attribute does not exixts'
+                        logger.print_on_console(err_msg)
+                        local_uo.log.error(err_msg)
+                else:
+                    err_msg = 'Input is empty'
+                    logger.print_on_console(err_msg)
+                    local_uo.log.error(err_msg)
+        except NoSuchAttributeException as ex:
+            err_msg = 'Attribute does not exixts'
+            logger.print_on_console(err_msg)
+            local_uo.log.error(ex)
+        except Exception as e:
+            err_msg = 'Error occured while verifying attribute'
+            logger.print_on_console(err_msg)
+            local_uo.log.error(e)
+        return status,methodoutput,output,err_msg
