@@ -70,18 +70,13 @@ if SYSTEM_OS == "Windows":
     CHROME_DRIVER_PATH += ".exe"
     GECKODRIVER_PATH += ".exe"
 #-------------------------------------------------------------------------------
-
-ABOUT_PATH= NINETEEN68_HOME + '/assets/about_manifest.json'
+MANIFEST_LOC= NINETEEN68_HOME + '/assets/about_manifest.json'
 UNPACK_LOC = NINETEEN68_HOME
-LOC_7Z = NINETEEN68_HOME + '/assets/7_Zip/7z.exe'
-if ( os.path.exists(NINETEEN68_HOME + '/plugins/Update/Client_updater.py') ):
-    UPDATER_LOC = NINETEEN68_HOME + '/plugins/Update/Client_updater.py'
-elif ( os.path.exists(NINETEEN68_HOME + '/plugins/Update/Client_updater.exe') ):
-    UPDATER_LOC = NINETEEN68_HOME + '/plugins/Update/Client_updater.exe'
-if( os.path.exists(NINETEEN68_HOME +'/assets/Rollback/rollback.py') ):
-    ROLLBACK_LOC = NINETEEN68_HOME +'/assets/Rollback/rollback.py'
-elif( os.path.exists(NINETEEN68_HOME +'/assets/Rollback/rollback.exe') ):
-    ROLLBACK_LOC = NINETEEN68_HOME +'/assets/Rollback/rollback.exe'
+LOC_7Z = NINETEEN68_HOME + '/Lib/7_Zip/7z.exe'
+if ( os.path.exists(NINETEEN68_HOME + '/assets/Update/Update.py') ):
+    UPDATER_LOC = NINETEEN68_HOME + '/assets/Update/Update.py'
+elif ( os.path.exists(NINETEEN68_HOME + '/assets/Update/Update.exe') ):
+    UPDATER_LOC = NINETEEN68_HOME + '/assets/Update/Update.exe'
 SERVER_LOC = None
 #-------------------------------------------------------------------------------
 
@@ -2174,7 +2169,7 @@ class About_window(wx.Frame):
     def get_client_manifest(self):
         data=None
         try:
-            with open(ABOUT_PATH) as f:
+            with open(MANIFEST_LOC) as f:
                 data = json.load(f)
         except Exception as e:
             msg = 'Unable to fetch About Manifest'
@@ -2294,7 +2289,7 @@ class Check_Update_window(wx.Frame):
             self.close(event)
             logger.print_on_console("--Updating Files and Packages--")
             log.info("--Updating Files and Packages--")
-            update_obj.download_and_run_updater()
+            update_obj.run_updater()
         except Exception as e:
             log.error('Error occoured in update_ice : ' + str(e))
             logger.print_on_console('Error occoured in update_ice : ' + str(e))
@@ -2346,12 +2341,12 @@ class rollback_window(wx.Frame):
             self.close_btn.Bind(wx.EVT_BUTTON, self.close)
 
             self.rollback_btn.Disable()
-            res = os.path.exists(UNPACK_LOC+'\\assets\\Rollback\\Nineteen68_backup.7z')
-            self.rollback_obj = update_module.Check_for_rollback()
+            res = os.path.exists(UNPACK_LOC+'\\assets\\Update\\Nineteen68_backup.7z')
+            self.rollback_obj = update_module.Update_Rollback()
             if ( res == False ):
                 self.disp_msg.AppendText( "Nineteen68 backup not found, cannot rollback changes.")
             else:
-                self.rollback_obj.update(UNPACK_LOC, LOC_7Z, ROLLBACK_LOC)
+                self.rollback_obj.update(None, None, None, UNPACK_LOC, LOC_7Z, UPDATER_LOC, 'ROLLBACK')
                 self.disp_msg.AppendText( "Click 'Rollback' to run previous version of Nineteen68.")
                 self.rollback_btn.Enable()
             self.Centre()
@@ -2547,8 +2542,8 @@ def check_update(flag):
     #-----------------------------------------------------------Updater Module
     def update_updater_module(data):
         global update_obj
-        update_obj = update_module.Check_for_updates()
-        update_obj.update(data, ABOUT_PATH, SERVER_LOC, UNPACK_LOC, LOC_7Z, UPDATER_LOC)
+        update_obj = update_module.Update_Rollback()
+        update_obj.update(data, MANIFEST_LOC, SERVER_LOC, UNPACK_LOC, LOC_7Z, UPDATER_LOC, 'UPDATE')
     #---------------------------------------updater
     data = get_server_manifest_data()
     update_updater_module(data)

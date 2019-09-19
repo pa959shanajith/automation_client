@@ -1,7 +1,8 @@
 #-------------------------------------------------------------------------------
 # Name:        Update_module
 # Purpose:     1.Checks if ICE requires an update, and calls required updaters if necessary
-#              2.Calls rollback.py/rollback.exe
+#              2.Calls Update.py/Update.exe to rollback changes
+#
 # Author:      anas.ahmed
 #
 # Created:     06-02-2019
@@ -14,36 +15,38 @@ import logger
 import logging
 log = logging.getLogger('update_module.py')
 
-class Check_for_updates:
+class Update_Rollback:
     def __init__(self):
         """Initializing variables"""
         self.update_flag = False
         self.check_flag = False
-        #-----------------------------------------------------------------------
         self.data_tags = {}
         self.client_tag = {}
         self.SERVER_LOC = None
+        #-----------------------------------------------Required only for Update
         self.Update_loc = None
         self.loc_7z = None
         self.updater_loc = None
-        #-----------------------------------------------------------------------
+        self.option = None
+        #----------------------------------Required for both Update and Rollback
 
-    def update(self, data_from_server, path, SERVER_LOC, UNPAC_LOC, LOC_7Z, UPDATER_LOC):
+    def update(self, data_from_server, path, SERVER_LOC, UNPAC_LOC, LOC_7Z, UPDATER_LOC, OPTION):
         """Assigning values to variables"""
         try:
-            client_data = self.get_client_manifest(path)
-            self.check(client_data, data_from_server)
-            self.SERVER_LOC = SERVER_LOC
             self.Update_loc = UNPAC_LOC
             self.loc_7z = LOC_7Z
             self.updater_loc = UPDATER_LOC
+            self.option = OPTION
+            self.SERVER_LOC = SERVER_LOC
+            if ( self.option == 'UPDATE' ):
+                client_data = self.get_client_manifest(path)
+                self.check(client_data, data_from_server)
         except Exception as e:
             log.error( "Error in update : " + str(e) )
         pass
 
     def get_client_manifest(self, path):
         data = None
-        print (path)
         try:
             with open(path) as f:
                 data = json.load(f)
@@ -52,7 +55,11 @@ class Check_for_updates:
         return data
 
     def check(self,client_data,data_from_server):
-        """filters till the point where it find the current ICE version in the server manifest, omits lower versions"""
+        """Filters till the point where it find the current ICE version in the server manifest, omits lower versions"""
+        """Input 1.Client Manifest Data
+                 2.Server Manifest Data"""
+        """Output 1.Sets the latest data tags
+                  2.Sets the update flag and the check flag"""
         #version check
         data_L = []
         #data_tags={}
@@ -115,6 +122,7 @@ class Check_for_updates:
         return keys[len(keys)-1]
 
     def send_update_message(self):
+        """Returns a message """
         update_msg = None
         if ( self.update_flag == True and self.check_flag == True ):
             update_msg = 'Update Available!!! Click on update'
@@ -124,32 +132,18 @@ class Check_for_updates:
             update_msg = 'An Error has occoured while checking for new versions of Nineteen68, kindly contact Support Team'
         return update_msg
 
-    def download_and_run_updater(self):
+    def run_updater(self):
+        """function to run Updater.py/Updater.exe ' UPDATE ' feature"""
         try:
-            log.debug( 'Info passing to Client_updater : ' + 'python ' + str(self.updater_loc) + ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z) )
-            os.system('python ' + str(self.updater_loc) + ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
+            log.debug( 'Sending the following data to Updater : ' + 'python ' + str(self.updater_loc) + ' ' + str(self.option) +  ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z) )
+            os.system('python ' + str(self.updater_loc) + ' ' + str(self.option) + ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
         except Exception as e:
             log.error( "Error in download_and_run_updater : " + str(e) )
 
-class Check_for_rollback:
-    def __init__(self):
-        """Initializing variables"""
-        #-----------------------------------------------------------------------
-        self.Update_loc = None
-        self.loc_7z = None
-        self.rollback_loc = None
-        #-----------------------------------------------------------------------
-    def update(self,UNPAC_LOC, LOC_7Z, ROLLBACK_LOC):
-        """Assigning values to variables"""
-        try:
-            self.Update_loc = UNPAC_LOC
-            self.loc_7z = LOC_7Z
-            self.rollback_loc = ROLLBACK_LOC
-        except Exception as e:
-            log.error( "Error in update : " + str(e) )
     def run_rollback(self):
+        """function to run Updater.py/Updater.exe ' ROLLBACK ' feature"""
         try:
-            log.debug( 'Info passing to rollback : ' + 'python ' + str(self.rollback_loc) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
-            os.system('python ' + str(self.rollback_loc) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
+            log.debug( 'Sending the following data to Updater : ' + 'python ' + str(self.updater_loc) + ' ' + self.option + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
+            os.system('python ' + str(self.updater_loc) + ' ' + str(self.option) + ' '  ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
         except Exception as e:
             log.error( "Error in run_rollback : " + str(e) )
