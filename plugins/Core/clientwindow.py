@@ -72,7 +72,7 @@ if SYSTEM_OS == "Windows":
 #-------------------------------------------------------------------------------
 MANIFEST_LOC= NINETEEN68_HOME + '/assets/about_manifest.json'
 UNPACK_LOC = NINETEEN68_HOME
-LOC_7Z = NINETEEN68_HOME + '/Lib/7_Zip/7z.exe'
+LOC_7Z = NINETEEN68_HOME + '/Lib/7zip/7z.exe'
 if ( os.path.exists(NINETEEN68_HOME + '/assets/Update/Update.py') ):
     UPDATER_LOC = NINETEEN68_HOME + '/assets/Update/Update.py'
 elif ( os.path.exists(NINETEEN68_HOME + '/assets/Update/Update.exe') ):

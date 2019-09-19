@@ -44,6 +44,8 @@ import time
 import logging
 import datetime
 date_obj = datetime.datetime.now()
+if not ( os.path.isdir(str(os.getcwd()) + "\\assets\\Update\\logs") and os.path.exists(str(os.getcwd()) + "\\assets\\Update\\logs") ):
+    os.mkdir(str(os.getcwd()) + "\\assets\\Update\\logs")
 LOG_FILEPATH = str(os.getcwd()) + '\\assets\\Update\\logs\\' + 'Updater_logs_' + str(date_obj.year) + '_' + str(date_obj.month) + '_' + str(date_obj.day) + '_' + str(date_obj.hour) + str(date_obj.minute) + '.log'
 logging.basicConfig(filename=LOG_FILEPATH, level=logging.DEBUG)
 try:
