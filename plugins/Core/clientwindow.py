@@ -71,7 +71,6 @@ if SYSTEM_OS == "Windows":
     GECKODRIVER_PATH += ".exe"
 #-------------------------------------------------------------------------------
 MANIFEST_LOC= NINETEEN68_HOME + '/assets/about_manifest.json'
-UNPACK_LOC = NINETEEN68_HOME
 LOC_7Z = NINETEEN68_HOME + '/Lib/7zip/7z.exe'
 if ( os.path.exists(NINETEEN68_HOME + '/assets/Update/Update.py') ):
     UPDATER_LOC = NINETEEN68_HOME + '/assets/Update/Update.py'
@@ -2341,12 +2340,12 @@ class rollback_window(wx.Frame):
             self.close_btn.Bind(wx.EVT_BUTTON, self.close)
 
             self.rollback_btn.Disable()
-            res = os.path.exists(UNPACK_LOC+'\\assets\\Update\\Nineteen68_backup.7z')
+            res = os.path.exists(NINETEEN68_HOME+'\\assets\\Update\\Nineteen68_backup.7z')
             self.rollback_obj = update_module.Update_Rollback()
             if ( res == False ):
                 self.disp_msg.AppendText( "Nineteen68 backup not found, cannot rollback changes.")
             else:
-                self.rollback_obj.update(None, None, None, UNPACK_LOC, LOC_7Z, UPDATER_LOC, 'ROLLBACK')
+                self.rollback_obj.update(None, None, None, NINETEEN68_HOME, LOC_7Z, UPDATER_LOC, 'ROLLBACK')
                 self.disp_msg.AppendText( "Click 'Rollback' to run previous version of Nineteen68.")
                 self.rollback_btn.Enable()
             self.Centre()
@@ -2543,7 +2542,7 @@ def check_update(flag):
     def update_updater_module(data):
         global update_obj
         update_obj = update_module.Update_Rollback()
-        update_obj.update(data, MANIFEST_LOC, SERVER_LOC, UNPACK_LOC, LOC_7Z, UPDATER_LOC, 'UPDATE')
+        update_obj.update(data, MANIFEST_LOC, SERVER_LOC, NINETEEN68_HOME, LOC_7Z, UPDATER_LOC, 'UPDATE')
     #---------------------------------------updater
     data = get_server_manifest_data()
     update_updater_module(data)
