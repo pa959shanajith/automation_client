@@ -135,15 +135,23 @@ class Update_Rollback:
     def run_updater(self):
         """function to run Updater.py/Updater.exe ' UPDATE ' feature"""
         try:
-            log.debug( 'Sending the following data to Updater : ' + 'python ' + str(self.updater_loc) + ' ' + str(self.option) +  ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z) )
-            os.system('python ' + str(self.updater_loc) + ' ' + str(self.option) + ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
+            if (os.path.exists(self.Update_loc+'//assets//Update//Update.py')):
+                log.debug( 'Sending the following data to Updater.py : ' + 'python ' + str(self.updater_loc) + ' ' + str(self.option) +  ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z) )
+                os.system('python ' + str(self.updater_loc) + ' ' + str(self.option) + ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
+            elif (os.path.exists(self.Update_loc+'//assets//Update//Update.exe')):
+                log.debug( 'Sending the following data to Updater.exe : ' + str(self.updater_loc) + ' ' + str(self.option) +  ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z) )
+                os.system(str(self.updater_loc) + ' ' + str(self.option) + ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
         except Exception as e:
             log.error( "Error in download_and_run_updater : " + str(e) )
 
     def run_rollback(self):
         """function to run Updater.py/Updater.exe ' ROLLBACK ' feature"""
         try:
-            log.debug( 'Sending the following data to Updater : ' + 'python ' + str(self.updater_loc) + ' ' + self.option + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
-            os.system('python ' + str(self.updater_loc) + ' ' + str(self.option) + ' '  ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
+            if (os.path.exists(self.Update_loc+'//assets//Update//Update.py')):
+                log.debug( 'Sending the following data to Updater.py : ' + 'python ' + str(self.updater_loc) + ' ' + self.option + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
+                os.system('python ' + str(self.updater_loc) + ' ' + str(self.option) + ' '  ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
+            elif (os.path.exists(self.Update_loc+'//assets//Update//Update.exe')):
+                log.debug( 'Sending the following data to Updater.exe : ' + str(self.updater_loc) + ' ' + self.option + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
+                os.system(str(self.updater_loc) + ' ' + str(self.option) + ' '  ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
         except Exception as e:
             log.error( "Error in run_rollback : " + str(e) )
