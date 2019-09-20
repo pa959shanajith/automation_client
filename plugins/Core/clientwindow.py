@@ -71,10 +71,10 @@ if SYSTEM_OS == "Windows":
     GECKODRIVER_PATH += ".exe"
 MANIFEST_LOC= NINETEEN68_HOME + '/assets/about_manifest.json'
 LOC_7Z = NINETEEN68_HOME + '/Lib/7zip/7z.exe'
-if ( os.path.exists(NINETEEN68_HOME + '/assets/Update/Update.py') ):
-    UPDATER_LOC = NINETEEN68_HOME + '/assets/Update/Update.py'
-elif ( os.path.exists(NINETEEN68_HOME + '/assets/Update/Update.exe') ):
-    UPDATER_LOC = NINETEEN68_HOME + '/assets/Update/Update.exe'
+UPDATER_LOC = NINETEEN68_HOME + '/assets/Update/Update'
+if (os.path.exists(UPDATER_LOC + ".py")): UPDATER_LOC += ".py"
+elif (os.path.exists(UPDATER_LOC + ".exe")): UPDATER_LOC += ".exe"
+else: UPDATER_LOC = None
 SERVER_LOC = None
 
 class MainNamespace(BaseNamespace):
