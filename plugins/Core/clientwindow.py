@@ -69,7 +69,6 @@ GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
 if SYSTEM_OS == "Windows":
     CHROME_DRIVER_PATH += ".exe"
     GECKODRIVER_PATH += ".exe"
-#-------------------------------------------------------------------------------
 MANIFEST_LOC= NINETEEN68_HOME + '/assets/about_manifest.json'
 LOC_7Z = NINETEEN68_HOME + '/Lib/7zip/7z.exe'
 if ( os.path.exists(NINETEEN68_HOME + '/assets/Update/Update.py') ):
@@ -77,7 +76,6 @@ if ( os.path.exists(NINETEEN68_HOME + '/assets/Update/Update.py') ):
 elif ( os.path.exists(NINETEEN68_HOME + '/assets/Update/Update.exe') ):
     UPDATER_LOC = NINETEEN68_HOME + '/assets/Update/Update.exe'
 SERVER_LOC = None
-#-------------------------------------------------------------------------------
 
 class MainNamespace(BaseNamespace):
     core_utils_obj = core_utils.CoreUtils()
@@ -2147,22 +2145,16 @@ class About_window(wx.Frame):
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
             self.SetIcon(self.wicon)
             self.panel = wx.Panel(self)
-
-            """Text area"""
             self.disp_msg = wx.TextCtrl(self.panel, pos = upload_fields["disp_msg"][0], size = (425, 120), style = wx.TE_MULTILINE|wx.TE_READONLY)
-
-            """Close btn"""
             self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
             self.close_btn.Bind(wx.EVT_BUTTON, self.close)
-
             self.disp_msg.AppendText( msg )
-
             self.Centre()
             wx.Frame(self.panel)
             self.Show()
         except Exception as e:
-            logger.print_on_console("Error occoured in About")
-            log.error("Error occoured in About ,Err msg : " + str(e))
+            logger.print_on_console("Error occured in About")
+            log.error("Error occured in About ,Err msg : " + str(e))
 
 
     def get_client_manifest(self):
@@ -2175,6 +2167,7 @@ class About_window(wx.Frame):
             logger.print_on_console(msg)
             log.error(msg)
         return data
+
     def get_Info_1(self,data):
         str1=''
         try:
@@ -2182,6 +2175,7 @@ class About_window(wx.Frame):
         except Exception as e:
             log.error(e)
         return str1
+
     def get_Info_2(self,data):
         str1=''
         try:
@@ -2189,6 +2183,7 @@ class About_window(wx.Frame):
         except Exception as e:
             log.error(e)
         return str1
+
     def get_Info_3(self,data):
         str1=''
         try:
@@ -2196,8 +2191,10 @@ class About_window(wx.Frame):
         except Exception as e:
             log.error(e)
         return str1
+
     def get_Info_4(self):
         return 'Copyright ?? -SLK Software Solutions \n'
+
     def get_Info_5(self,data):
         str1=''
         try:
@@ -2208,6 +2205,7 @@ class About_window(wx.Frame):
         except Exception as e:
             log.error(e)
         return str1
+
     def get_Info_6(self):
         return 'For any queries write to us @ : support.nineteen68@slkgroup.com'
 
@@ -2249,18 +2247,11 @@ class Check_Update_window(wx.Frame):
             self.SetIcon(self.wicon)
             self.updated = False
             self.panel = wx.Panel(self)
-
-            """Text area"""
             self.disp_msg = wx.TextCtrl(self.panel, pos = upload_fields["disp_msg"][0], size = (425, 60), style = wx.TE_MULTILINE|wx.TE_READONLY)
-
-            """Update btn"""
             self.update_btn = wx.Button(self.panel, label="Update",pos=upload_fields["Update"][0], size=upload_fields["Update"][1])
             self.update_btn.Bind(wx.EVT_BUTTON, self.update_ice)
-
-            """Close btn"""
             self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
             self.close_btn.Bind(wx.EVT_BUTTON, self.close)
-
             self.update_btn.Disable()
             UPDATE_MSG = update_obj.send_update_message()
             if ( UPDATE_MSG == 'Update Available!!! Click on update' ):
@@ -2269,18 +2260,16 @@ class Check_Update_window(wx.Frame):
                 self.update_btn.Enable()
             else:
                 self.disp_msg.SetValue(UPDATE_MSG)
-
             self.Centre()
             wx.Frame(self.panel)
             self.Show()
-
         except Exception as e:
             if ( str(e) == "'NoneType' object has no attribute 'emit'" ):
                 logger.print_on_console( "Connection not established, cannot check for updates")
                 log.error( "Connection not established, cannot check for updates")
             else:
-                logger.print_on_console( "Error occoured while checking for updates : ",e)
-                log.error( "Error occoured while checking for updates : ",e)
+                logger.print_on_console( "Error occured while checking for updates : ",e)
+                log.error( "Error occured while checking for updates : ",e)
 
     """updates ICE"""
     def update_ice(self,event):
@@ -2290,9 +2279,8 @@ class Check_Update_window(wx.Frame):
             log.info("--Updating Files and Packages--")
             update_obj.run_updater()
         except Exception as e:
-            log.error('Error occoured in update_ice : ' + str(e))
-            logger.print_on_console('Error occoured in update_ice : ' + str(e))
-
+            log.error('Error occured in update_ice : ' + str(e))
+            logger.print_on_console('Error occured in update_ice : ' + str(e))
 
     def close(self, event):
         self.Close()
@@ -2327,20 +2315,13 @@ class rollback_window(wx.Frame):
             self.SetIcon(self.wicon)
             self.panel = wx.Panel(self)
             self.rollback_obj = None
-
-            """Text area"""
             self.disp_msg = wx.TextCtrl(self.panel, pos = upload_fields["disp_msg"][0], size = (425, 60), style = wx.TE_MULTILINE|wx.TE_READONLY)
-
-            """Rollback btn"""
             self.rollback_btn = wx.Button(self.panel, label="Rollback",pos=upload_fields["Rollback"][0], size=upload_fields["Rollback"][1])
             self.rollback_btn.Bind(wx.EVT_BUTTON, self.rollback)
-
-            """Close btn"""
             self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
             self.close_btn.Bind(wx.EVT_BUTTON, self.close)
-
             self.rollback_btn.Disable()
-            res = os.path.exists(NINETEEN68_HOME+'\\assets\\Update\\Nineteen68_backup.7z')
+            res = os.path.exists(os.path.normpath(NINETEEN68_HOME+'/assets/Update/Nineteen68_backup.7z'))
             self.rollback_obj = update_module.Update_Rollback()
             if ( res == False ):
                 self.disp_msg.AppendText( "Nineteen68 backup not found, cannot rollback changes.")
@@ -2352,8 +2333,8 @@ class rollback_window(wx.Frame):
             wx.Frame(self.panel)
             self.Show()
         except Exception as e:
-            log.error('Error occoured in rollback_window class : ' + str(e))
-            logger.print_on_console('Error occoured while trying to rollback.')
+            log.error('Error occured in rollback_window class : ' + str(e))
+            logger.print_on_console('Error occured while trying to rollback.')
 
     def rollback(self,event):
         """Rolls back Nineteen68"""
@@ -2363,8 +2344,8 @@ class rollback_window(wx.Frame):
             log.info("--Rolling back to previous version of Nineteen68--")
             self.rollback_obj.run_rollback()
         except Exception as e:
-            log.error('Error occoured in rollback : ' + str(e))
-            logger.print_on_console('Error occoured in rollback : ' + str(e))
+            log.error('Error occured in rollback : ' + str(e))
+            logger.print_on_console('Error occured in rollback : ' + str(e))
 
     def close(self, event):
         self.Close()
