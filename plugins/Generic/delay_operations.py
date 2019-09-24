@@ -75,7 +75,7 @@ class Delay_keywords:
         if(configvalues['displayVariableTimeOut']=='0'):
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
-            logger.debug("Ignoring this step as DisplayVariableTimeout is 0")
+            logger.print_on_console("Ignoring this step as DisplayVariableTimeout is 0")
             return status,methodoutput,output,err_msg,display_input
         else:
             try:
