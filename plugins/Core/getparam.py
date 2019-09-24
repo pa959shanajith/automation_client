@@ -813,5 +813,5 @@ class GetParam():
             step_description='Data Parameterization failed : Wrong filters given'
             self.add_report_end_iteration(reporting_obj,step_description,0,0)
             #Reporting part ends
-            log.error(e)
+            log.error(e,exc_info=True)
         return return_value

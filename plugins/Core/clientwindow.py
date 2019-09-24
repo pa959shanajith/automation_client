@@ -71,10 +71,8 @@ if SYSTEM_OS == "Windows":
     GECKODRIVER_PATH += ".exe"
 MANIFEST_LOC= NINETEEN68_HOME + '/assets/about_manifest.json'
 LOC_7Z = NINETEEN68_HOME + '/Lib/7zip/7z.exe'
-UPDATER_LOC = NINETEEN68_HOME + '/assets/Update/Update'
-if (os.path.exists(UPDATER_LOC + ".py")): UPDATER_LOC += ".py"
-elif (os.path.exists(UPDATER_LOC + ".exe")): UPDATER_LOC += ".exe"
-else: UPDATER_LOC = None
+UPDATER_LOC = NINETEEN68_HOME + '/assets/Update.exe'
+if (os.path.exists(UPDATER_LOC[:-3] + "py")): UPDATER_LOC += "py"
 SERVER_LOC = None
 
 class MainNamespace(BaseNamespace):
@@ -93,8 +91,9 @@ class MainNamespace(BaseNamespace):
                     if browsercheckFlag == False:
                         browsercheckFlag = check_browser()
                     if updatecheckFlag == False:
-                        logger.print_on_console("Checking for client package updates...")
-                        log.info("Checking for client package updates...")
+                        msg='Checking for client package updates'
+                        logger.print_on_console(msg)
+                        log.info(msg)
                         updatecheckFlag = check_update(True)
                     if executionOnly:
                         msg='Execution only Mode enabled'
@@ -495,9 +494,10 @@ class MainNamespace(BaseNamespace):
         global qcdata
         global soc
         global socketIO
-        server_data=''
+        server_data=b''
         data_stream=None
         client_data=None
+        EOF_QC = b'#E&D@Q!C#'
         try:
             if SYSTEM_OS == "Windows":
                 if len(args) > 0:
@@ -516,14 +516,14 @@ class MainNamespace(BaseNamespace):
                                 soc.connect(("localhost",10000))
 
                     data_to_send = json.dumps(qcdata).encode('utf-8')
-                    data_to_send+='#E&D@Q!C#'
+                    data_to_send+=EOF_QC
                     soc.send(data_to_send)
                     while True:
                         data_stream= soc.recv(1024)
                         server_data+=data_stream
-                        if '#E&D@Q!C#' in server_data:
+                        if EOF_QC in server_data:
                             break
-                    client_data= server_data[:server_data.find('#E&D@Q!C#')]
+                    client_data= server_data[:server_data.find(EOF_QC)].decode('utf-8')
                     if('Fail@f@!l' in client_data):
                         client_data=client_data[:client_data.find('@f@!l')]
                         logger.print_on_console('Error occurred in QC')
@@ -972,24 +972,24 @@ class ClientWindow(wx.Frame):
         self.Bind(wx.EVT_CHOICE, self.test)
         #own event
         self.loggerMenu = wx.Menu()
-        self.infoItem = wx.MenuItem(self.loggerMenu, 100,text = "Info",kind = wx.ITEM_NORMAL)
+        self.infoItem = wx.MenuItem(self.loggerMenu, 100,text = "&Info",kind = wx.ITEM_NORMAL)
         self.loggerMenu.Append(self.infoItem)
-        self.debugItem = wx.MenuItem(self.loggerMenu, 101,text = "Debug",kind = wx.ITEM_NORMAL)
+        self.debugItem = wx.MenuItem(self.loggerMenu, 101,text = "&Debug",kind = wx.ITEM_NORMAL)
         self.loggerMenu.Append(self.debugItem)
-        self.errorItem = wx.MenuItem(self.loggerMenu, 102,text = "Error",kind = wx.ITEM_NORMAL)
+        self.errorItem = wx.MenuItem(self.loggerMenu, 102,text = "&Error",kind = wx.ITEM_NORMAL)
         self.loggerMenu.Append(self.errorItem)
         self.fileMenu.AppendSubMenu(self.loggerMenu, "&Logger Level")
         self.menubar.Append(self.fileMenu, '&File')
 
-        self.configItem = wx.MenuItem(self.editMenu, 103,text = "Configuration",kind = wx.ITEM_NORMAL)
+        self.configItem = wx.MenuItem(self.editMenu, 103,text = "&Configuration",kind = wx.ITEM_NORMAL)
         self.editMenu.Append(self.configItem)
         self.menubar.Append(self.editMenu, '&Edit')
 
-        self.pdfReportItem = wx.MenuItem(self.toolMenu, 151,text = "Generate PDF Report",kind = wx.ITEM_NORMAL)
+        self.pdfReportItem = wx.MenuItem(self.toolMenu, 151,text = "Generate PDF &Report",kind = wx.ITEM_NORMAL)
         self.toolMenu.Append(self.pdfReportItem)
-        self.pdfReportBatchItem = wx.MenuItem(self.toolMenu, 152,text = "Generate PDF Report (Batch)",kind = wx.ITEM_NORMAL)
+        self.pdfReportBatchItem = wx.MenuItem(self.toolMenu, 152,text = "Generate PDF Report (B&atch)",kind = wx.ITEM_NORMAL)
         self.toolMenu.Append(self.pdfReportBatchItem)
-        self.menubar.Append(self.toolMenu, '&Tools')
+        self.menubar.Append(self.toolMenu, 'T&ools')
         self.SetMenuBar(self.menubar)
 
         self.aboutItem = wx.MenuItem(self.helpMenu, 160, text="About", kind=wx.ITEM_NORMAL)
@@ -1060,14 +1060,8 @@ class ClientWindow(wx.Frame):
             self.connectbutton.Disable()
             self.rbox.Disable()
         self.DisableAll()
-        if configvalues['browser_check'].lower()=='no':
-            browsercheckFlag=True
-        else:
-            browsercheckFlag=False
-        if configvalues['update_check'].lower()=='no':
-            updatecheckFlag=True
-        else:
-            updatecheckFlag=False
+        updatecheckFlag = configvalues['update_check'].lower() == 'no'
+        browsercheckFlag = configvalues['browser_check'].lower() == 'no'
         self.OnClear(wx.EVT_LEFT_DOWN)
         self.verifyMACAddress()
         self.connectbutton.SetFocus()
@@ -1149,9 +1143,7 @@ class ClientWindow(wx.Frame):
 
         elif id == 160:      # When user selects Edit > About
             try:
-                msg = '--About selected--'
-                logger.print_on_console(msg)
-                log.info(msg)
+                log.info('--About selected--')
                 About_window(parent = None,id = -1, title="About")
             except Exception as e:
                 msg = "Error while selecting about file"
@@ -1160,9 +1152,7 @@ class ClientWindow(wx.Frame):
                 log.error(e)
         elif id==161:      # When user selects Edit > Check for updates
             try:
-                msg = '--Check for updates selected--'
-                logger.print_on_console(msg)
-                log.info(msg)
+                log.info('--Check for updates selected--')
                 Check_Update_window(parent = None,id = -1, title="Check for Updates")
             except Exception as e:
                 msg = "Error while updating file"
@@ -1172,9 +1162,7 @@ class ClientWindow(wx.Frame):
 
         elif id==162:      # When user selects Edit > Rollback
             try:
-                msg = '--Rollback selected--'
-                logger.print_on_console(msg)
-                log.info(msg)
+                log.info('--Rollback selected--')
                 rollback_window(parent = None,id = -1, title="Rollback")
             except Exception as e:
                 msg = "Error while rolling back file"
@@ -2095,22 +2083,16 @@ class Config_window(wx.Frame):
             self.server_cert.SetValue(path)
         dlg.Destroy()
 
-    """This method closes the wxPython instance"""
+    """This method closes the wxPython config window instance"""
     def close(self, event):
         self.Destroy()
         global configvalues, browsercheckFlag, chromeFlag, firefoxFlag,updatecheckFlag
         configvalues = readconfig.readConfig().readJson() # Re-reading config values
-        if configvalues['browser_check'].lower()=='no':
+        browsercheckFlag=False
+        if configvalues['browser_check'].lower() == 'no':
             browsercheckFlag=True
             chromeFlag=firefoxFlag=False
-        else:
-            browsercheckFlag=False
-
-        if configvalues['update_check'].lower()=='no':
-            updatecheckFlag=True
-        else:
-            updatecheckFlag=False
-
+        updatecheckFlag = configvalues['update_check'].lower() == 'no'
         try:
             logfilename = os.path.normpath(configvalues["logFile_Path"]).replace("\\","\\\\")
             logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename},disable_existing_loggers=False)
@@ -2169,7 +2151,7 @@ class About_window(wx.Frame):
             with open(MANIFEST_LOC) as f:
                 data = json.load(f)
         except Exception as e:
-            msg = 'Unable to fetch About Manifest'
+            msg = 'Unable to fetch package manifest.'
             logger.print_on_console(msg)
             log.error(msg)
         return data
@@ -2219,7 +2201,7 @@ class About_window(wx.Frame):
         self.Close()
         self.Destroy()
         wxObject.EnableAll()
-        log.info('--Updater pop-up closed--')
+        log.info('--About pop-up closed--')
 
 #-------------
 """Checks if config file is present, if not prompts the user to enter config file details"""
@@ -2230,7 +2212,11 @@ class Check_Update_window(wx.Frame):
         """Check if updates are avaliable"""
         try:
             boolval,l_ver=check_update(False)
-            self.currentDirectory = os.environ["NINETEEN68_HOME"]
+            if boolval is False and l_ver == "N/A":
+                msg = "Update Failed!"
+                logger.print_on_console(msg)
+                log.error(msg)
+                return None
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows':
                 upload_fields= {
@@ -2270,12 +2256,10 @@ class Check_Update_window(wx.Frame):
             wx.Frame(self.panel)
             self.Show()
         except Exception as e:
-            if ( str(e) == "'NoneType' object has no attribute 'emit'" ):
-                logger.print_on_console( "Connection not established, cannot check for updates")
-                log.error( "Connection not established, cannot check for updates")
-            else:
-                logger.print_on_console( "Error occured while checking for updates : ",e)
-                log.error( "Error occured while checking for updates : ",e)
+            msg = "Error occured while checking for updates"
+            logger.print_on_console(msg)
+            log.error(msg)
+            log.error(e, exc_info=True)
 
     """updates ICE"""
     def update_ice(self,event):
@@ -2330,7 +2314,7 @@ class rollback_window(wx.Frame):
             res = os.path.exists(os.path.normpath(NINETEEN68_HOME+'/assets/Update/Nineteen68_backup.7z'))
             self.rollback_obj = update_module.Update_Rollback()
             if ( res == False ):
-                self.disp_msg.AppendText( "Nineteen68 backup not found, cannot rollback changes.")
+                self.disp_msg.AppendText( "Nineteen68 ICE backup not found, cannot rollback changes.")
             else:
                 self.rollback_obj.update(None, None, None, NINETEEN68_HOME, LOC_7Z, UPDATER_LOC, 'ROLLBACK')
                 self.disp_msg.AppendText( "Click 'Rollback' to run previous version of Nineteen68.")
@@ -2357,7 +2341,6 @@ class rollback_window(wx.Frame):
         self.Close()
         self.Destroy()
         wxObject.EnableAll()
-        logger.print_on_console('--Rollback pop-up closed--')
         log.info('--Rollback pop-up closed--')
 #------------------
 
@@ -2514,16 +2497,14 @@ def check_update(flag):
     def get_server_manifest_data():
         data = None
         request = None
+        emsg = "Error in fetching update manifest from server"
         try:
             request = requests.get(SERVER_LOC + "/manifest.json", verify=False)
-            try:
-                data = json.loads(request.text)#will return json of the manifest
-            except exception as e:
-                log.error(e)
-                logger.print_on_console( "Error in fetching server manifest, kinldy contact Nineteen68 Support Team for further assistance" )
+            data = json.loads(request.text) #will return json of the manifest
         except Exception as e:
-            log.error(e)
-            logger.print_on_console( "NewConnectionError : Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it")
+            log.error(emsg)
+            log.error(e,exc_info=True)
+            logger.print_on_console(emsg)
         return data
     #-----------------------------------------------------------Updater Module
     def update_updater_module(data):
@@ -2532,6 +2513,7 @@ def check_update(flag):
         update_obj.update(data, MANIFEST_LOC, SERVER_LOC, NINETEEN68_HOME, LOC_7Z, UPDATER_LOC, 'UPDATE')
     #---------------------------------------updater
     data = get_server_manifest_data()
+    if data is None: return False, "N/A"
     update_updater_module(data)
     UPDATE_MSG=update_obj.send_update_message()
     l_ver = update_obj.fetch_current_value()

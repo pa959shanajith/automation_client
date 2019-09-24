@@ -44,7 +44,7 @@ import time
 import logging
 import datetime
 date_obj = datetime.datetime.now()
-conf = open(str(os.getcwd())+"\\assets\\config.json", 'r')
+conf = open(os.path.normpath(str(os.getcwd())+"/assets/config.json"), 'r')
 params = json.load(conf)
 conf.close()
 log_loc = params['logFile_Path'][:params['logFile_Path'].rindex('\\')]
