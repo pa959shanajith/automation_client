@@ -12,6 +12,7 @@ import core_utils
 import logger
 import logging
 from webscrape_utils import WebScrape_Utils
+from selenium.common.exceptions import NoSuchWindowException
 cropandaddobj = None
 browserobj = browserops.BrowserOperations()
 clickandaddoj = clickandadd.Clickandadd()
@@ -114,7 +115,6 @@ class ScrapeWindow(wx.Frame):
 
     def clickandadd(self,event):
         try:
-            from selenium.common.exceptions import NoSuchWindowException
             if not(self.driver.current_window_handle):
                 self.driver.switch_to_window(self.driver.window_handles[-1])
         except NoSuchWindowException as e:
@@ -196,7 +196,6 @@ class ScrapeWindow(wx.Frame):
 
     def fullscrape(self,event):
         try:
-            from selenium.common.exceptions import NoSuchWindowException
             if not(self.driver.current_window_handle):
                 self.driver.switch_to_window(self.driver.window_handles[-1])
         except NoSuchWindowException as e:
