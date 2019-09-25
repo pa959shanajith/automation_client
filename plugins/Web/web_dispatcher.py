@@ -655,6 +655,7 @@ class Dispatcher:
                 configvalues = readconfig.configvalues
         if((webElement==None or webElement== '') and configvalues['extn_enabled'].lower() == 'yes' and self.action=='debug' and isinstance(driver, webdriver.Chrome)):
             try:
+                flag=True
                 logger.print_on_console('Scrape the Element using extension')
                 import pause_display_operation
                 from itertools import combinations
@@ -674,12 +675,12 @@ class Dispatcher:
                         'txtbox': 'input'
                 }
                 old_ele_type=custname.split('_')[1]
-                if (typemap[old_ele_type]==new_ele_type):
-                    flag=True
+                if (typemap[old_ele_type]!=new_ele_type):
+                    flag=False
                 if(flag==False):
                     o = pause_display_operation.PauseAndDisplay()
                     inputs1={'custtype':typemap[old_ele_type],'newtype':new_ele_type}
-                    o.debug_error(inputs,self.wxObject,self.thread)
+                    o.debug_error(inputs1,self.wxObject,self.thread)
                 ele='//*'
                 a=[]
                 combo=''
