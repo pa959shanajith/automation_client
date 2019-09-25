@@ -64,7 +64,7 @@ class BluezoneKeywords:
                 logger.print_on_console(err_msg)
         except Exception as e:
             err_msg = "Error: Unable to launch " + self.emulator_type + " Mainframe."
-            if e[1] == "Class not registered":
+            if if (type(e).__name__ == "com_error") and ("Class not registered" in str(e))::
                 output = "x86"
                 err_msg = err_msg[:-1]+" in 64-bit mode. Trying again in 32 bit-mode."
             log.error(err_msg)
