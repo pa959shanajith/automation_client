@@ -72,7 +72,7 @@ if SYSTEM_OS == "Windows":
 MANIFEST_LOC= NINETEEN68_HOME + '/assets/about_manifest.json'
 LOC_7Z = NINETEEN68_HOME + '/Lib/7zip/7z.exe'
 UPDATER_LOC = NINETEEN68_HOME + '/assets/Update.exe'
-if (os.path.exists(UPDATER_LOC[:-3] + "py")): UPDATER_LOC += "py"
+if (os.path.exists(UPDATER_LOC[:-3] + "py")): UPDATER_LOC = UPDATER_LOC[:-3] + "py"
 SERVER_LOC = None
 
 class MainNamespace(BaseNamespace):
@@ -2311,7 +2311,7 @@ class rollback_window(wx.Frame):
             self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
             self.close_btn.Bind(wx.EVT_BUTTON, self.close)
             self.rollback_btn.Disable()
-            res = os.path.exists(os.path.normpath(NINETEEN68_HOME+'/assets/Update/Nineteen68_backup.7z'))
+            res = os.path.exists(os.path.normpath(NINETEEN68_HOME+'/assets/Nineteen68_backup.7z'))
             self.rollback_obj = update_module.Update_Rollback()
             if ( res == False ):
                 self.disp_msg.AppendText( "Nineteen68 ICE backup not found, cannot rollback changes.")
@@ -2513,7 +2513,6 @@ def check_update(flag):
         update_obj.update(data, MANIFEST_LOC, SERVER_LOC, NINETEEN68_HOME, LOC_7Z, UPDATER_LOC, 'UPDATE')
     #---------------------------------------updater
     data = get_server_manifest_data()
-    if data is None: return False, "N/A"
     update_updater_module(data)
     UPDATE_MSG=update_obj.send_update_message()
     l_ver = update_obj.fetch_current_value()
@@ -2525,4 +2524,11 @@ def check_update(flag):
     elif ( UPDATE_MSG == 'You are running the latest version of Nineteen68' and flag == True ):
         logger.print_on_console( "No updates available" )
         log.info( "No updates available" )
+    elif ( UPDATE_MSG == 'An Error has occoured while checking for new versions of Nineteen68, kindly contact Support Team'):
+        if not (os.path.exists(MANIFEST_LOC)):
+            logger.print_on_console( "Client manifest unavaliable." )
+            log.info( "Client manifest unavaliable." )
+        else:
+            logger.print_on_console( UPDATE_MSG )
+            log.info( UPDATE_MSG )
     return False,l_ver

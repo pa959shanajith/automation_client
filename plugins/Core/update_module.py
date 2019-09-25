@@ -118,7 +118,8 @@ class Update_Rollback:
         """Returns the latest production version available"""
         keys = list(self.data_tags.keys())
         keys.sort()
-        return keys[-1]
+        if (len(keys)>0):return keys[-1]
+        else: return 'N/A'
 
     def send_update_message(self):
         """Returns a message """
