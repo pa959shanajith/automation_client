@@ -107,7 +107,8 @@ class Update_Rollback:
                         log.debug( 'Found till the original' )
             #log.debug (data_L)
             self.check_flag = True
-            self.update_flag = True
+            if (list(self.client_tag.keys())[0] == self.fetch_current_value()):self.update_flag = False
+            else:self.update_flag = True
         except Exception as e:
             log.error( "Error in update_check : " + str(e),exc_info=True)
         #data_tags.reverse()
