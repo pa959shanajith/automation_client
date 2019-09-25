@@ -154,12 +154,17 @@ class Webocular():
                 if self.accessTest==True:
                     options = Options()
                     options.headless = True
+                    accessTags=[]
+                    for rule in self.searchData["access-rules"]:
+                        if rule["selected"]:
+                            accessTags.append(rule["tag"])
+                    accessOptions={'runOnly':{'type': "tag",'values': accessTags}}
                     driver = webdriver.Firefox(options=options,executable_path=GECKODRIVER_PATH)
                     driver.get(url)
                     axe = Axe(driver)
                     # Inject axe-core javascript into page.
                     axe.inject()
-                    results = axe.run()
+                    results = axe.run(options=accessOptions)
                     violationCount=dict()
                     for violation in results["violations"]:
                         for tag in violation["tags"]:
