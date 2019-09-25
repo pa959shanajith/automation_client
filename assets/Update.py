@@ -44,7 +44,7 @@ import time
 import logging
 import datetime
 date_obj = datetime.datetime.now()
-conf = open(str(os.getcwd())+"\\assets\\config.json", 'r')
+conf = open(os.path.normpath(str(os.getcwd())+"/assets/config.json"), 'r')
 params = json.load(conf)
 conf.close()
 log_loc = params['logFile_Path'][:params['logFile_Path'].rindex('\\')]
@@ -137,44 +137,27 @@ class Updater:
                           3.If Update folder is not present then creates a new folder by the same name in ICE directory
                           4.Adds Nineteen68(plugins) folder to Nineteen68_backup.7z
                           5.Adds about_manifest.json to Nineteen68_backup.7z"""
-        flag = False
         try:
             log.debug( 'Inside create_backup function' )
             #--------------------------------------------check if Update folder exists
-            if ( os.path.isdir(self.extraction_loc + "\\assets\\Update") and os.path.exists(self.extraction_loc + "\\assets\\Update") ):
-                log.debug( 'Update folder exists' )
-                if ( os.path.exists(self.extraction_loc + "\\assets\\Update\\Nineteen68_backup.7z") ):
-                    log.debug( 'Nineteen68_backup.7z already exists, removing Nineteen68_backup.7z' )
-                    os.remove(self.extraction_loc + "\\assets\\Update\\Nineteen68_backup.7z")
-                    log.debug( 'Nineteen68_backup.7z removed succefully' )
-                    time.sleep(1)
-                flag = True
-            else:
-                log.debug( 'Update folder does not exist, creating Update folder' )
-                try:
-                    os.mkdir(self.extraction_loc + "\\assets\\Update")
-                    flag = True
-                except OSError:
-                    log.error("Creation of the directory " + self.extraction_loc + "\\assets\\Update" + " failed.")
-                else:
-                    log.debug("Successfully created the directory " + self.extraction_loc + "\\assets\\Update")
-            if ( flag == True ):
-                print ( '=>Creating new Nineteen68 backup instance' )
-                store_loc = self.extraction_loc+"\\assets\\Update\\Nineteen68_backup.7z"
-                source_nineteen68 = self.extraction_loc +'\\plugins'
-                source_client_manifest = self.extraction_loc +'\\assets\\about_manifest.json'
-                log.debug( 'Adding ' + source_nineteen68 + " to archive" )
-                archive_command = r'"{}" a "{}" "{}"'.format(self.loc_7z, store_loc, source_nineteen68)
-                subprocess.call(archive_command, shell=True)
-                log.debug( 'Success : Added ' + source_nineteen68 + " to archive" )
-                log.debug( 'Adding '+source_client_manifest+ " to archive" )
-                archive_command = r'"{}" a "{}" "{}"'.format(self.loc_7z, store_loc, source_client_manifest)
-                subprocess.call(archive_command, shell=True)
-                log.debug( 'Success : Added ' + source_client_manifest + " to archive" )
-                log.debug( 'Successfully created backup of Nineteen68' )
-            else :
-                print ( '=>Failed to create Nineteen68 backup' )
-                log.error( "Failed to create Nineteen68 backup" )
+            if ( os.path.exists(self.extraction_loc + "\\assets\\Nineteen68_backup.7z") ):
+                log.debug( 'Nineteen68_backup.7z already exists, removing Nineteen68_backup.7z' )
+                os.remove(self.extraction_loc + "\\assets\\Nineteen68_backup.7z")
+                log.debug( 'Nineteen68_backup.7z removed succefully' )
+                time.sleep(1)
+            print ( '=>Creating new Nineteen68 backup instance' )
+            store_loc = self.extraction_loc+"\\assets\\Nineteen68_backup.7z"
+            source_nineteen68 = self.extraction_loc +'\\plugins'
+            source_client_manifest = self.extraction_loc +'\\assets\\about_manifest.json'
+            log.debug( 'Adding ' + source_nineteen68 + " to archive" )
+            archive_command = r'"{}" a "{}" "{}"'.format(self.loc_7z, store_loc, source_nineteen68)
+            subprocess.call(archive_command, shell=True)
+            log.debug( 'Success : Added ' + source_nineteen68 + " to archive" )
+            log.debug( 'Adding '+source_client_manifest+ " to archive" )
+            archive_command = r'"{}" a "{}" "{}"'.format(self.loc_7z, store_loc, source_client_manifest)
+            subprocess.call(archive_command, shell=True)
+            log.debug( 'Success : Added ' + source_client_manifest + " to archive" )
+            log.debug( 'Successfully created backup of Nineteen68' )
         except Exception as e:
             print ( "Error occoured in create_backup : ", e )
             log.error( "Error occoured in create_backup : " + str(e) )
@@ -258,9 +241,9 @@ class Updater:
                 fileObj = requests.get(str(url),verify=False)
                 open(temp_file_path, 'wb').write(fileObj.content)
                 print ('=>navigating to extract_files')
-                #self.extract_files(temp_file_path)
+                self.extract_files(temp_file_path)
                 print ('=>deleting the extracted file')
-                #self.delete_temp_file(temp_file_path)
+                self.delete_temp_file(temp_file_path)
                 print (str(filename), ' was extracted and deleted')
             pass
         except Exception as e:
@@ -328,7 +311,7 @@ class Rollback():
 
     def assignment(self,NINETEEN68_LOC,loc_7z):
         """Assigning value to class variables"""
-        self.ROLLBACK_LOC = NINETEEN68_LOC+"\\assets\\Update\\Nineteen68_backup.7z"
+        self.ROLLBACK_LOC = NINETEEN68_LOC+"\\assets\\Nineteen68_backup.7z"
         log.info( '=>Rollback location : ' + str(self.ROLLBACK_LOC))
         self.NINETEEN68_LOC = NINETEEN68_LOC
         log.info( '=>Nineteen68 location : ' + str(self.NINETEEN68_LOC))

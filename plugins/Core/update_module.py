@@ -109,17 +109,17 @@ class Update_Rollback:
             self.check_flag = True
             self.update_flag = True
         except Exception as e:
-            log.error( "Error in check : " + str(e) )
+            log.error( "Error in update_check : " + str(e),exc_info=True)
         #data_tags.reverse()
         #return data_tags
         #calling the update msg
 
     def fetch_current_value(self):
         """Returns the latest production version available"""
-        keys = None
         keys = list(self.data_tags.keys())
         keys.sort()
-        return keys[len(keys)-1]
+        if (len(keys)>0):return keys[-1]
+        else: return 'N/A'
 
     def send_update_message(self):
         """Returns a message """
@@ -135,15 +135,27 @@ class Update_Rollback:
     def run_updater(self):
         """function to run Updater.py/Updater.exe ' UPDATE ' feature"""
         try:
-            log.debug( 'Sending the following data to Updater : ' + 'python ' + str(self.updater_loc) + ' ' + str(self.option) +  ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z) )
-            os.system('python ' + str(self.updater_loc) + ' ' + str(self.option) + ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
+            update_cmd = str(self.updater_loc) + ' ' + str(self.option) + ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z)
+            msg = "Sending the following data to Updater."
+            if (self.updater_loc.endswith(".py")):
+                update_cmd = 'python ' + update_cmd
+                msg += "py"
+            else: msg += "exe"
+            log.debug(msg + ' : ' + update_cmd)
+            os.system(update_cmd)
         except Exception as e:
             log.error( "Error in download_and_run_updater : " + str(e) )
 
     def run_rollback(self):
         """function to run Updater.py/Updater.exe ' ROLLBACK ' feature"""
         try:
-            log.debug( 'Sending the following data to Updater : ' + 'python ' + str(self.updater_loc) + ' ' + self.option + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
-            os.system('python ' + str(self.updater_loc) + ' ' + str(self.option) + ' '  ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z))
+            update_cmd = str(self.updater_loc) + ' ' + str(self.option) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z)
+            msg = "Sending the following data to Updater."
+            if (self.updater_loc.endswith(".py")):
+                update_cmd = 'python ' + update_cmd
+                msg += "py"
+            else: msg += "exe"
+            log.debug(msg + ' : ' + update_cmd)
+            os.system(update_cmd)
         except Exception as e:
             log.error( "Error in run_rollback : " + str(e) )
