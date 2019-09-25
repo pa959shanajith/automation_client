@@ -149,7 +149,7 @@ class PauseAndDisplay:
         with cont.pause_cond:
             while cont.paused:
                 cont.pause_cond.wait()
-
+            
     def debug_object(self,input,wx_object,mythread,driver):
         global dispinput, dispflag, cont
         dispinput = [input,driver]
@@ -169,27 +169,20 @@ class PauseAndDisplay:
 class Debug(wx.Frame):
     def __init__(self, parent,id, title, input):
         wx.Frame.__init__(self, parent, title=title,
-                          size=(410, 130),style=wx.STAY_ON_TOP| wx.DEFAULT_FRAME_STYLE & ~ (wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
-        self.driver=input[1]                  
+                          size=(410, 130),style=wx.STAY_ON_TOP| wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
         self.SetBackgroundColour('#e6e7e8')
         self.panel = wx.Panel(self)
-        self.sizer = wx.GridBagSizer(1, 2)
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         label="Debug Paused!! Web Element '"+str(input[0]['custname'])+"' not found in step num"+str(input[0]['stepnum'])
-        self.text1 = wx.StaticText(self.panel, label=label)
+        self.text1 = wx.StaticText(self.panel, label=label,pos=(5,0),style=wx.ALIGN_CENTRE_HORIZONTAL)
         self.text1.Wrap(370)
-        self.sizer.Add(self.text1, pos=(0, 0), flag=wx.TOP | wx.LEFT | wx.BOTTOM,border=10)
-        self.line = wx.StaticLine(self.panel)
-        self.sizer.Add(self.line, pos=(1, 0),flag= wx.Center, border=50)
-        self.contbutton = wx.Button(self.panel, label="Continue Debug")
+        self.contbutton = wx.Button(self.panel, label="Continue Debug",pos=(55,65))
         self.contbutton.Bind(wx.EVT_BUTTON, self.OnContinue)   # need to implement OnExit(). Leave notrace
-        self.sizer.Add(self.contbutton, pos=(2, 0), flag=wx.TOP | wx.LEFT, border=0)
-        self.scrapebutton = wx.ToggleButton(self.panel, label="Scrape Object")
+        self.scrapebutton = wx.ToggleButton(self.panel, label="Scrape Object",pos=(245,65))
         self.scrapebutton.Bind(wx.EVT_TOGGLEBUTTON, self.OnScrape)   # need to implement OnExit(). Leave notrace
-        self.sizer.Add(self.scrapebutton, pos=(2, 1), flag=wx.TOP | wx.LEFT, border=0)
-        self.sizer.AddGrowableCol(1)
         self.panel.SetSizer(self.sizer)
         self.CenterOnScreen()
         self.Centre()
@@ -228,26 +221,20 @@ class Debug(wx.Frame):
 class Error(wx.Frame):
     def __init__(self, parent,id, title, input):
         wx.Frame.__init__(self, parent, title=title,
-                          size=(410, 130),style=wx.STAY_ON_TOP| wx.DEFAULT_FRAME_STYLE & ~ (wx.MAXIMIZE_BOX|wx.CLOSE_BOX))                 
+                          size=(410, 130),style=wx.STAY_ON_TOP| wx.DEFAULT_FRAME_STYLE & ~ (wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
         self.SetBackgroundColour('#e6e7e8')
         self.panel = wx.Panel(self)
-        self.sizer = wx.GridBagSizer(1, 2)
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
-        label="The newly added object is of "+str(input['custname'])+" and existing object is of of "+str(input['newname'])
-        self.text1 = wx.StaticText(self.panel, label=label)
+        label="The newly added object is of "+str(input['newtype'])+" and existing object is of "+str(input['custtype'])
+        self.text1 = wx.StaticText(self.panel, label=label,pos=(5,0))
         self.text1.Wrap(370)
-        self.sizer.Add(self.text1, pos=(0, 0), flag=wx.TOP | wx.LEFT | wx.BOTTOM,border=10)
-        self.line = wx.StaticLine(self.panel)
-        self.sizer.Add(self.line, pos=(1, 0),flag= wx.Center, border=50)
-        self.contbutton = wx.Button(self.panel, label="Continue Debug")
+        self.contbutton = wx.Button(self.panel, label="Terminate Debug",pos=(55,65))
         self.contbutton.Bind(wx.EVT_BUTTON, self.OnContinue)   # need to implement OnExit(). Leave notrace
-        self.sizer.Add(self.contbutton, pos=(2, 0), flag=wx.TOP | wx.LEFT, border=0)
-        self.scrapebutton = wx.ToggleButton(self.panel, label="Scrape Object")
+        self.scrapebutton = wx.ToggleButton(self.panel, label="Save Object",pos=(245,65))
         self.scrapebutton.Bind(wx.EVT_TOGGLEBUTTON, self.OnScrape)   # need to implement OnExit(). Leave notrace
-        self.sizer.Add(self.scrapebutton, pos=(2, 1), flag=wx.TOP | wx.RIGHT, border=0)
-        self.sizer.AddGrowableCol(1)
         self.panel.SetSizer(self.sizer)
         self.CenterOnScreen()
         self.Centre()
@@ -256,9 +243,10 @@ class Error(wx.Frame):
     def OnContinue(self, *event):
         self.resume_execution()
         self.Destroy()
+        controller.terminate_flag=True
 
     def OnScrape(self, *event):
-        self.scrapebutton = wx.Button(self.panel, label="Finish Scrape")
+        self.Destroy()
         self.resume_execution()
 
     def resume_execution(self):
