@@ -50,7 +50,7 @@ conf.close()
 log_loc = params['logFile_Path'][:params['logFile_Path'].rindex('\\')]
 if not ( os.path.isdir(str(log_loc)) and os.path.exists(str(log_loc)) ):
     os.mkdir(str(log_loc))
-LOG_FILEPATH = str(log_loc) + 'Updater_logs_' + str(date_obj.year) + '_' + str(date_obj.month) + '_' + str(date_obj.day) + '_' + str(date_obj.hour) + str(date_obj.minute) + '.log'
+LOG_FILEPATH = str(log_loc) + '\\Updater_logs_' + str(date_obj.year) + '_' + str(date_obj.month) + '_' + str(date_obj.day) + '_' + str(date_obj.hour) + str(date_obj.minute) + '.log'
 logging.basicConfig(filename = LOG_FILEPATH, level = logging.DEBUG)
 try:
     log = logging.getLogger("Updater.py")
