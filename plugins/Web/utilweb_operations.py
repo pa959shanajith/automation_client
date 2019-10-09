@@ -889,7 +889,7 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output=OUTPUT_CONSTANT
-        att_name=input[0]
+        attr_name=input[0]
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement != None and webelement !='':
