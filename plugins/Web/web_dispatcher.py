@@ -265,7 +265,7 @@ class Dispatcher:
                                     logger.print_on_console(err_msg)
                                     local_Wd.log.error(err_msg)
                             else:
-                                reference_element=self.getwebelement(driver,teststepproperty.parent_xpath)
+                                reference_element=self.getwebelement(driver,teststepproperty.parent_xpath,teststepproperty.stepnum,teststepproperty.custname)
                             local_Wd.log.debug('Reference_element ')
                             local_Wd.log.debug(reference_element)
                             if reference_element != None:
@@ -313,7 +313,7 @@ class Dispatcher:
                                 if teststepproperty.custname in v:
                                     objectname=v[teststepproperty.custname]
                                     UserObjectScrape.update_data[str(teststepproperty.stepnum)]=v
-                            webelement = self.getwebelement(driver,objectname)
+                            webelement = self.getwebelement(driver,objectname,teststepproperty.stepnum,teststepproperty.custname)
                             if(obj_flag!=False):
                                 import UserObjectScrape
                                 webscrape=UserObjectScrape.UserObject()
@@ -448,10 +448,11 @@ class Dispatcher:
                         file_path = screen_shot_obj.captureScreenshot()
                         result.append(file_path[2])
         except TypeError as e:
-            log.error(e,exc_info=True)
+            local_Wd.log.error(e,exc_info=True)
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result=list(result)
             result[3]=err_msg
+            result[2]=None
         except Exception as e:
             local_Wd.log.error(e)
 ##            logger.print_on_console('Exception at dispatcher')
@@ -494,7 +495,7 @@ class Dispatcher:
         return status,value
 
 
-    def getwebelement(self,driver,objectname):
+    def getwebelement(self,driver,objectname,stepnum,custname):
 ##        objectname = str(objectname)
         global obj_flag
         obj_flag=False
@@ -558,18 +559,18 @@ class Dispatcher:
                                     tempwebElement = driver.find_elements_by_name(identifiers[3])
                                     if (len(tempwebElement) == 1):
                                         logger.print_on_console('Webelement found by OI4')
-                                        log.debug('Webelement found by OI4')
+                                        local_Wd.log.debug('Webelement found by OI4')
                                     if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                         tempwebElement = driver.find_elements_by_class_name(identifiers[5])
                                         if (len(tempwebElement) == 1):
                                             logger.print_on_console('Webelement found by OI5')
-                                            log.debug('Webelement found by OI5')
+                                            local_Wd.log.debug('Webelement found by OI5')
                                     if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                         if(len(identifiers)==12):
                                             tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
                                             if (len(tempwebElement) == 1):
                                                 logger.print_on_console('Webelement found by OI6')
-                                                log.debug('Webelement found by OI6')
+                                                local_Wd.log.debug('Webelement found by OI6')
                                             else:
                                                 tempwebElement = None
                                 webElement = tempwebElement
@@ -579,13 +580,13 @@ class Dispatcher:
                                             tempwebElement = driver.find_elements_by_class_name(identifiers[5])
                                             if (len(tempwebElement) == 1):
                                                 logger.print_on_console('Webelement found by OI5')
-                                                log.debug('Webelement found by OI5')
+                                                local_Wd.log.debug('Webelement found by OI5')
                                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
                                                 if(len(identifiers)==12):
                                                     tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
                                                     if (len(tempwebElement) == 1):
                                                         logger.print_on_console('Webelement found by OI6')
-                                                        log.debug('Webelement found by OI6')
+                                                        local_Wd.log.debug('Webelement found by OI6')
                                                     else:
                                                         tempwebElement = None
                                         webElement = tempwebElement
@@ -596,7 +597,7 @@ class Dispatcher:
                                                     tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
                                                     if (len(tempwebElement) == 1):
                                                         logger.print_on_console('Webelement found by OI6')
-                                                        log.debug('Webelement found by OI6')
+                                                        local_Wd.log.debug('Webelement found by OI6')
                                                     else:
                                                         tempwebElement = None
                                             webElement = tempwebElement
@@ -657,12 +658,32 @@ class Dispatcher:
                 configvalues = readconfig.configvalues
         if((webElement==None or webElement== '') and configvalues['extn_enabled'].lower() == 'yes' and self.action=='debug' and isinstance(driver, webdriver.Chrome)):
             try:
+                flag=True
                 logger.print_on_console('Scrape the Element using extension')
                 import pause_display_operation
                 from itertools import combinations
                 o = pause_display_operation.PauseAndDisplay()
-                o.execute(self.wxObject,self.thread)
+                inputs={'stepnum':stepnum,'custname':custname} 
+                o.debug_object(inputs,self.wxObject,self.thread,driver)
                 attributes=driver.execute_script("return JSON.parse(window.localStorage.attributes)")
+                new_ele_type=driver.execute_script("return window.localStorage.element").lower()
+                typemap={'btn': 'button',
+                        'chkbox': 'checkbox',
+                        'elmnt': 'elmnt',
+                        'img': 'img',
+                        'lst': 'list',
+                        'radiobtn': 'radiobutton',
+                        'select': 'select',
+                        'tbl': 'table',
+                        'txtbox': 'input',
+                        'lnk':'a'
+                }
+                if (typemap[identifiers[4]]!=new_ele_type):
+                    flag=False
+                if(flag==False):
+                    o = pause_display_operation.PauseAndDisplay()
+                    inputs1={'custtype':typemap[identifiers[4]],'newtype':new_ele_type}
+                    o.debug_error(inputs1,self.wxObject,self.thread)
                 ele='//*'
                 a=[]
                 combo=''

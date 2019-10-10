@@ -64,11 +64,12 @@ class BluezoneKeywords:
                 logger.print_on_console(err_msg)
         except Exception as e:
             err_msg = "Error: Unable to launch " + self.emulator_type + " Mainframe."
+            if (type(e).__name__ == "com_error") and ("Class not registered" in str(e)):
+                output = "x86"
+                err_msg = err_msg[:-1]+" in 64-bit mode. Trying again in 32 bit-mode."
             log.error(err_msg)
             log.error(e)
             logger.print_on_console(err_msg)
-            if e[1] == "Class not registered":
-                output = "x86"
         return (return_value == 0),output,err_msg
 
     def connect_session(self,psid):
@@ -609,7 +610,7 @@ class BluezoneAPIKeywords:
             stat = data["stat"]
             if stat == 0:
                 scrncnt = dataTransmitter("gettext", 5, 1, 2)
-                if scrncnt["ret"] != MAINFRAME_READY:
+                if scrncnt["res"] != MAINFRAME_READY:
                     dataTransmitter("sendvalue", [option, MAINFRAME_KEY_ENTER])
                     dataTransmitter("setcursor", 3, 1)
                 data = dataTransmitter("sendvalue", [MAINFRAME_LOGOFF,MAINFRAME_KEY_ENTER])
@@ -619,7 +620,7 @@ class BluezoneAPIKeywords:
             else:
                 err_msg = "Error: "+data["emsg"]
                 log.debug("Return Value is "+str(stat))
-            if err_msg != 0:
+            if err_msg is not None:
                 err_msg = "Error: Unable to logoff from " + self.emulator_type + " Mainframe."
                 log.error(err_msg)
                 logger.print_on_console(err_msg)

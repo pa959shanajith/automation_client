@@ -23,5 +23,6 @@
     "server_ip": "<server-host-name>",
     "server_port": "8443",
     "stepExecutionWait": "1",
-    "timeOut": "1"
+    "timeOut": "1",
+    "update_check": "Yes"
 }

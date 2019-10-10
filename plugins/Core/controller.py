@@ -1214,15 +1214,22 @@ def kill_process():
 
         try:
             import browser_Keywords
-            pidset = browser_Keywords.local_bk.pid_set
-            ##processes = psutil.net_connections()
-            for pid in pidset:
-                log.info( 'Pid Found' )
-                log.info(pid)
-                os.system("TASKKILL /F /PID " + str(pid))
-            del browser_Keywords.local_bk.pid_set[:]
-            browser_Keywords.local_bk.driver_obj = None
             del browser_Keywords.drivermap[:]
+            if hasattr(browser_Keywords.local_bk, 'driver_obj'):
+                if (browser_Keywords.local_bk.driver_obj):
+                    browser_Keywords.local_bk.driver_obj = None
+            if hasattr(browser_Keywords.local_bk, 'pid_set'):
+                if (browser_Keywords.local_bk.pid_set):
+                    pidset = browser_Keywords.local_bk.pid_set
+                    ##processes = psutil.net_connections()
+                    for pid in pidset:
+                        log.info( 'Pid Found' )
+                        log.info(pid)
+                        try:
+                            os.system("TASKKILL /F /PID " + str(pid))
+                        except Exception as e:
+                            log.error(e)
+                del browser_Keywords.local_bk.pid_set[:]
         except Exception as e:
             log.error(e,exc_info=True)
         time.sleep(3)

@@ -52,7 +52,7 @@ class XMLOperations():
         """
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
-        block_count = 0
+        block_count = None
         block_number=-1
         err_msg=None
         exception_json=None
@@ -83,6 +83,7 @@ class XMLOperations():
                 log.info('Json Input:',json_obj_dict)
                 log.info('Block:',block)
                 log.info('Block_Number:',number)
+                block_count = 0
                 if len(block)==1:
                     if block[0] in json_obj_dict:
                         block_count=1
@@ -183,7 +184,7 @@ class XMLOperations():
         block_count = 0
         invalidinput = False
         err_msg=None
-        tagvalue = ''
+        tagvalue = None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
 ##            root = ET.fromstring(str(input_string))
@@ -282,7 +283,7 @@ class XMLOperations():
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
         block_count = 0
-        blockvalue = []
+        blockvalue = None
         exception_json=None
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -306,6 +307,7 @@ class XMLOperations():
                 #json logic
                 json_obj_dict=self.build_dict(json_obj)
                 if(input_tag in json_obj_dict):
+                    blockvalue = []
                     json_value=json_obj_dict[input_tag]
                     block_count=len(json_value)
                     block_number = int(block_number)
@@ -353,6 +355,7 @@ class XMLOperations():
                 log.debug('Getting children node from the root')
                 log.debug(blocks)
                 if len(blocks) > 0:
+                    blockvalue = []
                     log.debug('There are children in the root node, get the total number of children')
                     block_count = len(blocks)
                     block_number = int(block_number)

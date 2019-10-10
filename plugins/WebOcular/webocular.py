@@ -23,7 +23,20 @@ from encryption_utility import AESCipher
 log = logging.getLogger(__name__)
 import controller
 import webocular_constants
+import os
+import platform
 
+# imports for Accessibility
+from selenium import webdriver
+from axe_selenium_python import Axe
+from selenium.webdriver.firefox.options import Options
+
+SYSTEM_OS=platform.system()
+NINETEEN68_HOME = os.environ["NINETEEN68_HOME"]
+DRIVERS_PATH = NINETEEN68_HOME + "/Lib/Drivers"
+GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
+if SYSTEM_OS == "Windows":
+    GECKODRIVER_PATH += ".exe"
 
 class Webocular():
 
@@ -47,6 +60,8 @@ class Webocular():
         self.searchText=None
         self.totalSearchTextCount=0
         self.searchImage=None
+        self.accessTest=False
+        self.searchData=None
         #self.driver = webdriver.PhantomJS(executable_path="some\\path")
 
     def get_complete_url(self,url, new_url) :
@@ -135,6 +150,47 @@ class Webocular():
                     searchList=re.findall(self.searchText,pageText)
                     obj["searchTextCount"]=str(len(searchList))
                     self.totalSearchTextCount+=int(obj["searchTextCount"])
+
+                if self.accessTest==True:
+                    options = Options()
+                    options.headless = True
+                    accessTags=[]
+                    for rule in self.searchData["access-rules"]:
+                        if rule["selected"]:
+                            accessTags.append(rule["tag"])
+                    accessOptions={'runOnly':{'type': "tag",'values': accessTags}}
+                    driver = webdriver.Firefox(options=options,executable_path=GECKODRIVER_PATH)
+                    driver.get(url)
+                    axe = Axe(driver)
+                    # Inject axe-core javascript into page.
+                    axe.inject()
+                    results = axe.run(options=accessOptions)
+                    violationCount=dict()
+                    for violation in results["violations"]:
+                        for tag in violation["tags"]:
+                            if tag in violationCount:
+                                violationCount[tag]+=1
+                            else:
+                                violationCount[tag]=1
+                    # logger.print_on_console(violationCount)
+                    for rule in self.searchData["access-rules"]:
+                            if rule["tag"] in violationCount:
+                                rule["pass"]=False
+                                rule["count"]=violationCount[rule["tag"]]
+                            else:
+                                rule["pass"]=True
+                                rule["count"]=0
+                    # axe.write_results(results, 'WebOcular.json')
+                    try:
+                        driver.close()
+                        driver.quit()
+                    except:
+                        pass
+                    obj["accessibility"]=results
+                    obj["access-rules"]=self.searchData["access-rules"]
+                else:
+                    obj["accessibility"]="NA"
+                    obj["access-rules"]="NA"
 
                 if soup.title :
                     obj["title"] = soup.title.text
@@ -309,6 +365,11 @@ class Webocular():
         start_url = url
         self.rooturl = start_url
         start = time.clock()
+        self.searchData=searchData
+        if searchData["accessTest"]==True:
+            self.accessTest=True
+        else:
+            self.accessTest=False
         msg = "New Webocular request has started with following parameters: [URL] : " + start_url  +  " [LEVEL] : "  +  str(level) + " [Agent] : " + str(agent)
         if len(searchData["text"])>0:
             msg += " [SEARCH TEXT] : "+ str(searchData["text"])
@@ -321,6 +382,10 @@ class Webocular():
             msg += " [SEARCH IMAGE] : YES"
         else:
             self.searchImage="NA"
+        if self.accessTest==True:
+            msg+= "[Accessibility]: True "
+        else:
+            msg+= "[Accessibility]: False "
         if proxy["enable"]:
             msg += "*(Proxy Enabled)"
             proxy_url = proxy["url"]
@@ -392,7 +457,7 @@ class Webocular():
         log.info("Webocular request completed " + crawling_status +" in " +  time_str)
 
         #send the completion object to Node
-        completetionObj = json.dumps({"progress" : "complete" ,"sdata" : sdata, "status": "success" ,"subdomains":  self.subdomains, "others" : self.others, "notParsedURLs" : self.notParsedURLs, "time_taken" : str(time_taken) +  " seconds","totalSearchTextCount":str(self.totalSearchTextCount),"searchText":str(self.searchText)})
+        completetionObj = json.dumps({"progress" : "complete" ,"sdata" : sdata, "status": "success" ,"subdomains":  self.subdomains, "others" : self.others, "notParsedURLs" : self.notParsedURLs, "time_taken" : str(time_taken) +  " seconds","totalSearchTextCount":str(self.totalSearchTextCount),"searchText":str(self.searchText),"accessibility_stats":self.searchData["access-rules"]})
         self.socketIO.emit('result_web_crawler_finished',completetionObj)
         logger.print_on_console("Webocular request completed " + crawling_status +" in " +  time_str)
 

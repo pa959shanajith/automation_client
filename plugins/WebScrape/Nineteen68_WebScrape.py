@@ -12,6 +12,7 @@ import core_utils
 import logger
 import logging
 from webscrape_utils import WebScrape_Utils
+from selenium.common.exceptions import NoSuchWindowException
 cropandaddobj = None
 browserobj = browserops.BrowserOperations()
 clickandaddoj = clickandadd.Clickandadd()
@@ -113,6 +114,12 @@ class ScrapeWindow(wx.Frame):
         self.driver.close()
 
     def clickandadd(self,event):
+        try:
+            if not(self.driver.current_window_handle):
+                self.driver.switch_to_window(self.driver.window_handles[-1])
+        except NoSuchWindowException as e:
+            log.debug("Window Handle not found, switching to window",self.driver.window_handles[-1])
+            self.driver.switch_to_window(self.driver.window_handles[-1])
         if self.driver.current_url in self.invalid_urls:
             wx.MessageBox(self.invalid_url_msg, "SLK Nineteen68 - Web Scraper", wx.OK | wx.ICON_ERROR)
             self.startbutton.SetValue(not self.startbutton.GetValue())
@@ -188,7 +195,12 @@ class ScrapeWindow(wx.Frame):
             self.Close()
 
     def fullscrape(self,event):
-
+        try:
+            if not(self.driver.current_window_handle):
+                self.driver.switch_to_window(self.driver.window_handles[-1])
+        except NoSuchWindowException as e:
+            log.debug("Window Handle not found, switching to window",self.driver.window_handles[-1])
+            self.driver.switch_to_window(self.driver.window_handles[-1])
         if self.driver.current_url in self.invalid_urls:
             wx.MessageBox(self.invalid_url_msg, "SLK Nineteen68 - Web Scraper", wx.OK | wx.ICON_ERROR)
         else:
