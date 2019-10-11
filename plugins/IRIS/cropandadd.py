@@ -21,6 +21,7 @@ import readconfig
 class Cropandadd():
     def startcropandadd(self,wx_window):
         try:
+            controller.terminate_flag = False
             wx_window.Hide()
             time.sleep(1)
             im = PIL.ImageGrab.grab()
