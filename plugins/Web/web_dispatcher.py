@@ -208,11 +208,14 @@ class Dispatcher:
                     'sendvalue':['textbox','textarea','password','number','email','url'],
                     'gettext': ['textbox','textarea','password','number','email','url'],
                     'setsecuretext':['textbox','password'],
-                    'sendsecurevalue':['textbox','password']
+                    'sendsecurevalue':['textbox','password'],
+
+                    'getattributevalue':['radio','checkbox','dropdown','listbox','textbox','textarea','password','number','email','url'],
+                    'verifyattribute':['radio','checkbox','dropdown','listbox','textbox','textarea','password','number','email','url']
 
                     }
         custom_dict_element={'element':['getobjectcount','getobject','clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists', 'verifyhidden','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys',
-                                        'tab','waitforelementvisible','mousehover','savefile','press','verifyenabled','verifydisabled','verifyreadonly']}
+                                        'tab','waitforelementvisible','mousehover','savefile','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute']}
 
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
 
