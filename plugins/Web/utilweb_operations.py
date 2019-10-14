@@ -851,11 +851,11 @@ class UtilWebKeywords:
         return status,methodoutput,output,err_msg
 
     def get_attribute_value(self,webelement,input,*args):
-        status = TEST_RESULT_FAIL
-        methodoutput = TEST_RESULT_FALSE
-        err_msg = None
-        output = OUTPUT_CONSTANT
-        attr_name = input[0]
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=None
+        attr_name=input[0]
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement != None and webelement !='':
@@ -867,7 +867,7 @@ class UtilWebKeywords:
                     else:
                         output = browser_Keywords.local_bk.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
                     if output != None and output !='':
-                        logger.print_on_console('Result: ',output)
+                        logger.print_on_console('Output: ',output)
                         status = TEST_RESULT_PASS
                         methodoutput = TEST_RESULT_TRUE
                     else:
@@ -875,7 +875,7 @@ class UtilWebKeywords:
                         logger.print_on_console(err_msg)
                         local_uo.log.error(err_msg)
                 else:
-                    err_msg = 'Failed to fetch the attribute value/Input value exceeded'
+                    err_msg = 'Failed to fetch the attribute value/Number of inputs exceeded'
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
         except Exception as e:
@@ -885,11 +885,11 @@ class UtilWebKeywords:
         return status,methodoutput,output,err_msg
 
     def verify_attribute(self,webelement,input,*args):
-        status = TEST_RESULT_FAIL
-        methodoutput = TEST_RESULT_FALSE
-        err_msg = None
-        output = OUTPUT_CONSTANT
-        attr_name = input[0]
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        attr_name=input[0]
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement != None and webelement !='':
@@ -923,7 +923,7 @@ class UtilWebKeywords:
                         logger.print_on_console(err_msg)
                         local_uo.log.error(err_msg)
                 else:
-                    err_msg = 'Input is empty/Input value exceeded'
+                    err_msg = 'Input is empty/Number of inputs exceeded'
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
         except NoSuchAttributeException as ex:
