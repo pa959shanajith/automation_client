@@ -203,6 +203,8 @@ class DesktopDispatcher:
             import iris_operations
             iris_object = iris_operations.IRISKeywords()
             self.desktop_dict['clickiris'] = iris_object.clickiris
+            self.desktop_dict['doubleclickiris'] = iris_object.doubleclickiris
+            self.desktop_dict['rightclickiris'] = iris_object.rightclickiris
             self.desktop_dict['settextiris'] = iris_object.settextiris
             self.desktop_dict['gettextiris'] = iris_object.gettextiris
             self.desktop_dict['getrowcountiris'] = iris_object.getrowcountiris

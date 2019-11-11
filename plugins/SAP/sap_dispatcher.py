@@ -204,6 +204,8 @@ class SAPDispatcher:
                 import iris_operations
                 iris_object = iris_operations.IRISKeywords()
                 self.sap_dict['clickiris'] = iris_object.clickiris
+                self.sap_dict['doubleclickiris'] = iris_object.doubleclickiris
+                self.sap_dict['rightclickiris'] = iris_object.rightclickiris
                 self.sap_dict['settextiris'] = iris_object.settextiris
                 self.sap_dict['gettextiris'] = iris_object.gettextiris
                 self.sap_dict['getrowcountiris'] = iris_object.getrowcountiris

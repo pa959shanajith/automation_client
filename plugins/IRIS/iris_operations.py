@@ -336,6 +336,68 @@ class IRISKeywords():
             logger.print_on_console("Error occurred in clickiris")
         return status,result,value,err_msg
 
+    def doubleclickiris(self,element,*args):
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg=None
+        value = OUTPUT_CONSTANT
+        try:
+            img = None
+            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+                elem_coordinates = element['coordinates']
+                const_coordintes = args[2]['coordinates']
+                elements = [(const_coordintes[0],const_coordintes[1]),
+                        (const_coordintes[2],const_coordintes[3]),
+                        (elem_coordinates[0], elem_coordinates[1]),
+                        (elem_coordinates[2], elem_coordinates[3])]
+                img,res = find_relative_image(elements, verifyexists)
+                width = res[2] - res[0]
+                height = res[3] - res[1]
+                pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
+            else:
+                res = gotoobject(element)
+            if(len(res)>0):
+                pyautogui.doubleClick()
+                status= TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+            else:
+                logger.print_on_console("Object not found")
+        except Exception as e:
+            log.error("Error occurred in doubleclickiris, Err_Msg :",e)
+            logger.print_on_console("Error occurred in doubleclickiris")
+        return status,result,value,err_msg
+
+    def rightclickiris(self,element,*args):
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg=None
+        value = OUTPUT_CONSTANT
+        try:
+            img = None
+            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+                elem_coordinates = element['coordinates']
+                const_coordintes = args[2]['coordinates']
+                elements = [(const_coordintes[0],const_coordintes[1]),
+                        (const_coordintes[2],const_coordintes[3]),
+                        (elem_coordinates[0], elem_coordinates[1]),
+                        (elem_coordinates[2], elem_coordinates[3])]
+                img,res = find_relative_image(elements, verifyexists)
+                width = res[2] - res[0]
+                height = res[3] - res[1]
+                pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
+            else:
+                res = gotoobject(element)
+            if(len(res)>0):
+                pyautogui.rightClick()
+                status= TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+            else:
+                logger.print_on_console("Object not found")
+        except Exception as e:
+            log.error("Error occurred in rightclickiris, Err_Msg :",e)
+            logger.print_on_console("Error occurred in rightclickiris")
+        return status,result,value,err_msg
+
     def settextiris(self,element,*args):
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE

@@ -223,6 +223,8 @@ class Dispatcher:
             import iris_operations
             iris_object = iris_operations.IRISKeywords()
             self.web_dict['clickiris'] = iris_object.clickiris
+            self.web_dict['doubleclickiris'] = iris_object.doubleclickiris
+            self.web_dict['rightclickiris'] = iris_object.rightclickiris
             self.web_dict['settextiris'] = iris_object.settextiris
             self.web_dict['gettextiris'] = iris_object.gettextiris
             self.web_dict['getrowcountiris'] = iris_object.getrowcountiris
@@ -663,7 +665,7 @@ class Dispatcher:
                 import pause_display_operation
                 from itertools import combinations
                 o = pause_display_operation.PauseAndDisplay()
-                inputs={'stepnum':stepnum,'custname':custname} 
+                inputs={'stepnum':stepnum,'custname':custname}
                 o.debug_object(inputs,self.wxObject,self.thread,driver)
                 attributes=driver.execute_script("return JSON.parse(window.localStorage.attributes)")
                 new_ele_type=driver.execute_script("return window.localStorage.element").lower()
