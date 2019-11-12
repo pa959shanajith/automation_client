@@ -25,7 +25,6 @@ import core_utils
 import time
 import win32gui
 import base64
-import traceback
 #-------------------
 cropandaddobj = None
 backend_process = None
