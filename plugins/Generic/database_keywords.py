@@ -93,10 +93,11 @@ class DatabaseOperation():
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
-        value = None
-        err_msg=None
-        details = []
-        cnxn=None
+        data = ""
+        err_msg = None
+        # details = []
+        cnxn = None
+        cursor = None
         try:
 ##            if len(args)>0 :
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
@@ -117,13 +118,11 @@ class DatabaseOperation():
 ##            for row in rows:
 ##                logger.print_on_console(row)
             if cnxn is not None:
-                details.append(ip)
-                details.append(port)
-                details.append(userName)
-                details.append(password)
-                details.append(dbName)
-                details.append(query)
-                details.append(dbtype)
+                cursor = cnxn.cursor()
+                cursor.execute(query)
+                rows = cursor.fetchall()
+                if is_instance(rows,list):
+                    data = str(rows)
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
 ##            else:
@@ -134,42 +133,10 @@ class DatabaseOperation():
             err_msg = 'Database Login failed'
             logger.print_on_console(err_msg)
         finally:
-##            cursor.close()
-            if cnxn!=None:
-                cnxn.close()
-        return status,result,details,err_msg
-
-    def fetchData(self,input_val,*args):
-        value = None
-        if(len(input_val)== 8):
-            try:
-                cnxn = self.connection(input_val[6], input_val[0] , input_val[1] , input_val[4], input_val[2] , input_val[3])
-                import re
-                data = re.findall(r'\[([^]]*)\]',input_val[7])
-                row = data[0]
-                col = data[1]
-                row = int(row)
-                col = int(col)
-                row_no = row - 1
-                col_no = col - 1
-                cursor = cnxn.cursor()
-                cursor.execute(input_val[5])
-                rows = cursor.fetchall()
-                value = rows[row_no][col_no]
-                ##if condition added to fix issue:304-Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
-                ##changes done by jayashree.r
-                if value == None:
-                    value = 'None'
-                log.info('Value obtained :')
-                log.info(value)
-            except Exception as e:
-                log.error(e)
-                err_msg = str(e)
-                logger.print_on_console(err_msg)
-            finally:
-                cursor.close()
-                cnxn.close()
-            return value
+            if cursor is not None: cursor.close()
+            if cnxn is not None: cnxn.close()
+                
+        return status,result,data,err_msg
 
     def secureGetData(self, ip , port , userName , password, dbName, query, dbtype,*args):
         """
@@ -495,11 +462,17 @@ class DatabaseOperation():
         param : database type, IP, port number , database name, username , password , query
         return : connection object
         """
-        dbNumber = {4:'{SQL Server}',5:'{Microdsoft ODBC for Oracle}',2:'{IBM DB2 ODBC DRIVER}'}
+        dbNumber = {4:'{SQL Server}',5:'{Microdsoft ODBC for Oracle}'}#,2:'{IBM DB2 ODBC DRIVER}'}
         err_msg=None
         try:
             dbtype= int(dbtype)
-            self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
+            if dbtype != 2:
+                self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
+            else:
+                import ibm_db
+                cnxn = ibm_db.connect('database=%s;hostname=%s;port=%s;protocol=TCPIP;uid=%s;pwd=%s'%(dbName,ip,port,userName,password), '', '')
+                import ibm_db_dbi
+                self.cnxn = ibm_db_dbi.Connection(cnxn)
             return self.cnxn
         except Exception as e:
             log.error(e)
