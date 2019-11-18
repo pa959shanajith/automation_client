@@ -1151,3 +1151,51 @@ class Dropdown_Keywords():
                 log.error( e )
             #-------------------------------------------------poulating the new martix
             return NewMatrix
+            
+        #to get All values present in the dropdown
+        def getAllValues(self, element, parent, input_val, *args):
+            status = desktop_constants.TEST_RESULT_FAIL
+            result = desktop_constants.TEST_RESULT_FALSE
+            err_msg = None
+            dektop_element = []
+            checkName = ""
+            try:
+                if ( input_val[0] == 'dropdown' and int(input_val[1]) == True ):
+                    input_val = input_val[3:]
+            except :
+                pass
+            try:
+                if element is not None:
+                    log.info('Recieved web element from the web dispatcher')
+                    log.info('element is visible, performing operations')
+                    checkName = element.friendly_class_name()
+                    dektop_element = element.texts()
+                    opt_len = len(dektop_element)
+                    inp_val_len = len(input_val)
+                    log.info('inp_val_len: ')
+                    log.info(inp_val_len)
+                    temp = []
+                    if (checkName == 'ComboBox' or checkName == 'ListView'):
+                        for x in range(1,opt_len):
+                            internal_val = dektop_element[x]
+                            temp.append(internal_val)
+                    elif(checkName == 'ListBox'):
+                        for x in range(0,opt_len):
+                            internal_val = dektop_element[x].item_texts
+                            temp.append(internal_val)
+                    output=temp
+                    if(len(output) != 0 ):
+                        status = desktop_constants.TEST_RESULT_PASS
+                        result = desktop_constants.TEST_RESULT_TRUE
+                    else:
+                        err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                        logger.print_on_console(err_msg)
+                        log.error(err_msg)
+                else:
+                    err_msg='No Desktop element found'
+                    log.error(err_msg)
+                    logger.print_on_console(err_msg)
+            except Exception as e:
+                log.error(e)
+                logger.print_on_console(e)
+            return status, result, output, err_msg
