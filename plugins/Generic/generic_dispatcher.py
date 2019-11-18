@@ -143,6 +143,16 @@ class GenericKeywordDispatcher:
             'readxml': local_generic.generic_word.readxml,
             'readpdf': local_generic.generic_word.readPdf,
             'getkeyvalue': local_generic.json_oper.get_key_value
+            #adding the new Xml Keywords and JSON on 11/12/2019 to support the xml version-1.0.
+            'xmlfileread': local_generic.xml_oper.xmlfileread,
+            'xmlgetroot': local_generic.xml_oper.getroot,
+            'xmlgetattribute': local_generic.xml_oper.getelement_attribute,
+            'xmlgettag': local_generic.xml_oper.getelement_tag,
+            'xmlfindall': local_generic.xml_oper.findall,
+            'xmlfindelement': local_generic.xml_oper.find_element,
+            'xmlgetelementtext': local_generic.xml_oper.get_elements_text,
+            'xmlnestedoperation': local_generic.xml_oper.nestedxml_operation,
+            'json_fileread': local_generic.json_oper.jsonfile_read
             }
 	#Call to fetch data in database keywords
     def fetch_data(self,input):

@@ -9,6 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
+import xml
 import xml.etree.ElementTree as ET
 import ast
 import logger
@@ -21,6 +22,316 @@ from constants import *
 from lxml import etree
 log = logging.getLogger('xml_operations.py')
 class XMLOperations():
+
+    def __init__(self):
+        self.xmlfile=None
+        self.xmlroot=None
+        
+    def xmlfileread(self,xml_file):
+        #reading the xml file and saving in object.
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+        if os.path.exists(xml_file)!=False:
+            log.info("Specified Path Exists")
+            fileName,file_ext=os.path.splitext(xml_file)
+            logger.print_on_console("Checking the file extension")
+            if file_ext.lower().find('.xml')!=-1:
+                logger.print_on_console("File Extension found True")
+                self.xmlfile = ET.parse(xml_file)
+                output=self.xmlfile
+                status = TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+                logger.print_on_console("XML file reading success")
+            else:
+                log.debug("File Extension Found False")
+                logger.print_on_console("File Extension is not '.xml'")
+        else:
+            log.info("Specified Path not exists")
+            logger.print_on_console("Specified Path not exists")
+
+        except Exception as e:
+            log.error(e)
+            err_msg = generic_constants.INVALID_INPUT
+        if err_msg != None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        
+        return  status, result, output, err_msg
+        
+    def xmlreadfromstring(self,xml_string):
+        # reading the xml from string
+        pass
+        
+    def getroot(self):
+        #Getting the xml file root and print the root name:
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            if self.xmlfile!=None or self.xmlfile!='':
+                log.info("xmlfile not found empty")
+                self.xmlroot=self.xmlfile.getroot()
+                output=self.xmlroot
+                status = TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+                logger.print_on_console("Root found and Value is {}".format(self.xmlroot.tag))
+            else:
+                log.debug("Xmlfile data read found empty")
+                logger.print_on_console("Not Found Proper XML Data")
+
+        except Exception as e:
+            log.error(e)
+            err_msg = generic_constants.INVALID_INPUT
+        if err_msg != None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        
+        return  status, result, output, err_msg
+ 
+    def getelement_attribute(self,root,elementname):
+        #getting the attribute of the node
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        list_attribute=None
+        try:
+            if type(root).find("<class 'xml.etree.ElementTree")!=-1:
+                if elementname!=None or elementname!='':
+                    #finding the attribute of the specified element.
+                    log.debug("finding the attribute of element {}".format(elementname))
+                    list_attribute = [child.attrib for child in root.iter(elementname)]
+                    log.debug("Assign the output with list attribute")
+                    output=list_attribute
+                    logger.print_on_console("Found list of attributes {} for the element {}".format(output,elementname))
+                    status = TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
+                else:
+                    #logging the error  
+                    log.info("Please provide the proper element")
+                    logger.print_on_console("Please provide the proper element")
+            else:
+                log.debug("Please Provide the Root element")
+                logger.print_on_console("Please Provide the Root element")
+                
+        except Exception as e:
+            log.error(e)
+            err_msg = generic_constants.INVALID_INPUT
+        if err_msg != None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        
+        return  status, result, output, err_msg
+        
+    def getelement_tag(self,root,elementname):
+        #getting the tag of the node
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        list_tag = None
+        try:
+            if type(root).find("<class 'xml.etree.ElementTree")!=-1:
+                if elementname!=None or elementname!='':
+                    #finding the attribute of the specified element.
+                    log.debug("finding the attribute of element {}".format(elementname))
+                    list_tag = [child_tag for child in root.iter(elementname)]  
+                    log.debug("Assign the ouput with listtag")
+                    output=list_tag
+                    logger.print_on_console("Found the list of tags {} for the element {}".format(output,elementname))
+                    status = TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
+                else:
+                    #logging the error  
+                    log.info("Please provide the proper element")
+                    logger.print_on_console("Please provide the proper element")
+                    
+            else:
+                log.debug("Please Provide the Root element")
+                logger.print_on_console("Please Provide the Root element")
+                
+        except Exception as e:
+            log.error(e)
+            err_msg = generic_constants.INVALID_INPUT
+        if err_msg != None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        
+        return  status, result, output, err_msg
+    
+    def findall(self,root,elementname):
+        #finding all the elements of the node
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        findall_list = []
+        try:
+            if type(root).find("<class 'xml.etree.ElementTree")!=-1::
+                if elementname!=None or elementname!='':
+                    finddict = {}
+                    log.debug("Finding tag,attribute,text of the element {} ".format(elementname))
+                    for each_child in root.iter(elementname)
+                        if elementname not in finddict.keys():
+                            finddict[elementname.tag] = [each_child.tag,each_child.attrib,each_child.text]
+                        else:
+                            finddict[elementname.tag].append([each_child.tag,each_child.attrib,each_child.text])
+                    log.debug("Collected all the values of the element {}".format(elementname))
+                    logger.print_on_console("Collected Values of the element {}".format(finddict))
+                    output=finddict
+                    logger.print_on_console("Find all the values of the element {}".format(output))
+                else:
+                    findall_list = [[] for each_child in root.iter() for each_element in each_child.iter()]
+                    #logg for element not found.
+                    log.debug("Provided Element not Found")
+                    logger.print_on_console("Please Provide the Valid Element")
+                    
+            else:
+                #logg for root element not found.
+                log.debug("Root Element not provided")
+                logger.print_on_console("Please Provide the root element")
+  
+        except Exception as e:
+            log.error(e)
+            err_msg = generic_constants.INVALID_INPUT
+        if err_msg != None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        
+        return  status, result, output, err_msg
+        
+    def find_element(self,root,elementname):
+    
+        #finding the elements of the node
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        elementname_list = None:
+        try:
+            if type(root).find("<class 'xml.etree.ElementTree")!=-1:
+                if elementname!=None or elementname!='':
+                    log.info("finding the elements of the specified element")
+                    elementname_list=[each_child.tag for each_element in root.iter(elementname) for each_child in each_element.iter()]
+                    output = elementname_list
+                    log.debug("Found elements {} for the provided element {}".format(elementname_list,elementname))
+                    logger.print_on_console("Result Obtined for the element {} : {}".format(elementname,elementname_list))
+                
+                else:
+                    log.debug("Please Provide the Element to find")
+                    logger.print_on_console("Please Provide the element to find")
+                    
+            else:
+                log.debug("Please provide the root element")
+                logger.print_on_console("Please Provided the root element")
+                
+        except Exception as e:
+            log.error(e)
+            err_msg = generic_constants.INVALID_INPUT
+        if err_msg != None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        
+        return  status, result, output, err_msg
+
+    def get_elements_text(self,root,elementname):
+        #getting the elements text
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        element_text = None
+        try:
+            if type(root).find("<class 'xml.etree.ElementTree")!=-1:
+                if elementname!=None or elementname!='':
+                    #looping to get the all the text of specified element.
+                    log.info("Finding the provided elements text")
+                    element_text= [(child.find(elementname).text,child.find(elementname).tail) for child in root.iter() if child.find(elementname)!=None]
+                    output=element_text
+                    status = TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
+                    logger.print_on_console("Result Obtined for the provided element {}".format(output))
+                    
+                else:
+                    log.debug("Element not specified")
+                    logger.print_on_console("Element not Provided")
+            else:
+                log.debug("root element not specified")
+                logger.print_on_console("root element not specified")
+
+        except Exception as e:
+            log.error(e)
+            err_msg = generic_constants.INVALID_INPUT
+        if err_msg != None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        
+        return  status, result, output, err_msg   
+        
+    def nested_looping(self,root,elementname,result_dict):
+        #looping to find the elements and attribute of elements.
+        if elementname!=None or elementname!='':
+            for each_element in root.findall(elementname)[:int(depth)]:
+                for each_child in each_element.iter():
+                    if each_element not in result_dict.keys():
+                        result_dict[each_element] = {}
+                    else:
+                        result_dict[each_element].update({each_child.tag:[each_child.attrib,each_child.text]})
+            
+        else:
+        
+            for each_element in root[:int(depth)]:
+                for each_child in each_element.iter():
+                    if each_element not in result_dict.keys():
+                        result_dict[each_element] = {}
+                    else:
+                        result_dict[each_element].update({each_child.tag:[each_child.attrib,each_child.text]})
+        
+        return result_dict
+ 
+    def nestedxml_operation(self,root,elementname,depth):
+    
+        # Nested XML Operation: if the elementname and depth given, get the child elements tag,attribute,text.
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        result_dict={}
+        try:
+            if type(root).find("<class 'xml.etree.ElementTree")!=-1:
+                if elementname!=None or elementname!='':
+                    if int(depth)>0:
+                        result_dict=self.nested_looping(root,elementname,depth,result_dict)        
+                    elif depth==0:
+                        result_dict=self.nested_looping(root,elementname,-1,result_dict)
+                    else:
+                        #log for to mention the depth
+                        log.debug("Please Provide the depth for Iter")
+                elif elementname=='' or elementname==None:
+                    if int(depth)>0:
+                        result_dict=self.nested_looping(root,None,depth,result_dict)        
+                    elif depth==0:
+                        result_dict=self.nested_looping(root,None,-1,result_dict)
+                    else:
+                        #log for to mention the depth
+                        log.debug("Please Provide the depth for Iter")
+                    
+                log.debug("Result {}".format(result_dict))
+                output=result_dict
+                logger.print_on_console("Result Obtined : {}".format(output)
+
+        except Exception as e:
+            log.error(e)
+            err_msg = generic_constants.INVALID_INPUT
+        if err_msg != None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        
+        return  status, result, output, err_msg
 
     def build_dict(self,json_obj):
      keys={}
@@ -151,10 +462,6 @@ class XMLOperations():
                     log.info(STATUS_METHODOUTPUT_UPDATE)
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
-
-
-
-
 
         except Exception as e:
             log.error(e)
@@ -530,3 +837,42 @@ class JSONOperations():
             log.error(e)
 ##        key_value=key_value.encode('utf-8')
         return status,methodoutput,key_value,err_msg
+    
+    def jsonfile_read(self,json_file):
+        #reading the JSON File.
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        key_value=None
+        exception_json=None
+        err_msg=None
+        output=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if json_file!='' or json_file!=None:
+                if os.path.exists(json_file)!=False:
+                    fileName,file_ext=os.path.splitext(xml_file)
+                    if file_ext.lower().find('.json')!=-1:
+                        with open(json_file) as json_read:
+                            output=str(json.load(json_read))
+                            status = TEST_RESULT_PASS
+                            result = TEST_RESULT_TRUE
+                            logger.print_on_console("Result Obtined:".format(output))
+                    else:
+                        log.debug("File extension not json")
+                        logger.print_on_console("File extension not json")
+                        
+                else:
+                    log.debug("File Not Found in the specified Location")
+                    logger.print_on_console("File Not Found in the specified Location")
+            else:
+                log.info("Please Mention the Json File Path")
+                logger.print_on_console("Please Mention the Json File Path")
+
+        except Exception as e:
+            log.error(e)
+            err_msg = generic_constants.INVALID_INPUT
+        if err_msg != None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        
+        return  status, result, output, err_msg
