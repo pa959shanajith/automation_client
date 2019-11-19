@@ -139,7 +139,7 @@ class XMLOperations():
                 if elementname!=None or elementname!='':
                     #finding the attribute of the specified element.
                     log.debug("finding the attribute of element {}".format(elementname))
-                    list_tag = [child_tag for child in root.iter(elementname)]  
+                    list_tag = [child.tag for child in root.iter(elementname)]
                     log.debug("Assign the ouput with listtag")
                     output=list_tag
                     logger.print_on_console("Found the list of tags {} for the element {}".format(output,elementname))
@@ -272,7 +272,7 @@ class XMLOperations():
         
         return  status, result, output, err_msg   
         
-    def nested_looping(self,root,elementname,result_dict):
+    def nested_looping(self,root,elementname,depth,result_dict):
         #looping to find the elements and attribute of elements.
         if elementname!=None or elementname!='':
             for each_element in root.findall(elementname)[:int(depth)]:
