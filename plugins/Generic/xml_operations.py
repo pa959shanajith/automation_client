@@ -30,7 +30,7 @@ class XMLOperations():
             if os.path.exists(input_string):
             
                 filename,file_ext = os.path.splitext(input_string)
-                print (file_ext.find('.json'))
+                
                 if file_ext.find('.xml')!=-1:
                     tree = ET.parse(input_string)
                     input_string = ElementTree.tostring(tree.getroot()).decode('utf8')
