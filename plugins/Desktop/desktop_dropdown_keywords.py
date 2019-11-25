@@ -595,10 +595,45 @@ class Dropdown_Keywords():
                 logger.print_on_console( err_msg )
             return status, result, verb, err_msg
 
+        def getAllValues(self, element, parent, input_val, *args):
+            status = desktop_constants.TEST_RESULT_FAIL
+            result = desktop_constants.TEST_RESULT_FALSE
+            err_msg = None
+            dektop_element = []
+            checkName = None
+            try:
+                if (element is not None ):
+                    checkName = element.friendly_class_name()
+                    dektop_element = element.texts()
+                    opt_len = len(dektop_element)
+                    output = []
+                    if (checkName == 'ComboBox' or checkName == 'ListView'):
+                        for x in range(1,opt_len):
+                            internal_val = dektop_element[x]
+                            output.append(internal_val)
+                    elif(checkName == 'ListBox'):
+                        for x in range(0,opt_len):
+                            internal_val = dektop_element[x].item_texts
+                            output.append(internal_val)
+                    if(len(output) != 0 ):
+                        status = desktop_constants.TEST_RESULT_PASS
+                        result = desktop_constants.TEST_RESULT_TRUE
+                    else:
+                        err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                        logger.print_on_console(err_msg)
+                        log.error(err_msg)
+                else:
+                    err_msg='No Desktop element found'
+                    log.error(err_msg)
+                    logger.print_on_console(err_msg)
+            except Exception as e:
+                log.error(e)
+                logger.print_on_console(e)
+            return status, result, output, err_msg
 
         def verifyAllValues(self, element, parent, input_val, *args):
             try:
-                if ( input_val[0] == 'dropdown' and int(input_val[1]) == True ):         #to check is object is custom dropdown
+                if ( input_val[0] == 'dropdown' and int(input_val[2]) == True ):         #to check is object is custom dropdown
                     input_val = input_val[3:]                                #if custom then populate list from 4th element
             except :
                 pass
@@ -607,7 +642,7 @@ class Dropdown_Keywords():
             verb = OUTPUT_CONSTANT
             err_msg = None
             items = []
-            checkName = ""
+            checkName = None
             try:
                dektop_element = element
                verify_obj = Text_Box()
@@ -683,7 +718,7 @@ class Dropdown_Keywords():
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                         else:
-                            err_msg = 'Element not present on the page where operation is trying to be performed'
+                            err_msg = 'Given Value does not exist in the list'
                             log.info( err_msg )
                             logger.print_on_console( err_msg )
                     #==============================================================
@@ -702,30 +737,24 @@ class Dropdown_Keywords():
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                             else:
-                                err_msg = 'Element not present on the page where operation is trying to be performed'
+                                err_msg = 'Given Value does not exist in the list'
                                 log.info( err_msg )
                                 logger.print_on_console( err_msg )
 
                         if ( checkName == 'ListView' ):
+                             flag = False
+                             itemtextlist = []
                              items = list(element.items())
-                             elelist = element.texts()
-                             elelist.pop(0)
-                             newlist = []
-                             items_list = input_val
-                             flag1 = False
-                             for i in range(0, len(items)):
-                                    newlist.append(elelist[i])
-                                    for i in range(0, len(items_list)):
-                                        if ( items_list[i] not in newlist ):
-                                            flag1 = True
-                                            break
-                                    if(flag1 == True):
-                                        break
-                             if(flag1 == False):
+                             for i in items: itemtextlist.append(i.text())
+                             for ele in input_val:
+                                if (ele not in itemtextlist):
+                                    flag = True
+                                    break
+                             if(flag == False):
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                              else:
-                                err_msg = 'Element not present on the page where operation is trying to be performed'
+                                err_msg = 'Given Value does not exist in the list'
                                 log.info( err_msg )
                                 logger.print_on_console( err_msg )
                     #=================================================================
@@ -1151,51 +1180,3 @@ class Dropdown_Keywords():
                 log.error( e )
             #-------------------------------------------------poulating the new martix
             return NewMatrix
-            
-        #to get All values present in the dropdown
-        def getAllValues(self, element, parent, input_val, *args):
-            status = desktop_constants.TEST_RESULT_FAIL
-            result = desktop_constants.TEST_RESULT_FALSE
-            err_msg = None
-            dektop_element = []
-            checkName = ""
-            try:
-                if ( input_val[0] == 'dropdown' and int(input_val[1]) == True ):
-                    input_val = input_val[3:]
-            except :
-                pass
-            try:
-                if element is not None:
-                    log.info('Recieved web element from the web dispatcher')
-                    log.info('element is visible, performing operations')
-                    checkName = element.friendly_class_name()
-                    dektop_element = element.texts()
-                    opt_len = len(dektop_element)
-                    inp_val_len = len(input_val)
-                    log.info('inp_val_len: ')
-                    log.info(inp_val_len)
-                    temp = []
-                    if (checkName == 'ComboBox' or checkName == 'ListView'):
-                        for x in range(1,opt_len):
-                            internal_val = dektop_element[x]
-                            temp.append(internal_val)
-                    elif(checkName == 'ListBox'):
-                        for x in range(0,opt_len):
-                            internal_val = dektop_element[x].item_texts
-                            temp.append(internal_val)
-                    output=temp
-                    if(len(output) != 0 ):
-                        status = desktop_constants.TEST_RESULT_PASS
-                        result = desktop_constants.TEST_RESULT_TRUE
-                    else:
-                        err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                        logger.print_on_console(err_msg)
-                        log.error(err_msg)
-                else:
-                    err_msg='No Desktop element found'
-                    log.error(err_msg)
-                    logger.print_on_console(err_msg)
-            except Exception as e:
-                log.error(e)
-                logger.print_on_console(e)
-            return status, result, output, err_msg
