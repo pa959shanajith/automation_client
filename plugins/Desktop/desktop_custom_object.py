@@ -148,6 +148,9 @@ class CustomObjectHandler():
                          elif ( tag == 'Table' ):
                             tag = 'table'
                             text = str(text) + '_table'
+                         elif ( tag == 'TreeView' ):
+                            tag = 'tree'
+                            text = str(text) + '_tree'
                          else:
                             tag = 'label'
                             if ( not isinstance(text, str) ):

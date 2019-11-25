@@ -395,14 +395,25 @@ class Tree_View_Keywords():
         err_msg = None
         flag = False
         tree_elm = ''
-        slash = '\\'
+        #-----------------------custom element check
+        """Following operations need to be performed for custom:
+        1.Check is input is > 3
+        2.Check if input_val[0] is a tree object type
+        3.Check if input type of inputval[1] is an integer
+        4.If above conditions are matched then object is a custom object of tree type at position input_val[1] from parent object
+        5.Since inputs start from the 4th input_val assign these values to a variable and proceed"""
+        if ( len(input_val) > 3 and (input_val[0]).lower()=='tree' and type(input_val[2])==int):
+            input_val = input_val[3:]
+            log.info('Custom object of type "tree" with input : ' + str(input_val))
+        #-------------------------------------------
+
         if ( len(input_val) == 1 ):
             if ( input_val[0] == '' ):
                 flag = True
         else:
 ##            input_val=input_val[0]
             #------------------------------------------------ replacing ";" with "\\"
-            input_val = slash.join(input_val)
+            input_val = '\\'.join(input_val)
 ##            if "\\" in input_val:
 ##                input_val=string.replace(input_val ,'\\','\ ')
             input_val = "\\" + input_val
@@ -577,6 +588,17 @@ class Tree_View_Keywords():
         err_msg = None
         flag = False
         try:
+            #-----------------------custom element check
+            """Following operations need to be performed for custom:
+            1.Check is input is > 3
+            2.Check if input_val[0] is a tree object type
+            3.Check if input type of inputval[1] is an integer
+            4.If above conditions are matched then object is a custom object of tree type at position input_val[1] from parent object
+            5.Since inputs start from the 4th input_val assign these values to a variable and proceed"""
+            if ( len(input_val) > 3 and (input_val[0]).lower()=='tree' and type(input_val[2])==int):
+                input_val = input_val[3:]
+                log.info('Custom object of type "tree" with input : ' + str(input_val))
+            #-------------------------------------------
             if ( desktop_launch_keywords.window_name != None ):
                 verify_obj = Text_Box()
                 log.info( 'Recieved element from the desktop dispatcher' )
