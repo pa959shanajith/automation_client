@@ -602,18 +602,19 @@ class Dropdown_Keywords():
             dektop_element = []
             checkName = None
             try:
+                if ( input_val[0] == 'dropdown' and int(input_val[1]) == True ):
+                    input_val = input_val[3:]
+            except :
+                pass
+            try:
                 if (element is not None ):
                     checkName = element.friendly_class_name()
                     dektop_element = element.texts()
                     opt_len = len(dektop_element)
                     output = []
-                    if (checkName == 'ComboBox' or checkName == 'ListView'):
+                    if (checkName == 'ComboBox' or checkName == 'ListView' or checkName == 'ListBox'):
                         for x in range(1,opt_len):
                             internal_val = dektop_element[x]
-                            output.append(internal_val)
-                    elif(checkName == 'ListBox'):
-                        for x in range(0,opt_len):
-                            internal_val = dektop_element[x].item_texts
                             output.append(internal_val)
                     if(len(output) != 0 ):
                         status = desktop_constants.TEST_RESULT_PASS
