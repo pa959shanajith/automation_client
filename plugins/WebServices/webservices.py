@@ -346,8 +346,10 @@ class WSkeywords:
             #added status code
             self.baseResHeader['StatusCode']=response.status_code
             log.info(ws_constants.RESPONSE_HEADER+'\n'+str(self.baseResHeader))
-            #resp_content = response.content.decode("utf-8") if (type(response.content)==bytes) else response.content
-            self.baseResBody=str(response.content).replace("&gt;",">").replace("&lt;","<")
+            brb=response.content
+            if (type(brb)==bytes):brb = brb.decode('utf8') #convertes bytes to string
+            brb = brb.translate(str.maketrans('', '', ''.join([chr(char) for char in range(1, 32)])))#removes escape sequences if any
+            self.baseResBody=str(brb).replace("&gt;",">").replace("&lt;","<")
             log.info(ws_constants.RESPONSE_BODY+'\n'+str(self.baseResBody))
             log.debug(STATUS_METHODOUTPUT_UPDATE)
             status = ws_constants.TEST_RESULT_PASS
