@@ -491,7 +491,8 @@ class Controller():
                 if self.core_utilsobject.getdatasize(display_keyword_response[1],'mb') < 10:
                     from bs4 import BeautifulSoup
                     if 'soap:Envelope' in display_keyword_response[1]:
-                        root = BeautifulSoup(display_keyword_response[1][2:-1], "xml").prettify()
+                        #root = BeautifulSoup(display_keyword_response[1][2:-1], "xml").prettify()
+                        root = BeautifulSoup(display_keyword_response[1], "xml").prettify()
                         respBody = root.replace("\n",' ')
                         logger.print_on_console('Response Body: \n',respBody,'\n')
                     else:
