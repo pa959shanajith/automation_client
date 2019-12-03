@@ -185,6 +185,60 @@ class Launch_Keywords():
             logger.print_on_console( "Error occured in ToolbarActions" )
         return status,result,value,err_msg
 
+    def selectMenu(self, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        flag=False
+        try:
+            ses, wnd = self.getSessWindow()
+            if ( ses and wnd ):
+                wndId =  wnd.__getattr__('id')
+                mbar_action = wndId +'/mbar'
+                mbar = ses.FindById(mbar_action) #get the window id from getSessWindow and append /mbar
+                global index,flag1,flag2
+                index = 0
+                flag1 = flag2 =  False
+                def menuSelector(fobj):
+                    global index,flag1,flag2
+                    try:
+                        for i in list(fobj.Children):
+                            if( i.Name != input_val[index] ):
+                                flag1 = False
+                            elif( i.Name == input_val[index] ):
+                                log.debug("Selecting menu item : ",i.Name)
+                                i.Select()
+                                flag1 = True
+                                index = index + 1
+                                if ( index < len(input_val) ):
+                                    menuSelector(i)
+                                else:
+                                    flag2 = True
+                                    break
+                            if( flag2 ):
+                                break
+                    except Exception as e:
+                        err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+                        log.error( err_msg )
+                menuSelector(mbar)
+                if ( flag1 == True and flag2 == True ):
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                elif( flag1 != False ):
+                    err_msg = "Unable to find the menu item"
+            else:
+                err_msg = sap_constants.SESSION_AND_WINDOW_ERROR
+            #-----------------------------------logging
+            if ( err_msg ):
+                log.info( err_msg)
+                logger.print_on_console ( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in SelectMenu" )
+        return status,result,value,err_msg
+
     def launch_application(self, input_val, *args):
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE

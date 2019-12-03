@@ -48,6 +48,7 @@ class SAPDispatcher:
             'getpopuptext' : launch_keywords_obj.getPopUpText,
             'geterrormessage' : launch_keywords_obj.getErrorMessage,
             'toolbaraction' : launch_keywords_obj.toolbar_actions,
+            'selectmenu': launch_keywords_obj.selectMenu,
             #------------------------------------------------------textbox keywords
             'settext' : editable_text_obj.setText,
             'setsecuretext' : editable_text_obj.setSecureText,
@@ -216,7 +217,7 @@ class SAPDispatcher:
 
             keyword = keyword.lower()
             if ( keyword in list(self.sap_dict.keys()) ):
-                if ( keyword == 'serverconnect' or keyword == 'launchapplication' or keyword == 'starttransaction' or keyword == 'toolbaraction' ):
+                if ( keyword == 'serverconnect' or keyword == 'launchapplication' or keyword == 'starttransaction' or keyword == 'toolbaraction' or keyword == 'selectmenu'):
                     result= self.sap_dict[keyword](input, output)
                 else:
                     if ( teststepproperty.cord != None and teststepproperty.cord != '' ):
