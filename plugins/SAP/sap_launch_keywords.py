@@ -75,7 +75,7 @@ class Launch_Keywords():
             logger.print_on_console( sap_constants.NO_INSTANCE_OPEN_ERROR )
         return ses, wnd
 
-    def getErrorMessage(self, *args):
+    def getStatusBarMessage(self, *args):
         #time.sleep(2)
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -89,7 +89,7 @@ class Launch_Keywords():
                 sbar = ses.FindById(sbarId)
                 value = sbar.FindByName("pane[0]", "GuiStatusPane").text
                 if value == '' or value == None:
-                    err_msg = "Empty text in error message"
+                    err_msg = "Empty text in status bar message"
                 status = sap_constants.TEST_RESULT_PASS
                 result = sap_constants.TEST_RESULT_TRUE
             else:
@@ -101,7 +101,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in getErrorMessage" )
+            logger.print_on_console( "Error occured in getStatusBarMessage" )
         return status, result, value, err_msg
 
     def startTransaction(self, input_val, *args):

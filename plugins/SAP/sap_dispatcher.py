@@ -46,7 +46,7 @@ class SAPDispatcher:
             'starttransaction' : launch_keywords_obj.startTransaction,
             'serverconnect' : launch_keywords_obj.serverConnect,
             'getpopuptext' : launch_keywords_obj.getPopUpText,
-            'geterrormessage' : launch_keywords_obj.getErrorMessage,
+            'getstatusbarmessage' : launch_keywords_obj.getStatusBarMessage,
             'toolbaraction' : launch_keywords_obj.toolbar_actions,
             'selectmenu': launch_keywords_obj.selectMenu,
             #------------------------------------------------------textbox keywords
