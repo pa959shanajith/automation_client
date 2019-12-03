@@ -220,7 +220,6 @@ class Launch_Keywords():
                                 break
                     except Exception as e:
                         err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
-                        log.error( err_msg )
                 menuSelector(mbar)
                 if ( flag1 == True and flag2 == True ):
                     status = sap_constants.TEST_RESULT_PASS
