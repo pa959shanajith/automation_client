@@ -657,7 +657,7 @@ class Dispatcher:
                 err_msg=WEB_ELEMENT_NOT_FOUND
                 logger.print_on_console(err_msg)
                 local_Wd.log.error(err_msg)
-                configvalues = readconfig.configvalues
+        configvalues = readconfig.configvalues
         if((webElement==None or webElement== '') and configvalues['extn_enabled'].lower() == 'yes' and self.action=='debug' and isinstance(driver, webdriver.Chrome)):
             try:
                 flag=True
