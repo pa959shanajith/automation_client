@@ -36,8 +36,13 @@ from ehllapi_keywords import EhllapiKeywords
 from encryption_utility import AESCipher
 import logger
 import logging
+import subprocess
 
 log = logging.getLogger('mainframe_keywords.py')
+
+#added the below code for the bug:FHN#1982
+NINETEEN68_HOME = os.environ["NINETEEN68_HOME"]
+mainframe_api=NINETEEN68_HOME+"plugins/Mainframe/nineteen68MFapi.exe"
 
 class MainframeKeywords:
 
@@ -101,6 +106,7 @@ class MainframeKeywords:
                     elif self.emulator_type == MAINFRAME_BLUEZONE:
                         result,output,err_msg =  self.bluezone_object.launch_mainframe(self.emulator_path, self.emulator_type)
                         if output == "x86":
+                            subprocess.Popen(mainframe_api, cwd = os.path.dirname(mainframe_api))
                             self.bluezone_object = BluezoneAPIKeywords()
                             result,output,err_msg =  self.bluezone_object.launch_mainframe(self.emulator_path, self.emulator_type)
                             if result == False:
