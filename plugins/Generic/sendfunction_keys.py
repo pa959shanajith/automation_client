@@ -17,17 +17,11 @@ import logger
 
 import time
 from constants import *
-
 import logging
-
 import readconfig
-<<<<<<< HEAD
-=======
-
 configvalues = readconfig.readConfig().readJson()
 #print (configvalues)
 delay_stringinput = float(configvalues['delay_stringinput'])
->>>>>>> c6b64d9bfe04e79f7f90e02ff479367916d36895
 
 configvalues = readconfig.readConfig().readJson()
 #print (configvalues)

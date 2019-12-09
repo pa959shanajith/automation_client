@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #-------------------------------------------------------------------------------
 # Name:        mainframe_keywords.py
 # Purpose:     To automate Mainframe keywords
