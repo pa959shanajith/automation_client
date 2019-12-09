@@ -21,6 +21,13 @@ from constants import *
 import logging
 
 import readconfig
+<<<<<<< HEAD
+=======
+
+configvalues = readconfig.readConfig().readJson()
+#print (configvalues)
+delay_stringinput = float(configvalues['delay_stringinput'])
+>>>>>>> c6b64d9bfe04e79f7f90e02ff479367916d36895
 
 configvalues = readconfig.readConfig().readJson()
 #print (configvalues)
@@ -71,7 +78,7 @@ class SendFunctionKeys:
                 count=self.get_args(args)
                 if count == 'type':
                     log.debug('sending the keys in input')
-                    self.type(input)
+                    self.type(input,delay_stringinput)
                 else:
                     if '+' in input:
                         keys_list=input.split('+')
