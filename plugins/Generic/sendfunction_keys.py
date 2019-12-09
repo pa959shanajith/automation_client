@@ -20,7 +20,18 @@ from constants import *
 
 import logging
 
+import readconfig
+<<<<<<< HEAD
+=======
 
+configvalues = readconfig.readConfig().readJson()
+#print (configvalues)
+delay_stringinput = float(configvalues['delay_stringinput'])
+>>>>>>> c6b64d9bfe04e79f7f90e02ff479367916d36895
+
+configvalues = readconfig.readConfig().readJson()
+#print (configvalues)
+delay_stringinput = float(configvalues['delay_stringinput'])
 log = logging.getLogger('sendfunction_keys.py')
 class SendFunctionKeys:
 
@@ -67,7 +78,7 @@ class SendFunctionKeys:
                 count=self.get_args(args)
                 if count == 'type':
                     log.debug('sending the keys in input')
-                    self.type(input)
+                    self.type(input,delay_stringinput)
                 else:
                     if '+' in input:
                         keys_list=input.split('+')
@@ -92,7 +103,7 @@ class SendFunctionKeys:
         return status,methodoutput,output_res,err_msg
 
     def execute_key(self,key,count):
-        for x in range(count):
+        for x in range(len([count])):
             robot=Robot()
             log.debug('press and release the key', key)
             robot.press_and_release(key)
@@ -106,10 +117,10 @@ class SendFunctionKeys:
 
 
 
-    def type(self,input):
+    def type(self,input,delay_stringinput=0.005):
         try:
             robot=Robot()
-            robot.type_string(str(input),1)
+            robot.type_string(str(input),delay_stringinput)
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
