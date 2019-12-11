@@ -49,6 +49,7 @@ class SAPDispatcher:
             'getstatusbarmessage' : launch_keywords_obj.getStatusBarMessage,
             'toolbaraction' : launch_keywords_obj.toolbar_actions,
             'selectmenu': launch_keywords_obj.selectMenu,
+            'doubleclickstatusbar': launch_keywords_obj.doubleClickStatusBar,
             #------------------------------------------------------textbox keywords
             'settext' : editable_text_obj.setText,
             'setsecuretext' : editable_text_obj.setSecureText,
